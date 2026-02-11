@@ -7,19 +7,22 @@
 
   <xsl:template match="/">
 
+    <!-- Component-scoped stylesheet -->
+    <link rel="stylesheet" href="/assets/rbccm/css/sub/test/imagine-2025.css"/>
+
     <section class="rbccm-testimonials" aria-label="Client Testimonials">
       <!-- Inline styles: background color + CSS var for ::after bg image -->
       <xsl:attribute name="style">
         <!-- optional background color -->
-        <xsl:if test="/Properties/Datum[@ID='Background'] != ''">
+        <xsl:if test="//Properties/Datum[@ID='Background'] != ''">
           <xsl:text>background-color:</xsl:text>
-          <xsl:value-of select="/Properties/Datum[@ID='Background']"/>
+          <xsl:value-of select="//Properties/Datum[@ID='Background']"/>
           <xsl:text>;</xsl:text>
         </xsl:if>
 
         <!-- CSS custom property from image picker -->
         <xsl:text>--rbccm-testimonials-bg:url('</xsl:text>
-        <xsl:value-of select="/Properties/Datum[@ID='BgImage']/Image/Path"/>
+        <xsl:value-of select="//Properties/Datum[@ID='BgImage']/Image/Path"/>
         <xsl:text>');</xsl:text>
       </xsl:attribute>
 
@@ -27,20 +30,17 @@
 
         <!-- Text slider: quotes -->
         <div class="rbccm-testimonials__slider-text" id="testimonialTextSlider">
-          <xsl:for-each select="
-              /Properties/Data/Group[@ID='Slide' or @Name='Testimonial Slide']
-              | /Data/Group[@ID='Slide' or @Name='Testimonial Slide']
-            ">
+          <xsl:for-each select="//Group[starts-with(@ID,'Slide')]">
             <div class="rbccm-testimonials__text-slide">
               <blockquote class="rbccm-testimonials__quote">
-                <xsl:value-of select="Datum[@ID='Quote' or @Name='Quote']" disable-output-escaping="yes"/>
+                <xsl:value-of select="Datum[@ID='Quote']" disable-output-escaping="yes"/>
               </blockquote>
               <cite class="rbccm-testimonials__citation">
                 <span class="rbccm-testimonials__author">
-                  <xsl:value-of select="Datum[@ID='Author' or @Name='Author']"/>
+                  <xsl:value-of select="Datum[@ID='Author']"/>
                 </span>
                 <span class="rbccm-testimonials__role">
-                  <xsl:value-of select="Datum[@ID='Role' or @Name='Role / Title']" disable-output-escaping="yes"/>
+                  <xsl:value-of select="Datum[@ID='Role']" disable-output-escaping="yes"/>
                 </span>
               </cite>
             </div>
@@ -55,17 +55,14 @@
 
         <!-- Image slider: portraits -->
         <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
-          <xsl:for-each select="
-              /Properties/Data/Group[@ID='Slide' or @Name='Testimonial Slide']
-              | /Data/Group[@ID='Slide' or @Name='Testimonial Slide']
-            ">
+          <xsl:for-each select="//Group[starts-with(@ID,'Slide')]">
             <div class="rbccm-testimonials__image-slide">
               <img>
                 <xsl:attribute name="src">
-                  <xsl:value-of select="Datum[@ID='Portrait' or @Name='Portrait Image']/Image/Path"/>
+                  <xsl:value-of select="Datum[@ID='Portrait']/Image/Path"/>
                 </xsl:attribute>
                 <xsl:attribute name="alt">
-                  <xsl:value-of select="Datum[@ID='Alt' or @Name='Image Alt Text']"/>
+                  <xsl:value-of select="Datum[@ID='Alt']"/>
                 </xsl:attribute>
               </img>
             </div>
@@ -95,16 +92,16 @@
             ? $('.rbccm-testimonials__arrows-desktop')
             : $('.rbccm-testimonials__arrows');
 
-          var rawInfinite = "]]><xsl:value-of select="/Properties/Datum[@ID='Infinite']"/><![CDATA[";
-          var rawAutoplay = "]]><xsl:value-of select="/Properties/Datum[@ID='Autoplay']"/><![CDATA[";
-          var rawShowDots = "]]><xsl:value-of select="/Properties/Datum[@ID='ShowDots']"/><![CDATA[";
+          var rawInfinite = "]]><xsl:value-of select="//Properties/Datum[@ID='Infinite']"/><![CDATA[";
+          var rawAutoplay = "]]><xsl:value-of select="//Properties/Datum[@ID='Autoplay']"/><![CDATA[";
+          var rawShowDots = "]]><xsl:value-of select="//Properties/Datum[@ID='ShowDots']"/><![CDATA[";
 
           var infinite = parseBool(rawInfinite, true);
           var autoplay = parseBool(rawAutoplay, true);
           var showDots = parseBool(rawShowDots, true);
 
           var autoplaySpeed = parseInt(
-            "]]><xsl:value-of select="/Properties/Datum[@ID='AutoplaySpeed']"/><![CDATA[",
+            "]]><xsl:value-of select="//Properties/Datum[@ID='AutoplaySpeed']"/><![CDATA[",
             10
           ) || 4500;
 
