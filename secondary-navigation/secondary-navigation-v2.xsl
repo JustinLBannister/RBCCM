@@ -19,7 +19,7 @@
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/secondary-navigation-v2.css"/>
 
       <!-- ── Sticky offset variable ── -->
-      <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='StickyOffset'])"/></xsl:when><xsl:otherwise>60</xsl:otherwise></xsl:choose></xsl:variable>
+      <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='StickyOffset'])"/></xsl:when><xsl:otherwise>89</xsl:otherwise></xsl:choose></xsl:variable>
 
       <!-- ── Component HTML ── -->
       <nav class="secondary-nav secondary-nav--sections"
@@ -88,7 +88,7 @@
   <!-- Accessibility -->
   <Datum ID="NavAriaLabel" Type="String" Name="Navigation Aria Label">Section Navigation</Datum>
   <!-- Layout -->
-  <Datum ID="StickyOffset" Type="String" Name="Sticky Offset (px)">60</Datum>
+  <Datum ID="StickyOffset" Type="String" Name="Sticky Offset (px)">89</Datum>
 </Properties>
 
 

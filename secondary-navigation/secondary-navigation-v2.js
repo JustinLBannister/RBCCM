@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const progressBar = nav.querySelector(".secondary-nav__progress-bar");
   const links = nav.querySelectorAll(".secondary-nav__item a");
 
-  // ── Configurable sticky offset (from data attribute or default 60) ──
-  const stickyOffset = parseInt(nav.getAttribute("data-sticky-offset"), 10) || 60;
+  // ── Configurable sticky offset (from data attribute or default 89) ──
+  const stickyOffset = parseInt(nav.getAttribute("data-sticky-offset"), 10) || 89;
 
   // ── Active state detection ──
   function setActiveItem() {
@@ -225,6 +225,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           });
 
+          // Clear tracking from all items first
+          nav.querySelectorAll(".secondary-nav__item.tracking").forEach(
+            (item) => item.classList.remove("tracking")
+          );
+
           if (currentSection) {
             const currentId = currentSection.id;
             const currentHref = "#" + currentId;
@@ -252,6 +257,15 @@ document.addEventListener("DOMContentLoaded", function () {
                   }
                 }
               }
+            }
+
+            // Set tracking on the current section's nav item (controls chevron rotation)
+            const trackingLink = nav.querySelector(
+              'a[href="' + currentHref + '"]'
+            );
+            if (trackingLink) {
+              const trackingLi = trackingLink.closest(".secondary-nav__item");
+              if (trackingLi) trackingLi.classList.add("tracking");
             }
           }
 
