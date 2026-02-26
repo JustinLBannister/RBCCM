@@ -1,0 +1,126 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+.page-banner--title h1 {
+  max-width: 500px !important;
+}
+
+/* Base Nav Styles */
+.secondary-nav {
+  overflow-x: auto;
+  border-top: 10px solid #f7c750;
+}
+
+.secondary-nav.shrink {
+  height: auto !important;
+}
+
+.secondary-nav__wrapper {
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+
+  /* Hide scrollbar cross-browser */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.secondary-nav__wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Nav List */
+.secondary-nav__list {
+  display: flex;
+  flex-wrap: nowrap;
+  list-style: none;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  gap: 8px; /* optional spacing between items */
+}
+
+.secondary-nav__item {
+  flex: 0 0 auto;
+  position: relative;
+}
+
+/* Link Styles - Mobile First Base */
+.secondary-nav__item a {
+  display: inline-block;
+  text-decoration: none;
+  padding: 12px 12px;
+  font-family: "Roboto Light","Roboto",Arial,Verdana,sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: #424242;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.secondary-nav__item a:hover {
+	background-color: #eeeeee;
+}
+
+/* Active Item + Triangle - Mobile First Base */
+.secondary-nav__item.active a,
+.secondary-nav__item a[aria-current="page"] {
+  font-weight: 500;
+  font-family: "Roboto Medium","Roboto",Arial,Verdana,sans-serif;
+}
+
+/* Show yellow triangle only for current page link */
+.secondary-nav__item a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #f7c750;
+  z-index: 1;
+}
+
+/* Scroll Progress Bar */
+.secondary-nav__progress-bar {
+  position: relative;
+  height: 3px;
+  background-color: #c0c0c0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.secondary-nav__progress-fill {
+  position: absolute;
+  height: 100%;
+  width: 0%;
+  background-color: #184997;
+  transition: width 0.2s ease-out;
+}
+
+/* Larger screen overrides */
+@media (min-width: 1200px) {
+  .secondary-nav__item a {
+    padding: 13px 15px;
+    font-size: 13px;
+  }
+
+  .secondary-nav__item a[aria-current="page"]::after {
+    border-left: 7.5px solid transparent;
+    border-right: 7.5px solid transparent;
+    border-bottom: 8px solid #f7c750;
+  }
+
+  .secondary-nav__list {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secondary Navigation V2</title>
+  <link rel="stylesheet" href="secondary-navigation-v2.css">
+</head>
+<body style="margin: 0; padding: 0; background-color: #e8e0d4;">
+
+<!-- Fake sticky primary nav (60px) -->
+<header style="position: sticky; top: 0; z-index: 100; height: 60px; background-color: #002144; display: flex; align-items: center; padding: 0 20px;">
+  <span style="color: #ffffff; font-family: 'Roboto', Arial, sans-serif; font-size: 18px; font-weight: 600; letter-spacing: 1px;">RBC Capital Markets</span>
+</header>
+
+<!-- 200px spacer (hero/banner area) -->
+<div style="height: 200px; background-color: #e8e0d4; display: flex; align-items: center; justify-content: center; border-bottom: 10px solid #f7c750;">
+  <span style="color: #666; font-family: 'Roboto', Arial, sans-serif; font-size: 14px;">Hero / Banner Area (200px spacer)</span>
+</div>
+
+<nav class="secondary-nav secondary-nav--sections" aria-label="Section Navigation" itemscope="" itemtype="https://schema.org/SiteNavigationElement">
+  <div class="secondary-nav__wrapper">
+    <ul class="secondary-nav__list" data-nav-section="sections" role="list">
+      <li class="secondary-nav__item secondary-nav__item--expertise" data-nav-item="expertise" itemprop="name">
+        <a href="#expertise" itemprop="url">
+          Our industry expertise
+          <svg class="secondary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 10 15" fill="none" aria-hidden="true"><path d="M2.73876 14.6125L9.52646 8.49415C9.67651 8.36156 9.79561 8.20382 9.87688 8.03003C9.95816 7.85623 10 7.66982 10 7.48154C10 7.29327 9.95816 7.10686 9.87688 6.93306C9.79561 6.75927 9.67651 6.60153 9.52646 6.46894L2.73876 0.421867C2.58994 0.288192 2.41288 0.18209 2.2178 0.109684C2.02272 0.037278 1.81348 0 1.60214 0C1.39081 0 1.18156 0.037278 0.986483 0.109684C0.791402 0.18209 0.614344 0.288192 0.465522 0.421867C0.167357 0.689083 0 1.05055 0 1.42734C0 1.80412 0.167357 2.16559 0.465522 2.43281L6.13261 7.48154L0.465522 12.5303C0.169769 12.7959 0.0030365 13.1545 0.00126839 13.5286C4.95911e-05 13.7163 0.040432 13.9024 0.120099 14.0762C0.199765 14.2499 0.31715 14.408 0.465522 14.5412C0.608989 14.6797 0.781828 14.7914 0.974054 14.87C1.16628 14.9486 1.37408 14.9925 1.58545 14.9991C1.79683 15.0057 2.00758 14.975 2.20553 14.9086C2.40348 14.8423 2.58472 14.7416 2.73876 14.6125Z" fill="#003168"/></svg>
+        </a>
+      </li>
+      <li class="secondary-nav__item secondary-nav__item--transactions" data-nav-item="transactions" itemprop="name">
+        <a href="#transactions" itemprop="url">
+          Featured transactions
+          <svg class="secondary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 10 15" fill="none" aria-hidden="true"><path d="M2.73876 14.6125L9.52646 8.49415C9.67651 8.36156 9.79561 8.20382 9.87688 8.03003C9.95816 7.85623 10 7.66982 10 7.48154C10 7.29327 9.95816 7.10686 9.87688 6.93306C9.79561 6.75927 9.67651 6.60153 9.52646 6.46894L2.73876 0.421867C2.58994 0.288192 2.41288 0.18209 2.2178 0.109684C2.02272 0.037278 1.81348 0 1.60214 0C1.39081 0 1.18156 0.037278 0.986483 0.109684C0.791402 0.18209 0.614344 0.288192 0.465522 0.421867C0.167357 0.689083 0 1.05055 0 1.42734C0 1.80412 0.167357 2.16559 0.465522 2.43281L6.13261 7.48154L0.465522 12.5303C0.169769 12.7959 0.0030365 13.1545 0.00126839 13.5286C4.95911e-05 13.7163 0.040432 13.9024 0.120099 14.0762C0.199765 14.2499 0.31715 14.408 0.465522 14.5412C0.608989 14.6797 0.781828 14.7914 0.974054 14.87C1.16628 14.9486 1.37408 14.9925 1.58545 14.9991C1.79683 15.0057 2.00758 14.975 2.20553 14.9086C2.40348 14.8423 2.58472 14.7416 2.73876 14.6125Z" fill="#003168"/></svg>
+        </a>
+      </li>
+      <li class="secondary-nav__item secondary-nav__item--insights" data-nav-item="insights" itemprop="name">
+        <a href="#insights" itemprop="url">
+          Latest insights
+          <svg class="secondary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 10 15" fill="none" aria-hidden="true"><path d="M2.73876 14.6125L9.52646 8.49415C9.67651 8.36156 9.79561 8.20382 9.87688 8.03003C9.95816 7.85623 10 7.66982 10 7.48154C10 7.29327 9.95816 7.10686 9.87688 6.93306C9.79561 6.75927 9.67651 6.60153 9.52646 6.46894L2.73876 0.421867C2.58994 0.288192 2.41288 0.18209 2.2178 0.109684C2.02272 0.037278 1.81348 0 1.60214 0C1.39081 0 1.18156 0.037278 0.986483 0.109684C0.791402 0.18209 0.614344 0.288192 0.465522 0.421867C0.167357 0.689083 0 1.05055 0 1.42734C0 1.80412 0.167357 2.16559 0.465522 2.43281L6.13261 7.48154L0.465522 12.5303C0.169769 12.7959 0.0030365 13.1545 0.00126839 13.5286C4.95911e-05 13.7163 0.040432 13.9024 0.120099 14.0762C0.199765 14.2499 0.31715 14.408 0.465522 14.5412C0.608989 14.6797 0.781828 14.7914 0.974054 14.87C1.16628 14.9486 1.37408 14.9925 1.58545 14.9991C1.79683 15.0057 2.00758 14.975 2.20553 14.9086C2.40348 14.8423 2.58472 14.7416 2.73876 14.6125Z" fill="#003168"/></svg>
+        </a>
+      </li>
+      <li class="secondary-nav__item secondary-nav__item--regional" data-nav-item="regional" itemprop="name">
+        <a href="#regional-projects" itemprop="url">
+          Regional impact projects
+          <svg class="secondary-nav__chevron" xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 10 15" fill="none" aria-hidden="true"><path d="M2.73876 14.6125L9.52646 8.49415C9.67651 8.36156 9.79561 8.20382 9.87688 8.03003C9.95816 7.85623 10 7.66982 10 7.48154C10 7.29327 9.95816 7.10686 9.87688 6.93306C9.79561 6.75927 9.67651 6.60153 9.52646 6.46894L2.73876 0.421867C2.58994 0.288192 2.41288 0.18209 2.2178 0.109684C2.02272 0.037278 1.81348 0 1.60214 0C1.39081 0 1.18156 0.037278 0.986483 0.109684C0.791402 0.18209 0.614344 0.288192 0.465522 0.421867C0.167357 0.689083 0 1.05055 0 1.42734C0 1.80412 0.167357 2.16559 0.465522 2.43281L6.13261 7.48154L0.465522 12.5303C0.169769 12.7959 0.0030365 13.1545 0.00126839 13.5286C4.95911e-05 13.7163 0.040432 13.9024 0.120099 14.0762C0.199765 14.2499 0.31715 14.408 0.465522 14.5412C0.608989 14.6797 0.781828 14.7914 0.974054 14.87C1.16628 14.9486 1.37408 14.9925 1.58545 14.9991C1.79683 15.0057 2.00758 14.975 2.20553 14.9086C2.40348 14.8423 2.58472 14.7416 2.73876 14.6125Z" fill="#003168"/></svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="secondary-nav__progress-bar" aria-hidden="true">
+    <div class="secondary-nav__progress-fill"></div>
+  </div>
+</nav>
+
+<section id="expertise" style="height: 100vh; background-color: #003168; display: flex; align-items: center; justify-content: center;">
+  <h1 style="color: #ffffff; font-family: 'Roboto', Arial, sans-serif; font-size: 32px;">Our industry expertise</h1>
+</section>
+
+<section id="transactions" style="height: 100vh; background-color: #184997; display: flex; align-items: center; justify-content: center;">
+  <h1 style="color: #ffffff; font-family: 'Roboto', Arial, sans-serif; font-size: 32px;">Featured transactions</h1>
+</section>
+
+<section id="insights" style="height: 100vh; background-color: #f7c750; display: flex; align-items: center; justify-content: center;">
+  <h1 style="color: #003168; font-family: 'Roboto', Arial, sans-serif; font-size: 32px;">Latest insights</h1>
+</section>
+
+<section id="regional-projects" style="height: 100vh; background-color: #002144; display: flex; align-items: center; justify-content: center;">
+  <h1 style="color: #ffffff; font-family: 'Roboto', Arial, sans-serif; font-size: 32px;">Regional impact projects</h1>
+</section>
+
+<script src="secondary-navigation-v2.js"></script>
+</body>
+</html>

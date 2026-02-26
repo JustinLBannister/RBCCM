@@ -1,0 +1,162 @@
+/* ============================================================
+   Secondary Navigation V2 — Sections variant
+   Desktop (fits): centered, white background, no border
+   Overflowing (mobile/tablet): horizontal scroll + progress bar
+   Breakpoint is JS-driven via .is-overflowing class
+   ============================================================ */
+
+/* ── Base / Desktop-fits state ── */
+.secondary-nav--sections {
+  background-color: transparent;
+  border-bottom: none;
+  position: sticky;
+  top: 60px;
+  z-index: 90;
+  margin-top: -34px;
+  margin-bottom: -34px;
+}
+
+.secondary-nav--sections .secondary-nav__wrapper {
+  overflow-x: visible;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+
+  /* Hide scrollbar cross-browser */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.secondary-nav--sections .secondary-nav__wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Nav List — centered when items fit */
+.secondary-nav--sections .secondary-nav__list {
+  display: flex;
+  flex-wrap: nowrap;
+  list-style: none;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.secondary-nav--sections .secondary-nav__item {
+  flex: 0 0 auto;
+  position: relative;
+}
+
+/* Link Styles — white bg only on the items themselves */
+.secondary-nav--sections .secondary-nav__item a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #003168;
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  font-family: "Roboto", Arial, sans-serif;
+  padding: 24.45px 28.5px;
+  line-height: 120%;
+  text-align: center;
+  white-space: nowrap;
+  border-right: 1px solid #d2d2d2;
+  background-color: #ffffff;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.secondary-nav--sections .secondary-nav__item a:hover {
+  background-color: #eeeeee;
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+}
+
+/* Inline SVG Chevron */
+.secondary-nav--sections .secondary-nav__chevron {
+  width: 19px;
+  height: 16px;
+  fill: #003168;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* Active Item */
+.secondary-nav--sections .secondary-nav__item.active a,
+.secondary-nav--sections .secondary-nav__item a[aria-current="page"] {
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+  color: #003168;
+  background-color: #eeeeee;
+}
+
+/* Rotate chevron to point down only when nav is sticky AND item is active */
+.secondary-nav--sections.is-sticky .secondary-nav__item.active a .secondary-nav__chevron,
+.secondary-nav--sections.is-sticky .secondary-nav__item a[aria-current="page"] .secondary-nav__chevron {
+  transform: rotate(90deg);
+}
+
+/* Scroll Progress Bar — tracks vertical page scroll through sections */
+.secondary-nav--sections .secondary-nav__progress-bar {
+  position: relative;
+  height: 3px;
+  background-color: #c0c0c0;
+  overflow: hidden;
+  width: 100%;
+  display: none;
+}
+
+.secondary-nav--sections .secondary-nav__progress-fill {
+  position: absolute;
+  height: 100%;
+  width: 0%;
+  background-color: #184997;
+  transition: width 0.2s ease-out;
+}
+
+/* Last item — no right border */
+.secondary-nav--sections .secondary-nav__item:last-child a {
+  border-right: none;
+}
+
+/* ============================================================
+   Overflowing state — toggled by JS via .is-overflowing class
+   ============================================================ */
+.secondary-nav--sections.is-overflowing {
+  background-color: #ffffff;
+  margin-top: -29.5px;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__progress-bar {
+  display: block;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__wrapper {
+  overflow-x: auto;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__list {
+  justify-content: flex-start;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__item a {
+  padding: 18.5px 15px;
+  color: #575757;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__chevron {
+  width: 14px;
+  height: 11.48px;
+  fill: #575757;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__item a:hover {
+  color: #000000;
+}
+
+.secondary-nav--sections.is-overflowing .secondary-nav__item.active a,
+.secondary-nav--sections.is-overflowing .secondary-nav__item a[aria-current="page"] {
+  color: #000000;
+}
+
