@@ -19,14 +19,14 @@
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/secondary-navigation-v2.css"/>
 
       <!-- ── Sticky offset variable ── -->
-      <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="/Properties/Datum[@ID='StickyOffset']"/></xsl:when><xsl:otherwise>60</xsl:otherwise></xsl:choose></xsl:variable>
+      <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='StickyOffset'])"/></xsl:when><xsl:otherwise>60</xsl:otherwise></xsl:choose></xsl:variable>
 
       <!-- ── Component HTML ── -->
       <nav class="secondary-nav secondary-nav--sections"
            itemscope=""
            itemtype="https://schema.org/SiteNavigationElement">
 
-        <xsl:attribute name="aria-label"><xsl:choose><xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''"><xsl:value-of select="/Properties/Datum[@ID='NavAriaLabel']"/></xsl:when><xsl:otherwise>Section Navigation</xsl:otherwise></xsl:choose></xsl:attribute>
+        <xsl:attribute name="aria-label"><xsl:choose><xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='NavAriaLabel'])"/></xsl:when><xsl:otherwise>Section Navigation</xsl:otherwise></xsl:choose></xsl:attribute>
 
         <xsl:attribute name="style"><xsl:text>top:</xsl:text><xsl:value-of select="$offset"/><xsl:text>px;</xsl:text></xsl:attribute>
 
@@ -42,17 +42,17 @@
               ">
               <li itemprop="name">
 
-                <xsl:attribute name="class"><xsl:text>secondary-nav__item</xsl:text><xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''"><xsl:text> secondary-nav__item--</xsl:text><xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/></xsl:if></xsl:attribute>
+                <xsl:attribute name="class"><xsl:text>secondary-nav__item</xsl:text><xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''"><xsl:text> secondary-nav__item--</xsl:text><xsl:value-of select="normalize-space(Datum[@ID='Key' or @Name='Item Key'])"/></xsl:if></xsl:attribute>
 
                 <xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''">
-                  <xsl:attribute name="data-nav-item"><xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/></xsl:attribute>
+                  <xsl:attribute name="data-nav-item"><xsl:value-of select="normalize-space(Datum[@ID='Key' or @Name='Item Key'])"/></xsl:attribute>
                 </xsl:if>
 
                 <a itemprop="url">
-                  <xsl:attribute name="href"><xsl:value-of select="Datum[@ID='Href' or @Name='Link URL / Anchor']"/></xsl:attribute>
+                  <xsl:attribute name="href"><xsl:value-of select="normalize-space(Datum[@ID='Href' or @Name='Link URL / Anchor'])"/></xsl:attribute>
 
                   <!-- Link text -->
-                  <xsl:value-of select="Datum[@ID='Label' or @Name='Link Label']"/>
+                  <xsl:value-of select="normalize-space(Datum[@ID='Label' or @Name='Link Label'])"/>
 
                   <!-- Inline SVG chevron -->
                   <svg class="secondary-nav__chevron"
