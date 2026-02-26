@@ -28,8 +28,6 @@
 
         <xsl:attribute name="aria-label"><xsl:choose><xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='NavAriaLabel'])"/></xsl:when><xsl:otherwise>Section Navigation</xsl:otherwise></xsl:choose></xsl:attribute>
 
-        <xsl:attribute name="style"><xsl:text>top:</xsl:text><xsl:value-of select="$offset"/><xsl:text>px;</xsl:text></xsl:attribute>
-
         <xsl:attribute name="data-sticky-offset"><xsl:value-of select="$offset"/></xsl:attribute>
 
         <div class="secondary-nav__wrapper">

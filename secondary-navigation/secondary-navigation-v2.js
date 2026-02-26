@@ -142,12 +142,28 @@ document.addEventListener("DOMContentLoaded", function () {
   // ── Init ──
   evaluateLayout();
 
+  // ── JS-driven sticky: store original position + create spacer ──
+  let navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+
+  const spacer = document.createElement("div");
+  spacer.style.display = "none";
+  spacer.className = "secondary-nav__spacer";
+  nav.parentNode.insertBefore(spacer, nav.nextSibling);
+
   // ── Resize handler ──
   let resizeTimer;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      // Temporarily unstick to measure true position
+      nav.classList.remove("is-sticky");
+      nav.style.top = "";
+      spacer.style.display = "none";
+
       evaluateLayout();
+
+      // Recalculate original position after layout reflow
+      navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
     }, 50);
   });
 
@@ -178,12 +194,21 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", () => {
       if (!scrollTicking) {
         window.requestAnimationFrame(() => {
-          // Detect if nav is stuck at its sticky position
-          const navTop = nav.getBoundingClientRect().top;
-          if (navTop <= stickyOffset + 1) {
-            nav.classList.add("is-sticky");
+          // JS-driven sticky: compare scroll position against nav's original position
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          if (scrollTop >= navOriginalTop - stickyOffset) {
+            if (!nav.classList.contains("is-sticky")) {
+              spacer.style.display = "block";
+              spacer.style.height = nav.offsetHeight + "px";
+              nav.style.top = stickyOffset + "px";
+              nav.classList.add("is-sticky");
+            }
           } else {
-            nav.classList.remove("is-sticky");
+            if (nav.classList.contains("is-sticky")) {
+              nav.classList.remove("is-sticky");
+              nav.style.top = "";
+              spacer.style.display = "none";
+            }
           }
 
           // Update progress bar based on vertical scroll through sections

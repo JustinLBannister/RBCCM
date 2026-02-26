@@ -9,11 +9,18 @@
 .secondary-nav--sections {
   background-color: transparent;
   border-bottom: none;
-  position: sticky;
-  top: 60px;
+  position: relative;
   z-index: 90;
   margin-top: -34px;
   margin-bottom: -34px;
+}
+
+/* JS-driven fixed positioning — bypasses TeamSite container overflow restrictions */
+.secondary-nav--sections.is-sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
 .secondary-nav--sections .secondary-nav__wrapper {
