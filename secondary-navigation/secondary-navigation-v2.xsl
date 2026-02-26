@@ -2,6 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: Secondary Navigation V2 — Sections -->
 
+  <xsl:strip-space elements="*"/>
+
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
 
@@ -16,40 +18,19 @@
       <!-- ── Load CSS ── -->
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/secondary-navigation-v2.css"/>
 
+      <!-- ── Sticky offset variable ── -->
+      <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="/Properties/Datum[@ID='StickyOffset']"/></xsl:when><xsl:otherwise>60</xsl:otherwise></xsl:choose></xsl:variable>
+
       <!-- ── Component HTML ── -->
       <nav class="secondary-nav secondary-nav--sections"
            itemscope=""
            itemtype="https://schema.org/SiteNavigationElement">
 
-        <!-- aria-label from properties -->
-        <xsl:attribute name="aria-label">
-          <xsl:choose>
-            <xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''">
-              <xsl:value-of select="/Properties/Datum[@ID='NavAriaLabel']"/>
-            </xsl:when>
-            <xsl:otherwise>Section Navigation</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
+        <xsl:attribute name="aria-label"><xsl:choose><xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''"><xsl:value-of select="/Properties/Datum[@ID='NavAriaLabel']"/></xsl:when><xsl:otherwise>Section Navigation</xsl:otherwise></xsl:choose></xsl:attribute>
 
-        <!-- Sticky offset: inline top + data attribute for JS -->
-        <xsl:variable name="offset">
-          <xsl:choose>
-            <xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''">
-              <xsl:value-of select="/Properties/Datum[@ID='StickyOffset']"/>
-            </xsl:when>
-            <xsl:otherwise>60</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
+        <xsl:attribute name="style"><xsl:text>top:</xsl:text><xsl:value-of select="$offset"/><xsl:text>px;</xsl:text></xsl:attribute>
 
-        <xsl:attribute name="style">
-          <xsl:text>top:</xsl:text>
-          <xsl:value-of select="$offset"/>
-          <xsl:text>px;</xsl:text>
-        </xsl:attribute>
-
-        <xsl:attribute name="data-sticky-offset">
-          <xsl:value-of select="$offset"/>
-        </xsl:attribute>
+        <xsl:attribute name="data-sticky-offset"><xsl:value-of select="$offset"/></xsl:attribute>
 
         <div class="secondary-nav__wrapper">
           <ul class="secondary-nav__list" data-nav-section="sections" role="list">
@@ -60,26 +41,15 @@
                 | /Data/Group[@ID='NavItem' or @Name='Navigation Item']
               ">
               <li itemprop="name">
-                <!-- Build CSS class with optional modifier -->
-                <xsl:attribute name="class">
-                  <xsl:text>secondary-nav__item</xsl:text>
-                  <xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''">
-                    <xsl:text> secondary-nav__item--</xsl:text>
-                    <xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/>
-                  </xsl:if>
-                </xsl:attribute>
 
-                <!-- data-nav-item attribute -->
+                <xsl:attribute name="class"><xsl:text>secondary-nav__item</xsl:text><xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''"><xsl:text> secondary-nav__item--</xsl:text><xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/></xsl:if></xsl:attribute>
+
                 <xsl:if test="Datum[@ID='Key' or @Name='Item Key'] != ''">
-                  <xsl:attribute name="data-nav-item">
-                    <xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/>
-                  </xsl:attribute>
+                  <xsl:attribute name="data-nav-item"><xsl:value-of select="Datum[@ID='Key' or @Name='Item Key']"/></xsl:attribute>
                 </xsl:if>
 
                 <a itemprop="url">
-                  <xsl:attribute name="href">
-                    <xsl:value-of select="Datum[@ID='Href' or @Name='Link URL / Anchor']"/>
-                  </xsl:attribute>
+                  <xsl:attribute name="href"><xsl:value-of select="Datum[@ID='Href' or @Name='Link URL / Anchor']"/></xsl:attribute>
 
                   <!-- Link text -->
                   <xsl:value-of select="Datum[@ID='Label' or @Name='Link Label']"/>
