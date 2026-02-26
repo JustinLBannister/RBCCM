@@ -41,32 +41,38 @@ document.addEventListener("DOMContentLoaded", function () {
   setActiveItem();
 
   // ── Progress bar — tracks vertical page scroll through sections ──
+  // Uses document scroll position rather than section element heights,
+  // so it works with <span> anchors, <div> wrappers, or full <section> blocks
   function updateProgressBar() {
     if (!fill) return;
 
-    // If no sections found yet, fall back to 0
     if (!sections || !sections.length) {
       fill.style.width = "0%";
       return;
     }
 
-    const offset = stickyOffset + nav.offsetHeight + 10;
-    const firstTop = sections[0].getBoundingClientRect().top;
-    const lastSection = sections[sections.length - 1];
-    const lastBottom =
-      lastSection.getBoundingClientRect().top + lastSection.offsetHeight;
+    const triggerPoint = stickyOffset + nav.offsetHeight + 10;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Total scrollable range = from top of first section to bottom of last
-    const totalRange = lastBottom - firstTop;
-    // How far we've scrolled into it = offset minus top of first section
-    const scrolled = offset - firstTop;
+    // Document-relative position of first anchor
+    const firstDocTop = sections[0].getBoundingClientRect().top + scrollTop;
+
+    // Scroll position where progress starts (first anchor reaches trigger)
+    const startScroll = firstDocTop - triggerPoint;
+
+    // End of scrollable content
+    const endScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+    // Total range and current progress
+    const totalRange = endScroll - startScroll;
+    const scrolled = scrollTop - startScroll;
 
     let percent = 0;
     if (totalRange > 0) {
       percent = Math.max(0, Math.min(100, (scrolled / totalRange) * 100));
     }
 
-    fill.style.width = `${percent}%`;
+    fill.style.width = percent + "%";
   }
 
   // Reference sections early so updateProgressBar can use them
