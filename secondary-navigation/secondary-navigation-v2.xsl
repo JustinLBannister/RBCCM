@@ -31,6 +31,8 @@
 
         <xsl:attribute name="data-sticky-offset"><xsl:value-of select="$offset"/></xsl:attribute>
 
+        <xsl:attribute name="data-sticky-enabled"><xsl:choose><xsl:when test="normalize-space(/Properties/Datum[@ID='StickyEnabled']) != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='StickyEnabled'])"/></xsl:when><xsl:otherwise>true</xsl:otherwise></xsl:choose></xsl:attribute>
+
         <div class="secondary-nav__wrapper">
           <ul class="secondary-nav__list" data-nav-section="sections" role="list">
 
@@ -90,6 +92,8 @@
   <Datum ID="NavAriaLabel" Type="String" Name="Navigation Aria Label">Section Navigation</Datum>
   <!-- Layout -->
   <Datum ID="StickyOffset" Type="String" Name="Sticky Offset (px)">89</Datum>
+  <!-- Behavior -->
+  <Datum ID="StickyEnabled" Type="String" Name="Enable Sticky Navigation">true</Datum>
   <!-- Variation -->
   <Datum ID="CompactMobile" Type="String" Name="Compact Mobile Style">false</Datum>
 </Properties>

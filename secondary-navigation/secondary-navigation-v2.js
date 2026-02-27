@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Configurable sticky offset (from data attribute or default 89) ──
   const stickyOffset = parseInt(nav.getAttribute("data-sticky-offset"), 10) || 89;
+  const stickyEnabled = nav.getAttribute("data-sticky-enabled") !== "false";
 
   // ── Active state detection ──
   function setActiveItem() {
@@ -143,27 +144,36 @@ document.addEventListener("DOMContentLoaded", function () {
   evaluateLayout();
 
   // ── JS-driven sticky: store original position + create spacer ──
-  let navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+  let navOriginalTop = 0;
+  let spacer = null;
 
-  const spacer = document.createElement("div");
-  spacer.style.display = "none";
-  spacer.className = "secondary-nav__spacer";
-  nav.parentNode.insertBefore(spacer, nav.nextSibling);
+  if (stickyEnabled) {
+    navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+
+    spacer = document.createElement("div");
+    spacer.style.display = "none";
+    spacer.className = "secondary-nav__spacer";
+    nav.parentNode.insertBefore(spacer, nav.nextSibling);
+  }
 
   // ── Resize handler ──
   let resizeTimer;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      // Temporarily unstick to measure true position
-      nav.classList.remove("is-sticky");
-      nav.style.top = "";
-      spacer.style.display = "none";
+      if (stickyEnabled) {
+        // Temporarily unstick to measure true position
+        nav.classList.remove("is-sticky");
+        nav.style.top = "";
+        spacer.style.display = "none";
+      }
 
       evaluateLayout();
 
-      // Recalculate original position after layout reflow
-      navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      if (stickyEnabled) {
+        // Recalculate original position after layout reflow
+        navOriginalTop = nav.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      }
     }, 50);
   });
 
@@ -188,26 +198,40 @@ document.addEventListener("DOMContentLoaded", function () {
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
+  // ── Scroll offset for section targets ──
+  // Accounts for fixed primary nav + secondary nav height so sections
+  // don't land behind the sticky navs. Works with the existing smooth
+  // scroll library — no conflicting click handlers needed.
+  if (sections.length) {
+    const scrollMargin = (stickyOffset + nav.offsetHeight + 10) + "px";
+    sections.forEach((section) => {
+      section.style.scrollMarginTop = scrollMargin;
+    });
+  }
+
   if (sections.length) {
     let scrollTicking = false;
 
     window.addEventListener("scroll", () => {
       if (!scrollTicking) {
         window.requestAnimationFrame(() => {
-          // JS-driven sticky: compare scroll position against nav's original position
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          if (scrollTop >= navOriginalTop - stickyOffset) {
-            if (!nav.classList.contains("is-sticky")) {
-              spacer.style.display = "block";
-              spacer.style.height = nav.offsetHeight + "px";
-              nav.style.top = stickyOffset + "px";
-              nav.classList.add("is-sticky");
-            }
-          } else {
-            if (nav.classList.contains("is-sticky")) {
-              nav.classList.remove("is-sticky");
-              nav.style.top = "";
-              spacer.style.display = "none";
+
+          // JS-driven sticky: compare scroll position against nav's original position
+          if (stickyEnabled) {
+            if (scrollTop >= navOriginalTop - stickyOffset) {
+              if (!nav.classList.contains("is-sticky")) {
+                spacer.style.display = "block";
+                spacer.style.height = nav.offsetHeight + "px";
+                nav.style.top = stickyOffset + "px";
+                nav.classList.add("is-sticky");
+              }
+            } else {
+              if (nav.classList.contains("is-sticky")) {
+                nav.classList.remove("is-sticky");
+                nav.style.top = "";
+                spacer.style.display = "none";
+              }
             }
           }
 
