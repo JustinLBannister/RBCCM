@@ -23,6 +23,16 @@
   width: 100%;
 }
 
+/* Desktop sticky — bottom border for visibility when content scrolls behind */
+.secondary-nav--sections.is-sticky:not(.is-overflowing) .secondary-nav__item a {
+  border-bottom: 1px solid #d2d2d2;
+}
+
+/* Close off the right edge on the last item */
+.secondary-nav--sections.is-sticky:not(.is-overflowing) .secondary-nav__item:last-child a {
+  border-right: 1px solid #d2d2d2;
+}
+
 .secondary-nav--sections .secondary-nav__wrapper {
   overflow-x: visible;
   white-space: nowrap;
@@ -168,5 +178,31 @@
 .secondary-nav--sections.is-overflowing .secondary-nav__item.active a,
 .secondary-nav--sections.is-overflowing .secondary-nav__item a[aria-current="page"] {
   color: #000000;
+}
+
+/* ============================================================
+   Compact modifier — simplified mobile/overflow anchors
+   Add .secondary-nav--compact alongside .secondary-nav--sections
+   ============================================================ */
+
+/* Hide chevrons on all items */
+.secondary-nav--compact.is-overflowing .secondary-nav__chevron {
+  display: none;
+}
+
+/* Show chevron only on active item */
+.secondary-nav--compact.is-overflowing .secondary-nav__item a[aria-current="page"] .secondary-nav__chevron {
+  display: inline-block;
+}
+
+/* Normal font weight on hover (no bold) */
+.secondary-nav--compact.is-overflowing .secondary-nav__item a:hover {
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+/* Normal font weight on active (no bold) */
+.secondary-nav--compact.is-overflowing .secondary-nav__item.active a,
+.secondary-nav--compact.is-overflowing .secondary-nav__item a[aria-current="page"] {
+  font-family: "Roboto", Arial, sans-serif;
 }
 

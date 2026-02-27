@@ -22,9 +22,10 @@
       <xsl:variable name="offset"><xsl:choose><xsl:when test="/Properties/Datum[@ID='StickyOffset'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='StickyOffset'])"/></xsl:when><xsl:otherwise>89</xsl:otherwise></xsl:choose></xsl:variable>
 
       <!-- ── Component HTML ── -->
-      <nav class="secondary-nav secondary-nav--sections"
-           itemscope=""
+      <nav itemscope=""
            itemtype="https://schema.org/SiteNavigationElement">
+
+        <xsl:attribute name="class"><xsl:text>secondary-nav secondary-nav--sections</xsl:text><xsl:if test="normalize-space(/Properties/Datum[@ID='CompactMobile']) = 'true'"><xsl:text> secondary-nav--compact</xsl:text></xsl:if></xsl:attribute>
 
         <xsl:attribute name="aria-label"><xsl:choose><xsl:when test="/Properties/Datum[@ID='NavAriaLabel'] != ''"><xsl:value-of select="normalize-space(/Properties/Datum[@ID='NavAriaLabel'])"/></xsl:when><xsl:otherwise>Section Navigation</xsl:otherwise></xsl:choose></xsl:attribute>
 
@@ -89,6 +90,8 @@
   <Datum ID="NavAriaLabel" Type="String" Name="Navigation Aria Label">Section Navigation</Datum>
   <!-- Layout -->
   <Datum ID="StickyOffset" Type="String" Name="Sticky Offset (px)">89</Datum>
+  <!-- Variation -->
+  <Datum ID="CompactMobile" Type="String" Name="Compact Mobile Style">false</Datum>
 </Properties>
 
 
