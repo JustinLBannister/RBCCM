@@ -145,14 +145,27 @@ function FormViewModel(t) {
     e.fetchedYears[t] = true;
     console.log('[SA] fetchYear: requesting ' + t);
 
-    $.ajax({
-      url: "https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page",
-      dataType: "xml",
-      cache: true,
-      success: function (i) {
-        // Guard against empty or invalid XML response
-        if (!i || !$(i).find("news").length) {
-          console.log('[SA] fetchYear: ' + t + ' returned empty or invalid XML — stopping');
+    fetch("https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page")
+      .then(function(response) {
+        if (!response.ok) {
+          console.log('[SA] fetchYear: ' + t + ' returned ' + response.status + ' — stopping recursion, hiding skeleton');
+          e.loaded(true);
+          $("#load-more-skeleton").hide();
+          e.hasMore(false);
+          $("#load-more").text("See more episodes");
+          e.notify.notifySubscribers();
+          return;
+        }
+        return response.text();
+      })
+      .then(function(text) {
+        if (!text) return;
+        var parser = new DOMParser();
+        var xml = parser.parseFromString(text, "text/xml");
+        var items = xml.querySelectorAll("news");
+
+        if (!items.length) {
+          console.log('[SA] fetchYear: ' + t + ' returned empty XML — stopping');
           e.loaded(true);
           $("#load-more-skeleton").hide();
           e.hasMore(false);
@@ -161,23 +174,24 @@ function FormViewModel(t) {
         }
 
         var count = 0;
-        $(i).find("news").each(function () {
+        items.forEach(function(node) {
+          var text = function(tag) { var el = node.querySelector(tag); return el ? el.textContent : ''; };
           var o = {
-            date: $(this).find("date").text(),
-            link: $(this).find("link").text(),
-            thumbnail: $(this).find("thumbnail").text(),
-            podcast: $(this).find("podcast").text(),
-            title: $(this).find("title").text(),
-            description: $(this).find("description").text(),
-            category: $(this).find("category").text() || "Podcast",
-            apple: $(this).find("apple").text(),
-            spotify: $(this).find("spotify").text(),
-            region: $(this).find("region").text(),
-            author: $(this).find("author").text(),
-            tags: $(this).find("tags").text(),
-            readtime: $(this).find("readtime").text(),
-            watchtime: $(this).find("watchtime").text(),
-            type: $(this).find("type").text()
+            date: text("date"),
+            link: text("link"),
+            thumbnail: text("thumbnail"),
+            podcast: text("podcast"),
+            title: text("title"),
+            description: text("description"),
+            category: text("category") || "Podcast",
+            apple: text("apple"),
+            spotify: text("spotify"),
+            region: text("region"),
+            author: text("author"),
+            tags: text("tags"),
+            readtime: text("readtime"),
+            watchtime: text("watchtime"),
+            type: text("type")
           };
 
           o.year = o.date.split(",")[1];
@@ -194,8 +208,7 @@ function FormViewModel(t) {
             o.thumbnail = "//www.rbccm.com" + o.thumbnail;
           }
 
-          // Deduplicate by title before pushing
-          if (!e.items().some(item => item.title === o.title)) {
+          if (!e.items().some(function(item) { return item.title === o.title; })) {
             e.items.push(o);
             count++;
           } else {
@@ -223,16 +236,15 @@ function FormViewModel(t) {
           $("#load-more").text("See more episodes");
         }
         $(window).scrollTop(lmScroll);
-      },
-      error: function (xhr) {
-        console.log('[SA] fetchYear: ' + t + ' returned ' + xhr.status + ' — stopping recursion, hiding skeleton');
+      })
+      .catch(function(err) {
+        console.log('[SA] fetchYear: ' + t + ' fetch error — ' + err);
         e.loaded(true);
         $("#load-more-skeleton").hide();
         e.hasMore(false);
         $("#load-more").text("See more episodes");
         e.notify.notifySubscribers();
-      }
-    });
+      });
   };
 
   e.userRequestedMore = false;
