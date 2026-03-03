@@ -147,6 +147,7 @@ function FormViewModel(t) {
         // Guard against empty or invalid XML response
         if (!i || !$(i).find("news").length) {
           e.loaded(true);
+          e.loadingMore(false);
           e.hasMore(false);
           $("#load-more").text("See more episodes");
           return;
@@ -193,11 +194,13 @@ function FormViewModel(t) {
         e.loaded(true);
         $(".initial").remove();
         e.notify.notifySubscribers();
-        // On user click, recurse to next year — but skip current-1 since it was pre-fetched on init
-        if (t > 2016 && e.userRequestedMore && t !== e.year - 1) {
-          e.fetchYear(t - 1);
+
+        var nextYear = t - 1;
+        var willRecurse = t > 2016 && e.userRequestedMore && t !== e.year - 1 && !e.fetchedYears[nextYear];
+
+        if (willRecurse) {
+          e.fetchYear(nextYear);
         } else {
-          // No more recursion — safe to hide skeleton and update button
           e.loadingMore(false);
           $("#load-more").text("See more episodes");
         }
