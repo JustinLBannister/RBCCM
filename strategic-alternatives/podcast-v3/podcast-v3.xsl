@@ -1,10 +1,10 @@
-<!DOCTYPE html-entities SYSTEM http://www.interwoven.com/livesite/xsl/xsl-html.dtd>
-<xsl:stylesheet version="1.0" xmlns:xsl=http://www.w3.org/1999/XSL/Transform>
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBCCM - Insights new -->
   <!-- VERSION 2 - Removed server-rendered .initial block; Knockout/JS handles all rendering via fetchYear() -->
 
-  <xsl:include href=http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl />
-  <xsl:include href=http://www.interwoven.com/livesite/xsl/StringTemplates.xsl />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
   <xsl:template match="/">
 
     <!-- ============================================================ -->
@@ -77,12 +77,12 @@
                       <a class="learn-more audio-play btn-close-player" href="javascript:void(0);" data-bind="visible: podcast !== ''" aria-label="Play episode"><u>Play episode</u></a>
 
                           <p class="read-watch" style="padding-top: 30px;">
-                           <img src=https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg alt="Watch Time" data-bind="visible: type === 'video'"/>
+                           <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="Watch Time" data-bind="visible: type === 'video'"/>
                            <span class="date" data-bind="visible: type === 'video', html: watchtime"></span>
-                           <img src=https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg alt="Listen Time" data-bind="visible: type === 'audio'"/>
+                           <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="Listen Time" data-bind="visible: type === 'audio'"/>
                            <span class="date" data-bind="visible: type === 'audio', html: watchtime"></span>
                            <span class="separator" role="presentation" style="display: inline-block;height: 15px;border-left: 1px #000000 solid;opacity: .5;margin: 0 7px;" data-bind="visible: watchtime != ''"></span>
-                           <img src=https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg alt="Read Time" data-bind="visible: readtime != ''"/>
+                           <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="Read Time" data-bind="visible: readtime != ''"/>
                            <span class="date" data-bind="visible: readtime != '', html: readtime"></span>
                           </p>
                     </div>
