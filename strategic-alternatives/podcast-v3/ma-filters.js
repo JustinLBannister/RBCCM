@@ -135,6 +135,10 @@ function FormViewModel(t) {
   };
 
   e.fetchYear = function (t) {
+    // Prevent fetching the same year twice
+    if (e.fetchedYears[t]) return;
+    e.fetchedYears[t] = true;
+
     $.ajax({
       url: "https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page",
       dataType: "xml",
@@ -208,7 +212,8 @@ function FormViewModel(t) {
 
   e.userRequestedMore = false;
   e.hasMore = ko.observable(true);
-  e.loadingMore = ko.observable(false); // Assume there's more until a year fetch returns empty or 404
+  e.loadingMore = ko.observable(false);
+  e.fetchedYears = {}; // Track which years have already been fetched // Assume there's more until a year fetch returns empty or 404
 
   e.loadMore = function () {
     e.userRequestedMore = true;
