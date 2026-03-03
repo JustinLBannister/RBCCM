@@ -191,12 +191,16 @@ function FormViewModel(t) {
         });
 
         e.loaded(true);
-        e.loadingMore(false);
-        $("#load-more").text("See more episodes");
         $(".initial").remove();
         e.notify.notifySubscribers();
         // On user click, recurse to next year — but skip current-1 since it was pre-fetched on init
-        if (t > 2016 && e.userRequestedMore && t !== e.year - 1) e.fetchYear(t - 1);
+        if (t > 2016 && e.userRequestedMore && t !== e.year - 1) {
+          e.fetchYear(t - 1);
+        } else {
+          // No more recursion — safe to hide skeleton and update button
+          e.loadingMore(false);
+          $("#load-more").text("See more episodes");
+        }
         $(window).scrollTop(lmScroll);
       },
       error: function (xhr) {
