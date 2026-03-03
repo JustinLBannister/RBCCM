@@ -1,7 +1,7 @@
 var lmScroll = 0;
 function FormViewModel(t) {
   var e = this;
-  e.show = ko.observable(t === 0 ? 5 : 9 + 6 * t);
+  e.show = ko.observable(5 + 6 * t);
   e.items = ko.observableArray();
   e.topics = ko.observableArray().extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
   e.pubs = ko.observableArray();
@@ -12,6 +12,8 @@ function FormViewModel(t) {
   e.year = new Date().getFullYear();
   e.fronly = ko.observable(false);
   e.query = ko.observable("").extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
+  e.hasMore = ko.observable(true);
+  e.fetchedYears = {};
 
   e.filteredItems = ko.computed(function () {
     e.notify();
@@ -59,7 +61,7 @@ function FormViewModel(t) {
   };
 
   e.selectNoTopics = function () {
-    e.show(9);
+    e.show(5);
     e.query("");
     e.topics([]);
     e.pubs([]);
@@ -76,7 +78,7 @@ function FormViewModel(t) {
     e.authors([]);
     e.notify.notifySubscribers();
     $(".initial").remove();
-    e.show(9);
+    e.show(5);
   };
 
   e.selectAuthor = function (t) {
@@ -88,7 +90,7 @@ function FormViewModel(t) {
     e.authors([t]);
     e.notify.notifySubscribers();
     $(".initial").remove();
-    e.show(9);
+    e.show(5);
   };
 
   e.query.subscribe(function () {
@@ -124,74 +126,56 @@ function FormViewModel(t) {
     var t = $(window).scrollTop();
     if (e.show() === 0) e.show(5);
     if (e.items().length < 1) {
-      console.log('[SA] loadContent: no items yet — fetching ' + e.year + ' and ' + (e.year - 1));
       $(".initial").remove();
       $("#load-more").text("Loading...");
+      console.log("[SA] loadContent: no items yet — fetching " + e.year);
       e.fetchYear(e.year);
-      e.fetchYear(e.year - 1);
       $(window).scrollTop(t);
     } else {
-      console.log('[SA] loadContent: items already loaded (' + e.items().length + ') — skipping fetch');
       $("#load-more").text("See more episodes");
     }
   };
 
   e.fetchYear = function (t) {
-    // Prevent fetching the same year twice
     if (e.fetchedYears[t]) {
-      console.log('[SA] fetchYear: skipping ' + t + ' — already fetched');
+      console.log("[SA] fetchYear: skipping " + t + " — already fetched");
       return;
     }
     e.fetchedYears[t] = true;
-    console.log('[SA] fetchYear: requesting ' + t);
+    console.log("[SA] fetchYear: requesting " + t);
 
-    fetch("https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page")
-      .then(function(response) {
-        if (!response.ok) {
-          console.log('[SA] fetchYear: ' + t + ' returned ' + response.status + ' — stopping recursion, hiding skeleton');
+    $.ajax({
+      url: "https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page",
+      dataType: "xml",
+      cache: true,
+      success: function (i) {
+        if (!i || !$(i).find("news").length) {
+          console.log("[SA] fetchYear: " + t + " returned empty XML — stopping");
           e.loaded(true);
-          $("#load-more-skeleton").hide();
           e.hasMore(false);
-          $("#load-more").text("See more episodes");
-          e.notify.notifySubscribers();
-          return;
-        }
-        return response.text();
-      })
-      .then(function(text) {
-        if (!text) return;
-        var parser = new DOMParser();
-        var xml = parser.parseFromString(text, "text/xml");
-        var items = xml.querySelectorAll("news");
-
-        if (!items.length) {
-          console.log('[SA] fetchYear: ' + t + ' returned empty XML — stopping');
-          e.loaded(true);
           $("#load-more-skeleton").hide();
-          e.hasMore(false);
           $("#load-more").text("See more episodes");
           return;
         }
 
         var count = 0;
-        items.forEach(function(node) {
-          var text = function(tag) { var el = node.querySelector(tag); return el ? el.textContent : ''; };
+        $(i).find("news").each(function () {
           var o = {
-            date: text("date"),
-            link: text("link"),
-            thumbnail: text("thumbnail"),
-            podcast: text("podcast"),
-            title: text("title"),
-            description: text("description"),
-            category: text("category") || "Podcast",
-            apple: text("apple"),
-            spotify: text("spotify"),
-            region: text("region"),
-            author: text("author"),
-            tags: text("tags"),
-            readtime: text("readtime"),
-            watchtime: text("watchtime"),
-            type: text("type")
+            date: $(this).find("date").text(),
+            link: $(this).find("link").text(),
+            thumbnail: $(this).find("thumbnail").text(),
+            podcast: $(this).find("podcast").text(),
+            title: $(this).find("title").text(),
+            description: $(this).find("description").text(),
+            category: $(this).find("category").text() || "Podcast",
+            apple: $(this).find("apple").text(),
+            spotify: $(this).find("spotify").text(),
+            region: $(this).find("region").text(),
+            author: $(this).find("author").text(),
+            tags: $(this).find("tags").text(),
+            readtime: $(this).find("readtime").text(),
+            watchtime: $(this).find("watchtime").text(),
+            type: $(this).find("type").text()
           };
 
           o.year = o.date.split(",")[1];
@@ -208,65 +192,57 @@ function FormViewModel(t) {
             o.thumbnail = "//www.rbccm.com" + o.thumbnail;
           }
 
-          if (!e.items().some(function(item) { return item.title === o.title; })) {
+          if (!e.items().some(item => item.title === o.title)) {
             e.items.push(o);
             count++;
           } else {
-            console.log('[SA] fetchYear: duplicate skipped — ' + o.title);
+            console.log("[SA] fetchYear: duplicate skipped — " + o.title);
           }
         });
 
-        console.log('[SA] fetchYear: ' + t + ' complete — ' + count + ' new items added, total items: ' + e.items().length);
+        console.log("[SA] fetchYear: " + t + " complete — " + count + " new items, total: " + e.items().length);
 
         e.loaded(true);
         $(".initial").remove();
         e.notify.notifySubscribers();
 
         var nextYear = t - 1;
-        var willRecurse = t > 2016 && e.userRequestedMore && t !== e.year - 1 && !e.fetchedYears[nextYear];
-
-        console.log('[SA] fetchYear: ' + t + ' — willRecurse: ' + willRecurse + ', userRequestedMore: ' + e.userRequestedMore + ', nextYear: ' + nextYear + ', alreadyFetched: ' + !!e.fetchedYears[nextYear]);
+        var willRecurse = t > 2016 && e.userRequestedMore && !e.fetchedYears[nextYear];
 
         if (willRecurse) {
-          console.log('[SA] fetchYear: recursing to ' + nextYear);
+          console.log("[SA] fetchYear: recursing to " + nextYear);
           e.fetchYear(nextYear);
         } else {
-          console.log('[SA] fetchYear: no more recursion — hiding skeleton');
+          console.log("[SA] fetchYear: done — hiding skeleton");
           $("#load-more-skeleton").hide();
           $("#load-more").text("See more episodes");
         }
         $(window).scrollTop(lmScroll);
-      })
-      .catch(function(err) {
-        console.log('[SA] fetchYear: ' + t + ' fetch error — ' + err);
+      },
+      error: function (xhr) {
+        console.log("[SA] fetchYear: " + t + " returned " + xhr.status + " — stopping");
         e.loaded(true);
-        $("#load-more-skeleton").hide();
         e.hasMore(false);
+        $("#load-more-skeleton").hide();
         $("#load-more").text("See more episodes");
         e.notify.notifySubscribers();
-      });
+      }
+    });
   };
 
   e.userRequestedMore = false;
-  e.hasMore = ko.observable(true);
-  // loadingMore now controlled via jQuery #load-more-skeleton
-  e.fetchedYears = {}; // Track which years have already been fetched // Assume there's more until a year fetch returns empty or 404
 
   e.loadMore = function () {
-    console.log('[SA] loadMore: clicked — show: ' + e.show() + ', items: ' + e.items().length);
-    e.userRequestedMore = true;
-    $("#load-more-skeleton").show();
     lmScroll = $(window).scrollTop();
+    e.userRequestedMore = true;
+    console.log("[SA] loadMore: clicked — show: " + e.show() + ", items: " + e.items().length);
     $("#load-more").text("Loading...");
+    $("#load-more-skeleton").show();
     setTimeout(function () {
       if (e.items().length < 1) {
         e.fetchYear(e.year);
       } else {
-        // Items already in memory — no fetch needed, hide skeleton immediately
-        console.log('[SA] loadMore: items already in memory — hiding skeleton immediately');
         $(".initial").remove();
-        $("#load-more-skeleton").hide();
-        $("#load-more").text("See more episodes");
       }
       if (e.show() === 0) {
         e.show(11);
@@ -278,12 +254,8 @@ function FormViewModel(t) {
     }, 50);
   };
 
-  // ============================================================
-  // V2 CHANGE: Always fetch on init regardless of hash/page state.
-  // Replaces the old conditional block that only fetched when
-  // show() > 9. loadContent() handles both fresh load and
-  // deep-link (hash) cases correctly.
-  // ============================================================
+  // Fetch on init — eliminates .initial server-rendered tiles
+  // and ensures correct episode order from the start.
   setTimeout(function () {
     if (getUrlParameter("t") === undefined) {
       e.loadContent();
@@ -322,7 +294,6 @@ function getUrlParameter(name) {
 }
 
 $(document).ready(function () {
-  // Prevent duplicate Knockout bindings
   if (!ko.dataFor(document.body)) {
     let viewModel;
     if (location.hash !== "") {
