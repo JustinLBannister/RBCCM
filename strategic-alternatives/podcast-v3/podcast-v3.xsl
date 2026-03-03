@@ -424,3 +424,27 @@ $(document).ready(function () {
  
  
 </xsl:stylesheet>
+ 
+<Properties ComponentID="1445986034770">
+  <Datum ID="Container" Type="Boolean" Name="Wrap in Container">true</Datum>
+  <Datum ID="ShowPlayButton" Type="Boolean" Name="Show Video Play Button">true</Datum>
+  <Datum ID="ShowDate" Type="Boolean" Name="Show Publish Date">false</Datum>
+  <Datum ID="ShowAuthor" Type="Boolean" Name="Show Author">true</Datum>
+  <Datum ID="CharacterLimit" Type="Number" Name="Allowed characters for description">140</Datum>
+</Properties>
+ 
+<Data>
+  <Datum ID="Title" Type="String" Name="My String">Recent Articles</Datum>
+  <Datum ID="ArchiveYear" Type="Number" Name="Archive Year" Replicatable="true" CloneGroupID="irnlszht">2016</Datum>
+  <Datum ID="ViewPage" Type="PageLink" Name="View Article Page"><![CDATA[$PAGE_LINK[about-us]]]></Datum>
+  <Datum ID="ArchivePage" Type="PageLink" Name="Archive Page"><![CDATA[$PAGE_LINK[about-us]]]></Datum>
+  <External>
+    <Parameters>
+      <Datum ID="qQuery" Name="qQuery" Type="String" Label="Query"> ((TeamSite/Templating/DCR/Type:article/story) OR (TeamSite/Templating/DCR/Type:rbccm/episode)) AND ((TeamSite/Metadata/sitelocation:ma-inflection-points) OR (TeamSite/Metadata/podcast_type=:strategic)) AND (TeamSite/Metadata/publishdate:&gt;2020-00-00)</Datum>
+      <Datum ID="qSort" Name="qSort" Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
+      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">4</Datum>
+    </Parameters>
+    <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>
+    <Method>findByQuery</Method>
+  </External>
+</Data>
