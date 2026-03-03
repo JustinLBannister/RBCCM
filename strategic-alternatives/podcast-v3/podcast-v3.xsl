@@ -189,7 +189,7 @@
       </div>
 
       <div class="container">
-        <div class="text-center" data-bind="visible: loaded() && (filteredItems().length > show() || hasMore())">
+        <div class="text-center" data-bind="visible: loaded() &amp;&amp; (filteredItems().length > show() || hasMore())">
           <a id="load-more" href="javascript:void(0);" class="btn btn-inverse"
             data-bind="click: loadMore" aria-label="See more episodes">See more episodes</a>
         </div>
