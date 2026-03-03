@@ -146,8 +146,50 @@
         </div>
       </div>
 
+      <!-- Skeleton shown while fetching additional years on See More click -->
+      <div class="container" data-bind="visible: loadingMore()">
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="skeleton-tile">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line" style="width: 25%;"></div>
+                <div class="skeleton-line" style="width: 60%; height: 20px; margin-bottom: 16px;"></div>
+                <div class="skeleton-line" style="width: 90%;"></div>
+                <div class="skeleton-line" style="width: 80%;"></div>
+                <div class="skeleton-line" style="width: 30%; margin-top: 20px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12">
+            <div class="skeleton-tile">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line" style="width: 25%;"></div>
+                <div class="skeleton-line" style="width: 60%; height: 20px; margin-bottom: 16px;"></div>
+                <div class="skeleton-line" style="width: 90%;"></div>
+                <div class="skeleton-line" style="width: 80%;"></div>
+                <div class="skeleton-line" style="width: 30%; margin-top: 20px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12">
+            <div class="skeleton-tile">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line" style="width: 25%;"></div>
+                <div class="skeleton-line" style="width: 60%; height: 20px; margin-bottom: 16px;"></div>
+                <div class="skeleton-line" style="width: 90%;"></div>
+                <div class="skeleton-line" style="width: 80%;"></div>
+                <div class="skeleton-line" style="width: 30%; margin-top: 20px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="container">
-        <div class="text-center" data-bind="visible: (show()==5)||(show() &lt; filteredItems().length) ">
+        <div class="text-center" data-bind="visible: loaded() && (filteredItems().length > show() || hasMore())">
           <a id="load-more" href="javascript:void(0);" class="btn btn-inverse"
             data-bind="click: loadMore" aria-label="See more episodes">See more episodes</a>
         </div>

@@ -140,6 +140,13 @@ function FormViewModel(t) {
       dataType: "xml",
       cache: true,
       success: function (i) {
+        // Guard against empty or invalid XML response
+        if (!i || !$(i).find("news").length) {
+          e.loaded(true);
+          e.hasMore(false);
+          $("#load-more").text("See more episodes");
+          return;
+        }
         $(i).find("news").each(function () {
           var o = {
             date: $(this).find("date").text(),
@@ -180,20 +187,32 @@ function FormViewModel(t) {
         });
 
         e.loaded(true);
+        e.loadingMore(false);
         $("#load-more").text("See more episodes");
         $(".initial").remove();
         e.notify.notifySubscribers();
         // On user click, recurse to next year — but skip current-1 since it was pre-fetched on init
         if (t > 2016 && e.userRequestedMore && t !== e.year - 1) e.fetchYear(t - 1);
         $(window).scrollTop(lmScroll);
+      },
+      error: function (xhr) {
+        // Silently handle 404s — means no data exists for that year, stop recursing
+        e.loaded(true);
+        e.loadingMore(false);
+        e.hasMore(false);
+        $("#load-more").text("See more episodes");
+        e.notify.notifySubscribers();
       }
     });
   };
 
   e.userRequestedMore = false;
+  e.hasMore = ko.observable(true);
+  e.loadingMore = ko.observable(false); // Assume there's more until a year fetch returns empty or 404
 
   e.loadMore = function () {
     e.userRequestedMore = true;
+    e.loadingMore(true);
     lmScroll = $(window).scrollTop();
     $("#load-more").text("Loading...");
     setTimeout(function () {
