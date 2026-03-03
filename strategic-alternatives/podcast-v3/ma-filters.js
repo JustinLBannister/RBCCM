@@ -124,20 +124,26 @@ function FormViewModel(t) {
     var t = $(window).scrollTop();
     if (e.show() === 0) e.show(5);
     if (e.items().length < 1) {
+      console.log('[SA] loadContent: no items yet — fetching ' + e.year + ' and ' + (e.year - 1));
       $(".initial").remove();
       $("#load-more").text("Loading...");
       e.fetchYear(e.year);
       e.fetchYear(e.year - 1);
       $(window).scrollTop(t);
     } else {
+      console.log('[SA] loadContent: items already loaded (' + e.items().length + ') — skipping fetch');
       $("#load-more").text("See more episodes");
     }
   };
 
   e.fetchYear = function (t) {
     // Prevent fetching the same year twice
-    if (e.fetchedYears[t]) return;
+    if (e.fetchedYears[t]) {
+      console.log('[SA] fetchYear: skipping ' + t + ' — already fetched');
+      return;
+    }
     e.fetchedYears[t] = true;
+    console.log('[SA] fetchYear: requesting ' + t);
 
     $.ajax({
       url: "https://www.rbccm.com/en/gib/ma-data/data/" + t + "-strategic-alternatives.page",
@@ -146,12 +152,15 @@ function FormViewModel(t) {
       success: function (i) {
         // Guard against empty or invalid XML response
         if (!i || !$(i).find("news").length) {
+          console.log('[SA] fetchYear: ' + t + ' returned empty or invalid XML — stopping');
           e.loaded(true);
           e.loadingMore(false);
           e.hasMore(false);
           $("#load-more").text("See more episodes");
           return;
         }
+
+        var count = 0;
         $(i).find("news").each(function () {
           var o = {
             date: $(this).find("date").text(),
@@ -188,8 +197,13 @@ function FormViewModel(t) {
           // Deduplicate by title before pushing
           if (!e.items().some(item => item.title === o.title)) {
             e.items.push(o);
+            count++;
+          } else {
+            console.log('[SA] fetchYear: duplicate skipped — ' + o.title);
           }
         });
+
+        console.log('[SA] fetchYear: ' + t + ' complete — ' + count + ' new items added, total items: ' + e.items().length);
 
         e.loaded(true);
         $(".initial").remove();
@@ -198,16 +212,20 @@ function FormViewModel(t) {
         var nextYear = t - 1;
         var willRecurse = t > 2016 && e.userRequestedMore && t !== e.year - 1 && !e.fetchedYears[nextYear];
 
+        console.log('[SA] fetchYear: ' + t + ' — willRecurse: ' + willRecurse + ', userRequestedMore: ' + e.userRequestedMore + ', nextYear: ' + nextYear + ', alreadyFetched: ' + !!e.fetchedYears[nextYear]);
+
         if (willRecurse) {
+          console.log('[SA] fetchYear: recursing to ' + nextYear);
           e.fetchYear(nextYear);
         } else {
+          console.log('[SA] fetchYear: no more recursion — hiding skeleton');
           e.loadingMore(false);
           $("#load-more").text("See more episodes");
         }
         $(window).scrollTop(lmScroll);
       },
       error: function (xhr) {
-        // Silently handle 404s — means no data exists for that year, stop recursing
+        console.log('[SA] fetchYear: ' + t + ' returned ' + xhr.status + ' — stopping recursion, hiding skeleton');
         e.loaded(true);
         e.loadingMore(false);
         e.hasMore(false);
@@ -223,6 +241,7 @@ function FormViewModel(t) {
   e.fetchedYears = {}; // Track which years have already been fetched // Assume there's more until a year fetch returns empty or 404
 
   e.loadMore = function () {
+    console.log('[SA] loadMore: clicked — show: ' + e.show() + ', items: ' + e.items().length);
     e.userRequestedMore = true;
     e.loadingMore(true);
     lmScroll = $(window).scrollTop();
