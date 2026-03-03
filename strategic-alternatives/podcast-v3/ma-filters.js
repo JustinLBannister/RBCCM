@@ -154,7 +154,7 @@ function FormViewModel(t) {
         if (!i || !$(i).find("news").length) {
           console.log('[SA] fetchYear: ' + t + ' returned empty or invalid XML — stopping');
           e.loaded(true);
-          e.loadingMore(false);
+          $("#load-more-skeleton").hide();
           e.hasMore(false);
           $("#load-more").text("See more episodes");
           return;
@@ -219,7 +219,7 @@ function FormViewModel(t) {
           e.fetchYear(nextYear);
         } else {
           console.log('[SA] fetchYear: no more recursion — hiding skeleton');
-          e.loadingMore(false);
+          $("#load-more-skeleton").hide();
           $("#load-more").text("See more episodes");
         }
         $(window).scrollTop(lmScroll);
@@ -227,7 +227,7 @@ function FormViewModel(t) {
       error: function (xhr) {
         console.log('[SA] fetchYear: ' + t + ' returned ' + xhr.status + ' — stopping recursion, hiding skeleton');
         e.loaded(true);
-        e.loadingMore(false);
+        $("#load-more-skeleton").hide();
         e.hasMore(false);
         $("#load-more").text("See more episodes");
         e.notify.notifySubscribers();
@@ -237,13 +237,13 @@ function FormViewModel(t) {
 
   e.userRequestedMore = false;
   e.hasMore = ko.observable(true);
-  e.loadingMore = ko.observable(false);
+  // loadingMore now controlled via jQuery #load-more-skeleton
   e.fetchedYears = {}; // Track which years have already been fetched // Assume there's more until a year fetch returns empty or 404
 
   e.loadMore = function () {
     console.log('[SA] loadMore: clicked — show: ' + e.show() + ', items: ' + e.items().length);
     e.userRequestedMore = true;
-    e.loadingMore(true);
+    $("#load-more-skeleton").show();
     lmScroll = $(window).scrollTop();
     $("#load-more").text("Loading...");
     setTimeout(function () {
@@ -253,7 +253,7 @@ function FormViewModel(t) {
         // Items already in memory — no fetch needed, hide skeleton immediately
         console.log('[SA] loadMore: items already in memory — hiding skeleton immediately');
         $(".initial").remove();
-        e.loadingMore(false);
+        $("#load-more-skeleton").hide();
         $("#load-more").text("See more episodes");
       }
       if (e.show() === 0) {

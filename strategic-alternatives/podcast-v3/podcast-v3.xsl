@@ -147,7 +147,7 @@
       </div>
 
       <!-- Skeleton shown while fetching additional years on See More click -->
-      <div class="container" data-bind="visible: loadingMore()">
+      <div class="container" id="load-more-skeleton" style="display:none">
         <div class="row">
           <div class="col-xs-12">
             <div class="skeleton-tile">
