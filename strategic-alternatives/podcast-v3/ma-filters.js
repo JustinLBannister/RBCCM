@@ -250,7 +250,10 @@ function FormViewModel(t) {
       if (e.items().length < 1) {
         e.fetchYear(e.year);
       } else {
+        // Items already in memory — no fetch needed, hide skeleton immediately
+        console.log('[SA] loadMore: items already in memory — hiding skeleton immediately');
         $(".initial").remove();
+        e.loadingMore(false);
         $("#load-more").text("See more episodes");
       }
       if (e.show() === 0) {
