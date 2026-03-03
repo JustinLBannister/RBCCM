@@ -129,7 +129,7 @@ function FormViewModel(t) {
       e.fetchYear(e.year);
       $(window).scrollTop(t);
     } else {
-      $("#load-more").text("See more");
+      $("#load-more").text("See more episodes");
     }
   };
 
@@ -172,13 +172,14 @@ function FormViewModel(t) {
             o.thumbnail = "//www.rbccm.com" + o.thumbnail;
           }
 
+          // Deduplicate by title before pushing
           if (!e.items().some(item => item.title === o.title)) {
-  e.items.push(o);
-}
+            e.items.push(o);
+          }
         });
 
         e.loaded(true);
-        $("#load-more").text("See more");
+        $("#load-more").text("See more episodes");
         $(".initial").remove();
         e.notify.notifySubscribers();
         if (t > 2016) e.fetchYear(t - 1);
@@ -195,7 +196,7 @@ function FormViewModel(t) {
         e.fetchYear(e.year);
       } else {
         $(".initial").remove();
-        $("#load-more").text("See more");
+        $("#load-more").text("See more episodes");
       }
       if (e.show() === 0) {
         e.show(15);
@@ -207,18 +208,20 @@ function FormViewModel(t) {
     }, 50);
   };
 
-  if (e.show() > 9) {
-    $(".initial").remove();
-    $("#load-more").text("Loading...");
-    setTimeout(function () {
-      if (e.items().length < 1 && getUrlParameter("t") === undefined) {
-        e.fetchYear(e.year);
-      } else {
-        $("#load-more").text("See more");
-      }
+  // ============================================================
+  // V2 CHANGE: Always fetch on init regardless of hash/page state.
+  // Replaces the old conditional block that only fetched when
+  // show() > 9. loadContent() handles both fresh load and
+  // deep-link (hash) cases correctly.
+  // ============================================================
+  setTimeout(function () {
+    if (getUrlParameter("t") === undefined) {
+      e.loadContent();
+    }
+    if (e.show() > 9) {
       setPage((e.show() - 9) / 6);
-    }, 50);
-  }
+    }
+  }, 0);
 }
 
 function setPage(t) {
@@ -242,7 +245,7 @@ function getURLtag(t) {
 }
 
 function getUrlParameter(name) {
-  name = name.replace(/[Ã®â‚¬Â]/, "\Ã®â‚¬Â").replace(/[Ã®â‚¬Â]/, "\Ã®â‚¬Â");
+  name = name.replace(/[Ã®â‚¬Â]/, "\Ã®â‚¬Â").replace(/[Ã®â‚¬Â]/, "\Ã®â‚¬Â");
   var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
       results = regex.exec(location.search);
   return results === null ? undefined : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -275,7 +278,7 @@ $(document).ready(function () {
     }
   }
 
-   if ($(".insights-dropdown-toggle").on({
+  if ($(".insights-dropdown-toggle").on({
         click: function(t) {
             $(this).toggleClass("active"),
             $(this).next(".insights-dropdown-items").toggleClass("active").focus(),
@@ -348,17 +351,14 @@ $(document).ready(function () {
     $("#clear-search").on("click", function() {
         $("#search-categories-list .category").removeClass("active")
     })
-   );
-   
-    var e = getUrlParameter("t");
-    if (void 0 !== e) {
-        var i = e.split(",");
-        $.each(i, function(t, e) {
-            $("input[value='" + $.trim(e) + "']").click()
-        })
-    }
-  
+  );
 
-
+  var e = getUrlParameter("t");
+  if (void 0 !== e) {
+    var i = e.split(",");
+    $.each(i, function(t, e) {
+      $("input[value='" + $.trim(e) + "']").click()
+    })
+  }
 
 });
