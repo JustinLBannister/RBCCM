@@ -122,11 +122,12 @@ function FormViewModel(t) {
 
   e.loadContent = function () {
     var t = $(window).scrollTop();
-    if (e.show() === 0) e.show(9);
+    if (e.show() === 0) e.show(5);
     if (e.items().length < 1) {
       $(".initial").remove();
       $("#load-more").text("Loading...");
       e.fetchYear(e.year);
+      e.fetchYear(e.year - 1);
       $(window).scrollTop(t);
     } else {
       $("#load-more").text("See more episodes");
@@ -182,13 +183,17 @@ function FormViewModel(t) {
         $("#load-more").text("See more episodes");
         $(".initial").remove();
         e.notify.notifySubscribers();
-        if (t > 2016) e.fetchYear(t - 1);
+        // On user click, recurse to next year — but skip current-1 since it was pre-fetched on init
+        if (t > 2016 && e.userRequestedMore && t !== e.year - 1) e.fetchYear(t - 1);
         $(window).scrollTop(lmScroll);
       }
     });
   };
 
+  e.userRequestedMore = false;
+
   e.loadMore = function () {
+    e.userRequestedMore = true;
     lmScroll = $(window).scrollTop();
     $("#load-more").text("Loading...");
     setTimeout(function () {

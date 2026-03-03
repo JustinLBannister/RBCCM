@@ -14,6 +14,55 @@
     <!-- This eliminates the ordering mismatch on "See more" click.   -->
     <!-- ============================================================ -->
 
+    <!-- Loading skeleton shown while fetchYear() is in progress -->
+    <style>
+      @keyframes pulse {
+        0% { background-color: #e0e0e0; }
+        50% { background-color: #ececec; }
+        100% { background-color: #e0e0e0; }
+      }
+      .skeleton-tile {
+        display: flex;
+        margin-bottom: 20px;
+        border: 1px solid #e5e5e5;
+        min-height: 200px;
+      }
+      .skeleton-img {
+        width: 33%;
+        min-height: 200px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      .skeleton-content {
+        width: 67%;
+        padding: 20px;
+      }
+      .skeleton-line {
+        height: 14px;
+        margin-bottom: 12px;
+        border-radius: 3px;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    </style>
+
+    <div class="container" data-bind="visible: loaded() === false">
+      <div class="row">
+        <xsl:for-each select="1 to 5">
+          <div class="col-xs-12">
+            <div class="skeleton-tile">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-line" style="width: 25%;"></div>
+                <div class="skeleton-line" style="width: 60%; height: 20px; margin-bottom: 16px;"></div>
+                <div class="skeleton-line" style="width: 90%;"></div>
+                <div class="skeleton-line" style="width: 80%;"></div>
+                <div class="skeleton-line" style="width: 30%; margin-top: 20px;"></div>
+              </div>
+            </div>
+          </div>
+        </xsl:for-each>
+      </div>
+    </div>
+
     <div class="insights-stories ko">
 
       <div class="container" style="display: none" data-bind="visible: show() &gt;= 0">
