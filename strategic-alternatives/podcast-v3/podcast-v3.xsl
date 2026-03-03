@@ -98,7 +98,7 @@
       </div>
 
       <div class="container">
-        <div class="text-center" data-bind="visible: (show()==9)||(show() &lt; filteredItems().length) ">
+        <div class="text-center" data-bind="visible: (show()==5)||(show() &lt; filteredItems().length) ">
           <a id="load-more" href="javascript:void(0);" class="btn btn-inverse"
             data-bind="click: loadMore" aria-label="See more episodes">See more episodes</a>
         </div>
@@ -106,49 +106,49 @@
     </div>
 
     <script>
-    $(document).ready(function () {
+$(document).ready(function () {
 
-      // Handle Play episode button click
-      $(document).on("click", ".audio-play", function () {
-        console.log("Yes");
+  // Handle Play episode button click
+  $(document).on("click", ".audio-play", function () {
+    console.log("Yes");
 
-        // Hide any currently visible podcast players and clear their iframes src
-        $('.story-podcast-playing:visible').each(function() {
-          var iframe = $(this).find("iframe");
-          iframe.data("src", iframe.attr("src"));
-          iframe.attr("src", "");
-          $(this).hide();
-        });
-
-        // Show the selected podcast player and restore its iframe src
-        var podcastElement = $(this).closest(".external-button-group").find(".story-podcast-playing");
-        var iframe = podcastElement.find("iframe");
-
-        if (!podcastElement.is(":visible")) {
-          podcastElement.show();
-          iframe.attr("src", iframe.data("src"));
-        }
-      });
-
-      // Handle X button click to close podcast player
-      $(document).on("click", ".close-btn", function () {
-        var podcastElement = $(this).closest(".story-podcast-playing");
-        var iframe = podcastElement.find("iframe");
-        podcastElement.hide();
-        iframe.data("src", iframe.attr("src"));
-        iframe.attr("src", "");
-      });
-
-      // Additional styling
-      $(this).closest(".white-box-text").find(".tile--gib").css("padding", "15px 20px");
-      $(".tile--gib").css("height", "290px");
-      $(".white-box.tile--news.tile--gib.tile.story.tile--white").css({
-        "max-height": "290px",
-        "min-height": "290px"
-      });
-
-      $('a').each
+    // Hide any currently visible podcast players and clear their iframes src
+    $('.story-podcast-playing:visible').each(function() {
+      var iframe = $(this).find("iframe");
+      iframe.data("src", iframe.attr("src"));
+      iframe.attr("src", "");
+      $(this).hide();
     });
+
+    // Show the selected podcast player and restore its iframe src
+    var podcastElement = $(this).closest(".external-button-group").find(".story-podcast-playing");
+    var iframe = podcastElement.find("iframe");
+
+    if (!podcastElement.is(":visible")) {
+      podcastElement.show();
+      iframe.attr("src", iframe.data("src"));
+    }
+  });
+
+  // Handle X button click to close podcast player
+  $(document).on("click", ".close-btn", function () {
+    var podcastElement = $(this).closest(".story-podcast-playing");
+    var iframe = podcastElement.find("iframe");
+    podcastElement.hide();
+    iframe.data("src", iframe.attr("src"));
+    iframe.attr("src", "");
+  });
+
+  // Additional styling
+  $(this).closest(".white-box-text").find(".tile--gib").css("padding", "15px 20px");
+  $(".tile--gib").css("height", "290px");
+  $(".white-box.tile--news.tile--gib.tile.story.tile--white").css({
+    "max-height": "290px",
+    "min-height": "290px"
+  });
+
+  $('a').each
+});
     </script>
 
   </xsl:template>
@@ -176,6 +176,8 @@
     <xsl:text> </xsl:text>
     <xsl:value-of select="$vDay" />, <xsl:value-of select="$vYear" />
   </xsl:template>
+
+
 </xsl:stylesheet>
 
 <Properties ComponentID="1445986034770">
