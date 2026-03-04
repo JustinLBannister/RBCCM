@@ -1,4 +1,4 @@
-<!DOCTYPE html-entities SYSTEM http://www.interwoven.com/livesite/xsl/xsl-html.dtd>
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl=http://www.w3.org/1999/XSL/Transform>
   <!-- Skin: RBCCM - Insights new -->
  
@@ -43,7 +43,7 @@
                     <xsl:variable name="ARTICLE_DESCRIPTION" select="./attr[ @key = 'TeamSite/Metadata/Description' ]" />
                     <xsl:variable name="ARTICLE_THUMBNAIL" select="./attr[ @key = 'TeamSite/Metadata/thumbnail' ]" />
                     <xsl:variable name="ARTICLE_SERIES" select="./attr[ @key = 'TeamSite/Metadata/sitelocation' ]" />
-                    <xsl:variable name="ARTICLE_ID" select=./@path />
+                    <xsl:variable name="ARTICLE_ID" select="./@path" />
                     <xsl:variable name="ARTICLE_PODCAST" select="./attr[ @key = 'TeamSite/Metadata/podcast' ]" />
                     <xsl:variable name="ARTICLE_TEMPLATE_TITLE" select="tokenize($ARTICLE_ID,'/')[last()]" />
                     <xsl:variable name="ARTICLE_SUBCATEGORY" select="./attr[ @key = 'TeamSite/Metadata/subcategory' ]" />
@@ -279,10 +279,10 @@
                       <a class="learn-more audio-play btn-close-player" href="javascript:void(0);" data-bind="visible: podcast !== ''" aria-label="Play episode"><u>Play episode</u></a>
  
                           <p class="read-watch" style="padding-top: 30px;">
-                           <img src=https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg alt="Watch Time" data-bind="visible: type === 'video'"/><span class="date" data-bind="visible: type === 'video', html: watchtime"></span>
-                           <img src=https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg alt="Listen Time" data-bind="visible: type === 'audio'"/><span class="date" data-bind="visible: type === 'audio', html: watchtime"></span>
+                           <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="Watch Time" data-bind="visible: type === 'video'"/><span class="date" data-bind="visible: type === 'video', html: watchtime"></span>
+                           <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="Listen Time" data-bind="visible: type === 'audio'"/><span class="date" data-bind="visible: type === 'audio', html: watchtime"></span>
                            <span class="separator" role="presentation" style="display: inline-block;height: 15px;border-left: 1px #000000 solid;opacity: .5;margin: 0 7px;" data-bind="visible: watchtime != ''"></span>
-                            <img src=https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg alt="Read Time" data-bind="visible: readtime != ''"/><span class="date" data-bind="visible: readtime != '', html: readtime"></span>
+                            <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="Read Time" data-bind="visible: readtime != ''"/><span class="date" data-bind="visible: readtime != '', html: readtime"></span>
                           </p>
                     </div>
                   </div>
