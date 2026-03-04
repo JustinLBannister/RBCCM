@@ -1,0 +1,33 @@
+<!-- Year Filter — placed before div.insights-stories.ko, inside iw_component -->
+<div class="container deals-year-filter" data-bind="visible: availableYears().length > 0">
+  <div class="row">
+    <div class="col-xs-12">
+      <ul class="year-filter-list">
+        <!-- "All" button -->
+        <li>
+          <button
+            class="year-filter-btn"
+            data-bind="
+              click: clearYear,
+              css: { 'active': year() === null }
+            ">
+            All
+          </button>
+        </li>
+        <!-- One button per year, descending -->
+        <!-- ko foreach: availableYears -->
+        <li>
+          <button
+            class="year-filter-btn"
+            data-bind="
+              text: $data,
+              click: function() { $root.selectYear($data); },
+              css: { 'active': $root.year() === $data }
+            ">
+          </button>
+        </li>
+        <!-- /ko -->
+      </ul>
+    </div>
+  </div>
+</div>
