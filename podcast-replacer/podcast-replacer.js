@@ -1,7 +1,34 @@
 // Universal podcast/hero handler - detects page type and runs appropriate script
 (function() {
+    // =========================================================================
+    // STRIP MARKETO aliId FROM URL ON PAGE LOAD
+    // aliId is appended by Munchkin during LinkedIn Insight Tag-triggered reloads.
+    // We wait 1500ms to ensure Munchkin reads it first, then clean silently.
+    // We use the native replaceState (before any monitor wraps it) so LinkedIn
+    // Insight Tag does not see the call and trigger another reload.
+    // =========================================================================
+    const nativeReplaceState = window.history.replaceState.bind(window.history);
+    (function() {
+        function stripAliId() {
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('aliId')) {
+                url.searchParams.delete('aliId');
+                const cleanUrl = url.pathname + (url.search && url.search !== '?' ? url.search : '');
+                nativeReplaceState(null, '', cleanUrl);
+                console.log('[AliId Strip] Cleaned aliId from URL:', cleanUrl);
+            }
+        }
+        if (document.readyState === 'complete') {
+            setTimeout(stripAliId, 1500);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(stripAliId, 1500);
+            });
+        }
+    })();
     console.log('Universal podcast handler initializing...');
-    // ADDED: Intercept history changes to diagnose what is writing to the URL
+    // DIAGNOSTIC: Intercept history changes to confirm what is writing to the URL.
+    // Remove this block once the aliId issue is confirmed resolved in production.
     (function() {
         const origPush = history.pushState;
         const origReplace = history.replaceState;
@@ -55,8 +82,8 @@
                 console.log('[Captivate] Removing existing overlay');
                 existing.remove();
             }
-            // CHANGED: use <div> instead of <a> to prevent click events
-            // from bubbling through an anchor and triggering navigation
+            // Use <div> instead of <a> to prevent click events from bubbling
+            // through an anchor and triggering unintended navigation
             const wrapper = document.createElement('div');
             wrapper.id = 'custom-podcast-overlay';
             wrapper.style.cssText = `
@@ -87,9 +114,9 @@
             iframe.scrolling = 'no';
             iframe.frameBorder = 'no';
             iframe.allow = 'autoplay';
-            // ADDED: sandbox prevents iframe from calling pushState/replaceState
+            // sandbox prevents the Captivate iframe from calling pushState/replaceState
             // on the parent window. allow-top-navigation intentionally omitted.
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-autoplay');
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-presentation');
             iframe.src = episodeUrl;
             console.log('[Captivate] Overlay iframe src set to:', episodeUrl);
             closeButton.onclick = function(e) {
@@ -102,9 +129,6 @@
                     iframe.src = episodeUrl;
                     console.log('[Captivate] iframe src restored for next open');
                 }, 100);
-                // ADDED: clean URL when player is closed too
-                history.replaceState(null, '', window.location.pathname);
-                console.log('[Captivate] URL cleaned on close');
             };
             overlay.appendChild(closeButton);
             overlay.appendChild(iframe);
@@ -140,7 +164,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('[Captivate] Hero play button clicked - showing overlay');
-                console.log('[Captivate] URL at time of click (before clean):', window.location.href);
+                console.log('[Captivate] URL at time of click:', window.location.href);
                 hideOriginalPlayer();
                 if (!document.getElementById('custom-podcast-overlay')) {
                     const url = episodeUrl || getFirstEpisodeUrl();
@@ -156,12 +180,6 @@
                     overlay.style.display = 'block';
                     console.log('[Captivate] Podcast overlay now visible');
                 }
-                // ADDED: Clean aliId and any other params Marketo/Munchkin
-                // writes to the URL on click. Tracking is already fired by
-                // this point — this only cleans the visible URL.
-                const urlBefore = window.location.href;
-                history.replaceState(null, '', window.location.pathname);
-                console.log('[Captivate] URL cleaned after click:', urlBefore, '->', window.location.pathname);
                 setTimeout(hideOriginalPlayer, 100);
                 setTimeout(hideOriginalPlayer, 300);
                 setTimeout(hideOriginalPlayer, 500);
