@@ -1,6 +1,35 @@
 // Universal podcast/hero handler - detects page type and runs appropriate script
 (function() {
     console.log('Universal podcast handler initializing...');
+    // =========================================================================
+    // aliId RELOAD RECOVERY
+    // If Munchkin/LinkedIn appended aliId and caused a reload mid-interaction,
+    // clean the URL immediately on load and reopen the player automatically
+    // so the user experience is seamless.
+    // =========================================================================
+    (function() {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('aliId')) {
+            console.log('[AliId] aliId detected on page load, cleaning URL and will reopen player');
+            // Capture native replaceState before any monitor wraps it
+            const nativeReplace = window.history.replaceState.bind(window.history);
+            nativeReplace(null, '', window.location.pathname);
+            console.log('[AliId] URL cleaned to:', window.location.pathname);
+            // Wait for the overlay to be created by initCaptivateOverlay, then open it
+            function tryOpenPlayer() {
+                const overlay = document.getElementById('custom-podcast-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    console.log('[AliId] Player reopened after aliId reload');
+                } else {
+                    setTimeout(tryOpenPlayer, 200);
+                }
+            }
+            // Start polling after a short delay to give the rest of the script
+            // time to initialise and create the overlay
+            setTimeout(tryOpenPlayer, 500);
+        }
+    })();
     // DIAGNOSTIC: Intercept history changes to confirm what is writing to the URL.
     // Remove this block once the aliId issue is confirmed resolved in production.
     (function() {
@@ -137,7 +166,7 @@
             button.parentNode.replaceChild(newButton, button);
             // capture: true ensures this fires before any bubble-phase listeners
             // (including LinkedIn Insight Tag) so stopImmediatePropagation kills
-            // the event before LinkedIn can intercept it and trigger a page reload
+            // the event before third-party scripts can intercept it
             newButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -162,7 +191,7 @@
                 setTimeout(hideOriginalPlayer, 100);
                 setTimeout(hideOriginalPlayer, 300);
                 setTimeout(hideOriginalPlayer, 500);
-            }, true); // true = capture phase, fires before LinkedIn's bubble listener
+            }, true); // true = capture phase, fires before bubble-phase listeners
             console.log('[Captivate] Hero button handler attached');
             return true;
         }
