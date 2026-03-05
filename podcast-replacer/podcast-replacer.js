@@ -1,31 +1,5 @@
 // Universal podcast/hero handler - detects page type and runs appropriate script
 (function() {
-    // =========================================================================
-    // STRIP MARKETO aliId FROM URL ON PAGE LOAD
-    // aliId is appended by Munchkin during LinkedIn Insight Tag-triggered reloads.
-    // We wait 1500ms to ensure Munchkin reads it first, then clean silently.
-    // We use the native replaceState (before any monitor wraps it) so LinkedIn
-    // Insight Tag does not see the call and trigger another reload.
-    // =========================================================================
-    const nativeReplaceState = window.history.replaceState.bind(window.history);
-    (function() {
-        function stripAliId() {
-            const url = new URL(window.location.href);
-            if (url.searchParams.has('aliId')) {
-                url.searchParams.delete('aliId');
-                const cleanUrl = url.pathname + (url.search && url.search !== '?' ? url.search : '');
-                nativeReplaceState(null, '', cleanUrl);
-                console.log('[AliId Strip] Cleaned aliId from URL:', cleanUrl);
-            }
-        }
-        if (document.readyState === 'complete') {
-            setTimeout(stripAliId, 1500);
-        } else {
-            window.addEventListener('load', function() {
-                setTimeout(stripAliId, 1500);
-            });
-        }
-    })();
     console.log('Universal podcast handler initializing...');
     // DIAGNOSTIC: Intercept history changes to confirm what is writing to the URL.
     // Remove this block once the aliId issue is confirmed resolved in production.
@@ -122,6 +96,7 @@
             closeButton.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 console.log('[Captivate] Close button clicked, hiding overlay');
                 wrapper.style.display = 'none';
                 iframe.src = '';
@@ -160,9 +135,13 @@
             const newButton = button.cloneNode(true);
             newButton.removeAttribute('aria-controls');
             button.parentNode.replaceChild(newButton, button);
+            // capture: true ensures this fires before any bubble-phase listeners
+            // (including LinkedIn Insight Tag) so stopImmediatePropagation kills
+            // the event before LinkedIn can intercept it and trigger a page reload
             newButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 console.log('[Captivate] Hero play button clicked - showing overlay');
                 console.log('[Captivate] URL at time of click:', window.location.href);
                 hideOriginalPlayer();
@@ -183,8 +162,7 @@
                 setTimeout(hideOriginalPlayer, 100);
                 setTimeout(hideOriginalPlayer, 300);
                 setTimeout(hideOriginalPlayer, 500);
-                return false;
-            });
+            }, true); // true = capture phase, fires before LinkedIn's bubble listener
             console.log('[Captivate] Hero button handler attached');
             return true;
         }
