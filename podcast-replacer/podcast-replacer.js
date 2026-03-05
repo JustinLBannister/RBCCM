@@ -4,18 +4,16 @@
     // =========================================================================
     // aliId RELOAD RECOVERY
     // If Munchkin/LinkedIn appended aliId and caused a reload mid-interaction,
-    // clean the URL immediately on load and reopen the player automatically
-    // so the user experience is seamless.
+    // clean the URL immediately and reopen the player automatically so the
+    // user experience is seamless.
     // =========================================================================
     (function() {
         const url = new URL(window.location.href);
         if (url.searchParams.has('aliId')) {
             console.log('[AliId] aliId detected on page load, cleaning URL and will reopen player');
-            // Capture native replaceState before any monitor wraps it
             const nativeReplace = window.history.replaceState.bind(window.history);
             nativeReplace(null, '', window.location.pathname);
             console.log('[AliId] URL cleaned to:', window.location.pathname);
-            // Wait for the overlay to be created by initCaptivateOverlay, then open it
             function tryOpenPlayer() {
                 const overlay = document.getElementById('custom-podcast-overlay');
                 if (overlay) {
@@ -25,8 +23,6 @@
                     setTimeout(tryOpenPlayer, 200);
                 }
             }
-            // Start polling after a short delay to give the rest of the script
-            // time to initialise and create the overlay
             setTimeout(tryOpenPlayer, 500);
         }
     })();
@@ -161,12 +157,39 @@
                 return false;
             }
             console.log('[Captivate] Found hero button:', button);
-            const newButton = button.cloneNode(true);
-            newButton.removeAttribute('aria-controls');
+            // Create a <div> replacement to avoid LinkedIn/Munchkin click tracking
+            // which specifically targets <button> and <a> elements
+            const newButton = document.createElement('div');
+            newButton.setAttribute('role', 'button');
+            newButton.setAttribute('tabindex', '0');
+            newButton.setAttribute('aria-expanded', 'false');
+            newButton.setAttribute('class', button.getAttribute('class'));
+            newButton.setAttribute('id', button.getAttribute('id'));
+            newButton.setAttribute('title', button.getAttribute('title'));
+            newButton.innerHTML = button.innerHTML;
+            // Apply styles to the div wrapper
+            newButton.style.cssText = `
+                width: auto;
+                max-width: 166px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                cursor: pointer;
+            `;
+            // Apply styles to the icon-circle span
+            const iconSpan = newButton.querySelector('.icon-circle');
+            if (iconSpan) {
+                iconSpan.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                `;
+            }
+            // Replace the original <button> in the DOM
             button.parentNode.replaceChild(newButton, button);
-            // capture: true ensures this fires before any bubble-phase listeners
-            // (including LinkedIn Insight Tag) so stopImmediatePropagation kills
-            // the event before third-party scripts can intercept it
+            console.log('[Captivate] Replaced <button> with <div role="button"> to avoid third-party click tracking');
+            // Click handler — capture phase so it fires before any bubble listeners
             newButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -192,6 +215,13 @@
                 setTimeout(hideOriginalPlayer, 300);
                 setTimeout(hideOriginalPlayer, 500);
             }, true); // true = capture phase, fires before bubble-phase listeners
+            // Keyboard support — <div> doesn't natively fire click on Enter/Space
+            newButton.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    newButton.click();
+                }
+            }, true);
             console.log('[Captivate] Hero button handler attached');
             return true;
         }
