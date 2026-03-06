@@ -64,3 +64,12 @@
     console.log('[BrokenLinkChecker] initialised');
   });
 }());
+
+Detects and removes broken link anchors on page load and year filter change
+Title text is kept, just made non-clickable
+Limitations
+Only fixes the display — bad URLs still exist in the source data files
+Can only detect broken links on rbccm.com itself; third-party URLs (CNBC, Bloomberg, etc.) are outside our reach from the browser
+Proper fix
+Audit and correct the URLs directly in the data/YYYY.page source files
+Set up a server-side link checker to catch these proactively going forward
