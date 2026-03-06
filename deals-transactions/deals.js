@@ -1,247 +1,242 @@
-// deals.js — annotated diff, full ViewModel shown
-var lmScroll = 0;
-function FormViewModel(page) {
-  var self = this;
-  self.show = ko.observable(9 + page * 6);
-  self.items = ko.observableArray();
-  self.topics = ko.observableArray().extend({ rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' } });
-  self.pubs = ko.observableArray();
-  self.authors = ko.observableArray();
-  self.notify = ko.observable();
-  self.loaded = ko.observable(false);
-  self.loading = ko.observable(false);
-  // ✅ CHANGED: was `self.year = new Date().getFullYear()` (plain number)
-  // Now it's an observable so UI and filteredItems can react to it
-  self.year = ko.observable(null); // null = "All Years"
-  self.fronly = ko.observable(false);
-  self.query = ko.observable('').extend({ rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' } });
-  // ✅ NEW: computed list of distinct years from loaded items, descending
-  self.availableYears = ko.computed(function () {
-    var years = [];
-    ko.utils.arrayForEach(self.items(), function (item) {
-      // ✅ FIX: was item.date.split(',')[1] — dates are "Jan 2026", no comma
-      var y = item.date ? item.date.split(' ')[1] : null;
-      if (y && years.indexOf(y) === -1) years.push(y);
-    });
-    return years.sort(function (a, b) { return b - a; }); // descending
-  });
-  self.filteredItems = ko.computed(function () {
-    self.notify();
-    var selectedYear = self.year();
-    var noFilters = (
-      self.topics().length === 0 &&
-      self.pubs().length === 0 &&
-      self.authors().length === 0 &&
-      self.query().length === 0
-    );
-    var pool = noFilters ? self.items() : ko.utils.arrayFilter(self.items(), function (item) {
-      var tmatch = false, pmatch = false, amatch = false;
-      // pubs filter (title)
-      if (self.pubs().length > 0) {
-        $.each(self.pubs(), function (key, value) {
-          if (item.title.toLowerCase().indexOf(value.toLowerCase()) !== -1) pmatch = true;
-        });
-      } else { pmatch = true; }
-      // author filter
-      if (self.authors().length > 0) {
-        $.each(self.authors(), function (key, value) {
-          if (item.author !== undefined &&
-              item.author.toString().toLowerCase().indexOf(value.toLowerCase()) !== -1) {
-            amatch = true;
-          }
-        });
-      } else { amatch = true; }
-      // topic / tag / category filter
-      if (self.topics().length > 0) {
-        var itemTopics;
-        if (item.tags !== undefined) {
-          var itemTags = item.tags.split(',');
-          itemTopics = item.category !== undefined ? itemTags.concat(item.category.split(',')) : itemTags;
-        } else if (item.category !== undefined) {
-          itemTopics = item.category.split(',');
+(function () {
+  'use strict';
+  const STICKY_TOP = 60;
+  const DEFAULT_COUNT = 6;
+  function init() {
+    const koDiv = document.querySelector('.insights-stories.ko');
+    if (!koDiv || typeof ko === 'undefined') return;
+    const vm = ko.dataFor(koDiv);
+    if (!vm) return;
+    // ── 1. Hide Load More button ─────────────────────────────────────────────
+    const loadMoreBtn = document.querySelector('a.btn[data-bind*="loadMore"]');
+    if (loadMoreBtn) {
+      const wrapper = loadMoreBtn.parentElement?.parentElement; // .container
+      if (wrapper) wrapper.style.display = 'none';
+    }
+    // ── 2. Tag all col-md-4 tiles with data-year ─────────────────────────────
+    function tagTiles() {
+      koDiv.querySelectorAll('.col-md-4:not([data-year])').forEach(col => {
+        const dateEl = col.querySelector('.deal-date');
+        if (dateEl) {
+          const m = dateEl.textContent.trim().match(/(\\d{4})/);
+          if (m) col.setAttribute('data-year', m[1]);
         }
-        $.each(itemTopics, function (key, value) {
-          if ($.trim(value)) {
-            if (self.topics().filter(function (t) {
-              return t.toLowerCase().indexOf($.trim(value.toLowerCase())) !== -1;
-            })[0] !== undefined ||
-            self.topics().filter(function (t) {
-              return $.trim(value.toLowerCase()).indexOf(t.toLowerCase()) !== -1;
-            })[0] !== undefined) {
-              tmatch = true;
-            }
-          }
-        });
-      } else { tmatch = true; }
-      if (self.query()) return tmatch || pmatch || amatch;
-      return tmatch && pmatch && amatch;
-    });
-    // ✅ NEW: apply year filter on top of existing filters
-    if (selectedYear) {
-      return ko.utils.arrayFilter(pool, function (item) {
-        // ✅ FIX: parse year from "MMM YYYY" format correctly
-        var itemYear = item.date ? item.date.split(' ')[1] : null;
-        return itemYear === String(selectedYear);
       });
     }
-    return pool;
-  });
-  // ✅ NEW: select a year (clears other filters, same pattern as selectTopic)
-  self.selectYear = function (y) {
-    self.show(0);
-    self.loadContent();
-    self.query('');
-    self.topics([]);
-    self.pubs([]);
-    self.authors([]);
-    self.year(y);           // set the observable
-    self.notify.notifySubscribers();
-    $('.initial').remove(); // remove static tiles
-    self.show(9);
-  };
-  // ✅ NEW: clear year filter (show all years)
-  self.clearYear = function () {
-    self.year(null);
-    self.show(9);
-    self.notify.notifySubscribers();
-  };
-  // ---- existing functions unchanged below ----
-  self.selectNoTopics = function () {
-    self.show(9);
-    self.query('');
-    self.topics([]);
-    self.pubs([]);
-    self.authors([]);
-    self.notify.notifySubscribers();
-  };
-  self.selectTopic = function (t) {
-    self.show(0);
-    self.loadContent();
-    self.query('');
-    self.topics(t);
-    self.pubs([]);
-    self.authors([]);
-    self.notify.notifySubscribers();
-    $('.initial').remove();
-    self.show(9);
-  };
-  self.selectAuthor = function (a) {
-    self.show(0);
-    self.loadContent();
-    self.query('');
-    self.topics([]);
-    self.pubs([]);
-    self.authors([a]);
-    self.notify.notifySubscribers();
-    $('.initial').remove();
-    self.show(9);
-  };
-  self.query.subscribe(function () {
-    self.loadContent();
-    var q = self.query();
-    self.topics([q]);
-    self.pubs([q]);
-    self.authors([q]);
-    self.notify.notifySubscribers();
-    $('#clear-search').show();
-  });
-  self.resetQuery = function () {
-    self.loadContent();
-    self.query('');
-    self.topics([]);
-    self.pubs([]);
-    self.authors([]);
-    self.notify.notifySubscribers();
-    $('#clear-search').hide();
-  };
-  self.selectFromURL = function (tag, author) {
-    self.loadContent();
-    self.query('');
-    self.topics(tag ? [tag] : []);
-    self.pubs([]);
-    self.authors(author ? [author] : []);
-    self.notify.notifySubscribers();
-  };
-  self.loadContent = function () {
-    var scroll = $(window).scrollTop();
-    if (self.show() === 0) self.show(9);
-    if (self.items().length < 1) {
-      $('.initial').remove();
-      $('#load-more').text('Loading...');
-      // ✅ CHANGED: fetchYear now called without passing self.year since it's observable
-      // Pass the raw year value or current year as fallback
-      self.fetchYear(new Date().getFullYear());
-      $(window).scrollTop(scroll);
-    } else {
-      $('#load-more').text('Load More');
-    }
-  };
-  self.fetchYear = function (y) {
-    $.ajax({
-      url: 'transactions/data/deals.page',
-      dataType: 'xml',
-      cache: true,
-      success: function (data) {
-        var item = {};
-        $(data).find('news').each(function () {
-          item = {};
-          item.date = $(this).find('date').text();
-          // ✅ FIX: was item.date.split(',')[1] — should be split(' ')[1]
-          item.year = item.date.split(' ')[1];
-          item.link = $(this).find('link').text();
-          item.thumbnail = $(this).find('thumbnail').text();
-          item.title = $(this).find('title').text();
-          item.description = $(this).find('description').text();
-          if (item.description.length > 130) {
-            item.description = item.description.substring(0, item.description.substring(0, 130).lastIndexOf(' ')) + '...';
-            if (item.description.charAt(item.description.length - 1) === ',') {
-              item.description = item.description.substring(0, item.description.length - 1);
-            }
-          }
-          item.role = $(this).find('role').text();
-          item.status = $(this).find('status').text();
-          item.amount = $(this).find('amount').text();
-          item.region = $(this).find('region').text();
-          item.specialty = $(this).find('specialty').text();
-          self.items().push(item);
+    tagTiles();
+    // ── 3. State ──────────────────────────────────────────────────────────────
+    const state = { activeYear: null };
+    // ── 4. Helpers ────────────────────────────────────────────────────────────
+    const getCols = () => Array.from(koDiv.querySelectorAll('.col-md-4[data-year]'));
+    const getYearCounts = () => {
+      const counts = {};
+      getCols().forEach(c => { const y = c.getAttribute('data-year'); counts[y] = (counts[y] || 0) + 1; });
+      return counts;
+    };
+    const getYears = () => [...new Set(getCols().map(c => c.getAttribute('data-year')).filter(Boolean))].sort().reverse();
+    const getVisibleCount = () => getCols().filter(c => c.style.display !== 'none').length;
+    // ── 5. Filter logic ───────────────────────────────────────────────────────
+    function applyFilter(year) {
+      state.activeYear = year;
+      const all = getCols();
+      if (year === null) {
+        let shown = 0;
+        all.forEach(col => {
+          col.style.display = shown < DEFAULT_COUNT ? '' : 'none';
+          if (col.style.display !== 'none') shown++;
         });
-        $('#load-more').text('Load More');
-        if ($('.initial').length > 0) $('.initial').remove();
-        self.notify.notifySubscribers();
-        $(window).scrollTop(lmScroll);
+      } else {
+        all.forEach(col => {
+          col.style.display = col.getAttribute('data-year') === year ? '' : 'none';
+        });
       }
+      updateUI();
+    }
+    // ── 6. Build DOM ──────────────────────────────────────────────────────────
+    const filterBar = document.createElement('div');
+    filterBar.id = 'yf-filter-bar';
+    filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;';
+    const inner = document.createElement('div');
+    inner.className = 'container';
+    inner.style.cssText = 'display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 15px;';
+    // Label
+    const label = document.createElement('label');
+    label.setAttribute('for', 'yf-drop-btn');
+    label.textContent = 'Filter by Year:';
+    label.style.cssText = 'font-family:Fira,"Lucida Grande",Verdana,sans-serif;font-size:14px;font-weight:600;color:#333;white-space:nowrap;cursor:default;';
+    // Dropdown wrapper
+    const dropWrap = document.createElement('div');
+    dropWrap.style.cssText = 'position:relative;display:inline-block;';
+    // Button
+    const dropBtn = document.createElement('button');
+    dropBtn.id = 'yf-drop-btn';
+    dropBtn.setAttribute('aria-haspopup', 'listbox');
+    dropBtn.setAttribute('aria-expanded', 'false');
+    dropBtn.setAttribute('aria-controls', 'yf-listbox');
+    dropBtn.setAttribute('aria-label', 'Select year filter');
+    dropBtn.style.cssText = 'font-family:Fira,"Lucida Grande",Verdana,sans-serif;font-size:14px;font-weight:500;padding:7px 32px 7px 14px;border:2px solid #0051A5;border-radius:4px;background:#fff;color:#0051A5;cursor:pointer;outline:none;position:relative;min-width:145px;text-align:left;appearance:none;-webkit-appearance:none;';
+    dropBtn.appendChild(document.createTextNode('Select year\\u2026'));
+    const arrow = document.createElement('span');
+    arrow.id = 'yf-arrow';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.innerHTML = '&#9660;';
+    arrow.style.cssText = 'position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#0051A5;pointer-events:none;transition:transform 0.2s;';
+    dropBtn.appendChild(arrow);
+    // Listbox
+    const listbox = document.createElement('ul');
+    listbox.id = 'yf-listbox';
+    listbox.setAttribute('role', 'listbox');
+    listbox.setAttribute('aria-label', 'Year options');
+    listbox.setAttribute('tabindex', '-1');
+    listbox.style.cssText = 'display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:100%;background:#fff;border:2px solid #0051A5;border-radius:4px;margin:0;padding:4px 0;list-style:none;z-index:9999;box-shadow:0 4px 14px rgba(0,81,165,0.18);';
+    // Count badge
+    const badge = document.createElement('span');
+    badge.id = 'yf-count-badge';
+    badge.setAttribute('aria-live', 'polite');
+    badge.setAttribute('aria-atomic', 'true');
+    badge.style.cssText = 'font-family:Fira,"Lucida Grande",Verdana,sans-serif;font-size:13px;color:#555;font-style:italic;white-space:nowrap;';
+    badge.textContent = `Showing ${DEFAULT_COUNT} most recent deals`;
+    // Clear button
+    const clearBtn = document.createElement('button');
+    clearBtn.id = 'yf-clear-btn';
+    clearBtn.textContent = '\\u2715 Clear filter';
+    clearBtn.setAttribute('aria-label', 'Clear year filter');
+    clearBtn.style.cssText = 'font-family:Fira,"Lucida Grande",Verdana,sans-serif;font-size:12px;font-weight:500;color:#0051A5;background:none;border:1px solid #0051A5;border-radius:4px;cursor:pointer;padding:4px 10px;display:none;outline:none;';
+    clearBtn.addEventListener('click', () => applyFilter(null));
+    // ── 7. Dropdown interactions ──────────────────────────────────────────────
+    function openDropdown() {
+      buildOptions();
+      listbox.style.display = 'block';
+      dropBtn.setAttribute('aria-expanded', 'true');
+      document.getElementById('yf-arrow').style.transform = 'translateY(-50%) rotate(180deg)';
+      const sel = listbox.querySelector('[aria-selected="true"]') || listbox.querySelector('[role="option"]');
+      if (sel) setTimeout(() => sel.focus(), 10);
+    }
+    function closeDropdown() {
+      listbox.style.display = 'none';
+      dropBtn.setAttribute('aria-expanded', 'false');
+      document.getElementById('yf-arrow').style.transform = 'translateY(-50%) rotate(0deg)';
+    }
+    dropBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      listbox.style.display === 'none' ? openDropdown() : closeDropdown();
     });
-  };
-  self.loadMore = function () {
-    lmScroll = $(window).scrollTop();
-    $('#load-more').text('Loading...');
-    setTimeout(function () {
-      if (self.items().length < 1) {
-        self.fetchYear(new Date().getFullYear());
-      } else {
-        $('.initial').remove();
-        $('#load-more').text('Load More');
-      }
-      if (self.show() === 0) {
-        self.show(18);
-      } else {
-        self.show(self.show() + 6);
-      }
-      setPage((self.show() - 9) / 6);
-      $(window).scrollTop(lmScroll);
-    }, 50);
-    $('#load-more').hide();
-  };
-  if (self.show() > 9) {
-    $('.initial').remove();
-    $('#load-more').text('Loading...');
-    setTimeout(function () {
-      if (self.items().length < 1 && getUrlParameter('t') === undefined) {
-        self.fetchYear(new Date().getFullYear());
-      } else {
-        $('#load-more').text('Load More');
-      }
-      setPage((self.show() - 9) / 6);
-    }, 50);
+    dropBtn.addEventListener('keydown', e => {
+      if (['ArrowDown', 'Enter', ' '].includes(e.key)) { e.preventDefault(); openDropdown(); }
+    });
+    listbox.addEventListener('keydown', e => {
+      const opts = Array.from(listbox.querySelectorAll('[role="option"]'));
+      const idx = opts.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); opts[(idx + 1) % opts.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); opts[(idx - 1 + opts.length) % opts.length].focus(); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const v = document.activeElement.getAttribute('data-value'); if (v) { closeDropdown(); applyFilter(v); } }
+      else if (e.key === 'Escape') closeDropdown();
+    });
+    document.addEventListener('click', e => { if (!dropWrap.contains(e.target)) closeDropdown(); }, true);
+    // ── 8. Build listbox options ──────────────────────────────────────────────
+    function buildOptions() {
+      listbox.innerHTML = '';
+      const year = state.activeYear;
+      const counts = getYearCounts();
+      getYears().forEach(y => {
+        const isActive = year === y;
+        const li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        li.setAttribute('data-value', y);
+        li.setAttribute('tabindex', '-1');
+        li.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        li.style.cssText = `display:flex;justify-content:space-between;align-items:center;padding:9px 14px;cursor:pointer;font-family:Fira,"Lucida Grande",Verdana,sans-serif;font-size:14px;color:${isActive ? '#0051A5' : '#333'};background:${isActive ? '#e8f0fb' : '#fff'};font-weight:${isActive ? '600' : '400'};outline:none;user-select:none;`;
+        const yLabel = document.createElement('span');
+        yLabel.textContent = y;
+        yLabel.style.pointerEvents = 'none';
+        const cnt = document.createElement('span');
+        cnt.textContent = counts[y] || 0;
+        cnt.style.cssText = 'margin-left:12px;font-size:12px;color:#fff;background:#0051A5;padding:2px 8px;border-radius:10px;font-weight:600;min-width:22px;text-align:center;pointer-events:none;';
+        li.appendChild(yLabel);
+        li.appendChild(cnt);
+        li.addEventListener('mouseover', () => { if (state.activeYear !== y) li.style.background = '#f0f6ff'; });
+        li.addEventListener('mouseout', () => { li.style.background = state.activeYear === y ? '#e8f0fb' : '#fff'; });
+        li.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+        li.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); closeDropdown(); applyFilter(y); });
+        listbox.appendChild(li);
+      });
+    }
+    // ── 9. Update UI ──────────────────────────────────────────────────────────
+    function updateUI() {
+      const year = state.activeYear;
+      const visible = getVisibleCount();
+      // Button label
+      dropBtn.innerHTML = '';
+      dropBtn.appendChild(document.createTextNode(year || 'Select year\\u2026'));
+      const newArrow = document.createElement('span');
+      newArrow.id = 'yf-arrow';
+      newArrow.setAttribute('aria-hidden', 'true');
+      newArrow.innerHTML = '&#9660;';
+      newArrow.style.cssText = 'position:absolute;right:10px;top:50%;transform:translateY(-50%) rotate(0deg);font-size:11px;color:#0051A5;pointer-events:none;transition:transform 0.2s;';
+      dropBtn.appendChild(newArrow);
+      // Badge
+      badge.textContent = year === null
+        ? `Showing ${visible} most recent deal${visible !== 1 ? 's' : ''}`
+        : `Showing ${visible} deal${visible !== 1 ? 's' : ''} from ${year}`;
+      // Clear button
+      clearBtn.style.display = year !== null ? 'inline' : 'none';
+      buildOptions();
+    }
+    // ── 10. Assemble filter bar ───────────────────────────────────────────────
+    dropWrap.appendChild(dropBtn);
+    dropWrap.appendChild(listbox);
+    inner.appendChild(label);
+    inner.appendChild(dropWrap);
+    inner.appendChild(badge);
+    inner.appendChild(clearBtn);
+    filterBar.appendChild(inner);
+    koDiv.parentNode.insertBefore(filterBar, koDiv);
+    // ── 11. Sticky behavior ───────────────────────────────────────────────────
+    const placeholder = document.createElement('div');
+    placeholder.id = 'yf-sticky-placeholder';
+    placeholder.style.cssText = 'display:none;margin:0;padding:0;';
+    filterBar.parentNode.insertBefore(placeholder, filterBar);
+    const topSentinel = document.createElement('div');
+    topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
+    filterBar.parentNode.insertBefore(topSentinel, placeholder);
+    const bottomSentinel = document.createElement('div');
+    bottomSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
+    koDiv.appendChild(bottomSentinel);
+    let isSticky = false;
+    function makeSticky() {
+      if (isSticky) return;
+      isSticky = true;
+      placeholder.style.height = filterBar.offsetHeight + 'px';
+      placeholder.style.display = 'block';
+      filterBar.style.cssText = `position:fixed;top:${STICKY_TOP}px;left:0;right:0;z-index:500;background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1);`;
+    }
+    function makeNormal() {
+      if (!isSticky) return;
+      isSticky = false;
+      placeholder.style.display = 'none';
+      filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;';
+    }
+    function onScroll() {
+      const topRect = topSentinel.getBoundingClientRect();
+      const bottomRect = bottomSentinel.getBoundingClientRect();
+      const barHeight = filterBar.offsetHeight || 70;
+      (topRect.top < STICKY_TOP && bottomRect.top > STICKY_TOP + barHeight) ? makeSticky() : makeNormal();
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // set correct state on load
+    // ── 12. MutationObserver for dynamically loaded tiles ─────────────────────
+    new MutationObserver(() => {
+      tagTiles();
+      applyFilter(state.activeYear);
+    }).observe(koDiv, { childList: true, subtree: true });
+    // ── 13. Initial render ────────────────────────────────────────────────────
+    applyFilter(null);
   }
-}
+  // Wait for KO + DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    // Small delay to let KO bind its viewmodel
+    setTimeout(init, 500);
+  }
+})();
