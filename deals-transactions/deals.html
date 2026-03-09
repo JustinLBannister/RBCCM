@@ -31,3 +31,46 @@
     </div>
   </div>
 </div>
+
+<div id="yf-filter-bar" style="background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;">
+  <div class="container" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 15px;">
+    <label for="yf-drop-btn" style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:14px;font-weight:600;color:#333;white-space:nowrap;cursor:default;">
+      Filter by Year:
+    </label>
+    <div id="yf-drop-wrap" style="position:relative;display:inline-block;">
+      <button
+        id="yf-drop-btn"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+        aria-controls="yf-listbox"
+        aria-label="Select year filter"
+        style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:14px;font-weight:500;padding:7px 32px 7px 14px;border:2px solid #0051A5;border-radius:4px;background:#fff;color:#0051A5;cursor:pointer;outline:none;position:relative;min-width:145px;text-align:left;appearance:none;-webkit-appearance:none;">
+        Select year&hellip;
+        <span id="yf-arrow" aria-hidden="true" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#0051A5;pointer-events:none;transition:transform 0.2s;">&#9660;</span>
+      </button>
+      <ul
+        id="yf-listbox"
+        role="listbox"
+        aria-label="Year options"
+        tabindex="-1"
+        style="display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:100%;background:#fff;border:2px solid #0051A5;border-radius:4px;margin:0;padding:4px 0;list-style:none;z-index:9999;box-shadow:0 4px 14px rgba(0,81,165,0.18);">
+        <!-- year options injected by filter-deals.js -->
+      </ul>
+    </div>
+    <span
+      id="yf-count-badge"
+      aria-live="polite"
+      aria-atomic="true"
+      style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:13px;color:#555;font-style:italic;white-space:nowrap;">
+      Showing 6 most recent deals
+    </span>
+    <button
+      id="yf-clear-btn"
+      aria-label="Clear year filter"
+      style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:12px;font-weight:500;color:#0051A5;background:none;border:1px solid #0051A5;border-radius:4px;cursor:pointer;padding:4px 10px;display:none;outline:none;">
+      &#10005; Clear filter
+    </button>
+  </div>
+</div>
+<!-- sticky placeholder - JS uses this to reserve space when bar goes fixed -->
+<div id="yf-sticky-placeholder" style="display:none;margin:0;padding:0;"></div>
