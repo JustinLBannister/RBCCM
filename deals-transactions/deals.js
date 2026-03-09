@@ -3,10 +3,6 @@
   var STICKY_TOP    = 60;
   var DEFAULT_COUNT = 6;
   function init() {
-    var koDiv = document.querySelector('.insights-stories.ko');
-    if (!koDiv || typeof ko === 'undefined') return;
-    var vm = ko.dataFor(koDiv);
-    if (!vm) return;
     var filterBar = document.getElementById('yf-filter-bar');
     if (!filterBar) return;
     var dropBtn  = document.getElementById('yf-drop-btn');
@@ -15,8 +11,15 @@
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
+    // Tile container — starts as .initial, switches to .ko after Load More
+    function getTileContainer() {
+      return document.querySelector('.insights-stories.initial') ||
+             document.querySelector('.insights-stories.ko');
+    }
     function tagTiles() {
-      koDiv.querySelectorAll('.col-md-4:not([data-year])').forEach(function (col) {
+      var container = getTileContainer();
+      if (!container) return;
+      container.querySelectorAll('.col-md-4:not([data-year])').forEach(function (col) {
         var dateEl = col.querySelector('.deal-date');
         if (dateEl) {
           var m = dateEl.textContent.trim().match(/(\\d{4})/);
@@ -27,7 +30,9 @@
     tagTiles();
     var state = { activeYear: null };
     function getCols() {
-      return Array.from(koDiv.querySelectorAll('.col-md-4[data-year]'));
+      var container = getTileContainer();
+      if (!container) return [];
+      return Array.from(container.querySelectorAll('.col-md-4[data-year]'));
     }
     function getYearCounts() {
       var counts = {};
@@ -118,18 +123,13 @@
         li.setAttribute('tabindex', '-1');
         li.setAttribute('aria-selected', isActive ? 'true' : 'false');
         li.style.cssText = [
-          'display:flex',
-          'justify-content:space-between',
-          'align-items:center',
-          'padding:9px 14px',
-          'cursor:pointer',
-          'font-family:Fira,"Lucida Grande",Verdana,sans-serif',
-          'font-size:14px',
+          'display:flex', 'justify-content:space-between', 'align-items:center',
+          'padding:9px 14px', 'cursor:pointer',
+          'font-family:Fira,"Lucida Grande",Verdana,sans-serif', 'font-size:14px',
           'color:'       + (isActive ? '#0051A5' : '#333'),
           'background:'  + (isActive ? '#e8f0fb' : '#fff'),
           'font-weight:' + (isActive ? '600' : '400'),
-          'outline:none',
-          'user-select:none'
+          'outline:none', 'user-select:none'
         ].join(';') + ';';
         var yLabel = document.createElement('span');
         yLabel.textContent = y;
@@ -146,14 +146,11 @@
           li.style.background = state.activeYear === y ? '#e8f0fb' : '#fff';
         });
         li.addEventListener('mousedown', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
         });
         li.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          closeDropdown();
-          applyFilter(y);
+          e.preventDefault(); e.stopPropagation();
+          closeDropdown(); applyFilter(y);
         });
         listbox.appendChild(li);
       });
@@ -170,13 +167,16 @@
       clearBtn.style.display = year !== null ? 'inline' : 'none';
       buildOptions();
     }
+    // Sticky
     var placeholder = document.getElementById('yf-sticky-placeholder');
     var topSentinel = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     filterBar.parentNode.insertBefore(topSentinel, filterBar);
+    // Bottom sentinel goes on whichever container is present
     var bottomSentinel = document.createElement('div');
     bottomSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
-    koDiv.appendChild(bottomSentinel);
+    var stickyContainer = getTileContainer();
+    if (stickyContainer) stickyContainer.appendChild(bottomSentinel);
     var isSticky = false;
     function makeSticky() {
       if (isSticky) return;
@@ -205,72 +205,17 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+    // Watch the whole page body for .initial being removed and .ko being populated
+    // This handles the Load More transition seamlessly
     new MutationObserver(function () {
       tagTiles();
       applyFilter(state.activeYear);
-    }).observe(koDiv, { childList: true, subtree: true });
+    }).observe(document.body, { childList: true, subtree: true });
     applyFilter(null);
   }
-  function waitForKO() {
-    var koDiv = document.querySelector('.insights-stories.ko');
-    if (!koDiv || typeof ko === 'undefined') return;
-    var vm = ko.dataFor(koDiv);
-    if (!vm || typeof vm.show !== 'function') return;
-    // deals.js auto-fires loadContent(), removes .initial and populates .ko.
-    // If tiles are already there by the time this runs, init immediately.
-    if (koDiv.querySelectorAll('.col-md-4').length > 0) {
-      init();
-      return;
-    }
-    // Otherwise watch .ko for tiles to appear via MutationObserver
-    var observer = new MutationObserver(function () {
-      if (koDiv.querySelectorAll('.col-md-4').length > 0) {
-        observer.disconnect();
-        init();
-      }
-    });
-    observer.observe(koDiv, { childList: true, subtree: true });
-    // Belt-and-suspenders: also subscribe to vm.show()
-    var sub = vm.show.subscribe(function (val) {
-      if (val > 0 && koDiv.querySelectorAll('.col-md-4').length > 0) {
-        sub.dispose();
-        observer.disconnect();
-        init();
-      }
-    });
-  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForKO);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    waitForKO();
+    init();
   }
 }());
-
-(function () {
-  var koDiv = document.querySelector('.insights-stories.ko');
-  var vm = ko.dataFor(koDiv);
-  if (koDiv.querySelectorAll('.col-md-4').length > 0) {
-    console.log('tiles already in .ko, calling init');
-  } else {
-    console.log('no tiles yet, watching...');
-    new MutationObserver(function (m, obs) {
-      if (koDiv.querySelectorAll('.col-md-4').length > 0) {
-        obs.disconnect();
-        console.log('tiles appeared, ready to init');
-      }
-    }).observe(koDiv, { childList: true, subtree: true });
-  }
-})();
-
-// Step 1 - check if .ko has tiles yet
-document.querySelector('.insights-stories.ko').querySelectorAll('.col-md-4').length
-// Step 2 - manually tag tiles
-document.querySelector('.insights-stories.ko').querySelectorAll('.col-md-4').forEach(function(col) {
-  var d = col.querySelector('.deal-date');
-  if (d) {
-    var m = d.textContent.trim().match(/(\\d{4})/);
-    if (m) col.setAttribute('data-year', m[1]);
-  }
-});
-// Step 3 - confirm tagging worked
-document.querySelector('.insights-stories.ko').querySelectorAll('.col-md-4[data-year]').length
