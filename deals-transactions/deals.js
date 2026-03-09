@@ -244,6 +244,13 @@
   }
 }());
 
-
-... [existing filter bar HTML] ...
-<script src="/assets/rbccm/js/sub/test/filter-deals.js?v=2" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+(function(){
+  var s = document.createElement('script');
+  s.src = '/assets/rbccm/js/sub/test/filter-deals.js?v=1';
+  s.type = 'text/javascript';
+  document.head.appendChild(s);
+})();
+//]]>
+</script>
