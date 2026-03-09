@@ -15,8 +15,6 @@
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
-    // FIX: Do NOT hide Load More. deals.js manages it and we need it to keep working.
-    // Tag tiles — koDiv is now correct because deals.js has already populated it
     function tagTiles() {
       koDiv.querySelectorAll('.col-md-4:not([data-year])').forEach(function (col) {
         var dateEl = col.querySelector('.deal-date');
@@ -120,13 +118,18 @@
         li.setAttribute('tabindex', '-1');
         li.setAttribute('aria-selected', isActive ? 'true' : 'false');
         li.style.cssText = [
-          'display:flex', 'justify-content:space-between', 'align-items:center',
-          'padding:9px 14px', 'cursor:pointer',
-          'font-family:Fira,"Lucida Grande",Verdana,sans-serif', 'font-size:14px',
+          'display:flex',
+          'justify-content:space-between',
+          'align-items:center',
+          'padding:9px 14px',
+          'cursor:pointer',
+          'font-family:Fira,"Lucida Grande",Verdana,sans-serif',
+          'font-size:14px',
           'color:'       + (isActive ? '#0051A5' : '#333'),
           'background:'  + (isActive ? '#e8f0fb' : '#fff'),
           'font-weight:' + (isActive ? '600' : '400'),
-          'outline:none', 'user-select:none'
+          'outline:none',
+          'user-select:none'
         ].join(';') + ';';
         var yLabel = document.createElement('span');
         yLabel.textContent = y;
@@ -143,19 +146,22 @@
           li.style.background = state.activeYear === y ? '#e8f0fb' : '#fff';
         });
         li.addEventListener('mousedown', function (e) {
-          e.preventDefault(); e.stopPropagation();
+          e.preventDefault();
+          e.stopPropagation();
         });
         li.addEventListener('click', function (e) {
-          e.preventDefault(); e.stopPropagation();
-          closeDropdown(); applyFilter(y);
+          e.preventDefault();
+          e.stopPropagation();
+          closeDropdown();
+          applyFilter(y);
         });
         listbox.appendChild(li);
       });
     }
     function updateUI() {
-      var year    = state.activeYear;
-      var visible = getVisibleCount();
-      var arrowEl = document.getElementById('yf-arrow');
+      var year      = state.activeYear;
+      var visible   = getVisibleCount();
+      var arrowEl   = document.getElementById('yf-arrow');
       var arrowHTML = arrowEl ? arrowEl.outerHTML : '';
       dropBtn.innerHTML = (year ? year : 'Select year&hellip;') + arrowHTML;
       badge.textContent = year === null
@@ -164,7 +170,6 @@
       clearBtn.style.display = year !== null ? 'inline' : 'none';
       buildOptions();
     }
-    // Sticky — bottomSentinel on koDiv is now correct since .initial is gone
     var placeholder = document.getElementById('yf-sticky-placeholder');
     var topSentinel = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
@@ -200,7 +205,6 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    // MutationObserver: re-tag and re-filter when Load More appends new KO tiles
     new MutationObserver(function () {
       tagTiles();
       applyFilter(state.activeYear);
@@ -212,15 +216,13 @@
     if (!koDiv || typeof ko === 'undefined') return;
     var vm = ko.dataFor(koDiv);
     if (!vm || typeof vm.show !== 'function') return;
-    // deals.js removes .initial and populates .ko automatically on page load.
-    // Wait for .ko to have tiles (deals.js fired loadContent) before wiring up.
-    // By the time this script runs, deals.js may have already populated .ko,
-    // or it may still be fetching — handle both cases.
+    // deals.js auto-fires loadContent(), removes .initial and populates .ko.
+    // If tiles are already there by the time this runs, init immediately.
     if (koDiv.querySelectorAll('.col-md-4').length > 0) {
       init();
       return;
     }
-    // deals.js hasn't finished yet — watch for tiles to appear in .ko
+    // Otherwise watch .ko for tiles to appear via MutationObserver
     var observer = new MutationObserver(function () {
       if (koDiv.querySelectorAll('.col-md-4').length > 0) {
         observer.disconnect();
@@ -228,7 +230,7 @@
       }
     });
     observer.observe(koDiv, { childList: true, subtree: true });
-    // Also subscribe to show() as a belt-and-suspenders fallback
+    // Belt-and-suspenders: also subscribe to vm.show()
     var sub = vm.show.subscribe(function (val) {
       if (val > 0 && koDiv.querySelectorAll('.col-md-4').length > 0) {
         sub.dispose();
@@ -243,17 +245,6 @@
     waitForKO();
   }
 }());
-
-<script type="text/javascript">
-//<![CDATA[
-(function(){
-  var s = document.createElement('script');
-  s.src = '/assets/rbccm/js/sub/test/filter-deals.js?v=1';
-  s.type = 'text/javascript';
-  document.head.appendChild(s);
-})();
-//]]>
-</script>
 
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
