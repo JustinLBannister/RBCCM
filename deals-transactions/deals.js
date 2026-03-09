@@ -7,26 +7,22 @@
     if (!koDiv || typeof ko === 'undefined') return;
     var vm = ko.dataFor(koDiv);
     if (!vm) return;
-    // Expect the filter bar HTML to already be in the page via TeamSite block.
-    // If it's not there for any reason, bail out gracefully.
     var filterBar = document.getElementById('yf-filter-bar');
     if (!filterBar) return;
-    // Grab references to the pre-existing elements
-    var dropBtn   = document.getElementById('yf-drop-btn');
-    var dropWrap  = document.getElementById('yf-drop-wrap');
-    var listbox   = document.getElementById('yf-listbox');
-    var badge     = document.getElementById('yf-count-badge');
-    var clearBtn  = document.getElementById('yf-clear-btn');
+    var dropBtn  = document.getElementById('yf-drop-btn');
+    var dropWrap = document.getElementById('yf-drop-wrap');
+    var listbox  = document.getElementById('yf-listbox');
+    var badge    = document.getElementById('yf-count-badge');
+    var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
-    // Hide Load More button
-    var loadMoreBtn = document.querySelector('a.btn[data-bind*="loadMore"]');
-    if (loadMoreBtn) {
-      var wrapper = loadMoreBtn.parentElement && loadMoreBtn.parentElement.parentElement;
-      if (wrapper) wrapper.style.display = 'none';
-    }
-    // Tag all col-md-4 tiles with data-year
+    // FIX 3: Removed the Load More hide block entirely.
+    // Hiding it was a deadlock — .ko tiles only populate after loadMore fires,
+    // and the MutationObserver handles re-filtering when they do.
+    // FIX 1: Tag tiles across BOTH .initial and .ko sections.
+    // Previously queried only koDiv (which is always empty on page load).
+    // Static server-rendered tiles live in .insights-stories.initial.
     function tagTiles() {
-      koDiv.querySelectorAll('.col-md-4:not([data-year])').forEach(function (col) {
+      document.querySelectorAll('.insights-stories .col-md-4:not([data-year])').forEach(function (col) {
         var dateEl = col.querySelector('.deal-date');
         if (dateEl) {
           var m = dateEl.textContent.trim().match(/(\\d{4})/);
@@ -35,11 +31,10 @@
       });
     }
     tagTiles();
-    // State
     var state = { activeYear: null };
-    // Helpers
+    // FIX 1 (cont): All helper functions now query across both sections.
     function getCols() {
-      return Array.from(koDiv.querySelectorAll('.col-md-4[data-year]'));
+      return Array.from(document.querySelectorAll('.insights-stories .col-md-4[data-year]'));
     }
     function getYearCounts() {
       var counts = {};
@@ -56,7 +51,6 @@
     function getVisibleCount() {
       return getCols().filter(function (c) { return c.style.display !== 'none'; }).length;
     }
-    // Filter logic
     function applyFilter(year) {
       state.activeYear = year;
       var all = getCols();
@@ -73,7 +67,6 @@
       }
       updateUI();
     }
-    // Dropdown open / close
     function openDropdown() {
       buildOptions();
       listbox.style.display = 'block';
@@ -120,7 +113,6 @@
       if (dropWrap && !dropWrap.contains(e.target)) closeDropdown();
     }, true);
     clearBtn.addEventListener('click', function () { applyFilter(null); });
-    // Build year option list items
     function buildOptions() {
       listbox.innerHTML = '';
       var year   = state.activeYear;
@@ -140,14 +132,14 @@
           'cursor:pointer',
           'font-family:Fira,"Lucida Grande",Verdana,sans-serif',
           'font-size:14px',
-          'color:'      + (isActive ? '#0051A5' : '#333'),
-          'background:' + (isActive ? '#e8f0fb' : '#fff'),
-          'font-weight:'+ (isActive ? '600'     : '400'),
+          'color:'       + (isActive ? '#0051A5' : '#333'),
+          'background:'  + (isActive ? '#e8f0fb' : '#fff'),
+          'font-weight:' + (isActive ? '600'     : '400'),
           'outline:none',
           'user-select:none'
         ].join(';') + ';';
         var yLabel = document.createElement('span');
-        yLabel.textContent    = y;
+        yLabel.textContent = y;
         yLabel.style.pointerEvents = 'none';
         var cnt = document.createElement('span');
         cnt.textContent = counts[y] || 0;
@@ -173,12 +165,9 @@
         listbox.appendChild(li);
       });
     }
-    // Update UI state (badge text, button label, clear button visibility)
     function updateUI() {
       var year    = state.activeYear;
       var visible = getVisibleCount();
-      // Reset button label back to the static HTML text (no JS string injection)
-      // The arrow span is already in the HTML, just ensure it stays
       var arrowEl = document.getElementById('yf-arrow');
       var arrowHTML = arrowEl ? arrowEl.outerHTML : '';
       dropBtn.innerHTML = (year ? year : 'Select year&hellip;') + arrowHTML;
@@ -188,14 +177,16 @@
       clearBtn.style.display = year !== null ? 'inline' : 'none';
       buildOptions();
     }
-    // Sticky behaviour
-    var placeholder = document.getElementById('yf-sticky-placeholder');
+    // Sticky behaviour — bottomSentinel now appended to .initial (where tiles are)
+    // FIX: was appended to koDiv which is empty, so scroll trigger never fired correctly
+    var initialDiv   = document.querySelector('.insights-stories.initial') || koDiv;
+    var placeholder  = document.getElementById('yf-sticky-placeholder');
     var topSentinel = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     filterBar.parentNode.insertBefore(topSentinel, filterBar);
     var bottomSentinel = document.createElement('div');
     bottomSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
-    koDiv.appendChild(bottomSentinel);
+    initialDiv.appendChild(bottomSentinel);   // FIX: was koDiv.appendChild
     var isSticky = false;
     function makeSticky() {
       if (isSticky) return;
@@ -224,31 +215,35 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    // MutationObserver handles subsequent "Load more" clicks
+    // FIX 4: Observe BOTH sections so filter reacts whether tiles are
+    // in .initial (static) or .ko (KO-rendered after Load More).
+    var initialDivForObserver = document.querySelector('.insights-stories.initial');
+    if (initialDivForObserver) {
+      new MutationObserver(function () {
+        tagTiles();
+        applyFilter(state.activeYear);
+      }).observe(initialDivForObserver, { childList: true, subtree: true });
+    }
     new MutationObserver(function () {
       tagTiles();
       applyFilter(state.activeYear);
     }).observe(koDiv, { childList: true, subtree: true });
-    // Initial render
     applyFilter(null);
   }
-  // Wait for KO to render its first batch of tiles before wiring up.
-  // The page shows a static .insights-stories.initial section until the
-  // user clicks Load More, at which point KO fetches data and show() goes
-  // from 0 to N. We subscribe once, call init(), then dispose.
   function waitForKO() {
     var koDiv = document.querySelector('.insights-stories.ko');
     if (!koDiv || typeof ko === 'undefined') return;
     var vm = ko.dataFor(koDiv);
     if (!vm || typeof vm.show !== 'function') return;
-    // Already has tiles (e.g. script loaded late / cached page)
-    if (koDiv.querySelectorAll('.col-md-4').length > 0) {
+    // FIX 2: Check for tiles across BOTH sections, not just .ko.
+    // On page load, tiles are always in .initial (static HTML), never in .ko.
+    if (document.querySelectorAll('.insights-stories .col-md-4').length > 0) {
       init();
       return;
     }
-    // Wait for KO data to arrive
+    // Fallback for edge cases where the page is fully KO-driven
     var sub = vm.show.subscribe(function (val) {
-      if (val > 0 && koDiv.querySelectorAll('.col-md-4').length > 0) {
+      if (val > 0 && document.querySelectorAll('.insights-stories .col-md-4').length > 0) {
         sub.dispose();
         init();
       }
