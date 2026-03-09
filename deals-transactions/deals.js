@@ -243,3 +243,7 @@
     waitForKO();
   }
 }());
+
+
+... [existing filter bar HTML] ...
+<script src="/assets/rbccm/js/sub/test/filter-deals.js?v=2" type="text/javascript"></script>
