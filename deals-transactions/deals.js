@@ -15,14 +15,10 @@
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
-    // FIX 3: Removed the Load More hide block entirely.
-    // Hiding it was a deadlock — .ko tiles only populate after loadMore fires,
-    // and the MutationObserver handles re-filtering when they do.
-    // FIX 1: Tag tiles across BOTH .initial and .ko sections.
-    // Previously queried only koDiv (which is always empty on page load).
-    // Static server-rendered tiles live in .insights-stories.initial.
+    // FIX: Do NOT hide Load More. deals.js manages it and we need it to keep working.
+    // Tag tiles — koDiv is now correct because deals.js has already populated it
     function tagTiles() {
-      document.querySelectorAll('.insights-stories .col-md-4:not([data-year])').forEach(function (col) {
+      koDiv.querySelectorAll('.col-md-4:not([data-year])').forEach(function (col) {
         var dateEl = col.querySelector('.deal-date');
         if (dateEl) {
           var m = dateEl.textContent.trim().match(/(\\d{4})/);
@@ -32,9 +28,8 @@
     }
     tagTiles();
     var state = { activeYear: null };
-    // FIX 1 (cont): All helper functions now query across both sections.
     function getCols() {
-      return Array.from(document.querySelectorAll('.insights-stories .col-md-4[data-year]'));
+      return Array.from(koDiv.querySelectorAll('.col-md-4[data-year]'));
     }
     function getYearCounts() {
       var counts = {};
@@ -125,18 +120,13 @@
         li.setAttribute('tabindex', '-1');
         li.setAttribute('aria-selected', isActive ? 'true' : 'false');
         li.style.cssText = [
-          'display:flex',
-          'justify-content:space-between',
-          'align-items:center',
-          'padding:9px 14px',
-          'cursor:pointer',
-          'font-family:Fira,"Lucida Grande",Verdana,sans-serif',
-          'font-size:14px',
+          'display:flex', 'justify-content:space-between', 'align-items:center',
+          'padding:9px 14px', 'cursor:pointer',
+          'font-family:Fira,"Lucida Grande",Verdana,sans-serif', 'font-size:14px',
           'color:'       + (isActive ? '#0051A5' : '#333'),
           'background:'  + (isActive ? '#e8f0fb' : '#fff'),
-          'font-weight:' + (isActive ? '600'     : '400'),
-          'outline:none',
-          'user-select:none'
+          'font-weight:' + (isActive ? '600' : '400'),
+          'outline:none', 'user-select:none'
         ].join(';') + ';';
         var yLabel = document.createElement('span');
         yLabel.textContent = y;
@@ -153,14 +143,11 @@
           li.style.background = state.activeYear === y ? '#e8f0fb' : '#fff';
         });
         li.addEventListener('mousedown', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
         });
         li.addEventListener('click', function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          closeDropdown();
-          applyFilter(y);
+          e.preventDefault(); e.stopPropagation();
+          closeDropdown(); applyFilter(y);
         });
         listbox.appendChild(li);
       });
@@ -177,16 +164,14 @@
       clearBtn.style.display = year !== null ? 'inline' : 'none';
       buildOptions();
     }
-    // Sticky behaviour — bottomSentinel now appended to .initial (where tiles are)
-    // FIX: was appended to koDiv which is empty, so scroll trigger never fired correctly
-    var initialDiv   = document.querySelector('.insights-stories.initial') || koDiv;
-    var placeholder  = document.getElementById('yf-sticky-placeholder');
+    // Sticky — bottomSentinel on koDiv is now correct since .initial is gone
+    var placeholder = document.getElementById('yf-sticky-placeholder');
     var topSentinel = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     filterBar.parentNode.insertBefore(topSentinel, filterBar);
     var bottomSentinel = document.createElement('div');
     bottomSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
-    initialDiv.appendChild(bottomSentinel);   // FIX: was koDiv.appendChild
+    koDiv.appendChild(bottomSentinel);
     var isSticky = false;
     function makeSticky() {
       if (isSticky) return;
@@ -215,15 +200,7 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    // FIX 4: Observe BOTH sections so filter reacts whether tiles are
-    // in .initial (static) or .ko (KO-rendered after Load More).
-    var initialDivForObserver = document.querySelector('.insights-stories.initial');
-    if (initialDivForObserver) {
-      new MutationObserver(function () {
-        tagTiles();
-        applyFilter(state.activeYear);
-      }).observe(initialDivForObserver, { childList: true, subtree: true });
-    }
+    // MutationObserver: re-tag and re-filter when Load More appends new KO tiles
     new MutationObserver(function () {
       tagTiles();
       applyFilter(state.activeYear);
@@ -235,16 +212,27 @@
     if (!koDiv || typeof ko === 'undefined') return;
     var vm = ko.dataFor(koDiv);
     if (!vm || typeof vm.show !== 'function') return;
-    // FIX 2: Check for tiles across BOTH sections, not just .ko.
-    // On page load, tiles are always in .initial (static HTML), never in .ko.
-    if (document.querySelectorAll('.insights-stories .col-md-4').length > 0) {
+    // deals.js removes .initial and populates .ko automatically on page load.
+    // Wait for .ko to have tiles (deals.js fired loadContent) before wiring up.
+    // By the time this script runs, deals.js may have already populated .ko,
+    // or it may still be fetching — handle both cases.
+    if (koDiv.querySelectorAll('.col-md-4').length > 0) {
       init();
       return;
     }
-    // Fallback for edge cases where the page is fully KO-driven
+    // deals.js hasn't finished yet — watch for tiles to appear in .ko
+    var observer = new MutationObserver(function () {
+      if (koDiv.querySelectorAll('.col-md-4').length > 0) {
+        observer.disconnect();
+        init();
+      }
+    });
+    observer.observe(koDiv, { childList: true, subtree: true });
+    // Also subscribe to show() as a belt-and-suspenders fallback
     var sub = vm.show.subscribe(function (val) {
-      if (val > 0 && document.querySelectorAll('.insights-stories .col-md-4').length > 0) {
+      if (val > 0 && koDiv.querySelectorAll('.col-md-4').length > 0) {
         sub.dispose();
+        observer.disconnect();
         init();
       }
     });
