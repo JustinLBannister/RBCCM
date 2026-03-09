@@ -254,3 +254,67 @@
 })();
 //]]>
 </script>
+
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Component: Deal Year Filter Bar -->
+  <xsl:strip-space elements="*"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+  <xsl:template match="/">
+    <!-- ── Version param for cache busting ── -->
+    <xsl:variable name="ver">
+      <xsl:choose>
+        <xsl:when test="normalize-space(/Properties/Datum[@ID='Version']) != ''">
+          <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Version'])"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- ── Sticky placeholder ── -->
+    <div id="yf-sticky-placeholder" style="display:none;"></div>
+    <!-- ── Filter bar HTML ── -->
+    <div id="yf-filter-bar" style="background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;">
+      <div class="container" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 15px;">
+        <label for="yf-drop-btn" style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:14px;font-weight:600;color:#333;white-space:nowrap;cursor:default;">Filter by Year:</label>
+        <div id="yf-drop-wrap" style="position:relative;display:inline-block;">
+          <button id="yf-drop-btn"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="yf-listbox"
+                  aria-label="Select year filter"
+                  style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:14px;font-weight:500;padding:7px 32px 7px 14px;border:2px solid #0051A5;border-radius:4px;background:#fff;color:#0051a5;cursor:pointer;outline:none;position:relative;min-width:145px;text-align:left;appearance:none;-webkit-appearance:none;">
+            Select year&#x2026;
+            <span id="yf-arrow"
+                  aria-hidden="true"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#0051a5;pointer-events:none;transition:transform 0.2s;">&#x25BC;</span>
+          </button>
+          <ul id="yf-listbox"
+              role="listbox"
+              aria-label="Year options"
+              style="display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:100%;background:#fff;border:2px solid #0051A5;border-radius:4px;margin:0;padding:4px 0;list-style:none;z-index:9999;box-shadow:0 4px 14px rgba(0,81,165,0.18);">
+            <!-- year options injected by JS -->
+          </ul>
+        </div>
+        <span id="yf-count-badge"
+              aria-live="polite"
+              aria-atomic="true"
+              style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:13px;color:#555;font-style:italic;white-space:nowrap;">
+          Showing 6 most recent deals
+        </span>
+        <button id="yf-clear-btn"
+                aria-label="Clear year filter"
+                style="font-family:Fira,'Lucida Grande',Verdana,sans-serif;font-size:12px;font-weight:500;color:#0051a5;background:none;border:1px solid #0051A5;border-radius:4px;cursor:pointer;padding:4px 10px;display:none;outline:none;">
+          &#x2715; Clear filter
+        </button>
+      </div>
+    </div>
+    <!-- ── Load JS with cache-busting version ── -->
+    <script>
+      <xsl:attribute name="src">
+        <xsl:text>/assets/rbccm/js/sub/test/filter-deals.js?v=</xsl:text>
+        <xsl:value-of select="$ver"/>
+      </xsl:attribute>
+    </script>
+  </xsl:template>
+</xsl:stylesheet>
