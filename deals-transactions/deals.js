@@ -38,6 +38,13 @@ function getURLtag(tag) {
     return '';
   }
 }
+/* ─── helpers ─── */
+// item.date is "Mon YYYY" e.g. "Oct 2025" — space-separated, NO comma
+function getItemYear(item) {
+  if (!item || !item.date) return null;
+  var parts = item.date.trim().split(' ');
+  return parts.length > 1 ? parts[parts.length - 1] : null;
+}
 /* ─── KO ViewModel ─── */
 function FormViewModel(page) {
   var self = this;
@@ -53,27 +60,28 @@ function FormViewModel(page) {
   self.loading = ko.observable(false);
   self.year    = new Date().getFullYear();
   self.fronly  = ko.observable(false);
-  /* ── active year filter (null = no filter / show most-recent 6) ── */
-  self.activeYear = ko.observable(null);
+  self.activeYear = ko.observable(null); // year filter state
   self.query = ko
     .observable('')
     .extend({ rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' } });
-  /* ── base filtered list (topics / pubs / authors / query) ── */
+  /* ── filteredItems: what KO template renders (foreach:filteredItems) ── */
   self.filteredItems = ko.computed(function () {
     self.notify();
+    var activeYear = self.activeYear();
+    // Base: topic / pubs / authors / query filters
+    var base;
     if (
       self.topics().length  === 0 &&
       self.pubs().length    === 0 &&
       self.authors().length === 0 &&
       self.query().length   === 0
     ) {
-      return self.items();
+      base = self.items();
     } else {
-      return ko.utils.arrayFilter(self.items(), function (item) {
+      base = ko.utils.arrayFilter(self.items(), function (item) {
         var tmatch = false;
         var pmatch = false;
         var amatch = false;
-        // ── title filter ──
         if (self.pubs().length > 0) {
           $.each(self.pubs(), function (key, value) {
             if (item.title.toLowerCase().indexOf(value.toLowerCase()) != -1) {
@@ -83,14 +91,10 @@ function FormViewModel(page) {
         } else {
           pmatch = true;
         }
-        // ── author filter ──
         if (self.authors().length > 0) {
           $.each(self.authors(), function (key, value) {
             if (item.author !== undefined) {
-              if (
-                item.author.toString().toLowerCase()
-                  .indexOf(value.toLowerCase()) != -1
-              ) {
+              if (item.author.toString().toLowerCase().indexOf(value.toLowerCase()) != -1) {
                 amatch = true;
               }
             }
@@ -98,14 +102,12 @@ function FormViewModel(page) {
         } else {
           amatch = true;
         }
-        // ── topic / category / tag filter ──
         if (self.topics().length > 0) {
           var itemTopics;
           if (item.tags !== undefined) {
             var itemTags = item.tags.split(',');
             if (item.category !== undefined) {
-              var itemCategories = item.category.split(',');
-              itemTopics = itemTags.concat(itemCategories);
+              itemTopics = itemTags.concat(item.category.split(','));
             }
           } else if (item.category !== undefined && itemTopics === undefined) {
             itemTopics = item.category.split(',');
@@ -113,11 +115,11 @@ function FormViewModel(page) {
           $.each(itemTopics, function (key, value) {
             if ($.trim(value)) {
               if (
-                self.topics().filter(function (item) {
-                  return item.toLowerCase().indexOf($.trim(value.toLowerCase())) !== -1;
+                self.topics().filter(function (t) {
+                  return t.toLowerCase().indexOf($.trim(value.toLowerCase())) !== -1;
                 })[0] !== undefined ||
-                self.topics().filter(function (item) {
-                  return $.trim(value.toLowerCase()).indexOf(item.toLowerCase()) !== -1;
+                self.topics().filter(function (t) {
+                  return $.trim(value.toLowerCase()).indexOf(t.toLowerCase()) !== -1;
                 })[0] !== undefined
               ) {
                 tmatch = true;
@@ -133,72 +135,61 @@ function FormViewModel(page) {
         return tmatch && pmatch && amatch;
       });
     }
-  });
-  /* ── year-aware display list ─────────────────────────────────────
-     • activeYear = null  → show most-recent DEFAULT_COUNT (6) items
-     • activeYear = "YYYY" → show all items whose date contains that year
-     • Respects self.show() for "Load More" paging when no year is set
-  ──────────────────────────────────────────────────────────────── */
-  self.displayItems = ko.computed(function () {
-    var base = self.filteredItems();
-    var year = self.activeYear();
-    if (year !== null) {
-      // Return every item whose date string contains the selected year.
-      // Items from years after 2024 are excluded when no year is selected
-      // but are still reachable via the dropdown.
+    // ── Year filter layer ──
+    // Applied on top of the base filter so the KO template sees it directly.
+    if (activeYear !== null) {
+      // Show all items matching the selected year
       return ko.utils.arrayFilter(base, function (item) {
-        return item.date && item.date.indexOf(year) !== -1;
+        return getItemYear(item) === activeYear;
       });
     }
-    // No year selected: show most-recent DEFAULT_COUNT, excluding post-2024
+    // Default: show most-recent DEFAULT_COUNT items that are <= 2024
     var cutoff = base.filter(function (item) {
-      var y = item.date ? parseInt(item.date.split(',')[1]) : 0;
-      return y <= 2024;
+      var y = parseInt(getItemYear(item));
+      return !isNaN(y) && y <= 2024;
     });
     return cutoff.slice(0, self.show());
   });
-  /* ── available years for the dropdown (derived from loaded items) ── */
+  /* ── availableYears: drive the dropdown (from ALL items, ignoring year filter) ── */
   self.availableYears = ko.computed(function () {
     self.notify();
-    var seen   = {};
-    var years  = [];
-    self.filteredItems().forEach(function (item) {
-      var y = item.date ? item.date.split(',')[1] : null;
-      if (y) {
-        y = y.trim();
-        if (!seen[y]) { seen[y] = 0; }
-        seen[y]++;
-      }
+    var seen = {};
+    self.items().forEach(function (item) {
+      var y = getItemYear(item);
+      if (y) seen[y] = (seen[y] || 0) + 1;
     });
-    Object.keys(seen).sort().reverse().forEach(function (y) {
-      years.push({ year: y, count: seen[y] });
+    return Object.keys(seen).sort().reverse().map(function (y) {
+      return { year: y, count: seen[y] };
     });
-    return years;
   });
   /* ── year filter actions ── */
   self.selectYear = function (yearObj) {
+    self.show(9);
     self.activeYear(yearObj.year);
+    self.notify.notifySubscribers();
     self.updateYearUI();
   };
   self.clearYear = function () {
+    self.show(9);
     self.activeYear(null);
+    self.notify.notifySubscribers();
     self.updateYearUI();
   };
-  /* ── update the static DOM filter-bar UI to match KO state ── */
+  /* ── update the filter bar DOM ── */
   self.updateYearUI = function () {
-    var year    = self.activeYear();
-    var visible = self.displayItems().length;
-    var dropBtn = document.getElementById('yf-drop-btn');
-    var badge   = document.getElementById('yf-count-badge');
+    var year     = self.activeYear();
+    var visible  = self.filteredItems().length;
+    var dropBtn  = document.getElementById('yf-drop-btn');
+    var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
-    var arrowEl = document.getElementById('yf-arrow');
+    var arrowEl  = document.getElementById('yf-arrow');
     if (dropBtn) {
       var arrowHTML = arrowEl ? arrowEl.outerHTML : '';
       dropBtn.innerHTML = (year ? year : 'Select year&hellip;') + arrowHTML;
     }
     if (badge) {
       badge.textContent = year === null
-        ? 'Showing ' + visible + ' most recent deal' + (visible !== 1 ? 's' : '')
+        ? 'Showing ' + visible + ' most recent deal' + (visible !== 1 ? 's' : '') + ' (\\u22642024)'
         : 'Showing ' + visible + ' deal' + (visible !== 1 ? 's' : '') + ' from ' + year;
     }
     if (clearBtn) {
@@ -206,7 +197,7 @@ function FormViewModel(page) {
     }
     buildDropdownOptions();
   };
-  /* ── rebuild dropdown <li> options ── */
+  /* ── build dropdown <li> options ── */
   function buildDropdownOptions() {
     var listbox = document.getElementById('yf-listbox');
     if (!listbox) return;
@@ -216,9 +207,9 @@ function FormViewModel(page) {
       var y        = yObj.year;
       var isActive = activeYear === y;
       var li = document.createElement('li');
-      li.setAttribute('role',         'option');
-      li.setAttribute('data-value',   y);
-      li.setAttribute('tabindex',     '-1');
+      li.setAttribute('role',          'option');
+      li.setAttribute('data-value',    y);
+      li.setAttribute('tabindex',      '-1');
       li.setAttribute('aria-selected', isActive ? 'true' : 'false');
       li.style.cssText = [
         'display:flex', 'justify-content:space-between', 'align-items:center',
@@ -230,10 +221,10 @@ function FormViewModel(page) {
         'outline:none', 'user-select:none'
       ].join(';') + ';';
       var yLabel = document.createElement('span');
-      yLabel.textContent   = y;
+      yLabel.textContent = y;
       yLabel.style.pointerEvents = 'none';
       var cnt = document.createElement('span');
-      cnt.textContent  = yObj.count;
+      cnt.textContent   = yObj.count;
       cnt.style.cssText = 'margin-left:12px;font-size:12px;color:#fff;background:#0051A5;' +
         'padding:2px 8px;border-radius:10px;font-weight:600;min-width:22px;' +
         'text-align:center;pointer-events:none;';
@@ -256,9 +247,9 @@ function FormViewModel(page) {
   }
   /* ── dropdown open / close ── */
   function openDropdown() {
-    var listbox  = document.getElementById('yf-listbox');
-    var dropBtn  = document.getElementById('yf-drop-btn');
-    var arrowEl  = document.getElementById('yf-arrow');
+    var listbox = document.getElementById('yf-listbox');
+    var dropBtn = document.getElementById('yf-drop-btn');
+    var arrowEl = document.getElementById('yf-arrow');
     if (!listbox) return;
     buildDropdownOptions();
     listbox.style.display = 'block';
@@ -355,7 +346,7 @@ function FormViewModel(page) {
         $(data).find('news').each(function () {
           item = {};
           item.date        = $(this).find('date').text();
-          item.year        = item.date.split(',')[1];
+          item.year        = getItemYear(item);  // FIX: was split(',')[1]
           item.link        = $(this).find('link').text();
           item.thumbnail   = $(this).find('thumbnail').text();
           item.title       = $(this).find('title').text();
@@ -380,7 +371,7 @@ function FormViewModel(page) {
         $('#load-more').text('Load More');
         if ($('.initial').length > 0) { $('.initial').remove(); }
         self.notify.notifySubscribers();
-        // Sync year-filter UI now that items are loaded
+        // FIX: refresh the year filter UI now that items are loaded
         self.updateYearUI();
         $(window).scrollTop(lmScroll);
       }
@@ -396,8 +387,7 @@ function FormViewModel(page) {
         $('.initial').remove();
         $('#load-more').text('Load More');
       }
-      // If a year is selected, don't cap by self.show() –
-      // all matching items are already shown
+      // Only page when no year is selected (year shows ALL matches, no paging needed)
       if (self.activeYear() === null) {
         if (self.show() === 0) {
           self.show(18);
@@ -423,7 +413,7 @@ function FormViewModel(page) {
       setPage((self.show() - 9) / 6);
     }, 50);
   }
-  /* ── wire up filter-bar DOM events after KO is ready ── */
+  /* ── wire up filter-bar DOM events ── */
   self.initFilterBar = function () {
     var filterBar = document.getElementById('yf-filter-bar');
     if (!filterBar) return;
@@ -433,7 +423,6 @@ function FormViewModel(page) {
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
-    // ── dropdown button ──
     dropBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       listbox.style.display === 'none' ? openDropdown() : closeDropdown();
@@ -456,10 +445,7 @@ function FormViewModel(page) {
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         var v = document.activeElement.getAttribute('data-value');
-        if (v) {
-          closeDropdown();
-          self.selectYear({ year: v });
-        }
+        if (v) { closeDropdown(); self.selectYear({ year: v }); }
       } else if (e.key === 'Escape') {
         closeDropdown();
       }
@@ -468,7 +454,7 @@ function FormViewModel(page) {
       if (dropWrap && !dropWrap.contains(e.target)) closeDropdown();
     }, true);
     clearBtn.addEventListener('click', function () { self.clearYear(); });
-    // ── sticky bar ──
+    // ── sticky ──
     var placeholder  = document.getElementById('yf-sticky-placeholder');
     var topSentinel  = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
@@ -508,14 +494,12 @@ function FormViewModel(page) {
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    // initial UI state
-    self.updateYearUI();
+    // FIX: DON'T call updateYearUI here — items aren't loaded yet.
+    // It will be called from fetchYear's success callback instead.
   };
 }
 /* ─── DOM Ready ─── */
 $(document).ready(function () {
-  /* ── dropdown accessibility ── */
-  var menuTimeout;
   $('.insights-dropdown-toggle').on({
     click: function (e) {
       $(this).toggleClass('active');
@@ -573,7 +557,6 @@ $(document).ready(function () {
   $('.insights-dropdown-items input').change(function () {
     clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout'));
   });
-  /* ── category list ── */
   $('#search-categories-list .category').on({
     click: function (e) {
       $('#search-categories-list .category').removeClass('active');
@@ -598,7 +581,6 @@ $(document).ready(function () {
   $('#clear-search').on('click', function () {
     $('#search-categories-list .category').removeClass('active');
   });
-  /* ── KO date binding ── */
   ko.bindingHandlers.dateString = {
     init: function (element, valueAccessor) {
       element.onchange = function () {
@@ -614,7 +596,6 @@ $(document).ready(function () {
       }
     }
   };
-  /* ── Bootstrap KO + year-filter bar ── */
   var model;
   if (location.hash !== '') {
     model = new FormViewModel(parseInt(location.hash.replace('#', '')));
@@ -628,17 +609,4 @@ $(document).ready(function () {
       model.selectFromURL(getURLtag('tag'), null);
     }
   }
-  // Init the sticky year-filter bar (wires events, sticky scroll, initial UI)
-  model.initFilterBar();
-  /* ── URL topic parameter ── */
-  var topics = getUrlParameter('t');
-  if (topics !== undefined) {
-    var t_arr = topics.split(',');
-    $.each(t_arr, function (key, value) {
-      $("input[value='" + $.trim(value) + "']").click();
-    });
-  }
-  /* ── slick slider ── */
-  $('#ls-row-3-area-1 .story-tiles > .row').slick({ dots: true });
-  $('button.slick-autoplay-toggle-button').css('display', 'none');
-});
+  // FIX: call loadContent on init so items fetch immediately on page lo
