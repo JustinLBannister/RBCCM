@@ -44,6 +44,10 @@ function FormViewModel(page) {
   self.fronly  = ko.observable(false);
   self.activeYear = ko.observable(null);
   self.query   = ko.observable('').extend({ rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' } });
+  // Snapshot of the exact Teamsite .initial tiles as rendered in the DOM
+  // Captured once in initFilterBar() before anything touches the DOM
+  self._initialSnapshot = null;
+  self._initialConsumed = false;
   self.filteredItems = ko.computed(function () {
     self.notify();
     if (self.topics().length === 0 && self.pubs().length === 0 &&
@@ -103,7 +107,7 @@ function FormViewModel(page) {
       return { year: y, count: seen[y] };
     });
   }
-  /* ── doFilter: show/hide KO tiles by year (used post-KO-render) ── */
+  /* ── doFilter: show/hide KO tiles by year ── */
   function doFilter(year) {
     var koContainer = document.querySelector('.insights-stories.ko');
     if (!koContainer) return;
@@ -113,6 +117,22 @@ function FormViewModel(page) {
         var tileYear = (c.querySelector('.deal-date').textContent || '').trim().split(' ').pop();
         c.style.display = (tileYear === year) ? '' : 'none';
       });
+  }
+  /* ── restoreInitialSnapshot: put the exact original 6 tiles back ── */
+  function restoreInitialSnapshot() {
+    var koContainer = document.querySelector('.insights-stories.ko');
+    if (!koContainer || !self._initialSnapshot) return;
+    // Find the KO foreach template comment node — we must preserve it
+    // It's the first child comment node KO uses as an anchor
+    var templateComment = null;
+    koContainer.childNodes.forEach(function (node) {
+      if (node.nodeType === 8) { templateComment = node; } // comment node
+    });
+    // Wipe current KO-rendered tile content but keep the template comment
+    koContainer.innerHTML = '';
+    if (templateComment) { koContainer.appendChild(templateComment); }
+    // Re-inject the snapshotted HTML (the exact tiles from Teamsite)
+    koContainer.insertAdjacentHTML('beforeend', self._initialSnapshot);
   }
   /* ── Dropdown ── */
   function buildDropdownOptions() {
@@ -160,22 +180,28 @@ function FormViewModel(page) {
     lb.style.display = 'none'; db.setAttribute('aria-expanded', 'false');
     if (ar) ar.style.transform = 'translateY(-50%) rotate(0deg)';
   }
-  /* ── applyYearFilter: handles both pre- and post-Load More states ── */
+  /* ── applyYearFilter ── */
   self.applyYearFilter = function (year) {
     self.activeYear(year);
     var initialContainer = document.querySelector('.insights-stories.initial');
-    var koContainer      = document.querySelector('.insights-stories.ko');
     if (year === null) {
       // ── Clear filter ──────────────────────────────────────────────────
       if (initialContainer) {
-        // .initial still present — just un-hide its tiles
+        // .initial still in DOM — just un-hide all its tiles
         Array.from(initialContainer.querySelectorAll('.col-md-4'))
           .forEach(function (c) { c.style.display = ''; });
-      } else if (koContainer) {
-        // KO tiles — un-hide all
-        Array.from(koContainer.querySelectorAll('.col-md-4'))
-          .filter(function (c) { return c.querySelector('.deal-date'); })
-          .forEach(function (c) { c.style.display = ''; });
+      } else if (self._initialConsumed && self._initialSnapshot) {
+        // .initial was consumed by a year filter — restore the exact
+        // snapshotted tiles into the .ko container
+        restoreInitialSnapshot();
+      } else {
+        // Came from a normal Load More path — just un-hide all KO tiles
+        var koContainer = document.querySelector('.insights-stories.ko');
+        if (koContainer) {
+          Array.from(koContainer.querySelectorAll('.col-md-4'))
+            .filter(function (c) { return c.querySelector('.deal-date'); })
+            .forEach(function (c) { c.style.display = ''; });
+        }
       }
       self.updateYearUI();
       return;
@@ -184,16 +210,12 @@ function FormViewModel(page) {
     if (initialContainer) {
       // .initial still present: remove it, trigger KO render, then filter
       $('.initial').remove();
-      $('#load-more').hide();
+      self._initialConsumed = true;
       if (self.show() === 0) { self.show(9); }
-      self.notify.notifySubscribers(); // triggers KO foreach render
+      self.notify.notifySubscribers();
       setTimeout(function () {
         doFilter(year);
         self.updateYearUI();
-        // Show Load More if more results exist than are currently visible
-        var total = self.items().filter(function (i) { return getItemYear(i) === year; }).length;
-        var visible = document.querySelectorAll('.insights-stories.ko .col-md-4:not([style*="none"])').length;
-        if (total > visible) { $('#load-more').show().text('Load More'); }
       }, 100);
     } else {
       // .initial already gone — filter KO tiles directly
@@ -211,7 +233,6 @@ function FormViewModel(page) {
       if (year === null) {
         badge.textContent = 'Showing 6 most recent deals';
       } else {
-        // Count from items array (reliable whether .initial or .ko is present)
         var n = self.items().filter(function (i) { return getItemYear(i) === year; }).length;
         badge.textContent = 'Showing ' + n + ' deal' + (n !== 1 ? 's' : '') + ' from ' + year;
       }
@@ -248,13 +269,11 @@ function FormViewModel(page) {
     var scroll = $(window).scrollTop();
     if (self.show() === 0) self.show(9);
     if (self.items().length < 1) {
-      $('.initial').remove(); $('#load-more').text('Loading...');
+      $('.initial').remove();
       self.fetchYear(self.year); $(window).scrollTop(scroll);
-    } else {
-      $('#load-more').text('Load More');
     }
   };
-  /* ── fetchYear: fixes date parsing, populates dropdown silently on init ── */
+  /* ── fetchYear ── */
   self.fetchYear = function (y) {
     $.ajax({
       url: 'transactions/data/deals.page', dataType: 'xml', cache: true,
@@ -279,7 +298,6 @@ function FormViewModel(page) {
           item.specialty = $(this).find('specialty').text();
           self.items().push(item);
         });
-        if ($('#load-more').text() === 'Loading...') $('#load-more').text('Load More');
         if (self._userTriggered) {
           self._userTriggered = false;
           if ($('.initial').length > 0) $('.initial').remove();
@@ -289,16 +307,14 @@ function FormViewModel(page) {
             setTimeout(function () { self.applyYearFilter(cur); }, 100);
           }
         }
-        // Always populate the dropdown
         buildDropdownOptions();
         $(window).scrollTop(lmScroll);
       }
     });
   };
-  /* ── loadMore: user action — renders new KO tiles, re-applies filter ── */
+  /* ── loadMore ── */
   self.loadMore = function () {
     lmScroll = $(window).scrollTop();
-    $('#load-more').text('Loading...');
     setTimeout(function () {
       if (self.items().length < 1) {
         self._userTriggered = true;
@@ -306,7 +322,7 @@ function FormViewModel(page) {
         return;
       }
       $('.initial').remove();
-      $('#load-more').text('Load More');
+      self._initialConsumed = true;
       if (self.show() === 0) { self.show(18); } else { self.show(self.show() + 6); }
       self.notify.notifySubscribers();
       setPage((self.show() - 9) / 6);
@@ -315,22 +331,19 @@ function FormViewModel(page) {
         $(window).scrollTop(lmScroll);
       }, 100);
     }, 50);
-    $('#load-more').hide();
   };
   if (self.show() > 9) {
     $('.initial').remove();
-    $('#load-more').text('Loading...');
+    self._initialConsumed = true;
     setTimeout(function () {
       if (self.items().length < 1 && getUrlParameter('t') === undefined) {
         self._userTriggered = true;
         self.fetchYear(self.year);
-      } else {
-        $('#load-more').text('Load More');
       }
       setPage((self.show() - 9) / 6);
     }, 50);
   }
-  /* ── initFilterBar: wire DOM events + sticky ── */
+  /* ── initFilterBar ── */
   self.initFilterBar = function () {
     var filterBar = document.getElementById('yf-filter-bar');
     if (!filterBar) return;
@@ -340,6 +353,13 @@ function FormViewModel(page) {
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
+    // ── Snapshot the exact Teamsite tiles before anything removes them ──
+    var initialContainer = document.querySelector('.insights-stories.initial');
+    if (initialContainer) {
+      // Grab only the tile columns, not any wrapper markup we don't own
+      var tileCols = Array.from(initialContainer.querySelectorAll('.col-md-4'));
+      self._initialSnapshot = tileCols.map(function (c) { return c.outerHTML; }).join('');
+    }
     badge.textContent = 'Showing 6 most recent deals';
     dropBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -375,12 +395,12 @@ function FormViewModel(page) {
     function onScroll() { var t = topSentinel.getBoundingClientRect(), b = bottomSentinel.getBoundingClientRect(), h = filterBar.offsetHeight || 70; if (t.top < STICKY_TOP && b.top > STICKY_TOP + h) { makeSticky(); } else { makeNormal(); } }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    // Silently fetch data for dropdown — does NOT remove .initial or trigger KO render
     self.fetchYear(self.year);
   };
 }
 /* ─── DOM Ready ─── */
 $(document).ready(function () {
+  $('#load-more').hide();
   $('.insights-dropdown-toggle').on({
     click:    function (e) { $(this).toggleClass('active'); $(this).next('.insights-dropdown-items').toggleClass('active').focus(); e.preventDefault(); },
     focusout: function () { $(this).next('.insights-dropdown-items').data('menuTimeout', setTimeout(function () { $(this).removeClass('active'); $(this).next('.insights-dropdown-items').removeClass('active'); }.bind(this), 100)); },
