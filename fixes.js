@@ -18,7 +18,7 @@ $('.close').click(function () {
     $('.search-box').removeClass('on').addClass('invisible');
     $('.search-toggle').focus().attr('aria-expanded', 'false');
 });
-// Fix: Close search bar when any primary nav UL/LI is clicked
+
 // Fix: Close search bar when any nav UL/LI is clicked
 (function() {
   var searchModal = document.getElementById('openSearchModal');
@@ -32,15 +32,6 @@ $('.close').click(function () {
     }, true);
   });
 })();
-
-/* BEFORE */
-footer .heading, footer .sitemap .heading, footer .sitemap .heading a {
-    text-decoration: underline;
-}
-/* AFTER */
-footer .sitemap .heading a {
-    text-decoration: underline;
-}
 
 (function() {
   var carousel = document.getElementById('team-profiles-carousel');
