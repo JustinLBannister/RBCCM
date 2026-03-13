@@ -19,20 +19,18 @@ $('.close').click(function () {
     $('.search-toggle').focus().attr('aria-expanded', 'false');
 });
 // Fix: Close search bar when any primary nav UL/LI is clicked
+// Fix: Close search bar when any nav UL/LI is clicked
 (function() {
-    var primaryNavUl = Array.from(document.querySelectorAll('nav ul')).find(function(ul) {
-        return Array.from(ul.children)
-            .filter(function(c) { return c.tagName === 'LI'; })
-            .some(function(li) { return li.textContent.trim().startsWith('Client Solutions'); });
-    });
-    var searchModal = document.getElementById('openSearchModal');
-    var closeBtn = searchModal ? searchModal.querySelector('button.close') : null;
-    if (!primaryNavUl || !searchModal || !closeBtn) return;
-    primaryNavUl.addEventListener('click', function() {
-        if (searchModal.classList.contains('on')) {
-            closeBtn.click();
-        }
+  var searchModal = document.getElementById('openSearchModal');
+  var closeBtn = searchModal ? searchModal.querySelector('button.close') : null;
+  if (!searchModal || !closeBtn) return;
+  document.querySelectorAll('nav ul').forEach(function(ul) {
+    ul.addEventListener('click', function() {
+      if (searchModal.classList.contains('on')) {
+        closeBtn.click();
+      }
     }, true);
+  });
 })();
 
 /* BEFORE */
