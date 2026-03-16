@@ -128,13 +128,17 @@ function FormViewModel(page) {
     if (!koContainer) return;
     var tiles = Array.from(koContainer.querySelectorAll('.col-md-4'))
       .filter(function (c) { return c.querySelector('.deal-date'); });
-    /* Step 1: reset all to visible */
     tiles.forEach(function (c) { c.style.display = ''; });
-    /* Step 2: hide tiles before 2024 */
     tiles.forEach(function (c) {
       var tileYear = parseInt((c.querySelector('.deal-date').textContent || '').trim().split(' ').pop(), 10);
       if (tileYear < 2024) c.style.display = 'none';
     });
+  }
+
+  /* -- stripKoMarginTop: remove any margin-top from .ko tombstones-wrap -- */
+  function stripKoMarginTop() {
+    var koTomb = document.querySelector('.insights-stories.ko .tombstones-wrap');
+    if (koTomb) koTomb.style.marginTop = '';
   }
 
   /* -- buildInitialFromSnapshot: rebuild .initial structure -- */
@@ -275,11 +279,10 @@ function FormViewModel(page) {
     }
 
     /* -- Apply a year filter -- */
-    if (initialContainer) {
-      initialContainer.style.display = 'none';
-    }
+    if (initialContainer) initialContainer.style.display = 'none';
     if (koContainer) {
       koContainer.style.display = '';
+      stripKoMarginTop();
     }
 
     if (self.show() === 0) self.show(9);
@@ -291,6 +294,7 @@ function FormViewModel(page) {
     if (clearBtn) clearBtn.style.display = 'inline';
 
     setTimeout(function () {
+      stripKoMarginTop();
       doFilter(year);
       self.updateYearUI();
     }, 100);
@@ -435,7 +439,10 @@ function FormViewModel(page) {
 
       $('.initial').remove();
       var koContainer = document.querySelector('.insights-stories.ko');
-      if (koContainer) koContainer.style.display = '';
+      if (koContainer) {
+        koContainer.style.display = '';
+        stripKoMarginTop();
+      }
 
       $('#load-more').text('Load More');
       if (self.show() === 0) {
@@ -446,6 +453,7 @@ function FormViewModel(page) {
       self.notify.notifySubscribers();
 
       setTimeout(function () {
+        stripKoMarginTop();
         if (self.activeYear() === null) {
           showRecentTilesOnly();
         } else {
@@ -526,6 +534,13 @@ function FormViewModel(page) {
         'font-size:14px;font-weight:600;color:#333;white-space:nowrap;cursor:default;margin-bottom:0;'
       );
     }
+
+    /* Remove font-family from clear and drop buttons if set inline */
+    clearBtn.style.fontFamily = '';
+    dropBtn.style.fontFamily  = '';
+
+    /* Strip any margin-top from .ko tombstones-wrap on init */
+    stripKoMarginTop();
 
     badge.textContent = 'Showing 6 most recent deals';
     badge.style.display = 'none';
