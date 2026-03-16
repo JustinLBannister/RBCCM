@@ -137,8 +137,8 @@ function FormViewModel(page) {
 
   /* -- stripKoMarginTop: remove any margin-top from .ko tombstones-wrap -- */
   function stripKoMarginTop() {
-    var koTomb = document.querySelector('.insights-stories.ko .tombstones-wrap');
-    if (koTomb) koTomb.style.marginTop = '';
+    var koRow = document.querySelector('.insights-stories.ko .container .row');
+    if (koRow) koRow.style.marginTop = '';
   }
 
   /* -- buildInitialFromSnapshot: rebuild .initial structure -- */
