@@ -54,6 +54,16 @@ function FormViewModel(page) {
   self._initialSnapshot = null;
   self._initialConsumed = false;
 
+  // CHANGE: snapshot .initial tiles immediately at ViewModel construction,
+  // before the show()>9 block below can remove .initial from the DOM
+  (function () {
+    var initialContainer = document.querySelector('.insights-stories.initial');
+    if (initialContainer) {
+      var tileCols = Array.from(initialContainer.querySelectorAll('.col-md-4'));
+      self._initialSnapshot = tileCols.map(function (c) { return c.outerHTML; }).join('');
+    }
+  })();
+
   self.filteredItems = ko.computed(function () {
     self.notify();
     if (self.topics().length === 0 && self.pubs().length === 0 &&
@@ -130,7 +140,38 @@ function FormViewModel(page) {
       });
   }
 
-  /* ── restoreInitialSnapshot ── */
+  // CHANGE: reset all KO tiles to visible then hide anything older than 2024
+  function showRecentTilesOnly() {
+    var koContainer = document.querySelector('.insights-stories.ko');
+    if (!koContainer) return;
+    Array.from(koContainer.querySelectorAll('.col-md-4'))
+      .filter(function (c) { return c.querySelector('.deal-date'); })
+      .forEach(function (c) {
+        var yr = parseInt((c.querySelector('.deal-date').textContent || '').trim().split(' ').pop(), 10);
+        c.style.display = (yr && yr < 2024) ? 'none' : '';
+      });
+  }
+
+  // CHANGE: rebuild .initial with correct DOM structure from snapshot
+  function buildInitialFromSnapshot() {
+    if (!self._initialSnapshot) return null;
+    var wrapper = document.createElement('div');
+    wrapper.className = 'insights-stories initial';
+    var tombstonesWrap = document.createElement('div');
+    tombstonesWrap.className = 'tombstones-wrap';
+    tombstonesWrap.style.marginTop = '20px';
+    var container = document.createElement('div');
+    container.className = 'container';
+    var row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = self._initialSnapshot;
+    container.appendChild(row);
+    tombstonesWrap.appendChild(container);
+    wrapper.appendChild(tombstonesWrap);
+    return wrapper;
+  }
+
+  /* ── restoreInitialSnapshot (kept for internal use) ── */
 
   function restoreInitialSnapshot() {
     var koContainer = document.querySelector('.insights-stories.ko');
@@ -201,39 +242,35 @@ function FormViewModel(page) {
 
     var initialContainer = document.querySelector('.insights-stories.initial');
     var koContainer      = document.querySelector('.insights-stories.ko');
+    var lmBtn            = document.getElementById('load-more');
+    var clearBtn         = document.getElementById('yf-clear-btn');
 
     if (year === null) {
-      // ── Clear filter ──
-
-      // CHANGE 2: If .initial was removed, re-insert it from snapshot and hide .ko
+      // CHANGE: clear filter — rebuild .initial from snapshot with correct structure,
+      // hide .ko, restore load-more, hide clear btn
       if (!initialContainer && self._initialSnapshot) {
-        var newInitial = document.createElement('div');
-        // Copy classes from .ko sibling or use known class list
-        newInitial.className = 'insights-stories initial row';
-        newInitial.innerHTML = self._initialSnapshot;
-        if (koContainer) {
-          koContainer.parentNode.insertBefore(newInitial, koContainer);
-        }
-        initialContainer = newInitial;
+        var rebuilt = buildInitialFromSnapshot();
+        if (koContainer && rebuilt) koContainer.parentNode.insertBefore(rebuilt, koContainer);
+        initialContainer = rebuilt;
         self._initialConsumed = false;
       }
-
-      // Show .initial, hide .ko
       if (initialContainer) {
         initialContainer.style.display = '';
         Array.from(initialContainer.querySelectorAll('.col-md-4'))
           .forEach(function (c) { c.style.display = ''; });
       }
       if (koContainer) koContainer.style.display = 'none';
-
+      if (lmBtn)    lmBtn.style.removeProperty('display');
+      if (clearBtn) clearBtn.style.display = 'none';
       self.updateYearUI();
       return;
     }
 
-    // ── Apply a year filter ──
-    // Show .ko, hide .initial
+    // CHANGE: year selected — hide .initial, show .ko, hide load-more, show clear btn
     if (initialContainer) initialContainer.style.display = 'none';
     if (koContainer) koContainer.style.display = '';
+    if (lmBtn)    lmBtn.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'inline';
 
     if (initialContainer) {
       $('.initial').remove();
@@ -269,7 +306,7 @@ function FormViewModel(page) {
     buildDropdownOptions();
   };
 
-  /* ── Standard KO action methods ── */
+  /* ── Standard KO action methods — unchanged ── */
 
   self.selectNoTopics = function () { self.show(9); self.query(''); self.topics([]); self.pubs([]); self.authors([]); self.notify.notifySubscribers(); };
   self.selectTopic = function (t) {
@@ -303,7 +340,7 @@ function FormViewModel(page) {
     }
   };
 
-  /* ── fetchYear ── */
+  /* ── fetchYear — unchanged, loads ALL items so dropdown shows all years ── */
 
   self.fetchYear = function (y) {
     $.ajax({
@@ -313,10 +350,6 @@ function FormViewModel(page) {
           var item = {};
           item.date        = $(this).find('date').text();
           item.year        = getItemYear(item);
-
-          // CHANGE 1: cap load more at 2024 — skip anything older than 2024
-          if (item.year && parseInt(item.year, 10) < 2024) return;
-
           item.link        = $(this).find('link').text();
           item.thumbnail   = $(this).find('thumbnail').text();
           item.title       = $(this).find('title').text();
@@ -358,14 +391,31 @@ function FormViewModel(page) {
         self.fetchYear(self.year);
         return;
       }
+      // CHANGE: show .ko, remove .initial
+      var koContainer = document.querySelector('.insights-stories.ko');
+      if (koContainer) koContainer.style.display = '';
       $('.initial').remove();
       self._initialConsumed = true;
       if (self.show() === 0) { self.show(18); } else { self.show(self.show() + 6); }
       self.notify.notifySubscribers();
-      setPage((self.show() - 9) / 6);
+      // CHANGE: no setPage() — no hash added to URL
+      // CHANGE: hide load-more, show clear filter
+      var lmBtn    = document.getElementById('load-more');
+      var clearBtn = document.getElementById('yf-clear-btn');
+      if (lmBtn)    lmBtn.style.display = 'none';
+      if (clearBtn) clearBtn.style.display = 'inline';
       setTimeout(function () {
-        self.applyYearFilter(self.activeYear());
-        $(window).scrollTop(lmScroll);
+        if (self.activeYear() !== null) {
+          self.applyYearFilter(self.activeYear());
+        } else {
+          // CHANGE: reset all tiles then hide pre-2024
+          showRecentTilesOnly();
+        }
+        // CHANGE: scroll to filter bar instead of lmScroll position
+        var filterBar = document.getElementById('yf-filter-bar');
+        if (filterBar) {
+          $('html, body').animate({ scrollTop: $(filterBar).offset().top }, 0);
+        }
       }, 100);
     }, 50);
   };
@@ -378,7 +428,7 @@ function FormViewModel(page) {
         self._userTriggered = true;
         self.fetchYear(self.year);
       }
-      setPage((self.show() - 9) / 6);
+      // CHANGE: no setPage() — no hash added to URL
     }, 50);
   }
 
@@ -396,14 +446,21 @@ function FormViewModel(page) {
 
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
 
-    // CHANGE 3: CSS-hide the badge without removing it from the DOM
+    // CHANGE: hide badge without removing from DOM
     badge.style.display = 'none';
 
-    // ── Snapshot the exact Teamsite tiles before anything removes them ──
-    var initialContainer = document.querySelector('.insights-stories.initial');
-    if (initialContainer) {
-      var tileCols = Array.from(initialContainer.querySelectorAll('.col-md-4'));
-      self._initialSnapshot = tileCols.map(function (c) { return c.outerHTML; }).join('');
+    // CHANGE: filter bar padding and label margin
+    filterBar.style.padding = '15px 0px';
+    var filterLabel = filterBar.querySelector('label');
+    if (filterLabel) filterLabel.style.marginBottom = '0';
+
+    // Snapshot — use the one captured at ViewModel construction if available
+    if (!self._initialSnapshot) {
+      var initialContainer = document.querySelector('.insights-stories.initial');
+      if (initialContainer) {
+        var tileCols = Array.from(initialContainer.querySelectorAll('.col-md-4'));
+        self._initialSnapshot = tileCols.map(function (c) { return c.outerHTML; }).join('');
+      }
     }
 
     badge.textContent = 'Showing 6 most recent deals';
@@ -441,8 +498,8 @@ function FormViewModel(page) {
     if (sc) sc.appendChild(bottomSentinel);
 
     var isSticky = false;
-    function makeSticky() { if (isSticky) return; isSticky = true; if (placeholder) { placeholder.style.height = filterBar.offsetHeight + 'px'; placeholder.style.display = 'block'; } filterBar.style.cssText = 'position:fixed;top:' + STICKY_TOP + 'px;left:0;right:0;z-index:500;background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1);'; }
-    function makeNormal() { if (!isSticky) return; isSticky = false; if (placeholder) placeholder.style.display = 'none'; filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;'; }
+    function makeSticky() { if (isSticky) return; isSticky = true; if (placeholder) { placeholder.style.height = filterBar.offsetHeight + 'px'; placeholder.style.display = 'block'; } filterBar.style.cssText = 'position:fixed;top:' + STICKY_TOP + 'px;left:0;right:0;z-index:500;background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;padding:15px 0px;box-shadow:0 2px 8px rgba(0,0,0,0.1);'; }
+    function makeNormal() { if (!isSticky) return; isSticky = false; if (placeholder) placeholder.style.display = 'none'; filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;padding:15px 0px;'; }
     function onScroll() { var t = topSentinel.getBoundingClientRect(), b = bottomSentinel.getBoundingClientRect(), h = filterBar.offsetHeight || 70; if (t.top < STICKY_TOP && b.top > STICKY_TOP + h) { makeSticky(); } else { makeNormal(); } }
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -463,29 +520,24 @@ $(document).ready(function () {
     focusout: function () { $(this).next('.insights-dropdown-items').data('menuTimeout', setTimeout(function () { $(this).removeClass('active'); $(this).next('.insights-dropdown-items').removeClass('active'); }.bind(this), 100)); },
     focusin:  function () { clearTimeout($(this).next('.insights-dropdown-items').data('menuTimeout')); }
   });
-
   $('.insights-dropdown-items').on({
     focusout: function () { $(this).data('menuTimeout', setTimeout(function () { $(this).removeClass('active'); $(this).prev('.insights-dropdown-toggle').removeClass('active'); }.bind(this), 100)); },
     focusin:  function () { clearTimeout($(this).data('menuTimeout')); },
     keydown:  function (e) { if (e.which === 27) { $(this).removeClass('active'); $(this).prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
-
   $('.insights-dropdown-items label').on({
     click:   function (e) { $(this).focus(); clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     focusin: function () { clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     keydown: function (e) { if (e.which === 27) { $(this).parent('.insights-dropdown-items').removeClass('active'); $(this).parent('.insights-dropdown-items').prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
-
   $('.insights-dropdown-items input').change(function () {
     clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout'));
   });
-
   $('#search-categories-list .category').on({
     click:   function (e) { $('#search-categories-list .category').removeClass('active'); $('#insights-search-bar #search').val(''); $(this).toggleClass('active').focus(); clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     focusin: function () { clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     keydown: function (e) { if (e.which === 27) { $(this).parent('.insights-dropdown-items').removeClass('active'); $(this).parent('.insights-dropdown-items').prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
-
   $('#insights-search-bar input').change(function () { $('#search-categories-list li').removeClass('active'); });
   $('#clear-search').on('click', function () { $('#search-categories-list .category').removeClass('active'); });
 
