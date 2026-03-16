@@ -1,5 +1,7 @@
 var lmScroll = 0;
+
 /* ─── Utility helpers ─── */
+
 function setPage(state) {
   if (state !== 0) {
     if (history.pushState) {
@@ -9,6 +11,7 @@ function setPage(state) {
     }
   }
 }
+
 function getQueryValue(variable) {
   var query = location.search.substring(1);
   if (query.indexOf('=') > -1) {
@@ -22,6 +25,7 @@ function getQueryValue(variable) {
   }
   return false;
 }
+
 function getURLtag(tag) {
   var init_tag = getQueryValue(tag);
   if (init_tag) {
@@ -29,7 +33,9 @@ function getURLtag(tag) {
   }
   return '';
 }
+
 /* ─── KO ViewModel ─── */
+
 function FormViewModel(page) {
   var self = this;
   self.show    = ko.observable(9 + page * 6);
@@ -44,10 +50,10 @@ function FormViewModel(page) {
   self.fronly  = ko.observable(false);
   self.activeYear = ko.observable(null);
   self.query   = ko.observable('').extend({ rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' } });
-  // Snapshot of the exact Teamsite .initial tiles as rendered in the DOM
-  // Captured once in initFilterBar() before anything touches the DOM
+
   self._initialSnapshot = null;
   self._initialConsumed = false;
+
   self.filteredItems = ko.computed(function () {
     self.notify();
     if (self.topics().length === 0 && self.pubs().length === 0 &&
@@ -91,12 +97,15 @@ function FormViewModel(page) {
       });
     }
   });
+
   /* ── Year filter helpers ── */
+
   function getItemYear(item) {
     if (!item || !item.date) return null;
     var parts = item.date.trim().split(' ');
     return parts.length > 1 ? parts[parts.length - 1] : null;
   }
+
   function getAvailableYears() {
     var seen = {};
     self.items().forEach(function (item) {
@@ -107,7 +116,9 @@ function FormViewModel(page) {
       return { year: y, count: seen[y] };
     });
   }
+
   /* ── doFilter: show/hide KO tiles by year ── */
+
   function doFilter(year) {
     var koContainer = document.querySelector('.insights-stories.ko');
     if (!koContainer) return;
@@ -118,23 +129,23 @@ function FormViewModel(page) {
         c.style.display = (tileYear === year) ? '' : 'none';
       });
   }
-  /* ── restoreInitialSnapshot: put the exact original 6 tiles back ── */
+
+  /* ── restoreInitialSnapshot ── */
+
   function restoreInitialSnapshot() {
     var koContainer = document.querySelector('.insights-stories.ko');
     if (!koContainer || !self._initialSnapshot) return;
-    // Find the KO foreach template comment node — we must preserve it
-    // It's the first child comment node KO uses as an anchor
     var templateComment = null;
     koContainer.childNodes.forEach(function (node) {
-      if (node.nodeType === 8) { templateComment = node; } // comment node
+      if (node.nodeType === 8) { templateComment = node; }
     });
-    // Wipe current KO-rendered tile content but keep the template comment
     koContainer.innerHTML = '';
     if (templateComment) { koContainer.appendChild(templateComment); }
-    // Re-inject the snapshotted HTML (the exact tiles from Teamsite)
     koContainer.insertAdjacentHTML('beforeend', self._initialSnapshot);
   }
+
   /* ── Dropdown ── */
+
   function buildDropdownOptions() {
     var listbox = document.getElementById('yf-listbox');
     if (!listbox) return;
@@ -166,6 +177,7 @@ function FormViewModel(page) {
       listbox.appendChild(li);
     });
   }
+
   function openDropdown() {
     var lb = document.getElementById('yf-listbox'), db = document.getElementById('yf-drop-btn'), ar = document.getElementById('yf-arrow');
     if (!lb) return;
@@ -174,41 +186,56 @@ function FormViewModel(page) {
     var sel = lb.querySelector('[aria-selected="true"]') || lb.querySelector('[role="option"]');
     if (sel) setTimeout(function () { sel.focus(); }, 10);
   }
+
   function closeDropdown() {
     var lb = document.getElementById('yf-listbox'), db = document.getElementById('yf-drop-btn'), ar = document.getElementById('yf-arrow');
     if (!lb) return;
     lb.style.display = 'none'; db.setAttribute('aria-expanded', 'false');
     if (ar) ar.style.transform = 'translateY(-50%) rotate(0deg)';
   }
+
   /* ── applyYearFilter ── */
+
   self.applyYearFilter = function (year) {
     self.activeYear(year);
+
     var initialContainer = document.querySelector('.insights-stories.initial');
+    var koContainer      = document.querySelector('.insights-stories.ko');
+
     if (year === null) {
-      // ── Clear filter ──────────────────────────────────────────────────
+      // ── Clear filter ──
+
+      // CHANGE 2: If .initial was removed, re-insert it from snapshot and hide .ko
+      if (!initialContainer && self._initialSnapshot) {
+        var newInitial = document.createElement('div');
+        // Copy classes from .ko sibling or use known class list
+        newInitial.className = 'insights-stories initial row';
+        newInitial.innerHTML = self._initialSnapshot;
+        if (koContainer) {
+          koContainer.parentNode.insertBefore(newInitial, koContainer);
+        }
+        initialContainer = newInitial;
+        self._initialConsumed = false;
+      }
+
+      // Show .initial, hide .ko
       if (initialContainer) {
-        // .initial still in DOM — just un-hide all its tiles
+        initialContainer.style.display = '';
         Array.from(initialContainer.querySelectorAll('.col-md-4'))
           .forEach(function (c) { c.style.display = ''; });
-      } else if (self._initialConsumed && self._initialSnapshot) {
-        // .initial was consumed by a year filter — restore the exact
-        // snapshotted tiles into the .ko container
-        restoreInitialSnapshot();
-      } else {
-        // Came from a normal Load More path — just un-hide all KO tiles
-        var koContainer = document.querySelector('.insights-stories.ko');
-        if (koContainer) {
-          Array.from(koContainer.querySelectorAll('.col-md-4'))
-            .filter(function (c) { return c.querySelector('.deal-date'); })
-            .forEach(function (c) { c.style.display = ''; });
-        }
       }
+      if (koContainer) koContainer.style.display = 'none';
+
       self.updateYearUI();
       return;
     }
-    // ── Apply a year filter ───────────────────────────────────────────
+
+    // ── Apply a year filter ──
+    // Show .ko, hide .initial
+    if (initialContainer) initialContainer.style.display = 'none';
+    if (koContainer) koContainer.style.display = '';
+
     if (initialContainer) {
-      // .initial still present: remove it, trigger KO render, then filter
       $('.initial').remove();
       self._initialConsumed = true;
       if (self.show() === 0) { self.show(9); }
@@ -218,11 +245,11 @@ function FormViewModel(page) {
         self.updateYearUI();
       }, 100);
     } else {
-      // .initial already gone — filter KO tiles directly
       doFilter(year);
       self.updateYearUI();
     }
   };
+
   self.updateYearUI = function () {
     var year    = self.activeYear();
     var db      = document.getElementById('yf-drop-btn');
@@ -241,7 +268,9 @@ function FormViewModel(page) {
     if (clear) clear.style.display = year !== null ? 'inline' : 'none';
     buildDropdownOptions();
   };
+
   /* ── Standard KO action methods ── */
+
   self.selectNoTopics = function () { self.show(9); self.query(''); self.topics([]); self.pubs([]); self.authors([]); self.notify.notifySubscribers(); };
   self.selectTopic = function (t) {
     self.show(0); self.loadContent(); self.query(''); self.topics(t); self.pubs([]); self.authors([]);
@@ -273,7 +302,9 @@ function FormViewModel(page) {
       self.fetchYear(self.year); $(window).scrollTop(scroll);
     }
   };
+
   /* ── fetchYear ── */
+
   self.fetchYear = function (y) {
     $.ajax({
       url: 'transactions/data/deals.page', dataType: 'xml', cache: true,
@@ -282,6 +313,10 @@ function FormViewModel(page) {
           var item = {};
           item.date        = $(this).find('date').text();
           item.year        = getItemYear(item);
+
+          // CHANGE 1: cap load more at 2024 — skip anything older than 2024
+          if (item.year && parseInt(item.year, 10) < 2024) return;
+
           item.link        = $(this).find('link').text();
           item.thumbnail   = $(this).find('thumbnail').text();
           item.title       = $(this).find('title').text();
@@ -312,7 +347,9 @@ function FormViewModel(page) {
       }
     });
   };
+
   /* ── loadMore ── */
+
   self.loadMore = function () {
     lmScroll = $(window).scrollTop();
     setTimeout(function () {
@@ -332,6 +369,7 @@ function FormViewModel(page) {
       }, 100);
     }, 50);
   };
+
   if (self.show() > 9) {
     $('.initial').remove();
     self._initialConsumed = true;
@@ -343,24 +381,33 @@ function FormViewModel(page) {
       setPage((self.show() - 9) / 6);
     }, 50);
   }
+
   /* ── initFilterBar ── */
+
   self.initFilterBar = function () {
     var filterBar = document.getElementById('yf-filter-bar');
     if (!filterBar) return;
+
     var dropBtn  = document.getElementById('yf-drop-btn');
     var dropWrap = document.getElementById('yf-drop-wrap');
     var listbox  = document.getElementById('yf-listbox');
     var badge    = document.getElementById('yf-count-badge');
     var clearBtn = document.getElementById('yf-clear-btn');
+
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
+
+    // CHANGE 3: CSS-hide the badge without removing it from the DOM
+    badge.style.display = 'none';
+
     // ── Snapshot the exact Teamsite tiles before anything removes them ──
     var initialContainer = document.querySelector('.insights-stories.initial');
     if (initialContainer) {
-      // Grab only the tile columns, not any wrapper markup we don't own
       var tileCols = Array.from(initialContainer.querySelectorAll('.col-md-4'));
       self._initialSnapshot = tileCols.map(function (c) { return c.outerHTML; }).join('');
     }
+
     badge.textContent = 'Showing 6 most recent deals';
+
     dropBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       listbox.style.display === 'none' ? openDropdown() : closeDropdown();
@@ -378,58 +425,75 @@ function FormViewModel(page) {
     document.addEventListener('click', function (e) {
       if (dropWrap && !dropWrap.contains(e.target)) closeDropdown();
     }, true);
+
     clearBtn.addEventListener('click', function () { self.applyYearFilter(null); });
+
     // Sticky
     var placeholder  = document.getElementById('yf-sticky-placeholder');
     var STICKY_TOP   = 60;
     var topSentinel  = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     filterBar.parentNode.insertBefore(topSentinel, filterBar);
+
     var bottomSentinel = document.createElement('div');
     bottomSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     var sc = document.querySelector('.insights-stories.initial') || document.querySelector('.insights-stories.ko');
     if (sc) sc.appendChild(bottomSentinel);
+
     var isSticky = false;
     function makeSticky() { if (isSticky) return; isSticky = true; if (placeholder) { placeholder.style.height = filterBar.offsetHeight + 'px'; placeholder.style.display = 'block'; } filterBar.style.cssText = 'position:fixed;top:' + STICKY_TOP + 'px;left:0;right:0;z-index:500;background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1);'; }
     function makeNormal() { if (!isSticky) return; isSticky = false; if (placeholder) placeholder.style.display = 'none'; filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;margin:0;padding:14px 0;'; }
     function onScroll() { var t = topSentinel.getBoundingClientRect(), b = bottomSentinel.getBoundingClientRect(), h = filterBar.offsetHeight || 70; if (t.top < STICKY_TOP && b.top > STICKY_TOP + h) { makeSticky(); } else { makeNormal(); } }
+
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+
     self.fetchYear(self.year);
   };
+
 }
+
 /* ─── DOM Ready ─── */
+
 $(document).ready(function () {
   $('#load-more').hide();
+
   $('.insights-dropdown-toggle').on({
     click:    function (e) { $(this).toggleClass('active'); $(this).next('.insights-dropdown-items').toggleClass('active').focus(); e.preventDefault(); },
     focusout: function () { $(this).next('.insights-dropdown-items').data('menuTimeout', setTimeout(function () { $(this).removeClass('active'); $(this).next('.insights-dropdown-items').removeClass('active'); }.bind(this), 100)); },
     focusin:  function () { clearTimeout($(this).next('.insights-dropdown-items').data('menuTimeout')); }
   });
+
   $('.insights-dropdown-items').on({
     focusout: function () { $(this).data('menuTimeout', setTimeout(function () { $(this).removeClass('active'); $(this).prev('.insights-dropdown-toggle').removeClass('active'); }.bind(this), 100)); },
     focusin:  function () { clearTimeout($(this).data('menuTimeout')); },
     keydown:  function (e) { if (e.which === 27) { $(this).removeClass('active'); $(this).prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
+
   $('.insights-dropdown-items label').on({
     click:   function (e) { $(this).focus(); clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     focusin: function () { clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     keydown: function (e) { if (e.which === 27) { $(this).parent('.insights-dropdown-items').removeClass('active'); $(this).parent('.insights-dropdown-items').prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
+
   $('.insights-dropdown-items input').change(function () {
     clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout'));
   });
+
   $('#search-categories-list .category').on({
     click:   function (e) { $('#search-categories-list .category').removeClass('active'); $('#insights-search-bar #search').val(''); $(this).toggleClass('active').focus(); clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     focusin: function () { clearTimeout($(this).parent('.insights-dropdown-items').data('menuTimeout')); },
     keydown: function (e) { if (e.which === 27) { $(this).parent('.insights-dropdown-items').removeClass('active'); $(this).parent('.insights-dropdown-items').prev('.insights-dropdown-toggle').removeClass('active'); e.preventDefault(); } }
   });
+
   $('#insights-search-bar input').change(function () { $('#search-categories-list li').removeClass('active'); });
   $('#clear-search').on('click', function () { $('#search-categories-list .category').removeClass('active'); });
+
   ko.bindingHandlers.dateString = {
     init:   function (element, valueAccessor) { element.onchange = function () { var value = valueAccessor(); value(formatDate(element.value).toDate()); }; },
     update: function (element, valueAccessor) { var value = valueAccessor(), v = ko.utils.unwrapObservable(value); if (v) element.innerHTML = formatDate(v); }
   };
+
   var model;
   if (location.hash !== '') {
     model = new FormViewModel(parseInt(location.hash.replace('#', '')));
@@ -440,12 +504,15 @@ $(document).ready(function () {
     if (getQueryValue('author')) { model.selectFromURL(null, getURLtag('author')); }
     else if (getQueryValue('tag')) { model.selectFromURL(getURLtag('tag'), null); }
   }
+
   model.initFilterBar();
+
   var topics = getUrlParameter('t');
   if (topics !== undefined) {
     var t_arr = topics.split(',');
     $.each(t_arr, function (key, value) { $("input[value='" + $.trim(value) + "']").click(); });
   }
+
   $('#ls-row-3-area-1 .story-tiles > .row').slick({ dots: true });
   $('button.slick-autoplay-toggle-button').css('display', 'none');
 });
