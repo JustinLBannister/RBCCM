@@ -145,7 +145,6 @@ function FormViewModel(page) {
 
     var tombWrap = document.createElement('div');
     tombWrap.className = 'tombstones-wrap';
-    tombWrap.style.marginTop = '20px';
 
     var container = document.createElement('div');
     container.className = 'container';
@@ -496,6 +495,18 @@ function FormViewModel(page) {
     var clearBtn = document.getElementById('yf-clear-btn');
     if (!dropBtn || !listbox || !badge || !clearBtn) return;
 
+    /* Inject responsive max-width so filter bar is 30px narrower than std container */
+    if (!document.getElementById('yf-filter-bar-styles')) {
+      var styleEl = document.createElement('style');
+      styleEl.id = 'yf-filter-bar-styles';
+      styleEl.textContent = [
+        '@media (min-width:768px)  { #yf-filter-bar.container { max-width:720px; } }',
+        '@media (min-width:992px)  { #yf-filter-bar.container { max-width:940px; } }',
+        '@media (min-width:1200px) { #yf-filter-bar.container { max-width:1140px; } }'
+      ].join(' ');
+      document.head.appendChild(styleEl);
+    }
+
     /* Add container class for proper width/margins (normal state only) */
     filterBar.classList.add('container');
 
@@ -507,6 +518,14 @@ function FormViewModel(page) {
       'padding:15px 0 !important;' +
       'text-align:right;'
     );
+
+    /* Fix label - no font-family, no margin-bottom */
+    var label = filterBar.querySelector('label');
+    if (label) {
+      label.setAttribute('style',
+        'font-size:14px;font-weight:600;color:#333;white-space:nowrap;cursor:default;margin-bottom:0;'
+      );
+    }
 
     badge.textContent = 'Showing 6 most recent deals';
     badge.style.display = 'none';
