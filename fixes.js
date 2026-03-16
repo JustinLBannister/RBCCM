@@ -94,6 +94,20 @@ $(document).ready(function() {
     }, 0);
   });
 
+  // Log which item is focused when tabbing through the carousel
+  carousel.addEventListener('focusin', function(e) {
+    var item = e.target.closest('.owl-item');
+    if (item) {
+      var allItems = Array.from(carousel.querySelectorAll('.owl-item'));
+      var itemIndex = allItems.indexOf(item);
+      console.log('[owl-off-canvas] focus on owl-item index:', itemIndex,
+        '| active:', item.classList.contains('active'),
+        '| cloned:', item.classList.contains('cloned'),
+        '| element:', e.target.tagName, e.target.getAttribute('aria-label') || e.target.textContent.trim().substring(0, 30)
+      );
+    }
+  });
+
   // Slide carousel when tabbing into an off-canvas real card
   carousel.addEventListener('focusin', function(e) {
     var item = e.target.closest('.owl-item');
@@ -117,9 +131,17 @@ $(document).ready(function() {
     }
   }, true);
 
-  // Tab boundary: trap focus within the currently active (visible) items only.
-  // Forward Tab from the last active card exits the carousel to the next section.
-  // Shift+Tab from the first active card exits the carousel backwards.
+  // Helper: is an element visible enough to receive focus?
+  function isFocusable(el) {
+    if (el.offsetParent === null) return false;          // hidden / display:none
+    var style = window.getComputedStyle(el);
+    if (style.visibility === 'hidden') return false;
+    if (style.display === 'none') return false;
+    return true;
+  }
+
+  // Tab boundary: allow Tab to exit the carousel after the last active (visible) item.
+  // Skips off-canvas items, clones, proxy buttons, and any invisible elements.
   carousel.addEventListener('keydown', function(e) {
     if (e.key !== 'Tab') return;
 
@@ -129,24 +151,32 @@ $(document).ready(function() {
     var firstFocusable = activeItems[0].querySelector('a, button');
     var lastFocusable  = activeItems[activeItems.length - 1].querySelector('a, button');
 
-    // Shift+Tab from first active card → exit carousel backwards (do nothing, let browser handle)
-    // Forward Tab from last active card → skip over off-canvas items to next section
+    console.log('[owl-off-canvas] keydown Tab | activeElement:', document.activeElement,
+      '| lastFocusable:', lastFocusable,
+      '| match:', document.activeElement === lastFocusable,
+      '| shiftKey:', e.shiftKey
+    );
+
+    // Forward Tab from last active card → jump to first visible focusable outside carousel
     if (!e.shiftKey && document.activeElement === lastFocusable) {
       e.preventDefault();
-      // Move focus to the first focusable element after the carousel
-      var focusables = Array.from(document.querySelectorAll(
+
+      var allFocusables = Array.from(document.querySelectorAll(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
       ));
-      var carouselIndex = focusables.indexOf(lastFocusable);
-      // Skip past any focusables still inside the carousel (off-canvas items, clones, proxies)
+      var carouselIndex = allFocusables.indexOf(lastFocusable);
       var next = null;
-      for (var i = carouselIndex + 1; i < focusables.length; i++) {
-        if (!carousel.contains(focusables[i])) {
-          next = focusables[i];
+      for (var i = carouselIndex + 1; i < allFocusables.length; i++) {
+        if (!carousel.contains(allFocusables[i]) && isFocusable(allFocusables[i])) {
+          next = allFocusables[i];
           break;
         }
       }
-      if (next) next.focus();
+
+      console.log('[owl-off-canvas] jumping focus to:', next);
+      if (next) {
+        next.focus();
+      }
     }
   }, true);
 
