@@ -44,10 +44,6 @@ $(document).ready(function() {
   var slideLock = false;
   var SLIDE_SPEED = 350;
 
-  // The real prev/next buttons are positioned off-screen (left:-120px / right:-120px)
-  // which causes page scroll when natively focused. Instead we create visually-hidden
-  // proxy buttons INSIDE the carousel track (always in-viewport) that delegate to them.
-  // The real buttons are untouched for normal mouse interaction.
   var proxyStyle = [
     'position:absolute',
     'width:1px',
@@ -70,12 +66,10 @@ $(document).ready(function() {
   proxyNext.setAttribute('aria-label', 'Next Slide');
   proxyNext.setAttribute('style', proxyStyle);
 
-  // Place proxies inside owl-nav so they're always within the viewport
   var owlNav = carousel.querySelector('.owl-nav');
   owlNav.insertBefore(proxyPrev, prevBtn);
   owlNav.appendChild(proxyNext);
 
-  // Proxy delegates to the real button clicks (preserves all existing mouse handlers)
   proxyPrev.addEventListener('click', function() { prevBtn.click(); });
   proxyNext.addEventListener('click', function() { nextBtn.click(); });
 
@@ -123,29 +117,36 @@ $(document).ready(function() {
     }
   }, true);
 
-  // Tab boundary: intercept Tab at last real card so focus skips clones
-  // and lands on proxyPrev (which is in-viewport, no scroll side-effect)
+  // Tab boundary: trap focus within the currently active (visible) items only.
+  // Forward Tab from the last active card exits the carousel to the next section.
+  // Shift+Tab from the first active card exits the carousel backwards.
   carousel.addEventListener('keydown', function(e) {
     if (e.key !== 'Tab') return;
 
-    var realItems = Array.from(carousel.querySelectorAll('.owl-item:not(.cloned)'));
-    var firstFocusable = realItems[0].querySelector('a, button');
-    var lastFocusable  = realItems[realItems.length - 1].querySelector('a, button');
+    var activeItems = Array.from(carousel.querySelectorAll('.owl-item.active:not(.cloned)'));
+    if (!activeItems.length) return;
 
-    // Forward Tab from last real card → proxyPrev
+    var firstFocusable = activeItems[0].querySelector('a, button');
+    var lastFocusable  = activeItems[activeItems.length - 1].querySelector('a, button');
+
+    // Shift+Tab from first active card → exit carousel backwards (do nothing, let browser handle)
+    // Forward Tab from last active card → skip over off-canvas items to next section
     if (!e.shiftKey && document.activeElement === lastFocusable) {
       e.preventDefault();
-      proxyPrev.focus();
-    }
-    // Shift+Tab from first real card → proxyNext
-    if (e.shiftKey && document.activeElement === firstFocusable) {
-      e.preventDefault();
-      proxyNext.focus();
-    }
-    // Shift+Tab from proxyPrev → back to last real card
-    if (e.shiftKey && document.activeElement === proxyPrev) {
-      e.preventDefault();
-      lastFocusable.focus();
+      // Move focus to the first focusable element after the carousel
+      var focusables = Array.from(document.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ));
+      var carouselIndex = focusables.indexOf(lastFocusable);
+      // Skip past any focusables still inside the carousel (off-canvas items, clones, proxies)
+      var next = null;
+      for (var i = carouselIndex + 1; i < focusables.length; i++) {
+        if (!carousel.contains(focusables[i])) {
+          next = focusables[i];
+          break;
+        }
+      }
+      if (next) next.focus();
     }
   }, true);
 
