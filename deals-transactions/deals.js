@@ -54,7 +54,7 @@ function FormViewModel(page) {
   self._initialSnapshot = null;
   self._initialConsumed = false;
 
-  // CHANGE: snapshot .initial tiles immediately at ViewModel construction,
+  // CHANGE: snapshot .initial tiles immediately at ViewModel construction
   // before the show()>9 block below can remove .initial from the DOM
   (function () {
     var initialContainer = document.querySelector('.insights-stories.initial');
@@ -197,10 +197,10 @@ function FormViewModel(page) {
       var li = document.createElement('li');
       li.setAttribute('role', 'option'); li.setAttribute('data-value', y);
       li.setAttribute('tabindex', '-1'); li.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      // CHANGE: no font-family set — inherits from page styles
       li.style.cssText = [
         'display:flex', 'justify-content:space-between', 'align-items:center',
         'padding:9px 14px', 'cursor:pointer',
-        'font-family:Fira,"Lucida Grande",Verdana,sans-serif', 'font-size:14px',
         'color:'       + (isActive ? '#0051A5' : '#333'),
         'background:'  + (isActive ? '#e8f0fb' : '#fff'),
         'font-weight:' + (isActive ? '600'     : '400'),
@@ -411,7 +411,7 @@ function FormViewModel(page) {
           // CHANGE: reset all tiles then hide pre-2024
           showRecentTilesOnly();
         }
-        // CHANGE: scroll to filter bar instead of lmScroll position
+        // CHANGE: scroll to filter bar
         var filterBar = document.getElementById('yf-filter-bar');
         if (filterBar) {
           $('html, body').animate({ scrollTop: $(filterBar).offset().top }, 0);
@@ -449,8 +449,15 @@ function FormViewModel(page) {
     // CHANGE: hide badge without removing from DOM
     badge.style.display = 'none';
 
-    // CHANGE: filter bar padding and label margin
-    filterBar.style.padding = '15px 0px';
+    // CHANGE: filter bar padding and alignment, label margin
+    filterBar.setAttribute('style',
+      'background:#f7f7f7;' +
+      'border-top:2px solid #ddd;' +
+      'border-bottom:2px solid #ddd;' +
+      'margin:0;' +
+      'padding:15px 0 !important;' +
+      'text-align:right;'
+    );
     var filterLabel = filterBar.querySelector('label');
     if (filterLabel) filterLabel.style.marginBottom = '0';
 
@@ -486,9 +493,10 @@ function FormViewModel(page) {
     clearBtn.addEventListener('click', function () { self.applyYearFilter(null); });
 
     // Sticky
-    var placeholder  = document.getElementById('yf-sticky-placeholder');
-    var STICKY_TOP   = 60;
-    var topSentinel  = document.createElement('div');
+    var placeholder = document.getElementById('yf-sticky-placeholder');
+    var STICKY_TOP  = 60;
+
+    var topSentinel = document.createElement('div');
     topSentinel.style.cssText = 'position:relative;height:1px;pointer-events:none;';
     filterBar.parentNode.insertBefore(topSentinel, filterBar);
 
@@ -498,9 +506,38 @@ function FormViewModel(page) {
     if (sc) sc.appendChild(bottomSentinel);
 
     var isSticky = false;
-    function makeSticky() { if (isSticky) return; isSticky = true; if (placeholder) { placeholder.style.height = filterBar.offsetHeight + 'px'; placeholder.style.display = 'block'; } filterBar.style.cssText = 'position:fixed;top:' + STICKY_TOP + 'px;left:0;right:0;z-index:500;background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;padding:15px 0px;box-shadow:0 2px 8px rgba(0,0,0,0.1);'; }
-    function makeNormal() { if (!isSticky) return; isSticky = false; if (placeholder) placeholder.style.display = 'none'; filterBar.style.cssText = 'background:#f7f7f7;border-top:2px solid #ddd;border-bottom:2px solid #ddd;padding:15px 0px;'; }
-    function onScroll() { var t = topSentinel.getBoundingClientRect(), b = bottomSentinel.getBoundingClientRect(), h = filterBar.offsetHeight || 70; if (t.top < STICKY_TOP && b.top > STICKY_TOP + h) { makeSticky(); } else { makeNormal(); } }
+
+    // CHANGE: makeSticky/makeNormal use setAttribute to preserve padding !important and text-align
+    function makeSticky() {
+      if (isSticky) return;
+      isSticky = true;
+      if (placeholder) { placeholder.style.height = filterBar.offsetHeight + 'px'; placeholder.style.display = 'block'; }
+      filterBar.setAttribute('style',
+        'position:fixed;top:' + STICKY_TOP + 'px;left:0;right:0;z-index:500;' +
+        'background:#f7f7f7;' +
+        'border-top:2px solid #ddd;border-bottom:2px solid #ddd;' +
+        'margin:0;padding:15px 0 !important;' +
+        'box-shadow:0 2px 8px rgba(0,0,0,0.1);' +
+        'text-align:right;'
+      );
+    }
+
+    function makeNormal() {
+      if (!isSticky) return;
+      isSticky = false;
+      if (placeholder) placeholder.style.display = 'none';
+      filterBar.setAttribute('style',
+        'background:#f7f7f7;' +
+        'border-top:2px solid #ddd;border-bottom:2px solid #ddd;' +
+        'margin:0;padding:15px 0 !important;' +
+        'text-align:right;'
+      );
+    }
+
+    function onScroll() {
+      var t = topSentinel.getBoundingClientRect(), b = bottomSentinel.getBoundingClientRect(), h = filterBar.offsetHeight || 70;
+      if (t.top < STICKY_TOP && b.top > STICKY_TOP + h) { makeSticky(); } else { makeNormal(); }
+    }
 
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -513,7 +550,7 @@ function FormViewModel(page) {
 /* ─── DOM Ready ─── */
 
 $(document).ready(function () {
-  $('#load-more').hide();
+  // CHANGE: removed $('#load-more').hide() — load more visible by default
 
   $('.insights-dropdown-toggle').on({
     click:    function (e) { $(this).toggleClass('active'); $(this).next('.insights-dropdown-items').toggleClass('active').focus(); e.preventDefault(); },
