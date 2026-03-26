@@ -815,7 +815,7 @@
       var typeButton = document.createElement('button');
       typeButton.id = 'yf-x-type-btn';
       typeButton.type = 'button';
-      typeButton.innerHTML = 'Type <span class="arrow">&#9660;</span>';
+      typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
 
       var typeList = document.createElement('ul');
       typeList.id = 'yf-x-type-lb';
