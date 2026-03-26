@@ -653,7 +653,7 @@
         '#yf-x-year-lb li:hover,#yf-x-type-lb li:hover{background:#f0f6ff;}',
         '#yf-x-year-lb li.active,#yf-x-type-lb li.active{background:#e8f0fb;color:#0051A5;font-weight:600;}',
         '.ycnt,.tcnt,#yf-x-count{display:none!important;}',
-        '#yf-x-amt-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;}',
+        '#yf-x-amt-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;display:none;}',
         '#yf-x-amt-lbl{font-size:13px;font-weight:600;color:#333;white-space:nowrap;}',
         '#yf-x-rng-wrap{position:relative;display:inline-block;width:160px;height:28px;}',
         '#yf-x-rng-wrap input[type=range]{-webkit-appearance:none;appearance:none;position:absolute;width:100%;height:4px;background:transparent;outline:none;pointer-events:none;top:50%;transform:translateY(-50%);}',
@@ -994,9 +994,9 @@
         }
 
         if (activeType) {
-          addTag('Type: ' + activeType, function () {
+          addTag('Product Type: ' + activeType, function () {
             activeType = null;
-            typeButton.innerHTML = 'Type <span class="arrow">&#9660;</span>';
+            typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
             applyFilters();
           });
         }
@@ -1281,7 +1281,7 @@
 
         typeButton.innerHTML = (value
           ? '<span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;">' + value + '</span>'
-          : 'Type') + ' <span class="arrow">&#9660;</span>';
+          : 'Product Type') + ' <span class="arrow">&#9660;</span>';
 
         closeDropdown(typeList, typeButton);
         applyFilters();
