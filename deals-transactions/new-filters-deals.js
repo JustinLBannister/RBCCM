@@ -670,6 +670,7 @@
         '#yf-x-pagination button:hover{background:#f0f6ff;border-color:#0051A5;color:#0051A5;}',
         '#yf-x-pagination button.pg-active{background:#0051A5;border-color:#0051A5;color:#fff;}',
         '#yf-x-pagination button:disabled{opacity:.35;cursor:default;pointer-events:none;}',
+        '#load-more{position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;}',
         '#yf-x-pg-info{display:inline-block;font-size:12px;color:#666;margin-left:14px;vertical-align:middle;}'
       ].join('');
       document.head.appendChild(style);
