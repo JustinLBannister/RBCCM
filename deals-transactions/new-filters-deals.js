@@ -604,6 +604,18 @@
         self._initialSnapshot = buildTileSnapshot('.insights-stories.initial .col-md-4');
       }
 
+      // If items haven't loaded yet, fetch them then reinit
+      if (self.items().length === 0) {
+        self._filterBarInitialized = false; // allow re-init after data loads
+        self.items.subscribe(function (newItems) {
+          if (newItems.length > 0 && !self._filterBarInitialized) {
+            self.initFilterBar();
+          }
+        });
+        self.fetchYear(self.year);
+        return; // bail out early, will re-run once data arrives
+      }
+
       if (!document.getElementById('yf-filter-bar-styles')) {
         var baseStyle = document.createElement('style');
         baseStyle.id = 'yf-filter-bar-styles';
