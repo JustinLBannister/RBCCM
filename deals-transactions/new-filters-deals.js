@@ -1226,7 +1226,7 @@
             count.style.cssText = 'display:block;font-size:12px;color:#c00;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
           } else {
             count.textContent = matchedTiles.length + ' Deal' + (matchedTiles.length !== 1 ? 's' : '');
-            count.style.cssText = 'display:block;font-size:12px;color:#666;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
+            count.style.cssText = 'display:none;font-size:12px;color:#666;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
           }
           stripKoMarginTop();
           updateTags();
