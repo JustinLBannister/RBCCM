@@ -672,7 +672,8 @@
         '#yf-x-pagination button.pg-active{background:#0051A5;border-color:#0051A5;color:#fff;}',
         '#yf-x-pagination button:disabled{opacity:.35;cursor:default;pointer-events:none;}',
         '#load-more{position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;}',
-        '#yf-x-pg-info{display:inline-block;font-size:12px;color:#666;margin-left:14px;vertical-align:middle;}'
+        '#yf-x-pg-info{display:none;font-size:12px;color:#666;margin-left:14px;vertical-align:middle;}',
+        '.yf-x-tag-or{display:inline-flex;align-items:center;font-size:12px;color:#777;margin-right:4px;}'
       ].join('');
       document.head.appendChild(style);
 
@@ -987,21 +988,50 @@
           tagsRow.appendChild(tag);
         }
 
+        // if (activeFilterYear) {
+        //   addTag('Year: ' + activeFilterYear, function () {
+        //     activeFilterYear = null;
+        //     yearButton.innerHTML = 'Year <span class="arrow">&#9660;</span>';
+        //     applyFilters();
+        //   });
+        // }
+
+        // if (activeType) {
+        //   addTag('Product Type: ' + activeType, function () {
+        //     activeType = null;
+        //     typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
+        //     applyFilters();
+        //   });
+        // }
+
+        var activeTags = [];
+
         if (activeFilterYear) {
-          addTag('Year: ' + activeFilterYear, function () {
+          activeTags.push({ text: 'Year: ' + activeFilterYear, onClear: function () {
             activeFilterYear = null;
             yearButton.innerHTML = 'Year <span class="arrow">&#9660;</span>';
             applyFilters();
-          });
+          }});
         }
 
         if (activeType) {
-          addTag('Product Type: ' + activeType, function () {
+          activeTags.push({ text: 'Product Type: ' + activeType, onClear: function () {
             activeType = null;
             typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
             applyFilters();
-          });
+          }});
         }
+
+        activeTags.forEach(function (tagDef, index) {
+          if (index > 0) {
+            addLabel();
+            var or = document.createElement('span');
+            or.className = 'yf-x-tag-or';
+            or.textContent = 'and';
+            tagsRow.appendChild(or);
+          }
+          addTag(tagDef.text, tagDef.onClear);
+        });
 
         var min = parseInt(minSlider.value, 10);
         var max = parseInt(maxSlider.value, 10);
@@ -1209,7 +1239,11 @@
               }
             }
 
-            var passes = (yearActive && passYear) || (typeActive && passType) || (amountActive && passAmount);
+            // CURRENT (OR):
+            // var passes = (yearActive && passYear) || (typeActive && passType) || (amountActive && passAmount);
+
+            // CHANGE TO (AND):
+            var passes = (!yearActive || passYear) && (!typeActive || passType) && (!amountActive || passAmount);
 
             if (passes) {
               matchedTiles.push(tile);
