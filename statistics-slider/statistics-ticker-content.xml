@@ -6,17 +6,29 @@
   <Datum ID="Footnote" Type="String" Name="Footnote">Data as of Q4 2025</Datum>
 
   <!-- ── Stat items (min 4, max 8) ── -->
-  <!-- Min 4, max 8 stats. Component will not render outside those bounds. -->
+  <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
+    <Datum ID="Number" Type="String" Name="Stat Number">7th Largest</Datum>
+    <Datum ID="Description" Type="String" Name="Description">North American Bank<br>by Market Cap</Datum>
+  </Group>
 
   <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
-    <Datum ID="Number" Type="String" Name="Stat Number">
-      <!-- The large display value e.g. "#1", "7th Largest", "Aa1/AA-", "TOP 3" -->
-      <!-- Supports inline HTML e.g. "£36.2<span>B</span>" or "19<span>M+</span> / 29" -->
-    </Datum>
-    <Datum ID="Description" Type="String" Name="Description">
-      <!-- Smaller text below the number e.g. "North American Bank by Market Cap" -->
-      <!-- Supports &lt;br&gt; for line breaks -->
-    </Datum>
+    <Datum ID="Number" Type="String" Name="Stat Number">£36.2<span style="font-size:0.6em;">B</span></Datum>
+    <Datum ID="Description" Type="String" Name="Description">2025<br>Total revenue</Datum>
+  </Group>
+
+  <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
+    <Datum ID="Number" Type="String" Name="Stat Number">19<span style="font-size:0.6em;">M+</span> / 29</Datum>
+    <Datum ID="Description" Type="String" Name="Description"># of Clients/Countries</Datum>
+  </Group>
+
+  <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
+    <Datum ID="Number" Type="String" Name="Stat Number">Aa1/AA-</Datum>
+    <Datum ID="Description" Type="String" Name="Description">Moody's/S&amp;P<br>Credit Ratings</Datum>
+  </Group>
+
+  <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
+    <Datum ID="Number" Type="String" Name="Stat Number">TOP 3</Datum>
+    <Datum ID="Description" Type="String" Name="Description">Most valuable<br>global brand</Datum>
   </Group>
 
 </Data>

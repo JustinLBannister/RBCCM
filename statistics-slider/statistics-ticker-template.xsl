@@ -10,7 +10,10 @@
   <xsl:template match="/">
 
     <!-- ── Guard: only render if between 4 and 8 stats ── -->
-    <xsl:variable name="statCount" select="count(/Data/Group[@ID='StatItem' or @Name='Stat Item'])"/>
+    <xsl:variable name="statCount" select="count(
+        /Properties/Data/Group[@ID='StatItem' or @Name='Stat Item']
+        | /Data/Group[@ID='StatItem' or @Name='Stat Item']
+      )"/>
 
     <xsl:if test="$statCount &gt;= 4 and $statCount &lt;= 8">
 
@@ -51,7 +54,10 @@
 
         <!-- Stat grid -->
         <div class="rbccm-stats__grid">
-          <xsl:for-each select="/Data/Group[@ID='StatItem' or @Name='Stat Item']">
+          <xsl:for-each select="
+              /Properties/Data/Group[@ID='StatItem' or @Name='Stat Item']
+              | /Data/Group[@ID='StatItem' or @Name='Stat Item']
+            ">
             <xsl:variable name="number"      select="normalize-space(Datum[@ID='Number'      or @Name='Stat Number'])"/>
             <xsl:variable name="description" select="normalize-space(Datum[@ID='Description' or @Name='Description'])"/>
 
