@@ -17,17 +17,17 @@
 
     <xsl:if test="$statCount &gt;= 4 and $statCount &lt;= 8">
 
-      <!-- ── Header fields ── -->
+      <!-- ── Header fields (from appearance XML) ── -->
       <xsl:variable name="title">
-        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Title'])"/>
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Title'])"/>
       </xsl:variable>
 
       <xsl:variable name="subtitle">
-        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Subtitle'])"/>
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Subtitle'])"/>
       </xsl:variable>
 
       <xsl:variable name="footnote">
-        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Footnote'])"/>
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Footnote'])"/>
       </xsl:variable>
 
       <!-- ── Load CSS ── -->
