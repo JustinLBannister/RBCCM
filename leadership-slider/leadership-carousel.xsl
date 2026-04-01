@@ -33,7 +33,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
           </xsl:when>
-          <xsl:otherwise>European leadership team carousel</xsl:otherwise>
+          <xsl:otherwise>European leadership</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
@@ -41,7 +41,7 @@
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/leadership-carousel.css"/>
 
       <!-- ── Component HTML ── -->
-      <section class="rbccm-leadership" id="rbccm-leadership-demo">
+      <section class="rbccm-leadership" id="rbccm-leadership">
         <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
 
         <div class="rbccm-leadership__inner">
@@ -422,7 +422,7 @@
           }
 
           $(document).on('keydown', function (e) {
-            if (!$.contains(document.getElementById('rbccm-leadership-demo'), document.activeElement)) return;
+            if (!$.contains(document.getElementById('rbccm-leadership'), document.activeElement)) return;
 
             var handled = false;
 

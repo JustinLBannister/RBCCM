@@ -1,0 +1,310 @@
+/* ============================================================
+   Leadership Carousel
+   Path: /assets/rbccm/css/sub/test/leadership-carousel.css
+============================================================ */
+
+/* ── Screen reader only ── */
+    .rbccm-leadership__sr-only {
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+
+
+    /* ── Section ── */
+    #rbccm-leadership.rbccm-leadership {
+      background-color: #ffffff;
+      box-sizing: border-box;
+      overflow: hidden;
+      padding: 64px 0;
+      position: relative;
+      width: 100%;
+    }
+
+    /* ── Inner container ── */
+    .rbccm-leadership__inner {
+      box-sizing: border-box;
+      margin: 0 auto;
+      max-width: 1200px;
+      position: relative;
+    }
+    @media (min-width: 1170px) {
+      .rbccm-leadership__inner { max-width: 1140px; }
+    }
+
+    /* ── Heading ── */
+    .rbccm-leadership__heading {
+      color: #003168;
+      font-family: 'RBC Display', serif;
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: -0.789px;
+      line-height: normal;
+      margin: 0px 0 35px;
+      padding: 0 16px;
+    }
+    @media (min-width: 1170px) {
+      .rbccm-leadership__heading { padding: 0; }
+    }
+
+    /* ── Slider wrapper ── */
+    .rbccm-leadership__slider-track { margin: 0 -8px; }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__slider-track { margin: 0; }
+    }
+
+    /* ── Slick overrides ── */
+    #rbccm-leadership .slick-slide {
+      box-sizing: border-box;
+      float: none;
+      height: auto;
+    }
+    #rbccm-leadership .slick-slide > div,
+    #rbccm-leadership .slick-slide > div > div { }
+    #rbccm-leadership .slick-track {
+      display: flex !important;
+      align-items: stretch !important;
+    }
+    #rbccm-leadership .slick-list { overflow: visible; }
+    #rbccm-leadership .slick-prev,
+    #rbccm-leadership .slick-next { display: none !important; }
+
+    /* ── Active card border ── */
+    .rbccm-leadership__card {
+      border: 1px solid #A8A8A8;
+      box-sizing: border-box;
+      display: flex !important;
+      flex-direction: column !important;
+      margin: 0 8px;
+      width: 343px;
+    }
+    @media (min-width: 1025px) {
+      .rbccm-leadership__card { width: 273px; }
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__card { margin: 0 16px; width: 273px; }
+    }
+    #rbccm-leadership .slick-center .rbccm-leadership__card {
+      border-color: #003168;
+    }
+
+    /* ── Card image zone ── */
+    .rbccm-leadership__card-image {
+      background-color: #DADADA;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      max-height: 263px;
+      min-height: 263px;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+    .rbccm-leadership__card-image img {
+      display: block;
+      height: 263px;
+      object-fit: cover;
+      object-position: top center;
+      width: 100%;
+    }
+    .rbccm-leadership__fpo {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      height: 263px;
+    }
+    .rbccm-leadership__fpo svg { height: 80px; opacity: 0.3; width: 80px; }
+    .rbccm-leadership__card-image img[src]:not([src=""]):not([src*="fpoimg.com"]) ~ .rbccm-leadership__fpo { display: none; }
+
+    /* ── Card body ── */
+    .rbccm-leadership__card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      gap: 8px;
+      height: auto;
+      max-height: 117px;
+      min-height: 117px;
+      padding: 24px 24px 46px 24px;
+      position: relative;
+    }
+
+    /* ── Card name ── */
+    .rbccm-leadership__card-name {
+      color: #000;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: normal;
+      margin: 0;
+    }
+
+    /* ── Card role ── */
+    .rbccm-leadership__card-role {
+      color: #454545;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 19px;
+      margin: 0;
+    }
+
+    /* ── LinkedIn — absolute bottom-right of card body ── */
+    .rbccm-leadership__card-linkedin {
+      bottom: 24px;
+      display: inline-block;
+      height: 44px;
+      position: absolute;
+      right: 24px;
+      text-decoration: none;
+      width: 44px;
+    }
+    .rbccm-leadership__card-linkedin .li-default { display: block; }
+    .rbccm-leadership__card-linkedin .li-hover   { display: none; }
+    .rbccm-leadership__card-linkedin:hover .li-default { display: none; }
+    .rbccm-leadership__card-linkedin:hover .li-hover   { display: block; }
+
+    /* ── Controls row — visible up to 1199px ── */
+    .rbccm-leadership__controls {
+      align-items: center;
+      display: flex;
+      gap: 26px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__controls { display: none; }
+    }
+
+    /* ── Control buttons ── */
+    .rbccm-leadership__btn {
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-shrink: 0;
+      height: 24px;
+      justify-content: center;
+      padding: 0;
+      width: 14px;
+    }
+    .rbccm-leadership__btn svg { display: block; }
+
+    /* ── Dots wrapper ── */
+    .rbccm-leadership__dots-wrap {
+      align-items: center;
+      display: flex;
+      flex: 0 0 auto;
+      justify-content: center;
+    }
+
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots {
+      align-items: center;
+      bottom: auto !important;
+      display: flex !important;
+      gap: 26px;
+      justify-content: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: static !important;
+      width: auto !important;
+    }
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex !important;
+      height: 11px !important;
+      justify-content: center;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 11px !important;
+    }
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button {
+      background: none !important;
+      border: none !important;
+      box-sizing: border-box !important;
+      cursor: pointer;
+      display: block !important;
+      font-size: 0 !important;
+      height: 11px !important;
+      line-height: 0 !important;
+      margin: 0 !important;
+      outline: none;
+      padding: 0 !important;
+      position: static !important;
+      width: 11px !important;
+    }
+    /* Inactive dot: outlined circle */
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-size: 11px 11px !important;
+      content: '' !important;
+      display: block !important;
+      height: 11px !important;
+      opacity: 1 !important;
+      position: static !important;
+      width: 11px !important;
+    }
+    /* Active li: same 11px size, ring via box-shadow 4px offset */
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li.slick-active {
+      height: 11px !important;
+      width: 11px !important;
+    }
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li.slick-active button {
+      height: 11px !important;
+      width: 11px !important;
+    }
+    /* Active dot: filled circle + ring 4px out via box-shadow */
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li.slick-active button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+      background-size: 11px 11px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+      height: 11px !important;
+      width: 11px !important;
+    }
+
+    /* ── Desktop arrows overlay ≥1245px ── */
+    .rbccm-leadership__arrows-desktop {
+      align-items: center;
+      display: none;
+      inset: 0 -60px;
+      justify-content: space-between;
+      pointer-events: none;
+      position: absolute;
+      z-index: 10;
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__arrows-desktop { display: flex; }
+    }
+    .rbccm-leadership__btn-desk {
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      height: 60px;
+      justify-content: center;
+      padding: 0 8px;
+      pointer-events: all;
+      width: 60px;
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      #rbccm-leadership .slick-track {
+        transition: none !important;
+      }
+      .rbccm-leadership__card-linkedin::before,
+      .rbccm-leadership__card-linkedin::after,
+      .rbccm-leadership__card {
+        transition: none !important;
+      }
+    }
