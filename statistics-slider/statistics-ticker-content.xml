@@ -1,0 +1,25 @@
+<Properties ComponentID="rbccm-stats-ticker">
+
+  <!-- ── Header fields ── -->
+  <Datum ID="Title" Type="String" Name="Header">#1 safest bank in North America</Datum>
+  <Datum ID="Subtitle" Type="String" Name="Subheader">(Global finance, 2025)</Datum>
+  <Datum ID="Footnote" Type="String" Name="Footnote">Data as of Q4 2025</Datum>
+
+  <!-- ── Stat items (min 4, max 8) ── -->
+  <Data>
+    <!-- Min 4, max 8 stats. Component will not render outside those bounds. -->
+
+    <Group ID="StatItem" Name="Stat Item" Replicatable="true" CloneGroupID="stat-item">
+      <Datum ID="Number" Type="String" Name="Stat Number">
+        <!-- The large display value e.g. "#1", "7th Largest", "Aa1/AA-", "TOP 3" -->
+        <!-- Supports inline HTML e.g. "£36.2<span>B</span>" or "19<span>M+</span> / 29" -->
+      </Datum>
+      <Datum ID="Description" Type="String" Name="Description">
+        <!-- Smaller text below the number e.g. "North American Bank by Market Cap" -->
+        <!-- Supports &lt;br&gt; for line breaks -->
+      </Datum>
+    </Group>
+
+  </Data>
+
+</Properties>
