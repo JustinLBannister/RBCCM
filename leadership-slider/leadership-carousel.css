@@ -80,13 +80,13 @@
       display: flex !important;
       flex-direction: column !important;
       margin: 0 8px;
-      width: 343px;
+      width: 343px !important;
     }
     @media (min-width: 1025px) {
-      .rbccm-leadership__card { width: 273px; }
+      .rbccm-leadership__card { width: 273px !important; }
     }
     @media (min-width: 1245px) {
-      .rbccm-leadership__card { margin: 0 16px; width: 273px; }
+      .rbccm-leadership__card { margin: 0 16px; width: 273px !important; }
     }
     #rbccm-leadership .slick-center .rbccm-leadership__card {
       border-color: #003168;
@@ -118,7 +118,9 @@
       height: 263px;
     }
     .rbccm-leadership__fpo svg { height: 80px; opacity: 0.3; width: 80px; }
-    .rbccm-leadership__card-image img[src]:not([src=""]):not([src*="fpoimg.com"]) ~ .rbccm-leadership__fpo { display: none; }
+    .rbccm-leadership__card-image img[src]:not([src=""]):not([src*="fpoimg.com"]) ~ .rbccm-leadership__fpo {
+      display: none;
+    }
 
     /* ── Card body ── */
     .rbccm-leadership__card-body {
@@ -127,8 +129,8 @@
       flex: 1 1 auto;
       gap: 8px;
       height: auto;
-      max-height: 117px;
-      min-height: 117px;
+      max-height: 185px;
+      min-height: 185px;
       padding: 24px 24px 46px 24px;
       position: relative;
     }
