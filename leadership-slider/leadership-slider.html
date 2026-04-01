@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBCCM European Leadership</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+  <style id="rbccm-leadership-styles">
+
+    /* ── Screen reader only ── */
+    .rbccm-leadership__sr-only {
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+
+    body { margin: 0; padding: 0; }
+
+    /* ── Section ── */
+    #rbccm-leadership-demo.rbccm-leadership {
+      background-color: #ffffff;
+      box-sizing: border-box;
+      overflow: hidden;
+      padding: 64px 0;
+      position: relative;
+      width: 100%;
+    }
+
+    /* ── Inner container ── */
+    .rbccm-leadership__inner {
+      box-sizing: border-box;
+      margin: 0 auto;
+      max-width: 1200px;
+      position: relative;
+    }
+    @media (min-width: 1170px) {
+      .rbccm-leadership__inner { max-width: 1140px; }
+    }
+
+    /* ── Heading ── */
+    .rbccm-leadership__heading {
+      color: #003168;
+      font-family: 'RBC Display', serif;
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: -0.789px;
+      line-height: normal;
+      margin: 0px 0 35px;
+      padding: 0 16px;
+    }
+    @media (min-width: 1170px) {
+      .rbccm-leadership__heading { padding: 0; }
+    }
+
+    /* ── Slider wrapper ── */
+    .rbccm-leadership__slider-track { margin: 0 -8px; }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__slider-track { margin: 0; }
+    }
+
+    /* ── Slick overrides ── */
+    #rbccm-leadership-demo .slick-slide {
+      box-sizing: border-box;
+      float: none;
+      height: auto;
+    }
+    #rbccm-leadership-demo .slick-slide > div,
+    #rbccm-leadership-demo .slick-slide > div > div { }
+    #rbccm-leadership-demo .slick-track {
+      display: flex !important;
+      align-items: stretch !important;
+    }
+    #rbccm-leadership-demo .slick-list { overflow: visible; }
+    #rbccm-leadership-demo .slick-prev,
+    #rbccm-leadership-demo .slick-next { display: none !important; }
+
+    /* ── Active card border ── */
+    .rbccm-leadership__card {
+      border: 1px solid #A8A8A8;
+      box-sizing: border-box;
+      display: flex !important;
+      flex-direction: column !important;
+      margin: 0 8px;
+      width: 343px;
+    }
+    @media (min-width: 1025px) {
+      .rbccm-leadership__card { width: 273px; }
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__card { margin: 0 16px; width: 273px; }
+    }
+    #rbccm-leadership-demo .slick-center .rbccm-leadership__card {
+      border-color: #003168;
+    }
+
+    /* ── Card image zone ── */
+    .rbccm-leadership__card-image {
+      background-color: #DADADA;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      max-height: 263px;
+      min-height: 263px;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+    .rbccm-leadership__card-image img {
+      display: block;
+      height: 263px;
+      object-fit: cover;
+      object-position: top center;
+      width: 100%;
+    }
+    .rbccm-leadership__fpo {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      height: 263px;
+    }
+    .rbccm-leadership__fpo svg { height: 80px; opacity: 0.3; width: 80px; }
+    .rbccm-leadership__card-image img[src]:not([src=""]):not([src*="fpoimg.com"]) ~ .rbccm-leadership__fpo { display: none; }
+
+    /* ── Card body ── */
+    .rbccm-leadership__card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      gap: 8px;
+      height: auto;
+      max-height: 117px;
+      min-height: 117px;
+      padding: 24px 24px 46px 24px;
+      position: relative;
+    }
+
+    /* ── Card name ── */
+    .rbccm-leadership__card-name {
+      color: #000;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: normal;
+      margin: 0;
+    }
+
+    /* ── Card role ── */
+    .rbccm-leadership__card-role {
+      color: #454545;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 19px;
+      margin: 0;
+    }
+
+    /* ── LinkedIn — absolute bottom-right of card body ── */
+    .rbccm-leadership__card-linkedin {
+      bottom: 24px;
+      display: inline-block;
+      height: 44px;
+      position: absolute;
+      right: 24px;
+      text-decoration: none;
+      width: 44px;
+    }
+    .rbccm-leadership__card-linkedin .li-default { display: block; }
+    .rbccm-leadership__card-linkedin .li-hover   { display: none; }
+    .rbccm-leadership__card-linkedin:hover .li-default { display: none; }
+    .rbccm-leadership__card-linkedin:hover .li-hover   { display: block; }
+
+    /* ── Controls row — visible up to 1199px ── */
+    .rbccm-leadership__controls {
+      align-items: center;
+      display: flex;
+      gap: 26px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__controls { display: none; }
+    }
+
+    /* ── Control buttons ── */
+    .rbccm-leadership__btn {
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-shrink: 0;
+      height: 24px;
+      justify-content: center;
+      padding: 0;
+      width: 14px;
+    }
+    .rbccm-leadership__btn svg { display: block; }
+
+    /* ── Dots wrapper ── */
+    .rbccm-leadership__dots-wrap {
+      align-items: center;
+      display: flex;
+      flex: 0 0 auto;
+      justify-content: center;
+    }
+
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots {
+      align-items: center;
+      bottom: auto !important;
+      display: flex !important;
+      gap: 26px;
+      justify-content: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: static !important;
+      width: auto !important;
+    }
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex !important;
+      height: 11px !important;
+      justify-content: center;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 11px !important;
+    }
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li button {
+      background: none !important;
+      border: none !important;
+      box-sizing: border-box !important;
+      cursor: pointer;
+      display: block !important;
+      font-size: 0 !important;
+      height: 11px !important;
+      line-height: 0 !important;
+      margin: 0 !important;
+      outline: none;
+      padding: 0 !important;
+      position: static !important;
+      width: 11px !important;
+    }
+    /* Inactive dot: outlined circle */
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-size: 11px 11px !important;
+      content: '' !important;
+      display: block !important;
+      height: 11px !important;
+      opacity: 1 !important;
+      position: static !important;
+      width: 11px !important;
+    }
+    /* Active li: same 11px size, ring via box-shadow 4px offset */
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li.slick-active {
+      height: 11px !important;
+      width: 11px !important;
+    }
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li.slick-active button {
+      height: 11px !important;
+      width: 11px !important;
+    }
+    /* Active dot: filled circle + ring 4px out via box-shadow */
+    #rbccm-leadership-demo .rbccm-leadership__dots-wrap .slick-dots li.slick-active button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+      background-size: 11px 11px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+      height: 11px !important;
+      width: 11px !important;
+    }
+
+    /* ── Desktop arrows overlay ≥1245px ── */
+    .rbccm-leadership__arrows-desktop {
+      align-items: center;
+      display: none;
+      inset: 0 -60px;
+      justify-content: space-between;
+      pointer-events: none;
+      position: absolute;
+      z-index: 10;
+    }
+    @media (min-width: 1245px) {
+      .rbccm-leadership__arrows-desktop { display: flex; }
+    }
+    .rbccm-leadership__btn-desk {
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      height: 60px;
+      justify-content: center;
+      padding: 0 8px;
+      pointer-events: all;
+      width: 60px;
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      #rbccm-leadership-demo .slick-track {
+        transition: none !important;
+      }
+      .rbccm-leadership__card-linkedin::before,
+      .rbccm-leadership__card-linkedin::after,
+      .rbccm-leadership__card {
+        transition: none !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<section class="rbccm-leadership" id="rbccm-leadership-demo" aria-label="European leadership team carousel">
+  <div class="rbccm-leadership__inner">
+    <h2 class="rbccm-leadership__heading">European leadership</h2>
+
+    <!-- Visually hidden live region for screen reader announcements -->
+    <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
+
+    <!-- Visually hidden keyboard instructions -->
+    <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">
+      Use left and right arrow keys to navigate between slides. Use Tab to move between cards.
+    </p>
+    <div class="rbccm-leadership__arrows-desktop">
+      <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="46" viewBox="0 0 25 46" fill="none" aria-hidden="true">
+          <path d="M23.4143 45L1.41431 23L23.4143 1" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="46" viewBox="0 0 25 46" fill="none" aria-hidden="true">
+          <path d="M1.58569 45L23.5857 23L1.58569 1" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Slider -->
+    <div class="rbccm-leadership__slider-track" role="region" aria-label="Leadership cards" aria-describedby="rbccm-lead-instructions">
+
+      <!-- SLIDE 1 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Sian Hurrell">
+          <div class="rbccm-leadership__fpo" aria-hidden="true">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Sian Hurrell</h3>
+          <p class="rbccm-leadership__card-role">Head, Co-CEO Europe And Head Of Capital Markets Europe</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Sian Hurrell on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Dominic Hudson">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Dominic Hudson</h3>
+          <p class="rbccm-leadership__card-role">Head, European &amp; APAC Investment Banking</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Dominic Hudson on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Ayesha Patel">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Ayesha Patel</h3>
+          <p class="rbccm-leadership__card-role">Chief Operating Officer, RBC Capital Markets, Europe</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Ayesha Patel on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Edward Dickinson">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Edward Dickinson</h3>
+          <p class="rbccm-leadership__card-role">Head, Corporate Banking Europe &amp; Australia And Leveraged Finance Europe</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Edward Dickinson on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Graeme Pearson">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Graeme Pearson</h3>
+          <p class="rbccm-leadership__card-role">Global Head, Research &amp; Head, European Equities</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Graeme Pearson on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 6 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Christophe Coutte">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Christophe Coutte</h3>
+          <p class="rbccm-leadership__card-role">Global Head, Trading, Global Markets Europe</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Christophe Coutte on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 7 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Rob Lamb">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Rob Lamb</h3>
+          <p class="rbccm-leadership__card-role">Head, Debt Capital Markets And Syndicate</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Rob Lamb on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- SLIDE 8 -->
+      <div class="rbccm-leadership__card">
+        <div class="rbccm-leadership__card-image">
+          <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'" alt="Mark Tinworth">
+          <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="rbccm-leadership__card-body">
+          <h3 class="rbccm-leadership__card-name">Mark Tinworth</h3>
+          <p class="rbccm-leadership__card-role">Head, Global Markets Sales, Europe</p>
+          <a class="rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/{{linkedin_handle}}" aria-label="Mark Tinworth on LinkedIn, opens in new tab">
+            <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+            <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /.slider-track -->
+
+    <!-- Controls: inline arrows + dots ≤1199px -->
+    <div class="rbccm-leadership__controls">
+      <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
+      <button id="rbccm-lead-next" class="rbccm-leadership__btn" aria-label="Next slide" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+$(document).ready(function () {
+  var $track = $('.rbccm-leadership__slider-track');
+  var $dots  = $('#rbccm-lead-dots');
+
+  // Ensure arrow buttons are in tab order from the start
+  $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
+    .attr('tabindex', '0');
+
+  var entryLinkedInIdx = 0; // which linkedin to land on when tabbing from a button
+
+  $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
+    focusQueue = [];
+    $track.slick('slickPrev');
+  });
+  $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
+    focusQueue = [];
+    $track.slick('slickNext');
+  });
+  function syncArrows() {
+    var slick      = $track.slick('getSlick');
+    var current    = slick.currentSlide;
+    var total      = slick.slideCount;
+    var isInfinite = slick.options.infinite;
+
+    if (isInfinite) {
+      $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
+        .prop('disabled', false)
+        .attr('aria-disabled', 'false')
+        .css('opacity', 1);
+      return;
+    }
+
+    // Calculate how many cards are visible at once based on viewport and card width
+    var cardWidth    = $('.rbccm-leadership__card').first().outerWidth(true); // includes margin
+    var trackWidth   = $track.width();
+    var visibleCards = Math.ceil(trackWidth / cardWidth);
+    var maxIndex     = total - visibleCards; // last valid starting index
+
+    var atStart = current <= 0;
+    var atEnd   = current >= maxIndex;
+
+    $('#rbccm-lead-prev, #rbccm-lead-prev-desk')
+      .prop('disabled', atStart)
+      .attr('aria-disabled', atStart ? 'true' : 'false')
+      .css('opacity', atStart ? 0.3 : 1);
+    $('#rbccm-lead-next, #rbccm-lead-next-desk')
+      .prop('disabled', atEnd)
+      .attr('aria-disabled', atEnd ? 'true' : 'false')
+      .css('opacity', atEnd ? 0.3 : 1);
+  }
+
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  $track.slick({
+    slidesToShow:    1,
+    slidesToScroll:  1,
+    variableWidth:   true,
+    infinite:        true,
+    initialSlide:    0,
+    arrows:          false,
+    dots:            true,
+    dotsClass:       'slick-dots',
+    appendDots:      $dots,
+    speed:           reducedMotion ? 0 : 350,
+    cssEase:         reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+    easing:          'linear',
+    useCSS:          true,
+    useTransform:    true,
+    fade:            false,
+    centerMode:      true,
+    centerPadding:   '0px',
+    adaptiveHeight:  false,
+    rows:            1,
+    slidesPerRow:    1,
+    vertical:        false,
+    verticalSwiping: false,
+    rtl:             false,
+    draggable:       false,
+    swipe:           true,
+    swipeToSlide:    false,
+    touchMove:       true,
+    touchThreshold:  5,
+    edgeFriction:    0.35,
+    autoplay:        false,
+    autoplaySpeed:   3000,
+    accessibility:   false,
+    pauseOnHover:    true,
+    pauseOnFocus:    true,
+    pauseOnDotsHover: false,
+    respondTo:       'window',
+    mobileFirst:     false,
+    responsive: [
+      {
+        breakpoint: 99999,
+        settings: {
+          centerMode:     false,
+          centerPadding:  '0px',
+          draggable:      false,
+          infinite:       false,
+          slidesToScroll: 1,
+          swipe:          false,
+          touchMove:      false,
+          variableWidth:  true
+        }
+      },
+      {
+        breakpoint: 1245,
+        settings: {
+          centerMode:     true,
+          centerPadding:  '0px',
+          draggable:      true,
+          infinite:       true,
+          slidesToScroll: 1,
+          swipe:          true,
+          touchMove:      true,
+          variableWidth:  true
+        }
+      },
+      {
+        breakpoint: 1025,
+        settings: {
+          centerMode:     true,
+          centerPadding:  '0px',
+          draggable:      true,
+          infinite:       true,
+          slidesToScroll: 1,
+          swipe:          true,
+          touchMove:      true,
+          variableWidth:  true
+        }
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          centerMode:     true,
+          centerPadding:  '0px',
+          draggable:      true,
+          infinite:       true,
+          slidesToScroll: 1,
+          swipe:          true,
+          touchMove:      true,
+          variableWidth:  true
+        }
+      }
+    ],
+    asNavFor:       null,
+    waitForAnimate: true,
+    zIndex:         1000
+  });
+
+  $track.on('afterChange init', function (e, slick, currentSlide) {
+    syncArrows();
+
+    // Remove aria-hidden and tabindex=-1 from slide contents only
+    $track.find('.slick-slide').each(function () {
+      $(this).removeAttr('aria-hidden');
+      $(this).find('a, button').removeAttr('tabindex');
+    });
+
+    // Ensure prev/next buttons always have tabindex=0 so they're in the tab sequence
+    $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
+      .attr('tabindex', '0');
+
+    // Announce current slide position to screen readers
+    if (typeof currentSlide !== 'undefined') {
+      var total = slick.slideCount;
+      $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + total);
+    }
+
+    // Clear animation lock and process any queued focus requests
+    isAnimating = false;
+    if (typeof currentSlide !== 'undefined') {
+      entryLinkedInIdx = currentSlide;
+    }
+    processQueue();
+  });
+
+  var isAnimating = false;
+  var focusQueue  = [];
+
+  function processQueue() {
+    if (focusQueue.length === 0) return;
+    var $next = focusQueue.shift();
+    if ($next && $next.length) {
+      $next.get(0).focus({ preventScroll: true });
+    }
+  }
+
+  // Full focusable sequence: prev → next → linkedin 1-8 → exit
+  function getFocusable() {
+    var $prev = $('#rbccm-lead-prev-desk').is(':visible')
+      ? $('#rbccm-lead-prev-desk')
+      : $('#rbccm-lead-prev');
+    var $next = $('#rbccm-lead-next-desk').is(':visible')
+      ? $('#rbccm-lead-next-desk')
+      : $('#rbccm-lead-next');
+    return $().add($prev)
+              .add($next)
+              .add($track.find('.rbccm-leadership__card-linkedin'));
+  }
+
+  function navigateSequence(direction) {
+    var $focusable = getFocusable();
+    var $links     = $track.find('.rbccm-leadership__card-linkedin');
+    var currIdx    = $focusable.index(document.activeElement);
+    var onPrevBtn  = $(document.activeElement).is('#rbccm-lead-prev, #rbccm-lead-prev-desk');
+    var onNextBtn  = $(document.activeElement).is('#rbccm-lead-next, #rbccm-lead-next-desk');
+
+    if (currIdx === -1) return false;
+
+    // Tabbing forward from next button → land on current slide's LinkedIn
+    if (onNextBtn && direction === 1) {
+      var currentSlide = $track.slick('getSlick').currentSlide;
+      var $target      = $links.eq(currentSlide);
+      if ($target.length) {
+        $target.get(0).focus({ preventScroll: true });
+        return true;
+      }
+    }
+
+    // Shift-tabbing backward from prev button → exit naturally (handled by boundary check)
+    if (onPrevBtn && direction === -1) return false;
+
+    var nextIdx = currIdx + direction;
+
+    if (nextIdx < 0 || nextIdx >= $focusable.length) return false; // exit naturally
+
+    var $next      = $focusable.eq(nextIdx);
+    var isLinkedIn = $next.hasClass('rbccm-leadership__card-linkedin');
+
+    if (isLinkedIn) {
+      if (isAnimating) {
+        focusQueue.push($next);
+        return true;
+      }
+
+      var slickNav       = $track.slick('getSlick');
+      var currentNav     = slickNav.currentSlide;
+      var cardWidthNav   = $('.rbccm-leadership__card').first().outerWidth(true);
+      var trackWidthNav  = $track.width();
+      var visibleNav     = Math.ceil(trackWidthNav / cardWidthNav);
+      var lastVisibleNav = currentNav + visibleNav - 1;
+      var linkedInIdx    = $links.index($next);
+
+      if (direction === 1 && linkedInIdx > lastVisibleNav) {
+        isAnimating = true;
+        focusQueue.push($next);
+        $track.slick('slickNext');
+        return true;
+      } else if (direction === -1 && linkedInIdx < currentNav) {
+        isAnimating = true;
+        focusQueue.push($next);
+        $track.slick('slickPrev');
+        return true;
+      }
+    }
+
+    $next.get(0).focus({ preventScroll: true });
+    return true;
+  }
+
+  $(document).on('keydown', function (e) {
+    if (!$.contains(document.getElementById('rbccm-leadership-demo'), document.activeElement)) return;
+
+    var handled = false;
+
+    if ((e.key === 'Enter' || e.key === ' ') && 
+        $(document.activeElement).closest('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk').length) {
+      e.preventDefault();
+      focusQueue = [];
+      $(document.activeElement).trigger('click');
+      return;
+    }
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault(); // always stop page scroll
+      handled = navigateSequence(1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault(); // always stop page scroll
+      handled = navigateSequence(-1);
+    } else if (e.key === 'Tab') {
+      var direction = e.shiftKey ? -1 : 1;
+      handled = navigateSequence(direction);
+      if (handled) e.preventDefault(); // only prevent if we handled it, let exit naturally
+    }
+  });
+  var resizeTimer;
+  $(window).on('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if ($track.hasClass('slick-initialized')) {
+        $track.slick('setPosition');
+        syncArrows();
+      }
+    }, 50);
+  });
+});
+</script>
+
+</body>
+</html>
