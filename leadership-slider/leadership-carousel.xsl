@@ -56,14 +56,16 @@
 
           <!-- Desktop arrows -->
           <div class="rbccm-leadership__arrows-desktop">
-            <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="46" viewBox="0 0 25 46" fill="none" aria-hidden="true">
-                <path d="M23.4143 45L1.41431 23L23.4143 1" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+                <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </button>
-            <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="46" viewBox="0 0 25 46" fill="none" aria-hidden="true">
-                <path d="M1.58569 45L23.5857 23L1.58569 1" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+                <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
