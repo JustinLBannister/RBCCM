@@ -58,8 +58,8 @@
               /Properties/Data/Group[@ID='StatItem' or @Name='Stat Item']
               | /Data/Group[@ID='StatItem' or @Name='Stat Item']
             ">
-            <xsl:variable name="number"      select="normalize-space(Datum[@ID='Number'      or @Name='Stat Number'])"/>
-            <xsl:variable name="description" select="normalize-space(Datum[@ID='Description' or @Name='Description'])"/>
+            <xsl:variable name="number"      select="normalize-space(Datum[@Name='Stat Number'])"/>
+            <xsl:variable name="description" select="normalize-space(Datum[@Name='Description'])"/>
 
             <div class="rbccm-stats__item rbccm-stats__item--big">
               <div class="rbccm-stats__number">
