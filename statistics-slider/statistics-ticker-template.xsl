@@ -10,24 +10,21 @@
   <xsl:template match="/">
 
     <!-- ── Guard: only render if between 4 and 8 stats ── -->
-    <xsl:variable name="statCount" select="count(
-        /Properties/Data/Group[@ID='StatItem' or @Name='Stat Item']
-        | /Data/Group[@ID='StatItem' or @Name='Stat Item']
-      )"/>
+    <xsl:variable name="statCount" select="count(/Data/Group[@ID='StatItem' or @Name='Stat Item'])"/>
 
     <xsl:if test="$statCount &gt;= 4 and $statCount &lt;= 8">
 
       <!-- ── Header fields ── -->
       <xsl:variable name="title">
-        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Title'])"/>
+        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Title'])"/>
       </xsl:variable>
 
       <xsl:variable name="subtitle">
-        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Subtitle'])"/>
+        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Subtitle'])"/>
       </xsl:variable>
 
       <xsl:variable name="footnote">
-        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Footnote'])"/>
+        <xsl:value-of select="normalize-space(/Data/Datum[@ID='Footnote'])"/>
       </xsl:variable>
 
       <!-- ── Load CSS ── -->
@@ -54,10 +51,7 @@
 
         <!-- Stat grid -->
         <div class="rbccm-stats__grid">
-          <xsl:for-each select="
-              /Properties/Data/Group[@ID='StatItem' or @Name='Stat Item']
-              | /Data/Group[@ID='StatItem' or @Name='Stat Item']
-            ">
+          <xsl:for-each select="/Data/Group[@ID='StatItem' or @Name='Stat Item']">
             <xsl:variable name="number"      select="normalize-space(Datum[@ID='Number'      or @Name='Stat Number'])"/>
             <xsl:variable name="description" select="normalize-space(Datum[@ID='Description' or @Name='Description'])"/>
 
