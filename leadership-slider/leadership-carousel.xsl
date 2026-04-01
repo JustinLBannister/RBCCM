@@ -33,7 +33,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
           </xsl:when>
-          <xsl:otherwise>European leadership</xsl:otherwise>
+          <xsl:otherwise>European leadership team carousel</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
