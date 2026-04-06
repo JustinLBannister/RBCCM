@@ -1,0 +1,84 @@
+/* -----------------------------
+   SLICK ARROWS - POSITIONING
+----------------------------- */
+
+.slick-prev,
+.slick-next {
+  position: absolute;
+  top: auto;
+  bottom: -3px; /* tweak to align with dots */
+  transform: none;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+}
+
+/* LTR positioning */
+.slick-prev {
+  left: -35px;
+}
+
+.slick-next {
+  right: -35px;
+}
+
+/* RTL support */
+[dir="rtl"] .slick-prev {
+  right: -35px;
+  left: auto;
+}
+
+[dir="rtl"] .slick-next {
+  left: -35px;
+  right: auto;
+}
+
+/* -----------------------------
+   REMOVE DEFAULT SLICK ICONS
+----------------------------- */
+
+.slick-prev::before,
+.slick-next::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 24px;
+  margin: 0 auto;
+  opacity: 1;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-size: 0;
+}
+
+/* -----------------------------
+   SVG ARROWS (DATA URI)
+----------------------------- */
+
+/* Prev */
+.slick-prev::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='24' viewBox='0 0 14 24' fill='none'%3E%3Cpath d='M12.3032 1L1.41422 11.889L12.3032 22.778' stroke='%23003168' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Next (flipped) */
+.slick-next::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='24' viewBox='0 0 14 24' fill='none'%3E%3Cpath d='M12.3032 1L1.41422 11.889L12.3032 22.778' stroke='%23003168' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  transform: rotate(180deg);
+}
+
+/* -----------------------------
+   STATES
+----------------------------- */
+
+.slick-prev:hover,
+.slick-next:hover,
+.slick-prev:focus,
+.slick-next:focus {
+  opacity: 0.8;
+}
+
+.slick-prev.slick-disabled,
+.slick-next.slick-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
