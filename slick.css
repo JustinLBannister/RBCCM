@@ -82,3 +82,68 @@
   opacity: 0.35;
   pointer-events: none;
 }
+
+/* ---------------------------------
+   GENERIC SLICK DOTS
+   styled like leadership carousel
+---------------------------------- */
+
+.slick-dots {
+  position: static !important;
+  bottom: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  width: auto !important;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slick-dots li {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.slick-dots li button {
+  position: static !important;
+  display: block !important;
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none !important;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 0;
+  line-height: 0;
+  outline: none;
+}
+
+.slick-dots li button::before {
+  content: "" !important;
+  display: block !important;
+  width: 11px;
+  height: 11px;
+  opacity: 1 !important;
+  background: transparent !important;          /* white fill */
+  border: 1px solid #003168 !important;    /* blue stroke */
+  border-radius: 50% !important;
+  box-sizing: border-box;
+}
+
+/* active dot ring */
+.slick-dots li.slick-active button::before {
+  box-shadow:
+    0 0 0 4px #ffffff,
+    0 0 0 5px #003168 !important;
+  border-radius: 50% !important;
+}
