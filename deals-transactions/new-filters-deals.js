@@ -637,7 +637,7 @@
       style.id = 'yf-x-css';
       style.textContent = [
         '#yf-filter-bar .container{display:flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:flex-end;width:100%;}',
-        '#yf-x-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:flex-start;width:100%;padding:0 5px;box-sizing:border-box;max-width:1148px;margin:0 auto;}',
+        '#yf-x-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:flex-start;width:100%;padding:0 5px;box-sizing:border-box;max-width:1164px;margin:0 auto;}',
         '#yf-x-filter-lbl{font-size:13px;font-weight:700;color:#333;white-space:nowrap;margin-right:2px;}',
         '#yf-x-year-wrap,#yf-x-type-wrap{position:relative;display:inline-block;vertical-align:middle;}',
         '#yf-x-year-btn,#yf-x-type-btn{display:inline-flex;align-items:center;padding:7px 12px;border:1px solid #0051A5;border-radius:4px;background:#fff;color:#0051A5;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;justify-content:space-between;gap:6px;}',
@@ -663,7 +663,7 @@
         '#yf-x-fill{position:absolute;height:4px;background:#0051A5;border-radius:2px;top:50%;transform:translateY(-50%);}',
         '#yf-x-amt-v{font-size:12px;color:#555;font-weight:600;white-space:nowrap;min-width:110px;}',
         '#yf-x-amt-clr{display:none;background:none;border:none;cursor:pointer;color:#0051A5;font-size:15px;padding:0;line-height:1;}',
-        '#yf-x-tags{display:none;font-size:12px;width:100%;text-align:left;padding:0 5px;box-sizing:border-box;}',
+        '#yf-x-tags{max-width:1132px;display:none;font-size:12px;width:100%;text-align:left;padding:0 5px;box-sizing:border-box;}',
         '.yf-x-tag{display:inline-flex;align-items:center;gap:3px;background:#e8f0fb;color:#0051A5;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:5px;}',
         '.yf-x-tag button{background:none;border:none;cursor:pointer;color:#0051A5;font-size:14px;line-height:1;padding:0 0 0 3px;}',
         '#yf-x-pagination{display:none;text-align:center;padding:28px 0 12px;width:100%;clear:both;}',
@@ -818,7 +818,7 @@
       var typeButton = document.createElement('button');
       typeButton.id = 'yf-x-type-btn';
       typeButton.type = 'button';
-      typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
+      typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
 
       var typeList = document.createElement('ul');
       typeList.id = 'yf-x-type-lb';
@@ -1256,7 +1256,7 @@
           showPage(1);
           renderPagination(matchedTiles.length, 1);
           if (matchedTiles.length === 0) {
-            count.textContent = 'No Deals Matching Filters';
+            count.textContent = 'No deals matching filters';
             count.style.cssText = 'display:block;font-size:12px;color:#c00;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
           } else {
             count.textContent = matchedTiles.length + ' Deal' + (matchedTiles.length !== 1 ? 's' : '');
@@ -1264,6 +1264,8 @@
           }
           stripKoMarginTop();
           updateTags();
+          var storiesEl = document.querySelector('.insights-stories');
+          if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         }, 200);
       }
 
