@@ -997,9 +997,9 @@
         // }
 
         // if (activeType) {
-        //   addTag('Product Type: ' + activeType, function () {
+        //   addTag('Product type: ' + activeType, function () {
         //     activeType = null;
-        //     typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
+        //     typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
         //     applyFilters();
         //   });
         // }
@@ -1015,9 +1015,9 @@
         }
 
         if (activeType) {
-          activeTags.push({ text: 'Product Type: ' + activeType, onClear: function () {
+          activeTags.push({ text: 'Product type: ' + activeType, onClear: function () {
             activeType = null;
-            typeButton.innerHTML = 'Product Type <span class="arrow">&#9660;</span>';
+            typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
             applyFilters();
           }});
         }
@@ -1327,7 +1327,7 @@
 
         typeButton.innerHTML = (value
           ? '<span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;">' + value + '</span>'
-          : 'Product Type') + ' <span class="arrow">&#9660;</span>';
+          : 'Product type') + ' <span class="arrow">&#9660;</span>';
 
         closeDropdown(typeList, typeButton);
         applyFilters();
