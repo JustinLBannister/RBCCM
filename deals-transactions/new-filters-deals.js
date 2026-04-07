@@ -819,7 +819,6 @@
       typeButton.id = 'yf-x-type-btn';
       typeButton.type = 'button';
       typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
-      
 
       var typeList = document.createElement('ul');
       typeList.id = 'yf-x-type-lb';
@@ -1265,8 +1264,6 @@
           }
           stripKoMarginTop();
           updateTags();
-          var storiesEl = document.querySelector('.insights-stories');
-          if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         }, 200);
       }
 
@@ -1306,6 +1303,8 @@
 
         closeDropdown(yearList, yearButton);
         applyFilters();
+        var storiesEl = document.querySelector('.insights-stories');
+        if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       });
 
       typeButton.addEventListener('click', function (event) {
@@ -1332,6 +1331,8 @@
 
         closeDropdown(typeList, typeButton);
         applyFilters();
+        var storiesEl = document.querySelector('.insights-stories');
+        if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       });
 
       document.addEventListener(
