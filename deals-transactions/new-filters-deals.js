@@ -623,7 +623,8 @@
           '#yf-filter-bar.container{margin-left:15px;margin-right:15px;}',
           '@media (min-width:768px){#yf-filter-bar.container{margin-left:auto;margin-right:auto;max-width:720px;}}',
           '@media (min-width:992px){#yf-filter-bar.container{max-width:940px;}}',
-          '@media (min-width:1200px){#yf-filter-bar.container{max-width:1140px;}}'
+          '@media (min-width:1200px){#yf-filter-bar.container{max-width:1140px;}}',
+          '@media (max-width:1199px){#yf-filter-bar.container.is-sticky{padding: 0 15px !important;}}'
         ].join('');
         document.head.appendChild(baseStyle);
       }
