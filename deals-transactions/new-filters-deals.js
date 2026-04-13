@@ -1012,7 +1012,22 @@
             yearButton.innerHTML = 'Year <span class="arrow">&#9660;</span>';
             applyFilters();
             var bar = document.getElementById('yf-filter-bar');
-            if (bar) { window.scrollTo({ top: bar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }
+            if (bar) {
+              if (bar.classList.contains('sticky')) {
+                  var ko = document.querySelector('.insights-stories.ko');
+                  if (ko) {
+                      window.scrollTo({
+                          top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                          behavior: 'smooth'
+                      });
+                  }
+              } else {
+                  window.scrollTo({
+                      top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                      behavior: 'smooth'
+                  });
+              }
+            }
           }});
         }
 
@@ -1022,7 +1037,22 @@
             typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
             applyFilters();
             var bar = document.getElementById('yf-filter-bar');
-            if (bar) { window.scrollTo({ top: bar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }
+            if (bar) {
+              if (bar.classList.contains('sticky')) {
+                  var ko = document.querySelector('.insights-stories.ko');
+                  if (ko) {
+                      window.scrollTo({
+                          top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                          behavior: 'smooth'
+                      });
+                  }
+              } else {
+                  window.scrollTo({
+                      top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                      behavior: 'smooth'
+                  });
+              }
+            }
           }});
         }
 
@@ -1049,7 +1079,22 @@
               updateFill();
               applyFilters();
               var bar = document.getElementById('yf-filter-bar');
-              if (bar) { window.scrollTo({ top: bar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }
+              if (bar) {
+                if (bar.classList.contains('sticky')) {
+                    var ko = document.querySelector('.insights-stories.ko');
+                    if (ko) {
+                        window.scrollTo({
+                            top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                            behavior: 'smooth'
+                        });
+                    }
+                } else {
+                    window.scrollTo({
+                        top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                        behavior: 'smooth'
+                    });
+                }
+              }
             }
           );
         }
@@ -1094,10 +1139,20 @@
 
             var bar = document.getElementById('yf-filter-bar');
             if (bar) {
-              window.scrollTo({
-                top: bar.getBoundingClientRect().top + window.scrollY - 80,
-                behavior: 'smooth'
-              });
+                if (bar.classList.contains('sticky')) {
+                    var ko = document.querySelector('.insights-stories.ko');
+                    if (ko) {
+                        window.scrollTo({
+                            top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                            behavior: 'smooth'
+                        });
+                    }
+                } else {
+                    window.scrollTo({
+                        top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                        behavior: 'smooth'
+                    });
+                }
             }
           });
 
@@ -1312,7 +1367,22 @@
         // var storiesEl = document.querySelector('.insights-stories');
         // if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         var bar = document.getElementById('yf-filter-bar');
-        if (bar) { window.scrollTo({ top: bar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }
+        if (bar) {
+              if (bar.classList.contains('sticky')) {
+                  var ko = document.querySelector('.insights-stories.ko');
+                  if (ko) {
+                      window.scrollTo({
+                          top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                          behavior: 'smooth'
+                      });
+                  }
+              } else {
+                  window.scrollTo({
+                      top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                      behavior: 'smooth'
+                  });
+              }
+        }
       });
 
       typeButton.addEventListener('click', function (event) {
@@ -1342,7 +1412,22 @@
         // var storiesEl = document.querySelector('.insights-stories');
         // if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         var bar = document.getElementById('yf-filter-bar');
-        if (bar) { window.scrollTo({ top: bar.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); }
+        if (bar) {
+              if (bar.classList.contains('sticky')) {
+                  var ko = document.querySelector('.insights-stories.ko');
+                  if (ko) {
+                      window.scrollTo({
+                          top: ko.getBoundingClientRect().top + window.scrollY - (bar.offsetHeight + STICKY_TOP + 20),
+                          behavior: 'smooth'
+                      });
+                  }
+              } else {
+                  window.scrollTo({
+                      top: bar.getBoundingClientRect().top + window.scrollY - 80,
+                      behavior: 'smooth'
+                  });
+              }
+        }
       });
 
       document.addEventListener(
