@@ -639,6 +639,7 @@
       style.textContent = [
         '#yf-filter-bar .container{display:flex;align-items:center;flex-wrap:wrap;gap:0px !important;justify-content:flex-start;max-width: 1140px;}',
         '#yf-filter-bar .container.is-sticky{padding: 0px !important; gap: 0 !important;}',
+        '@media (max-width:1199px){#yf-filter-bar.container.is-sticky{padding: 0 15px !important;}}',
         '#yf-x-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:flex-start;padding:0;box-sizing:border-box;max-width:1164px;margin:0;width:auto; margin: 15px 10px 15px 0;}',
         '#yf-x-filter-lbl{font-size:13px;font-weight:700;color:#333;white-space:nowrap;margin-right:2px;}',
         '#yf-x-year-wrap,#yf-x-type-wrap{position:relative;display:inline-block;vertical-align:middle;}',
