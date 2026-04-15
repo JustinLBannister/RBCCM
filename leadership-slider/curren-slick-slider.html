@@ -310,19 +310,7 @@
           });
           } // end initCarousel
 
-          // Check if Slick is already loaded, if not load from CDN then init
-          if (typeof $.fn.slick !== 'undefined') {
-            initCarousel();
-          } else {
-            var slickScript = document.createElement('script');
-            slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
-            slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
-            slickScript.crossOrigin = 'anonymous';
-            slickScript.referrerPolicy = 'no-referrer';
-            slickScript.onload = function () { initCarousel(); };
-            document.head.appendChild(slickScript);
-          }
-
+          // Bind events BEFORE init so the 'init' event fires into our handler
           $track.on('afterChange init', function (e, slick, currentSlide) {
             syncArrows();
 
@@ -343,6 +331,19 @@
             isAnimating = false;
             processQueue();
           });
+
+          // Now that the handler is bound, load Slick (if needed) and init
+          if (typeof $.fn.slick !== 'undefined') {
+            initCarousel();
+          } else {
+            var slickScript = document.createElement('script');
+            slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+            slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
+            slickScript.crossOrigin = 'anonymous';
+            slickScript.referrerPolicy = 'no-referrer';
+            slickScript.onload = function () { initCarousel(); };
+            document.head.appendChild(slickScript);
+          }
 
           var isAnimating = false;
           var focusQueue  = [];
