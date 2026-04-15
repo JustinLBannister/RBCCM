@@ -1,0 +1,288 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <!-- Skin: Default XSL-->
+ 
+    <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+    <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+    <xsl:template match="/">
+ 
+        <!--<xsl:variable
+        name="AUTHORS" select="/Properties/Data/Datum[@Name='Author']/DCR/authorlist"/>-->
+        <xsl:variable name="AUTHORS" select="/Properties/Data/Datum[@Name='Author']" />
+ 
+        <div class="blue-box" id="team-profiles" style="padding-bottom:40px;">
+            <div class="container">
+                <h2 style="margin-top: 45px; margin-bottom:35px;">Our team</h2>
+                <div>
+                    <xsl:value-of select="/Properties/Data/Datum[@ID='before-text']"
+                        disable-output-escaping="yes" />
+                </div>
+ 
+                <!--OWL
+                Carousel-->
+                <div class="owl-carousel owl-theme ">
+                    <xsl:attribute name="id">
+                        <xsl:value-of select="/Properties/Data/Datum[@ID='ID']"
+                            disable-output-escaping="yes" />
+                    </xsl:attribute>
+ 
+                    <xsl:for-each select="$AUTHORS">
+                        <xsl:variable name="AUTHOR_NAME" select="./DCR/authorlist/name" />
+                        <xsl:variable name="AUTHOR_TITLE" select="./DCR/authorlist/title" />
+                        <xsl:variable name="AUTHOR_SUBTITLE" select="./DCR/authorlist/subtitle" />
+                        <xsl:variable name="AUTHOR_PHOTO" select="./DCR/authorlist/photo" />
+                        <xsl:variable name="AUTHOR_ID" select="./DCR/authorlist/id" />
+                        <xsl:variable name="AUTHOR_EMAIL" select="./DCR/authorlist/email" />
+                        <xsl:variable name="AUTHOR_BIO" select="./DCR/authorlist/bio" />
+ 
+                        <div class="item">
+                            <div class="img-stretch gib-team-profiles">
+                                <xsl:choose>
+                                    <xsl:when test="normalize-space($AUTHOR_PHOTO) !=''">
+                                        <xsl:attribute name="style">background-image: url('<xsl:value-of
+                                                select="$AUTHOR_PHOTO" />'); width: auto; height:
+                                            263px;</xsl:attribute>
+                                        <xsl:attribute name="alt">
+                                            <xsl:value-of select="$AUTHOR_PHOTO" />
+                                        </xsl:attribute>
+ 
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="style">background-color: white;
+                                            background-image:
+                                            url('/assets/rbccm/images/authors/anon.png'); width:
+                                            auto; height: 263px;</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </div>
+ 
+                            <xsl:choose>
+                                <xsl:when test="normalize-space($AUTHOR_BIO) !=''">
+ 
+                                    <div class="white-box tile"
+                                        style="padding: 15px; margin-bottom:10px; position: relative; min-height:190px;">
+                                        <p class="name" style="margin-top: 5px; color:#002144;">
+                                            <xsl:value-of select="$AUTHOR_NAME" />
+                                        </p>
+                                        <p class="subtitle" style="margin-bottom: 10px;">
+                                            <xsl:value-of select="$AUTHOR_TITLE"
+                                                disable-output-escaping="yes" />
+                                            <xsl:if test="normalize-space($AUTHOR_SUBTITLE) != ''">, <xsl:value-of
+                                                    select="$AUTHOR_SUBTITLE"
+                                                    disable-output-escaping="yes" /></xsl:if>
+                                        </p>
+                                        <div style="position: absolute; bottom: 20px;" class="link">
+ 
+                                            <a class="profile-toggle" data-toggle="tab"
+                                                style="color: #0051A5;">
+                                                <xsl:attribute name="href">#<xsl:value-of
+                                                        select="$AUTHOR_ID" /></xsl:attribute>
+                                                Biography</a>
+ 
+                                        </div>
+                                    </div>
+                                </xsl:when>
+ 
+                                <xsl:otherwise>
+                                    <div class="white-box tile"
+                                        style="padding: 15px; margin-bottom:10px; position: relative; min-height:190px;">
+                                        <p class="name" style="margin-top: 5px; color:#002144;">
+                                            <xsl:value-of select="$AUTHOR_NAME" />
+                                        </p>
+                                        <p class="subtitle" style="margin-bottom: 10px;">
+                                            <xsl:value-of select="$AUTHOR_TITLE"
+                                                disable-output-escaping="yes" />
+                                            <xsl:if test="normalize-space($AUTHOR_SUBTITLE) != ''">, <xsl:value-of
+                                                    select="$AUTHOR_SUBTITLE"
+                                                    disable-output-escaping="yes" /></xsl:if>
+                                        </p>
+                                        <div style="position: absolute; bottom: 20px;" class="link">
+ 
+                                            <xsl:if test="normalize-space($AUTHOR_EMAIL) != ''">
+                                                <a target="_blank" class="blue-circle-outline"
+                                                    style="margin-left: 0px;">
+                                                    <xsl:attribute name="href">mailto:<xsl:value-of
+                                                            select="$AUTHOR_EMAIL" /></xsl:attribute>
+                                                    <em class="fa fa-envelope"
+                                                        style="color: #0051a5;margin-left: 12px;"></em>
+                                                </a>
+                                            </xsl:if>
+ 
+                                        </div>
+                                    </div>
+ 
+                                </xsl:otherwise>
+ 
+                            </xsl:choose>
+                            <img class="profile-pointer" src="/assets/rbccm/images/blue-pointer.png"
+                                alt="Profile Pointer" role="presentation">
+                                <xsl:attribute name="id">pointer-<xsl:value-of select="$AUTHOR_ID" /></xsl:attribute>
+                            </img>
+                        </div>
+ 
+                    </xsl:for-each>
+                </div>
+ 
+            </div><!--end
+            container-->
+ 
+            <!--PROFILES
+            POPUP-->
+            <div class="profile-div tab-content">
+ 
+                <xsl:for-each select="$AUTHORS">
+                    <xsl:variable name="AUTHOR_NAME" select="./DCR/authorlist/name" />
+                    <xsl:variable name="AUTHOR_TITLE" select="./DCR/authorlist/title" />
+                    <xsl:variable name="AUTHOR_SUBTITLE" select="./DCR/authorlist/subtitle" />
+                    <xsl:variable name="AUTHOR_PHOTO" select="./DCR/authorlist/photo" />
+                    <xsl:variable name="AUTHOR_ID" select="./DCR/authorlist/id" />
+                    <xsl:variable name="AUTHOR_BIO" select="./DCR/authorlist/bio" />
+                    <xsl:variable name="AUTHOR_EMAIL" select="./DCR/authorlist/email" />
+                    <xsl:variable name="AUTHOR_PHONE" select="./DCR/authorlist/telephone" />
+                    <xsl:variable name="AUTHOR_LINKEDIN" select="./DCR/authorlist/linkedin" />
+                    <xsl:variable name="AUTHOR_TWITTER" select="./DCR/authorlist/twitter" />
+                    <xsl:variable name="AUTHOR_STORIES" select="./DCR/authorlist/story" />
+ 
+                    <div class="profile-popup tab-pane" role="tabpanel">
+                        <xsl:attribute name="id">
+                            <xsl:value-of select="$AUTHOR_ID" />
+                        </xsl:attribute>
+                        <xsl:attribute name="name">
+                            <xsl:value-of select="$AUTHOR_ID" />
+                        </xsl:attribute>
+ 
+                        <button type="button" class="close profileclose">
+                            <xsl:attribute name="aria-label">
+                                <xsl:text>Close </xsl:text>
+                                <xsl:value-of select="$AUTHOR_NAME" />
+                                <xsl:text>'s biography</xsl:text>
+                            </xsl:attribute>
+ 
+                            <span aria-hidden="true">×</span>
+                        </button>
+ 
+                        <div class="container">
+                            <div class="row">
+                                <div style="min-height:300px; height:auto;">
+                                    <xsl:attribute name="class">col-xs-12 col-sm-8 pleft <xsl:if
+                                            test="count($AUTHOR_STORIES) = 0 or $AUTHOR_STORIES = ''">
+                                        col-sm-offset-2</xsl:if>
+                                    </xsl:attribute>
+                                    <div style="padding:40px 20px 40px 0px;">
+                                        <xsl:value-of select="$AUTHOR_BIO"
+                                            disable-output-escaping="yes" />
+ 
+                                        <div class="contact-details">
+                                            <xsl:if
+                                                test="/Properties/Datum[@Name='Show Contact Details'] = 'true'">
+                                                <xsl:if test="normalize-space($AUTHOR_EMAIL) != ''">
+                                                    <a target="_blank" class="white-circle-outline">
+                                                        <xsl:attribute name="href">mailto:<xsl:value-of
+                                                                select="$AUTHOR_EMAIL" /></xsl:attribute>
+                                                        <xsl:attribute name="aria-label"> Send mail
+                                                            to <xsl:value-of select="$AUTHOR_NAME" />
+                                                        </xsl:attribute>
+                                                        <em class="fa fa-envelope"
+                                                            style="color: #fff;margin-left: 16px;"></em>
+                                                    </a>
+                                                </xsl:if>
+                                                <xsl:if
+                                                    test="normalize-space($AUTHOR_TWITTER) != ''">
+                                                    <a target="_blank" class="white-circle-outline">
+                                                        <xsl:attribute name="href">
+                                                            <xsl:value-of select="$AUTHOR_TWITTER" />
+                                                        </xsl:attribute>
+                                                        <xsl:attribute name="aria-label"> View <xsl:value-of
+                                                                select="$AUTHOR_NAME" />'s twitter
+                                                            profile </xsl:attribute>
+                                                        <em class="fa fa-twitter"
+                                                            style="color: #fff; margin-left: 18px;">
+                                                            &nbsp;</em>
+                                                    </a>
+                                                </xsl:if>
+                                            </xsl:if>
+                                            <xsl:if
+                                                test="/Properties/Datum[@Name='Show Contact Details'] = 'true' or /Properties/Datum[@Name='Show LinkedIn Only'] = 'true'">
+                                                <xsl:if
+                                                    test="normalize-space($AUTHOR_LINKEDIN) != ''">
+                                                    <a target="_blank" class="white-circle-outline">
+                                                        <xsl:attribute name="href">
+                                                            <xsl:value-of select="$AUTHOR_LINKEDIN" />
+                                                        </xsl:attribute>
+                                                        <xsl:attribute name="aria-label"> View <xsl:value-of
+                                                                select="$AUTHOR_NAME" />'s linkedin
+                                                            profile </xsl:attribute>
+                                                        <em class="fa fa-linkedin"
+                                                            style="color: #fff; margin-left: 18px;">
+                                                            &nbsp;</em>
+                                                    </a>
+                                                </xsl:if>
+                                            </xsl:if>
+ 
+                                        </div>
+ 
+                                    </div>
+                                </div>
+ 
+                                <xsl:if test="$AUTHOR_STORIES != ''">
+                                    <div class="col-xs-12 col-sm-4 pright"
+                                        style="border-left:1px solid #7fa7d1; overflow:auto;">
+                                        <div style="padding:20px;">
+                                            <div class="related-articles">
+ 
+                                                <h3 class="uppercase"
+                                                    style="letter-spacing:1px; font-size: 18px; margin-top:20px;">Related
+                                                    Content</h3>
+                                                <div>
+                                                    <xsl:attribute name="class">related-content</xsl:attribute>
+                                                    <div class="related-story loading">
+                                                        <div class="category">
+                                                            <span class="placeholder"></span>
+                                                        </div>
+                                                        <h4>
+                                                            <span class="placeholder"></span>
+                                                        </h4>
+                                                        <p class="byline">
+                                                            <span class="placeholder"></span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+ 
+                                            </div>
+                                        </div>
+                                    </div>
+ 
+                                    <script> $(document).ready(function () { <xsl:for-each
+                                            select="$AUTHOR_STORIES"> loadRelated("<xsl:value-of
+                                                select="." />", "<xsl:value-of select="$AUTHOR_ID" />
+                                        "); </xsl:for-each> }); </script>
+ 
+                                </xsl:if>
+ 
+                            </div>
+                        </div>
+                    </div>
+ 
+                </xsl:for-each>
+ 
+            </div>
+ 
+        </div><!--End
+        blue box div-->
+ 
+    </xsl:template>
+</xsl:stylesheet>
+ 
+<Properties ComponentID="1554499053422">
+  <Datum ID="ShowDetails" Type="Boolean" Name="Show Contact Details">true</Datum>
+  <Datum ID="ShowLinkedIn" Type="Boolean" Name="Show LinkedIn Only">true</Datum>
+</Properties>
+ 
+<Data>
+  <Datum ID="ID" Type="String" Name="Carousel ID">team-profiles-carousel</Datum>
+  <Datum ID="Title" Type="String" Name="Title">Our team</Datum>
+  <Datum ID="before-text" Type="Textarea" Name="Before"/>
+  <Datum ID="AuthorData" Type="DCR" Name="Author" Replicatable="true" CloneGroupID="jt77rq63">
+    <DCR Category="rbccm" Type="authors"/>
+  </Datum>
+</Data>
