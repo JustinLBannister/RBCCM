@@ -169,10 +169,12 @@
           var entryLinkedInIdx = 0;
 
           $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
+            if (!$track.hasClass('slick-initialized')) return;
             focusQueue = [];
             $track.slick('slickPrev');
           });
           $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
+            if (!$track.hasClass('slick-initialized')) return;
             focusQueue = [];
             $track.slick('slickNext');
           });
@@ -193,20 +195,31 @@
 
             var cardWidth    = $('.rbccm-leadership__card').first().outerWidth(true);
             var trackWidth   = $track.width();
-            var visibleCards = Math.ceil(trackWidth / cardWidth);
-            var maxIndex     = total - visibleCards;
 
             var atStart = current &lt;= 0;
-            var atEnd   = current >= maxIndex;
 
+            // Always safe to set prev state from currentSlide
             $('#rbccm-lead-prev, #rbccm-lead-prev-desk')
               .prop('disabled', atStart)
               .attr('aria-disabled', atStart ? 'true' : 'false')
               .css('opacity', atStart ? 0.3 : 1);
-            $('#rbccm-lead-next, #rbccm-lead-next-desk')
-              .prop('disabled', atEnd)
-              .attr('aria-disabled', atEnd ? 'true' : 'false')
-              .css('opacity', atEnd ? 0.3 : 1);
+
+            // Only compute/set next state when measurements are valid
+            if (cardWidth > 0 &amp;&amp; trackWidth > 0) {
+              var visibleCards = Math.ceil(trackWidth / cardWidth);
+              var maxIndex     = total - visibleCards;
+              var atEnd        = current >= maxIndex;
+              $('#rbccm-lead-next, #rbccm-lead-next-desk')
+                .prop('disabled', atEnd)
+                .attr('aria-disabled', atEnd ? 'true' : 'false')
+                .css('opacity', atEnd ? 0.3 : 1);
+            } else {
+              // Layout not ready — leave next enabled
+              $('#rbccm-lead-next, #rbccm-lead-next-desk')
+                .prop('disabled', false)
+                .attr('aria-disabled', 'false')
+                .css('opacity', 1);
+            }
           }
 
           var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
