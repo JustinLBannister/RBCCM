@@ -3,7 +3,7 @@
    Path: /assets/rbccm/css/sub/test/leadership-carousel.css
 ============================================================ */
 
-/* ── Screen reader only ── */
+/* -- Screen reader only -- */
     .rbccm-leadership__sr-only {
       clip: rect(0 0 0 0);
       clip-path: inset(50%);
@@ -15,7 +15,7 @@
     }
 
 
-    /* ── Section ── */
+    /* -- Section -- */
     #rbccm-leadership.rbccm-leadership {
       background-color: #ffffff;
       box-sizing: border-box;
@@ -25,7 +25,7 @@
       width: 100%;
     }
 
-    /* ── Inner container ── */
+    /* -- Inner container -- */
     .rbccm-leadership__inner {
       box-sizing: border-box;
       margin: 0 auto;
@@ -36,7 +36,7 @@
       .rbccm-leadership__inner { max-width: 1140px; }
     }
 
-    /* ── Heading ── */
+    /* -- Heading -- */
     .rbccm-leadership__heading {
       color: #003168;
       font-family: 'RBC Display', serif;
@@ -44,24 +44,25 @@
       font-weight: 500;
       letter-spacing: -0.789px;
       line-height: normal;
-      margin: 0px 0 35px;
+      margin: 0 -16px 35px -16px;
       padding: 0 16px;
     }
     @media (min-width: 1170px) {
-      .rbccm-leadership__heading { padding: 0; }
+      .rbccm-leadership__heading { padding: 0;}
     }
 
-    /* ── Slider wrapper ── */
+    /* -- Slider wrapper -- */
     .rbccm-leadership__slider-track { margin: 0 -8px; }
     @media (min-width: 1245px) {
-      .rbccm-leadership__slider-track { margin: 0; }
+      .rbccm-leadership__slider-track { margin: 0; overflow: hidden;}
     }
 
-    /* ── Slick overrides ── */
+    /* -- Slick overrides -- */
     #rbccm-leadership .slick-slide {
       box-sizing: border-box;
       float: none;
       height: auto;
+      margin: 0 !important;
     }
     #rbccm-leadership .slick-slide > div,
     #rbccm-leadership .slick-slide > div > div { }
@@ -73,7 +74,7 @@
     #rbccm-leadership .slick-prev,
     #rbccm-leadership .slick-next { display: none !important; }
 
-    /* ── Active card border ── */
+    /* -- Active card border -- */
     .rbccm-leadership__card {
       border: 1px solid #A8A8A8;
       box-sizing: border-box;
@@ -86,15 +87,16 @@
       .rbccm-leadership__card { width: 273px !important; }
     }
     @media (min-width: 1245px) {
-      .rbccm-leadership__card { margin: 0 16px; width: 273px !important; }
+      .rbccm-leadership__card { margin: 0 32px 0 0; width: 270px !important; }
     }
     #rbccm-leadership .slick-center .rbccm-leadership__card {
       border-color: #003168;
     }
 
-    /* ── Card image zone ── */
+    /* -- Card image zone -- */
     .rbccm-leadership__card-image {
       background-color: #DADADA;
+      border-bottom: 1px solid #DADADA;
       box-sizing: border-box;
       flex-shrink: 0;
       max-height: 263px;
@@ -122,7 +124,7 @@
       display: none;
     }
 
-    /* ── Card body ── */
+    /* -- Card body -- */
     .rbccm-leadership__card-body {
       display: flex;
       flex-direction: column;
@@ -135,7 +137,7 @@
       position: relative;
     }
 
-    /* ── Card name ── */
+    /* -- Card name -- */
     .rbccm-leadership__card-name {
       color: #000;
       font-family: Roboto, sans-serif;
@@ -145,7 +147,7 @@
       margin: 0;
     }
 
-    /* ── Card role ── */
+    /* -- Card role -- */
     .rbccm-leadership__card-role {
       color: #454545;
       font-family: Roboto, sans-serif;
@@ -155,7 +157,7 @@
       margin: 0;
     }
 
-    /* ── LinkedIn — absolute bottom-right of card body ── */
+    /* -- LinkedIn -- absolute bottom-right of card body -- */
     .rbccm-leadership__card-linkedin {
       bottom: 24px;
       display: inline-block;
@@ -170,7 +172,7 @@
     .rbccm-leadership__card-linkedin:hover .li-default { display: none; }
     .rbccm-leadership__card-linkedin:hover .li-hover   { display: block; }
 
-    /* ── Controls row — visible up to 1199px ── */
+    /* -- Controls row -- visible up to 1199px -- */
     .rbccm-leadership__controls {
       align-items: center;
       display: flex;
@@ -182,7 +184,7 @@
       .rbccm-leadership__controls { display: none; }
     }
 
-    /* ── Control buttons ── */
+    /* -- Control buttons -- */
     .rbccm-leadership__btn {
       align-items: center;
       background: none;
@@ -197,7 +199,7 @@
     }
     .rbccm-leadership__btn svg { display: block; }
 
-    /* ── Dots wrapper ── */
+    /* -- Dots wrapper -- */
     .rbccm-leadership__dots-wrap {
       align-items: center;
       display: flex;
@@ -244,7 +246,7 @@
     }
     /* Inactive dot: outlined circle */
     #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+      /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important; */
       background-repeat: no-repeat !important;
       background-size: 11px 11px !important;
       content: '' !important;
@@ -273,7 +275,7 @@
       width: 11px !important;
     }
 
-    /* ── Desktop arrows overlay ≥1245px ── */
+    /* -- Desktop arrows overlay >=1245px -- */
     .rbccm-leadership__arrows-desktop {
       align-items: center;
       display: none;
@@ -300,7 +302,7 @@
       width: 44px;
     }
 
-    /* ── Reduced motion ── */
+    /* -- Reduced motion -- */
     @media (prefers-reduced-motion: reduce) {
       #rbccm-leadership .slick-track {
         transition: none !important;
