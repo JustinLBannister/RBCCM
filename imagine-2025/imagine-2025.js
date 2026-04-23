@@ -993,7 +993,7 @@ setTimeout(() => {
       ) {
         var h2 = document.createElement('h2');
         h2.className = 'latest-insights-heading';
-        h2.textContent = 'Latest insights';
+        h2.textContent = 'Featured insights';
         tiles.insertBefore(h2, row);
       }
 
