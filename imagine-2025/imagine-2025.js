@@ -967,6 +967,7 @@ setTimeout(() => {
    - Moves #w1776721949713 between .rbccm-themes and .rbccm-testimonials
    - Inserts an <h2>Latest insights</h2> before the first .row
      inside #imagine-article-tiles
+   - Forces the wrapper to display: block (beats !important CSS)
    ----------------------------------------------------------- */
 (function () {
   function initImaginePreview() {
@@ -974,9 +975,10 @@ setTimeout(() => {
       var params = new URLSearchParams(window.location.search);
       if (!params.has('preview')) return;
 
-      // 1) Reposition the preview wrapper between themes and testimonials
       var wrap   = document.getElementById('w1776721949713');
       var themes = document.querySelector('.rbccm-themes');
+
+      // 1) Reposition the preview wrapper between themes and testimonials
       if (wrap && themes && wrap.previousElementSibling !== themes) {
         themes.parentNode.insertBefore(wrap, themes.nextSibling);
       }
@@ -993,6 +995,11 @@ setTimeout(() => {
         h2.className = 'latest-insights-heading';
         h2.textContent = 'Latest insights';
         tiles.insertBefore(h2, row);
+      }
+
+      // 3) Reveal the wrapper — uses !important to beat any CSS rule
+      if (wrap) {
+        wrap.style.setProperty('display', 'block', 'important');
       }
     } catch (e) {
       if (window.console && console.error) {
