@@ -969,48 +969,37 @@ setTimeout(() => {
      inside #imagine-article-tiles
    - Forces the wrapper to display: block (beats !important CSS)
    ----------------------------------------------------------- */
+/* -----------------------------------------------------------
+   Featured Insights heading
+   - Inserts an <h2>Featured insights</h2> before the first .row
+     inside #imagine-article-tiles
+   ----------------------------------------------------------- */
 (function () {
-  function initImaginePreview() {
+  function initFeaturedInsightsHeading() {
     try {
-      var params = new URLSearchParams(window.location.search);
-      if (!params.has('preview')) return;
-
-      var wrap   = document.getElementById('w1776721949713');
-      var themes = document.querySelector('.rbccm-themes');
-
-      // 1) Reposition the preview wrapper between themes and testimonials
-      if (wrap && themes && wrap.previousElementSibling !== themes) {
-        themes.parentNode.insertBefore(wrap, themes.nextSibling);
-      }
-
-      // 2) Insert "Latest insights" heading above the tile grid
       var tiles = document.getElementById('imagine-article-tiles');
-      var row   = tiles && tiles.querySelector(':scope > .row');
-      if (
-        tiles &&
-        row &&
-        !tiles.querySelector(':scope > h2.latest-insights-heading')
-      ) {
-        var h2 = document.createElement('h2');
-        h2.className = 'latest-insights-heading';
-        h2.textContent = 'Featured insights';
-        tiles.insertBefore(h2, row);
-      }
+      if (!tiles) return;
 
-      // 3) Reveal the wrapper — uses !important to beat any CSS rule
-      if (wrap) {
-        wrap.style.setProperty('display', 'block', 'important');
-      }
+      var row = tiles.querySelector(':scope > .row');
+      if (!row) return;
+
+      // Avoid double-insertion
+      if (tiles.querySelector(':scope > h2.latest-insights-heading')) return;
+
+      var h2 = document.createElement('h2');
+      h2.className = 'latest-insights-heading';
+      h2.textContent = 'Featured insights';
+      tiles.insertBefore(h2, row);
     } catch (e) {
       if (window.console && console.error) {
-        console.error('Imagine preview init error:', e);
+        console.error('Featured insights heading init error:', e);
       }
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initImaginePreview);
+    document.addEventListener('DOMContentLoaded', initFeaturedInsightsHeading);
   } else {
-    initImaginePreview();
+    initFeaturedInsightsHeading();
   }
 })();
