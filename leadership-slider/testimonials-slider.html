@@ -1,0 +1,183 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Testimonials Carousel (synced text + image sliders) -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- Slides come from replicatable Groups; render only when at least 1 exists -->
+    <xsl:variable name="slides" select="
+        /Properties/Data/Group[@ID='Testimonial' or @Name='Testimonial']
+        | /Data/Group[@ID='Testimonial' or @Name='Testimonial']"/>
+    <xsl:variable name="slideCount" select="count($slides)"/>
+
+    <xsl:if test="$slideCount &gt;= 1">
+
+      <!-- ── Aria label ── -->
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Client Testimonials</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Load CSS ── -->
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/testimonials-carousel.css"/>
+
+      <!-- ── Component HTML ── -->
+      <section class="rbccm-testimonials">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+
+        <div class="rbccm-testimonials__container">
+
+          <!-- Text slider: quotes -->
+          <div class="rbccm-testimonials__slider-text" id="testimonialTextSlider">
+            <xsl:for-each select="$slides">
+              <xsl:variable name="quote"  select="Datum[@ID='Quote' or @Name='Quote']"/>
+              <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
+              <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
+
+              <div class="rbccm-testimonials__text-slide">
+                <blockquote class="rbccm-testimonials__quote">
+                  <xsl:value-of select="$quote" disable-output-escaping="yes"/>
+                </blockquote>
+                <cite class="rbccm-testimonials__citation">
+                  <span class="rbccm-testimonials__author"><xsl:value-of select="$author"/></span>
+                  <xsl:if test="$role != ''">
+                    <span class="rbccm-testimonials__role">
+                      <xsl:value-of select="$role" disable-output-escaping="yes"/>
+                    </span>
+                  </xsl:if>
+                </cite>
+              </div>
+            </xsl:for-each>
+          </div>
+
+          <!-- Controls: arrows + dots -->
+          <div class="rbccm-testimonials__controls">
+            <div class="rbccm-testimonials__arrows"></div>
+            <div class="rbccm-testimonials__dots"></div>
+          </div>
+
+          <!-- Image slider: portraits -->
+          <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
+            <xsl:for-each select="$slides">
+              <xsl:variable name="image"  select="normalize-space(Datum[@ID='Image' or @Name='Image Path'])"/>
+              <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
+              <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
+              <xsl:variable name="altText">
+                <xsl:choose>
+                  <xsl:when test="$author != '' and $role != ''">
+                    <xsl:value-of select="concat($author, ' - ', $role)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$author"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <div class="rbccm-testimonials__image-slide">
+                <img loading="lazy">
+                  <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+                  <xsl:attribute name="alt"><xsl:value-of select="$altText"/></xsl:attribute>
+                </img>
+              </div>
+            </xsl:for-each>
+          </div>
+
+        </div>
+
+        <!-- Desktop-only arrow wrapper (outside container) -->
+        <div class="rbccm-testimonials__arrows-desktop"></div>
+      </section>
+
+      <!-- ── Inline JS: sync the two sliders ── -->
+      <script>
+        jQuery(document).ready(function ($) {
+          var $text   = $('#testimonialTextSlider');
+          var $image  = $('#testimonialImageSlider');
+          var $arrows = $('.rbccm-testimonials__arrows');
+          var $dots   = $('.rbccm-testimonials__dots');
+          var $arrowsDesk = $('.rbccm-testimonials__arrows-desktop');
+
+          var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          function initCarousels() {
+            // Image slider — visual companion, no controls of its own
+            $image.slick({
+              slidesToShow:   1,
+              slidesToScroll: 1,
+              arrows:         false,
+              dots:           false,
+              fade:           true,
+              infinite:       true,
+              swipe:          false,
+              draggable:      false,
+              touchMove:      false,
+              accessibility:  false,
+              speed:          reducedMotion ? 0 : 350,
+              asNavFor:       '#testimonialTextSlider'
+            });
+
+            // Text slider — owns arrows + dots
+            $text.slick({
+              slidesToShow:   1,
+              slidesToScroll: 1,
+              arrows:         true,
+              prevArrow:      '&lt;button type="button" class="rbccm-testimonials__btn rbccm-testimonials__btn--prev" aria-label="Previous testimonial"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"&gt;&lt;path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/&gt;&lt;/svg&gt;&lt;/button&gt;',
+              nextArrow:      '&lt;button type="button" class="rbccm-testimonials__btn rbccm-testimonials__btn--next" aria-label="Next testimonial"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"&gt;&lt;path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/&gt;&lt;/svg&gt;&lt;/button&gt;',
+              appendArrows:   $arrows,
+              dots:           true,
+              appendDots:     $dots,
+              fade:           true,
+              infinite:       true,
+              speed:          reducedMotion ? 0 : 350,
+              asNavFor:       '#testimonialImageSlider'
+            });
+          }
+
+          if (typeof $.fn.slick !== 'undefined') {
+            initCarousels();
+          } else {
+            var s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+            s.onload = initCarousels;
+            document.head.appendChild(s);
+          }
+        });
+      </script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053500">
+  <!-- Accessibility -->
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Client Testimonials</Datum>
+</Properties>
+
+<Data>
+  <!-- Each Group is one testimonial slide. -->
+  <!-- Author/Role pull from the rbccm authors DCR; Quote and Image are entered per slide. -->
+  <!-- Image alt text is generated as "Author - Role" automatically. -->
+  <Group ID="Testimonial" Name="Testimonial" Replicatable="true" CloneGroupID="testimonial-slide">
+    <Datum ID="Quote" Type="Textarea" Name="Quote">
+      <!-- User-generated. HTML entities (&amp;ndash;, &amp;nbsp;) allowed. -->
+    </Datum>
+    <Datum ID="AuthorRef" Type="DCR" Name="Author">
+      <!-- Pick an author from the rbccm authors DCR — supplies name + title -->
+      <DCR Category="rbccm" Type="authors"/>
+    </Datum>
+    <Datum ID="Image" Type="String" Name="Image Path">
+      <!-- Path to portrait, e.g. /assets/rbccm/images/imagine-images/nik-modi-imagine-carousel.webp -->
+    </Datum>
+  </Group>
+</Data>
