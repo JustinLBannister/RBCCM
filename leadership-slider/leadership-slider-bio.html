@@ -192,26 +192,30 @@
 
         </div>
 
-        <!-- ── Bio Modal (single shared instance, only relevant when linkType = biography) ── -->
+        <!-- ── Bio Modal (Bootstrap pattern, single shared instance) ── -->
         <xsl:if test="$linkType = 'biography'">
-          <div class="rbccm-leadership__modal" id="rbccm-lead-modal" role="dialog" aria-modal="true" aria-labelledby="rbccm-lead-modal-name" hidden="hidden">
-            <div class="rbccm-leadership__modal-backdrop" data-modal-close="true"></div>
-            <div class="rbccm-leadership__modal-dialog" role="document">
-              <button type="button" class="rbccm-leadership__modal-close" aria-label="Close biography" data-modal-close="true">
-                <span aria-hidden="true">&#215;</span>
-              </button>
-              <div class="rbccm-leadership__modal-header">
-                <img class="rbccm-leadership__modal-image" alt="" src=""/>
-                <div class="rbccm-leadership__modal-titles">
-                  <h3 class="rbccm-leadership__modal-name" id="rbccm-lead-modal-name"></h3>
-                  <p class="rbccm-leadership__modal-role"></p>
+          <div class="modal fade" id="rbccm-lead-modal" tabindex="-1" role="dialog" aria-labelledby="rbccm-lead-modal-name" aria-hidden="true">
+            <div class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;" role="document">
+              <div class="modal-content">
+                <div>
+                  <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+                    <button class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" aria-label="Close">&#215;</button>
+                  </div>
+                  <div class="modal-body" style="padding: 0px;">
+                    <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+                      <div style="margin-bottom: 20px;">
+                        <h2 class="rbccm-leadership__modal-name" id="rbccm-lead-modal-name" style="font-size: 20px;"></h2>
+                        <p class="rbccm-leadership__modal-role" style="margin: 4px 0 16px 0; color: #4a4a4a;"></p>
+                        <div class="rbccm-leadership__modal-body"></div>
+                        <p class="rbccm-leadership__modal-footer" style="margin-top: 20px;">
+                          <a class="rbccm-leadership__modal-linkedin" target="_blank" rel="noopener noreferrer" hidden="hidden">
+                            View LinkedIn profile
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="rbccm-leadership__modal-body"></div>
-              <div class="rbccm-leadership__modal-footer">
-                <a class="rbccm-leadership__modal-linkedin" target="_blank" rel="noopener noreferrer" hidden="hidden">
-                  View LinkedIn profile
-                </a>
               </div>
             </div>
           </div>
@@ -431,7 +435,7 @@
             if (!$.contains(document.getElementById('rbccm-leadership'), document.activeElement)) return;
 
             // While modal is open, let modal handle its own keys
-            if ($('#rbccm-lead-modal').is(':visible') &amp;&amp; !$('#rbccm-lead-modal').prop('hidden')) return;
+            if ($('#rbccm-lead-modal').hasClass('in')) return;
 
             if ((e.key === 'Enter' || e.key === ' ') &amp;&amp;
                 $(document.activeElement).closest('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk').length) {
@@ -465,81 +469,28 @@
           });
 
           // ─────────────────────────────────────────────────────────
-          // Biography modal
+          // Biography modal — Bootstrap pattern
           // ─────────────────────────────────────────────────────────
           var $modal     = $('#rbccm-lead-modal');
           var $modalName = $modal.find('.rbccm-leadership__modal-name');
           var $modalRole = $modal.find('.rbccm-leadership__modal-role');
-          var $modalImg  = $modal.find('.rbccm-leadership__modal-image');
           var $modalBody = $modal.find('.rbccm-leadership__modal-body');
           var $modalLi   = $modal.find('.rbccm-leadership__modal-linkedin');
-          var $opener    = null;
 
-          function openBio(targetId, $trigger) {
-            var $src = $('#' + targetId);
+          $(document).on('click', '.rbccm-leadership__card-bio', function (e) {
+            e.preventDefault();
+            var $src = $('#' + $(this).attr('data-bio-target'));
             if (!$src.length) return;
-
-            $opener = $trigger;
 
             $modalName.text($src.attr('data-name') || '');
             $modalRole.text($src.attr('data-role') || '');
-
-            var img = $src.attr('data-image') || '';
-            if (img) {
-              $modalImg.attr('src', img).attr('alt', $src.attr('data-name') || '').show();
-            } else {
-              $modalImg.hide();
-            }
-
-            var li = $src.attr('data-linkedin') || '';
-            if (li) {
-              $modalLi.attr('href', li).removeAttr('hidden');
-            } else {
-              $modalLi.attr('hidden', 'hidden');
-            }
-
             $modalBody.html($src.html());
 
-            $modal.removeAttr('hidden').addClass('is-open');
-            $('body').addClass('rbccm-leadership__modal-open');
+            var li = $src.attr('data-linkedin') || '';
+            if (li) { $modalLi.attr('href', li).removeAttr('hidden'); }
+            else    { $modalLi.attr('hidden', 'hidden'); }
 
-            // Focus close button
-            setTimeout(function () {
-              $modal.find('.rbccm-leadership__modal-close').get(0).focus({ preventScroll: true });
-            }, 0);
-          }
-
-          function closeBio() {
-            $modal.attr('hidden', 'hidden').removeClass('is-open');
-            $('body').removeClass('rbccm-leadership__modal-open');
-            $modalBody.empty();
-            if ($opener &amp;&amp; $opener.length) {
-              $opener.get(0).focus({ preventScroll: true });
-            }
-            $opener = null;
-          }
-
-          // Open via button click
-          $(document).on('click', '.rbccm-leadership__card-bio', function (e) {
-            e.preventDefault();
-            var targetId = $(this).attr('data-bio-target');
-            openBio(targetId, $(this));
-          });
-
-          // Close via backdrop or close button
-          $(document).on('click', '[data-modal-close]', function () { closeBio(); });
-
-          // Escape key + simple focus trap
-          $(document).on('keydown', function (e) {
-            if ($modal.prop('hidden')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeBio(); return; }
-            if (e.key === 'Tab') {
-              var $f = $modal.find('button, a[href], [tabindex]:not([tabindex="-1"])').filter(':visible');
-              if (!$f.length) return;
-              var first = $f.get(0), last = $f.get($f.length - 1);
-              if (e.shiftKey &amp;&amp; document.activeElement === first) { e.preventDefault(); last.focus(); }
-              else if (!e.shiftKey &amp;&amp; document.activeElement === last) { e.preventDefault(); first.focus(); }
-            }
+            $modal.modal('show');
           });
 
         });
