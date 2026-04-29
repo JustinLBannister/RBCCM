@@ -519,3 +519,40 @@
     <DCR Category="rbccm" Type="authors"/>
   </Datum>
 </Data>
+
+
+/* -- Biography -- absolute bottom-left of card body -- */
+.rbccm-leadership__card-bio {
+  /* Strip button chrome */
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* Pin to bottom-left, mirroring the LinkedIn placement */
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+
+  /* Link styling */
+  color: #0051A5;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: none;
+}
+
+.rbccm-leadership__card-bio:hover,
+.rbccm-leadership__card-bio:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+/* Hide the circular SVG icon — text-only link */
+.rbccm-leadership__card-bio svg {
+  display: none;
+}
