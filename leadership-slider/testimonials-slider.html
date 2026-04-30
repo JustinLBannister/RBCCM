@@ -68,7 +68,16 @@
           <!-- Image slider: portraits -->
           <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
             <xsl:for-each select="$slides">
-              <xsl:variable name="overrideImage" select="normalize-space(Datum[@ID='Image']/Image/Path)"/>
+              <xsl:variable name="overrideImage">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='Portrait']/Image/Path) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='Portrait']/Image/Path)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="normalize-space(Datum[@ID='Portrait' or @Name='Portrait Image'])"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
               <xsl:variable name="authorImage" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
               <xsl:variable name="image">
                 <xsl:choose>
@@ -187,11 +196,6 @@
       <!-- Pick an author from the rbccm authors DCR - supplies name, title, and photo -->
       <DCR Category="rbccm" Type="authors"/>
     </Datum>
-    <Datum ID="Image" Type="Image" Name="Override Portrait Image">
-      <Image Width="150" Height="150">
-        <Path/>
-        <Description/>
-      </Image>
-    </Datum>
+    <Datum ID="Portrait" Type="Image" Name="Portrait Image"/>
   </Group>
 </Data>
