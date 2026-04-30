@@ -68,27 +68,7 @@
           <!-- Image slider: portraits -->
           <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
             <xsl:for-each select="$slides">
-              <xsl:variable name="overrideImage">
-                <xsl:choose>
-                  <xsl:when test="normalize-space(Datum[@ID='PortraitFile']/Image/Path) != ''">
-                    <xsl:value-of select="normalize-space(Datum[@ID='PortraitFile']/Image/Path)"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="normalize-space(Datum[@ID='PortraitFile' or @Name='Portrait Image'])"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
-              <xsl:variable name="authorImage" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
-              <xsl:variable name="image">
-                <xsl:choose>
-                  <xsl:when test="$overrideImage != ''">
-                    <xsl:value-of select="$overrideImage"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="$authorImage"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
+              <xsl:variable name="image"  select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
               <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
               <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
               <xsl:variable name="altText">
@@ -186,8 +166,8 @@
 
 <Data>
   <!-- Each Group is one testimonial slide. -->
-  <!-- Author/Role pull from the rbccm authors DCR; Quote and optional override Image are entered per slide. -->
-  <!-- Image falls back to the author DCR photo. Alt text is generated as "Author - Role" automatically. -->
+  <!-- Author/Role/Image pull from the rbccm authors DCR; Quote is entered per slide. -->
+  <!-- Image alt text is generated as "Author - Role" automatically. -->
   <Group ID="Testimonial" Name="Testimonial" Replicatable="true" CloneGroupID="testimonial-slide">
     <Datum ID="Quote" Type="Textarea" Name="Quote">
       <!-- User-generated. HTML entities (&amp;ndash;, &amp;nbsp;) allowed. -->
@@ -196,6 +176,5 @@
       <!-- Pick an author from the rbccm authors DCR - supplies name, title, and photo -->
       <DCR Category="rbccm" Type="authors"/>
     </Datum>
-    <Datum ID="PortraitFile" Type="File" Name="Portrait Image"/>
   </Group>
 </Data>
