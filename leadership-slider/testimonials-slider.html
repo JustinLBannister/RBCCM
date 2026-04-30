@@ -68,7 +68,18 @@
           <!-- Image slider: portraits -->
           <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
             <xsl:for-each select="$slides">
-              <xsl:variable name="image"  select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
+              <xsl:variable name="overridePhoto" select="normalize-space(Datum[@ID='PortraitPath' or @Name='Portrait Asset Path'])"/>
+              <xsl:variable name="authorPhoto" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
+              <xsl:variable name="image">
+                <xsl:choose>
+                  <xsl:when test="$overridePhoto != ''">
+                    <xsl:value-of select="$overridePhoto"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$authorPhoto"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
               <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
               <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
               <xsl:variable name="altText">
@@ -166,7 +177,7 @@
 
 <Data>
   <!-- Each Group is one testimonial slide. -->
-  <!-- Author/Role/Image pull from the rbccm authors DCR; Quote is entered per slide. -->
+  <!-- Author/Role/Image pull from the rbccm authors DCR; Quote and optional portrait override are entered per slide. -->
   <!-- Image alt text is generated as "Author - Role" automatically. -->
   <Group ID="Testimonial" Name="Testimonial" Replicatable="true" CloneGroupID="testimonial-slide">
     <Datum ID="Quote" Type="Textarea" Name="Quote">
@@ -175,6 +186,9 @@
     <Datum ID="AuthorRef" Type="DCR" Name="Author">
       <!-- Pick an author from the rbccm authors DCR - supplies name, title, and photo -->
       <DCR Category="rbccm" Type="authors"/>
+    </Datum>
+    <Datum ID="PortraitPath" Type="String" Name="Portrait Asset Path">
+      <!-- Optional override path, e.g. /assets/rbccm/images/authors/example.webp -->
     </Datum>
   </Group>
 </Data>
