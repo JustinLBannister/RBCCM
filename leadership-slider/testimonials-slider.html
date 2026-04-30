@@ -39,9 +39,10 @@
           <!-- Text slider: quotes -->
           <div class="rbccm-testimonials__slider-text" id="testimonialTextSlider">
             <xsl:for-each select="$slides">
+              <xsl:variable name="authorDcr" select="Datum[@ID='AuthorData' or @ID='AuthorRef' or @Name='Author']/DCR/authorlist"/>
               <xsl:variable name="quote"  select="Datum[@ID='Quote' or @Name='Quote']"/>
-              <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
-              <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
+              <xsl:variable name="author" select="normalize-space($authorDcr/name)"/>
+              <xsl:variable name="role"   select="normalize-space($authorDcr/title)"/>
 
               <div class="rbccm-testimonials__text-slide">
                 <blockquote class="rbccm-testimonials__quote">
@@ -68,24 +69,14 @@
           <!-- Image slider: portraits -->
           <div class="rbccm-testimonials__slider-image" id="testimonialImageSlider">
             <xsl:for-each select="$slides">
-              <xsl:variable name="image"  select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/photo)"/>
-              <xsl:variable name="author" select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/name)"/>
-              <xsl:variable name="role"   select="normalize-space(Datum[@ID='AuthorRef' or @Name='Author']/DCR/authorlist/title)"/>
-              <xsl:variable name="altText">
-                <xsl:choose>
-                  <xsl:when test="$author != '' and $role != ''">
-                    <xsl:value-of select="concat($author, ' - ', $role)"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="$author"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
+              <xsl:variable name="authorDcr" select="Datum[@ID='AuthorData' or @ID='AuthorRef' or @Name='Author']/DCR/authorlist"/>
+              <xsl:variable name="image"  select="normalize-space($authorDcr/photo)"/>
+              <xsl:variable name="author" select="normalize-space($authorDcr/name)"/>
 
               <div class="rbccm-testimonials__image-slide">
                 <img loading="lazy">
                   <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
-                  <xsl:attribute name="alt"><xsl:value-of select="$altText"/></xsl:attribute>
+                  <xsl:attribute name="alt"><xsl:value-of select="$author"/></xsl:attribute>
                 </img>
               </div>
             </xsl:for-each>
@@ -167,7 +158,7 @@
 <Data>
   <!-- Each Group is one testimonial slide. -->
   <!-- Author/Role/Image pull from the rbccm authors DCR; Quote is entered per slide. -->
-  <!-- Image alt text is generated as "Author - Role" automatically. -->
+  <!-- Image alt text is generated from the author name. -->
   <Group ID="Testimonial" Name="Testimonial" Replicatable="true" CloneGroupID="testimonial-slide">
     <Datum ID="Quote" Type="Textarea" Name="Quote">
       <!-- User-generated. HTML entities (&amp;ndash;, &amp;nbsp;) allowed. -->
