@@ -70,11 +70,11 @@
             <xsl:for-each select="$slides">
               <xsl:variable name="overrideImage">
                 <xsl:choose>
-                  <xsl:when test="normalize-space(Datum[@ID='Portrait']/Image/Path) != ''">
-                    <xsl:value-of select="normalize-space(Datum[@ID='Portrait']/Image/Path)"/>
+                  <xsl:when test="normalize-space(Datum[@ID='PortraitFile']/Image/Path) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='PortraitFile']/Image/Path)"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="normalize-space(Datum[@ID='Portrait' or @Name='Portrait Image'])"/>
+                    <xsl:value-of select="normalize-space(Datum[@ID='PortraitFile' or @Name='Portrait Image'])"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:variable>
@@ -196,6 +196,6 @@
       <!-- Pick an author from the rbccm authors DCR - supplies name, title, and photo -->
       <DCR Category="rbccm" Type="authors"/>
     </Datum>
-    <Datum ID="Portrait" Type="Image" Name="Portrait Image"/>
+    <Datum ID="PortraitFile" Type="File" Name="Portrait Image"/>
   </Group>
 </Data>
