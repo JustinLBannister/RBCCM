@@ -1,0 +1,518 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: Why RBC Capital Markets - user-entered reasons -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <xsl:variable name="reasons" select="
+        /Properties/Data/Group[@ID='Reason' or @Name='Reason']
+          [normalize-space(Datum[@ID='Title' or @Name='Card Heading']) != '' and normalize-space(Datum[@ID='Body' or @Name='Card Text']) != '']
+        | /Data/Group[@ID='Reason' or @Name='Reason']
+          [normalize-space(Datum[@ID='Title' or @Name='Card Heading']) != '' and normalize-space(Datum[@ID='Body' or @Name='Card Text']) != '']
+      "/>
+    <xsl:variable name="reasonCount" select="count($reasons)"/>
+
+    <!-- Exactly four complete reason items are required. -->
+    <xsl:if test="$reasonCount = 4">
+
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Why RBC Capital Markets</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SectionAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SectionAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$heading"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="backgroundColor">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundColor']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundColor'])"/>
+          </xsl:when>
+          <xsl:otherwise>#ffffff</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <style>
+        .rbccm-reasons {
+          box-sizing: border-box;
+          overflow: hidden;
+          padding: 55px 0 60px 0;
+          position: relative;
+          width: 100%;
+        }
+
+        .rbccm-reasons * {
+          box-sizing: border-box;
+        }
+
+        .rbccm-reasons__inner {
+          position: relative;
+        }
+
+        .rbccm-reasons__heading {
+          color: #003168;
+          margin-bottom: 50px;
+          margin-top: 0;
+        }
+
+        .rbccm-reasons__track {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          margin: 0;
+        }
+
+        .rbccm-reasons__item {
+          min-height: 132px;
+          padding: 0 28px;
+        }
+
+        .rbccm-reasons__item + .rbccm-reasons__item {
+          border-left: 2px solid #0051a5;
+        }
+
+        @media (min-width: 1245px) {
+          .rbccm-reasons__item {
+            padding-left: 37.333px;
+            padding-right: 37.333px;
+          }
+
+          .rbccm-reasons__item:first-child {
+            padding-left: 0;
+          }
+
+          .rbccm-reasons__item:last-child {
+            padding-right: 0;
+          }
+        }
+
+        .rbccm-reasons__title {
+          color: #0051a5;
+          margin-bottom: 20px;
+          margin-top: 0;
+        }
+
+        .rbccm-reasons__body {
+          color: #000000;
+        }
+
+        .rbccm-reasons__controls {
+          display: none;
+        }
+
+        .rbccm-reasons__sr-only {
+          clip: rect(0 0 0 0);
+          clip-path: inset(50%);
+          height: 1px;
+          overflow: hidden;
+          position: absolute;
+          white-space: nowrap;
+          width: 1px;
+        }
+
+        @media (max-width: 1244px) {
+          .rbccm-reasons {
+            padding: 35px 0 40px 0;
+          }
+
+          .rbccm-reasons__track {
+            display: block;
+          }
+
+          .rbccm-reasons__item,
+          .rbccm-reasons__item + .rbccm-reasons__item {
+            border-left: 2px solid #0051a5;
+            border-right: 2px solid #0051a5;
+            min-height: 146px;
+            padding: 0 32px;
+          }
+
+          .rbccm-reasons .slick-list {
+            overflow: hidden;
+          }
+
+          .rbccm-reasons .slick-track {
+            align-items: stretch;
+            display: flex;
+          }
+
+          .rbccm-reasons .slick-slide {
+            height: auto;
+          }
+
+          .rbccm-reasons .slick-slide &gt; div,
+          .rbccm-reasons .slick-slide &gt; div &gt; div {
+            height: 100%;
+          }
+
+          .rbccm-reasons__controls {
+            align-items: center;
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            margin-top: 40px;
+            width: 100%;
+          }
+
+          .rbccm-reasons__btn {
+            align-items: center;
+            appearance: none;
+            background: transparent;
+            border: 0;
+            color: #003168;
+            cursor: pointer;
+            display: flex;
+            flex-shrink: 0;
+            height: 24px;
+            justify-content: center;
+            padding: 0;
+            width: 14px;
+          }
+
+          .rbccm-reasons__btn svg {
+            display: block;
+            height: 24px;
+            width: 14px;
+          }
+
+          .rbccm-reasons__btn:focus {
+            border-radius: 2px;
+            outline: 2px solid #0051a5;
+            outline-offset: 6px;
+          }
+
+          .rbccm-reasons__dots {
+            align-items: center;
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+          }
+
+          .rbccm-reasons .slick-dots {
+            align-items: center;
+            bottom: auto !important;
+            display: flex !important;
+            gap: 26px;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: static !important;
+            width: auto !important;
+          }
+
+          .rbccm-reasons .slick-dots li {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex !important;
+            height: 11px !important;
+            justify-content: center;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 11px !important;
+          }
+
+          .rbccm-reasons .slick-dots button {
+            appearance: none;
+            background: none !important;
+            border: none !important;
+            box-sizing: border-box !important;
+            cursor: pointer;
+            display: block !important;
+            font-size: 0 !important;
+            height: 11px !important;
+            line-height: 0 !important;
+            margin: 0 !important;
+            outline: none;
+            padding: 0 !important;
+            position: static !important;
+            width: 11px !important;
+          }
+
+          .rbccm-reasons .slick-dots li button:focus {
+            border-radius: 50%;
+            outline: 2px solid #0051a5 !important;
+            outline-offset: 6px;
+          }
+
+          .rbccm-reasons .slick-dots li button::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-size: 11px 11px !important;
+            content: '' !important;
+            display: block !important;
+            height: 11px !important;
+            opacity: 1 !important;
+            position: static !important;
+            width: 11px !important;
+          }
+
+          .rbccm-reasons .slick-dots li.slick-active button::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+            background-size: 11px 11px !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+            height: 11px !important;
+            outline: 0;
+            width: 11px !important;
+          }
+
+          .rbccm-reasons--single .rbccm-reasons__controls {
+            display: none;
+          }
+        }
+
+        @media (min-width: 768px) and (max-width: 1244px) {
+          .rbccm-reasons .slick-slide.slick-current .rbccm-reasons__item {
+            border-right-width: 1px;
+          }
+
+          .rbccm-reasons .slick-slide.slick-current + .slick-active .rbccm-reasons__item {
+            border-left-width: 1px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .rbccm-reasons__item,
+          .rbccm-reasons__item + .rbccm-reasons__item {
+            min-height: 132px;
+            padding: 0 24px;
+          }
+
+          .rbccm-reasons__controls {
+            margin-top: 42px;
+          }
+        }
+      </style>
+
+      <section class="rbccm-reasons">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+        <xsl:attribute name="style">background-color: <xsl:value-of select="$backgroundColor"/>;</xsl:attribute>
+
+          <div class="container rbccm-reasons__inner">
+          <h2 class="rbccm-reasons__heading"><xsl:value-of select="$heading"/></h2>
+          <div class="rbccm-reasons__sr-only" aria-live="polite" aria-atomic="true"></div>
+
+          <div class="rbccm-reasons__track">
+            <xsl:for-each select="$reasons">
+              <xsl:variable name="title" select="normalize-space(Datum[@ID='Title' or @Name='Card Heading'])"/>
+              <xsl:variable name="body" select="Datum[@ID='Body' or @Name='Card Text']"/>
+
+              <div class="rbccm-reasons__item">
+                <h3 class="rbccm-reasons__title"><xsl:value-of select="$title"/></h3>
+                <p class="rbccm-reasons__body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
+              </div>
+            </xsl:for-each>
+          </div>
+
+          <div class="rbccm-reasons__controls">
+            <button class="rbccm-reasons__btn rbccm-reasons__btn--prev" type="button" aria-label="Previous item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-reasons__dots"></div>
+            <button class="rbccm-reasons__btn rbccm-reasons__btn--next" type="button" aria-label="Next item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <script>
+        jQuery(document).ready(function ($) {
+          var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var mobileSlider = window.matchMedia('(max-width: 1244px)');
+
+          function loadSlick(callback) {
+            if (typeof $.fn.slick !== 'undefined') {
+              callback();
+              return;
+            }
+
+            var slickScript = document.createElement('script');
+            slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+            slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
+            slickScript.crossOrigin = 'anonymous';
+            slickScript.referrerPolicy = 'no-referrer';
+            slickScript.onload = callback;
+            document.head.appendChild(slickScript);
+          }
+
+          function setupReasonSection($section) {
+            var $track = $section.find('.rbccm-reasons__track');
+            var $items = $track.children('.rbccm-reasons__item');
+            var $dots = $section.find('.rbccm-reasons__dots');
+            var $announce = $section.find('.rbccm-reasons__sr-only');
+
+            $section.toggleClass('rbccm-reasons--single', $items.length &lt;= 1);
+
+            function updateAnnounce(currentSlide) {
+              if (!$announce.length || $items.length &lt;= 1) return;
+              $announce.text('Item ' + (currentSlide + 1) + ' of ' + $items.length);
+            }
+
+            function syncDots() {
+              var $buttons = $dots.find('li button');
+              if (!$buttons.length) return;
+
+              $dots.attr({
+                'role': 'group',
+                'aria-label': 'Choose a reason'
+              });
+
+              $buttons.each(function (idx) {
+                $(this)
+                  .attr('tabindex', '0')
+                  .attr('aria-label', 'Go to slide ' + (idx + 1));
+              });
+            }
+
+            function initSlider() {
+              if ($items.length &lt;= 1 || $track.hasClass('slick-initialized')) return;
+
+              $track.off('.rbccmReasons');
+              $track.on('init.rbccmReasons afterChange.rbccmReasons', function (event, slick, currentSlide) {
+                var activeSlide = typeof currentSlide === 'number' ? currentSlide : slick.currentSlide;
+                updateAnnounce(activeSlide);
+                syncDots();
+              });
+
+              $track.on('destroy.rbccmReasons', function () {
+                $dots.empty();
+                $announce.empty();
+              });
+
+              $track.slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                arrows: false,
+                dots: true,
+                appendDots: $dots,
+                infinite: true,
+                adaptiveHeight: true,
+                speed: reducedMotion ? 0 : 350,
+                cssEase: reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+                mobileFirst: true,
+                responsive: [
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 2
+                    }
+                  },
+                  {
+                    breakpoint: 1245,
+                    settings: 'unslick'
+                  }
+                ]
+              });
+
+              syncDots();
+
+              $section.find('.rbccm-reasons__btn--prev').off('click.rbccmReasons').on('click.rbccmReasons', function () {
+                if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
+              });
+
+              $section.find('.rbccm-reasons__btn--next').off('click.rbccmReasons').on('click.rbccmReasons', function () {
+                if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
+              });
+
+              $section.find('.rbccm-reasons__controls').off('keydown.rbccmReasons').on('keydown.rbccmReasons', function (e) {
+                if (!$track.hasClass('slick-initialized')) return;
+
+                var key = e.key;
+                var direction = 0;
+                if (key === 'ArrowLeft' || key === 'Left') direction = -1;
+                if (key === 'ArrowRight' || key === 'Right') direction = 1;
+                if (!direction) return;
+
+                var $target = $(e.target);
+                var $dotButton = $target.closest('.rbccm-reasons__dots button');
+
+                e.preventDefault();
+
+                if ($dotButton.length) {
+                  var $dotButtons = $dots.find('li button');
+                  var currentIdx = $dotButtons.index($dotButton);
+                  if (currentIdx === -1) return;
+
+                  var targetIdx = (currentIdx + direction + $dotButtons.length) % $dotButtons.length;
+                  var $nextDot = $dotButtons.eq(targetIdx);
+                  $nextDot.trigger('click');
+                  window.setTimeout(function () {
+                    $nextDot.get(0).focus({ preventScroll: true });
+                  }, 0);
+                  return;
+                }
+
+                if (direction === -1) $track.slick('slickPrev');
+                if (direction === 1) $track.slick('slickNext');
+              });
+            }
+
+            function syncMode() {
+              if (mobileSlider.matches) {
+                loadSlick(initSlider);
+              }
+            }
+
+            syncMode();
+
+            if (mobileSlider.addEventListener) {
+              mobileSlider.addEventListener('change', syncMode);
+            } else if (mobileSlider.addListener) {
+              mobileSlider.addListener(syncMode);
+            }
+          }
+
+          $('.rbccm-reasons').each(function () {
+            setupReasonSection($(this));
+          });
+        });
+      </script>
+
+    </xsl:if>
+
+  </xsl:template>
+</xsl:stylesheet>
+
+<Properties ComponentID="1777570106000">
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Why RBC Capital Markets</Datum>
+  <Datum ID="BackgroundColor" Type="String" Name="Section Background Color">#ffffff</Datum>
+  <!-- Accessibility -->
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section Aria Label">Why RBC Capital Markets</Datum>
+</Properties>
+
+<Data>
+  <!-- Exactly 4 reasons are required. Component will not render unless all 4 have a heading and text. -->
+  <!-- Desktop renders as a 4-column grid; mobile/tablet renders as a slider. -->
+  <Group ID="Reason" Name="Reason" Replicatable="true" CloneGroupID="why-rbccm-reason">
+    <Datum ID="Title" Type="String" Name="Card Heading">
+      <!-- Example: Global Scale -->
+    </Datum>
+    <Datum ID="Body" Type="Textarea" Name="Card Text">
+      <!-- Example: 700+ trading and risk specialists across 4 continents. HTML entities allowed. -->
+    </Datum>
+  </Group>
+</Data>
