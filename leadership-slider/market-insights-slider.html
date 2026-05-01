@@ -1,0 +1,583 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: Market Insights Carousel - user-entered cards -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <xsl:variable name="insights" select="
+        /Properties/Data/Group[@ID='Insight' or @Name='Insight']
+          [normalize-space(Datum[@ID='Title' or @Name='Card Heading']) != ''
+           and normalize-space(Datum[@ID='Summary' or @Name='Card Text']) != ''
+           and normalize-space(Datum[@ID='InsightImagePath' or @Name='Image Path']) != ''
+           and normalize-space(Datum[@ID='LinkUrl' or @Name='Link URL']) != '']
+        | /Data/Group[@ID='Insight' or @Name='Insight']
+          [normalize-space(Datum[@ID='Title' or @Name='Card Heading']) != ''
+           and normalize-space(Datum[@ID='Summary' or @Name='Card Text']) != ''
+           and normalize-space(Datum[@ID='InsightImagePath' or @Name='Image Path']) != ''
+           and normalize-space(Datum[@ID='LinkUrl' or @Name='Link URL']) != '']
+      "/>
+    <xsl:variable name="insightCount" select="count($insights)"/>
+
+    <!-- Exactly three complete insight cards are required. -->
+    <xsl:if test="$insightCount = 3">
+
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Market insights</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="leadDescription">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='LeadDescription']) != ''">
+            <xsl:value-of select="/Properties/Datum[@ID='LeadDescription']" disable-output-escaping="yes"/>
+          </xsl:when>
+          <xsl:otherwise>Expert perspectives on the trends shaping global equities.</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SectionAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SectionAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$heading"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="backgroundColor">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundColor']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundColor'])"/>
+          </xsl:when>
+          <xsl:otherwise>#FAFAFA</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <style>
+        .rbccm-market-insights {
+          box-sizing: border-box;
+          overflow: hidden;
+          padding: 55px 0 60px;
+          position: relative;
+          width: 100%;
+        }
+
+        .rbccm-market-insights * {
+          box-sizing: border-box;
+        }
+
+        .rbccm-market-insights__heading {
+          color: #003168;
+          margin: 0 0 16px 0;
+        }
+
+        .rbccm-market-insights__lead {
+          color: #00316A;
+          margin: 0;
+          padding: 0;
+        }
+
+        .rbccm-market-insights__track {
+          display: grid;
+          gap: 30px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          margin: 58px 0 0;
+        }
+
+        .rbccm-market-insights__item {
+          min-width: 0;
+        }
+
+        .rbccm-market-insights__card {
+          background-color: #003168;
+          background-position: center;
+          background-size: cover;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          min-height: 250px;
+          overflow: hidden;
+          position: relative;
+          text-decoration: none;
+          width: 100%;
+        }
+
+        .rbccm-market-insights__card::before {
+          background: linear-gradient(90deg, rgba(0, 31, 68, 0.88) 0%, rgba(0, 31, 68, 0.58) 58%, rgba(0, 31, 68, 0.34) 100%);
+          content: "";
+          inset: 0;
+          position: absolute;
+          z-index: 0;
+        }
+
+        .rbccm-market-insights__card:focus {
+          outline: 3px solid #0051a5;
+          outline-offset: 4px;
+        }
+
+        .rbccm-market-insights__content {
+          color: #ffffff;
+          flex: 1 1 auto;
+          padding: 36px 34px 24px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .rbccm-market-insights__title {
+          color: #ffffff;
+          font-size: 28px;
+          line-height: 1.12;
+          margin: 0 0 20px;
+        }
+
+        .rbccm-market-insights__summary {
+          color: #ffffff;
+          font-size: 15px;
+          line-height: 1.45;
+          margin: 0;
+        }
+
+        .rbccm-market-insights__cta {
+          background: rgba(0, 92, 170, 0.88);
+          color: #ffffff;
+          display: block;
+          font-size: 15px;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          line-height: 1.2;
+          padding: 20px 34px;
+          position: relative;
+          text-transform: none;
+          z-index: 1;
+        }
+
+        .rbccm-market-insights__controls {
+          display: none;
+        }
+
+        .rbccm-market-insights__sr-only,
+        .rbccm-market-insights .slick-sr-only {
+          clip: rect(0 0 0 0);
+          clip-path: inset(50%);
+          height: 1px;
+          overflow: hidden;
+          position: absolute;
+          white-space: nowrap;
+          width: 1px;
+        }
+
+        @media (max-width: 1244px) {
+          .rbccm-market-insights {
+            padding: 35px 0 40px;
+          }
+
+          .rbccm-market-insights__track {
+            display: block;
+            margin-top: 44px;
+          }
+
+          .rbccm-market-insights .slick-list {
+            margin: 0 -15px;
+            overflow: hidden;
+          }
+
+          .rbccm-market-insights .slick-track {
+            display: flex;
+          }
+
+          .rbccm-market-insights .slick-slide {
+            height: auto;
+            padding: 0 15px;
+          }
+
+          .rbccm-market-insights .slick-slide &gt; div,
+          .rbccm-market-insights .slick-slide &gt; div &gt; div {
+            height: 100%;
+          }
+
+          .rbccm-market-insights__item,
+          .rbccm-market-insights__card {
+            height: 100%;
+          }
+
+          .rbccm-market-insights__controls {
+            align-items: center;
+            display: flex;
+            gap: 26px;
+            justify-content: center;
+            margin-top: 44px;
+            width: 100%;
+          }
+
+          .rbccm-market-insights__btn {
+            align-items: center;
+            appearance: none;
+            background: transparent;
+            border: 0;
+            color: #003168;
+            cursor: pointer;
+            display: flex;
+            flex-shrink: 0;
+            height: 24px;
+            justify-content: center;
+            padding: 0;
+            width: 14px;
+          }
+
+          .rbccm-market-insights__btn svg {
+            display: block;
+            height: 24px;
+            width: 14px;
+          }
+
+          .rbccm-market-insights__btn:focus {
+            border-radius: 2px;
+            outline: 2px solid #0051a5;
+            outline-offset: 6px;
+          }
+
+          .rbccm-market-insights .slick-dots {
+            align-items: center;
+            bottom: auto !important;
+            display: flex !important;
+            gap: 26px;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: static !important;
+            width: auto !important;
+          }
+
+          .rbccm-market-insights .slick-dots li {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex !important;
+            height: 11px !important;
+            justify-content: center;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 11px !important;
+          }
+
+          .rbccm-market-insights .slick-dots li button {
+            appearance: none;
+            background: none !important;
+            border: none !important;
+            box-sizing: border-box !important;
+            cursor: pointer;
+            display: block !important;
+            font-size: 0 !important;
+            height: 11px !important;
+            line-height: 0 !important;
+            margin: 0 !important;
+            outline: none;
+            padding: 0 !important;
+            position: static !important;
+            width: 11px !important;
+          }
+
+          .rbccm-market-insights .slick-dots li button:focus {
+            border-radius: 50%;
+            outline: 2px solid #0051a5 !important;
+            outline-offset: 6px;
+          }
+
+          .rbccm-market-insights .slick-dots li button::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-size: 11px 11px !important;
+            content: "" !important;
+            display: block !important;
+            height: 11px !important;
+            opacity: 1 !important;
+            position: static !important;
+            width: 11px !important;
+          }
+
+          .rbccm-market-insights .slick-dots li.slick-active button::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+            background-size: 11px 11px !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 0 4px var(--rbccm-market-insights-bg, #FAFAFA), 0 0 0 5px #003168 !important;
+            height: 11px !important;
+            outline: 0;
+            width: 11px !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .rbccm-market-insights__content {
+            padding: 30px 30px 24px;
+          }
+
+          .rbccm-market-insights__title {
+            font-size: 26px;
+          }
+
+          .rbccm-market-insights__cta {
+            padding: 18px 30px;
+          }
+        }
+      </style>
+
+      <section class="rbccm-market-insights">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+        <xsl:attribute name="style">--rbccm-market-insights-bg: <xsl:value-of select="$backgroundColor"/>; background-color: <xsl:value-of select="$backgroundColor"/>;</xsl:attribute>
+
+        <div class="container rbccm-market-insights__inner">
+          <h2 class="rbccm-market-insights__heading"><xsl:value-of select="$heading"/></h2>
+          <p class="rbccm-market-insights__lead"><xsl:value-of select="$leadDescription" disable-output-escaping="yes"/></p>
+          <div class="rbccm-market-insights__sr-only" aria-live="polite" aria-atomic="true"></div>
+
+          <div class="rbccm-market-insights__track">
+            <xsl:for-each select="$insights">
+              <xsl:variable name="title" select="normalize-space(Datum[@ID='Title' or @Name='Card Heading'])"/>
+              <xsl:variable name="summary" select="Datum[@ID='Summary' or @Name='Card Text']"/>
+              <xsl:variable name="image" select="normalize-space(Datum[@ID='InsightImagePath' or @Name='Image Path'])"/>
+              <xsl:variable name="url" select="normalize-space(Datum[@ID='LinkUrl' or @Name='Link URL'])"/>
+              <xsl:variable name="aria" select="normalize-space(Datum[@ID='LinkAriaLabel' or @Name='Link Aria Label'])"/>
+              <xsl:variable name="cta">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='LinkLabel' or @Name='Link Label']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='LinkLabel' or @Name='Link Label'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Listen now</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <div class="rbccm-market-insights__item">
+                <a class="rbccm-market-insights__card">
+                  <xsl:attribute name="href"><xsl:value-of select="$url"/></xsl:attribute>
+                  <xsl:attribute name="aria-label">
+                    <xsl:choose>
+                      <xsl:when test="$aria != ''"><xsl:value-of select="$aria"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:attribute>
+                  <xsl:attribute name="style">background-image: url('<xsl:value-of select="$image"/>');</xsl:attribute>
+                  <div class="rbccm-market-insights__content">
+                    <h3 class="rbccm-market-insights__title"><xsl:value-of select="$title"/></h3>
+                    <p class="rbccm-market-insights__summary"><xsl:value-of select="$summary" disable-output-escaping="yes"/></p>
+                  </div>
+                  <span class="rbccm-market-insights__cta"><xsl:value-of select="$cta"/></span>
+                </a>
+              </div>
+            </xsl:for-each>
+          </div>
+
+          <div class="rbccm-market-insights__controls">
+            <button class="rbccm-market-insights__btn rbccm-market-insights__btn--prev" type="button" aria-label="Previous insight">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-market-insights__dots"></div>
+            <button class="rbccm-market-insights__btn rbccm-market-insights__btn--next" type="button" aria-label="Next insight">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <script>
+        jQuery(document).ready(function ($) {
+          var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var mobileSlider = window.matchMedia('(max-width: 1244px)');
+
+          function loadSlick(callback) {
+            if (typeof $.fn.slick !== 'undefined') {
+              callback();
+              return;
+            }
+
+            var slickScript = document.createElement('script');
+            slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+            slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
+            slickScript.crossOrigin = 'anonymous';
+            slickScript.referrerPolicy = 'no-referrer';
+            slickScript.onload = callback;
+            document.head.appendChild(slickScript);
+          }
+
+          function setupMarketInsights($section) {
+            var $track = $section.find('.rbccm-market-insights__track');
+            var $items = $track.children('.rbccm-market-insights__item');
+            var $dots = $section.find('.rbccm-market-insights__dots');
+            var $announce = $section.find('.rbccm-market-insights__sr-only');
+
+            function updateAnnounce(currentSlide) {
+              if (!$announce.length || $items.length &lt;= 1) return;
+              $announce.text('Insight ' + (currentSlide + 1) + ' of ' + $items.length);
+            }
+
+            function syncDots() {
+              var $buttons = $dots.find('li button');
+              if (!$buttons.length) return;
+
+              $dots.attr({
+                'role': 'group',
+                'aria-label': 'Choose a market insight'
+              });
+
+              $buttons.each(function (idx) {
+                $(this)
+                  .attr('tabindex', '0')
+                  .attr('aria-label', 'Go to insight slide ' + (idx + 1));
+              });
+            }
+
+            function initSlider() {
+              if ($items.length &lt;= 1 || $track.hasClass('slick-initialized')) return;
+
+              $track.off('.rbccmMarketInsights');
+              $track.on('init.rbccmMarketInsights afterChange.rbccmMarketInsights', function (event, slick, currentSlide) {
+                var activeSlide = typeof currentSlide === 'number' ? currentSlide : slick.currentSlide;
+                updateAnnounce(activeSlide);
+                syncDots();
+              });
+
+              $track.on('destroy.rbccmMarketInsights', function () {
+                $dots.empty();
+                $announce.empty();
+              });
+
+              $track.slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                arrows: false,
+                dots: true,
+                appendDots: $dots,
+                infinite: true,
+                adaptiveHeight: true,
+                speed: reducedMotion ? 0 : 350,
+                cssEase: reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+                mobileFirst: true,
+                responsive: [
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 2
+                    }
+                  },
+                  {
+                    breakpoint: 1245,
+                    settings: 'unslick'
+                  }
+                ]
+              });
+
+              syncDots();
+
+              $section.find('.rbccm-market-insights__btn--prev').off('click.rbccmMarketInsights').on('click.rbccmMarketInsights', function () {
+                if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
+              });
+
+              $section.find('.rbccm-market-insights__btn--next').off('click.rbccmMarketInsights').on('click.rbccmMarketInsights', function () {
+                if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
+              });
+
+              $section.find('.rbccm-market-insights__controls').off('keydown.rbccmMarketInsights').on('keydown.rbccmMarketInsights', function (e) {
+                if (!$track.hasClass('slick-initialized')) return;
+
+                var key = e.key;
+                var direction = 0;
+                if (key === 'ArrowLeft' || key === 'Left') direction = -1;
+                if (key === 'ArrowRight' || key === 'Right') direction = 1;
+                if (!direction) return;
+
+                var $target = $(e.target);
+                var $dotButton = $target.closest('.rbccm-market-insights__dots button');
+
+                e.preventDefault();
+
+                if ($dotButton.length) {
+                  var $dotButtons = $dots.find('li button');
+                  var currentIdx = $dotButtons.index($dotButton);
+                  if (currentIdx === -1) return;
+
+                  var targetIdx = (currentIdx + direction + $dotButtons.length) % $dotButtons.length;
+                  var $nextDot = $dotButtons.eq(targetIdx);
+                  $nextDot.trigger('click');
+                  window.setTimeout(function () {
+                    $nextDot.get(0).focus({ preventScroll: true });
+                  }, 0);
+                  return;
+                }
+
+                if (direction === -1) $track.slick('slickPrev');
+                if (direction === 1) $track.slick('slickNext');
+              });
+            }
+
+            function syncMode() {
+              if (mobileSlider.matches) {
+                loadSlick(initSlider);
+              }
+            }
+
+            syncMode();
+
+            if (mobileSlider.addEventListener) {
+              mobileSlider.addEventListener('change', syncMode);
+            } else if (mobileSlider.addListener) {
+              mobileSlider.addListener(syncMode);
+            }
+          }
+
+          $('.rbccm-market-insights').each(function () {
+            setupMarketInsights($(this));
+          });
+        });
+      </script>
+
+    </xsl:if>
+
+  </xsl:template>
+</xsl:stylesheet>
+
+<Properties ComponentID="1777570108000">
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Market insights</Datum>
+  <Datum ID="LeadDescription" Type="Textarea" Name="Lead Description">Expert perspectives on the trends shaping global equities.</Datum>
+  <Datum ID="BackgroundColor" Type="String" Name="Section Background Color">#FAFAFA</Datum>
+  <!-- Accessibility -->
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section Aria Label">Market insights</Datum>
+</Properties>
+
+<Data>
+  <!-- Exactly 3 insight cards are required. Component will not render unless all 3 have heading, text, image path, and URL. -->
+  <!-- Desktop renders as a 3-column grid; mobile/tablet renders as a slider. -->
+  <Group ID="Insight" Name="Insight" Replicatable="true" CloneGroupID="market-insight">
+    <Datum ID="Title" Type="String" Name="Card Heading">
+      <!-- Example: Strategic Alternatives -->
+    </Datum>
+    <Datum ID="Summary" Type="Textarea" Name="Card Text">
+      <!-- Example: Uncover new ways to drive growth and create value with experts across RBC Capital Markets. -->
+    </Datum>
+    <Datum ID="InsightImagePath" Type="String" Name="Image Path">
+      <!-- Example: /assets/rbccm/images/podcast/strategic-alternatives-podcast.jpg -->
+    </Datum>
+    <Datum ID="LinkUrl" Type="String" Name="Link URL">
+      <!-- Example: /en/insights/markets-in-motion -->
+    </Datum>
+    <Datum ID="LinkLabel" Type="String" Name="Link Label">Listen now</Datum>
+    <Datum ID="LinkAriaLabel" Type="String" Name="Link Aria Label">
+      <!-- Optional. Defaults to the card heading. -->
+    </Datum>
+  </Group>
+</Data>
