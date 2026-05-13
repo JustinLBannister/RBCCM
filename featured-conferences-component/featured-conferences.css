@@ -38,9 +38,9 @@
 .rbccm-featured-conferences__tab {
   align-items: center;
   align-self: stretch;
-  background: transparent;
-  border: 1px solid #FFFDFD;
-  border-radius: 4px;
+  background: var(--Blue-Dark-Blue, #003168);
+  border: 1.5px solid var(--Neutral-White, #FFF);
+  border-radius: 10px;
   color: #FFFDFD;
   cursor: pointer;
   display: flex;
@@ -472,7 +472,7 @@
   .rbccm-featured-conferences__inner-tab {
     background: transparent;
     border: none;
-    border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid #FFC72C;
     color: #FFFDFD;
     font-family: "Roboto Light", "Roboto", Arial, sans-serif;
     font-size: 18px;
@@ -480,13 +480,14 @@
     justify-content: center;
     padding: 18px 0;
     text-align: center;
-    transition: border-color 0.2s ease, font-weight 0.2s ease;
+    transition: border-width 0.15s ease, font-weight 0.2s ease;
   }
 
   .rbccm-featured-conferences__inner-tab.is-active {
-    border-bottom-color: #FFC72C;
+    border-bottom: 3px solid #FFC72C;
     font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
     font-weight: 500;
+    padding-bottom: 16px; /* compensate for +2px border so baseline stays put */
   }
 
   /* Hide chevrons on desktop */
