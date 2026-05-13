@@ -709,30 +709,36 @@
                   </xsl:if>
 
                   <div class="rbccm-featured-conferences__speakers">
-                    <xsl:for-each select="Group[@ID='Speaker' or @Name='Speaker']">
-                      <xsl:variable name="spkName"  select="normalize-space(Datum[@ID='SpeakerName'  or @Name='Speaker Name'])"/>
-                      <xsl:variable name="spkTitle" select="normalize-space(Datum[@ID='SpeakerTitle' or @Name='Speaker Title'])"/>
-                      <xsl:variable name="spkImage" select="normalize-space(Datum[@ID='SpeakerImage' or @Name='Speaker Image'])"/>
-                      <xsl:variable name="spkAlt">
-                        <xsl:choose>
-                          <xsl:when test="normalize-space(Datum[@ID='SpeakerAlt' or @Name='Speaker Image Alt']) != ''">
-                            <xsl:value-of select="normalize-space(Datum[@ID='SpeakerAlt' or @Name='Speaker Image Alt'])"/>
-                          </xsl:when>
-                          <xsl:otherwise><xsl:value-of select="$spkName"/></xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:variable>
-
-                      <div class="rbccm-featured-conferences__speaker">
-                        <div class="rbccm-featured-conferences__speaker-avatar">
-                          <img loading="lazy">
-                            <xsl:attribute name="src"><xsl:value-of select="$spkImage"/></xsl:attribute>
-                            <xsl:attribute name="alt"><xsl:value-of select="$spkAlt"/></xsl:attribute>
-                          </img>
-                        </div>
-                        <div class="rbccm-featured-conferences__speaker-name"><xsl:value-of select="$spkName"/></div>
-                        <div class="rbccm-featured-conferences__speaker-title"><xsl:value-of select="$spkTitle"/></div>
-                      </div>
-                    </xsl:for-each>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker1Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker1Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker1Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker1Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker2Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker2Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker2Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker2Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker3Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker3Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker3Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker3Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker4Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker4Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker4Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker4Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker5Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker5Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker5Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker5Alt'])"/>
+                    </xsl:call-template>
                   </div>
 
                   <xsl:if test="normalize-space($spkFootnote) != ''">
@@ -753,33 +759,52 @@
                 <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
 
-                  <!-- Featured insight (first one with FeaturedFlag = true, OR first if none flagged) -->
-                  <xsl:variable name="featured" select="Group[@ID='Insight' or @Name='Insight'][normalize-space(Datum[@ID='Featured' or @Name='Featured']) = 'true'][1]"/>
-                  <xsl:variable name="featuredFallback" select="Group[@ID='Insight' or @Name='Insight'][1]"/>
-                  <xsl:variable name="standardInsights" select="Group[@ID='Insight' or @Name='Insight'][not(normalize-space(Datum[@ID='Featured' or @Name='Featured']) = 'true')]"/>
-
                   <div class="rbccm-featured-conferences__insights">
 
-                    <!-- Featured (large) card -->
-                    <xsl:choose>
-                      <xsl:when test="$featured">
-                        <xsl:apply-templates select="$featured" mode="insight-featured"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:apply-templates select="$featuredFallback" mode="insight-featured"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <!-- Featured (large) card = position 1 -->
+                    <xsl:call-template name="render-insight">
+                      <xsl:with-param name="mode" select="'featured'"/>
+                      <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight1Label'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight1Title'])"/>
+                      <xsl:with-param name="desc"  select="Datum[@ID='Insight1Description']"/>
+                      <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight1Meta'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight1Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight1ImageAlt'])"/>
+                      <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight1Href'])"/>
+                    </xsl:call-template>
 
-                    <!-- Standard cards row -->
+                    <!-- Standard cards row (positions 2, 3, 4) -->
                     <div class="rbccm-featured-conferences__insights-row">
-                      <xsl:choose>
-                        <xsl:when test="$featured">
-                          <xsl:apply-templates select="$standardInsights" mode="insight-card"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:apply-templates select="Group[@ID='Insight' or @Name='Insight'][position() &gt; 1]" mode="insight-card"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight2Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight2Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight2Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight2Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight2Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight2ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight2Href'])"/>
+                      </xsl:call-template>
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight3Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight3Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight3Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight3Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight3Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight3ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight3Href'])"/>
+                      </xsl:call-template>
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight4Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight4Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight4Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight4Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight4Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight4ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight4Href'])"/>
+                      </xsl:call-template>
                     </div>
 
                     <!-- CTA -->
@@ -946,87 +971,84 @@
   </xsl:template>
 
   <!-- ─────────────────────────────────────────────
-       Insight templates
+       Named templates
        ───────────────────────────────────────────── -->
 
-  <xsl:template match="Group" mode="insight-featured">
-    <xsl:variable name="img"   select="normalize-space(Datum[@ID='InsightImage' or @Name='Insight Image'])"/>
-    <xsl:variable name="alt"   select="normalize-space(Datum[@ID='InsightImageAlt' or @Name='Insight Image Alt'])"/>
-    <xsl:variable name="label">
-      <xsl:choose>
-        <xsl:when test="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label']) != ''">
-          <xsl:value-of select="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label'])"/>
-        </xsl:when>
-        <xsl:otherwise>INSIGHTS</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="title" select="normalize-space(Datum[@ID='InsightTitle' or @Name='Insight Title'])"/>
-    <xsl:variable name="desc"  select="Datum[@ID='InsightDescription' or @Name='Insight Description']"/>
-    <xsl:variable name="meta"  select="normalize-space(Datum[@ID='InsightMeta' or @Name='Insight Meta'])"/>
-    <xsl:variable name="href"  select="normalize-space(Datum[@ID='InsightHref' or @Name='Insight Href'])"/>
+  <xsl:template name="render-speaker">
+    <xsl:param name="name"/>
+    <xsl:param name="title"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
 
-    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--featured">
-      <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
-      <div class="rbccm-featured-conferences__insight-media">
-        <img loading="lazy">
-          <xsl:attribute name="src"><xsl:value-of select="$img"/></xsl:attribute>
-          <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
-        </img>
+    <xsl:if test="$name != '' or $image != ''">
+      <xsl:variable name="altText">
+        <xsl:choose>
+          <xsl:when test="$alt != ''"><xsl:value-of select="$alt"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <div class="rbccm-featured-conferences__speaker">
+        <div class="rbccm-featured-conferences__speaker-avatar">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$altText"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__speaker-name"><xsl:value-of select="$name"/></div>
+        <div class="rbccm-featured-conferences__speaker-title"><xsl:value-of select="$title"/></div>
       </div>
-      <div class="rbccm-featured-conferences__insight-body">
-        <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$label"/></div>
-        <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
-        <p class="rbccm-featured-conferences__insight-desc">
-          <xsl:value-of select="$desc" disable-output-escaping="yes"/>
-        </p>
-        <xsl:if test="$meta != ''">
-          <p class="rbccm-featured-conferences__insight-meta">
-            <xsl:value-of select="$meta"/>
-            <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
-          </p>
-        </xsl:if>
-      </div>
-    </a>
+    </xsl:if>
   </xsl:template>
 
-  <xsl:template match="Group" mode="insight-card">
-    <xsl:variable name="img"   select="normalize-space(Datum[@ID='InsightImage' or @Name='Insight Image'])"/>
-    <xsl:variable name="alt"   select="normalize-space(Datum[@ID='InsightImageAlt' or @Name='Insight Image Alt'])"/>
-    <xsl:variable name="label">
-      <xsl:choose>
-        <xsl:when test="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label']) != ''">
-          <xsl:value-of select="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label'])"/>
-        </xsl:when>
-        <xsl:otherwise>INSIGHTS</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="title" select="normalize-space(Datum[@ID='InsightTitle' or @Name='Insight Title'])"/>
-    <xsl:variable name="desc"  select="Datum[@ID='InsightDescription' or @Name='Insight Description']"/>
-    <xsl:variable name="meta"  select="normalize-space(Datum[@ID='InsightMeta' or @Name='Insight Meta'])"/>
-    <xsl:variable name="href"  select="normalize-space(Datum[@ID='InsightHref' or @Name='Insight Href'])"/>
+  <xsl:template name="render-insight">
+    <xsl:param name="mode"/>  <!-- 'featured' or 'card' -->
+    <xsl:param name="label"/>
+    <xsl:param name="title"/>
+    <xsl:param name="desc"/>
+    <xsl:param name="meta"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
+    <xsl:param name="href"/>
 
-    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card">
-      <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
-      <div class="rbccm-featured-conferences__insight-media">
-        <img loading="lazy">
-          <xsl:attribute name="src"><xsl:value-of select="$img"/></xsl:attribute>
-          <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
-        </img>
-      </div>
-      <div class="rbccm-featured-conferences__insight-body">
-        <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$label"/></div>
-        <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
-        <p class="rbccm-featured-conferences__insight-desc">
-          <xsl:value-of select="$desc" disable-output-escaping="yes"/>
-        </p>
-        <xsl:if test="$meta != ''">
-          <p class="rbccm-featured-conferences__insight-meta">
-            <xsl:value-of select="$meta"/>
-            <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
+    <xsl:if test="$title != '' or $image != ''">
+      <xsl:variable name="labelText">
+        <xsl:choose>
+          <xsl:when test="$label != ''"><xsl:value-of select="$label"/></xsl:when>
+          <xsl:otherwise>INSIGHTS</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="modifierClass">
+        <xsl:choose>
+          <xsl:when test="$mode = 'featured'">rbccm-featured-conferences__insight--featured</xsl:when>
+          <xsl:otherwise>rbccm-featured-conferences__insight--card</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <a>
+        <xsl:attribute name="class">rbccm-featured-conferences__insight <xsl:value-of select="$modifierClass"/></xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+        <div class="rbccm-featured-conferences__insight-media">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__insight-body">
+          <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$labelText"/></div>
+          <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
+          <p class="rbccm-featured-conferences__insight-desc">
+            <xsl:value-of select="$desc" disable-output-escaping="yes"/>
           </p>
-        </xsl:if>
-      </div>
-    </a>
+          <xsl:if test="$meta != ''">
+            <p class="rbccm-featured-conferences__insight-meta">
+              <xsl:value-of select="$meta"/>
+              <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
+            </p>
+          </xsl:if>
+        </div>
+      </a>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
@@ -1086,12 +1108,31 @@
     </Datum>
     <Datum ID="SpeakersFootnote" Type="String" Name="Speakers Footnote">+ Additional speakers to be announced</Datum>
 
-    <Group ID="Speaker" Name="Speaker" Replicatable="true" CloneGroupID="conference-speaker">
-      <Datum ID="SpeakerName"  Type="String" Name="Speaker Name"/>
-      <Datum ID="SpeakerTitle" Type="String" Name="Speaker Title"/>
-      <Datum ID="SpeakerImage" Type="String" Name="Speaker Image"/>
-      <Datum ID="SpeakerAlt"   Type="String" Name="Speaker Image Alt"/>
-    </Group>
+    <!-- Up to 5 speakers per conference. Empty slots are skipped. -->
+    <Datum ID="Speaker1Name"  Type="String" Name="Speaker 1 — Name"/>
+    <Datum ID="Speaker1Title" Type="String" Name="Speaker 1 — Title"/>
+    <Datum ID="Speaker1Image" Type="String" Name="Speaker 1 — Image"/>
+    <Datum ID="Speaker1Alt"   Type="String" Name="Speaker 1 — Image Alt"/>
+
+    <Datum ID="Speaker2Name"  Type="String" Name="Speaker 2 — Name"/>
+    <Datum ID="Speaker2Title" Type="String" Name="Speaker 2 — Title"/>
+    <Datum ID="Speaker2Image" Type="String" Name="Speaker 2 — Image"/>
+    <Datum ID="Speaker2Alt"   Type="String" Name="Speaker 2 — Image Alt"/>
+
+    <Datum ID="Speaker3Name"  Type="String" Name="Speaker 3 — Name"/>
+    <Datum ID="Speaker3Title" Type="String" Name="Speaker 3 — Title"/>
+    <Datum ID="Speaker3Image" Type="String" Name="Speaker 3 — Image"/>
+    <Datum ID="Speaker3Alt"   Type="String" Name="Speaker 3 — Image Alt"/>
+
+    <Datum ID="Speaker4Name"  Type="String" Name="Speaker 4 — Name"/>
+    <Datum ID="Speaker4Title" Type="String" Name="Speaker 4 — Title"/>
+    <Datum ID="Speaker4Image" Type="String" Name="Speaker 4 — Image"/>
+    <Datum ID="Speaker4Alt"   Type="String" Name="Speaker 4 — Image Alt"/>
+
+    <Datum ID="Speaker5Name"  Type="String" Name="Speaker 5 — Name"/>
+    <Datum ID="Speaker5Title" Type="String" Name="Speaker 5 — Title"/>
+    <Datum ID="Speaker5Image" Type="String" Name="Speaker 5 — Image"/>
+    <Datum ID="Speaker5Alt"   Type="String" Name="Speaker 5 — Image Alt"/>
 
     <!-- INSIGHTS TAB -->
     <Datum ID="InsightsCTAText" Type="String" Name="Insights CTA Text">View all conference insights</Datum>
@@ -1099,20 +1140,38 @@
       <!-- URL for the CTA button -->
     </Datum>
 
-    <Group ID="Insight" Name="Insight" Replicatable="true" CloneGroupID="conference-insight">
-      <Datum ID="Featured" Type="String" Name="Featured (true/false)">
-        <!-- Set to "true" on exactly one Insight to flag it as the large featured tile -->
-      </Datum>
-      <Datum ID="InsightLabel" Type="String" Name="Insight Label">INSIGHTS</Datum>
-      <Datum ID="InsightTitle" Type="String" Name="Insight Title"/>
-      <Datum ID="InsightDescription" Type="Textarea" Name="Insight Description"/>
-      <Datum ID="InsightMeta" Type="String" Name="Insight Meta">
-        <!-- e.g. "8 min read", "12 min listen" -->
-      </Datum>
-      <Datum ID="InsightImage" Type="String" Name="Insight Image"/>
-      <Datum ID="InsightImageAlt" Type="String" Name="Insight Image Alt"/>
-      <Datum ID="InsightHref" Type="String" Name="Insight Href"/>
-    </Group>
+    <!-- Insight 1 = the large featured tile. Insights 2/3/4 = standard cards row. -->
+    <Datum ID="Insight1Label"       Type="String"   Name="Insight 1 — Label">INSIGHTS</Datum>
+    <Datum ID="Insight1Title"       Type="String"   Name="Insight 1 — Title"/>
+    <Datum ID="Insight1Description" Type="Textarea" Name="Insight 1 — Description"/>
+    <Datum ID="Insight1Meta"        Type="String"   Name="Insight 1 — Meta (e.g. 8 min read)"/>
+    <Datum ID="Insight1Image"       Type="String"   Name="Insight 1 — Image"/>
+    <Datum ID="Insight1ImageAlt"    Type="String"   Name="Insight 1 — Image Alt"/>
+    <Datum ID="Insight1Href"        Type="String"   Name="Insight 1 — Href"/>
+
+    <Datum ID="Insight2Label"       Type="String"   Name="Insight 2 — Label">INSIGHTS</Datum>
+    <Datum ID="Insight2Title"       Type="String"   Name="Insight 2 — Title"/>
+    <Datum ID="Insight2Description" Type="Textarea" Name="Insight 2 — Description"/>
+    <Datum ID="Insight2Meta"        Type="String"   Name="Insight 2 — Meta"/>
+    <Datum ID="Insight2Image"       Type="String"   Name="Insight 2 — Image"/>
+    <Datum ID="Insight2ImageAlt"    Type="String"   Name="Insight 2 — Image Alt"/>
+    <Datum ID="Insight2Href"        Type="String"   Name="Insight 2 — Href"/>
+
+    <Datum ID="Insight3Label"       Type="String"   Name="Insight 3 — Label">INSIGHTS</Datum>
+    <Datum ID="Insight3Title"       Type="String"   Name="Insight 3 — Title"/>
+    <Datum ID="Insight3Description" Type="Textarea" Name="Insight 3 — Description"/>
+    <Datum ID="Insight3Meta"        Type="String"   Name="Insight 3 — Meta"/>
+    <Datum ID="Insight3Image"       Type="String"   Name="Insight 3 — Image"/>
+    <Datum ID="Insight3ImageAlt"    Type="String"   Name="Insight 3 — Image Alt"/>
+    <Datum ID="Insight3Href"        Type="String"   Name="Insight 3 — Href"/>
+
+    <Datum ID="Insight4Label"       Type="String"   Name="Insight 4 — Label">INSIGHTS</Datum>
+    <Datum ID="Insight4Title"       Type="String"   Name="Insight 4 — Title"/>
+    <Datum ID="Insight4Description" Type="Textarea" Name="Insight 4 — Description"/>
+    <Datum ID="Insight4Meta"        Type="String"   Name="Insight 4 — Meta"/>
+    <Datum ID="Insight4Image"       Type="String"   Name="Insight 4 — Image"/>
+    <Datum ID="Insight4ImageAlt"    Type="String"   Name="Insight 4 — Image Alt"/>
+    <Datum ID="Insight4Href"        Type="String"   Name="Insight 4 — Href"/>
 
   </Group>
 </Data>
