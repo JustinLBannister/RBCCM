@@ -1,0 +1,1118 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Featured Conferences — outer tab selector x inner tabs (Overview / Speakers / Insights) -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- Conferences: replicatable Groups; gate render at EXACTLY 3 -->
+    <xsl:variable name="conferences" select="
+        /Properties/Data/Group[@ID='Conference' or @Name='Conference']
+        | /Data/Group[@ID='Conference' or @Name='Conference']"/>
+    <xsl:variable name="confCount" select="count($conferences)"/>
+
+    <xsl:if test="$confCount = 3">
+
+      <!-- ── Heading ── -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Aria label ── -->
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Brightcove globals ── -->
+      <xsl:variable name="bcAccount">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCAccount']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCAccount'])"/>
+          </xsl:when>
+          <xsl:otherwise>6021289101001</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcPlayer">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCPlayer']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCPlayer'])"/>
+          </xsl:when>
+          <xsl:otherwise>VyvCc9BZx</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcEmbed">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCEmbed']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCEmbed'])"/>
+          </xsl:when>
+          <xsl:otherwise>default</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Inline CSS (scoped to .rbccm-featured-conferences) ── -->
+      <style><xsl:text disable-output-escaping="yes">&lt;![CDATA[
+        .rbccm-featured-conferences {
+          background-color: #002144;
+          color: #FFFDFD;
+          padding: 0;
+        }
+        .rbccm-featured-conferences__container {
+          margin: 0 auto;
+          max-width: 1140px;
+          padding: 35px 16px 45px;
+        }
+        .rbccm-featured-conferences__heading {
+          color: #FFFDFD;
+          font-family: "RBCDisplay", Georgia, Times, serif;
+          font-size: 24px;
+          font-weight: 500;
+          margin: 0 0 24px 0;
+          padding: 0;
+        }
+
+        /* Outer tabs — mobile stacked */
+        .rbccm-featured-conferences__tablist {
+          align-items: center;
+          align-self: stretch;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin: 0 0 28px 0;
+        }
+        .rbccm-featured-conferences__tab {
+          align-items: center;
+          align-self: stretch;
+          background: transparent;
+          border: 1px solid #FFFDFD;
+          border-radius: 4px;
+          color: #FFFDFD;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          font-family: Roboto, Arial, Verdana, sans-serif;
+          font-size: 16px;
+          font-weight: 700;
+          gap: 12px;
+          justify-content: center;
+          line-height: 120%;
+          padding: 19px 0;
+          text-align: center;
+          text-transform: capitalize;
+          transition: background-color 0.2s ease, color 0.2s ease;
+          width: 100%;
+        }
+        .rbccm-featured-conferences__tab:hover { background-color: rgba(255,255,255,0.08); }
+        .rbccm-featured-conferences__tab.is-active {
+          background-color: #FFFDFD;
+          color: var(--Blue-Dark-Blue, #003168);
+        }
+
+        /* Outer panels */
+        .rbccm-featured-conferences__panel { display: none; }
+        .rbccm-featured-conferences__panel.is-active { display: block; }
+
+        /* Inner accordion (mobile) */
+        .rbccm-featured-conferences__inner-wrap { border-top: 1px solid rgba(255,199,54,0.5); }
+        .rbccm-featured-conferences__inner-tab {
+          align-items: center;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255,199,54,0.5);
+          color: #FFFDFD;
+          cursor: pointer;
+          display: flex;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-size: 18px;
+          font-weight: 500;
+          justify-content: space-between;
+          padding: 18px 4px;
+          text-align: left;
+          width: 100%;
+        }
+        .rbccm-featured-conferences__inner-chevron {
+          flex-shrink: 0;
+          transform: rotate(180deg);
+          transition: transform 0.25s ease;
+        }
+        .rbccm-featured-conferences__inner-tab.is-active .rbccm-featured-conferences__inner-chevron {
+          transform: rotate(0deg);
+        }
+        .rbccm-featured-conferences__inner-panel { display: none; padding: 24px 0; }
+        .rbccm-featured-conferences__inner-tab.is-active + .rbccm-featured-conferences__inner-panel {
+          border-bottom: 1px solid rgba(255,199,54,0.5);
+          display: block;
+        }
+
+        /* Overview */
+        .rbccm-featured-conferences__overview {
+          align-items: flex-start;
+          align-self: stretch;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .rbccm-featured-conferences__video {
+          width: 100%;
+          background: #000;
+          aspect-ratio: 16 / 9;
+        }
+
+        /* Info card */
+        .rbccm-featured-conferences__info {
+          align-items: flex-start;
+          align-self: stretch;
+          background-color: #003168;
+          border-radius: 4px;
+          display: grid;
+          grid-template-columns: auto auto;
+          gap: 24px;
+          justify-content: space-between;
+          padding: 24px 16px;
+        }
+        .rbccm-featured-conferences__info-item {
+          align-items: flex-start;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          width: 159px;
+        }
+        .rbccm-featured-conferences__info-item--full {
+          border-top: 1px solid rgba(255,255,255,0.28);
+          grid-column: 1 / -1;
+          padding-top: 25px;
+          width: auto;
+        }
+        .rbccm-featured-conferences__info-label {
+          color: var(--Yellow-Warm-Yellow, #FFC72C);
+          font-family: Roboto, Arial, sans-serif;
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 21px;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__info-value {
+          color: #FFF;
+          font-family: Roboto, Arial, sans-serif;
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 30px;
+        }
+        .rbccm-featured-conferences__info-item--full .rbccm-featured-conferences__info-value {
+          font-size: 18px;
+          line-height: 27px;
+        }
+
+        /* Overview body */
+        .rbccm-featured-conferences__overview-body {
+          align-items: flex-start;
+          align-self: stretch;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        .rbccm-featured-conferences__overview-heading {
+          color: #FFFDFD;
+          font-family: "RBCDisplay", Georgia, Times, serif;
+          font-size: 24px;
+          font-weight: 500;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__overview-text,
+        .rbccm-featured-conferences__overview-text p {
+          color: #FFFDFD;
+          font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+          font-size: 16px;
+          line-height: 1.6;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__overview-text p { margin: 0 0 16px 0; }
+        .rbccm-featured-conferences__overview-text p:last-child { margin-bottom: 0; }
+        .rbccm-featured-conferences__topics {
+          color: #FFFDFD;
+          font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+          font-size: 15px;
+          line-height: 1.6;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__topics strong {
+          display: block;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-weight: 500;
+          margin-bottom: 6px;
+        }
+        .rbccm-featured-conferences__contact {
+          color: #FFFDFD;
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__contact em { opacity: 0.85; }
+
+        /* Speakers */
+        .rbccm-featured-conferences__speakers-heading {
+          color: #FFFDFD;
+          font-family: "RBCDisplay", Georgia, Times, serif;
+          font-size: 22px;
+          font-weight: 500;
+          margin: 0 0 8px 0;
+        }
+        .rbccm-featured-conferences__speakers-intro {
+          color: #FFFDFD;
+          font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+          font-size: 15px;
+          line-height: 1.6;
+          margin: 0 0 24px 0;
+        }
+        .rbccm-featured-conferences__speakers {
+          align-items: flex-start;
+          align-self: stretch;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 32px;
+          justify-content: flex-start;
+          margin: 24px 0;
+        }
+        .rbccm-featured-conferences__speaker {
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          gap: 32px;
+          width: 194px;
+        }
+        .rbccm-featured-conferences__speaker-avatar {
+          align-items: flex-start;
+          align-self: stretch;
+          border: 2px solid #FFC72C;
+          border-radius: 50%;
+          display: flex;
+          flex-direction: column;
+          flex-shrink: 0;
+          height: 128px;
+          margin: 0 auto;
+          overflow: hidden;
+          width: 128px;
+        }
+        .rbccm-featured-conferences__speaker-avatar img {
+          align-self: stretch;
+          display: block;
+          flex-shrink: 0;
+          height: 128px;
+          object-fit: cover;
+          width: 100%;
+        }
+        .rbccm-featured-conferences__speaker-name {
+          color: var(--Yellow-Warm-Yellow, #FFC72C);
+          font-family: Roboto, Arial, sans-serif;
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 30px;
+          margin-bottom: 12px;
+          text-align: center;
+        }
+        .rbccm-featured-conferences__speaker-title {
+          color: #FFF;
+          font-family: Roboto, Arial, sans-serif;
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 20px;
+          text-align: center;
+        }
+        .rbccm-featured-conferences__speakers-footnote {
+          border-top: 1px solid rgba(255,255,255,0.2);
+          color: #FFFDFD;
+          font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+          font-size: 14px;
+          margin: 32px 0 0 0;
+          padding-top: 24px;
+          text-align: center;
+        }
+
+        /* Insights */
+        .rbccm-featured-conferences__insights {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+        .rbccm-featured-conferences__insights-row {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+        }
+        .rbccm-featured-conferences__insight {
+          background: #FFFDFD;
+          color: #002144;
+          display: block;
+          text-decoration: none;
+        }
+        .rbccm-featured-conferences__insight:hover { text-decoration: none; }
+        .rbccm-featured-conferences__insight-media img {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+        .rbccm-featured-conferences__insight-body { padding: 20px; }
+        .rbccm-featured-conferences__insight-label {
+          border-bottom: 2px solid #FFC72C;
+          color: #0051A5;
+          display: inline-block;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          margin-bottom: 8px;
+          padding-bottom: 6px;
+        }
+        .rbccm-featured-conferences__insight-title {
+          color: #002144;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-size: 18px;
+          font-weight: 500;
+          line-height: 1.3;
+          margin: 0 0 12px 0;
+        }
+        .rbccm-featured-conferences__insight-desc {
+          color: #454545;
+          font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.5;
+          margin: 0 0 14px 0;
+        }
+        .rbccm-featured-conferences__insight-meta {
+          color: #0051A5;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          margin: 0;
+        }
+        .rbccm-featured-conferences__insights-cta-wrap { text-align: center; }
+        .rbccm-featured-conferences__insights-cta {
+          background-color: #0051A5;
+          border: none;
+          color: #FFFDFD;
+          display: inline-block;
+          font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+          font-size: 16px;
+          font-weight: 500;
+          padding: 14px 28px;
+          text-decoration: none;
+        }
+        .rbccm-featured-conferences__insights-cta:hover {
+          color: #FFFDFD;
+          opacity: 0.92;
+          text-decoration: none;
+        }
+
+        /* ── Desktop (min-width: 992px) ── */
+        @media (min-width: 992px) {
+          .rbccm-featured-conferences__container { padding: 65px 16px; }
+          .rbccm-featured-conferences__heading { font-size: 29px; margin: 0 0 24px 0; }
+
+          .rbccm-featured-conferences__tablist {
+            align-items: flex-start;
+            flex-direction: row;
+            gap: 10px;
+            margin-bottom: 0;
+            width: 100%;
+          }
+          .rbccm-featured-conferences__tab {
+            align-self: auto;
+            flex: 1 1 0;
+            min-width: 0;
+            width: auto;
+          }
+
+          .rbccm-featured-conferences__inner-wrap {
+            border-top: none;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: auto;
+            padding-top: 40px;
+            position: relative;
+          }
+          .rbccm-featured-conferences__inner-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid rgba(255,255,255,0.4);
+            color: #FFFDFD;
+            font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 400;
+            justify-content: center;
+            padding: 18px 0;
+            text-align: center;
+            transition: border-color 0.2s ease, font-weight 0.2s ease;
+          }
+          .rbccm-featured-conferences__inner-tab.is-active {
+            border-bottom-color: #FFC72C;
+            font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+            font-weight: 500;
+          }
+          .rbccm-featured-conferences__inner-chevron { display: none; }
+          .rbccm-featured-conferences__inner-panel {
+            border-bottom: none !important;
+            grid-column: 1 / -1;
+            grid-row: 2;
+            padding: 40px 0 0 0;
+          }
+          .rbccm-featured-conferences__inner-tab.is-active + .rbccm-featured-conferences__inner-panel {
+            border-bottom: none;
+            display: none;
+          }
+          .rbccm-featured-conferences__inner-panel.is-active {
+            display: block !important;
+          }
+
+          .rbccm-featured-conferences__overview {
+            align-items: flex-start;
+            align-self: stretch;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 32px;
+          }
+          .rbccm-featured-conferences__video {
+            flex: 1 1 0;
+            min-width: 0;
+          }
+          .rbccm-featured-conferences__info {
+            align-items: flex-start;
+            align-self: stretch;
+            display: grid;
+            flex: 1 0 0;
+            gap: 24px;
+            grid-template-columns: 1fr 1fr;
+            justify-content: center;
+            padding: 32px;
+          }
+          .rbccm-featured-conferences__info-item { width: auto; }
+          .rbccm-featured-conferences__overview-body { flex-basis: 100%; }
+
+          .rbccm-featured-conferences__insights-row {
+            align-items: center;
+            align-self: stretch;
+            flex-direction: row;
+            gap: 30px;
+          }
+          .rbccm-featured-conferences__insights-row > * {
+            flex: 1 1 0;
+            min-width: 0;
+          }
+
+          .rbccm-featured-conferences__insight--featured {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+          }
+          .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-media { align-self: stretch; }
+          .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-media img {
+            height: 100%;
+            object-fit: cover;
+          }
+          .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-title {
+            font-size: 22px;
+          }
+        }
+      ]]&gt;</xsl:text></style>
+
+      <section class="rbccm-featured-conferences" id="rbccm-featured-conferences">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+
+        <div class="rbccm-featured-conferences__container">
+
+          <h2 class="rbccm-featured-conferences__heading">
+            <xsl:value-of select="$heading"/>
+          </h2>
+
+          <!-- ── OUTER TABS (conferences) ── -->
+          <div class="rbccm-featured-conferences__tablist" role="tablist">
+            <xsl:for-each select="$conferences">
+              <xsl:variable name="confKey" select="concat('conf-', position())"/>
+              <xsl:variable name="confName" select="normalize-space(Datum[@ID='Name' or @Name='Conference Name'])"/>
+              <button type="button"
+                      class="rbccm-featured-conferences__tab"
+                      role="tab"
+                      aria-expanded="false">
+                <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:attribute name="aria-controls">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:value-of select="$confName"/>
+              </button>
+            </xsl:for-each>
+          </div>
+
+          <!-- ── OUTER PANELS (one per conference) ── -->
+          <div class="rbccm-featured-conferences__panels">
+            <xsl:for-each select="$conferences">
+              <xsl:variable name="i"        select="position()"/>
+              <xsl:variable name="confKey"  select="concat('conf-', $i)"/>
+              <xsl:variable name="confName" select="normalize-space(Datum[@ID='Name' or @Name='Conference Name'])"/>
+
+              <!-- Brightcove per-conference -->
+              <xsl:variable name="videoId" select="normalize-space(Datum[@ID='BCVideoId' or @Name='Brightcove Video ID'])"/>
+              <xsl:variable name="videoPoster" select="normalize-space(Datum[@ID='BCPoster' or @Name='Brightcove Poster Override'])"/>
+
+              <!-- Overview fields -->
+              <xsl:variable name="date"      select="normalize-space(Datum[@ID='Date' or @Name='Date'])"/>
+              <xsl:variable name="location"  select="normalize-space(Datum[@ID='Location' or @Name='Location'])"/>
+              <xsl:variable name="format"    select="normalize-space(Datum[@ID='Format' or @Name='Format'])"/>
+              <xsl:variable name="ovHeading">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='OverviewHeading' or @Name='Overview Heading']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='OverviewHeading' or @Name='Overview Heading'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Conference overview</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="ovBody"   select="Datum[@ID='OverviewBody' or @Name='Overview Body']"/>
+              <xsl:variable name="topicsLabel">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='KeyTopicsLabel' or @Name='Key Topics Label']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='KeyTopicsLabel' or @Name='Key Topics Label'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Key topics:</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="topics"   select="Datum[@ID='KeyTopics' or @Name='Key Topics']"/>
+              <xsl:variable name="contact"  select="Datum[@ID='ContactText' or @Name='Contact Text']"/>
+
+              <!-- Speakers fields -->
+              <xsl:variable name="spkHeading">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='SpeakersHeading' or @Name='Speakers Heading']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='SpeakersHeading' or @Name='Speakers Heading'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Featured speakers</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="spkIntro" select="Datum[@ID='SpeakersIntro' or @Name='Speakers Intro']"/>
+              <xsl:variable name="spkFootnote" select="Datum[@ID='SpeakersFootnote' or @Name='Speakers Footnote']"/>
+
+              <!-- Insights fields -->
+              <xsl:variable name="insightsCtaText">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='InsightsCTAText' or @Name='Insights CTA Text']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='InsightsCTAText' or @Name='Insights CTA Text'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>View all conference insights</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="insightsCtaHref" select="normalize-space(Datum[@ID='InsightsCTAHref' or @Name='Insights CTA Href'])"/>
+
+              <div class="rbccm-featured-conferences__panel" role="tabpanel">
+                <xsl:attribute name="id">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+
+                <!-- INNER TABS + PANELS, interleaved so mobile accordion works via adjacent selector -->
+                <div class="rbccm-featured-conferences__inner-wrap">
+
+                <!-- INNER TAB + PANEL: OVERVIEW -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+
+                  <div class="rbccm-featured-conferences__overview">
+
+                    <!-- Brightcove video (autoloader picks this up) -->
+                    <div class="rbccm-featured-conferences__video">
+                      <xsl:attribute name="data-bc-account"><xsl:value-of select="$bcAccount"/></xsl:attribute>
+                      <xsl:attribute name="data-bc-player"><xsl:value-of select="$bcPlayer"/></xsl:attribute>
+                      <xsl:attribute name="data-bc-embed"><xsl:value-of select="$bcEmbed"/></xsl:attribute>
+                      <xsl:attribute name="data-bc-video-id"><xsl:value-of select="$videoId"/></xsl:attribute>
+                      <xsl:if test="$videoPoster != ''">
+                        <xsl:attribute name="data-bc-poster"><xsl:value-of select="$videoPoster"/></xsl:attribute>
+                      </xsl:if>
+                    </div>
+
+                    <!-- Info card -->
+                    <div class="rbccm-featured-conferences__info">
+                      <xsl:if test="$date != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Date</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$date"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$location != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Location</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$location"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$format != ''">
+                        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                          <div class="rbccm-featured-conferences__info-label">Format</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$format"/></div>
+                        </div>
+                      </xsl:if>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="rbccm-featured-conferences__overview-body">
+                      <h3 class="rbccm-featured-conferences__overview-heading"><xsl:value-of select="$ovHeading"/></h3>
+                      <div class="rbccm-featured-conferences__overview-text">
+                        <xsl:value-of select="$ovBody" disable-output-escaping="yes"/>
+                      </div>
+
+                      <xsl:if test="normalize-space($topics) != ''">
+                        <p class="rbccm-featured-conferences__topics">
+                          <strong><xsl:value-of select="$topicsLabel"/></strong>
+                          <xsl:text> </xsl:text>
+                          <span class="rbccm-featured-conferences__topics-list">
+                            <xsl:value-of select="$topics" disable-output-escaping="yes"/>
+                          </span>
+                        </p>
+                      </xsl:if>
+
+                      <xsl:if test="normalize-space($contact) != ''">
+                        <p class="rbccm-featured-conferences__contact">
+                          <em><xsl:value-of select="$contact" disable-output-escaping="yes"/></em>
+                        </p>
+                      </xsl:if>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- INNER TAB + PANEL: SPEAKERS -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+
+                  <h3 class="rbccm-featured-conferences__speakers-heading"><xsl:value-of select="$spkHeading"/></h3>
+                  <xsl:if test="normalize-space($spkIntro) != ''">
+                    <p class="rbccm-featured-conferences__speakers-intro">
+                      <xsl:value-of select="$spkIntro" disable-output-escaping="yes"/>
+                    </p>
+                  </xsl:if>
+
+                  <div class="rbccm-featured-conferences__speakers">
+                    <xsl:for-each select="Group[@ID='Speaker' or @Name='Speaker']">
+                      <xsl:variable name="spkName"  select="normalize-space(Datum[@ID='SpeakerName'  or @Name='Speaker Name'])"/>
+                      <xsl:variable name="spkTitle" select="normalize-space(Datum[@ID='SpeakerTitle' or @Name='Speaker Title'])"/>
+                      <xsl:variable name="spkImage" select="normalize-space(Datum[@ID='SpeakerImage' or @Name='Speaker Image'])"/>
+                      <xsl:variable name="spkAlt">
+                        <xsl:choose>
+                          <xsl:when test="normalize-space(Datum[@ID='SpeakerAlt' or @Name='Speaker Image Alt']) != ''">
+                            <xsl:value-of select="normalize-space(Datum[@ID='SpeakerAlt' or @Name='Speaker Image Alt'])"/>
+                          </xsl:when>
+                          <xsl:otherwise><xsl:value-of select="$spkName"/></xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:variable>
+
+                      <div class="rbccm-featured-conferences__speaker">
+                        <div class="rbccm-featured-conferences__speaker-avatar">
+                          <img loading="lazy">
+                            <xsl:attribute name="src"><xsl:value-of select="$spkImage"/></xsl:attribute>
+                            <xsl:attribute name="alt"><xsl:value-of select="$spkAlt"/></xsl:attribute>
+                          </img>
+                        </div>
+                        <div class="rbccm-featured-conferences__speaker-name"><xsl:value-of select="$spkName"/></div>
+                        <div class="rbccm-featured-conferences__speaker-title"><xsl:value-of select="$spkTitle"/></div>
+                      </div>
+                    </xsl:for-each>
+                  </div>
+
+                  <xsl:if test="normalize-space($spkFootnote) != ''">
+                    <p class="rbccm-featured-conferences__speakers-footnote">
+                      <xsl:value-of select="$spkFootnote" disable-output-escaping="yes"/>
+                    </p>
+                  </xsl:if>
+                </div>
+
+                <!-- INNER TAB + PANEL: INSIGHTS -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+
+                  <!-- Featured insight (first one with FeaturedFlag = true, OR first if none flagged) -->
+                  <xsl:variable name="featured" select="Group[@ID='Insight' or @Name='Insight'][normalize-space(Datum[@ID='Featured' or @Name='Featured']) = 'true'][1]"/>
+                  <xsl:variable name="featuredFallback" select="Group[@ID='Insight' or @Name='Insight'][1]"/>
+                  <xsl:variable name="standardInsights" select="Group[@ID='Insight' or @Name='Insight'][not(normalize-space(Datum[@ID='Featured' or @Name='Featured']) = 'true')]"/>
+
+                  <div class="rbccm-featured-conferences__insights">
+
+                    <!-- Featured (large) card -->
+                    <xsl:choose>
+                      <xsl:when test="$featured">
+                        <xsl:apply-templates select="$featured" mode="insight-featured"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:apply-templates select="$featuredFallback" mode="insight-featured"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+
+                    <!-- Standard cards row -->
+                    <div class="rbccm-featured-conferences__insights-row">
+                      <xsl:choose>
+                        <xsl:when test="$featured">
+                          <xsl:apply-templates select="$standardInsights" mode="insight-card"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:apply-templates select="Group[@ID='Insight' or @Name='Insight'][position() &gt; 1]" mode="insight-card"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </div>
+
+                    <!-- CTA -->
+                    <xsl:if test="$insightsCtaHref != ''">
+                      <div class="rbccm-featured-conferences__insights-cta-wrap">
+                        <a class="rbccm-featured-conferences__insights-cta">
+                          <xsl:attribute name="href"><xsl:value-of select="$insightsCtaHref"/></xsl:attribute>
+                          <xsl:value-of select="$insightsCtaText"/>
+                        </a>
+                      </div>
+                    </xsl:if>
+                  </div>
+                </div>
+
+                </div><!-- /.inner-wrap -->
+              </div>
+            </xsl:for-each>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Inline JS ── -->
+      <script>
+        (function () {
+          var root = document.getElementById('rbccm-featured-conferences');
+          if (!root) return;
+
+          var outerTabs   = root.querySelectorAll('.rbccm-featured-conferences__tab');
+          var outerPanels = root.querySelectorAll('.rbccm-featured-conferences__panel');
+          var innerTabs   = root.querySelectorAll('.rbccm-featured-conferences__inner-tab');
+          var innerPanels = root.querySelectorAll('.rbccm-featured-conferences__inner-panel');
+
+          function isDesktop() {
+            return window.matchMedia('(min-width: 992px)').matches;
+          }
+
+          // ── Outer tabs (conference selector) — single-active at all sizes ──
+          function activateOuter(key) {
+            for (var i = 0; i &lt; outerTabs.length; i++) {
+              var on = outerTabs[i].getAttribute('data-panel') === key;
+              outerTabs[i].classList.toggle('is-active', on);
+              outerTabs[i].setAttribute('aria-expanded', on ? 'true' : 'false');
+            }
+            for (var j = 0; j &lt; outerPanels.length; j++) {
+              var match = outerPanels[j].getAttribute('data-panel') === key;
+              outerPanels[j].classList.toggle('is-active', match);
+            }
+            // Default this conference's inner state for desktop = Overview active
+            if (isDesktop()) {
+              setExclusiveInner(key + '-overview');
+            } else {
+              // Mobile: collapse all inner accordions when switching conference
+              clearInner();
+            }
+          }
+
+          // Desktop: exclusive single-active inner tab
+          function setExclusiveInner(innerKey) {
+            for (var i = 0; i &lt; innerTabs.length; i++) {
+              var on = innerTabs[i].getAttribute('data-inner') === innerKey;
+              innerTabs[i].classList.toggle('is-active', on);
+              innerTabs[i].setAttribute('aria-expanded', on ? 'true' : 'false');
+            }
+            for (var j = 0; j &lt; innerPanels.length; j++) {
+              var match = innerPanels[j].getAttribute('data-inner') === innerKey;
+              innerPanels[j].classList.toggle('is-active', match);
+            }
+          }
+
+          function clearInner() {
+            for (var i = 0; i &lt; innerTabs.length; i++) {
+              innerTabs[i].classList.remove('is-active');
+              innerTabs[i].setAttribute('aria-expanded', 'false');
+            }
+            for (var j = 0; j &lt; innerPanels.length; j++) {
+              innerPanels[j].classList.remove('is-active');
+            }
+          }
+
+          // Mobile: each inner tab toggles its own open/closed
+          function toggleInner(innerKey) {
+            for (var i = 0; i &lt; innerTabs.length; i++) {
+              if (innerTabs[i].getAttribute('data-inner') === innerKey) {
+                var open = innerTabs[i].classList.toggle('is-active');
+                innerTabs[i].setAttribute('aria-expanded', open ? 'true' : 'false');
+                // panel state is driven by CSS adjacent-sibling on mobile,
+                // but we also flip the class for consistency
+                for (var j = 0; j &lt; innerPanels.length; j++) {
+                  if (innerPanels[j].getAttribute('data-inner') === innerKey) {
+                    innerPanels[j].classList.toggle('is-active', open);
+                  }
+                }
+                break;
+              }
+            }
+          }
+
+          // ── Click wiring ──
+          for (var i = 0; i &lt; outerTabs.length; i++) {
+            (function (btn) {
+              btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                activateOuter(btn.getAttribute('data-panel'));
+              });
+            })(outerTabs[i]);
+          }
+
+          for (var k = 0; k &lt; innerTabs.length; k++) {
+            (function (btn) {
+              btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var key = btn.getAttribute('data-inner');
+                if (isDesktop()) {
+                  setExclusiveInner(key);
+                } else {
+                  toggleInner(key);
+                }
+              });
+            })(innerTabs[k]);
+          }
+
+          // ── Initial state ──
+          if (outerTabs.length) {
+            activateOuter(outerTabs[0].getAttribute('data-panel'));
+          }
+
+          // ── Viewport change: re-sync ──
+          var lastDesktop = isDesktop();
+          var rTimer;
+          window.addEventListener('resize', function () {
+            clearTimeout(rTimer);
+            rTimer = setTimeout(function () {
+              var nowDesktop = isDesktop();
+              if (nowDesktop === lastDesktop) return;
+              lastDesktop = nowDesktop;
+
+              // Find currently active outer key
+              var activeKey = null;
+              for (var i = 0; i &lt; outerTabs.length; i++) {
+                if (outerTabs[i].classList.contains('is-active')) {
+                  activeKey = outerTabs[i].getAttribute('data-panel');
+                  break;
+                }
+              }
+              if (!activeKey &amp;&amp; outerTabs.length) {
+                activeKey = outerTabs[0].getAttribute('data-panel');
+              }
+
+              if (nowDesktop) {
+                // Mobile → Desktop: ensure one inner is active for the visible conference
+                setExclusiveInner(activeKey + '-overview');
+              } else {
+                // Desktop → Mobile: collapse all accordions
+                clearInner();
+              }
+            }, 150);
+          });
+        })();
+      </script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- ─────────────────────────────────────────────
+       Insight templates
+       ───────────────────────────────────────────── -->
+
+  <xsl:template match="Group" mode="insight-featured">
+    <xsl:variable name="img"   select="normalize-space(Datum[@ID='InsightImage' or @Name='Insight Image'])"/>
+    <xsl:variable name="alt"   select="normalize-space(Datum[@ID='InsightImageAlt' or @Name='Insight Image Alt'])"/>
+    <xsl:variable name="label">
+      <xsl:choose>
+        <xsl:when test="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label']) != ''">
+          <xsl:value-of select="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label'])"/>
+        </xsl:when>
+        <xsl:otherwise>INSIGHTS</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="title" select="normalize-space(Datum[@ID='InsightTitle' or @Name='Insight Title'])"/>
+    <xsl:variable name="desc"  select="Datum[@ID='InsightDescription' or @Name='Insight Description']"/>
+    <xsl:variable name="meta"  select="normalize-space(Datum[@ID='InsightMeta' or @Name='Insight Meta'])"/>
+    <xsl:variable name="href"  select="normalize-space(Datum[@ID='InsightHref' or @Name='Insight Href'])"/>
+
+    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--featured">
+      <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+      <div class="rbccm-featured-conferences__insight-media">
+        <img loading="lazy">
+          <xsl:attribute name="src"><xsl:value-of select="$img"/></xsl:attribute>
+          <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+        </img>
+      </div>
+      <div class="rbccm-featured-conferences__insight-body">
+        <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$label"/></div>
+        <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
+        <p class="rbccm-featured-conferences__insight-desc">
+          <xsl:value-of select="$desc" disable-output-escaping="yes"/>
+        </p>
+        <xsl:if test="$meta != ''">
+          <p class="rbccm-featured-conferences__insight-meta">
+            <xsl:value-of select="$meta"/>
+            <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
+          </p>
+        </xsl:if>
+      </div>
+    </a>
+  </xsl:template>
+
+  <xsl:template match="Group" mode="insight-card">
+    <xsl:variable name="img"   select="normalize-space(Datum[@ID='InsightImage' or @Name='Insight Image'])"/>
+    <xsl:variable name="alt"   select="normalize-space(Datum[@ID='InsightImageAlt' or @Name='Insight Image Alt'])"/>
+    <xsl:variable name="label">
+      <xsl:choose>
+        <xsl:when test="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label']) != ''">
+          <xsl:value-of select="normalize-space(Datum[@ID='InsightLabel' or @Name='Insight Label'])"/>
+        </xsl:when>
+        <xsl:otherwise>INSIGHTS</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="title" select="normalize-space(Datum[@ID='InsightTitle' or @Name='Insight Title'])"/>
+    <xsl:variable name="desc"  select="Datum[@ID='InsightDescription' or @Name='Insight Description']"/>
+    <xsl:variable name="meta"  select="normalize-space(Datum[@ID='InsightMeta' or @Name='Insight Meta'])"/>
+    <xsl:variable name="href"  select="normalize-space(Datum[@ID='InsightHref' or @Name='Insight Href'])"/>
+
+    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card">
+      <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+      <div class="rbccm-featured-conferences__insight-media">
+        <img loading="lazy">
+          <xsl:attribute name="src"><xsl:value-of select="$img"/></xsl:attribute>
+          <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+        </img>
+      </div>
+      <div class="rbccm-featured-conferences__insight-body">
+        <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$label"/></div>
+        <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
+        <p class="rbccm-featured-conferences__insight-desc">
+          <xsl:value-of select="$desc" disable-output-escaping="yes"/>
+        </p>
+        <xsl:if test="$meta != ''">
+          <p class="rbccm-featured-conferences__insight-meta">
+            <xsl:value-of select="$meta"/>
+            <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
+          </p>
+        </xsl:if>
+      </div>
+    </a>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053600">
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
+
+  <!-- Brightcove defaults (overridden per-conference via Conference fields if needed) -->
+  <Datum ID="BCAccount" Type="String" Name="Brightcove Account">6021289101001</Datum>
+  <Datum ID="BCPlayer"  Type="String" Name="Brightcove Player">VyvCc9BZx</Datum>
+  <Datum ID="BCEmbed"   Type="String" Name="Brightcove Embed">default</Datum>
+</Properties>
+
+<Data>
+  <!-- EXACTLY 3 Conference groups required (component will not render otherwise) -->
+  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="conference">
+
+    <!-- Conference basics -->
+    <Datum ID="Name" Type="String" Name="Conference Name">
+      <!-- e.g. "Global Healthcare Conference" -->
+    </Datum>
+
+    <!-- Brightcove video -->
+    <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">
+      <!-- e.g. "6385114247112" -->
+    </Datum>
+    <Datum ID="BCPoster" Type="String" Name="Brightcove Poster Override">
+      <!-- Optional custom poster image URL -->
+    </Datum>
+
+    <!-- OVERVIEW TAB -->
+    <Datum ID="Date" Type="String" Name="Date">
+      <!-- e.g. "March 15, 2026" -->
+    </Datum>
+    <Datum ID="Location" Type="String" Name="Location">
+      <!-- e.g. "New York, NY" -->
+    </Datum>
+    <Datum ID="Format" Type="String" Name="Format">
+      <!-- e.g. "In-person &amp; virtual" -->
+    </Datum>
+    <Datum ID="OverviewHeading" Type="String" Name="Overview Heading">Conference overview</Datum>
+    <Datum ID="OverviewBody" Type="Textarea" Name="Overview Body">
+      <!-- HTML allowed. Paragraphs encouraged. -->
+    </Datum>
+    <Datum ID="KeyTopicsLabel" Type="String" Name="Key Topics Label">Key topics:</Datum>
+    <Datum ID="KeyTopics" Type="Textarea" Name="Key Topics">Biomedical Innovation | Regulatory Landscape | Macro Environment | M&amp;A and Digital | Data and AI | Precision Medicine &amp; Genomics | Digital Health &amp; AI Integration | Regulatory Evolution &amp; Compliance | Healthcare M&amp;A &amp; Capital Markets</Datum>
+    <Datum ID="ContactText" Type="Textarea" Name="Contact Text">
+      <!-- Italic note at bottom, e.g. "Please contact your RBC representative…" -->
+    </Datum>
+
+    <!-- SPEAKERS TAB -->
+    <Datum ID="SpeakersHeading" Type="String" Name="Speakers Heading">Featured speakers</Datum>
+    <Datum ID="SpeakersIntro" Type="Textarea" Name="Speakers Intro">
+      <!-- e.g. "Hear from industry leaders and experts who are shaping the future…" -->
+    </Datum>
+    <Datum ID="SpeakersFootnote" Type="String" Name="Speakers Footnote">+ Additional speakers to be announced</Datum>
+
+    <Group ID="Speaker" Name="Speaker" Replicatable="true" CloneGroupID="conference-speaker">
+      <Datum ID="SpeakerName"  Type="String" Name="Speaker Name"/>
+      <Datum ID="SpeakerTitle" Type="String" Name="Speaker Title"/>
+      <Datum ID="SpeakerImage" Type="String" Name="Speaker Image"/>
+      <Datum ID="SpeakerAlt"   Type="String" Name="Speaker Image Alt"/>
+    </Group>
+
+    <!-- INSIGHTS TAB -->
+    <Datum ID="InsightsCTAText" Type="String" Name="Insights CTA Text">View all conference insights</Datum>
+    <Datum ID="InsightsCTAHref" Type="String" Name="Insights CTA Href">
+      <!-- URL for the CTA button -->
+    </Datum>
+
+    <Group ID="Insight" Name="Insight" Replicatable="true" CloneGroupID="conference-insight">
+      <Datum ID="Featured" Type="String" Name="Featured (true/false)">
+        <!-- Set to "true" on exactly one Insight to flag it as the large featured tile -->
+      </Datum>
+      <Datum ID="InsightLabel" Type="String" Name="Insight Label">INSIGHTS</Datum>
+      <Datum ID="InsightTitle" Type="String" Name="Insight Title"/>
+      <Datum ID="InsightDescription" Type="Textarea" Name="Insight Description"/>
+      <Datum ID="InsightMeta" Type="String" Name="Insight Meta">
+        <!-- e.g. "8 min read", "12 min listen" -->
+      </Datum>
+      <Datum ID="InsightImage" Type="String" Name="Insight Image"/>
+      <Datum ID="InsightImageAlt" Type="String" Name="Insight Image Alt"/>
+      <Datum ID="InsightHref" Type="String" Name="Insight Href"/>
+    </Group>
+
+  </Group>
+</Data>
