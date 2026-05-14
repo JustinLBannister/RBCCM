@@ -1,0 +1,365 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Upcoming Conference Programming
+       - Desktop: 3-col grid of cards
+       - Mobile:  slick carousel, 1 card per slide
+       - Filters / search render as static UI placeholders for V1 -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <xsl:variable name="conferences" select="
+        /Properties/Data/Group[@ID='Conference' or @Name='Conference']
+        | /Data/Group[@ID='Conference' or @Name='Conference']"/>
+    <xsl:variable name="count" select="count($conferences)"/>
+
+    <xsl:if test="$count &gt;= 1">
+
+      <!-- ── Section heading + intro ── -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Upcoming conference programming</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="intro" select="/Properties/Datum[@ID='Intro']"/>
+      <xsl:variable name="filterLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='FilterLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='FilterLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Filter by:</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="searchPlaceholder">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SearchPlaceholder']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SearchPlaceholder'])"/>
+          </xsl:when>
+          <xsl:otherwise>Search conferences by title or tag…</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="ctaText">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='CTAText']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CTAText'])"/>
+          </xsl:when>
+          <xsl:otherwise>View full list of 2026 Conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="ctaHref">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='CTAHref']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CTAHref'])"/>
+          </xsl:when>
+          <xsl:otherwise>#conference-listing-modal</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Modal header copy + row list -->
+      <xsl:variable name="modalHeading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='ModalHeading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='ModalHeading'])"/>
+          </xsl:when>
+          <xsl:otherwise>2026 Conference calendar</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="modalSubtitle">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='ModalSubtitle']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='ModalSubtitle'])"/>
+          </xsl:when>
+          <xsl:otherwise>All upcoming RBC Capital Markets conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="modalRows" select="
+          /Properties/Data/Group[@ID='ModalConference' or @Name='Modal Conference']
+          | /Data/Group[@ID='ModalConference' or @Name='Modal Conference']"/>
+
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/upcoming-conferences.css"/>
+
+      <section class="rbccm-upcoming-conferences" id="rbccm-upcoming-conferences" aria-label="Upcoming conferences">
+
+        <div class="rbccm-upcoming-conferences__container">
+
+          <h2 class="rbccm-upcoming-conferences__heading">
+            <xsl:value-of select="$heading"/>
+          </h2>
+
+          <xsl:if test="normalize-space($intro) != ''">
+            <p class="rbccm-upcoming-conferences__intro">
+              <xsl:value-of select="$intro" disable-output-escaping="yes"/>
+            </p>
+          </xsl:if>
+
+          <!-- ── Filter / search bar (static UI for V1) ── -->
+          <div class="rbccm-upcoming-conferences__filters">
+            <div class="rbccm-upcoming-conferences__filter-group">
+              <span class="rbccm-upcoming-conferences__filter-label">
+                <xsl:value-of select="$filterLabel"/>
+              </span>
+              <label class="rbccm-upcoming-conferences__select-wrap">
+                <span class="rbccm-upcoming-conferences__sr-only">Topic</span>
+                <select class="rbccm-upcoming-conferences__select" aria-label="Topic">
+                  <option value="">Topic</option>
+                  <!-- Topic options for V2 -->
+                </select>
+                <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </label>
+              <label class="rbccm-upcoming-conferences__select-wrap">
+                <span class="rbccm-upcoming-conferences__sr-only">Region</span>
+                <select class="rbccm-upcoming-conferences__select" aria-label="Region">
+                  <option value="">Region</option>
+                  <!-- Region options for V2 -->
+                </select>
+                <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </label>
+            </div>
+
+            <label class="rbccm-upcoming-conferences__search">
+              <svg class="rbccm-upcoming-conferences__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span class="rbccm-upcoming-conferences__sr-only">Search conferences</span>
+              <input type="search" class="rbccm-upcoming-conferences__search-input" aria-label="Search conferences">
+                <xsl:attribute name="placeholder"><xsl:value-of select="$searchPlaceholder"/></xsl:attribute>
+              </input>
+            </label>
+          </div>
+
+          <!-- ── Cards: desktop grid / mobile slick carousel ── -->
+          <div class="rbccm-upcoming-conferences__cards" id="rbccm-upcoming-conferences-cards">
+            <!-- V1: cap at 6 visible cards regardless of how many Conference Groups are authored -->
+            <xsl:for-each select="$conferences[position() &lt;= 6]">
+              <xsl:variable name="month"   select="normalize-space(Datum[@ID='Month' or @Name='Month'])"/>
+              <xsl:variable name="dateLbl" select="normalize-space(Datum[@ID='DateRange' or @Name='Date Range'])"/>
+              <xsl:variable name="image"   select="normalize-space(Datum[@ID='Image' or @Name='Image'])"/>
+              <xsl:variable name="imgAlt"  select="normalize-space(Datum[@ID='ImageAlt' or @Name='Image Alt'])"/>
+              <xsl:variable name="title"   select="normalize-space(Datum[@ID='Title' or @Name='Title'])"/>
+              <xsl:variable name="loc"     select="normalize-space(Datum[@ID='Location' or @Name='Location'])"/>
+              <xsl:variable name="topic"   select="normalize-space(Datum[@ID='Topic' or @Name='Topic'])"/>
+              <xsl:variable name="region"  select="normalize-space(Datum[@ID='Region' or @Name='Region'])"/>
+              <xsl:variable name="href"    select="normalize-space(Datum[@ID='Href' or @Name='Href'])"/>
+
+              <a class="rbccm-upcoming-conferences__card">
+                <xsl:if test="$href != ''">
+                  <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$topic != ''">
+                  <xsl:attribute name="data-topic"><xsl:value-of select="$topic"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$region != ''">
+                  <xsl:attribute name="data-region"><xsl:value-of select="$region"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$title != ''">
+                  <xsl:attribute name="aria-label"><xsl:value-of select="$title"/>, <xsl:value-of select="$month"/> <xsl:value-of select="$dateLbl"/>, <xsl:value-of select="$loc"/></xsl:attribute>
+                </xsl:if>
+
+                <!-- Background image + dark overlay -->
+                <div class="rbccm-upcoming-conferences__card-media">
+                  <xsl:if test="$image != ''">
+                    <img loading="lazy">
+                      <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+                      <xsl:attribute name="alt">
+                        <xsl:choose>
+                          <xsl:when test="$imgAlt != ''"><xsl:value-of select="$imgAlt"/></xsl:when>
+                          <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:attribute>
+                    </img>
+                  </xsl:if>
+                </div>
+
+                <!-- Top: month + date range -->
+                <div class="rbccm-upcoming-conferences__card-date">
+                  <div class="rbccm-upcoming-conferences__card-month"><xsl:value-of select="$month"/></div>
+                  <div class="rbccm-upcoming-conferences__card-day"><xsl:value-of select="$dateLbl"/></div>
+                </div>
+
+                <!-- Bottom: yellow divider, title, location -->
+                <div class="rbccm-upcoming-conferences__card-body">
+                  <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+                  <h3 class="rbccm-upcoming-conferences__card-title"><xsl:value-of select="$title"/></h3>
+                  <xsl:if test="$loc != ''">
+                    <p class="rbccm-upcoming-conferences__card-location">
+                      <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <xsl:value-of select="$loc"/>
+                    </p>
+                  </xsl:if>
+                </div>
+              </a>
+            </xsl:for-each>
+          </div>
+
+          <!-- Mobile slick controls (arrows + dots) — only visible when carousel is initialized -->
+          <div class="rbccm-upcoming-conferences__controls">
+            <button id="rbccm-uc-prev" class="rbccm-upcoming-conferences__btn" type="button" aria-label="Previous conference" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div id="rbccm-uc-dots" class="rbccm-upcoming-conferences__dots"></div>
+            <button id="rbccm-uc-next" class="rbccm-upcoming-conferences__btn" type="button" aria-label="Next conference" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- CTA — if Href starts with #, auto-wires Bootstrap modal trigger attributes -->
+          <xsl:if test="$ctaHref != ''">
+            <div class="rbccm-upcoming-conferences__cta-wrap">
+              <a class="rbccm-upcoming-conferences__cta">
+                <xsl:attribute name="href"><xsl:value-of select="$ctaHref"/></xsl:attribute>
+                <xsl:if test="starts-with($ctaHref, '#')">
+                  <xsl:attribute name="data-toggle">modal</xsl:attribute>
+                  <xsl:attribute name="data-target"><xsl:value-of select="$ctaHref"/></xsl:attribute>
+                </xsl:if>
+                <xsl:attribute name="aria-label"><xsl:value-of select="$ctaText"/></xsl:attribute>
+                <xsl:value-of select="$ctaText"/>
+              </a>
+            </div>
+          </xsl:if>
+
+        </div>
+      </section>
+
+      <!-- ── Conference listing modal (Bootstrap pattern, BEM-scoped content) ── -->
+      <xsl:if test="starts-with($ctaHref, '#')">
+        <div role="dialog" class="modal fade" id="conference-listing-modal">
+          <div role="document" class="modal-dialog rbccm-upcoming-conferences__modal-dialog">
+            <div class="modal-content rbccm-upcoming-conferences__modal-content">
+              <div class="modal-header rbccm-upcoming-conferences__modal-header">
+                <button aria-label="Close Modal" class="close rbccm-upcoming-conferences__modal-close" type="button" data-dismiss="modal">&#215;</button>
+              </div>
+              <div class="modal-body rbccm-upcoming-conferences__modal-body">
+
+                <!-- Heading row -->
+                <div class="rbccm-upcoming-conferences__modal-intro">
+                  <div class="rbccm-upcoming-conferences__modal-titles">
+                    <h2 class="rbccm-upcoming-conferences__modal-heading"><xsl:value-of select="$modalHeading"/></h2>
+                    <p class="rbccm-upcoming-conferences__modal-subtitle"><xsl:value-of select="$modalSubtitle"/></p>
+                  </div>
+                </div>
+
+                <!-- Conference list -->
+                <xsl:if test="count($modalRows) &gt;= 1">
+                  <div class="rbccm-upcoming-conferences__modal-list">
+                    <div class="rbccm-upcoming-conferences__modal-list-inner">
+                      <xsl:for-each select="$modalRows">
+                        <xsl:variable name="rowDate"     select="normalize-space(Datum[@ID='RowDate' or @Name='Date'])"/>
+                        <xsl:variable name="rowTitle"    select="normalize-space(Datum[@ID='RowTitle' or @Name='Title'])"/>
+                        <xsl:variable name="rowLocation" select="normalize-space(Datum[@ID='RowLocation' or @Name='Location'])"/>
+
+                        <div class="rbccm-upcoming-conferences__modal-row">
+                          <span class="rbccm-upcoming-conferences__modal-date"><xsl:value-of select="$rowDate"/></span>
+                          <h3 class="rbccm-upcoming-conferences__modal-title"><xsl:value-of select="$rowTitle"/></h3>
+                          <xsl:if test="$rowLocation != ''">
+                            <span class="rbccm-upcoming-conferences__modal-location">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M13.3334 6.66659C13.3334 9.99525 9.64075 13.4619 8.40075 14.5326C8.28523 14.6194 8.14461 14.6664 8.00008 14.6664C7.85555 14.6664 7.71493 14.6194 7.59941 14.5326C6.35941 13.4619 2.66675 9.99525 2.66675 6.66659C2.66675 5.2521 3.22865 3.89554 4.22885 2.89535C5.22904 1.89516 6.58559 1.33325 8.00008 1.33325C9.41457 1.33325 10.7711 1.89516 11.7713 2.89535C12.7715 3.89554 13.3334 5.2521 13.3334 6.66659Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 8.66675C9.10457 8.66675 10 7.77132 10 6.66675C10 5.56218 9.10457 4.66675 8 4.66675C6.89543 4.66675 6 5.56218 6 6.66675C6 7.77132 6.89543 8.66675 8 8.66675Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                              <span class="rbccm-upcoming-conferences__modal-location-text"><xsl:value-of select="$rowLocation"/></span>
+                            </span>
+                          </xsl:if>
+                        </div>
+                      </xsl:for-each>
+                    </div>
+                  </div>
+                </xsl:if>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </xsl:if>
+
+      <!-- ── Component JS (mobile slick init, scoped) ── -->
+      <script src="/assets/rbccm/js/sub/test/upcoming-conferences.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053700">
+  <!-- ── Section header ── -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Upcoming conference programming</Datum>
+  <Datum ID="Intro" Type="Textarea" Name="Section Intro">Connect with industry leaders and explore market-shaping trends at our upcoming global events.</Datum>
+
+  <!-- ── Filter UI (hidden in V1, kept for V2) ── -->
+  <Datum ID="FilterLabel" Type="String" Name="Filter Label">Filter by:</Datum>
+  <Datum ID="SearchPlaceholder" Type="String" Name="Search Placeholder">Search conferences by title or tag…</Datum>
+
+  <!-- ── CTA button at the bottom of the section ── -->
+  <Datum ID="CTAText" Type="String" Name="CTA Button Text">View full list of 2026 Conferences</Datum>
+  <Datum ID="CTAHref" Type="String" Name="CTA Button URL">#conference-listing-modal</Datum>
+
+  <!-- ── Modal header copy (modal opens when CTAHref starts with #) ── -->
+  <Datum ID="ModalHeading" Type="String" Name="Modal Heading">2026 Conference calendar</Datum>
+  <Datum ID="ModalSubtitle" Type="String" Name="Modal Subtitle">All upcoming RBC Capital Markets conferences</Datum>
+</Properties>
+
+<Data>
+  <!-- ── CAROUSEL CARDS ──
+       One Group per upcoming conference card. Render is capped at 6 cards by the XSL. -->
+  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="upcoming-conference">
+    <Datum ID="Month" Type="String" Name="Month / Year">
+      <!-- e.g. "MAR 2026" — uppercased by CSS -->
+    </Datum>
+    <Datum ID="DateRange" Type="String" Name="Date or Range">
+      <!-- e.g. "10-11" or "5" -->
+    </Datum>
+    <Datum ID="Image" Type="String" Name="Background Image">
+      <!-- Path to the city/event photo behind the card -->
+    </Datum>
+    <Datum ID="ImageAlt" Type="String" Name="Image Alt Text">
+      <!-- Defaults to Title if blank -->
+    </Datum>
+    <Datum ID="Title" Type="String" Name="Conference Title"/>
+    <Datum ID="Location" Type="String" Name="Location">
+      <!-- e.g. "New York, NY" -->
+    </Datum>
+    <Datum ID="Topic" Type="String" Name="Topic Tag">
+      <!-- Reserved for future filter wiring. Free-text tag. -->
+    </Datum>
+    <Datum ID="Region" Type="String" Name="Region Tag">
+      <!-- Reserved for future filter wiring. Free-text tag. -->
+    </Datum>
+    <Datum ID="Href" Type="String" Name="Card Link URL"/>
+  </Group>
+
+  <!-- ── MODAL ROWS ──
+       One Group per row in the "View full list" modal. No render cap. -->
+  <Group ID="ModalConference" Name="Modal Conference" Replicatable="true" CloneGroupID="modal-conference-row">
+    <Datum ID="RowDate" Type="String" Name="Date">
+      <!-- e.g. "May 19-20" — free-form display string -->
+    </Datum>
+    <Datum ID="RowTitle" Type="String" Name="Title">
+      <!-- e.g. "Global Healthcare Conference" -->
+    </Datum>
+    <Datum ID="RowLocation" Type="String" Name="Location">
+      <!-- e.g. "New York, NY" -->
+    </Datum>
+  </Group>
+</Data>
