@@ -322,44 +322,26 @@
 
 <Data>
   <!-- ── CAROUSEL CARDS ──
-       One Group per upcoming conference card. Render is capped at 6 cards by the XSL. -->
+       One Group per upcoming conference card. Render is capped at 6 cards by the XSL.
+       NOTE: Datum Name attributes MUST match the XSL's @Name selectors — Teamsite strips
+       @ID on replicated Datums, so @Name is the only reliable match. -->
   <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="upcoming-conference">
-    <Datum ID="Month" Type="String" Name="Month / Year">
-      <!-- e.g. "MAR 2026" — uppercased by CSS -->
-    </Datum>
-    <Datum ID="DateRange" Type="String" Name="Date or Range">
-      <!-- e.g. "10-11" or "5" -->
-    </Datum>
-    <Datum ID="Image" Type="String" Name="Background Image">
-      <!-- Path to the city/event photo behind the card -->
-    </Datum>
-    <Datum ID="ImageAlt" Type="String" Name="Image Alt Text">
-      <!-- Defaults to Title if blank -->
-    </Datum>
-    <Datum ID="Title" Type="String" Name="Conference Title"/>
-    <Datum ID="Location" Type="String" Name="Location">
-      <!-- e.g. "New York, NY" -->
-    </Datum>
-    <Datum ID="Topic" Type="String" Name="Topic Tag">
-      <!-- Reserved for future filter wiring. Free-text tag. -->
-    </Datum>
-    <Datum ID="Region" Type="String" Name="Region Tag">
-      <!-- Reserved for future filter wiring. Free-text tag. -->
-    </Datum>
-    <Datum ID="Href" Type="String" Name="Card Link URL"/>
+    <Datum ID="Month" Type="String" Name="Month">MAR 2026</Datum>
+    <Datum ID="DateRange" Type="String" Name="Date Range">10-11</Datum>
+    <Datum ID="Image" Type="String" Name="Image">/assets/rbccm/images/conferences/conference-placeholder.webp</Datum>
+    <Datum ID="ImageAlt" Type="String" Name="Image Alt">Conference</Datum>
+    <Datum ID="Title" Type="String" Name="Title">Conference Title</Datum>
+    <Datum ID="Location" Type="String" Name="Location">New York, NY</Datum>
+    <Datum ID="Topic" Type="String" Name="Topic"/>
+    <Datum ID="Region" Type="String" Name="Region"/>
+    <Datum ID="Href" Type="String" Name="Href"/>
   </Group>
 
   <!-- ── MODAL ROWS ──
        One Group per row in the "View full list" modal. No render cap. -->
   <Group ID="ModalConference" Name="Modal Conference" Replicatable="true" CloneGroupID="modal-conference-row">
-    <Datum ID="RowDate" Type="String" Name="Date">
-      <!-- e.g. "May 19-20" — free-form display string -->
-    </Datum>
-    <Datum ID="RowTitle" Type="String" Name="Title">
-      <!-- e.g. "Global Healthcare Conference" -->
-    </Datum>
-    <Datum ID="RowLocation" Type="String" Name="Location">
-      <!-- e.g. "New York, NY" -->
-    </Datum>
+    <Datum ID="RowDate" Type="String" Name="Date">May 19-20</Datum>
+    <Datum ID="RowTitle" Type="String" Name="Title">Conference Title</Datum>
+    <Datum ID="RowLocation" Type="String" Name="Location">New York, NY</Datum>
   </Group>
 </Data>
