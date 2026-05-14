@@ -156,7 +156,61 @@
                 <!-- INNER TABS + PANELS, interleaved so mobile accordion works via adjacent selector -->
                 <div class="rbccm-featured-conferences__inner-wrap">
 
-                <!-- INNER TAB + PANEL: OVERVIEW -->
+                <!-- ── V1 NEW TAB + PANEL A: Global Healthcare Conference ── -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-ghc</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Global Healthcare Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-ghc</xsl:attribute>
+                  <xsl:call-template name="render-ghc-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- ── V1 NEW TAB + PANEL B: Canadian Industrials Conference ── -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-cic</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Canadian Industrials Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-cic</xsl:attribute>
+                  <xsl:call-template name="render-cic-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- ── V1 NEW TAB + PANEL C: Global Energy, Power &amp; Infrastructure Conference ── -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-gep</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Global Energy, Power &amp; Infrastructure Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-gep</xsl:attribute>
+                  <xsl:call-template name="render-gep-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- INNER TAB + PANEL: OVERVIEW (hidden via CSS in V1, markup preserved) -->
                 <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
                   <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
@@ -169,15 +223,13 @@
 
                   <div class="rbccm-featured-conferences__overview">
 
-                    <!-- Brightcove video (autoloader picks this up) -->
-                    <div class="rbccm-featured-conferences__video">
-                      <xsl:attribute name="data-bc-account"><xsl:value-of select="$bcAccount"/></xsl:attribute>
-                      <xsl:attribute name="data-bc-player"><xsl:value-of select="$bcPlayer"/></xsl:attribute>
-                      <xsl:attribute name="data-bc-embed"><xsl:value-of select="$bcEmbed"/></xsl:attribute>
-                      <xsl:attribute name="data-bc-video-id"><xsl:value-of select="$videoId"/></xsl:attribute>
-                      <xsl:if test="$videoPoster != ''">
-                        <xsl:attribute name="data-bc-poster"><xsl:value-of select="$videoPoster"/></xsl:attribute>
-                      </xsl:if>
+                    <!-- Brightcove video — iframe embed inside a 16:9 aspect-ratio wrapper -->
+                    <div class="rbccm-featured-conferences__video video-reel-wrap">
+                      <div class="rbccm-featured-conferences__video-frame">
+                        <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+                          <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+                        </iframe>
+                      </div>
                     </div>
 
                     <!-- Info card -->
@@ -377,6 +429,244 @@
        Named templates
        ───────────────────────────────────────────── -->
 
+  <!-- V1 fixed-content: Global Healthcare Conference overview -->
+  <xsl:template name="render-ghc-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">March 19-20, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Global Healthcare Conference connects leaders, companies, and investors across the healthcare ecosystem — from life sciences, services, and medtech to tools and diagnostics – for a cross-sector view of where healthcare is headed.</p>
+        </div>
+
+        <p class="rbccm-featured-conferences__topics">
+          <strong>Key themes</strong>
+          <span class="rbccm-featured-conferences__topics-list">Biopharma innovation | MedTech momentum | Competitive dynamics | Regulatory and policy shifts | M&amp;A and partnership | Capital formation | AI-driven drug discovery | Digital health transformation | Healthcare utilization | Care delivery evolution</span>
+        </p>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <!-- V1 fixed-content: Canadian Industrials Conference overview -->
+  <xsl:template name="render-cic-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">May 19-21, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">Toronto, CA</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Canadian Industrials Conference brings together North American companies and investors across the sectors driving industrial growth — from transportation and infrastructure to engineering and construction, industrial products, aerospace and defence, and business services — to examine the forces shaping supply chain resilience and long-term competitiveness.</p>
+        </div>
+
+        <div class="rbccm-featured-conferences__themes">
+          <strong class="rbccm-featured-conferences__themes-label">Key themes</strong>
+          <ul class="rbccm-featured-conferences__themes-list">
+            <li>Infrastructure renewal</li>
+            <li>Energy corridor growth</li>
+            <li>Rail network demand</li>
+            <li>Power capacity needs</li>
+            <li>Critical minerals investment</li>
+            <li>Defence modernization</li>
+            <li>Housing supply pressures</li>
+            <li>Productivity improvement</li>
+            <li>Industrial automation</li>
+            <li>Cross-border trade resilience</li>
+          </ul>
+        </div>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <!-- V1 fixed-content: Global Energy, Power &amp; Infrastructure Conference overview -->
+  <xsl:template name="render-gep-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">June 2-3, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person &amp; virtual</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Global Energy, Power &amp; Infrastructure Conference is a long-standing forum, uniting executives and investors across the energy and utility value chain — from oil and gas producers and services to midstream, infrastructure, and energy transition — to assess the opportunities and risks shaping the sector's trajectory.</p>
+        </div>
+
+        <div class="rbccm-featured-conferences__themes">
+          <strong class="rbccm-featured-conferences__themes-label">Key themes</strong>
+          <ul class="rbccm-featured-conferences__themes-list">
+            <li>Energy security</li>
+            <li>Rising power demand</li>
+            <li>Infrastructure investment</li>
+            <li>Grid modernization</li>
+            <li>Natural gas growth</li>
+            <li>Resource development</li>
+            <li>Capital discipline</li>
+            <li>Customer affordability</li>
+            <li>Transition pragmatism</li>
+            <li>Commodity volatility</li>
+          </ul>
+        </div>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <xsl:template name="render-overview-content">
+    <xsl:param name="videoId"/>
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="date"/>
+    <xsl:param name="location"/>
+    <xsl:param name="format"/>
+    <xsl:param name="ovHeading"/>
+    <xsl:param name="ovBody"/>
+    <xsl:param name="topics"/>
+    <xsl:param name="topicsLabel"/>
+    <xsl:param name="contact"/>
+
+    <div class="rbccm-featured-conferences__overview">
+
+      <!-- Brightcove video — iframe embed inside a 16:9 aspect-ratio wrapper -->
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <!-- Info card -->
+      <div class="rbccm-featured-conferences__info">
+        <xsl:if test="$date != ''">
+          <div class="rbccm-featured-conferences__info-item">
+            <div class="rbccm-featured-conferences__info-label">Date</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$date"/></div>
+          </div>
+        </xsl:if>
+        <xsl:if test="$location != ''">
+          <div class="rbccm-featured-conferences__info-item">
+            <div class="rbccm-featured-conferences__info-label">Location</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$location"/></div>
+          </div>
+        </xsl:if>
+        <xsl:if test="$format != ''">
+          <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+            <div class="rbccm-featured-conferences__info-label">Format</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$format"/></div>
+          </div>
+        </xsl:if>
+      </div>
+
+      <!-- Body -->
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading"><xsl:value-of select="$ovHeading"/></h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <xsl:value-of select="$ovBody" disable-output-escaping="yes"/>
+        </div>
+
+        <xsl:if test="normalize-space($topics) != ''">
+          <p class="rbccm-featured-conferences__topics">
+            <strong><xsl:value-of select="$topicsLabel"/></strong>
+            <xsl:text> </xsl:text>
+            <span class="rbccm-featured-conferences__topics-list">
+              <xsl:value-of select="$topics" disable-output-escaping="yes"/>
+            </span>
+          </p>
+        </xsl:if>
+
+        <xsl:if test="normalize-space($contact) != ''">
+          <p class="rbccm-featured-conferences__contact">
+            <em><xsl:value-of select="$contact" disable-output-escaping="yes"/></em>
+          </p>
+        </xsl:if>
+      </div>
+
+    </div>
+  </xsl:template>
+
+
   <xsl:template name="render-speaker">
     <xsl:param name="name"/>
     <xsl:param name="title"/>
@@ -476,10 +766,8 @@
       <!-- e.g. "Global Healthcare Conference" -->
     </Datum>
 
-    <!-- Brightcove video -->
-    <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">
-      <!-- e.g. "6385114247112" -->
-    </Datum>
+    <!-- Brightcove video. Default = placeholder reel used during testing. -->
+    <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">6385583003112</Datum>
     <Datum ID="BCPoster" Type="String" Name="Brightcove Poster Override">
       <!-- Optional custom poster image URL -->
     </Datum>

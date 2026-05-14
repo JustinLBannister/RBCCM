@@ -28,7 +28,7 @@
     }
     // Default this conference's inner state for desktop = Overview active
     if (isDesktop()) {
-      setExclusiveInner(key + '-overview');
+      setExclusiveInner(key + '-ghc'); // V1: first visible inner tab (was '-overview' which is now hidden)
     } else {
       // Mobile: collapse all inner accordions when switching conference
       clearInner();
@@ -129,7 +129,7 @@
 
       if (nowDesktop) {
         // Mobile → Desktop: ensure one inner is active for the visible conference
-        setExclusiveInner(activeKey + '-overview');
+        setExclusiveInner(activeKey + '-ghc'); // V1: first visible inner tab
       } else {
         // Desktop → Mobile: collapse all accordions
         clearInner();

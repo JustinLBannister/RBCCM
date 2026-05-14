@@ -132,7 +132,27 @@
 .rbccm-featured-conferences__video {
   width: 100%;
   background: #000;
-  aspect-ratio: 16 / 9;
+  max-width: 1140px;
+  position: relative;
+}
+
+/* 16:9 aspect-ratio frame — padding-top trick keeps it responsive without aspect-ratio
+   (matches the working production embed pattern). */
+.rbccm-featured-conferences__video-frame {
+  display: block;
+  height: 0;
+  padding-top: 56.25%; /* 9 / 16 */
+  position: relative;
+  width: 100%;
+}
+
+.rbccm-featured-conferences__video-frame iframe {
+  border: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 
 /* Info card */
@@ -235,6 +255,32 @@
   font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
   font-weight: 500;
   margin-bottom: 6px;
+}
+
+/* ── Key themes (used in the GHC / CIC tabs) ── */
+.rbccm-featured-conferences__themes {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+}
+.rbccm-featured-conferences__themes-label {
+  display: block;
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.rbccm-featured-conferences__themes-list {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  list-style: disc;
+  margin: 0;
+  padding-left: 20px;
+}
+.rbccm-featured-conferences__themes-list li {
+  margin: 0;
+  padding: 0;
 }
 
 .rbccm-featured-conferences__contact {
@@ -573,4 +619,23 @@
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-title {
     font-size: 22px;
   }
+}
+
+/* =========================================
+   V1 temporary: hide the outer tablist (conference selector) and the three
+   original inner tabs (Overview / Speakers / Insights). Only the two new
+   inner tabs (Global Healthcare / Canadian Industrials Conference) are visible.
+   All hidden markup stays in place so it can be re-enabled later.
+   ========================================= */
+.rbccm-featured-conferences__tablist {
+  display: none !important;
+}
+
+.rbccm-featured-conferences__inner-tab[data-inner$="-overview"],
+.rbccm-featured-conferences__inner-tab[data-inner$="-speakers"],
+.rbccm-featured-conferences__inner-tab[data-inner$="-insights"],
+.rbccm-featured-conferences__inner-panel[data-inner$="-overview"],
+.rbccm-featured-conferences__inner-panel[data-inner$="-speakers"],
+.rbccm-featured-conferences__inner-panel[data-inner$="-insights"] {
+  display: none !important;
 }
