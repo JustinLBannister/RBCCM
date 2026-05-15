@@ -505,13 +505,16 @@
     width: auto;
   }
 
-  /* Inner tabs row + panels-below pattern via CSS Grid */
+  /* Inner tabs row + panels-below pattern via CSS Grid.
+     V1: 2 visible inner tabs (Global Healthcare / Canadian Industrials),
+     so the row is split 50/50. Change back to repeat(3, 1fr) if the third
+     tab (-gep) is re-enabled. */
   .rbccm-featured-conferences__inner-wrap {
     border-top: none;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: auto;
-    padding-top: 40px;
+    padding-top: 0;
     position: relative;
   }
 
@@ -566,8 +569,13 @@
     gap: 32px;
   }
 
+  /* Video + info share the row 50/50 with a 32px gap.
+     Explicit flex-basis of calc(50% - 16px) accounts for half of the gap
+     on each side, so the split is locked regardless of content width. */
   .rbccm-featured-conferences__video {
-    flex: 1 1 0;
+    box-sizing: border-box;
+    flex: 0 0 calc(50% - 16px);
+    max-width: calc(50% - 16px);
     min-width: 0;
   }
 
@@ -575,12 +583,15 @@
     align-content: center;        /* vertically center the row group inside the card */
     align-items: start;           /* each item sits at top of its row, not stretched */
     align-self: stretch;
+    box-sizing: border-box;
     display: grid;
-    flex: 1 0 0;
+    flex: 0 0 calc(50% - 16px);
     gap: 20px;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto; /* rows collapse to content height */
     justify-content: center;
+    max-width: calc(50% - 16px);
+    min-width: 0;
     padding: 32px;
   }
 
@@ -622,10 +633,11 @@
 }
 
 /* =========================================
-   V1 temporary: hide the outer tablist (conference selector) and the three
-   original inner tabs (Overview / Speakers / Insights). Only the two new
-   inner tabs (Global Healthcare / Canadian Industrials Conference) are visible.
-   All hidden markup stays in place so it can be re-enabled later.
+   V1 temporary: hide the outer tablist (conference selector), the three
+   original inner tabs (Overview / Speakers / Insights), and the third new
+   inner tab (Global Energy, Power & Infrastructure Conference). Only the
+   two new inner tabs (Global Healthcare / Canadian Industrials Conference)
+   are visible. All hidden markup stays in place so it can be re-enabled later.
    ========================================= */
 .rbccm-featured-conferences__tablist {
   display: none !important;
@@ -634,8 +646,10 @@
 .rbccm-featured-conferences__inner-tab[data-inner$="-overview"],
 .rbccm-featured-conferences__inner-tab[data-inner$="-speakers"],
 .rbccm-featured-conferences__inner-tab[data-inner$="-insights"],
+.rbccm-featured-conferences__inner-tab[data-inner$="-gep"],
 .rbccm-featured-conferences__inner-panel[data-inner$="-overview"],
 .rbccm-featured-conferences__inner-panel[data-inner$="-speakers"],
-.rbccm-featured-conferences__inner-panel[data-inner$="-insights"] {
+.rbccm-featured-conferences__inner-panel[data-inner$="-insights"],
+.rbccm-featured-conferences__inner-panel[data-inner$="-gep"] {
   display: none !important;
 }

@@ -26,13 +26,9 @@
       var match = outerPanels[j].getAttribute('data-panel') === key;
       outerPanels[j].classList.toggle('is-active', match);
     }
-    // Default this conference's inner state for desktop = Overview active
-    if (isDesktop()) {
-      setExclusiveInner(key + '-ghc'); // V1: first visible inner tab (was '-overview' which is now hidden)
-    } else {
-      // Mobile: collapse all inner accordions when switching conference
-      clearInner();
-    }
+    // Default this conference's inner state = first visible inner tab open
+    // (desktop: single-active tab; mobile: first accordion item expanded).
+    setExclusiveInner(key + '-ghc'); // V1: first visible inner tab (was '-overview' which is now hidden)
   }
 
   // Desktop: exclusive single-active inner tab
@@ -127,13 +123,9 @@
         activeKey = outerTabs[0].getAttribute('data-panel');
       }
 
-      if (nowDesktop) {
-        // Mobile → Desktop: ensure one inner is active for the visible conference
-        setExclusiveInner(activeKey + '-ghc'); // V1: first visible inner tab
-      } else {
-        // Desktop → Mobile: collapse all accordions
-        clearInner();
-      }
+      // Both directions: open the first visible inner tab of the visible
+      // conference (desktop = active tab, mobile = first accordion expanded).
+      setExclusiveInner(activeKey + '-ghc'); // V1: first visible inner tab
     }, 150);
   });
 })();
