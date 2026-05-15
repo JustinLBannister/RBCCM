@@ -136,8 +136,17 @@
          The picker stores the path with $URL_PREFIX so it resolves correctly across
          environments; the value rendered by `<xsl:value-of select="Datum[@ID='Image']"/>`
          is still just the path string, so the XSL above doesn't need to change.
-         Leave Image empty to fall back to the fpoimg placeholder in the XSL. -->
-    <Datum ID="Image" Type="Image" Name="Image"/>
+
+         IMPORTANT: Type="Image" Datums must have a valid image path at the default
+         level — an empty default fails the "Could not load component data XML into
+         XMLDOM" check. Point this at a real placeholder asset that exists in the
+         Teamsite asset library. Authors then swap it out per row via the picker.
+
+         If the asset below does not exist yet in your Teamsite, upload a generic
+         speaker placeholder image at that path or change this default to an asset
+         that does exist. The XSL fpoimg.com fallback still kicks in if the runtime
+         path resolves to an empty / broken value. -->
+    <Datum ID="Image" Type="Image" Name="Image">$URL_PREFIX/assets/rbccm/images/speakers/speaker-placeholder.webp</Datum>
     <Datum ID="ImageAlt" Type="String" Name="Image Alt">Speaker</Datum>
     <Datum ID="Name" Type="String" Name="Name">Speaker Name</Datum>
     <Datum ID="Title" Type="String" Name="Title">Role, Company</Datum>
