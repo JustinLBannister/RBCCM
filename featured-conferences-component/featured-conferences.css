@@ -537,10 +537,10 @@
 
   /* Active underline is a pseudo so the tab's box height never changes when
      toggling active state — prevents the row from "bouncing". The 3px stripe
-     sits on top of the persistent 1px border (centered: -1.5px offset). */
+     sits on top of the persistent 1px border (offset -2px). */
   .rbccm-featured-conferences__inner-tab.is-active::after {
     background: #FFC72C;
-    bottom: -1.5px;
+    bottom: -2px;
     content: "";
     height: 3px;
     left: 0;
@@ -702,18 +702,24 @@
 /* 3) Medium-weight elements.
    .__inner-tab is Medium by default (mobile accordion). On desktop, only the
    active inner-tab is Medium — the inactive one drops to Light (see rule
-   below in the desktop media query). */
+   below in the desktop media query). Each selector also targets `* `
+   descendants so the universal `.rbccm-featured-conferences *` Light rule
+   above (specificity 0,0,1,0) can't reach the inner-tab label `<span>`. */
 .rbccm-featured-conferences strong,
 .rbccm-featured-conferences .rbccm-featured-conferences__themes-label,
 .rbccm-featured-conferences .rbccm-featured-conferences__tab.is-active,
+.rbccm-featured-conferences .rbccm-featured-conferences__tab.is-active *,
 .rbccm-featured-conferences .rbccm-featured-conferences__inner-tab,
-.rbccm-featured-conferences .rbccm-featured-conferences__inner-tab.is-active {
+.rbccm-featured-conferences .rbccm-featured-conferences__inner-tab *,
+.rbccm-featured-conferences .rbccm-featured-conferences__inner-tab.is-active,
+.rbccm-featured-conferences .rbccm-featured-conferences__inner-tab.is-active * {
   font-family: "Roboto Medium", "Roboto", Arial, sans-serif !important;
 }
 
-/* Desktop: inactive inner-tab drops back to Light */
+/* Desktop: inactive inner-tab (and its label span) drops back to Light */
 @media (min-width: 992px) {
-  .rbccm-featured-conferences .rbccm-featured-conferences__inner-tab:not(.is-active) {
+  .rbccm-featured-conferences .rbccm-featured-conferences__inner-tab:not(.is-active),
+  .rbccm-featured-conferences .rbccm-featured-conferences__inner-tab:not(.is-active) * {
     font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
   }
 }
