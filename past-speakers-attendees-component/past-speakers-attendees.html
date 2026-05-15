@@ -52,6 +52,7 @@
               <xsl:variable name="imgAlt"     select="normalize-space(Datum[@ID='ImageAlt' or @Name='Image Alt'])"/>
               <xsl:variable name="name"       select="normalize-space(Datum[@ID='Name' or @Name='Name'])"/>
               <xsl:variable name="title"      select="normalize-space(Datum[@ID='Title' or @Name='Title'])"/>
+              <xsl:variable name="company"    select="normalize-space(Datum[@ID='Company' or @Name='Company'])"/>
               <xsl:variable name="conference" select="normalize-space(Datum[@ID='Conference' or @Name='Conference'])"/>
 
               <!-- Cards are presentational only (no link-out), so they render as
@@ -78,16 +79,32 @@
                   </img>
                 </div>
 
-                <!-- Name / title / past conference -->
+                <!-- Card body splits into two wrapper groups. Each wrapper is
+                     itself conditional — if both of its child Datums are empty,
+                     the wrapper isn't rendered at all (no orphan empty divs):
+                       __card-meta  → name + title       (rendered if name or title)
+                       __card-tags  → company + conference (rendered if either)
+                     Conference is rendered but CSS-hidden in V1; markup stays. -->
                 <div class="rbccm-past-speakers-attendees__card-body">
-                  <xsl:if test="$name != ''">
-                    <h3 class="rbccm-past-speakers-attendees__card-name"><xsl:value-of select="$name"/></h3>
+                  <xsl:if test="$name != '' or $title != ''">
+                    <div class="rbccm-past-speakers-attendees__card-meta">
+                      <xsl:if test="$name != ''">
+                        <h3 class="rbccm-past-speakers-attendees__card-name"><xsl:value-of select="$name"/></h3>
+                      </xsl:if>
+                      <xsl:if test="$title != ''">
+                        <p class="rbccm-past-speakers-attendees__card-title"><xsl:value-of select="$title"/></p>
+                      </xsl:if>
+                    </div>
                   </xsl:if>
-                  <xsl:if test="$title != ''">
-                    <p class="rbccm-past-speakers-attendees__card-title"><xsl:value-of select="$title"/></p>
-                  </xsl:if>
-                  <xsl:if test="$conference != ''">
-                    <p class="rbccm-past-speakers-attendees__card-conference"><xsl:value-of select="$conference"/></p>
+                  <xsl:if test="$company != '' or $conference != ''">
+                    <div class="rbccm-past-speakers-attendees__card-tags">
+                      <xsl:if test="$company != ''">
+                        <p class="rbccm-past-speakers-attendees__card-company"><xsl:value-of select="$company"/></p>
+                      </xsl:if>
+                      <xsl:if test="$conference != ''">
+                        <p class="rbccm-past-speakers-attendees__card-conference"><xsl:value-of select="$conference"/></p>
+                      </xsl:if>
+                    </div>
                   </xsl:if>
                 </div>
               </div>
@@ -144,7 +161,10 @@
     <Datum ID="Image" Type="String" Name="Image"/>
     <Datum ID="ImageAlt" Type="String" Name="Image Alt">Speaker</Datum>
     <Datum ID="Name" Type="String" Name="Name">Speaker Name</Datum>
-    <Datum ID="Title" Type="String" Name="Title">Role, Company</Datum>
+    <Datum ID="Title" Type="String" Name="Title">Role</Datum>
+    <Datum ID="Company" Type="String" Name="Company">Company</Datum>
+    <!-- Conference is hidden via CSS for now; the Datum remains so it can be
+         flipped back on by removing the display:none rule in the CSS. -->
     <Datum ID="Conference" Type="String" Name="Conference">Conference attended</Datum>
   </Group>
 </Data>

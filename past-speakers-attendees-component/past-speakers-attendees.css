@@ -103,8 +103,11 @@
   width: 100%;
 }
 
-/* Content panel below the image — fixed 187px height, name+title at top,
-   conference tag pushed to the bottom via margin-top: auto. */
+/* Content panel below the image — fixed 187px height with two wrapper groups:
+   - `__card-meta`  (top)    → name + title, sit together at the top
+   - `__card-tags`  (bottom)  → company + conference, sit together at the bottom
+   justify-content: space-between pushes the two groups to the top/bottom
+   edges. Either wrapper can have one item missing without disrupting layout. */
 .rbccm-past-speakers-attendees__card-body {
   align-items: flex-start;
   align-self: stretch;
@@ -113,6 +116,28 @@
   height: 187px;
   justify-content: space-between;
   padding: 24px;
+}
+
+/* Top wrapper — name + title grouped tight. */
+.rbccm-past-speakers-attendees__card-meta {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* name → title */
+}
+
+/* Bottom wrapper — company + conference grouped tight.
+   `margin-top: auto` pins this block to the bottom of the card-body, which
+   matters when this wrapper is the only one rendered (e.g. a row with no
+   Name and no Title). When both wrappers are present, `justify-content:
+   space-between` on the card-body already handles top/bottom distribution
+   so the auto margin is harmless. */
+.rbccm-past-speakers-attendees__card-tags {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* company → conference */
+  margin-top: auto;
 }
 
 /* Name — left-aligned, medium weight, capitalize. */
@@ -124,7 +149,7 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
-  margin: 0 0 10px 0; /* 10px gap to title */
+  margin: 0;
   text-align: left;
   text-transform: capitalize;
 }
@@ -142,7 +167,10 @@
   text-transform: capitalize;
 }
 
-/* Past conference tag — pinned to bottom of card-body via margin-top: auto */
+/* Company and past-conference share the same tag-style treatment: dark blue,
+   12px, capitalize. They sit in `__card-tags` together at the bottom of the
+   card-body. */
+.rbccm-past-speakers-attendees__card-company,
 .rbccm-past-speakers-attendees__card-conference {
   align-self: stretch;
   color: #003168;
@@ -151,9 +179,16 @@
   font-style: normal;
   font-weight: 400;
   line-height: 19px; /* 158.333% */
-  margin: auto 0 0 0;
+  margin: 0;
   text-align: left;
   text-transform: capitalize;
+}
+
+/* Conference is hidden for V1 (stakeholder asked to drop the per-speaker
+   conference label). Markup + DCR Datum stay in place so it can be flipped
+   back on by removing this single rule. */
+.rbccm-past-speakers-attendees__card-conference {
+  display: none;
 }
 
 /* ── Slick overrides — same pattern as upcoming-conferences / leadership-slider.
@@ -348,7 +383,8 @@
     width: 100%;
   }
 
-  /* Conference tag — tighter line-height on desktop (120% / 14.4px) */
+  /* Company + conference tags — tighter line-height on desktop (120% / 14.4px) */
+  .rbccm-past-speakers-attendees__card-company,
   .rbccm-past-speakers-attendees__card-conference {
     line-height: 120%;
   }
