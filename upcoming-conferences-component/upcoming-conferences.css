@@ -542,7 +542,15 @@
 /* Dialog + content frame.
    !important needed to beat Bootstrap's .modal-dialog { width: auto; margin: 10px } */
 .rbccm-upcoming-conferences__modal-dialog {
+  /* !important beats Bootstrap's `.modal-dialog { margin: 10px }` (modals.less)
+     and the wider-viewport `.modal-dialog { margin: 30px auto }`, both of
+     which load after this file and win by source order at equal specificity.
+     `auto` left/right centers the dialog horizontally on viewports wider than
+     the 960px max-width; 20px at the bottom leaves breathing room before the
+     viewport bottom. */
+  margin: 0 auto 20px auto !important;
   max-width: 960px;
+  padding: 20px;
   top: 0;
   width: 100% !important;
 }
@@ -566,7 +574,9 @@
 }
 
 .rbccm-upcoming-conferences__modal-body {
-  padding: 0;
+  /* !important beats Bootstrap's `.modal-body { padding: 15px }` (modals.less)
+     which loads after this file and wins at equal specificity (0,1,0). */
+  padding: 0 !important;
 }
 
 /* Heading block (h2 + subtitle) */
@@ -613,7 +623,7 @@
   display: flex;
   flex: 1 0 0;
   flex-direction: column;
-  padding: 32px 47px 32px 32px;
+  padding: 0 47px 32px 32px;
 }
 
 .rbccm-upcoming-conferences__modal-list-inner {
@@ -710,4 +720,22 @@
   .rbccm-upcoming-conferences__modal-title {
     flex-basis: 100%;
   }
+}
+
+/* ── Modal bottom ──
+   Soft gray footer band inside the conference listing modal. Originally
+   lived in `conference-hub.css:360`; relocated here so the modal styling
+   stays self-contained within this component's stylesheet.
+
+   Scoped to `#conference-listing-modal` so the `.modal-bottom` class name
+   can be preserved in markup without colliding with any other component
+   that uses the same class globally.
+
+   V1: hidden via `display: none` per stakeholder request. Remove (or
+   override) the display rule to flip it back on. */
+#conference-listing-modal .modal-bottom {
+  background: #F9FAFB;
+  border-top: 1px solid #E5E7EB;
+  display: none;
+  padding: 25px 32px;
 }
