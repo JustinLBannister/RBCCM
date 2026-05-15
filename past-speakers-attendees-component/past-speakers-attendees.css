@@ -103,18 +103,25 @@
   width: 100%;
 }
 
-/* Content panel below the image — fixed 187px height with two wrapper groups:
-   - `__card-meta`  (top)    → name + title, sit together at the top
-   - `__card-tags`  (bottom)  → company + conference, sit together at the bottom
-   justify-content: space-between pushes the two groups to the top/bottom
-   edges. Either wrapper can have one item missing without disrupting layout. */
+/* Content panel below the image — fixed 187px height. Layout works whether
+   the XSL renders the new wrapper groups (__card-meta + __card-tags) OR the
+   older flat structure (name / title / conference as direct children).
+
+   - `gap: 10px` provides spacing between direct children (covers both the
+     flat case AND the meta→tags spacing in the wrapper case).
+   - No `justify-content: space-between` — that was pushing name and title to
+     opposite ends when only those two were visible. Items now flow from the
+     top of the body.
+   - The bottom-anchor for the tags block is handled by `margin-top: auto` on
+     `__card-tags` (rule below). When tags isn't rendered (or there's no
+     wrapper at all), this is a no-op and items just stack from the top. */
 .rbccm-past-speakers-attendees__card-body {
   align-items: flex-start;
   align-self: stretch;
   display: flex;
   flex-direction: column;
+  gap: 10px;
   height: 187px;
-  justify-content: space-between;
   padding: 24px;
 }
 
