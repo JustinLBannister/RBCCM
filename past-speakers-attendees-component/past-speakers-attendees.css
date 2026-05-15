@@ -167,13 +167,14 @@
   text-transform: capitalize;
 }
 
-/* Company and past-conference share the same tag-style treatment: dark blue,
-   12px, capitalize. They sit in `__card-tags` together at the bottom of the
-   card-body. */
-.rbccm-past-speakers-attendees__card-company,
+/* Past-conference tag — dark-blue 12px label at the bottom of the card-body.
+   Currently hidden via `display: none` for V1 (stakeholder asked to drop the
+   per-speaker conference label). The Datum + markup stay in place so it can
+   be flipped back on by removing the display:none rule. */
 .rbccm-past-speakers-attendees__card-conference {
   align-self: stretch;
   color: #003168;
+  display: none;
   font-family: Roboto, Arial, sans-serif;
   font-size: 12px;
   font-style: normal;
@@ -182,13 +183,6 @@
   margin: 0;
   text-align: left;
   text-transform: capitalize;
-}
-
-/* Conference is hidden for V1 (stakeholder asked to drop the per-speaker
-   conference label). Markup + DCR Datum stay in place so it can be flipped
-   back on by removing this single rule. */
-.rbccm-past-speakers-attendees__card-conference {
-  display: none;
 }
 
 /* ── Slick overrides — same pattern as upcoming-conferences / leadership-slider.
@@ -383,8 +377,7 @@
     width: 100%;
   }
 
-  /* Company + conference tags — tighter line-height on desktop (120% / 14.4px) */
-  .rbccm-past-speakers-attendees__card-company,
+  /* Conference tag — tighter line-height on desktop (120% / 14.4px) */
   .rbccm-past-speakers-attendees__card-conference {
     line-height: 120%;
   }

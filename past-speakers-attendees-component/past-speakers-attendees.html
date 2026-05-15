@@ -79,31 +79,32 @@
                   </img>
                 </div>
 
-                <!-- Card body splits into two wrapper groups. Each wrapper is
-                     itself conditional — if both of its child Datums are empty,
-                     the wrapper isn't rendered at all (no orphan empty divs):
-                       __card-meta  → name + title       (rendered if name or title)
-                       __card-tags  → company + conference (rendered if either)
-                     Conference is rendered but CSS-hidden in V1; markup stays. -->
+                <!-- Card body splits into two wrapper groups, each conditional:
+                       __card-meta  → name + title-line (title + ", Company")
+                       __card-tags  → conference only (rendered if Conference is
+                                       authored; CSS-hidden in V1)
+                     The title-line concatenates Title and Company into a single
+                     "Title, Company" string so authors can split the data into
+                     two DCR fields while the visual remains a single line under
+                     the name (e.g. Title="CEO" + Company="VISA" → "CEO, VISA"). -->
                 <div class="rbccm-past-speakers-attendees__card-body">
-                  <xsl:if test="$name != '' or $title != ''">
+                  <xsl:if test="$name != '' or $title != '' or $company != ''">
                     <div class="rbccm-past-speakers-attendees__card-meta">
                       <xsl:if test="$name != ''">
                         <h3 class="rbccm-past-speakers-attendees__card-name"><xsl:value-of select="$name"/></h3>
                       </xsl:if>
-                      <xsl:if test="$title != ''">
-                        <p class="rbccm-past-speakers-attendees__card-title"><xsl:value-of select="$title"/></p>
+                      <xsl:if test="$title != '' or $company != ''">
+                        <p class="rbccm-past-speakers-attendees__card-title">
+                          <xsl:value-of select="$title"/>
+                          <xsl:if test="$title != '' and $company != ''">, </xsl:if>
+                          <xsl:value-of select="$company"/>
+                        </p>
                       </xsl:if>
                     </div>
                   </xsl:if>
-                  <xsl:if test="$company != '' or $conference != ''">
+                  <xsl:if test="$conference != ''">
                     <div class="rbccm-past-speakers-attendees__card-tags">
-                      <xsl:if test="$company != ''">
-                        <p class="rbccm-past-speakers-attendees__card-company"><xsl:value-of select="$company"/></p>
-                      </xsl:if>
-                      <xsl:if test="$conference != ''">
-                        <p class="rbccm-past-speakers-attendees__card-conference"><xsl:value-of select="$conference"/></p>
-                      </xsl:if>
+                      <p class="rbccm-past-speakers-attendees__card-conference"><xsl:value-of select="$conference"/></p>
                     </div>
                   </xsl:if>
                 </div>
