@@ -1,0 +1,383 @@
+/* =========================================
+   RBC CM — Past Speakers & Attendees
+   Scoped to .rbccm-past-speakers-attendees
+   Mobile-first; desktop at min-width: 992px
+
+   Slick carousel behavior mirrors `upcoming-conferences`:
+   - Mobile/tablet  → slick carousel (variableWidth + centerMode peek)
+   - Desktop        → static 3-col grid (slick destroyed)
+   - `.is-carousel` class on the root toggles carousel-only rules
+   ========================================= */
+
+.rbccm-past-speakers-attendees {
+  align-items: center;
+  align-self: stretch;
+  background-color: #FFF;
+  color: #2C2C2C;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* clip the mobile carousel peek at the section edge so
+                       cards bleeding past the container don't trigger
+                       horizontal page scroll */
+  padding: 40px 16px;
+  width: 100%;
+}
+
+/* Container — stretches edge-to-edge of the section's padding box, just like
+   upcoming-conferences. The 375px mobile cap was removed so the carousel
+   peek has room to breathe on tablet widths too. */
+.rbccm-past-speakers-attendees__container {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;        /* mobile — tightened from 40 since the slick wrapper
+                       adds ~5px of hidden padding above/below */
+  margin: 0 auto;
+  max-width: 1132px;
+  padding: 0;
+  width: 100%;
+}
+
+.rbccm-past-speakers-attendees__heading {
+  align-self: stretch;
+  color: #003168;
+  font-family: "RBCDisplay", "RBC Display", Georgia, Times, serif;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;
+  margin: 0;
+  text-align: left; /* mobile — flipped to center on desktop below */
+}
+
+/* SR-only utility */
+.rbccm-past-speakers-attendees__sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ── Cards container ── */
+.rbccm-past-speakers-attendees__cards {
+  display: block;          /* slick replaces this on mobile */
+  margin: 0;
+  width: 100%;
+}
+
+/* ── Card ──
+   Stacked layout: image fills the top (1:1), white content panel below
+   with name / title / past conference tag. Cards are presentational only
+   (no link-out), so this renders as a <div> in markup. */
+.rbccm-past-speakers-attendees__card {
+  background-color: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #2C2C2C;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 343px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Image area: 1:1 at the top of the card */
+.rbccm-past-speakers-attendees__card-media {
+  aspect-ratio: 1 / 1;
+  background-color: #E5E5E5;
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.rbccm-past-speakers-attendees__card-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Content panel below the image — fixed 187px height, name+title at top,
+   conference tag pushed to the bottom via margin-top: auto. */
+.rbccm-past-speakers-attendees__card-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  height: 187px;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+/* Name — left-aligned, medium weight, capitalize. */
+.rbccm-past-speakers-attendees__card-name {
+  align-self: stretch;
+  color: #000;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0 0 10px 0; /* 10px gap to title */
+  text-align: left;
+  text-transform: capitalize;
+}
+
+.rbccm-past-speakers-attendees__card-title {
+  align-self: stretch;
+  color: #353535;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 19px; /* 118.75% */
+  margin: 0;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+/* Past conference tag — pinned to bottom of card-body via margin-top: auto */
+.rbccm-past-speakers-attendees__card-conference {
+  align-self: stretch;
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 19px; /* 158.333% */
+  margin: auto 0 0 0;
+  text-align: left;
+  text-transform: capitalize;
+}
+
+/* ── Slick overrides — same pattern as upcoming-conferences / leadership-slider.
+   Cards have a fixed pixel width via !important so variableWidth can measure them. */
+#rbccm-past-speakers-attendees.is-carousel .slick-track {
+  align-items: stretch !important;
+  display: flex !important;
+}
+#rbccm-past-speakers-attendees.is-carousel .slick-slide {
+  box-sizing: border-box;
+  float: none;
+  height: auto;
+  margin: 0 !important;
+}
+#rbccm-past-speakers-attendees.is-carousel .slick-slide > div,
+#rbccm-past-speakers-attendees.is-carousel .slick-slide > div > div {
+  height: 100%;
+}
+#rbccm-past-speakers-attendees.is-carousel .slick-list {
+  overflow: visible;          /* peek effect — neighbor cards visible */
+}
+#rbccm-past-speakers-attendees.is-carousel .slick-prev,
+#rbccm-past-speakers-attendees.is-carousel .slick-next {
+  display: none !important;
+}
+
+/* Card on mobile carousel — fixed 343px width, 8px side spacing between slides */
+.rbccm-past-speakers-attendees.is-carousel .rbccm-past-speakers-attendees__card {
+  margin: 0 8px;
+  max-width: none;
+  width: 343px !important;
+}
+
+/* The .__cards wrapper clips the peek at the section's content edge, and
+   beats slick-theme's default `.slick-dotted.slick-slider { margin-bottom: 30px }`.
+   The carousel peek itself comes from `.slick-list { overflow: visible }`
+   inside the is-carousel rules above. */
+.rbccm-past-speakers-attendees.is-carousel .rbccm-past-speakers-attendees__cards {
+  margin-bottom: 0 !important;
+  overflow: hidden;
+}
+
+/* ── Mobile carousel controls (arrows + dots) ──
+   Inverse of upcoming-conferences: dark blue strokes on the white section. */
+.rbccm-past-speakers-attendees__controls {
+  align-items: center;
+  display: none;
+  gap: 16px;
+  justify-content: center;
+  margin: 0;
+}
+
+.rbccm-past-speakers-attendees.is-carousel .rbccm-past-speakers-attendees__controls {
+  display: flex;
+}
+
+.rbccm-past-speakers-attendees__btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #003168;
+  cursor: pointer;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  width: 24px;
+}
+.rbccm-past-speakers-attendees__btn:disabled,
+.rbccm-past-speakers-attendees__btn[aria-disabled="true"] {
+  cursor: default;
+}
+
+/* Arrow strokes — currentColor inherits from the button color, but pin the
+   stroke-width explicitly to 2px so it doesn't fall back to the SVG default. */
+.rbccm-past-speakers-attendees__btn svg path {
+  stroke: #003168;
+  stroke-width: 2px;
+}
+
+/* Dots */
+.rbccm-past-speakers-attendees__dots .slick-dots {
+  align-items: center;
+  bottom: auto;
+  display: flex !important;
+  gap: 26px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static;
+  width: auto;
+}
+
+.rbccm-past-speakers-attendees__dots .slick-dots li {
+  height: 10px;
+  margin: 0;
+  padding: 0;
+  width: 10px;
+}
+
+.rbccm-past-speakers-attendees__dots .slick-dots li button {
+  background: transparent;
+  border: 1px solid #003168;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 10px;
+  padding: 0;
+  text-indent: -9999px;
+  width: 10px;
+}
+.rbccm-past-speakers-attendees__dots .slick-dots li button:before {
+  display: none;
+}
+/* Active dot mirrors the upcoming-conferences pattern (filled dot + 1px ring
+   sitting 4px outside), but in dark blue instead of yellow since this section
+   sits on a white background. */
+.rbccm-past-speakers-attendees__dots .slick-dots li.slick-active button {
+  background: #003168;
+  border-radius: 50px;
+  outline: 1px solid #003168;
+  outline-offset: 4px;
+}
+
+/* Keyboard focus — soft dark-blue ring so tabbing through dots is visible
+   on the light section without competing with the active filled dot. */
+.rbccm-past-speakers-attendees__dots .slick-dots li button:focus,
+.rbccm-past-speakers-attendees__dots .slick-dots li button:focus-visible {
+  outline: 2px solid rgba(0, 49, 104, 0.4);
+  outline-offset: 4px;
+}
+
+/* ─────────────────────────────────────────────
+   DESKTOP (min-width: 992px)
+   ───────────────────────────────────────────── */
+@media (min-width: 992px) {
+
+  /* Section runs edge-to-edge with vertical-only padding; container takes
+     over horizontal sizing. Container is slightly smaller than the
+     upcoming-conferences spec (1100 vs 1132) to match this section's tighter
+     cards row (894px cap). */
+  .rbccm-past-speakers-attendees {
+    padding: 64px 0;
+  }
+
+  .rbccm-past-speakers-attendees__container {
+    gap: 43px;
+    max-width: 1100px;
+    padding: 0 16px;
+  }
+
+  .rbccm-past-speakers-attendees__heading {
+    color: #003168;
+    font-family: "RBC Display", "RBCDisplay", Georgia, Times, serif;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal; /* overrides mobile's 120% */
+    text-align: center;  /* desktop centers the h2 */
+  }
+
+  /* Cards row — flex wrap, 3 per row, centered in a 894px cap (the spec's
+     "cards don't go beyond 894"). The wrapper sits inside the 1100 container
+     so excess space on either side comes from container padding/auto margin. */
+  .rbccm-past-speakers-attendees__cards {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 894px;
+    overflow: visible;          /* clears the is-carousel overflow: hidden */
+    width: 100%;
+  }
+
+  /* Desktop cards (carousel destroyed) — 276px per Figma; 3-up rows come to
+     3×276 + 2×32 = 892, sitting under the 894px cards-total cap. */
+  .rbccm-past-speakers-attendees:not(.is-carousel) .rbccm-past-speakers-attendees__card {
+    flex: 0 1 276px;
+    margin: 0;
+    max-width: 276px;
+    width: auto;
+  }
+
+  /* Image — explicit 276 × 263 on desktop. flex-shrink: 0 keeps it from
+     collapsing inside the card's flex column. */
+  .rbccm-past-speakers-attendees:not(.is-carousel) .rbccm-past-speakers-attendees__card-media {
+    aspect-ratio: auto;         /* clear the mobile 1:1 */
+    flex-shrink: 0;
+    height: 263px;
+    width: 100%;
+  }
+
+  /* Conference tag — tighter line-height on desktop (120% / 14.4px) */
+  .rbccm-past-speakers-attendees__card-conference {
+    line-height: 120%;
+  }
+
+  /* Mobile carousel controls are never used on desktop */
+  .rbccm-past-speakers-attendees__controls,
+  .rbccm-past-speakers-attendees.is-carousel .rbccm-past-speakers-attendees__controls {
+    display: none;
+  }
+}
+
+/* =========================================
+   Font-family lockdown.
+   External stylesheets (unified.css / unified2.css) include broad selectors
+   like `*` and bare `h2`/`h3` that apply font-family DIRECTLY to descendants
+   of our component, beating any inherited !important from a parent class.
+   ========================================= */
+
+.rbccm-past-speakers-attendees,
+.rbccm-past-speakers-attendees * {
+  font-family: Roboto, Arial, sans-serif !important;
+}
+
+.rbccm-past-speakers-attendees h2,
+.rbccm-past-speakers-attendees .rbccm-past-speakers-attendees__heading {
+  font-family: "RBCDisplay", "RBC Display", Georgia, Times, serif !important;
+}
+
+.rbccm-past-speakers-attendees .rbccm-past-speakers-attendees__card-name,
+.rbccm-past-speakers-attendees strong {
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif !important;
+}

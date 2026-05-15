@@ -1,0 +1,146 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Past Speakers & Attendees
+       - Desktop: 3-col grid of cards
+       - Mobile:  slick carousel, 1 card per slide
+       - Card = image, name, title, past conference attended -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <xsl:variable name="speakers" select="
+        /Properties/Data/Group[@ID='Speaker' or @Name='Speaker']
+        | /Data/Group[@ID='Speaker' or @Name='Speaker']"/>
+    <xsl:variable name="count" select="count($speakers)"/>
+
+    <!-- V1: section requires exactly 6 Speaker rows. The XSL renders nothing
+         until at least 6 are authored, and then caps display at 6 even if more
+         are added. Keeps the desktop 3×2 grid + mobile carousel layout consistent. -->
+    <xsl:if test="$count &gt;= 6">
+
+      <!-- ── Section heading ── -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Past speakers &amp; attendees</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/past-speakers-attendees.css"/>
+
+      <section class="rbccm-past-speakers-attendees" id="rbccm-past-speakers-attendees" aria-label="Past speakers and attendees">
+
+        <div class="rbccm-past-speakers-attendees__container">
+
+          <h2 class="rbccm-past-speakers-attendees__heading">
+            <xsl:value-of select="$heading"/>
+          </h2>
+
+          <!-- ── Cards: desktop grid / mobile slick carousel ── -->
+          <div class="rbccm-past-speakers-attendees__cards" id="rbccm-past-speakers-attendees-cards">
+            <!-- V1: exactly 6 visible cards. The outer xsl:if already gates the
+                 section to require ≥ 6 Speakers; this position() filter clamps
+                 the upper end so a 7th+ authored Speaker is silently dropped. -->
+            <xsl:for-each select="$speakers[position() &lt;= 6]">
+              <xsl:variable name="image"      select="normalize-space(Datum[@ID='Image' or @Name='Image'])"/>
+              <xsl:variable name="imgAlt"     select="normalize-space(Datum[@ID='ImageAlt' or @Name='Image Alt'])"/>
+              <xsl:variable name="name"       select="normalize-space(Datum[@ID='Name' or @Name='Name'])"/>
+              <xsl:variable name="title"      select="normalize-space(Datum[@ID='Title' or @Name='Title'])"/>
+              <xsl:variable name="conference" select="normalize-space(Datum[@ID='Conference' or @Name='Conference'])"/>
+
+              <!-- Cards are presentational only (no link-out), so they render as
+                   a plain <div> rather than an <a>. -->
+              <div class="rbccm-past-speakers-attendees__card">
+
+                <!-- Image — falls back to an fpoimg.com placeholder when no Image is
+                     authored in DCR, so empty Speaker rows still render a usable card. -->
+                <div class="rbccm-past-speakers-attendees__card-media">
+                  <img loading="lazy">
+                    <xsl:attribute name="src">
+                      <xsl:choose>
+                        <xsl:when test="$image != ''"><xsl:value-of select="$image"/></xsl:when>
+                        <xsl:otherwise>https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:attribute name="alt">
+                      <xsl:choose>
+                        <xsl:when test="$imgAlt != ''"><xsl:value-of select="$imgAlt"/></xsl:when>
+                        <xsl:when test="$name != ''"><xsl:value-of select="$name"/></xsl:when>
+                        <xsl:otherwise>Speaker photo placeholder</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:attribute>
+                  </img>
+                </div>
+
+                <!-- Name / title / past conference -->
+                <div class="rbccm-past-speakers-attendees__card-body">
+                  <xsl:if test="$name != ''">
+                    <h3 class="rbccm-past-speakers-attendees__card-name"><xsl:value-of select="$name"/></h3>
+                  </xsl:if>
+                  <xsl:if test="$title != ''">
+                    <p class="rbccm-past-speakers-attendees__card-title"><xsl:value-of select="$title"/></p>
+                  </xsl:if>
+                  <xsl:if test="$conference != ''">
+                    <p class="rbccm-past-speakers-attendees__card-conference"><xsl:value-of select="$conference"/></p>
+                  </xsl:if>
+                </div>
+              </div>
+            </xsl:for-each>
+          </div>
+
+          <!-- Mobile slick controls (arrows + dots) — only visible when carousel is initialized -->
+          <div class="rbccm-past-speakers-attendees__controls">
+            <button id="rbccm-psa-prev" class="rbccm-past-speakers-attendees__btn" type="button" aria-label="Previous speaker" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div id="rbccm-psa-dots" class="rbccm-past-speakers-attendees__dots"></div>
+            <button id="rbccm-psa-next" class="rbccm-past-speakers-attendees__btn" type="button" aria-label="Next speaker" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Component JS (mobile slick init, scoped) ── -->
+      <script src="/assets/rbccm/js/sub/test/past-speakers-attendees.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053701">
+  <!-- ── Section header ── -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Past speakers &amp; attendees</Datum>
+</Properties>
+
+<Data>
+  <!-- ── CAROUSEL CARDS ──
+       One Group per past speaker / attendee. Render is capped at 6 cards by the XSL.
+       NOTE: Datum Name attributes MUST match the XSL's @Name selectors — Teamsite strips
+       @ID on replicated Datums, so @Name is the only reliable match. -->
+  <Group ID="Speaker" Name="Speaker" Replicatable="true" CloneGroupID="past-speaker">
+    <!-- Image is a Teamsite Image-picker Datum (Import / Select Existing / Select Modified).
+         The picker stores the path with $URL_PREFIX so it resolves correctly across
+         environments; the value rendered by `<xsl:value-of select="Datum[@ID='Image']"/>`
+         is still just the path string, so the XSL above doesn't need to change.
+         Leave Image empty to fall back to the fpoimg placeholder in the XSL. -->
+    <Datum ID="Image" Type="Image" Name="Image"/>
+    <Datum ID="ImageAlt" Type="String" Name="Image Alt">Speaker</Datum>
+    <Datum ID="Name" Type="String" Name="Name">Speaker Name</Datum>
+    <Datum ID="Title" Type="String" Name="Title">Role, Company</Datum>
+    <Datum ID="Conference" Type="String" Name="Conference">Conference attended</Datum>
+  </Group>
+</Data>
