@@ -656,3 +656,40 @@
 .rbccm-featured-conferences__inner-panel[data-inner$="-gep"] {
   display: none !important;
 }
+
+/* =========================================
+   Font-family lockdown.
+   External stylesheets (unified.css / unified2.css) include broad selectors
+   like `*` and bare `h3` that apply font-family DIRECTLY to descendants of
+   our component, beating any inherited !important from a parent class.
+   The block below pins typography per-element with !important so those
+   universal/element selectors can't slip through.
+
+   Hierarchy:
+   1) Default — every element inside the component is Roboto Light.
+   2) Headings (h2 / h3) — RBCDisplay.
+   3) Medium-weight bits (strong, themes-label, active tabs, buttons).
+   ========================================= */
+
+/* 1) Default body type for every descendant */
+.rbccm-featured-conferences,
+.rbccm-featured-conferences * {
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
+}
+
+/* 2) Headings */
+.rbccm-featured-conferences h2,
+.rbccm-featured-conferences h3,
+.rbccm-featured-conferences .rbccm-featured-conferences__heading,
+.rbccm-featured-conferences .rbccm-featured-conferences__overview-heading,
+.rbccm-featured-conferences .rbccm-featured-conferences__speakers-heading {
+  font-family: "RBCDisplay", Georgia, Times, serif !important;
+}
+
+/* 3) Medium-weight elements */
+.rbccm-featured-conferences strong,
+.rbccm-featured-conferences .rbccm-featured-conferences__themes-label,
+.rbccm-featured-conferences .rbccm-featured-conferences__tab.is-active,
+.rbccm-featured-conferences .rbccm-featured-conferences__inner-tab.is-active {
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif !important;
+}
