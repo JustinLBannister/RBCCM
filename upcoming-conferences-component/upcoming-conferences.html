@@ -1,5 +1,8 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:date="http://exslt.org/dates-and-times"
+  exclude-result-prefixes="date">
   <!-- Skin: RBCCM Upcoming Conference Programming
        - Pulls from the centralized Events List Datum (same source as the
          conferences hub table at /en/conference/upcoming-and-past-conferences.page).
@@ -17,38 +20,29 @@
 
   <xsl:template match="/">
 
-    <!-- Today + current year for the upcoming-only filter.
-         CURRENT_DATE = YYYYMMDD numeric for >= comparison with date_num. -->
-    <xsl:variable name="CURRENT_DATE" select="format-date(current-date(), '[Y0001][M01][D01]')"/>
-    <xsl:variable name="CURRENT_YEAR" select="format-date(current-date(), '[Y0001]')"/>
+    <!-- Today's date via EXSLT date:date-time() (XSLT 1.0 has no current-date()).
+         Returns ISO 8601, e.g. "2026-05-28T14:30:00-05:00", so fixed-position
+         substrings give the parts we need. -->
+    <xsl:variable name="today" select="date:date-time()"/>
+    <xsl:variable name="CURRENT_YEAR" select="substring($today, 1, 4)"/>
+    <!-- CURRENT_DATE = YYYYMMDD numeric string for >= comparison against each event_date. -->
+    <xsl:variable name="CURRENT_DATE" select="concat(substring($today, 1, 4), substring($today, 6, 2), substring($today, 9, 2))"/>
 
-    <!-- Source: centralized Events List Datum. Conference events only. -->
-    <xsl:variable name="events" select="
-        /Properties/Data/Datum[@Name='Events List']/DCR/events/event[contains(sitelocation, 'conference')]"/>
-
-    <!-- Default placeholder image used when an event has no image of its own.
-         When the Events List schema gains an `event_image` field, swap this
-         block's $cardImage assignment to prefer the per-event value. -->
+    <!-- Default placeholder image used when an event has no image of its own. -->
     <xsl:variable name="placeholderImage" select="'https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp'"/>
 
-    <!-- Pre-filter upcoming events in the current year, sorted ascending.
-         This sequence drives both the card grid and the modal list. -->
-    <xsl:variable name="upcomingEvents" as="element()*">
-      <xsl:for-each select="$events">
-        <xsl:sort select="event_date" order="ascending"/>
-        <xsl:variable name="dateNum">
-          <xsl:call-template name="date_num">
-            <xsl:with-param name="publish_date" select="event_date"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="eventYear" select="substring(event_date, 1, 4)"/>
-        <xsl:if test="$dateNum &gt;= $CURRENT_DATE and $eventYear = $CURRENT_YEAR">
-          <xsl:sequence select="."/>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
+    <!-- Source: centralized Events List Datum, filtered inline to:
+           - conference events only (sitelocation contains 'conference')
+           - current year (event_date year = today's year)
+           - upcoming (event_date YYYYMMDD >= today's YYYYMMDD)
+         This is a node-set, so the card + modal loops sort it directly with xsl:sort.
+         (XSLT 1.0: no xsl:sequence / as="element()*" needed.) -->
+    <xsl:variable name="events" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
+        contains(sitelocation, 'conference')
+        and substring(event_date, 1, 4) = $CURRENT_YEAR
+        and number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)]"/>
 
-    <xsl:variable name="upcomingCount" select="count($upcomingEvents)"/>
+    <xsl:variable name="upcomingCount" select="count($events)"/>
 
     <xsl:if test="$upcomingCount &gt;= 1">
 
@@ -176,7 +170,8 @@
                active, JS adds `.is-filtered` to this container and `.is-filtered-out`
                to non-matching cards. Mobile slick carousel still scopes to this set. -->
           <div class="rbccm-upcoming-conferences__cards" id="rbccm-upcoming-conferences-cards">
-            <xsl:for-each select="$upcomingEvents">
+            <xsl:for-each select="$events">
+              <xsl:sort select="event_date" order="ascending"/>
               <xsl:variable name="eventDate"    select="event_date"/>
               <xsl:variable name="eventDateEnd" select="event_date_end"/>
               <xsl:variable name="title"        select="normalize-space(event_name)"/>
@@ -220,9 +215,9 @@
                      data-region = exact location string ("New York", "Toronto", "London")
                      data-title  = lowercased event_name (for case-insensitive search) -->
                 <xsl:attribute name="data-month"><xsl:value-of select="$monthFull"/></xsl:attribute>
-                <xsl:attribute name="data-month-short"><xsl:value-of select="upper-case($monthAbbr)"/></xsl:attribute>
+                <xsl:attribute name="data-month-short"><xsl:value-of select="translate($monthAbbr, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute>
                 <xsl:attribute name="data-region"><xsl:value-of select="$loc"/></xsl:attribute>
-                <xsl:attribute name="data-title"><xsl:value-of select="lower-case($title)"/></xsl:attribute>
+                <xsl:attribute name="data-title"><xsl:value-of select="translate($title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/></xsl:attribute>
                 <xsl:attribute name="aria-label"><xsl:value-of select="$title"/>, <xsl:value-of select="$monthLabel"/> <xsl:value-of select="$dayLabel"/>, <xsl:value-of select="$loc"/></xsl:attribute>
 
                 <!-- Background image (placeholder by default) + dark overlay -->
@@ -235,7 +230,7 @@
 
                 <!-- Top: month + day(s) -->
                 <div class="rbccm-upcoming-conferences__card-date">
-                  <div class="rbccm-upcoming-conferences__card-month"><xsl:value-of select="upper-case($monthLabel)"/></div>
+                  <div class="rbccm-upcoming-conferences__card-month"><xsl:value-of select="translate($monthLabel, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></div>
                   <div class="rbccm-upcoming-conferences__card-day"><xsl:value-of select="$dayLabel"/></div>
                 </div>
 
@@ -301,7 +296,7 @@
             </button>
           </div>
 
-          <!-- CTA -- if Href starts with #, auto-wires Bootstrap modal trigger attributes -->
+          <!-- CTA: if Href starts with #, auto-wires Bootstrap modal trigger attributes -->
           <xsl:if test="$ctaHref != ''">
             <div class="rbccm-upcoming-conferences__cta-wrap">
               <a class="rbccm-upcoming-conferences__cta">
@@ -339,12 +334,14 @@
                 </div>
 
                 <!-- Conference list (same data source as the cards).
-                     Capped at the 8 nearest upcoming events. $upcomingEvents is
-                     already sorted ascending (soonest first), so position() <= 8
-                     yields the most imminent 8. -->
+                     Sort ascending, then keep the 8 nearest via position() &lt;= 8
+                     INSIDE the loop (XSLT 1.0: a predicate would apply pre-sort,
+                     so the cap must be an xsl:if in the loop body, post-sort). -->
                 <div class="rbccm-upcoming-conferences__modal-list">
                   <div class="rbccm-upcoming-conferences__modal-list-inner">
-                    <xsl:for-each select="$upcomingEvents[position() &lt;= 8]">
+                    <xsl:for-each select="$events">
+                      <xsl:sort select="event_date" order="ascending"/>
+                      <xsl:if test="position() &lt;= 8">
                       <xsl:variable name="rowMonth">
                         <xsl:call-template name="month_abbrev">
                           <xsl:with-param name="iso_date" select="event_date"/>
@@ -378,6 +375,7 @@
                           </span>
                         </xsl:if>
                       </div>
+                      </xsl:if>
                     </xsl:for-each>
                   </div>
                 </div>
@@ -399,18 +397,9 @@
 
   </xsl:template>
 
-  <!-- ---------------------------------------------
+  <!-- ============================================
        Named templates
-       --------------------------------------------- -->
-
-  <!-- Convert ISO date 'YYYY-MM-DD' into numeric YYYYMMDD for >= comparison -->
-  <xsl:template name="date_num">
-    <xsl:param name="publish_date"/>
-    <xsl:variable name="vYear"     select="substring($publish_date, 1, 4)"/>
-    <xsl:variable name="vnumMonth" select="substring($publish_date, 6, 2)"/>
-    <xsl:variable name="vDay"      select="substring($publish_date, 9, 2)"/>
-    <xsl:value-of select="concat($vYear, $vnumMonth, $vDay)"/>
-  </xsl:template>
+       ============================================ -->
 
   <!-- Convert ISO date 'YYYY-MM-DD' into 3-letter month abbreviation (Jan, Feb, ...) -->
   <xsl:template name="month_abbrev">
@@ -454,7 +443,7 @@
 
 </xsl:stylesheet>
 
-<Properties ComponentID="1554499053453">
+<Properties ComponentID="1554499053700">
   <!-- Section header -->
   <Datum ID="Heading" Type="String" Name="Section Heading">Upcoming conference programming</Datum>
   <Datum ID="Intro" Type="Textarea" Name="Section Intro">Connect with industry leaders and explore market-shaping trends at our upcoming global events.</Datum>
