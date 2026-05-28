@@ -1,0 +1,809 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Featured Conferences (RETRO / V1)
+       Previous iteration kept as a working reference. Differs from the V2
+       production skin (featured-conferences.html):
+         - Two hardcoded inner tabs visible (Global Healthcare / Canadian
+           Industrials) rendered from fixed-content named templates.
+         - Outer tablist + Overview/Speakers/Insights/-gep inner tabs hidden
+           via CSS (see featured-conferences-retro.css).
+         - No carousels; speakers wrap, insights are a static grid.
+       Pair this file with featured-conferences-retro.css + .js. -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- Conferences: replicatable Groups; gate render at EXACTLY 3 -->
+    <xsl:variable name="conferences" select="
+        /Properties/Data/Group[@ID='Conference' or @Name='Conference']
+        | /Data/Group[@ID='Conference' or @Name='Conference']"/>
+    <xsl:variable name="confCount" select="count($conferences)"/>
+
+    <xsl:if test="$confCount = 3">
+
+      <!-- Heading -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Aria label -->
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Brightcove globals -->
+      <xsl:variable name="bcAccount">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCAccount']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCAccount'])"/>
+          </xsl:when>
+          <xsl:otherwise>6021289101001</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcPlayer">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCPlayer']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCPlayer'])"/>
+          </xsl:when>
+          <xsl:otherwise>VyvCc9BZx</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcEmbed">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCEmbed']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCEmbed'])"/>
+          </xsl:when>
+          <xsl:otherwise>default</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- External CSS (scoped to .rbccm-featured-conferences) -->
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/featured-conferences-retro.css"/>
+
+      <section class="rbccm-featured-conferences" id="rbccm-featured-conferences">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+
+        <div class="rbccm-featured-conferences__container">
+
+          <h2 class="rbccm-featured-conferences__heading">
+            <xsl:value-of select="$heading"/>
+          </h2>
+
+          <!-- OUTER TABS (conferences) -->
+          <div class="rbccm-featured-conferences__tablist" role="tablist">
+            <xsl:for-each select="$conferences">
+              <xsl:variable name="confKey" select="concat('conf-', position())"/>
+              <xsl:variable name="confName" select="normalize-space(Datum[@ID='Name' or @Name='Conference Name'])"/>
+              <button type="button"
+                      class="rbccm-featured-conferences__tab"
+                      role="tab"
+                      aria-expanded="false">
+                <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:attribute name="aria-controls">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:value-of select="$confName"/>
+              </button>
+            </xsl:for-each>
+          </div>
+
+          <!-- OUTER PANELS (one per conference) -->
+          <div class="rbccm-featured-conferences__panels">
+            <xsl:for-each select="$conferences">
+              <xsl:variable name="i"        select="position()"/>
+              <xsl:variable name="confKey"  select="concat('conf-', $i)"/>
+              <xsl:variable name="confName" select="normalize-space(Datum[@ID='Name' or @Name='Conference Name'])"/>
+
+              <!-- Brightcove per-conference -->
+              <xsl:variable name="videoId" select="normalize-space(Datum[@ID='BCVideoId' or @Name='Brightcove Video ID'])"/>
+              <xsl:variable name="videoPoster" select="normalize-space(Datum[@ID='BCPoster' or @Name='Brightcove Poster Override'])"/>
+
+              <!-- Overview fields -->
+              <xsl:variable name="date"      select="normalize-space(Datum[@ID='Date' or @Name='Date'])"/>
+              <xsl:variable name="location"  select="normalize-space(Datum[@ID='Location' or @Name='Location'])"/>
+              <xsl:variable name="format"    select="normalize-space(Datum[@ID='Format' or @Name='Format'])"/>
+              <xsl:variable name="ovHeading">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='OverviewHeading' or @Name='Overview Heading']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='OverviewHeading' or @Name='Overview Heading'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Conference overview</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="ovBody"   select="Datum[@ID='OverviewBody' or @Name='Overview Body']"/>
+              <xsl:variable name="topicsLabel">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='KeyTopicsLabel' or @Name='Key Topics Label']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='KeyTopicsLabel' or @Name='Key Topics Label'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Key topics:</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="topics"   select="Datum[@ID='KeyTopics' or @Name='Key Topics']"/>
+              <xsl:variable name="contact"  select="Datum[@ID='ContactText' or @Name='Contact Text']"/>
+
+              <!-- Speakers fields -->
+              <xsl:variable name="spkHeading">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='SpeakersHeading' or @Name='Speakers Heading']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='SpeakersHeading' or @Name='Speakers Heading'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>Featured speakers</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="spkIntro" select="Datum[@ID='SpeakersIntro' or @Name='Speakers Intro']"/>
+              <xsl:variable name="spkFootnote" select="Datum[@ID='SpeakersFootnote' or @Name='Speakers Footnote']"/>
+
+              <!-- Insights fields -->
+              <xsl:variable name="insightsCtaText">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='InsightsCTAText' or @Name='Insights CTA Text']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='InsightsCTAText' or @Name='Insights CTA Text'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>View all conference insights</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="insightsCtaHref" select="normalize-space(Datum[@ID='InsightsCTAHref' or @Name='Insights CTA Href'])"/>
+
+              <div class="rbccm-featured-conferences__panel" role="tabpanel">
+                <xsl:attribute name="id">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+
+                <!-- INNER TABS + PANELS, interleaved so mobile accordion works via adjacent selector -->
+                <div class="rbccm-featured-conferences__inner-wrap">
+
+                <!-- V1 NEW TAB + PANEL A: Global Healthcare Conference -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-ghc</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Global Healthcare Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-ghc</xsl:attribute>
+                  <xsl:call-template name="render-ghc-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- V1 NEW TAB + PANEL B: Canadian Industrials Conference -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-cic</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Canadian Industrials Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-cic</xsl:attribute>
+                  <xsl:call-template name="render-cic-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- V1 NEW TAB + PANEL C: Global Energy, Power and Infrastructure Conference -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-gep</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Global Energy, Power &amp; Infrastructure Conference</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-gep</xsl:attribute>
+                  <xsl:call-template name="render-gep-content">
+                    <xsl:with-param name="bcAccount" select="$bcAccount"/>
+                    <xsl:with-param name="bcPlayer"  select="$bcPlayer"/>
+                    <xsl:with-param name="bcEmbed"   select="$bcEmbed"/>
+                    <xsl:with-param name="videoId"   select="$videoId"/>
+                  </xsl:call-template>
+                </div>
+
+                <!-- INNER TAB + PANEL: OVERVIEW (hidden via CSS in V1, markup preserved) -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+
+                  <div class="rbccm-featured-conferences__overview">
+
+                    <!-- Brightcove video -->
+                    <div class="rbccm-featured-conferences__video video-reel-wrap">
+                      <div class="rbccm-featured-conferences__video-frame">
+                        <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+                          <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+                        </iframe>
+                      </div>
+                    </div>
+
+                    <!-- Info card -->
+                    <div class="rbccm-featured-conferences__info">
+                      <xsl:if test="$date != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Date</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$date"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$location != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Location</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$location"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$format != ''">
+                        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                          <div class="rbccm-featured-conferences__info-label">Format</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$format"/></div>
+                        </div>
+                      </xsl:if>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="rbccm-featured-conferences__overview-body">
+                      <h3 class="rbccm-featured-conferences__overview-heading"><xsl:value-of select="$ovHeading"/></h3>
+                      <div class="rbccm-featured-conferences__overview-text">
+                        <xsl:value-of select="$ovBody" disable-output-escaping="yes"/>
+                      </div>
+
+                      <xsl:if test="normalize-space($topics) != ''">
+                        <p class="rbccm-featured-conferences__topics">
+                          <strong><xsl:value-of select="$topicsLabel"/></strong>
+                          <xsl:text> </xsl:text>
+                          <span class="rbccm-featured-conferences__topics-list">
+                            <xsl:value-of select="$topics" disable-output-escaping="yes"/>
+                          </span>
+                        </p>
+                      </xsl:if>
+
+                      <xsl:if test="normalize-space($contact) != ''">
+                        <p class="rbccm-featured-conferences__contact">
+                          <em><xsl:value-of select="$contact" disable-output-escaping="yes"/></em>
+                        </p>
+                      </xsl:if>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- INNER TAB + PANEL: SPEAKERS -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+
+                  <h3 class="rbccm-featured-conferences__speakers-heading"><xsl:value-of select="$spkHeading"/></h3>
+                  <xsl:if test="normalize-space($spkIntro) != ''">
+                    <p class="rbccm-featured-conferences__speakers-intro">
+                      <xsl:value-of select="$spkIntro" disable-output-escaping="yes"/>
+                    </p>
+                  </xsl:if>
+
+                  <div class="rbccm-featured-conferences__speakers">
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker1Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker1Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker1Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker1Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker2Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker2Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker2Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker2Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker3Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker3Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker3Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker3Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker4Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker4Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker4Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker4Alt'])"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="render-speaker">
+                      <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker5Name'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker5Title'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker5Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker5Alt'])"/>
+                    </xsl:call-template>
+                  </div>
+
+                  <xsl:if test="normalize-space($spkFootnote) != ''">
+                    <p class="rbccm-featured-conferences__speakers-footnote">
+                      <xsl:value-of select="$spkFootnote" disable-output-escaping="yes"/>
+                    </p>
+                  </xsl:if>
+                </div>
+
+                <!-- INNER TAB + PANEL: INSIGHTS -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+
+                  <div class="rbccm-featured-conferences__insights">
+
+                    <!-- Featured (large) card = position 1 -->
+                    <xsl:call-template name="render-insight">
+                      <xsl:with-param name="mode" select="'featured'"/>
+                      <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight1Label'])"/>
+                      <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight1Title'])"/>
+                      <xsl:with-param name="desc"  select="Datum[@ID='Insight1Description']"/>
+                      <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight1Meta'])"/>
+                      <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight1Image'])"/>
+                      <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight1ImageAlt'])"/>
+                      <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight1Href'])"/>
+                    </xsl:call-template>
+
+                    <!-- Standard cards row (positions 2, 3, 4) -->
+                    <div class="rbccm-featured-conferences__insights-row">
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight2Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight2Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight2Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight2Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight2Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight2ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight2Href'])"/>
+                      </xsl:call-template>
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight3Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight3Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight3Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight3Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight3Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight3ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight3Href'])"/>
+                      </xsl:call-template>
+                      <xsl:call-template name="render-insight">
+                        <xsl:with-param name="mode" select="'card'"/>
+                        <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight4Label'])"/>
+                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight4Title'])"/>
+                        <xsl:with-param name="desc"  select="Datum[@ID='Insight4Description']"/>
+                        <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight4Meta'])"/>
+                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight4Image'])"/>
+                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight4ImageAlt'])"/>
+                        <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight4Href'])"/>
+                      </xsl:call-template>
+                    </div>
+
+                    <!-- CTA -->
+                    <xsl:if test="$insightsCtaHref != ''">
+                      <div class="rbccm-featured-conferences__insights-cta-wrap">
+                        <a class="rbccm-featured-conferences__insights-cta">
+                          <xsl:attribute name="href"><xsl:value-of select="$insightsCtaHref"/></xsl:attribute>
+                          <xsl:value-of select="$insightsCtaText"/>
+                        </a>
+                      </div>
+                    </xsl:if>
+                  </div>
+                </div>
+
+                </div><!-- /.inner-wrap -->
+              </div>
+            </xsl:for-each>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- External JS (scoped to #rbccm-featured-conferences) -->
+      <script src="/assets/rbccm/js/sub/test/featured-conferences-retro.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- =============================================
+       Named templates
+       ============================================= -->
+
+  <!-- V1 fixed-content: Global Healthcare Conference overview -->
+  <xsl:template name="render-ghc-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <img class="conference-image" src="/assets/rbccm/images/conferences/global-healthcare-conference.webp" alt="Global Healthcare Conference panel" />
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">May 19-20, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Global Healthcare Conference connects leaders, companies, and investors across the healthcare ecosystem - from life sciences, services, and medtech to tools and diagnostics - for a cross-sector view of where healthcare is headed.</p>
+        </div>
+
+        <p class="rbccm-featured-conferences__topics">
+          <strong>Key themes</strong>
+          <span class="rbccm-featured-conferences__topics-list">Biopharma innovation | MedTech momentum | Competitive dynamics | Regulatory and policy shifts | M&amp;A and partnership | Capital formation | AI-driven drug discovery | Digital health transformation | Healthcare utilization | Care delivery evolution</span>
+        </p>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <!-- V1 fixed-content: Canadian Industrials Conference overview -->
+  <xsl:template name="render-cic-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <img class="conference-image" src="/assets/rbccm/images/conferences/canadian-industrials-conference.webp" alt="Canadian Industrials Conference participants" />
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">May 19-21, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">Toronto, CA</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Canadian Industrials Conference brings together North American companies and investors across the sectors driving industrial growth - from transportation and infrastructure to engineering and construction, industrial products, aerospace and defence, and business services - to examine the forces shaping supply chain resilience and long-term competitiveness.</p>
+        </div>
+
+        <p class="rbccm-featured-conferences__topics">
+          <strong>Key themes</strong>
+          <span class="rbccm-featured-conferences__topics-list">Infrastructure renewal | Energy corridor growth | Rail network demand | Power capacity needs | Critical minerals investment | Defence modernization | Housing supply pressures | Productivity improvement | Industrial automation | Cross-border trade resilience</span>
+        </p>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <!-- V1 fixed-content: Global Energy, Power and Infrastructure Conference overview -->
+  <xsl:template name="render-gep-content">
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="videoId"/>
+
+    <div class="rbccm-featured-conferences__overview">
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Date</div>
+          <div class="rbccm-featured-conferences__info-value">June 2-3, 2026</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item">
+          <div class="rbccm-featured-conferences__info-label">Location</div>
+          <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+        </div>
+        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+          <div class="rbccm-featured-conferences__info-label">Format</div>
+          <div class="rbccm-featured-conferences__info-value">In-person &amp; virtual</div>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <p>The Global Energy, Power &amp; Infrastructure Conference is a long-standing forum, uniting executives and investors across the energy and utility value chain - from oil and gas producers and services to midstream, infrastructure, and energy transition - to assess the opportunities and risks shaping the sector's trajectory.</p>
+        </div>
+
+        <p class="rbccm-featured-conferences__topics">
+          <strong>Key themes</strong>
+          <span class="rbccm-featured-conferences__topics-list">Energy security | Rising power demand | Infrastructure investment | Grid modernization | Natural gas growth | Resource development | Capital discipline | Customer affordability | Transition pragmatism | Cross-border trade resilience</span>
+        </p>
+
+        <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+      </div>
+    </div>
+  </xsl:template>
+
+  <!-- DCR-driven overview (used by the hidden -overview tab) -->
+  <xsl:template name="render-overview-content">
+    <xsl:param name="videoId"/>
+    <xsl:param name="bcAccount"/>
+    <xsl:param name="bcPlayer"/>
+    <xsl:param name="bcEmbed"/>
+    <xsl:param name="date"/>
+    <xsl:param name="location"/>
+    <xsl:param name="format"/>
+    <xsl:param name="ovHeading"/>
+    <xsl:param name="ovBody"/>
+    <xsl:param name="topics"/>
+    <xsl:param name="topicsLabel"/>
+    <xsl:param name="contact"/>
+
+    <div class="rbccm-featured-conferences__overview">
+
+      <div class="rbccm-featured-conferences__video video-reel-wrap">
+        <div class="rbccm-featured-conferences__video-frame">
+          <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
+            <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="rbccm-featured-conferences__info">
+        <xsl:if test="$date != ''">
+          <div class="rbccm-featured-conferences__info-item">
+            <div class="rbccm-featured-conferences__info-label">Date</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$date"/></div>
+          </div>
+        </xsl:if>
+        <xsl:if test="$location != ''">
+          <div class="rbccm-featured-conferences__info-item">
+            <div class="rbccm-featured-conferences__info-label">Location</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$location"/></div>
+          </div>
+        </xsl:if>
+        <xsl:if test="$format != ''">
+          <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+            <div class="rbccm-featured-conferences__info-label">Format</div>
+            <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$format"/></div>
+          </div>
+        </xsl:if>
+      </div>
+
+      <div class="rbccm-featured-conferences__overview-body">
+        <h3 class="rbccm-featured-conferences__overview-heading"><xsl:value-of select="$ovHeading"/></h3>
+        <div class="rbccm-featured-conferences__overview-text">
+          <xsl:value-of select="$ovBody" disable-output-escaping="yes"/>
+        </div>
+
+        <xsl:if test="normalize-space($topics) != ''">
+          <p class="rbccm-featured-conferences__topics">
+            <strong><xsl:value-of select="$topicsLabel"/></strong>
+            <xsl:text> </xsl:text>
+            <span class="rbccm-featured-conferences__topics-list">
+              <xsl:value-of select="$topics" disable-output-escaping="yes"/>
+            </span>
+          </p>
+        </xsl:if>
+
+        <xsl:if test="normalize-space($contact) != ''">
+          <p class="rbccm-featured-conferences__contact">
+            <em><xsl:value-of select="$contact" disable-output-escaping="yes"/></em>
+          </p>
+        </xsl:if>
+      </div>
+
+    </div>
+  </xsl:template>
+
+  <xsl:template name="render-speaker">
+    <xsl:param name="name"/>
+    <xsl:param name="title"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
+
+    <xsl:if test="$name != '' or $image != ''">
+      <xsl:variable name="altText">
+        <xsl:choose>
+          <xsl:when test="$alt != ''"><xsl:value-of select="$alt"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <div class="rbccm-featured-conferences__speaker">
+        <div class="rbccm-featured-conferences__speaker-avatar">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$altText"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__speaker-name"><xsl:value-of select="$name"/></div>
+        <div class="rbccm-featured-conferences__speaker-title"><xsl:value-of select="$title"/></div>
+      </div>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="render-insight">
+    <xsl:param name="mode"/>  <!-- 'featured' or 'card' -->
+    <xsl:param name="label"/>
+    <xsl:param name="title"/>
+    <xsl:param name="desc"/>
+    <xsl:param name="meta"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
+    <xsl:param name="href"/>
+
+    <xsl:if test="$title != '' or $image != ''">
+      <xsl:variable name="labelText">
+        <xsl:choose>
+          <xsl:when test="$label != ''"><xsl:value-of select="$label"/></xsl:when>
+          <xsl:otherwise>INSIGHTS</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="modifierClass">
+        <xsl:choose>
+          <xsl:when test="$mode = 'featured'">rbccm-featured-conferences__insight--featured</xsl:when>
+          <xsl:otherwise>rbccm-featured-conferences__insight--card</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <a>
+        <xsl:attribute name="class">rbccm-featured-conferences__insight <xsl:value-of select="$modifierClass"/></xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+        <div class="rbccm-featured-conferences__insight-media">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__insight-body">
+          <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$labelText"/></div>
+          <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
+          <p class="rbccm-featured-conferences__insight-desc">
+            <xsl:value-of select="$desc" disable-output-escaping="yes"/>
+          </p>
+          <xsl:if test="$meta != ''">
+            <p class="rbccm-featured-conferences__insight-meta">
+              <xsl:value-of select="$meta"/>
+              <span class="rbccm-featured-conferences__insight-chevron"> &#8250;</span>
+            </p>
+          </xsl:if>
+        </div>
+      </a>
+    </xsl:if>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053600">
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
+  <!-- Brightcove defaults (overridden per-conference via Conference fields if needed) -->
+  <Datum ID="BCAccount" Type="String" Name="Brightcove Account">6021289101001</Datum>
+  <Datum ID="BCPlayer" Type="String" Name="Brightcove Player">VyvCc9BZx</Datum>
+  <Datum ID="BCEmbed" Type="String" Name="Brightcove Embed">default</Datum>
+</Properties>
+
+<Data>
+  <!-- EXACTLY 3 Conference groups required (component will not render otherwise) -->
+  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="conference">
+    <!-- Conference basics -->
+    <Datum ID="Name" Type="String" Name="Conference Name"></Datum>
+    <!-- Brightcove video. Default = placeholder reel used during testing. -->
+    <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">6385583003112</Datum>
+    <Datum ID="BCPoster" Type="String" Name="Brightcove Poster Override"></Datum>
+    <!-- OVERVIEW TAB -->
+    <Datum ID="Date" Type="String" Name="Date"></Datum>
+    <Datum ID="Location" Type="String" Name="Location"></Datum>
+    <Datum ID="Format" Type="String" Name="Format"></Datum>
+    <Datum ID="OverviewHeading" Type="String" Name="Overview Heading">Conference overview</Datum>
+    <Datum ID="OverviewBody" Type="Textarea" Name="Overview Body"></Datum>
+    <Datum ID="KeyTopicsLabel" Type="String" Name="Key Topics Label">Key topics:</Datum>
+    <Datum ID="KeyTopics" Type="Textarea" Name="Key Topics"></Datum>
+    <Datum ID="ContactText" Type="Textarea" Name="Contact Text"></Datum>
+    <!-- SPEAKERS TAB -->
+    <Datum ID="SpeakersHeading" Type="String" Name="Speakers Heading">Featured speakers</Datum>
+    <Datum ID="SpeakersIntro" Type="Textarea" Name="Speakers Intro"></Datum>
+    <Datum ID="SpeakersFootnote" Type="String" Name="Speakers Footnote">+ Additional speakers to be announced</Datum>
+    <!-- Up to 5 speakers per conference. Empty slots are skipped. -->
+    <Datum ID="Speaker1Name" Type="String" Name="Speaker 1 - Name"/>
+    <Datum ID="Speaker1Title" Type="String" Name="Speaker 1 - Title"/>
+    <Datum ID="Speaker1Image" Type="String" Name="Speaker 1 - Image"/>
+    <Datum ID="Speaker1Alt" Type="String" Name="Speaker 1 - Image Alt"/>
+    <Datum ID="Speaker2Name" Type="String" Name="Speaker 2 - Name"/>
+    <Datum ID="Speaker2Title" Type="String" Name="Speaker 2 - Title"/>
+    <Datum ID="Speaker2Image" Type="String" Name="Speaker 2 - Image"/>
+    <Datum ID="Speaker2Alt" Type="String" Name="Speaker 2 - Image Alt"/>
+    <Datum ID="Speaker3Name" Type="String" Name="Speaker 3 - Name"/>
+    <Datum ID="Speaker3Title" Type="String" Name="Speaker 3 - Title"/>
+    <Datum ID="Speaker3Image" Type="String" Name="Speaker 3 - Image"/>
+    <Datum ID="Speaker3Alt" Type="String" Name="Speaker 3 - Image Alt"/>
+    <Datum ID="Speaker4Name" Type="String" Name="Speaker 4 - Name"/>
+    <Datum ID="Speaker4Title" Type="String" Name="Speaker 4 - Title"/>
+    <Datum ID="Speaker4Image" Type="String" Name="Speaker 4 - Image"/>
+    <Datum ID="Speaker4Alt" Type="String" Name="Speaker 4 - Image Alt"/>
+    <Datum ID="Speaker5Name" Type="String" Name="Speaker 5 - Name"/>
+    <Datum ID="Speaker5Title" Type="String" Name="Speaker 5 - Title"/>
+    <Datum ID="Speaker5Image" Type="String" Name="Speaker 5 - Image"/>
+    <Datum ID="Speaker5Alt" Type="String" Name="Speaker 5 - Image Alt"/>
+    <!-- INSIGHTS TAB -->
+    <Datum ID="InsightsCTAText" Type="String" Name="Insights CTA Text">View all conference insights</Datum>
+    <Datum ID="InsightsCTAHref" Type="String" Name="Insights CTA Href"></Datum>
+    <!-- Insight 1 = the large featured tile. Insights 2/3/4 = standard cards row. -->
+    <Datum ID="Insight1Label" Type="String" Name="Insight 1 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight1Title" Type="String" Name="Insight 1 - Title"/>
+    <Datum ID="Insight1Description" Type="Textarea" Name="Insight 1 - Description"/>
+    <Datum ID="Insight1Meta" Type="String" Name="Insight 1 - Meta (e.g. 8 min read)"/>
+    <Datum ID="Insight1Image" Type="String" Name="Insight 1 - Image"/>
+    <Datum ID="Insight1ImageAlt" Type="String" Name="Insight 1 - Image Alt"/>
+    <Datum ID="Insight1Href" Type="String" Name="Insight 1 - Href"/>
+    <Datum ID="Insight2Label" Type="String" Name="Insight 2 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight2Title" Type="String" Name="Insight 2 - Title"/>
+    <Datum ID="Insight2Description" Type="Textarea" Name="Insight 2 - Description"/>
+    <Datum ID="Insight2Meta" Type="String" Name="Insight 2 - Meta"/>
+    <Datum ID="Insight2Image" Type="String" Name="Insight 2 - Image"/>
+    <Datum ID="Insight2ImageAlt" Type="String" Name="Insight 2 - Image Alt"/>
+    <Datum ID="Insight2Href" Type="String" Name="Insight 2 - Href"/>
+    <Datum ID="Insight3Label" Type="String" Name="Insight 3 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight3Title" Type="String" Name="Insight 3 - Title"/>
+    <Datum ID="Insight3Description" Type="Textarea" Name="Insight 3 - Description"/>
+    <Datum ID="Insight3Meta" Type="String" Name="Insight 3 - Meta"/>
+    <Datum ID="Insight3Image" Type="String" Name="Insight 3 - Image"/>
+    <Datum ID="Insight3ImageAlt" Type="String" Name="Insight 3 - Image Alt"/>
+    <Datum ID="Insight3Href" Type="String" Name="Insight 3 - Href"/>
+    <Datum ID="Insight4Label" Type="String" Name="Insight 4 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight4Title" Type="String" Name="Insight 4 - Title"/>
+    <Datum ID="Insight4Description" Type="Textarea" Name="Insight 4 - Description"/>
+    <Datum ID="Insight4Meta" Type="String" Name="Insight 4 - Meta"/>
+    <Datum ID="Insight4Image" Type="String" Name="Insight 4 - Image"/>
+    <Datum ID="Insight4ImageAlt" Type="String" Name="Insight 4 - Image Alt"/>
+    <Datum ID="Insight4Href" Type="String" Name="Insight 4 - Href"/>
+  </Group>
+</Data>
