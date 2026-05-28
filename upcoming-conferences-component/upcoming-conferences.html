@@ -1,9 +1,14 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBCCM Upcoming Conference Programming
-       - Desktop: 3-col grid of cards
-       - Mobile:  slick carousel, 1 card per slide
-       - Filters / search render as static UI placeholders for V1 -->
+       - Pulls from the centralized Events List Datum (same source as the
+         conferences hub table at /en/conference/upcoming-and-past-conferences.page).
+       - Filters to events where sitelocation contains 'conference', event_date is
+         in the current year, and event_date >= today.
+       - Sorts ascending by event_date.
+       - Renders ALL matching events into the DOM. CSS hides cards beyond index 6
+         by default; JS uses the full set for search/filter show-hide.
+       - Modal renders the same set, unfiltered, no visible cap. -->
 
   <xsl:strip-space elements="*"/>
 
@@ -12,14 +17,42 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="conferences" select="
-        /Properties/Data/Group[@ID='Conference' or @Name='Conference']
-        | /Data/Group[@ID='Conference' or @Name='Conference']"/>
-    <xsl:variable name="count" select="count($conferences)"/>
+    <!-- Today + current year for the upcoming-only filter.
+         CURRENT_DATE = YYYYMMDD numeric for >= comparison with date_num. -->
+    <xsl:variable name="CURRENT_DATE" select="format-date(current-date(), '[Y0001][M01][D01]')"/>
+    <xsl:variable name="CURRENT_YEAR" select="format-date(current-date(), '[Y0001]')"/>
 
-    <xsl:if test="$count &gt;= 1">
+    <!-- Source: centralized Events List Datum. Conference events only. -->
+    <xsl:variable name="events" select="
+        /Properties/Data/Datum[@Name='Events List']/DCR/events/event[contains(sitelocation, 'conference')]"/>
 
-      <!-- ── Section heading + intro ── -->
+    <!-- Default placeholder image used when an event has no image of its own.
+         When the Events List schema gains an `event_image` field, swap this
+         block's $cardImage assignment to prefer the per-event value. -->
+    <xsl:variable name="placeholderImage" select="'https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp'"/>
+
+    <!-- Pre-filter upcoming events in the current year, sorted ascending.
+         This sequence drives both the card grid and the modal list. -->
+    <xsl:variable name="upcomingEvents" as="element()*">
+      <xsl:for-each select="$events">
+        <xsl:sort select="event_date" order="ascending"/>
+        <xsl:variable name="dateNum">
+          <xsl:call-template name="date_num">
+            <xsl:with-param name="publish_date" select="event_date"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="eventYear" select="substring(event_date, 1, 4)"/>
+        <xsl:if test="$dateNum &gt;= $CURRENT_DATE and $eventYear = $CURRENT_YEAR">
+          <xsl:sequence select="."/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="upcomingCount" select="count($upcomingEvents)"/>
+
+    <xsl:if test="$upcomingCount &gt;= 1">
+
+      <!-- Section heading + intro (authored) -->
       <xsl:variable name="heading">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
@@ -30,6 +63,7 @@
       </xsl:variable>
 
       <xsl:variable name="intro" select="/Properties/Datum[@ID='Intro']"/>
+
       <xsl:variable name="filterLabel">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='FilterLabel']) != ''">
@@ -44,7 +78,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='SearchPlaceholder']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SearchPlaceholder'])"/>
           </xsl:when>
-          <xsl:otherwise>Search conferences by title or tag…</xsl:otherwise>
+          <xsl:otherwise>Search conferences by title</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
@@ -53,7 +87,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='CTAText']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CTAText'])"/>
           </xsl:when>
-          <xsl:otherwise>View full list of 2026 Conferences</xsl:otherwise>
+          <xsl:otherwise>View full list of <xsl:value-of select="$CURRENT_YEAR"/> Conferences</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="ctaHref">
@@ -65,13 +99,13 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- Modal header copy + row list -->
+      <!-- Modal header copy -->
       <xsl:variable name="modalHeading">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='ModalHeading']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='ModalHeading'])"/>
           </xsl:when>
-          <xsl:otherwise>2026 Conference calendar</xsl:otherwise>
+          <xsl:otherwise><xsl:value-of select="$CURRENT_YEAR"/> Conference calendar</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="modalSubtitle">
@@ -82,9 +116,6 @@
           <xsl:otherwise>All upcoming RBC Capital Markets conferences</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:variable name="modalRows" select="
-          /Properties/Data/Group[@ID='ModalConference' or @Name='Modal Conference']
-          | /Data/Group[@ID='ModalConference' or @Name='Modal Conference']"/>
 
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/upcoming-conferences.css"/>
 
@@ -102,17 +133,16 @@
             </p>
           </xsl:if>
 
-          <!-- ── Filter / search bar (static UI for V1) ── -->
+          <!-- Filter / search bar (now active; JS populates Month + Region dropdowns from rendered card data) -->
           <div class="rbccm-upcoming-conferences__filters">
             <div class="rbccm-upcoming-conferences__filter-group">
               <span class="rbccm-upcoming-conferences__filter-label">
                 <xsl:value-of select="$filterLabel"/>
               </span>
               <label class="rbccm-upcoming-conferences__select-wrap">
-                <span class="rbccm-upcoming-conferences__sr-only">Topic</span>
-                <select class="rbccm-upcoming-conferences__select" aria-label="Topic">
-                  <option value="">Topic</option>
-                  <!-- Topic options for V2 -->
+                <span class="rbccm-upcoming-conferences__sr-only">Month</span>
+                <select class="rbccm-upcoming-conferences__select" id="rbccm-uc-filter-month" aria-label="Filter by month">
+                  <option value="">Month</option>
                 </select>
                 <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
                   <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -120,9 +150,8 @@
               </label>
               <label class="rbccm-upcoming-conferences__select-wrap">
                 <span class="rbccm-upcoming-conferences__sr-only">Region</span>
-                <select class="rbccm-upcoming-conferences__select" aria-label="Region">
+                <select class="rbccm-upcoming-conferences__select" id="rbccm-uc-filter-region" aria-label="Filter by region">
                   <option value="">Region</option>
-                  <!-- Region options for V2 -->
                 </select>
                 <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
                   <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -136,59 +165,78 @@
                 <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
               <span class="rbccm-upcoming-conferences__sr-only">Search conferences</span>
-              <input type="search" class="rbccm-upcoming-conferences__search-input" aria-label="Search conferences">
+              <input type="search" id="rbccm-uc-search" class="rbccm-upcoming-conferences__search-input" aria-label="Search conferences by title">
                 <xsl:attribute name="placeholder"><xsl:value-of select="$searchPlaceholder"/></xsl:attribute>
               </input>
             </label>
           </div>
 
-          <!-- ── Cards: desktop grid / mobile slick carousel ── -->
+          <!-- Cards: ALL upcoming 2026 events rendered. CSS hides cards beyond
+               index 6 by default via `:nth-of-type(n+7)`. When any filter is
+               active, JS adds `.is-filtered` to this container and `.is-filtered-out`
+               to non-matching cards. Mobile slick carousel still scopes to this set. -->
           <div class="rbccm-upcoming-conferences__cards" id="rbccm-upcoming-conferences-cards">
-            <!-- V1: cap at 6 visible cards regardless of how many Conference Groups are authored -->
-            <xsl:for-each select="$conferences[position() &lt;= 6]">
-              <xsl:variable name="month"   select="normalize-space(Datum[@ID='Month' or @Name='Month'])"/>
-              <xsl:variable name="dateLbl" select="normalize-space(Datum[@ID='DateRange' or @Name='Date Range'])"/>
-              <xsl:variable name="image"   select="normalize-space(Datum[@ID='Image' or @Name='Image'])"/>
-              <xsl:variable name="imgAlt"  select="normalize-space(Datum[@ID='ImageAlt' or @Name='Image Alt'])"/>
-              <xsl:variable name="title"   select="normalize-space(Datum[@ID='Title' or @Name='Title'])"/>
-              <xsl:variable name="loc"     select="normalize-space(Datum[@ID='Location' or @Name='Location'])"/>
-              <xsl:variable name="topic"   select="normalize-space(Datum[@ID='Topic' or @Name='Topic'])"/>
-              <xsl:variable name="region"  select="normalize-space(Datum[@ID='Region' or @Name='Region'])"/>
-              <xsl:variable name="href"    select="normalize-space(Datum[@ID='Href' or @Name='Href'])"/>
+            <xsl:for-each select="$upcomingEvents">
+              <xsl:variable name="eventDate"    select="event_date"/>
+              <xsl:variable name="eventDateEnd" select="event_date_end"/>
+              <xsl:variable name="title"        select="normalize-space(event_name)"/>
+              <xsl:variable name="loc"          select="normalize-space(location)"/>
+              <xsl:variable name="href"         select="normalize-space(event_url)"/>
+
+              <!-- Derive month abbreviation + full name + year + day range from event_date / event_date_end -->
+              <xsl:variable name="monthAbbr">
+                <xsl:call-template name="month_abbrev">
+                  <xsl:with-param name="iso_date" select="$eventDate"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="monthFull">
+                <xsl:call-template name="month_full">
+                  <xsl:with-param name="iso_date" select="$eventDate"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="yearOnly" select="substring($eventDate, 1, 4)"/>
+              <xsl:variable name="startDay" select="substring($eventDate, 9, 2)"/>
+              <xsl:variable name="endDay"   select="substring($eventDateEnd, 9, 2)"/>
+
+              <xsl:variable name="monthLabel" select="concat($monthAbbr, ' ', $yearOnly)"/>
+              <xsl:variable name="dayLabel">
+                <xsl:choose>
+                  <xsl:when test="$endDay != '' and $endDay != $startDay">
+                    <xsl:value-of select="concat($startDay, '-', $endDay)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$startDay"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
 
               <a class="rbccm-upcoming-conferences__card">
                 <xsl:if test="$href != ''">
                   <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
                 </xsl:if>
-                <xsl:if test="$topic != ''">
-                  <xsl:attribute name="data-topic"><xsl:value-of select="$topic"/></xsl:attribute>
-                </xsl:if>
-                <xsl:if test="$region != ''">
-                  <xsl:attribute name="data-region"><xsl:value-of select="$region"/></xsl:attribute>
-                </xsl:if>
-                <xsl:if test="$title != ''">
-                  <xsl:attribute name="aria-label"><xsl:value-of select="$title"/>, <xsl:value-of select="$month"/> <xsl:value-of select="$dateLbl"/>, <xsl:value-of select="$loc"/></xsl:attribute>
-                </xsl:if>
+                <!-- Filter / search attributes used by the JS:
+                     data-month = full month name ("June", "July"...) - feeds the Month dropdown
+                     data-month-short = uppercase 3-letter abbreviation ("JUN") - reserved for future use
+                     data-region = exact location string ("New York", "Toronto", "London")
+                     data-title  = lowercased event_name (for case-insensitive search) -->
+                <xsl:attribute name="data-month"><xsl:value-of select="$monthFull"/></xsl:attribute>
+                <xsl:attribute name="data-month-short"><xsl:value-of select="upper-case($monthAbbr)"/></xsl:attribute>
+                <xsl:attribute name="data-region"><xsl:value-of select="$loc"/></xsl:attribute>
+                <xsl:attribute name="data-title"><xsl:value-of select="lower-case($title)"/></xsl:attribute>
+                <xsl:attribute name="aria-label"><xsl:value-of select="$title"/>, <xsl:value-of select="$monthLabel"/> <xsl:value-of select="$dayLabel"/>, <xsl:value-of select="$loc"/></xsl:attribute>
 
-                <!-- Background image + dark overlay -->
+                <!-- Background image (placeholder by default) + dark overlay -->
                 <div class="rbccm-upcoming-conferences__card-media">
-                  <xsl:if test="$image != ''">
-                    <img loading="lazy">
-                      <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
-                      <xsl:attribute name="alt">
-                        <xsl:choose>
-                          <xsl:when test="$imgAlt != ''"><xsl:value-of select="$imgAlt"/></xsl:when>
-                          <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:attribute>
-                    </img>
-                  </xsl:if>
+                  <img loading="lazy">
+                    <xsl:attribute name="src"><xsl:value-of select="$placeholderImage"/></xsl:attribute>
+                    <xsl:attribute name="alt"><xsl:value-of select="$title"/></xsl:attribute>
+                  </img>
                 </div>
 
-                <!-- Top: month + date range -->
+                <!-- Top: month + day(s) -->
                 <div class="rbccm-upcoming-conferences__card-date">
-                  <div class="rbccm-upcoming-conferences__card-month"><xsl:value-of select="$month"/></div>
-                  <div class="rbccm-upcoming-conferences__card-day"><xsl:value-of select="$dateLbl"/></div>
+                  <div class="rbccm-upcoming-conferences__card-month"><xsl:value-of select="upper-case($monthLabel)"/></div>
+                  <div class="rbccm-upcoming-conferences__card-day"><xsl:value-of select="$dayLabel"/></div>
                 </div>
 
                 <!-- Bottom: yellow divider, title, location -->
@@ -209,7 +257,36 @@
             </xsl:for-each>
           </div>
 
-          <!-- Mobile slick controls (arrows + dots) — only visible when carousel is initialized -->
+          <!-- Empty state: shown by JS when no card matches the active filter / search.
+               Icon + heading + two messages + "Clear filters" button.
+               The button resets the search input + both selects + re-runs applyFilters. -->
+          <div class="rbccm-upcoming-conferences__empty" id="rbccm-uc-empty" hidden="hidden">
+            <div class="rbccm-upcoming-conferences__empty-icon-wrap">
+              <svg class="rbccm-upcoming-conferences__empty-icon" xmlns="http://www.w3.org/2000/svg" width="43" height="43" viewBox="0 0 43 43" fill="none" aria-hidden="true">
+                <g clip-path="url(#rbccm-uc-empty-clip)">
+                  <path d="M4.57628 42.4419C3.83654 43.1811 2.74615 43.1766 2.05053 42.477L0.485079 40.9024C-0.16078 40.2526 -0.169829 39.1647 0.500915 38.4945L8.78624 30.207C9.32465 29.6693 10.0316 29.5583 10.743 29.8108L11.6355 28.9131C8.20485 24.2944 8.38696 17.9302 12.1637 13.5073L8.47519 13.47C4.83982 13.4326 1.97927 10.4509 1.90461 6.83857C1.83449 3.36098 4.61926 0.00566013 8.31344 0.00566013L36.5593 0C40.2298 0 43.0315 3.29759 42.9998 6.76046C42.967 10.4078 40.0793 13.4473 36.4021 13.4666L30.767 13.496C34.9102 18.3343 34.684 25.4106 30.4333 29.9523C26.1622 34.5155 19.1166 35.1494 14.0775 31.3639L13.1941 32.2729C13.4441 32.9657 13.3344 33.6857 12.7971 34.2223L4.57628 42.443V42.4419ZM36.203 12.5745C39.5274 12.5893 42.1142 9.89843 42.1017 6.69367C42.0893 3.49909 39.49 0.861472 36.2223 0.862604L8.56341 0.875056C5.30923 0.876188 2.77443 3.61456 2.80271 6.76951C2.83099 9.90862 5.34543 12.5066 8.54871 12.5723L13.0539 12.5836C17.7695 8.14153 25.1691 8.14153 29.8836 12.5802L36.203 12.5734V12.5745ZM20.8257 10.1633C14.4678 10.5233 9.71827 15.9921 10.1074 22.2454C10.4965 28.5089 15.8737 33.2872 22.1389 32.9182C28.4188 32.5491 33.2101 27.1562 32.838 20.8542C32.4715 14.6484 27.1531 9.80561 20.8268 10.1633H20.8257ZM12.6478 31.5235C12.9453 31.245 13.1421 31.0628 13.3661 30.7922C12.9826 30.4209 12.6207 30.0938 12.2497 29.6579C11.9284 29.8402 11.735 30.1051 11.4828 30.3813L12.6478 31.5235ZM3.94512 41.8046L12.1615 33.5883C12.5234 33.2272 12.5121 32.6929 12.1682 32.3488L10.6458 30.8262C10.3042 30.4843 9.77822 30.4832 9.42192 30.8398L1.17279 39.0821C0.789346 39.4658 0.84477 40.0092 1.19767 40.3624L2.6387 41.8046C2.99726 42.1634 3.52888 42.2212 3.94512 41.8046Z" fill="#1D86F0"/>
+                  <path d="M36.2033 12.5746L29.8839 12.5814C25.1694 8.14156 17.7697 8.14156 13.0542 12.5848L8.54899 12.5734C5.34458 12.5078 2.83127 9.90979 2.80299 6.77068C2.77358 3.61572 5.30951 0.877354 8.56369 0.876222L36.2225 0.86377C39.4903 0.862638 42.0896 3.49913 42.102 6.69484C42.1156 9.8996 39.5288 12.5904 36.2033 12.5757V12.5746ZM36.6297 8.24911L35.6977 7.3016C36.1909 6.42202 35.9624 5.38735 35.2159 4.81907C34.4422 4.23155 33.3971 4.33343 32.7433 4.98774C32.0714 5.66016 32.0171 6.71182 32.5566 7.43631C33.1426 8.2242 34.1651 8.42231 35.0485 7.94912L36.0189 8.89097C36.2044 9.07096 36.5019 9.02002 36.6377 8.86832C36.7824 8.70644 36.813 8.43363 36.6309 8.24684L36.6297 8.24911ZM27.1918 7.16123C27.5549 7.16123 27.616 6.78879 27.5821 6.62465C27.5368 6.4107 27.3649 6.27599 27.0776 6.27599H7.97213C7.64637 6.27599 7.46652 6.50239 7.49028 6.76615C7.50951 6.97218 7.66786 7.16802 7.96873 7.16802L27.1918 7.16123Z" fill="#D5E7FE"/>
+                  <path d="M20.826 10.1631C27.1522 9.80542 32.4707 14.6482 32.8372 20.854C33.2093 27.156 28.4179 32.549 22.1381 32.918C15.8729 33.287 10.4968 28.5088 10.1065 22.2453C9.71742 15.9919 14.4669 10.5231 20.8249 10.1631H20.826ZM20.3181 11.9574C14.9273 12.6061 11.2127 17.5213 11.9106 22.8101C12.6017 28.0492 17.3863 31.7588 22.6414 31.1215C27.9044 30.4819 31.6676 25.6934 31.0511 20.4148C30.4347 15.1361 25.6795 11.3122 20.3181 11.9574Z" fill="#D5E7FE"/>
+                  <path d="M3.94529 41.8046C3.52904 42.2211 2.99742 42.1634 2.63886 41.8046L1.19784 40.3624C0.844934 40.0092 0.78951 39.4658 1.17295 39.082L9.42322 30.8386C9.77951 30.482 10.3055 30.4843 10.6471 30.825L12.1695 32.3476C12.5134 32.6917 12.5236 33.2249 12.1627 33.5872L3.94642 41.8034L3.94529 41.8046Z" fill="#D5E7FE"/>
+                  <path d="M27.1916 7.16097L7.96852 7.16776C7.66651 7.16776 7.50929 6.97192 7.49006 6.76589C7.46518 6.50326 7.64616 6.27686 7.97191 6.27686H27.0774C27.3635 6.27686 27.5366 6.41157 27.5818 6.62439C27.6169 6.7874 27.5547 7.16097 27.1916 7.16097Z" fill="#1D86F0"/>
+                  <path d="M36.6297 8.2492C36.8129 8.43485 36.7812 8.70767 36.6364 8.87068C36.5018 9.02237 36.2032 9.07218 36.0177 8.89332L35.0472 7.95148C34.1639 8.42466 33.1413 8.22543 32.5554 7.43867C32.017 6.71417 32.0702 5.66252 32.7421 4.9901C33.3958 4.33579 34.441 4.2339 35.2146 4.82143C35.9623 5.38857 36.1897 6.42437 35.6965 7.30396L36.6285 8.25146L36.6297 8.2492ZM33.9512 5.34555C33.3517 5.43046 33.0101 5.9659 33.1097 6.50928C33.2002 7.00171 33.6775 7.37867 34.2181 7.2983C34.7588 7.21792 35.1196 6.76285 35.054 6.19231C34.9997 5.72025 34.5462 5.26065 33.9512 5.34442V5.34555Z" fill="#1D86F0"/>
+                  <path d="M20.3181 11.9574C25.6795 11.3121 30.4381 15.161 31.0511 20.4148C31.6642 25.6685 27.9044 30.4819 22.6414 31.1215C17.3863 31.7599 12.6017 28.0491 11.9106 22.8101C11.2127 17.5224 14.9273 12.606 20.3181 11.9574ZM21.3361 12.7849C16.4147 12.863 12.604 16.9372 12.725 21.7596C12.846 26.5628 16.8173 30.3788 21.629 30.2928C26.4588 30.2068 30.3136 26.2186 30.2186 21.3589C30.1259 16.6055 26.2145 12.7079 21.3361 12.7849Z" fill="#1D86F0"/>
+                  <path d="M33.9511 5.34539C34.545 5.26162 34.9985 5.72123 35.054 6.19328C35.1196 6.76382 34.7339 7.22229 34.2181 7.29927C33.7023 7.37625 33.2001 7.00155 33.1096 6.51025C33.0101 5.96574 33.3528 5.43029 33.9511 5.34652V5.34539Z" fill="#D5E7FE"/>
+                </g>
+                <defs>
+                  <clipPath id="rbccm-uc-empty-clip">
+                    <rect width="43" height="43" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
+            <h3 class="rbccm-upcoming-conferences__empty-heading">No conferences found</h3>
+            <p class="rbccm-upcoming-conferences__empty-message">We couldn't find any conferences that match your current filters.</p>
+            <p class="rbccm-upcoming-conferences__empty-message rbccm-upcoming-conferences__empty-message--emphasis">Try adjusting your filters or search terms.</p>
+            <button type="button" class="rbccm-upcoming-conferences__empty-clear" id="rbccm-uc-clear">Clear filters</button>
+          </div>
+
+          <!-- Mobile slick controls (arrows + dots) - only visible when carousel is initialized -->
           <div class="rbccm-upcoming-conferences__controls">
             <button id="rbccm-uc-prev" class="rbccm-upcoming-conferences__btn" type="button" aria-label="Previous conference" tabindex="0">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
@@ -224,7 +301,7 @@
             </button>
           </div>
 
-          <!-- CTA — if Href starts with #, auto-wires Bootstrap modal trigger attributes -->
+          <!-- CTA -- if Href starts with #, auto-wires Bootstrap modal trigger attributes -->
           <xsl:if test="$ctaHref != ''">
             <div class="rbccm-upcoming-conferences__cta-wrap">
               <a class="rbccm-upcoming-conferences__cta">
@@ -242,7 +319,8 @@
         </div>
       </section>
 
-      <!-- ── Conference listing modal (Bootstrap pattern, BEM-scoped content) ── -->
+      <!-- Conference listing modal (Bootstrap pattern, BEM-scoped content).
+           Renders ALL upcoming events from the same source as the cards, no cap. -->
       <xsl:if test="starts-with($ctaHref, '#')">
         <div role="dialog" class="modal fade" id="conference-listing-modal">
           <div role="document" class="modal-dialog rbccm-upcoming-conferences__modal-dialog">
@@ -260,32 +338,50 @@
                   </div>
                 </div>
 
-                <!-- Conference list -->
-                <xsl:if test="count($modalRows) &gt;= 1">
-                  <div class="rbccm-upcoming-conferences__modal-list">
-                    <div class="rbccm-upcoming-conferences__modal-list-inner">
-                      <xsl:for-each select="$modalRows">
-                        <xsl:variable name="rowDate"     select="normalize-space(Datum[@ID='RowDate' or @Name='Date'])"/>
-                        <xsl:variable name="rowTitle"    select="normalize-space(Datum[@ID='RowTitle' or @Name='Title'])"/>
-                        <xsl:variable name="rowLocation" select="normalize-space(Datum[@ID='RowLocation' or @Name='Location'])"/>
+                <!-- Conference list (same data source as the cards, no cap) -->
+                <div class="rbccm-upcoming-conferences__modal-list">
+                  <div class="rbccm-upcoming-conferences__modal-list-inner">
+                    <xsl:for-each select="$upcomingEvents">
+                      <xsl:variable name="rowMonth">
+                        <xsl:call-template name="month_abbrev">
+                          <xsl:with-param name="iso_date" select="event_date"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:variable name="rowStartDay" select="substring(event_date, 9, 2)"/>
+                      <xsl:variable name="rowEndDay"   select="substring(event_date_end, 9, 2)"/>
+                      <xsl:variable name="rowDate">
+                        <xsl:choose>
+                          <xsl:when test="$rowEndDay != '' and $rowEndDay != $rowStartDay">
+                            <xsl:value-of select="concat($rowMonth, ' ', $rowStartDay, '-', $rowEndDay)"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="concat($rowMonth, ' ', $rowStartDay)"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:variable>
+                      <xsl:variable name="rowTitle"    select="normalize-space(event_name)"/>
+                      <xsl:variable name="rowLocation" select="normalize-space(location)"/>
 
-                        <div class="rbccm-upcoming-conferences__modal-row">
-                          <span class="rbccm-upcoming-conferences__modal-date"><xsl:value-of select="$rowDate"/></span>
-                          <h3 class="rbccm-upcoming-conferences__modal-title"><xsl:value-of select="$rowTitle"/></h3>
-                          <xsl:if test="$rowLocation != ''">
-                            <span class="rbccm-upcoming-conferences__modal-location">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                <path d="M13.3334 6.66659C13.3334 9.99525 9.64075 13.4619 8.40075 14.5326C8.28523 14.6194 8.14461 14.6664 8.00008 14.6664C7.85555 14.6664 7.71493 14.6194 7.59941 14.5326C6.35941 13.4619 2.66675 9.99525 2.66675 6.66659C2.66675 5.2521 3.22865 3.89554 4.22885 2.89535C5.22904 1.89516 6.58559 1.33325 8.00008 1.33325C9.41457 1.33325 10.7711 1.89516 11.7713 2.89535C12.7715 3.89554 13.3334 5.2521 13.3334 6.66659Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 8.66675C9.10457 8.66675 10 7.77132 10 6.66675C10 5.56218 9.10457 4.66675 8 4.66675C6.89543 4.66675 6 5.56218 6 6.66675C6 7.77132 6.89543 8.66675 8 8.66675Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-                              </svg>
-                              <span class="rbccm-upcoming-conferences__modal-location-text"><xsl:value-of select="$rowLocation"/></span>
-                            </span>
-                          </xsl:if>
-                        </div>
-                      </xsl:for-each>
-                    </div>
+                      <div class="rbccm-upcoming-conferences__modal-row">
+                        <span class="rbccm-upcoming-conferences__modal-date"><xsl:value-of select="$rowDate"/></span>
+                        <h3 class="rbccm-upcoming-conferences__modal-title"><xsl:value-of select="$rowTitle"/></h3>
+                        <xsl:if test="$rowLocation != ''">
+                          <span class="rbccm-upcoming-conferences__modal-location">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <path d="M13.3334 6.66659C13.3334 9.99525 9.64075 13.4619 8.40075 14.5326C8.28523 14.6194 8.14461 14.6664 8.00008 14.6664C7.85555 14.6664 7.71493 14.6194 7.59941 14.5326C6.35941 13.4619 2.66675 9.99525 2.66675 6.66659C2.66675 5.2521 3.22865 3.89554 4.22885 2.89535C5.22904 1.89516 6.58559 1.33325 8.00008 1.33325C9.41457 1.33325 10.7711 1.89516 11.7713 2.89535C12.7715 3.89554 13.3334 5.2521 13.3334 6.66659Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M8 8.66675C9.10457 8.66675 10 7.77132 10 6.66675C10 5.56218 9.10457 4.66675 8 4.66675C6.89543 4.66675 6 5.56218 6 6.66675C6 7.77132 6.89543 8.66675 8 8.66675Z" stroke="#2C2C2C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="rbccm-upcoming-conferences__modal-location-text"><xsl:value-of select="$rowLocation"/></span>
+                          </span>
+                        </xsl:if>
+                      </div>
+                    </xsl:for-each>
                   </div>
-                </xsl:if>
+                </div>
+
+                <div class="modal-bottom">
+                  <p><a href="#" class="btn btn-blue">Download the full conference list</a></p>
+                </div>
 
               </div>
             </div>
@@ -293,55 +389,79 @@
         </div>
       </xsl:if>
 
-      <!-- ── Component JS (mobile slick init, scoped) ── -->
+      <!-- Component JS (mobile slick + filter / search wiring) -->
       <script src="/assets/rbccm/js/sub/test/upcoming-conferences.js"></script>
 
     </xsl:if>
 
   </xsl:template>
 
+  <!-- ---------------------------------------------
+       Named templates
+       --------------------------------------------- -->
+
+  <!-- Convert ISO date 'YYYY-MM-DD' into numeric YYYYMMDD for >= comparison -->
+  <xsl:template name="date_num">
+    <xsl:param name="publish_date"/>
+    <xsl:variable name="vYear"     select="substring($publish_date, 1, 4)"/>
+    <xsl:variable name="vnumMonth" select="substring($publish_date, 6, 2)"/>
+    <xsl:variable name="vDay"      select="substring($publish_date, 9, 2)"/>
+    <xsl:value-of select="concat($vYear, $vnumMonth, $vDay)"/>
+  </xsl:template>
+
+  <!-- Convert ISO date 'YYYY-MM-DD' into 3-letter month abbreviation (Jan, Feb, ...) -->
+  <xsl:template name="month_abbrev">
+    <xsl:param name="iso_date"/>
+    <xsl:variable name="m" select="substring($iso_date, 6, 2)"/>
+    <xsl:choose>
+      <xsl:when test="$m = '01'">Jan</xsl:when>
+      <xsl:when test="$m = '02'">Feb</xsl:when>
+      <xsl:when test="$m = '03'">Mar</xsl:when>
+      <xsl:when test="$m = '04'">Apr</xsl:when>
+      <xsl:when test="$m = '05'">May</xsl:when>
+      <xsl:when test="$m = '06'">Jun</xsl:when>
+      <xsl:when test="$m = '07'">Jul</xsl:when>
+      <xsl:when test="$m = '08'">Aug</xsl:when>
+      <xsl:when test="$m = '09'">Sep</xsl:when>
+      <xsl:when test="$m = '10'">Oct</xsl:when>
+      <xsl:when test="$m = '11'">Nov</xsl:when>
+      <xsl:when test="$m = '12'">Dec</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Convert ISO date 'YYYY-MM-DD' into full month name (January, February, ...) -->
+  <xsl:template name="month_full">
+    <xsl:param name="iso_date"/>
+    <xsl:variable name="m" select="substring($iso_date, 6, 2)"/>
+    <xsl:choose>
+      <xsl:when test="$m = '01'">January</xsl:when>
+      <xsl:when test="$m = '02'">February</xsl:when>
+      <xsl:when test="$m = '03'">March</xsl:when>
+      <xsl:when test="$m = '04'">April</xsl:when>
+      <xsl:when test="$m = '05'">May</xsl:when>
+      <xsl:when test="$m = '06'">June</xsl:when>
+      <xsl:when test="$m = '07'">July</xsl:when>
+      <xsl:when test="$m = '08'">August</xsl:when>
+      <xsl:when test="$m = '09'">September</xsl:when>
+      <xsl:when test="$m = '10'">October</xsl:when>
+      <xsl:when test="$m = '11'">November</xsl:when>
+      <xsl:when test="$m = '12'">December</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
 
-<Properties ComponentID="1554499053700">
-  <!-- ── Section header ── -->
+<Properties ComponentID="1554499053453">
+  <!-- Section header -->
   <Datum ID="Heading" Type="String" Name="Section Heading">Upcoming conference programming</Datum>
   <Datum ID="Intro" Type="Textarea" Name="Section Intro">Connect with industry leaders and explore market-shaping trends at our upcoming global events.</Datum>
-
-  <!-- ── Filter UI (hidden in V1, kept for V2) ── -->
+  <!-- Filter / search UI -->
   <Datum ID="FilterLabel" Type="String" Name="Filter Label">Filter by:</Datum>
-  <Datum ID="SearchPlaceholder" Type="String" Name="Search Placeholder">Search conferences by title or tag…</Datum>
-
-  <!-- ── CTA button at the bottom of the section ── -->
-  <Datum ID="CTAText" Type="String" Name="CTA Button Text">View full list of 2026 Conferences</Datum>
+  <Datum ID="SearchPlaceholder" Type="String" Name="Search Placeholder">Search conferences by title</Datum>
+  <!-- CTA button at the bottom of the section. Defaults populate dynamically: "View full list of {CURRENT_YEAR} Conferences" -->
+  <Datum ID="CTAText" Type="String" Name="CTA Button Text"></Datum>
   <Datum ID="CTAHref" Type="String" Name="CTA Button URL">#conference-listing-modal</Datum>
-
-  <!-- ── Modal header copy (modal opens when CTAHref starts with #) ── -->
-  <Datum ID="ModalHeading" Type="String" Name="Modal Heading">2026 Conference calendar</Datum>
+  <!-- Modal header copy (modal opens when CTAHref starts with #) -->
+  <Datum ID="ModalHeading" Type="String" Name="Modal Heading"></Datum>
   <Datum ID="ModalSubtitle" Type="String" Name="Modal Subtitle">All upcoming RBC Capital Markets conferences</Datum>
 </Properties>
-
-<Data>
-  <!-- ── CAROUSEL CARDS ──
-       One Group per upcoming conference card. Render is capped at 6 cards by the XSL.
-       NOTE: Datum Name attributes MUST match the XSL's @Name selectors — Teamsite strips
-       @ID on replicated Datums, so @Name is the only reliable match. -->
-  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="upcoming-conference">
-    <Datum ID="Month" Type="String" Name="Month">MAR 2026</Datum>
-    <Datum ID="DateRange" Type="String" Name="Date Range">10-11</Datum>
-    <Datum ID="Image" Type="String" Name="Image">/assets/rbccm/images/conferences/conference-placeholder.webp</Datum>
-    <Datum ID="ImageAlt" Type="String" Name="Image Alt">Conference</Datum>
-    <Datum ID="Title" Type="String" Name="Title">Conference Title</Datum>
-    <Datum ID="Location" Type="String" Name="Location">New York, NY</Datum>
-    <Datum ID="Topic" Type="String" Name="Topic"/>
-    <Datum ID="Region" Type="String" Name="Region"/>
-    <Datum ID="Href" Type="String" Name="Href"/>
-  </Group>
-
-  <!-- ── MODAL ROWS ──
-       One Group per row in the "View full list" modal. No render cap. -->
-  <Group ID="ModalConference" Name="Modal Conference" Replicatable="true" CloneGroupID="modal-conference-row">
-    <Datum ID="RowDate" Type="String" Name="Date">May 19-20</Datum>
-    <Datum ID="RowTitle" Type="String" Name="Title">Conference Title</Datum>
-    <Datum ID="RowLocation" Type="String" Name="Location">New York, NY</Datum>
-  </Group>
-</Data>
