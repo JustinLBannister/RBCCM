@@ -338,10 +338,13 @@
                   </div>
                 </div>
 
-                <!-- Conference list (same data source as the cards, no cap) -->
+                <!-- Conference list (same data source as the cards).
+                     Capped at the 8 nearest upcoming events. $upcomingEvents is
+                     already sorted ascending (soonest first), so position() <= 8
+                     yields the most imminent 8. -->
                 <div class="rbccm-upcoming-conferences__modal-list">
                   <div class="rbccm-upcoming-conferences__modal-list-inner">
-                    <xsl:for-each select="$upcomingEvents">
+                    <xsl:for-each select="$upcomingEvents[position() &lt;= 8]">
                       <xsl:variable name="rowMonth">
                         <xsl:call-template name="month_abbrev">
                           <xsl:with-param name="iso_date" select="event_date"/>
@@ -465,3 +468,32 @@
   <Datum ID="ModalHeading" Type="String" Name="Modal Heading"></Datum>
   <Datum ID="ModalSubtitle" Type="String" Name="Modal Subtitle">All upcoming RBC Capital Markets conferences</Datum>
 </Properties>
+
+<Data>
+  <!-- Teamsite requires a non-empty <Data> block or the skin fails to load
+       ("Could not load component data XML into XMLDOM ... Premature end of file").
+
+       This component renders its cards + modal from the centralized
+       Events List Datum (/Properties/Data/Datum[@Name='Events List']/DCR/...),
+       NOT from these Groups. The Conference + ModalConference Groups below are
+       retained only to keep the data XML valid for Teamsite; the XSL does not
+       read them. Once the Events List binding is confirmed in this component's
+       context, this block can be replaced with the proper Events List Datum
+       declaration. -->
+  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="upcoming-conference">
+    <Datum ID="Month" Type="String" Name="Month">MAR 2026</Datum>
+    <Datum ID="DateRange" Type="String" Name="Date Range">10-11</Datum>
+    <Datum ID="Image" Type="String" Name="Image">/assets/rbccm/images/conferences/conference-placeholder.webp</Datum>
+    <Datum ID="ImageAlt" Type="String" Name="Image Alt">Conference</Datum>
+    <Datum ID="Title" Type="String" Name="Title">Conference Title</Datum>
+    <Datum ID="Location" Type="String" Name="Location">New York, NY</Datum>
+    <Datum ID="Topic" Type="String" Name="Topic"/>
+    <Datum ID="Region" Type="String" Name="Region"/>
+    <Datum ID="Href" Type="String" Name="Href"/>
+  </Group>
+  <Group ID="ModalConference" Name="Modal Conference" Replicatable="true" CloneGroupID="modal-conference-row">
+    <Datum ID="RowDate" Type="String" Name="Date">May 19-20</Datum>
+    <Datum ID="RowTitle" Type="String" Name="Title">Conference Title</Datum>
+    <Datum ID="RowLocation" Type="String" Name="Location">New York, NY</Datum>
+  </Group>
+</Data>
