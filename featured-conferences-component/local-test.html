@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Featured Conferences — Local Test</title>
+
+  <!-- jQuery + Slick (needed by the JS for the speakers/insights carousels) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+
+  <!-- Component CSS (same file deployed to /assets/rbccm/css/sub/test/) -->
+  <link rel="stylesheet" href="./featured-conferences.css"/>
+
+  <style>
+    /* Bare page reset so the component renders in isolation */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #001934;
+      font-family: Roboto, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================
+       Static render of <section class="rbccm-featured-conferences">
+       (mirrors what the XSL component outputs for 3 conferences)
+       ==================================================== -->
+  <section class="rbccm-featured-conferences" id="rbccm-featured-conferences" aria-label="Featured conferences">
+    <div class="rbccm-featured-conferences__container">
+
+      <h2 class="rbccm-featured-conferences__heading">Featured conferences</h2>
+
+      <!-- OUTER TABS -->
+      <div class="rbccm-featured-conferences__tablist" role="tablist">
+        <button type="button" class="rbccm-featured-conferences__tab" role="tab" aria-expanded="false" data-panel="conf-1" aria-controls="panel-conf-1">Global Energy, Power &amp; Infrastructure</button>
+        <button type="button" class="rbccm-featured-conferences__tab" role="tab" aria-expanded="false" data-panel="conf-2" aria-controls="panel-conf-2">Fintech</button>
+        <button type="button" class="rbccm-featured-conferences__tab" role="tab" aria-expanded="false" data-panel="conf-3" aria-controls="panel-conf-3">Global Mining &amp; Materials</button>
+      </div>
+
+      <!-- OUTER PANELS -->
+      <div class="rbccm-featured-conferences__panels">
+
+        <!-- ───────────── CONFERENCE 1 ───────────── -->
+        <div class="rbccm-featured-conferences__panel" role="tabpanel" id="panel-conf-1" data-panel="conf-1">
+          <div class="rbccm-featured-conferences__inner-wrap">
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-overview">
+              <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-1-overview">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <img class="conference-image" src="/assets/rbccm/images/conferences/global-energy-power-infrastructure-conference.webp" alt="Global Energy, Power &amp; Infrastructure Conference panel"/>
+                </div>
+
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">June 2-3, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person &amp; virtual</div>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>The Global Energy, Power &amp; Infrastructure Conference is a long-standing forum, uniting executives and investors across the energy and utility value chain — from oil and gas producers and services to midstream, infrastructure, and energy transition — to assess the opportunities and risks shaping the sector's trajectory.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Energy security | Rising power demand | Infrastructure investment | Grid modernization | Natural gas growth | Resource development | Capital discipline | Customer affordability | Transition pragmatism | Commodity volatility</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SPEAKERS -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-speakers">
+              <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel" data-inner="conf-1-speakers">
+              <h3 class="rbccm-featured-conferences__speakers-heading">Featured speakers</h3>
+              <p class="rbccm-featured-conferences__speakers-intro">Executives and investors across the energy and utility value chain — from upstream and midstream to power, grid, and the transition.</p>
+
+              <!-- Speakers slider (slick at all viewports). Each `.__speaker` becomes
+                   a slick slide. The conf-scoped IDs let the JS bind the matching
+                   prev/next/dots wrapper to each conference's slider. -->
+              <div class="rbccm-featured-conferences__speakers-slider" data-conf="conf-1">
+                <div class="rbccm-featured-conferences__speakers" id="rbccm-fc-speakers-conf-1">
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" alt="Jamie Wong"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Jamie Wong</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Head, Global Power &amp; Utilities Research</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80" alt="Alex Petrov"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Alex Petrov</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Partner, Cascade Energy Partners</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&q=80" alt="Rebecca Foster"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Rebecca Foster</div>
+                    <div class="rbccm-featured-conferences__speaker-title">SVP Strategy, Continental Midstream</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&q=80" alt="Hiroshi Tanaka"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Hiroshi Tanaka</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Head, LNG &amp; Natural Gas</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=400&q=80" alt="Olivia Mensah"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Olivia Mensah</div>
+                    <div class="rbccm-featured-conferences__speaker-title">CEO, Grid Forward Renewables</div>
+                  </div>
+                </div>
+
+                <!-- Carousel controls (arrows + dots). Visible whenever the slider
+                     is initialized; positioned below the speakers row. -->
+                <div class="rbccm-featured-conferences__speakers-controls">
+                  <button id="rbccm-fc-speakers-prev-conf-1" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Previous speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-speakers-dots-conf-1" class="rbccm-featured-conferences__speakers-dots"></div>
+                  <button id="rbccm-fc-speakers-next-conf-1" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Next speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <p class="rbccm-featured-conferences__speakers-footnote">+ Additional speakers to be announced</p>
+            </div>
+
+            <!-- INSIGHTS -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-insights">
+              <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel" data-inner="conf-1-insights">
+              <div class="rbccm-featured-conferences__insights-slider" data-conf="conf-1">
+                <!-- 4 insight cards. On desktop the first card spans the row (image
+                     left, content right) via CSS :first-of-type; the other 3 sit
+                     beneath in a 3-col grid. On mobile, the track becomes a flex
+                     row and JS translates it via `transform: translateX(...)`. -->
+                <div class="rbccm-featured-conferences__insights" id="rbccm-fc-insights-conf-1">
+                  <a class="rbccm-featured-conferences__insight" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80" alt="Power grid at dusk"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Powering the AI Era: Grid &amp; Generation Outlook</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Data-center demand is rewriting load forecasts. We map the capex implications for generation, transmission, and natural gas.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>10 min listen</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <a class="rbccm-featured-conferences__insight" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1473042904451-00171c69419d?w=600&q=80" alt="LNG terminal"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">LNG &amp; the Natural Gas Decade</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Why the global LNG order book is reshaping North American midstream economics.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>8 min read</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <a class="rbccm-featured-conferences__insight" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&q=80" alt="Wind turbines"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Renewables Reset</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Rate-driven IRR pressure is reshuffling the renewables developer landscape — where the survivors will be.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>7 min read</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <a class="rbccm-featured-conferences__insight" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80" alt="Critical minerals"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Critical Minerals &amp; the Energy Transition</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Supply concentration, policy support, and the investment case for upstream metals exposure.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>13 min listen</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+                </div>
+
+                <!-- Mobile-only carousel controls. Hidden on desktop via the
+                     `.has-overflow` class toggling in JS (4 cards always fit in
+                     the desktop grid, so .has-overflow is removed there). -->
+                <div class="rbccm-featured-conferences__insights-controls">
+                  <button id="rbccm-fc-insights-prev-conf-1" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Previous insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-insights-dots-conf-1" class="rbccm-featured-conferences__insights-dots"></div>
+                  <button id="rbccm-fc-insights-next-conf-1" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Next insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rbccm-featured-conferences__insights-cta-wrap">
+                <a class="rbccm-featured-conferences__insights-cta" href="#">View all conference insights</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ───────────── CONFERENCE 2 ───────────── -->
+        <div class="rbccm-featured-conferences__panel" role="tabpanel" id="panel-conf-2" data-panel="conf-2">
+          <div class="rbccm-featured-conferences__inner-wrap">
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-2-overview">
+              <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-2-overview">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <img class="conference-image" src="/assets/rbccm/images/conferences/fintech-conference.webp" alt="Fintech Conference participants"/>
+                </div>
+
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">June 9, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person</div>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>Financial services is at an inflection point. The Financial Technology Conference gathers executives and investors from across payments, digital banking, lending, wealth tech, and open banking to explore how agentic AI, stablecoin adoption, and tokenization are converging to reshape the infrastructure, business models, and competitive dynamics of the industry.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Agentic commerce | Stablecoin adoption | AI &amp; automation in financial services | Tokenization | Digital payments growth | Banking modernization | Lending technology | Wealth technology | Regulatory evolution | Open banking &amp; embedded finance</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-2-speakers">
+              <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel" data-inner="conf-2-speakers">
+              <h3 class="rbccm-featured-conferences__speakers-heading">Featured speakers</h3>
+              <p class="rbccm-featured-conferences__speakers-intro">Leaders from across payments, digital banking, lending, wealth tech, and open banking — shaping the next era of financial services.</p>
+
+              <div class="rbccm-featured-conferences__speakers-slider" data-conf="conf-2">
+                <div class="rbccm-featured-conferences__speakers" id="rbccm-fc-speakers-conf-2">
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=80" alt="Maya Patel"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Maya Patel</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Head, Global Fintech Investment Banking</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80" alt="David Klein"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">David Klein</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Chief Strategy Officer, Velocity Payments</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=80" alt="Aisha Bello"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Aisha Bello</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Partner, Sequence Capital</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80" alt="James Park"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">James Park</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Founder &amp; CEO, Embedded.io</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80" alt="Sofia Martinez"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Sofia Martinez</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Head of Digital Assets, Crossroad Bank</div>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__speakers-controls">
+                  <button id="rbccm-fc-speakers-prev-conf-2" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Previous speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-speakers-dots-conf-2" class="rbccm-featured-conferences__speakers-dots"></div>
+                  <button id="rbccm-fc-speakers-next-conf-2" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Next speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <p class="rbccm-featured-conferences__speakers-footnote">+ Additional speakers to be announced</p>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-2-insights">
+              <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel" data-inner="conf-2-insights">
+              <div class="rbccm-featured-conferences__insights-slider" data-conf="conf-2">
+                <div class="rbccm-featured-conferences__insights" id="rbccm-fc-insights-conf-2">
+                  <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--featured" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=800&q=80" alt="Agentic commerce dashboard"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Agentic Commerce: When AI Becomes the Customer</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">As AI agents start transacting on behalf of consumers, payments rails, fraud models, and merchant economics all have to adapt — fast.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>9 min listen</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=600&q=80" alt="Stablecoin"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Stablecoins Go Mainstream</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Cross-border settlement, treasury management, and the bank-stablecoin partnerships starting to scale.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>7 min read</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <div class="rbccm-featured-conferences__insights-row">
+                    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                      <div class="rbccm-featured-conferences__insight-media">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80" alt="Wealth management dashboard"/>
+                      </div>
+                      <div class="rbccm-featured-conferences__insight-body">
+                        <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                        <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                        <h4 class="rbccm-featured-conferences__insight-title">AI in Wealth Management</h4>
+                        <p class="rbccm-featured-conferences__insight-desc">Personalization, advisor productivity, and the new tooling stack reshaping the wealth value chain.</p>
+                        <p class="rbccm-featured-conferences__insight-meta">
+                          <span>6 min read</span>
+                          <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                            <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                          </svg>
+                        </p>
+                      </div>
+                    </a>
+
+                    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                      <div class="rbccm-featured-conferences__insight-media">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Open banking"/>
+                      </div>
+                      <div class="rbccm-featured-conferences__insight-body">
+                        <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                        <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                        <h4 class="rbccm-featured-conferences__insight-title">Open Banking 2.0 &amp; Embedded Finance</h4>
+                        <p class="rbccm-featured-conferences__insight-desc">How embedded finance is moving from novelty to default — and what it means for incumbent bank economics.</p>
+                        <p class="rbccm-featured-conferences__insight-meta">
+                          <span>12 min listen</span>
+                          <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                            <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                          </svg>
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__insights-controls">
+                  <button id="rbccm-fc-insights-prev-conf-2" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Previous insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-insights-dots-conf-2" class="rbccm-featured-conferences__insights-dots"></div>
+                  <button id="rbccm-fc-insights-next-conf-2" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Next insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rbccm-featured-conferences__insights-cta-wrap">
+                <a class="rbccm-featured-conferences__insights-cta" href="#">View all conference insights</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ───────────── CONFERENCE 3 ───────────── -->
+        <div class="rbccm-featured-conferences__panel" role="tabpanel" id="panel-conf-3" data-panel="conf-3">
+          <div class="rbccm-featured-conferences__inner-wrap">
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-3-overview">
+              <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-3-overview">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <div class="rbccm-featured-conferences__video-frame">
+                    <iframe src="//players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385583003112" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen"></iframe>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">June 10-12, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person</div>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>Now in its 20th year, the Global Mining &amp; Materials Conference brings together executives and investors across the full mining value chain — from bulk commodities and base metals to precious metals and critical minerals — to weigh the supply deficits, geopolitical shifts, and capital allocation decisions shaping the sector's trajectory.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Critical minerals security | Copper demand growth | Supply deficits &amp; project development | Capital allocation | M&amp;A dynamics | Geopolitical realignment | Cost pressures &amp; input inflation | Permitting &amp; social license | Capital returns | Gold &amp; precious metals outlook</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-3-speakers">
+              <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel" data-inner="conf-3-speakers">
+              <h3 class="rbccm-featured-conferences__speakers-heading">Featured speakers</h3>
+              <p class="rbccm-featured-conferences__speakers-intro">Executives and investors across the mining value chain — bulk commodities, base and precious metals, and critical minerals.</p>
+
+              <div class="rbccm-featured-conferences__speakers-slider" data-conf="conf-3">
+                <div class="rbccm-featured-conferences__speakers" id="rbccm-fc-speakers-conf-3">
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&q=80" alt="Patricia Lawrence"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Patricia Lawrence</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Head, Global Metals &amp; Mining Research</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80" alt="Marcus Liu"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Marcus Liu</div>
+                    <div class="rbccm-featured-conferences__speaker-title">CEO, Pacific Copper Corp</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&q=80" alt="Sundeep Rao"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Sundeep Rao</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Managing Director, Critical Minerals Capital</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" alt="Elena Vargas"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Elena Vargas</div>
+                    <div class="rbccm-featured-conferences__speaker-title">VP Exploration, Vanguard Gold</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__speaker">
+                    <div class="rbccm-featured-conferences__speaker-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=400&q=80" alt="Theo Mason"/></div>
+                    <div class="rbccm-featured-conferences__speaker-name">Theo Mason</div>
+                    <div class="rbccm-featured-conferences__speaker-title">Partner, Frontier Resources Partners</div>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__speakers-controls">
+                  <button id="rbccm-fc-speakers-prev-conf-3" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Previous speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-speakers-dots-conf-3" class="rbccm-featured-conferences__speakers-dots"></div>
+                  <button id="rbccm-fc-speakers-next-conf-3" class="rbccm-featured-conferences__speakers-btn" type="button" aria-label="Next speaker" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <p class="rbccm-featured-conferences__speakers-footnote">+ Additional speakers to be announced</p>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-3-insights">
+              <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel" data-inner="conf-3-insights">
+              <div class="rbccm-featured-conferences__insights-slider" data-conf="conf-3">
+                <div class="rbccm-featured-conferences__insights" id="rbccm-fc-insights-conf-3">
+                  <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--featured" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&q=80" alt="Open pit copper mine"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Copper's Decade of Deficit</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Electrification demand is colliding with a thin project pipeline. We map the structural supply gap and what it means for capital allocation across the sector.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>10 min listen</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                    <div class="rbccm-featured-conferences__insight-media">
+                      <img loading="lazy" src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80" alt="Critical minerals"/>
+                    </div>
+                    <div class="rbccm-featured-conferences__insight-body">
+                      <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                      <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                      <h4 class="rbccm-featured-conferences__insight-title">Critical Minerals &amp; Geopolitics</h4>
+                      <p class="rbccm-featured-conferences__insight-desc">Where supply concentration, policy support, and friend-shoring are reshaping the upstream metals investment case.</p>
+                      <p class="rbccm-featured-conferences__insight-meta">
+                        <span>8 min read</span>
+                        <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                          <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                        </svg>
+                      </p>
+                    </div>
+                  </a>
+
+                  <div class="rbccm-featured-conferences__insights-row">
+                    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                      <div class="rbccm-featured-conferences__insight-media">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600&q=80" alt="Gold bullion"/>
+                      </div>
+                      <div class="rbccm-featured-conferences__insight-body">
+                        <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                        <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                        <h4 class="rbccm-featured-conferences__insight-title">Gold's New Bull Case</h4>
+                        <p class="rbccm-featured-conferences__insight-desc">Central-bank buying, fiscal stress, and the producer margin story driving the precious metals re-rating.</p>
+                        <p class="rbccm-featured-conferences__insight-meta">
+                          <span>6 min read</span>
+                          <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                            <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                          </svg>
+                        </p>
+                      </div>
+                    </a>
+
+                    <a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="#">
+                      <div class="rbccm-featured-conferences__insight-media">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1542338347-4fff3276af78?w=600&q=80" alt="Mine site permitting"/>
+                      </div>
+                      <div class="rbccm-featured-conferences__insight-body">
+                        <div class="rbccm-featured-conferences__insight-label">INSIGHTS</div>
+                        <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+                        <h4 class="rbccm-featured-conferences__insight-title">Permitting &amp; the Project Pipeline</h4>
+                        <p class="rbccm-featured-conferences__insight-desc">Why social license and permitting timelines are becoming the binding constraint — and which jurisdictions are getting ahead.</p>
+                        <p class="rbccm-featured-conferences__insight-meta">
+                          <span>11 min listen</span>
+                          <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                            <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                          </svg>
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="rbccm-featured-conferences__insights-controls">
+                  <button id="rbccm-fc-insights-prev-conf-3" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Previous insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <div id="rbccm-fc-insights-dots-conf-3" class="rbccm-featured-conferences__insights-dots"></div>
+                  <button id="rbccm-fc-insights-next-conf-3" class="rbccm-featured-conferences__insights-btn" type="button" aria-label="Next insight" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                      <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rbccm-featured-conferences__insights-cta-wrap">
+                <a class="rbccm-featured-conferences__insights-cta" href="#">View all conference insights</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Component JS — same file deployed to /assets/rbccm/js/sub/test/ -->
+  <script src="./featured-conferences.js"></script>
+
+</body>
+</html>
