@@ -1,8 +1,5 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:date="http://exslt.org/dates-and-times"
-  exclude-result-prefixes="date">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBCCM Upcoming Conference Programming
        - Pulls from the centralized Events List Datum (same source as the
          conferences hub table at /en/conference/upcoming-and-past-conferences.page).
@@ -20,13 +17,12 @@
 
   <xsl:template match="/">
 
-    <!-- Today's date via EXSLT date:date-time() (XSLT 1.0 has no current-date()).
-         Returns ISO 8601, e.g. "2026-05-28T14:30:00-05:00", so fixed-position
-         substrings give the parts we need. -->
-    <xsl:variable name="today" select="date:date-time()"/>
-    <xsl:variable name="CURRENT_YEAR" select="substring($today, 1, 4)"/>
-    <!-- CURRENT_DATE = YYYYMMDD numeric string for >= comparison against each event_date. -->
-    <xsl:variable name="CURRENT_DATE" select="concat(substring($today, 1, 4), substring($today, 6, 2), substring($today, 9, 2))"/>
+    <!-- Today's date via XSLT 2.0 current-date(). This mirrors the conferences
+         hub page exactly (which renders this same feed in production), so we
+         know the engine supports it.
+         CURRENT_DATE = YYYYMMDD string, CURRENT_YEAR = YYYY. -->
+    <xsl:variable name="CURRENT_DATE" select="format-date(current-date(), '[Y0001][M01][D01]')"/>
+    <xsl:variable name="CURRENT_YEAR" select="format-date(current-date(), '[Y0001]')"/>
 
     <!-- Default placeholder image used when an event has no image of its own. -->
     <xsl:variable name="placeholderImage" select="'https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp'"/>
@@ -35,8 +31,7 @@
            - conference events only (sitelocation contains 'conference')
            - current year (event_date year = today's year)
            - upcoming (event_date YYYYMMDD >= today's YYYYMMDD)
-         This is a node-set, so the card + modal loops sort it directly with xsl:sort.
-         (XSLT 1.0: no xsl:sequence / as="element()*" needed.) -->
+         This is a node-set, so the card + modal loops sort it directly with xsl:sort. -->
     <xsl:variable name="events" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
         contains(sitelocation, 'conference')
         and substring(event_date, 1, 4) = $CURRENT_YEAR
