@@ -794,3 +794,36 @@
     });
   }
 })();
+
+/* =========================================================================
+   Video facade: click-to-play (custom Poster Override)
+   When a conference has a Poster Override, the Overview tab renders a poster
+   image + play button instead of the iframe (Brightcove iframe embeds ignore
+   the poster URL param). On click we inject the Brightcove iframe with
+   autoplay=1 in place of the facade.
+   ========================================================================= */
+(function () {
+  var root = document.getElementById('rbccm-featured-conferences');
+  if (!root) return;
+
+  function play(facade) {
+    var src = facade.getAttribute('data-bc-src');
+    if (!src) return;
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('src', src);
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+    iframe.setAttribute('allowfullscreen', 'allowfullscreen');
+    if (facade.parentNode) {
+      facade.parentNode.replaceChild(iframe, facade);
+    }
+  }
+
+  var facades = root.querySelectorAll('.rbccm-featured-conferences__video-facade');
+  Array.prototype.forEach.call(facades, function (facade) {
+    facade.addEventListener('click', function (e) {
+      e.preventDefault();
+      play(facade);
+    });
+  });
+})();

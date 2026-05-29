@@ -78,6 +78,17 @@
         </xsl:choose>
       </xsl:variable>
 
+      <!-- Default poster/image used for any conference that has no Poster
+           Override of its own. Author-overridable at the section level. -->
+      <xsl:variable name="defaultPoster">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='DefaultPoster']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DefaultPoster'])"/>
+          </xsl:when>
+          <xsl:otherwise>https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <!-- ── External CSS (scoped to .rbccm-featured-conferences) ── -->
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/featured-conferences.css"/>
 
@@ -116,6 +127,24 @@
               <!-- Brightcove per-conference -->
               <xsl:variable name="videoId" select="normalize-space(Datum[@ID='BCVideoId' or @Name='Brightcove Video ID'])"/>
               <xsl:variable name="videoPoster" select="normalize-space(Datum[@ID='BCPoster' or @Name='Brightcove Poster Override'])"/>
+              <!-- Effective poster/image: this conference's own override if set,
+                   otherwise the section-level default. Always non-empty. -->
+              <xsl:variable name="effectivePoster">
+                <xsl:choose>
+                  <xsl:when test="$videoPoster != ''"><xsl:value-of select="$videoPoster"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$defaultPoster"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <!-- Media mode: 'video' = click-to-play facade (poster + play
+                   icon, opens the Brightcove reel on click). Anything else
+                   (incl. blank) = 'image' (poster image only, no player).
+                   Lowercased so Video / VIDEO / video all match. -->
+              <xsl:variable name="mediaMode">
+                <xsl:choose>
+                  <xsl:when test="translate(normalize-space(Datum[@ID='MediaMode' or @Name='Media Mode']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'video'">video</xsl:when>
+                  <xsl:otherwise>image</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
 
               <!-- Overview fields -->
               <xsl:variable name="date"      select="normalize-space(Datum[@ID='Date' or @Name='Date'])"/>
@@ -185,12 +214,36 @@
 
                   <div class="rbccm-featured-conferences__overview">
 
-                    <!-- Brightcove video — iframe embed inside a 16:9 aspect-ratio wrapper -->
+                    <!-- Conference media inside a 16:9 aspect-ratio wrapper.
+                         Author picks per-conference via the Media Mode Datum:
+                           image (default) = show the poster image only (no
+                                    play icon, no iframe, not clickable).
+                           video  = click-to-play facade (poster image + play
+                                    icon); the Brightcove iframe is injected on
+                                    click. Brightcove iframe embeds IGNORE the
+                                    poster URL param, so the custom poster must
+                                    be an overlay image, not a player option.
+                         The poster always resolves: the conference's own
+                         override if set, otherwise the section-level default
+                         ($effectivePoster), so the frame is never empty. -->
                     <div class="rbccm-featured-conferences__video video-reel-wrap">
                       <div class="rbccm-featured-conferences__video-frame">
-                        <iframe frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen">
-                          <xsl:attribute name="src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/></xsl:attribute>
-                        </iframe>
+                        <xsl:choose>
+                          <xsl:when test="$mediaMode = 'video'">
+                            <button type="button" class="rbccm-featured-conferences__video-facade" aria-label="Play video">
+                              <xsl:attribute name="data-bc-src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/>&amp;autoplay=1</xsl:attribute>
+                              <img class="rbccm-featured-conferences__video-poster" alt="" loading="lazy" src="{$effectivePoster}"/>
+                              <span class="rbccm-featured-conferences__video-play" aria-hidden="true">
+                                <svg class="rbccm-featured-conferences__video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                  <path d="M8 5v14l11-7z" fill="currentColor"/>
+                                </svg>
+                              </span>
+                            </button>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <img class="rbccm-featured-conferences__video-poster" loading="lazy" src="{$effectivePoster}" alt="{$confName}"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
                       </div>
                     </div>
 
@@ -564,7 +617,7 @@
 
 </xsl:stylesheet>
 
-<Properties ComponentID="1554499053600">
+<Properties ComponentID="1554499053453">
   <!-- Content -->
   <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
   <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
@@ -584,6 +637,9 @@
   <Datum ID="BCAccount" Type="String" Name="Brightcove Account">6021289101001</Datum>
   <Datum ID="BCPlayer"  Type="String" Name="Brightcove Player">VyvCc9BZx</Datum>
   <Datum ID="BCEmbed"   Type="String" Name="Brightcove Embed">default</Datum>
+
+  <!-- Fallback poster/image for any conference with no Poster Override of its own -->
+  <Datum ID="DefaultPoster" Type="String" Name="Default Poster / Image">https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</Datum>
 </Properties>
 
 <Data>
@@ -595,8 +651,14 @@
       <!-- e.g. "Global Healthcare Conference" -->
     </Datum>
 
+    <!-- Media mode per conference: enter "video" (poster + play icon, opens the
+         Brightcove reel on click) or "image" (poster image only, no player).
+         Blank = image. -->
+    <Datum ID="MediaMode" Type="String" Name="Media Mode">image</Datum>
     <!-- Brightcove video. Default = placeholder reel used during testing. -->
     <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">6385583003112</Datum>
+    <!-- Poster / image URL. Used as the play-button poster in video mode and as
+         the standalone image in image mode. -->
     <Datum ID="BCPoster" Type="String" Name="Brightcove Poster Override">
       <!-- Optional custom poster image URL -->
     </Datum>
