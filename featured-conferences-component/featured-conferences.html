@@ -1,6 +1,6 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <!-- Skin: RBCCM Featured Conferences — outer tab selector x inner tabs (Overview / Speakers / Insights) -->
+  <!-- Skin: RBCCM Featured Conferences - outer tab selector x inner tabs (Overview / Speakers / Insights) -->
 
   <xsl:strip-space elements="*"/>
 
@@ -17,7 +17,7 @@
 
     <xsl:if test="$confCount = 3">
 
-      <!-- ── Heading ── -->
+      <!-- == Heading == -->
       <xsl:variable name="heading">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
@@ -27,7 +27,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Aria label ── -->
+      <!-- == Aria label == -->
       <xsl:variable name="ariaLabel">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
@@ -37,7 +37,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Optional ARIA overrides (empty = fall back to JS default) ── -->
+      <!-- == Optional ARIA overrides (empty = fall back to JS default) == -->
       <!-- For each Datum: emit the aria-label attribute ONLY when non-empty.
            When empty, no attribute is rendered, and the JS init code
            (setIfEmpty) writes the built-in English default. This lets
@@ -52,7 +52,7 @@
       <xsl:variable name="ariaInsightsDotsLabel"     select="normalize-space(/Properties/Datum[@ID='AriaInsightsDotsLabel'])"/>
       <xsl:variable name="ariaViewAllInsightsLabel"  select="normalize-space(/Properties/Datum[@ID='AriaViewAllInsightsLabel'])"/>
 
-      <!-- ── Brightcove globals ── -->
+      <!-- == Brightcove globals == -->
       <xsl:variable name="bcAccount">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='BCAccount']) != ''">
@@ -89,7 +89,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── External CSS (scoped to .rbccm-featured-conferences) ── -->
+      <!-- == External CSS (scoped to .rbccm-featured-conferences) == -->
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/featured-conferences.css"/>
 
       <section class="rbccm-featured-conferences" id="rbccm-featured-conferences">
@@ -101,7 +101,7 @@
             <xsl:value-of select="$heading"/>
           </h2>
 
-          <!-- ── OUTER TABS (conferences) ── -->
+          <!-- == OUTER TABS (conferences) == -->
           <div class="rbccm-featured-conferences__tablist" role="tablist">
             <xsl:for-each select="$conferences">
               <xsl:variable name="confKey" select="concat('conf-', position())"/>
@@ -117,7 +117,7 @@
             </xsl:for-each>
           </div>
 
-          <!-- ── OUTER PANELS (one per conference) ── -->
+          <!-- == OUTER PANELS (one per conference) == -->
           <div class="rbccm-featured-conferences__panels">
             <xsl:for-each select="$conferences">
               <xsl:variable name="i"        select="position()"/>
@@ -145,6 +145,14 @@
                   <xsl:otherwise>image</xsl:otherwise>
                 </xsl:choose>
               </xsl:variable>
+
+              <!-- Per-conference inner-tab visibility. Overview is always shown.
+                   Speakers / Insights render only when NOT explicitly hidden:
+                   enter "no" (also accepts false / hide) to hide; blank = show. -->
+              <xsl:variable name="showSpeakersVal" select="translate(normalize-space(Datum[@ID='ShowSpeakers' or @Name='Show Speakers']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+              <xsl:variable name="showSpeakers" select="not($showSpeakersVal = 'no' or $showSpeakersVal = 'false' or $showSpeakersVal = 'hide')"/>
+              <xsl:variable name="showInsightsVal" select="translate(normalize-space(Datum[@ID='ShowInsights' or @Name='Show Insights']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+              <xsl:variable name="showInsights" select="not($showInsightsVal = 'no' or $showInsightsVal = 'false' or $showInsightsVal = 'hide')"/>
 
               <!-- Overview fields -->
               <xsl:variable name="date"      select="normalize-space(Datum[@ID='Date' or @Name='Date'])"/>
@@ -296,7 +304,8 @@
                   </div>
                 </div>
 
-                <!-- INNER TAB + PANEL: SPEAKERS -->
+                <!-- INNER TAB + PANEL: SPEAKERS (per-conference toggle: Show Speakers) -->
+                <xsl:if test="$showSpeakers">
                 <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
                   <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
@@ -394,8 +403,10 @@
                     </p>
                   </xsl:if>
                 </div>
+                </xsl:if><!-- /Show Speakers -->
 
-                <!-- INNER TAB + PANEL: INSIGHTS -->
+                <!-- INNER TAB + PANEL: INSIGHTS (per-conference toggle: Show Insights) -->
+                <xsl:if test="$showInsights">
                 <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
                   <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
@@ -508,6 +519,7 @@
                       </div>
                     </xsl:if>
                 </div>
+                </xsl:if><!-- /Show Insights -->
 
                 </div><!-- /.inner-wrap -->
               </div>
@@ -517,16 +529,16 @@
         </div>
       </section>
 
-      <!-- ── External JS (scoped to #rbccm-featured-conferences) ── -->
+      <!-- == External JS (scoped to #rbccm-featured-conferences) == -->
       <script src="/assets/rbccm/js/sub/test/featured-conferences.js"></script>
 
     </xsl:if>
 
   </xsl:template>
 
-  <!-- ─────────────────────────────────────────────
+  <!-- =============================================
        Named templates
-       ───────────────────────────────────────────── -->
+       ============================================= -->
 
 
   <xsl:template name="render-speaker">
@@ -592,7 +604,7 @@
         <div class="rbccm-featured-conferences__insight-body">
           <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$labelText"/></div>
           <!-- 2px yellow divider between label and title. Expands to 56px on
-               card hover via CSS — matches the rbccm-upcoming-conferences hover
+               card hover via CSS - matches the rbccm-upcoming-conferences hover
                accent. aria-hidden because it's purely visual. -->
           <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
           <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
@@ -602,7 +614,7 @@
           <xsl:if test="$meta != ''">
             <p class="rbccm-featured-conferences__insight-meta">
               <span><xsl:value-of select="$meta"/></span>
-              <!-- Right-pointing chevron (4×10 SVG). Natural orientation —
+              <!-- Right-pointing chevron (4x10 SVG). Natural orientation -
                    do NOT rotate via CSS. aria-hidden because the parent <a>
                    already conveys "link" semantics. -->
               <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
@@ -679,83 +691,87 @@
     </Datum>
     <Datum ID="KeyTopicsLabel" Type="String" Name="Key Topics Label">Key themes</Datum>
     <Datum ID="KeyTopics" Type="Textarea" Name="Key Topics">
-      <!-- e.g. "Topic A | Topic B | Topic C" — pipe-separated, no leading/trailing pipe -->
+      <!-- e.g. "Topic A | Topic B | Topic C" - pipe-separated, no leading/trailing pipe -->
     </Datum>
     <Datum ID="ContactText" Type="Textarea" Name="Contact Text">
-      <!-- Italic note at bottom, e.g. "Please contact your RBC representative…" -->
+      <!-- Italic note at bottom, e.g. "Please contact your RBC representative..." -->
     </Datum>
 
     <!-- SPEAKERS TAB -->
+    <!-- Show this conference's Speakers tab? "yes" (default) or "no". -->
+    <Datum ID="ShowSpeakers" Type="String" Name="Show Speakers">yes</Datum>
     <Datum ID="SpeakersHeading" Type="String" Name="Speakers Heading">Featured speakers</Datum>
     <Datum ID="SpeakersIntro" Type="Textarea" Name="Speakers Intro">
-      <!-- e.g. "Hear from industry leaders and experts who are shaping the future…" -->
+      <!-- e.g. "Hear from industry leaders and experts who are shaping the future..." -->
     </Datum>
     <Datum ID="SpeakersFootnote" Type="String" Name="Speakers Footnote">+ Additional speakers to be announced</Datum>
 
     <!-- Up to 5 speakers per conference. Empty slots are skipped. -->
-    <Datum ID="Speaker1Name"  Type="String" Name="Speaker 1 — Name"/>
-    <Datum ID="Speaker1Title" Type="String" Name="Speaker 1 — Title"/>
-    <Datum ID="Speaker1Image" Type="String" Name="Speaker 1 — Image"/>
-    <Datum ID="Speaker1Alt"   Type="String" Name="Speaker 1 — Image Alt"/>
+    <Datum ID="Speaker1Name"  Type="String" Name="Speaker 1 - Name"/>
+    <Datum ID="Speaker1Title" Type="String" Name="Speaker 1 - Title"/>
+    <Datum ID="Speaker1Image" Type="String" Name="Speaker 1 - Image"/>
+    <Datum ID="Speaker1Alt"   Type="String" Name="Speaker 1 - Image Alt"/>
 
-    <Datum ID="Speaker2Name"  Type="String" Name="Speaker 2 — Name"/>
-    <Datum ID="Speaker2Title" Type="String" Name="Speaker 2 — Title"/>
-    <Datum ID="Speaker2Image" Type="String" Name="Speaker 2 — Image"/>
-    <Datum ID="Speaker2Alt"   Type="String" Name="Speaker 2 — Image Alt"/>
+    <Datum ID="Speaker2Name"  Type="String" Name="Speaker 2 - Name"/>
+    <Datum ID="Speaker2Title" Type="String" Name="Speaker 2 - Title"/>
+    <Datum ID="Speaker2Image" Type="String" Name="Speaker 2 - Image"/>
+    <Datum ID="Speaker2Alt"   Type="String" Name="Speaker 2 - Image Alt"/>
 
-    <Datum ID="Speaker3Name"  Type="String" Name="Speaker 3 — Name"/>
-    <Datum ID="Speaker3Title" Type="String" Name="Speaker 3 — Title"/>
-    <Datum ID="Speaker3Image" Type="String" Name="Speaker 3 — Image"/>
-    <Datum ID="Speaker3Alt"   Type="String" Name="Speaker 3 — Image Alt"/>
+    <Datum ID="Speaker3Name"  Type="String" Name="Speaker 3 - Name"/>
+    <Datum ID="Speaker3Title" Type="String" Name="Speaker 3 - Title"/>
+    <Datum ID="Speaker3Image" Type="String" Name="Speaker 3 - Image"/>
+    <Datum ID="Speaker3Alt"   Type="String" Name="Speaker 3 - Image Alt"/>
 
-    <Datum ID="Speaker4Name"  Type="String" Name="Speaker 4 — Name"/>
-    <Datum ID="Speaker4Title" Type="String" Name="Speaker 4 — Title"/>
-    <Datum ID="Speaker4Image" Type="String" Name="Speaker 4 — Image"/>
-    <Datum ID="Speaker4Alt"   Type="String" Name="Speaker 4 — Image Alt"/>
+    <Datum ID="Speaker4Name"  Type="String" Name="Speaker 4 - Name"/>
+    <Datum ID="Speaker4Title" Type="String" Name="Speaker 4 - Title"/>
+    <Datum ID="Speaker4Image" Type="String" Name="Speaker 4 - Image"/>
+    <Datum ID="Speaker4Alt"   Type="String" Name="Speaker 4 - Image Alt"/>
 
-    <Datum ID="Speaker5Name"  Type="String" Name="Speaker 5 — Name"/>
-    <Datum ID="Speaker5Title" Type="String" Name="Speaker 5 — Title"/>
-    <Datum ID="Speaker5Image" Type="String" Name="Speaker 5 — Image"/>
-    <Datum ID="Speaker5Alt"   Type="String" Name="Speaker 5 — Image Alt"/>
+    <Datum ID="Speaker5Name"  Type="String" Name="Speaker 5 - Name"/>
+    <Datum ID="Speaker5Title" Type="String" Name="Speaker 5 - Title"/>
+    <Datum ID="Speaker5Image" Type="String" Name="Speaker 5 - Image"/>
+    <Datum ID="Speaker5Alt"   Type="String" Name="Speaker 5 - Image Alt"/>
 
     <!-- INSIGHTS TAB -->
+    <!-- Show this conference's Insights tab? "yes" (default) or "no". -->
+    <Datum ID="ShowInsights" Type="String" Name="Show Insights">yes</Datum>
     <Datum ID="InsightsCTAText" Type="String" Name="Insights CTA Text">View all conference insights</Datum>
     <Datum ID="InsightsCTAHref" Type="String" Name="Insights CTA Href">
       <!-- URL for the CTA button -->
     </Datum>
 
     <!-- Insight 1 = the large featured tile. Insights 2/3/4 = standard cards row. -->
-    <Datum ID="Insight1Label"       Type="String"   Name="Insight 1 — Label">INSIGHTS</Datum>
-    <Datum ID="Insight1Title"       Type="String"   Name="Insight 1 — Title"/>
-    <Datum ID="Insight1Description" Type="Textarea" Name="Insight 1 — Description"/>
-    <Datum ID="Insight1Meta"        Type="String"   Name="Insight 1 — Meta (e.g. 8 min read)"/>
-    <Datum ID="Insight1Image"       Type="String"   Name="Insight 1 — Image"/>
-    <Datum ID="Insight1ImageAlt"    Type="String"   Name="Insight 1 — Image Alt"/>
-    <Datum ID="Insight1Href"        Type="String"   Name="Insight 1 — Href"/>
+    <Datum ID="Insight1Label"       Type="String"   Name="Insight 1 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight1Title"       Type="String"   Name="Insight 1 - Title"/>
+    <Datum ID="Insight1Description" Type="Textarea" Name="Insight 1 - Description"/>
+    <Datum ID="Insight1Meta"        Type="String"   Name="Insight 1 - Meta (e.g. 8 min read)"/>
+    <Datum ID="Insight1Image"       Type="String"   Name="Insight 1 - Image"/>
+    <Datum ID="Insight1ImageAlt"    Type="String"   Name="Insight 1 - Image Alt"/>
+    <Datum ID="Insight1Href"        Type="String"   Name="Insight 1 - Href"/>
 
-    <Datum ID="Insight2Label"       Type="String"   Name="Insight 2 — Label">INSIGHTS</Datum>
-    <Datum ID="Insight2Title"       Type="String"   Name="Insight 2 — Title"/>
-    <Datum ID="Insight2Description" Type="Textarea" Name="Insight 2 — Description"/>
-    <Datum ID="Insight2Meta"        Type="String"   Name="Insight 2 — Meta"/>
-    <Datum ID="Insight2Image"       Type="String"   Name="Insight 2 — Image"/>
-    <Datum ID="Insight2ImageAlt"    Type="String"   Name="Insight 2 — Image Alt"/>
-    <Datum ID="Insight2Href"        Type="String"   Name="Insight 2 — Href"/>
+    <Datum ID="Insight2Label"       Type="String"   Name="Insight 2 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight2Title"       Type="String"   Name="Insight 2 - Title"/>
+    <Datum ID="Insight2Description" Type="Textarea" Name="Insight 2 - Description"/>
+    <Datum ID="Insight2Meta"        Type="String"   Name="Insight 2 - Meta"/>
+    <Datum ID="Insight2Image"       Type="String"   Name="Insight 2 - Image"/>
+    <Datum ID="Insight2ImageAlt"    Type="String"   Name="Insight 2 - Image Alt"/>
+    <Datum ID="Insight2Href"        Type="String"   Name="Insight 2 - Href"/>
 
-    <Datum ID="Insight3Label"       Type="String"   Name="Insight 3 — Label">INSIGHTS</Datum>
-    <Datum ID="Insight3Title"       Type="String"   Name="Insight 3 — Title"/>
-    <Datum ID="Insight3Description" Type="Textarea" Name="Insight 3 — Description"/>
-    <Datum ID="Insight3Meta"        Type="String"   Name="Insight 3 — Meta"/>
-    <Datum ID="Insight3Image"       Type="String"   Name="Insight 3 — Image"/>
-    <Datum ID="Insight3ImageAlt"    Type="String"   Name="Insight 3 — Image Alt"/>
-    <Datum ID="Insight3Href"        Type="String"   Name="Insight 3 — Href"/>
+    <Datum ID="Insight3Label"       Type="String"   Name="Insight 3 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight3Title"       Type="String"   Name="Insight 3 - Title"/>
+    <Datum ID="Insight3Description" Type="Textarea" Name="Insight 3 - Description"/>
+    <Datum ID="Insight3Meta"        Type="String"   Name="Insight 3 - Meta"/>
+    <Datum ID="Insight3Image"       Type="String"   Name="Insight 3 - Image"/>
+    <Datum ID="Insight3ImageAlt"    Type="String"   Name="Insight 3 - Image Alt"/>
+    <Datum ID="Insight3Href"        Type="String"   Name="Insight 3 - Href"/>
 
-    <Datum ID="Insight4Label"       Type="String"   Name="Insight 4 — Label">INSIGHTS</Datum>
-    <Datum ID="Insight4Title"       Type="String"   Name="Insight 4 — Title"/>
-    <Datum ID="Insight4Description" Type="Textarea" Name="Insight 4 — Description"/>
-    <Datum ID="Insight4Meta"        Type="String"   Name="Insight 4 — Meta"/>
-    <Datum ID="Insight4Image"       Type="String"   Name="Insight 4 — Image"/>
-    <Datum ID="Insight4ImageAlt"    Type="String"   Name="Insight 4 — Image Alt"/>
-    <Datum ID="Insight4Href"        Type="String"   Name="Insight 4 — Href"/>
+    <Datum ID="Insight4Label"       Type="String"   Name="Insight 4 - Label">INSIGHTS</Datum>
+    <Datum ID="Insight4Title"       Type="String"   Name="Insight 4 - Title"/>
+    <Datum ID="Insight4Description" Type="Textarea" Name="Insight 4 - Description"/>
+    <Datum ID="Insight4Meta"        Type="String"   Name="Insight 4 - Meta"/>
+    <Datum ID="Insight4Image"       Type="String"   Name="Insight 4 - Image"/>
+    <Datum ID="Insight4ImageAlt"    Type="String"   Name="Insight 4 - Image Alt"/>
+    <Datum ID="Insight4Href"        Type="String"   Name="Insight 4 - Href"/>
 
   </Group>
 </Data>

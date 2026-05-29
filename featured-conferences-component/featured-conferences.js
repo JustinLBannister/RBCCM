@@ -1,5 +1,5 @@
 /* =========================================
-   RBC CM — Featured Conferences
+   RBC CM - Featured Conferences
    Scoped to #rbccm-featured-conferences
    ========================================= */
 (function () {
@@ -15,7 +15,7 @@
     return window.matchMedia('(min-width: 992px)').matches;
   }
 
-  // ── ARIA labels on the tab buttons ───────────────────────────────────
+  // -- ARIA labels on the tab buttons -----------------------------------
   // Tabs already announce themselves via role="tab" + their text content,
   // but adding richer aria-labels gives screen-reader users the position
   // ("tab 1 of 3") and, for inner tabs, the parent conference name. Pattern
@@ -61,10 +61,10 @@
   function notifyPanelChange() {
     try {
       root.dispatchEvent(new CustomEvent('rbccm-fc:panel-change'));
-    } catch (e) { /* old browsers — non-critical */ }
+    } catch (e) { /* old browsers - non-critical */ }
   }
 
-  // ── Outer tabs (conference selector) — single-active at all sizes ──
+  // -- Outer tabs (conference selector) - single-active at all sizes --
   function activateOuter(key) {
     for (var i = 0; i < outerTabs.length; i++) {
       var on = outerTabs[i].getAttribute('data-panel') === key;
@@ -124,7 +124,7 @@
     notifyPanelChange();
   }
 
-  // ── Click wiring ──
+  // -- Click wiring --
   for (var i = 0; i < outerTabs.length; i++) {
     (function (btn) {
       btn.addEventListener('click', function (e) {
@@ -148,12 +148,12 @@
     })(innerTabs[k]);
   }
 
-  // ── Initial state ──
+  // -- Initial state --
   if (outerTabs.length) {
     activateOuter(outerTabs[0].getAttribute('data-panel'));
   }
 
-  // ── Viewport change: re-sync ──
+  // -- Viewport change: re-sync --
   var lastDesktop = isDesktop();
   var rTimer;
   window.addEventListener('resize', function () {
@@ -184,14 +184,14 @@
 })();
 
 /* =========================================
-   RBC CM — Featured Conferences: Speakers slider
+   RBC CM - Featured Conferences: Speakers slider
    Fully manual transform-based carousel with infinite wrap.
 
    Layout: a flex row of 194px speakers with 32px gaps, clipped by the
    slider's `overflow: hidden`. JS clones the first speaker at the end and
    the last speaker at the start, then manages a `transform: translateX(...)`
    on the track to slide one card-step (226px) per nav action. When the row
-   lands on a clone, JS silently snaps to the matching real speaker — giving
+   lands on a clone, JS silently snaps to the matching real speaker - giving
    the illusion of infinite wrap.
 
    Accessibility:
@@ -212,7 +212,7 @@
 
   var CARD_WIDTH = 194;
   var GAP        = 32;
-  var STEP       = CARD_WIDTH + GAP; // 226 — distance from one card's left edge to the next
+  var STEP       = CARD_WIDTH + GAP; // 226 - distance from one card's left edge to the next
 
   Array.prototype.forEach.call(sliders, initOne);
 
@@ -242,7 +242,7 @@
     }
     var info = realSpeakers.map(speakerInfo);
 
-    // ── Insert clones for infinite wrap ───────────────────────────────────
+    // -- Insert clones for infinite wrap -----------------------------------
     // Layout: [start-clones 0..n-1] [real 0..n-1] [end-clones 0..n-1]
     // Real speakers occupy DOM positions n..2n-1.
     //
@@ -254,9 +254,9 @@
     // Example for n=5 (Sarah, David, Priya, Marcus, Elena):
     //   Pre-wrap pinned at Elena (pos 9): peek shows end-clone-Sarah (pos 10)
     //                                            + end-clone-David  (pos 11)
-    //   Click next → animate to pos 10 (clone-Sarah pinned), peek = end-clone-David
+    //   Click next -> animate to pos 10 (clone-Sarah pinned), peek = end-clone-David
     //   Teleport to pos 5 (real Sarah pinned), peek = real David
-    //   Both states render "Sarah pinned + David peek" → invisible swap.
+    //   Both states render "Sarah pinned + David peek" -> invisible swap.
     function buildCloneFragment(tag) {
       var frag = document.createDocumentFragment();
       realSpeakers.forEach(function (real) {
@@ -274,11 +274,11 @@
 
     // currentIndex is a REAL speaker index (0..n-1). DOM position of real i
     // is (n + i). displayedPos tracks the actual DOM position currently
-    // shown — needed by the transitionend handler to detect clones.
+    // shown - needed by the transitionend handler to detect clones.
     var currentIndex = 0;
     var displayedPos = n;
 
-    // ── ARIA setup ────────────────────────────────────────────────────────
+    // -- ARIA setup --------------------------------------------------------
     // Static aria-labels (region, prev/next buttons, dots wrapper) use a
     // "set if empty" pattern so author-overridable values from DCR can
     // flow through the markup and win. The dynamic per-slide / per-dot
@@ -308,7 +308,7 @@
     setIfEmpty(nextBtn,  'aria-label', 'Next speaker');
     setIfEmpty(dotsWrap, 'aria-label', 'Choose a speaker');
 
-    // ── Build dots ────────────────────────────────────────────────────────
+    // -- Build dots --------------------------------------------------------
     realSpeakers.forEach(function (s, i) {
       var dot = document.createElement('button');
       dot.type = 'button';
@@ -326,7 +326,7 @@
       dotsWrap.querySelectorAll('.rbccm-featured-conferences__speakers-dot')
     );
 
-    // ── Translate helpers ────────────────────────────────────────────────
+    // -- Translate helpers ------------------------------------------------
     // Sets the track's transform to pin the speaker at the given DOM
     // position to the slider's left edge. `domPos` is 0..3n-1.
     function setTransformAtPos(domPos, animate) {
@@ -354,11 +354,11 @@
       });
     }
 
-    // ── Navigation ───────────────────────────────────────────────────────
+    // -- Navigation -------------------------------------------------------
     // go() accepts:
-    //   -1     → wrap to last via the last start-clone (pos n-1)
-    //   n      → wrap to first via the first end-clone (pos 2n)
-    //   0..n-1 → direct jump to a real speaker (pos n + i)
+    //   -1     -> wrap to last via the last start-clone (pos n-1)
+    //   n      -> wrap to first via the first end-clone (pos 2n)
+    //   0..n-1 -> direct jump to a real speaker (pos n + i)
     function go(targetReal) {
       if (targetReal === -1) {
         setTransformAtPos(n - 1, true);  // animate to last start-clone
@@ -381,16 +381,16 @@
     track.addEventListener('transitionend', function (e) {
       if (e.target !== track || e.propertyName !== 'transform') return;
       if (displayedPos < n) {
-        // On a start-clone (pos 0..n-1) — teleport forward by n positions
+        // On a start-clone (pos 0..n-1) - teleport forward by n positions
         // to the matching real speaker.
         setTransformAtPos(displayedPos + n, false);
       } else if (displayedPos >= 2 * n) {
-        // On an end-clone (pos 2n..3n-1) — teleport backward by n.
+        // On an end-clone (pos 2n..3n-1) - teleport backward by n.
         setTransformAtPos(displayedPos - n, false);
       }
     });
 
-    // ── Wire up controls ─────────────────────────────────────────────────
+    // -- Wire up controls -------------------------------------------------
     prevBtn.addEventListener('click', function () {
       if (currentIndex === 0) go(-1);
       else go(currentIndex - 1);
@@ -425,7 +425,7 @@
     });
 
     // Total natural width of the real speakers row (no clones, no end gap).
-    // 5 speakers → 5 × 194 + 4 × 32 = 1098.
+    // 5 speakers -> 5 x 194 + 4 x 32 = 1098.
     var rowWidth = n * CARD_WIDTH + (n - 1) * GAP;
 
     // Toggle `.has-overflow` on the slider based on whether the real
@@ -434,7 +434,7 @@
     function updateOverflowState() {
       // slider.clientWidth is 0 while the slider's ancestor is display:none;
       // in that case we conservatively assume overflow IS present (so the
-      // controls will show when the panel becomes visible — they're cheap
+      // controls will show when the panel becomes visible - they're cheap
       // to render). Only when we can confirm `rowWidth <= clientWidth` do
       // we mark `no overflow`.
       var sliderWidth = slider.clientWidth;
@@ -445,7 +445,7 @@
       }
     }
 
-    // resetToFirst — pin real-0 to the left edge, no animation. Used as the
+    // resetToFirst - pin real-0 to the left edge, no animation. Used as the
     // canonical "fresh" state at page load and after every resize.
     function resetToFirst() {
       currentIndex = 0;
@@ -454,7 +454,7 @@
       updateOverflowState();
     }
 
-    // ── Resize handler ───────────────────────────────────────────────────
+    // -- Resize handler ---------------------------------------------------
     // When the viewport changes, reset to real-0 AND recompute the overflow
     // state so the controls re-appear/disappear at the new size. Debounced
     // 150ms so we don't churn during continuous drag-resize.
@@ -464,13 +464,13 @@
       resizeTimer = setTimeout(resetToFirst, 150);
     });
 
-    // ── Initial state ─────────────────────────────────────────────────────
+    // -- Initial state -----------------------------------------------------
     // Defer to the next animation frame so the browser has applied the CSS
     // (clones inserted, flex layout settled) before we measure / position.
     requestAnimationFrame(resetToFirst);
 
     // Re-check overflow state any time a panel becomes visible (the slider's
-    // clientWidth was 0 while hidden — once revealed, we may need to either
+    // clientWidth was 0 while hidden - once revealed, we may need to either
     // add or drop `.has-overflow` based on the now-real viewport).
     root.addEventListener('rbccm-fc:panel-change', function () {
       requestAnimationFrame(updateOverflowState);
@@ -479,13 +479,13 @@
 })();
 
 /* =========================================
-   RBC CM — Featured Conferences: Insights slider
+   RBC CM - Featured Conferences: Insights slider
    Mobile-only transform-based carousel.
 
    Layout: a flex row of 346px cards with 32px gaps. On mobile, JS translates
    the row left/right by one card-step per arrow click (346 + 32 = 378px).
    On desktop, CSS reflows the same DOM into a 3-col grid where the first
-   card spans the row — no carousel, controls hide via `.has-overflow`.
+   card spans the row - no carousel, controls hide via `.has-overflow`.
 
    No infinite wrap: 4 cards is short enough that simple edge-stop behavior
    (arrows disable at boundaries) feels natural. Active dot tracks
@@ -507,7 +507,7 @@
 
   var CARD_WIDTH = 346;
   var GAP        = 32;
-  var STEP       = CARD_WIDTH + GAP; // 378 — distance from one card's left edge to the next
+  var STEP       = CARD_WIDTH + GAP; // 378 - distance from one card's left edge to the next
 
   Array.prototype.forEach.call(sliders, initOne);
 
@@ -534,7 +534,7 @@
       cards[i].classList.add('rbccm-featured-conferences__insight--card');
     }
 
-    // ── Insert clones for infinite wrap ───────────────────────────────────
+    // -- Insert clones for infinite wrap -----------------------------------
     // Layout: [start-clones 0..n-1] [real 0..n-1] [end-clones 0..n-1]
     // Real cards occupy DOM positions n..2n-1.
     //
@@ -550,7 +550,7 @@
         var clone = real.cloneNode(true);
         clone.setAttribute('data-clone', tag);
         clone.setAttribute('aria-hidden', 'true');
-        // Strip both modifier classes — clones never carry the desktop styling
+        // Strip both modifier classes - clones never carry the desktop styling
         // (they're display: none on desktop anyway, but defensive).
         clone.classList.remove('rbccm-featured-conferences__insight--featured');
         clone.classList.remove('rbccm-featured-conferences__insight--card');
@@ -567,8 +567,8 @@
     var currentIndex = 0;
     var displayedPos = n;
 
-    // ── ARIA setup ────────────────────────────────────────────────────────
-    // Same "set if empty" pattern as speakers — author overrides via DCR
+    // -- ARIA setup --------------------------------------------------------
+    // Same "set if empty" pattern as speakers - author overrides via DCR
     // flow through markup and win over JS defaults.
     function setIfEmpty(el, attr, value) {
       if (el && !el.getAttribute(attr)) el.setAttribute(attr, value);
@@ -581,7 +581,7 @@
     track.setAttribute('aria-atomic', 'false');
 
     // Pull (title, meta text) per card so we can build rich aria-labels.
-    // Meta example: "6 min read" or "12 min listen" — surface the format
+    // Meta example: "6 min read" or "12 min listen" - surface the format
     // type so screen-reader users know whether the link is article vs audio
     // before they activate it.
     function insightInfo(el) {
@@ -608,7 +608,7 @@
     setIfEmpty(nextBtn,  'aria-label', 'Next insight');
     setIfEmpty(dotsWrap, 'aria-label', 'Choose an insight');
 
-    // Rich aria-label on the "View all conference insights" CTA — include the
+    // Rich aria-label on the "View all conference insights" CTA - include the
     // specific conference name so screen-reader users know which conference's
     // archive they're heading to. The CTA lives outside the slider but inside
     // the same inner-panel.
@@ -627,7 +627,7 @@
       );
     }
 
-    // ── Build dots ────────────────────────────────────────────────────────
+    // -- Build dots --------------------------------------------------------
     cards.forEach(function (c, i) {
       var dot = document.createElement('button');
       dot.type = 'button';
@@ -644,10 +644,10 @@
       dotsWrap.querySelectorAll('.rbccm-featured-conferences__insights-dot')
     );
 
-    // ── Overflow state — class-driven control visibility ─────────────────
+    // -- Overflow state - class-driven control visibility -----------------
     // Row natural width = n cards + (n-1) gaps. Compare to slider's
     // clientWidth. On desktop the slider holds a grid (no horizontal
-    // overflow), but we test this from the JS side anyway — when the
+    // overflow), but we test this from the JS side anyway - when the
     // grid layout is active, the cards aren't a flex row so the calc
     // doesn't really matter; CSS hides the controls on desktop regardless
     // by reflowing the track to grid.
@@ -673,7 +673,7 @@
       }
     }
 
-    // ── Sliding helpers ──────────────────────────────────────────────────
+    // -- Sliding helpers --------------------------------------------------
     // Position the row so the speaker at DOM position `domPos` sits at the
     // slider's left edge. `animate: false` snaps without transition (used
     // for the silent teleport off the boundary clones).
@@ -692,9 +692,9 @@
     }
 
     // go() accepts:
-    //   -1     → wrap to last via last start-clone (DOM pos n-1)
-    //   n      → wrap to first via first end-clone (DOM pos 2n)
-    //   0..n-1 → direct jump to a real card (DOM pos n + i)
+    //   -1     -> wrap to last via last start-clone (DOM pos n-1)
+    //   n      -> wrap to first via first end-clone (DOM pos 2n)
+    //   0..n-1 -> direct jump to a real card (DOM pos n + i)
     function go(targetReal) {
       if (targetReal === -1) {
         setTransformAtPos(n - 1, true);   // animate to last start-clone
@@ -713,15 +713,15 @@
     // silently teleport to the matching real card at the opposite end.
     // Because we cloned the full n-card strip on each side, the peek
     // visible just before the teleport matches the peek visible just
-    // after — invisible swap.
+    // after - invisible swap.
     track.addEventListener('transitionend', function (e) {
       if (e.target !== track || e.propertyName !== 'transform') return;
       if (displayedPos < n) {
-        // On a start-clone (pos 0..n-1) — teleport forward by n positions
+        // On a start-clone (pos 0..n-1) - teleport forward by n positions
         // to the matching real card.
         setTransformAtPos(displayedPos + n, false);
       } else if (displayedPos >= 2 * n) {
-        // On an end-clone (pos 2n..3n-1) — teleport backward by n.
+        // On an end-clone (pos 2n..3n-1) - teleport backward by n.
         setTransformAtPos(displayedPos - n, false);
       }
     });
@@ -731,11 +731,11 @@
         d.classList.toggle('is-active', i === currentIndex);
         d.setAttribute('aria-current', i === currentIndex ? 'true' : 'false');
       });
-      // No arrow disabled state — infinite wrap means there's always
+      // No arrow disabled state - infinite wrap means there's always
       // somewhere to go in either direction.
     }
 
-    // ── Reset to first card (used on init + on resize) ────────────────────
+    // -- Reset to first card (used on init + on resize) --------------------
     function resetToFirst() {
       currentIndex = 0;
       setTransformAtPos(n, false);   // DOM position n = real card 0
@@ -743,7 +743,7 @@
       updateOverflowState();
     }
 
-    // ── Wire up controls ─────────────────────────────────────────────────
+    // -- Wire up controls -------------------------------------------------
     prevBtn.addEventListener('click', function () {
       if (currentIndex === 0) go(-1);
       else go(currentIndex - 1);
@@ -777,14 +777,14 @@
       dots[realFocusIndex].focus();
     });
 
-    // ── Resize handler ───────────────────────────────────────────────────
+    // -- Resize handler ---------------------------------------------------
     var resizeTimer = null;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(resetToFirst, 150);
     });
 
-    // ── Initial state ─────────────────────────────────────────────────────
+    // -- Initial state -----------------------------------------------------
     requestAnimationFrame(resetToFirst);
 
     // Re-check overflow when a panel becomes visible (slider was display:none
