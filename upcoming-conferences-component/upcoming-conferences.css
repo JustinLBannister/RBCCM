@@ -3,7 +3,7 @@
    Scoped to .rbccm-upcoming-conferences
    Mobile-first; desktop at min-width: 992px
    ========================================= */
-
+ 
 .rbccm-upcoming-conferences {
   align-items: center;
   align-self: stretch;
@@ -14,7 +14,7 @@
   padding: 40px 16px;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__container {
   align-items: stretch;
   display: flex;
@@ -25,7 +25,7 @@
   padding: 0;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__heading {
   color: var(--Neutral-White, #FFF);
   font-family: "RBCDisplay", "RBC Display", Georgia, Times, serif;
@@ -35,7 +35,7 @@
   line-height: 120%; /* 28.8px */
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__intro {
   color: var(--Neutral-White, #FFF);
   font-family: Roboto, Arial, sans-serif;
@@ -46,12 +46,12 @@
   margin: 0;
   max-width: 720px;
 }
-
+ 
 /* Keep heading + intro visually grouped (tight) while everything below stays at 40px */
 .rbccm-upcoming-conferences__heading + .rbccm-upcoming-conferences__intro {
   margin-top: -28px;
 }
-
+ 
 /* -- Filters / search -- */
 /* Visible by default: month + region dropdowns + free-text title search.
    JS (upcoming-conferences.js) builds the dropdown option lists from the
@@ -61,26 +61,26 @@
   flex-direction: column;
   gap: 12px;
 }
-
+ 
 .rbccm-upcoming-conferences__filter-group {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
+ 
 .rbccm-upcoming-conferences__filter-label {
   color: #FFFDFD;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
 }
-
+ 
 .rbccm-upcoming-conferences__select-wrap {
   position: relative;
   flex: 1 1 0;
   min-width: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__select {
   appearance: none;
   -webkit-appearance: none;
@@ -93,12 +93,12 @@
   padding: 10px 32px 10px 12px;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__select option {
   background-color: #002144;
   color: #FFFDFD;
 }
-
+ 
 .rbccm-upcoming-conferences__select-chevron {
   color: #FFFDFD;
   pointer-events: none;
@@ -107,7 +107,7 @@
   top: 50%;
   transform: translateY(-50%);
 }
-
+ 
 .rbccm-upcoming-conferences__search {
   align-items: center;
   background-color: transparent;
@@ -118,12 +118,12 @@
   padding: 10px 12px;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__search-icon {
   color: #FFFDFD;
   flex-shrink: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__search-input {
   background: transparent;
   border: 0;
@@ -137,7 +137,7 @@
 .rbccm-upcoming-conferences__search-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
-
+ 
 /* SR-only utility */
 .rbccm-upcoming-conferences__sr-only {
   border: 0;
@@ -150,7 +150,7 @@
   white-space: nowrap;
   width: 1px;
 }
-
+ 
 /* -- Cards container --
    Renders ALL upcoming conferences in the current year. CSS hides cards
    beyond index 6 by default so the visible grid stays at 6. When the user
@@ -162,13 +162,13 @@
   display: block;          /* slick will replace this on mobile */
   margin: 0;
 }
-
+ 
 /* Default state: hide cards beyond index 6.
    Scoped via :not(.is-carousel) so slick on mobile sees every slide. */
 .rbccm-upcoming-conferences:not(.is-carousel) .rbccm-upcoming-conferences__cards:not(.is-filtered) .rbccm-upcoming-conferences__card:nth-of-type(n+7) {
   display: none;
 }
-
+ 
 /* When a filter / search is active: hide non-matching cards explicitly.
    `.is-filtered-out` is added by JS and beats the default-6 cap.
    `!important` is required to beat:
@@ -180,7 +180,7 @@
 .rbccm-upcoming-conferences__card.is-filtered-out {
   display: none !important;
 }
-
+ 
 /* Empty state -- shown by JS when no cards match the active filter / search.
    Stacks an icon circle + heading + 2 messages + "Clear filters" button,
    centered both axes inside a 594px-tall container with 32px gap throughout. */
@@ -193,7 +193,7 @@
   height: 594px;
   justify-content: center;
 }
-
+ 
 /* When the hidden attribute is present, the browser's UA stylesheet sets
    display: none, but our .__empty { display: flex } rule (specificity 0,1,0)
    would beat the [hidden] attribute selector (specificity 0,0,1). This rule
@@ -201,7 +201,7 @@
 .rbccm-upcoming-conferences__empty[hidden] {
   display: none;
 }
-
+ 
 /* Circular icon wrapper (80x80) with thin blue outline + low-opacity blue fill.
    Asymmetric padding (19 top/right, 18 bottom/left) lifts the icon visually. */
 .rbccm-upcoming-conferences__empty-icon-wrap {
@@ -217,14 +217,14 @@
   padding: 19px 19px 18px 18px;
   width: 80px;
 }
-
+ 
 .rbccm-upcoming-conferences__empty-icon {
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
   height: 43px;
   width: 43px;
 }
-
+ 
 .rbccm-upcoming-conferences__empty-heading {
   color: var(--Neutral-White, #FFF);
   font-family: "RBCDisplay", "RBC Display", Georgia, Times, serif;
@@ -235,7 +235,7 @@
   margin: 0;
   text-align: center;
 }
-
+ 
 /* The two messages share the same base styling; the second one (--emphasis) is
    set to weight 500 to read as a softer call-to-action. */
 .rbccm-upcoming-conferences__empty-message {
@@ -248,12 +248,12 @@
   margin: 0;
   text-align: center;
 }
-
+ 
 .rbccm-upcoming-conferences__empty-message--emphasis {
   font-weight: 500;
   line-height: normal;
 }
-
+ 
 /* "Clear filters" reset button. Matches the section CTA styling
    (212 x 50, 10px radius, white outline, Inter 16/500) but lives inside
    the empty state and triggers the JS reset (see upcoming-conferences.js). */
@@ -277,11 +277,11 @@
   text-align: center;
   width: 212px;
 }
-
+ 
 .rbccm-upcoming-conferences__empty-clear:hover {
   background-color: rgba(255, 255, 255, 0.08);
 }
-
+ 
 /* -- Card -- */
 .rbccm-upcoming-conferences__card {
   aspect-ratio: 1 / 1;
@@ -295,7 +295,7 @@
   text-decoration: none;
   width: 100%;
 }
-
+ 
 /* Slick overrides -- same pattern as leadership-slider (proven on production).
    Cards have fixed pixel width via !important so variableWidth can measure them. */
 #rbccm-upcoming-conferences.is-carousel .slick-track {
@@ -319,7 +319,7 @@
 #rbccm-upcoming-conferences.is-carousel .slick-next {
   display: none !important;
 }
-
+ 
 /* Card on mobile -- Figma: 343px wide, flex column, gap 10px, align-items flex-start */
 .rbccm-upcoming-conferences.is-carousel .rbccm-upcoming-conferences__card {
   align-items: flex-start;
@@ -330,7 +330,7 @@
   max-width: none;
   width: 343px !important;
 }
-
+ 
 /* The .__cards wrapper clips the peek so the section never overflows horizontally,
    and beats slick-theme's default `.slick-dotted.slick-slider { margin-bottom: 30px }`. */
 .rbccm-upcoming-conferences.is-carousel .rbccm-upcoming-conferences__cards {
@@ -342,12 +342,12 @@
   color: #FFFDFD;
   text-decoration: none;
 }
-
+ 
 /* Cards without an href are inert (no pointer, no focus, no scroll-jump) */
 .rbccm-upcoming-conferences__card:not([href]) {
   cursor: default;
 }
-
+ 
 .rbccm-upcoming-conferences__card-media {
   inset: 0;
   position: absolute;
@@ -367,7 +367,7 @@
   object-fit: cover;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__card-date {
   align-items: flex-start;
   display: flex;
@@ -378,7 +378,7 @@
   top: 24px;
   z-index: 1;
 }
-
+ 
 .rbccm-upcoming-conferences__card-month {
   color: #FFF;
   font-family: Roboto, Arial, sans-serif;
@@ -390,7 +390,7 @@
   margin: 0;
   text-transform: uppercase;
 }
-
+ 
 .rbccm-upcoming-conferences__card-day {
   color: #FFF;
   font-family: Roboto, Arial, sans-serif;
@@ -401,7 +401,7 @@
   line-height: 40px;
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__card-body {
   align-items: flex-start;
   bottom: 24px;
@@ -413,7 +413,7 @@
   right: 24px;
   z-index: 1;
 }
-
+ 
 .rbccm-upcoming-conferences__card-divider {
   background-color: #FFF;
   display: block;
@@ -421,7 +421,7 @@
   margin: 0;
   width: 32px;
 }
-
+ 
 .rbccm-upcoming-conferences__card-title {
   color: #FFF;
   font-family: "RBCDisplay", "RBC Display", Georgia, Times, serif;
@@ -431,7 +431,7 @@
   line-height: 27.5px;
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__card-location {
   align-items: center;
   color: #FFF;
@@ -444,14 +444,14 @@
   line-height: 20px;
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__pin {
   color: #FFF;
   flex-shrink: 0;
   height: 16px;
   width: 16px;
 }
-
+ 
 /* -- Mobile carousel controls -- */
 .rbccm-upcoming-conferences__controls {
   align-items: center;
@@ -460,11 +460,11 @@
   justify-content: center;
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences.is-carousel .rbccm-upcoming-conferences__controls {
   display: flex;
 }
-
+ 
 .rbccm-upcoming-conferences__btn {
   align-items: center;
   background: transparent;
@@ -482,7 +482,7 @@
 .rbccm-upcoming-conferences__btn[aria-disabled="true"] {
   cursor: default;
 }
-
+ 
 /* Dots */
 .rbccm-upcoming-conferences__dots .slick-dots {
   align-items: center;
@@ -495,14 +495,14 @@
   position: static;
   width: auto;
 }
-
+ 
 .rbccm-upcoming-conferences__dots .slick-dots li {
   height: 10px;
   margin: 0;
   padding: 0;
   width: 10px;
 }
-
+ 
 .rbccm-upcoming-conferences__dots .slick-dots li button {
   background: transparent;
   border: 1px solid #FFFDFD;
@@ -523,7 +523,7 @@
   outline: 1px solid var(--Yellow-Warm-Yellow, #FFC72C);
   outline-offset: 4px;
 }
-
+ 
 /* Keep the active ring visible on focus AND show the same ring when tabbing through
    inactive dots, so keyboard users can see where focus lands. */
 .rbccm-upcoming-conferences__dots .slick-dots li button:focus,
@@ -531,14 +531,14 @@
   outline: 1px solid var(--Yellow-Warm-Yellow, #FFC72C);
   outline-offset: 4px;
 }
-
+ 
 /* -- CTA -- */
 .rbccm-upcoming-conferences__cta-wrap {
   display: flex;
   justify-content: center;
   margin-top: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__cta {
   align-items: center;
   background-color: transparent;
@@ -562,29 +562,29 @@
   color: #FFFDFD;
   text-decoration: none;
 }
-
+ 
 /* ---------------------------------------------
    DESKTOP (min-width: 992px)
    --------------------------------------------- */
 @media (min-width: 992px) {
-
+ 
   .rbccm-upcoming-conferences {
     padding: 64px 0;
   }
-
+ 
   .rbccm-upcoming-conferences__container {
     gap: 43px;
     padding: 0;
   }
-
+ 
   .rbccm-upcoming-conferences__heading {
     font-size: 32px;
   }
-
+ 
   .rbccm-upcoming-conferences__intro {
     font-size: 18px;
   }
-
+ 
   /* Filter row: label + selects on the left, search on the right */
   .rbccm-upcoming-conferences__filters {
     align-items: center;
@@ -592,7 +592,7 @@
     flex-wrap: wrap;
     gap: 16px;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 0px;
   }
   .rbccm-upcoming-conferences__filter-group {
     flex: 0 0 auto;
@@ -601,12 +601,13 @@
   .rbccm-upcoming-conferences__select-wrap {
     flex: 0 0 auto;
     width: 140px;
+    margin: 0;
   }
   .rbccm-upcoming-conferences__search {
     flex: 0 0 auto;
     width: 320px;
   }
-
+ 
   /* Card grid -- 3 cols, 24px gap, total inner width = 1100px */
   .rbccm-upcoming-conferences__cards {
     display: grid;
@@ -614,7 +615,7 @@
     grid-template-columns: repeat(3, 1fr);
     overflow: visible;          /* clears the is-carousel overflow: hidden */
   }
-
+ 
   /* Desktop cards (when carousel is NOT active) -- beat any residual inline styles. */
   .rbccm-upcoming-conferences:not(.is-carousel) .rbccm-upcoming-conferences__card {
     aspect-ratio: auto;
@@ -624,7 +625,7 @@
     max-width: none;
     width: auto;
   }
-
+ 
   /* Desktop hover -- image zooms inside the fixed card frame; divider grows; overlay + content stay put */
   @media (hover: hover) {
     .rbccm-upcoming-conferences__card:hover,
@@ -640,7 +641,7 @@
       width: 56px;
     }
   }
-
+ 
   /* Smooth zoom on the image + grow on the divider */
   .rbccm-upcoming-conferences__card-media img {
     transition: transform 0.4s ease;
@@ -648,20 +649,20 @@
   .rbccm-upcoming-conferences__card-divider {
     transition: width 0.3s ease;
   }
-
+ 
   /* Mobile carousel controls are never used on desktop */
   .rbccm-upcoming-conferences__controls,
   .rbccm-upcoming-conferences.is-carousel .rbccm-upcoming-conferences__controls {
     display: none;
   }
 }
-
+ 
 /* =========================================
    Conference Listing Modal
    Lives inside Bootstrap's .modal pattern.
    BEM-scoped overrides + flex layout (no tables).
    ========================================= */
-
+ 
 /* Dialog + content frame.
    !important needed to beat Bootstrap's .modal-dialog { width: auto; margin: 10px } */
 .rbccm-upcoming-conferences__modal-dialog {
@@ -677,31 +678,31 @@
   top: 0;
   width: 100% !important;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-content {
   margin: 0 auto;
   max-width: 900px;
   width: 100%;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-header {
   border: none;
   border-top: 8px solid #FBDE00;
   padding: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-close {
   color: #595959;
   font-size: 41px;
   font-weight: normal;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-body {
   /* !important beats Bootstrap's `.modal-body { padding: 15px }` (modals.less)
      which loads after this file and wins at equal specificity (0,1,0). */
   padding: 0 !important;
 }
-
+ 
 /* Heading block (h2 + subtitle) */
 .rbccm-upcoming-conferences__modal-intro {
   align-items: center;
@@ -710,7 +711,7 @@
   min-height: 141px;
   padding: 0 32px;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-titles {
   align-items: flex-start;
   display: flex;
@@ -719,7 +720,7 @@
   gap: 4px;
   max-width: 455px;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-heading {
   color: #003168;
   font-family: Inter, "Roboto Medium", "Roboto", Arial, sans-serif;
@@ -729,7 +730,7 @@
   line-height: 48px;
   margin: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-subtitle {
   color: #2C2C2C;
   font-family: Inter, "Roboto", Arial, sans-serif;
@@ -739,7 +740,7 @@
   line-height: 24px;
   margin: 0;
 }
-
+ 
 /* Conference list */
 .rbccm-upcoming-conferences__modal-list {
   align-items: flex-start;
@@ -748,7 +749,7 @@
   flex-direction: column;
   padding: 0 47px 32px 32px;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-list-inner {
   align-items: flex-start;
   align-self: stretch;
@@ -756,7 +757,7 @@
   flex-direction: column;
   gap: 4px;
 }
-
+ 
 /* Each row */
 .rbccm-upcoming-conferences__modal-row {
   align-items: center;
@@ -768,7 +769,7 @@
   height: 57px;
   padding: 0 16px;
 }
-
+ 
 /* Date column */
 .rbccm-upcoming-conferences__modal-date {
   color: #003168;
@@ -780,7 +781,7 @@
   line-height: 24px;
   min-width: 90px;          /* keeps dates aligned across rows */
 }
-
+ 
 /* Title (middle column) */
 .rbccm-upcoming-conferences__modal-title {
   color: #003168;
@@ -792,7 +793,7 @@
   line-height: 24px;
   margin: 0;
 }
-
+ 
 /* Location (icon + text) */
 .rbccm-upcoming-conferences__modal-location {
   align-items: center;
@@ -802,11 +803,11 @@
   gap: 8px;
   height: 20px;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-location svg {
   flex-shrink: 0;
 }
-
+ 
 .rbccm-upcoming-conferences__modal-location-text {
   color: #2C2C2C;
   font-family: Inter, "Roboto", Arial, sans-serif;
@@ -816,7 +817,7 @@
   line-height: 20px;
   white-space: nowrap;
 }
-
+ 
 /* -- Mobile -- */
 @media (max-width: 767.98px) {
   .rbccm-upcoming-conferences__modal-intro {
@@ -844,16 +845,16 @@
     flex-basis: 100%;
   }
 }
-
+ 
 /* -- Modal bottom --
    Soft gray footer band inside the conference listing modal. Originally
    lived in `conference-hub.css:360`; relocated here so the modal styling
    stays self-contained within this component's stylesheet.
-
+ 
    Scoped to `#conference-listing-modal` so the `.modal-bottom` class name
    can be preserved in markup without colliding with any other component
    that uses the same class globally.
-
+ 
    V1: hidden via `display: none` per stakeholder request. Remove (or
    override) the display rule to flip it back on. */
 #conference-listing-modal .modal-bottom {
