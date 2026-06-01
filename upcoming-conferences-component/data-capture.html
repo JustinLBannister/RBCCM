@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE data-capture-requirements SYSTEM "datacapture6.0.dtd">
+ 
+<!-- Note that the dtd-system-identifier may be changed to point to the correct location of pr.dtd
+if DTD validation is needed. -->
+ 
+<data-capture-requirements
+dtd-system-identifier=http://localhost/iw-cc/sample/press-release.dtd.txt
+dcr-validation="none" name="">
+<ruleset name="dct">
+ 
+<description>
+This form is used to define a list of events
+</description>
+ 
+ 
+<root-container name="events" location="events">
+ 
+<item name="title" pathid="title">
+<label>Title</label>
+<text required="t" size="50" maxlength="256" />
+</item>
+ 
+<container name="event" location="event" combination="and" max="400">
+<label>Event</label>
+ 
+<item name="event_date" pathid="event_date">
+<label>Event Start Date</label>
+<description>Date format is YYYY-MM-DD</description>
+<text required="t" maxlength="10" validation-regex="^[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$" />
+</item>
+ 
+<item name="event_date_end" pathid="event_date_end">
+<label>Event End Date (optional)</label>
+<description>Date format is YYYY-MM-DD</description>
+<text maxlength="10" validation-regex="^[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$" />
+</item>
+ 
+<item name="event_name" pathid="event_name">
+<label>Event Name</label>
+<text required="t" size="50" maxlength="256" />
+</item>
+ 
+<item name="event_url" pathid="event_url">
+<label>Event URL</label>
+<text required="f" size="50" maxlength="256" />
+</item>
+ 
+<item name="newwindow" pathid="newwindow">
+<label>Open URL in New Window?</label>
+    <radio required="t">
+      <option label="Yes" value="y"/>
+      <option label="No" value="n" selected="t" />
+    </radio>
+</item>
+
+<item name="event_image" pathid="event_image">
+<label>Event Image (optional)</label>
+<description>URL or asset path for the poster image shown on the Upcoming Conferences card. Recommended 16:9 aspect ratio. Leave blank to use the section placeholder image.</description>
+<text required="f" size="50" maxlength="512" />
+</item>
+
+<item name="location" pathid="location">
+<label>Event Location</label>
+<description>e.g. Toronto, ON</description>
+<text required="t" size="50" maxlength="256" />
+</item>
+ 
+  <item name="sitelocation" pathid="sitelocation">
+    <label>Location to Feature</label> 
+    <description>&lt;strong style='color: #f00;'&gt;*ONLY check approved locations*&lt;/strong&gt;</description>
+    <checkbox required="f">
+      <option label="RBCCM Homepage" value="rbccm-homepage" />
+      <option label="Energy Transition" value="energy-transition" />
+      <option label="ESG" value="esg" />
+      <option label="European Insights" value="european-insights" />
+      <option label="Partner of Choice" value="partner-of-choice" />
+      <option label="Sustainable Finance" value="sustainable-finance" />
+      <option label="Realtime Geopolitics" value="realtime-geopolitics" />
+      <option label="Trade and Tariffs" value="trade-and-tariffs" />
+      <option label="*(Conference and Events Team ONLY - Conference Page)*" value="conference" />     
+    </checkbox>
+  </item>
+ 
+</container>
+</root-container>
+ 
+</ruleset>
+</data-capture-requirements>
