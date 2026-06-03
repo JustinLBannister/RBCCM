@@ -226,20 +226,51 @@
       <!-- ── Inline JS ── -->
       <script>
         jQuery(document).ready(function ($) {
-          var $track = $('.rbccm-leadership__slider-track');
-          var $dots  = $('#rbccm-lead-dots');
+          var $track    = $('.rbccm-leadership__slider-track');
+          var $dots     = $('#rbccm-lead-dots');
+          var section   = document.getElementById('rbccm-leadership');
+          var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
+          // === BEGIN DEBUG =======================================================
+          // Tab / focus tracing for QA. Flip DEBUG to false to silence, or
+          // block-comment this entire fenced section once verified on the server.
+          var DEBUG = true;
+          if (DEBUG) {
+            var __describeEl = function (el) {
+              if (!el || el === document.body) return '(body)';
+              var tag  = el.tagName.toLowerCase();
+              var id   = el.id ? '#' + el.id : '';
+              var cls  = el.className &amp;&amp; typeof el.className === 'string'
+                         ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : '';
+              var name = el.getAttribute('aria-label')
+                         || (el.textContent || '').trim().slice(0, 40);
+              var ti   = el.getAttribute('tabindex');
+              var inCarousel = section.contains(el) ? ' [in carousel]' : ' [OUTSIDE]';
+              return tag + id + cls + ' "' + name + '"' + (ti !== null ? ' tabindex=' + ti : '') + inCarousel;
+            };
+            $(document).on('keydown.rbccmDebug', function (e) {
+              if (e.key === 'Tab') {
+                console.log('%c[TAB ' + (e.shiftKey ? 'shift' : 'fwd') + ']',
+                  'color:#fff;background:#003168;padding:2px 6px;border-radius:3px;',
+                  'from:', __describeEl(document.activeElement));
+              }
+            });
+            document.addEventListener('focusin', function (e) {
+              console.log('%c[FOCUS]',
+                'color:#003168;background:#FFC72C;padding:2px 6px;border-radius:3px;',
+                __describeEl(e.target));
+            });
+          }
+          // === END DEBUG =========================================================
 
           $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
             .attr('tabindex', '0');
 
-          var entryActionIdx = 0;
-
+          // Prev / Next advance the carousel
           $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
-            focusQueue = [];
             if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
           });
           $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
-            focusQueue = [];
             if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
           });
 
@@ -278,6 +309,8 @@
           var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
           function initCarousel() {
+            // Once slick has built + measured the slides, set the initial a11y state.
+            $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
             $track.slick({
               slidesToShow:    1,
               slidesToScroll:  1,
@@ -340,121 +373,124 @@
             document.head.appendChild(slickScript);
           }
 
-          $track.on('afterChange init', function (e, slick, currentSlide) {
-            syncArrows();
+          // ─────────────────────────────────────────────────────────────
+          // Accessibility: roving tabindex + logical Tab order.
+          // Order = Prev -> visible slides -> Next. Off-canvas / cloned
+          // slides (and their focusable children) are removed from the tab
+          // sequence and hidden from assistive tech. Cards without an
+          // action become the tab stop themselves so focus still moves
+          // through them.
+          // ─────────────────────────────────────────────────────────────
 
+          // True for any slide (original OR cloned) essentially fully in view.
+          // 90% visibility threshold: flush-edge cards stay tabbable;
+          // peek neighbours in centerMode (typically 30–50% visible) are out.
+          function isSlideInView(slideEl) {
+            var list = $track.find('.slick-list')[0];
+            if (!list) return false;
+            var lr = list.getBoundingClientRect();
+            var sr = slideEl.getBoundingClientRect();
+            var visLeft  = Math.max(sr.left, lr.left);
+            var visRight = Math.min(sr.right, lr.right);
+            var visWidth = Math.max(0, visRight - visLeft);
+            var slideW   = sr.right - sr.left;
+            return slideW > 0 &amp;&amp; (visWidth / slideW) >= 0.9;
+          }
+
+          // The prev/next button visible at the current breakpoint.
+          function activeArrow(deskId, mobId) {
+            var desk = document.getElementById(deskId);
+            if (desk &amp;&amp; desk.offsetParent !== null) return desk;
+            return document.getElementById(mobId);
+          }
+
+          // Ordered focus ring: [Prev, ...visible card stops, Next].
+          // A "card stop" is the card's action element when present, OR
+          // the card itself when no action exists.
+          function getRing() {
+            var ring = [];
+            var prevBtn = activeArrow('rbccm-lead-prev-desk', 'rbccm-lead-prev');
+            var nextBtn = activeArrow('rbccm-lead-next-desk', 'rbccm-lead-next');
+            if (prevBtn) ring.push(prevBtn);
             $track.find('.slick-slide').each(function () {
-              $(this).removeAttr('aria-hidden');
-              $(this).find('a, button').removeAttr('tabindex');
+              if (isSlideInView(this)) {
+                var a = this.querySelector('.rbccm-leadership__card-action');
+                if (a) { ring.push(a); return; }
+                var card = this.querySelector('.rbccm-leadership__card');
+                if (card) ring.push(card);
+              }
             });
+            if (nextBtn) ring.push(nextBtn);
+            return ring;
+          }
 
-            $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
-              .attr('tabindex', '0');
+          // Roving tabindex + aria-hidden across all slides, then enable the ring.
+          function applyA11y() {
+            $track.find('.slick-slide').each(function () {
+              if (isSlideInView(this)) { this.removeAttribute('aria-hidden'); }
+              else                     { this.setAttribute('aria-hidden', 'true'); }
+              var kids = this.querySelectorAll(FOCUSABLE);
+              for (var i = 0; i &lt; kids.length; i++) kids[i].setAttribute('tabindex', '-1');
+              // Reset the card itself; set to 0 below only if it's in the ring.
+              var card = this.querySelector('.rbccm-leadership__card');
+              if (card) card.setAttribute('tabindex', '-1');
+            });
+            var ring = getRing();
+            for (var j = 0; j &lt; ring.length; j++) ring[j].setAttribute('tabindex', '0');
+          }
 
-            if (typeof currentSlide !== 'undefined') {
-              var total = slick.slideCount;
-              $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + total);
-              entryActionIdx = currentSlide;
+          // Move focus to the tabbable element just outside the section. Used
+          // to exit backward from Prev, which sits AFTER the slides in the DOM.
+          function focusOutside(backward) {
+            var nodes = Array.prototype.slice.call(document.querySelectorAll(FOCUSABLE))
+              .filter(function (el) { return el.tabIndex >= 0 &amp;&amp; !el.disabled &amp;&amp; el.offsetParent !== null; });
+            var firstIn = -1, lastIn = -1;
+            for (var i = 0; i &lt; nodes.length; i++) {
+              if (section.contains(nodes[i])) { if (firstIn === -1) firstIn = i; lastIn = i; }
             }
+            if (backward) { if (firstIn > 0) nodes[firstIn - 1].focus(); }
+            else          { if (lastIn !== -1 &amp;&amp; lastIn &lt; nodes.length - 1) nodes[lastIn + 1].focus(); }
+          }
 
-            isAnimating = false;
-            processQueue();
+          // Re-evaluate after every settle.
+          $track.on('afterChange', function (e, slick, currentSlide) {
+            applyA11y();
+            syncArrows();
+            if (typeof currentSlide !== 'undefined' &amp;&amp; slick) {
+              $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+            }
           });
 
-          var isAnimating = false;
-          var focusQueue  = [];
-
-          function processQueue() {
-            if (focusQueue.length === 0) return;
-            var $next = focusQueue.shift();
-            if ($next &amp;&amp; $next.length) $next.get(0).focus({ preventScroll: true });
-          }
-
-          // Generic action selector: works for both LinkedIn anchors and Biography buttons
-          var ACTION_SEL = '.rbccm-leadership__card-action';
-
-          function getFocusable() {
-            var $prev = $('#rbccm-lead-prev-desk').is(':visible')
-              ? $('#rbccm-lead-prev-desk')
-              : $('#rbccm-lead-prev');
-            var $next = $('#rbccm-lead-next-desk').is(':visible')
-              ? $('#rbccm-lead-next-desk')
-              : $('#rbccm-lead-next');
-            return $().add($prev).add($next).add($track.find(ACTION_SEL));
-          }
-
-          function navigateSequence(direction) {
-            var $focusable = getFocusable();
-            var $links     = $track.find(ACTION_SEL);
-            var currIdx    = $focusable.index(document.activeElement);
-            var onPrevBtn  = $(document.activeElement).is('#rbccm-lead-prev, #rbccm-lead-prev-desk');
-            var onNextBtn  = $(document.activeElement).is('#rbccm-lead-next, #rbccm-lead-next-desk');
-
-            if (currIdx === -1) return false;
-
-            if (onNextBtn &amp;&amp; direction === 1) {
-              var currentSlide = $track.slick('getSlick').currentSlide;
-              var $target      = $links.eq(currentSlide);
-              if ($target.length) {
-                $target.get(0).focus({ preventScroll: true });
-                return true;
-              }
-            }
-
-            if (onPrevBtn &amp;&amp; direction === -1) return false;
-
-            var nextIdx = currIdx + direction;
-            if (nextIdx &lt; 0 || nextIdx >= $focusable.length) return false;
-
-            var $next     = $focusable.eq(nextIdx);
-            var isAction  = $next.hasClass('rbccm-leadership__card-action');
-
-            if (isAction) {
-              if (isAnimating) { focusQueue.push($next); return true; }
-
-              var slickNav       = $track.slick('getSlick');
-              var currentNav     = slickNav.currentSlide;
-              var cardWidthNav   = $('.rbccm-leadership__card').first().outerWidth(true);
-              var trackWidthNav  = $track.width();
-              var visibleNav     = Math.ceil(trackWidthNav / cardWidthNav);
-              var lastVisibleNav = currentNav + visibleNav - 1;
-              var actionIdx      = $links.index($next);
-
-              if (direction === 1 &amp;&amp; actionIdx > lastVisibleNav) {
-                isAnimating = true; focusQueue.push($next); $track.slick('slickNext'); return true;
-              } else if (direction === -1 &amp;&amp; actionIdx &lt; currentNav) {
-                isAnimating = true; focusQueue.push($next); $track.slick('slickPrev'); return true;
-              }
-            }
-
-            $next.get(0).focus({ preventScroll: true });
-            return true;
-          }
-
-          $(document).on('keydown', function (e) {
-            if (!$.contains(document.getElementById('rbccm-leadership'), document.activeElement)) return;
-
-            // While modal is open, let modal handle its own keys
-            if ($('#rbccm-lead-modal').hasClass('in')) return;
-
-            if ((e.key === 'Enter' || e.key === ' ') &amp;&amp;
-                $(document.activeElement).closest('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk').length) {
+          // ── Tab: enforce Prev -> slides -> Next, exit cleanly at the ends ──
+          var lastTabShift = null;
+          $(document).on('mousedown.rbccmA11y', function () { lastTabShift = null; });
+          $(document).on('keydown.rbccmA11y', function (e) {
+            if (e.key !== 'Tab') { lastTabShift = null; return; }
+            lastTabShift = e.shiftKey;
+            if (!section.contains(document.activeElement)) return; // entry handled in focusin
+            var ring = getRing();
+            if (!ring.length) return;
+            var idx = ring.indexOf(document.activeElement);
+            if (idx === -1) return; // e.g. a dot button -> default behaviour
+            if (e.shiftKey) {
               e.preventDefault();
-              focusQueue = [];
-              $(document.activeElement).trigger('click');
-              return;
+              if (idx === 0) { focusOutside(true); }                 // on Prev -> leave widget backward
+              else           { ring[idx - 1].focus({ preventScroll: true }); }
+            } else {
+              if (idx === ring.length - 1) return;                   // on Next -> leave widget forward (natural)
+              e.preventDefault();
+              ring[idx + 1].focus({ preventScroll: true });
             }
+          });
 
-            if (e.key === 'ArrowRight') {
-              e.preventDefault();
-              navigateSequence(1);
-            } else if (e.key === 'ArrowLeft') {
-              e.preventDefault();
-              navigateSequence(-1);
-            } else if (e.key === 'Tab') {
-              var direction = e.shiftKey ? -1 : 1;
-              if (navigateSequence(direction)) e.preventDefault();
-            }
+          // ── Entry: forward-tab in -> Prev, shift-tab in -> Next ──
+          section.addEventListener('focusin', function (e) {
+            if (lastTabShift === null) return;                                // not via Tab (click etc.)
+            if (e.relatedTarget &amp;&amp; section.contains(e.relatedTarget)) return; // internal move
+            var ring = getRing();
+            if (!ring.length) return;
+            var target = lastTabShift ? ring[ring.length - 1] : ring[0];
+            if (target &amp;&amp; e.target !== target) target.focus({ preventScroll: true });
           });
 
           var resizeTimer;
@@ -464,6 +500,7 @@
               if ($track.hasClass('slick-initialized')) {
                 $track.slick('setPosition');
                 syncArrows();
+                applyA11y();
               }
             }, 50);
           });
@@ -519,40 +556,3 @@
     <DCR Category="rbccm" Type="authors"/>
   </Datum>
 </Data>
-
-
-/* -- Biography -- absolute bottom-left of card body -- */
-.rbccm-leadership__card-bio {
-  /* Strip button chrome */
-  appearance: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-
-  /* Pin to bottom-left, mirroring the LinkedIn placement */
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-
-  /* Link styling */
-  color: #0051A5;
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: left;
-  text-decoration: none;
-}
-
-.rbccm-leadership__card-bio:hover,
-.rbccm-leadership__card-bio:focus-visible {
-  text-decoration: underline;
-  outline: none;
-}
-
-/* Hide the circular SVG icon — text-only link */
-.rbccm-leadership__card-bio svg {
-  display: none;
-}

@@ -39,10 +39,9 @@
     /* -- Heading -- */
     .rbccm-leadership__heading {
       color: #003168;
-      font-family: 'RBC Display', serif;
-      font-size: 32px;
+      font-family: RBCDisplay, Georgia, Times, serif;
+      font-size: 29px;
       font-weight: 500;
-      letter-spacing: -0.789px;
       line-height: normal;
       margin: 0 -16px 35px -16px;
       padding: 0 16px;
@@ -87,7 +86,7 @@
       .rbccm-leadership__card { width: 273px !important; }
     }
     @media (min-width: 1245px) {
-      .rbccm-leadership__card { margin: 0 32px 0 0; width: 270px !important; }
+      .rbccm-leadership__card { margin: 0 20px 0 0; width: 270px !important; }
     }
     #rbccm-leadership .slick-center .rbccm-leadership__card {
       border-color: #003168;
@@ -135,6 +134,54 @@
       max-height: 185px;
       padding: 24px 24px 46px;
       position: relative;
+    }
+
+    /* -- Biography -- absolute bottom-left of card body -- */
+    .rbccm-leadership__card-bio {
+      /* Strip button chrome */
+      appearance: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+
+      /* Pin to bottom-left, mirroring the LinkedIn placement */
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+
+      /* Link styling */
+      color: #006AC3;
+      font-size: 15px;
+      line-height: 1;
+      text-align: left;
+      text-decoration: none;
+    }
+
+    .rbccm-leadership__card-bio:hover,
+    .rbccm-leadership__card-bio:focus-visible {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    /* Focus state on the card.
+       Reuses the active (.slick-center) #003168 border so the focus
+       treatment matches the centered-card language across:
+         (1) actionless cards that became the tab stop themselves
+             (.rbccm-leadership__card:focus-visible), AND
+         (2) cards whose inner action (LinkedIn anchor, Biography button)
+             has keyboard focus (:has(:focus-visible)). */
+    .rbccm-leadership__card:focus { outline: none; }
+    .rbccm-leadership__card:focus-visible,
+    .rbccm-leadership__card:has(:focus-visible) {
+      border-color: #003168;
+      outline: none;
+    }
+
+    /* Hide the circular SVG icon — text-only link */
+    .rbccm-leadership__card-bio svg {
+      display: none;
     }
 
     /* -- Card name -- */
@@ -246,7 +293,7 @@
     }
     /* Inactive dot: outlined circle */
     #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button::before {
-      /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important; */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
       background-repeat: no-repeat !important;
       background-size: 11px 11px !important;
       content: '' !important;
@@ -273,6 +320,7 @@
       box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
       height: 11px !important;
       width: 11px !important;
+      outline: 0px;
     }
 
     /* -- Desktop arrows overlay >=1245px -- */
