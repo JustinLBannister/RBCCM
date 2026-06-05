@@ -146,39 +146,9 @@ This form is used to define a list of events
 <text required="f" size="80" maxlength="256" />
 </item>
 
-<!-- Featured Conferences - Speakers (repeating, up to 5).
-     Each speaker is a single pick from the author DCR at
-     templatedata/rbccm/authors/data. The XSL will document() the picked
-     file and pull the author's photo, name, title (job title), and
-     subtitle (company) - so any speaker (RBC or guest) must exist as an
-     author entry first. 0 groups = Speakers tab hidden / shows
-     "Speakers coming soon". Net new: June 5, 2026. -->
-
-<container name="speaker" combination="and" max="5">
-
-<item name="author" pathid="author">
-<label>Speaker (pick author)</label>
-<description>Pick an author from templatedata/rbccm/authors/data. The speaker card will display the picked author's photo, name, title, and company automatically. Guest/non-RBC speakers need to be added to the authors data first. Net new: June 5, 2026.</description>
-<browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm" required="f" readonly="f" />
-</item>
-
-</container>
-
-<!-- Featured Conferences - Insights (repeating, up to 3).
-     Each insight is a single pick from the article/story DCR. The XSL
-     will document() the picked file and pull title, image, description,
-     and read-time from it - matching the related-stories pattern from
-     the author DCR. Net new: June 5, 2026. -->
-
-<container name="insight" combination="and" max="3">
-
-<item name="story" pathid="story">
-<label>Insight Article</label>
-<description>Pick an article from templatedata/article/story/data. The Insights card on the Featured Conferences component will display the picked article's image, title, description, and read-time automatically (single source of truth - if the article is edited later, the card updates). Net new: June 5, 2026.</description>
-<browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata/article" required="f" readonly="f" />
-</item>
-
-</container>
+<!-- DIAGNOSTIC: speaker and insight sub-containers temporarily removed
+     to bisect the parse error. If editing now works, the sub-containers
+     (or the browser inside them) were the cause. -->
 
 </container>
 </root-container>
