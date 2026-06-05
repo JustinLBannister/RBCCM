@@ -190,6 +190,15 @@
               <xsl:variable name="spkIntro" select="Datum[@ID='SpeakersIntro' or @Name='Speakers Intro']"/>
               <xsl:variable name="spkFootnote" select="Datum[@ID='SpeakersFootnote' or @Name='Speakers Footnote']"/>
 
+              <!-- Populated speaker count (a speaker is populated when its Name
+                   OR Image is set). Drives inline-style hiding of the heading /
+                   intro / slider when 0 are filled, and dropping the footnote's
+                   top divider so the panel reads as a clean "coming soon" note. -->
+              <xsl:variable name="speakerCount" select="
+                  number(normalize-space(Datum[@ID='Speaker1Name']) != '' or normalize-space(Datum[@ID='Speaker1Image']) != '')
+                + number(normalize-space(Datum[@ID='Speaker2Name']) != '' or normalize-space(Datum[@ID='Speaker2Image']) != '')
+                + number(normalize-space(Datum[@ID='Speaker3Name']) != '' or normalize-space(Datum[@ID='Speaker3Image']) != '')"/>
+
               <!-- Insights fields -->
               <xsl:variable name="insightsCtaText">
                 <xsl:choose>
@@ -200,6 +209,9 @@
                 </xsl:choose>
               </xsl:variable>
               <xsl:variable name="insightsCtaHref" select="normalize-space(Datum[@ID='InsightsCTAHref' or @Name='Insights CTA Href'])"/>
+              <xsl:variable name="insightsIntro" select="Datum[@ID='InsightsIntro' or @Name='Insights Intro']"/>
+
+
 
               <div class="rbccm-featured-conferences__panel" role="tabpanel">
                 <xsl:attribute name="id">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
@@ -316,9 +328,17 @@
                 <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
 
-                  <h3 class="rbccm-featured-conferences__speakers-heading"><xsl:value-of select="$spkHeading"/></h3>
+                  <h3 class="rbccm-featured-conferences__speakers-heading">
+                    <xsl:if test="$speakerCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$spkHeading"/>
+                  </h3>
                   <xsl:if test="normalize-space($spkIntro) != ''">
                     <p class="rbccm-featured-conferences__speakers-intro">
+                      <xsl:if test="$speakerCount = 0">
+                        <xsl:attribute name="style">display: none;</xsl:attribute>
+                      </xsl:if>
                       <xsl:value-of select="$spkIntro" disable-output-escaping="yes"/>
                     </p>
                   </xsl:if>
@@ -331,6 +351,9 @@
                     <xsl:attribute name="data-conf"><xsl:value-of select="$confKey"/></xsl:attribute>
                     <xsl:if test="$ariaSpeakersCarouselLabel != ''">
                       <xsl:attribute name="aria-label"><xsl:value-of select="$ariaSpeakersCarouselLabel"/></xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="$speakerCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
                     </xsl:if>
 
                     <div class="rbccm-featured-conferences__speakers">
@@ -353,18 +376,7 @@
                         <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker3Image'])"/>
                         <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker3Alt'])"/>
                       </xsl:call-template>
-                      <xsl:call-template name="render-speaker">
-                        <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker4Name'])"/>
-                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker4Title'])"/>
-                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker4Image'])"/>
-                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker4Alt'])"/>
-                      </xsl:call-template>
-                      <xsl:call-template name="render-speaker">
-                        <xsl:with-param name="name"  select="normalize-space(Datum[@ID='Speaker5Name'])"/>
-                        <xsl:with-param name="title" select="normalize-space(Datum[@ID='Speaker5Title'])"/>
-                        <xsl:with-param name="image" select="normalize-space(Datum[@ID='Speaker5Image'])"/>
-                        <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Speaker5Alt'])"/>
-                      </xsl:call-template>
+
                     </div>
 
                     <!-- Carousel controls (arrows + dots). JS toggles
@@ -399,6 +411,9 @@
 
                   <xsl:if test="normalize-space($spkFootnote) != ''">
                     <p class="rbccm-featured-conferences__speakers-footnote">
+                      <xsl:if test="$speakerCount = 0">
+                        <xsl:attribute name="style">border-top: 0px;</xsl:attribute>
+                      </xsl:if>
                       <xsl:value-of select="$spkFootnote" disable-output-escaping="yes"/>
                     </p>
                   </xsl:if>
@@ -429,9 +444,11 @@
                     <div class="rbccm-featured-conferences__insights">
                       <xsl:attribute name="id">rbccm-fc-insights-<xsl:value-of select="$confKey"/></xsl:attribute>
 
-                      <!-- Featured (large) card = position 1 -->
+                      <!-- Standard cards row (positions 2, 3, 4) -->
+                      <div class="rbccm-featured-conferences__insights-row">
+
                       <xsl:call-template name="render-insight">
-                        <xsl:with-param name="mode" select="'featured'"/>
+                        <xsl:with-param name="mode" select="'card'"/>
                         <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight1Label'])"/>
                         <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight1Title'])"/>
                         <xsl:with-param name="desc"  select="Datum[@ID='Insight1Description']"/>
@@ -441,8 +458,7 @@
                         <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight1Href'])"/>
                       </xsl:call-template>
 
-                      <!-- Standard cards row (positions 2, 3, 4) -->
-                      <div class="rbccm-featured-conferences__insights-row">
+
                         <xsl:call-template name="render-insight">
                           <xsl:with-param name="mode" select="'card'"/>
                           <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight2Label'])"/>
@@ -463,16 +479,7 @@
                           <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight3ImageAlt'])"/>
                           <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight3Href'])"/>
                         </xsl:call-template>
-                        <xsl:call-template name="render-insight">
-                          <xsl:with-param name="mode" select="'card'"/>
-                          <xsl:with-param name="label" select="normalize-space(Datum[@ID='Insight4Label'])"/>
-                          <xsl:with-param name="title" select="normalize-space(Datum[@ID='Insight4Title'])"/>
-                          <xsl:with-param name="desc"  select="Datum[@ID='Insight4Description']"/>
-                          <xsl:with-param name="meta"  select="normalize-space(Datum[@ID='Insight4Meta'])"/>
-                          <xsl:with-param name="image" select="normalize-space(Datum[@ID='Insight4Image'])"/>
-                          <xsl:with-param name="alt"   select="normalize-space(Datum[@ID='Insight4ImageAlt'])"/>
-                          <xsl:with-param name="href"  select="normalize-space(Datum[@ID='Insight4Href'])"/>
-                        </xsl:call-template>
+
                       </div>
                     </div>
 
@@ -505,6 +512,12 @@
                       </button>
                     </div>
                   </div>
+
+
+<!--HOTFIX-REMOVE LATER IF NEEDED-->
+<xsl:if test="normalize-space($insightsIntro) != ''">
+<xsl:value-of select="$insightsIntro" disable-output-escaping="yes"/>
+</xsl:if>
 
                     <!-- CTA -->
                     <xsl:if test="$insightsCtaHref != ''">
@@ -628,150 +641,3 @@
   </xsl:template>
 
 </xsl:stylesheet>
-
-<Properties ComponentID="1554499053453">
-  <!-- Content -->
-  <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
-  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
-
-  <!-- Optional ARIA overrides (leave blank to use built-in defaults) -->
-  <Datum ID="AriaSpeakersCarouselLabel" Type="String" Name="ARIA: Speakers Carousel Label"></Datum>
-  <Datum ID="AriaInsightsCarouselLabel" Type="String" Name="ARIA: Insights Carousel Label"></Datum>
-  <Datum ID="AriaPrevSpeakerLabel"      Type="String" Name="ARIA: Previous Speaker Button"></Datum>
-  <Datum ID="AriaNextSpeakerLabel"      Type="String" Name="ARIA: Next Speaker Button"></Datum>
-  <Datum ID="AriaPrevInsightLabel"      Type="String" Name="ARIA: Previous Insight Button"></Datum>
-  <Datum ID="AriaNextInsightLabel"      Type="String" Name="ARIA: Next Insight Button"></Datum>
-  <Datum ID="AriaSpeakersDotsLabel"     Type="String" Name="ARIA: Speakers Dots Group"></Datum>
-  <Datum ID="AriaInsightsDotsLabel"     Type="String" Name="ARIA: Insights Dots Group"></Datum>
-  <Datum ID="AriaViewAllInsightsLabel"  Type="String" Name="ARIA: View All Insights Button"></Datum>
-
-  <!-- Brightcove defaults (overridden per-conference via Conference fields if needed) -->
-  <Datum ID="BCAccount" Type="String" Name="Brightcove Account">6021289101001</Datum>
-  <Datum ID="BCPlayer"  Type="String" Name="Brightcove Player">VyvCc9BZx</Datum>
-  <Datum ID="BCEmbed"   Type="String" Name="Brightcove Embed">default</Datum>
-
-  <!-- Fallback poster/image for any conference with no Poster Override of its own -->
-  <Datum ID="DefaultPoster" Type="String" Name="Default Poster / Image">https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</Datum>
-</Properties>
-
-<Data>
-  <!-- EXACTLY 3 Conference groups required (component will not render otherwise) -->
-  <Group ID="Conference" Name="Conference" Replicatable="true" CloneGroupID="conference">
-
-    <!-- Conference basics -->
-    <Datum ID="Name" Type="String" Name="Conference Name">
-      <!-- e.g. "Global Healthcare Conference" -->
-    </Datum>
-
-    <!-- Media mode per conference: enter "video" (poster + play icon, opens the
-         Brightcove reel on click) or "image" (poster image only, no player).
-         Blank = image. -->
-    <Datum ID="MediaMode" Type="String" Name="Media Mode">image</Datum>
-    <!-- Brightcove video. Default = placeholder reel used during testing. -->
-    <Datum ID="BCVideoId" Type="String" Name="Brightcove Video ID">6385583003112</Datum>
-    <!-- Poster / image URL. Used as the play-button poster in video mode and as
-         the standalone image in image mode. -->
-    <Datum ID="BCPoster" Type="String" Name="Brightcove Poster Override">
-      <!-- Optional custom poster image URL -->
-    </Datum>
-
-    <!-- OVERVIEW TAB -->
-    <Datum ID="Date" Type="String" Name="Date">
-      <!-- e.g. "March 15, 2026" -->
-    </Datum>
-    <Datum ID="Location" Type="String" Name="Location">
-      <!-- e.g. "New York, NY" -->
-    </Datum>
-    <Datum ID="Format" Type="String" Name="Format">
-      <!-- e.g. "In-person &amp; virtual" -->
-    </Datum>
-    <Datum ID="OverviewHeading" Type="String" Name="Overview Heading">Conference overview</Datum>
-    <Datum ID="OverviewBody" Type="Textarea" Name="Overview Body">
-      <!-- HTML allowed. Paragraphs encouraged. -->
-    </Datum>
-    <Datum ID="KeyTopicsLabel" Type="String" Name="Key Topics Label">Key themes</Datum>
-    <Datum ID="KeyTopics" Type="Textarea" Name="Key Topics">
-      <!-- e.g. "Topic A | Topic B | Topic C" - pipe-separated, no leading/trailing pipe -->
-    </Datum>
-    <Datum ID="ContactText" Type="Textarea" Name="Contact Text">
-      <!-- Italic note at bottom, e.g. "Please contact your RBC representative..." -->
-    </Datum>
-
-    <!-- SPEAKERS TAB -->
-    <!-- Show this conference's Speakers tab? "yes" (default) or "no". -->
-    <Datum ID="ShowSpeakers" Type="String" Name="Show Speakers">yes</Datum>
-    <Datum ID="SpeakersHeading" Type="String" Name="Speakers Heading">Featured speakers</Datum>
-    <Datum ID="SpeakersIntro" Type="Textarea" Name="Speakers Intro">
-      <!-- e.g. "Hear from industry leaders and experts who are shaping the future..." -->
-    </Datum>
-    <Datum ID="SpeakersFootnote" Type="String" Name="Speakers Footnote">+ Additional speakers to be announced</Datum>
-
-    <!-- Up to 5 speakers per conference. Empty slots are skipped. -->
-    <Datum ID="Speaker1Name"  Type="String" Name="Speaker 1 - Name"/>
-    <Datum ID="Speaker1Title" Type="String" Name="Speaker 1 - Title"/>
-    <Datum ID="Speaker1Image" Type="String" Name="Speaker 1 - Image"/>
-    <Datum ID="Speaker1Alt"   Type="String" Name="Speaker 1 - Image Alt"/>
-
-    <Datum ID="Speaker2Name"  Type="String" Name="Speaker 2 - Name"/>
-    <Datum ID="Speaker2Title" Type="String" Name="Speaker 2 - Title"/>
-    <Datum ID="Speaker2Image" Type="String" Name="Speaker 2 - Image"/>
-    <Datum ID="Speaker2Alt"   Type="String" Name="Speaker 2 - Image Alt"/>
-
-    <Datum ID="Speaker3Name"  Type="String" Name="Speaker 3 - Name"/>
-    <Datum ID="Speaker3Title" Type="String" Name="Speaker 3 - Title"/>
-    <Datum ID="Speaker3Image" Type="String" Name="Speaker 3 - Image"/>
-    <Datum ID="Speaker3Alt"   Type="String" Name="Speaker 3 - Image Alt"/>
-
-    <Datum ID="Speaker4Name"  Type="String" Name="Speaker 4 - Name"/>
-    <Datum ID="Speaker4Title" Type="String" Name="Speaker 4 - Title"/>
-    <Datum ID="Speaker4Image" Type="String" Name="Speaker 4 - Image"/>
-    <Datum ID="Speaker4Alt"   Type="String" Name="Speaker 4 - Image Alt"/>
-
-    <Datum ID="Speaker5Name"  Type="String" Name="Speaker 5 - Name"/>
-    <Datum ID="Speaker5Title" Type="String" Name="Speaker 5 - Title"/>
-    <Datum ID="Speaker5Image" Type="String" Name="Speaker 5 - Image"/>
-    <Datum ID="Speaker5Alt"   Type="String" Name="Speaker 5 - Image Alt"/>
-
-    <!-- INSIGHTS TAB -->
-    <!-- Show this conference's Insights tab? "yes" (default) or "no". -->
-    <Datum ID="ShowInsights" Type="String" Name="Show Insights">yes</Datum>
-    <Datum ID="InsightsCTAText" Type="String" Name="Insights CTA Text">View all conference insights</Datum>
-    <Datum ID="InsightsCTAHref" Type="String" Name="Insights CTA Href">
-      <!-- URL for the CTA button -->
-    </Datum>
-
-    <!-- Insight 1 = the large featured tile. Insights 2/3/4 = standard cards row. -->
-    <Datum ID="Insight1Label"       Type="String"   Name="Insight 1 - Label">INSIGHTS</Datum>
-    <Datum ID="Insight1Title"       Type="String"   Name="Insight 1 - Title"/>
-    <Datum ID="Insight1Description" Type="Textarea" Name="Insight 1 - Description"/>
-    <Datum ID="Insight1Meta"        Type="String"   Name="Insight 1 - Meta (e.g. 8 min read)"/>
-    <Datum ID="Insight1Image"       Type="String"   Name="Insight 1 - Image"/>
-    <Datum ID="Insight1ImageAlt"    Type="String"   Name="Insight 1 - Image Alt"/>
-    <Datum ID="Insight1Href"        Type="String"   Name="Insight 1 - Href"/>
-
-    <Datum ID="Insight2Label"       Type="String"   Name="Insight 2 - Label">INSIGHTS</Datum>
-    <Datum ID="Insight2Title"       Type="String"   Name="Insight 2 - Title"/>
-    <Datum ID="Insight2Description" Type="Textarea" Name="Insight 2 - Description"/>
-    <Datum ID="Insight2Meta"        Type="String"   Name="Insight 2 - Meta"/>
-    <Datum ID="Insight2Image"       Type="String"   Name="Insight 2 - Image"/>
-    <Datum ID="Insight2ImageAlt"    Type="String"   Name="Insight 2 - Image Alt"/>
-    <Datum ID="Insight2Href"        Type="String"   Name="Insight 2 - Href"/>
-
-    <Datum ID="Insight3Label"       Type="String"   Name="Insight 3 - Label">INSIGHTS</Datum>
-    <Datum ID="Insight3Title"       Type="String"   Name="Insight 3 - Title"/>
-    <Datum ID="Insight3Description" Type="Textarea" Name="Insight 3 - Description"/>
-    <Datum ID="Insight3Meta"        Type="String"   Name="Insight 3 - Meta"/>
-    <Datum ID="Insight3Image"       Type="String"   Name="Insight 3 - Image"/>
-    <Datum ID="Insight3ImageAlt"    Type="String"   Name="Insight 3 - Image Alt"/>
-    <Datum ID="Insight3Href"        Type="String"   Name="Insight 3 - Href"/>
-
-    <Datum ID="Insight4Label"       Type="String"   Name="Insight 4 - Label">INSIGHTS</Datum>
-    <Datum ID="Insight4Title"       Type="String"   Name="Insight 4 - Title"/>
-    <Datum ID="Insight4Description" Type="Textarea" Name="Insight 4 - Description"/>
-    <Datum ID="Insight4Meta"        Type="String"   Name="Insight 4 - Meta"/>
-    <Datum ID="Insight4Image"       Type="String"   Name="Insight 4 - Image"/>
-    <Datum ID="Insight4ImageAlt"    Type="String"   Name="Insight 4 - Image Alt"/>
-    <Datum ID="Insight4Href"        Type="String"   Name="Insight 4 - Href"/>
-
-  </Group>
-</Data>
