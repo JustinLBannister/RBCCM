@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE data-capture-requirements SYSTEM "datacapture6.0.dtd">
- 
+
 <!-- Note that the dtd-system-identifier may be changed to point to the correct location of pr.dtd
 if DTD validation is needed. -->
- 
+
 <data-capture-requirements
 dtd-system-identifier=http://localhost/iw-cc/sample/press-release.dtd.txt
 dcr-validation="none" name="">
 <ruleset name="dct">
- 
+
 <description>
 This form is used to define a list of events
 </description>
- 
- 
+
+
 <root-container name="events" location="events">
- 
+
 <item name="title" pathid="title">
 <label>Title</label>
 <text required="t" size="50" maxlength="256" />
 </item>
- 
+
 <container name="event" location="event" combination="and" max="400">
 <label>Event</label>
- 
+
 <item name="event_date" pathid="event_date">
 <label>Event Start Date</label>
 <description>Date format is YYYY-MM-DD</description>
 <text required="t" maxlength="10" validation-regex="^[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$" />
 </item>
- 
+
 <item name="event_date_end" pathid="event_date_end">
 <label>Event End Date (optional)</label>
 <description>Date format is YYYY-MM-DD</description>
 <text maxlength="10" validation-regex="^[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$" />
 </item>
- 
+
 <item name="event_name" pathid="event_name">
 <label>Event Name</label>
 <text required="t" size="50" maxlength="256" />
 </item>
- 
+
 <item name="event_url" pathid="event_url">
 <label>Event URL</label>
 <text required="f" size="50" maxlength="256" />
 </item>
- 
+
 <item name="newwindow" pathid="newwindow">
 <label>Open URL in New Window?</label>
     <radio required="t">
@@ -59,7 +59,7 @@ This form is used to define a list of events
 <description>e.g. Toronto, ON</description>
 <text required="t" size="50" maxlength="256" />
 </item>
- 
+
   <item name="sitelocation" pathid="sitelocation">
     <label>Location to Feature</label>
     <description>&lt;strong style='color: #f00;'&gt;*ONLY check approved locations*&lt;/strong&gt;</description>
@@ -76,82 +76,17 @@ This form is used to define a list of events
     </checkbox>
   </item>
 
-<!-- ================================================================
-     NET NEW FIELDS
-     All items below were added to the original event schema after launch.
-     Each description ends with a "Net new: <date>" stamp so authors can
-     see at a glance when each field was introduced.
-     ================================================================ -->
-
+<!-- event_image as <browser>. Lands authors in the conferences image
+     folder; ceiling-dir kept at /assets/ so they can navigate up if needed.
+     extns includes webp. Net new: June 1, 2026. -->
 <item name="event_image" pathid="event_image">
 <label>Event Image (optional)</label>
-<description>Pick the poster image shown on the Upcoming Conferences card. 16:9 recommended. Net new: June 1, 2026.</description>
-<browser extns="gif,jpg,png" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/" required="f" />
+<description>Pick the poster image shown on the Upcoming Conferences card. Default folder: /assets/rbccm/images/conferences/. 16:9 recommended. Net new: June 1, 2026.</description>
+<browser required="f" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/"/>
 </item>
-
-<item name="event_title_override" pathid="event_title_override">
-<label>Title Override (optional)</label>
-<description>Optional alternate display title. Leave blank to use Event Name. Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="event_format" pathid="event_format">
-<label>Format</label>
-<description>e.g. "In-person", "Virtual", "Hybrid", "In-person and virtual". Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="event_region" pathid="event_region">
-<label>Region</label>
-<description>Broader geographic region for filtering. Suggested values: US, Canada, Europe, UK, Asia, LATAM. Different from the city/state in Location above. Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<!-- Featured Conferences - Overview tab fields (only used when this event
-     is one of the 3 featured conferences). Net new: June 5, 2026. -->
-
-<item name="event_overview_image" pathid="event_overview_image">
-<label>Overview Tab Image (optional)</label>
-<description>Pick the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
-<browser extns="gif,jpg,png" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/" required="f" />
-</item>
-
-<item name="event_brightcove_id" pathid="event_brightcove_id">
-<label>Brightcove Video ID (optional)</label>
-<description>If set, plays a Brightcove reel in the Overview tab. Fallback chain when blank: Overview Tab Image -&gt; Event Image -&gt; section placeholder. Net new: June 5, 2026.</description>
-<text required="f" size="40" maxlength="64" />
-</item>
-
-<item name="event_overview_body" pathid="event_overview_body">
-<label>Overview Body</label>
-<description>Main overview paragraph shown in the Featured Conferences Overview tab. WYSIWYG (TinyMCE) - supports rich text formatting. Net new: June 5, 2026.</description>
-<textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce"/>
-</item>
-
-<item name="event_key_themes" pathid="event_key_themes">
-<label>Key Themes (pipe-separated)</label>
-<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
-</item>
-
-<item name="event_overview_contact" pathid="event_overview_contact">
-<label>Overview Contact (override)</label>
-<description>Italic note at bottom of Overview tab. Default: "Please contact your RBC representative to attend or get more information." Leave blank to use the default. Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
-</item>
-
-<item name="event_speakers_footnote" pathid="event_speakers_footnote">
-<label>Speakers Footnote (override)</label>
-<description>Note below the speakers list. Default when speakers exist: "+ Additional speakers to be announced". Leave blank to use the default. (When no speakers are filled, the Speakers tab shows "Speakers coming soon".) Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
-</item>
-
-<!-- DIAGNOSTIC: speaker and insight sub-containers temporarily removed
-     to bisect the parse error. If editing now works, the sub-containers
-     (or the browser inside them) were the cause. -->
 
 </container>
 </root-container>
- 
+
 </ruleset>
 </data-capture-requirements>
