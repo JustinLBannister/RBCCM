@@ -85,8 +85,8 @@ This form is used to define a list of events
 
 <item name="event_image" pathid="event_image">
 <label>Event Image (optional)</label>
-<description>URL or asset path for the poster image on the Upcoming Conferences card. 16:9 recommended. Net new: June 1, 2026.</description>
-<text required="f" size="50" maxlength="256" />
+<description>Pick the poster image shown on the Upcoming Conferences card. 16:9 recommended. Net new: June 1, 2026.</description>
+<browser extns="gif,jpg,png,webp,svg" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/" required="f" />
 </item>
 
 <item name="event_title_override" pathid="event_title_override">
@@ -119,8 +119,8 @@ This form is used to define a list of events
 
 <item name="event_overview_image" pathid="event_overview_image">
 <label>Overview Tab Image (optional)</label>
-<description>URL or asset path for the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
+<description>Pick the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
+<browser extns="gif,jpg,png,webp,svg" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/" required="f" />
 </item>
 
 <item name="event_brightcove_id" pathid="event_brightcove_id">
@@ -131,8 +131,8 @@ This form is used to define a list of events
 
 <item name="event_overview_body" pathid="event_overview_body">
 <label>Overview Body</label>
-<description>Main overview paragraph(s) shown in the Featured Conferences Overview tab. Plain text or basic HTML. Net new: June 5, 2026.</description>
-<textarea required="f" rows="6" cols="60" />
+<description>Main overview paragraph shown in the Featured Conferences Overview tab. WYSIWYG (TinyMCE) - supports rich text formatting. Net new: June 5, 2026.</description>
+<textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce"/>
 </item>
 
 <item name="event_key_themes" pathid="event_key_themes">
@@ -153,67 +153,36 @@ This form is used to define a list of events
 <text required="f" size="80" maxlength="256" />
 </item>
 
-<!-- Featured Conferences - Speakers (up to 5). Empty groups are skipped.
-     If 0 are filled, Speakers tab is hidden / shows "Speakers coming soon".
-     Net new: June 5, 2026. -->
+<!-- Featured Conferences - Speakers (repeating, up to 5).
+     Each speaker is a single pick from the author DCR at
+     templatedata/rbccm/authors/data. The XSL will document() the picked
+     file and pull the author's photo, name, title (job title), and
+     subtitle (company) - so any speaker (RBC or guest) must exist as an
+     author entry first. 0 groups = Speakers tab hidden / shows
+     "Speakers coming soon". Net new: June 5, 2026. -->
 
-<container name="speaker" location="speaker" combination="and" max="5">
-<label>Speaker</label>
+<container name="speaker" combination="and" max="5">
 
-<item name="speaker_image" pathid="speaker_image">
-<label>Speaker - Image URL</label>
-<description>Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="speaker_name" pathid="speaker_name">
-<label>Speaker - Name</label>
-<description>Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="speaker_title" pathid="speaker_title">
-<label>Speaker - Title</label>
-<description>Job title and company. Supports HTML &lt;br/&gt; tags for line breaks. Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
+<item name="speaker_author" pathid="speaker_author">
+<label>Speaker (pick author)</label>
+<description>Pick an author from templatedata/rbccm/authors/data. The speaker card will display the picked author's photo, name, title, and company automatically. Guest/non-RBC speakers need to be added to the authors data first. Net new: June 5, 2026.</description>
+<browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm" required="f" readonly="f" />
 </item>
 
 </container>
 
-<!-- Featured Conferences - Insights (up to 3). Empty groups are skipped.
-     Net new: June 5, 2026. -->
+<!-- Featured Conferences - Insights (repeating, up to 3).
+     Each insight is a single pick from the article/story DCR. The XSL
+     will document() the picked file and pull title, image, description,
+     and read-time from it - matching the related-stories pattern from
+     the author DCR. Net new: June 5, 2026. -->
 
-<container name="insight" location="insight" combination="and" max="3">
-<label>Insight</label>
+<container name="insight" combination="and" max="3">
 
-<item name="insight_image" pathid="insight_image">
-<label>Insight - Image URL</label>
-<description>Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="insight_title" pathid="insight_title">
-<label>Insight - Title</label>
-<description>Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="insight_description" pathid="insight_description">
-<label>Insight - Description</label>
-<description>Net new: June 5, 2026.</description>
-<textarea required="f" rows="3" cols="60" />
-</item>
-
-<item name="insight_meta" pathid="insight_meta">
-<label>Insight - Meta</label>
-<description>e.g. "6 min read", "8 min listen", "12 min watch". Net new: June 5, 2026.</description>
-<text required="f" size="40" maxlength="64" />
-</item>
-
-<item name="insight_href" pathid="insight_href">
-<label>Insight - Link URL</label>
-<description>Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
+<item name="insight_article" pathid="insight_article">
+<label>Insight Article</label>
+<description>Pick an article from templatedata/article/story/data. The Insights card on the Featured Conferences component will display the picked article's image, title, description, and read-time automatically (single source of truth - if the article is edited later, the card updates). Net new: June 5, 2026.</description>
+<browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata/article" required="f" readonly="f" />
 </item>
 
 </container>
