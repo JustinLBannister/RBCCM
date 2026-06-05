@@ -76,13 +76,10 @@ This form is used to define a list of events
     </checkbox>
   </item>
 
-<!-- event_image as <browser>. Lands authors in the conferences image
-     folder; ceiling-dir kept at /assets/ so they can navigate up if needed.
-     extns includes webp. Net new: June 1, 2026. -->
 <item name="event_image" pathid="event_image">
 <label>Event Image (optional)</label>
-<description>Pick the poster image shown on the Upcoming Conferences card. Default folder: /assets/rbccm/images/conferences/. 16:9 recommended. Net new: June 1, 2026.</description>
-<browser required="f" initial-dir="/assets/rbccm/images/conferences/" ceiling-dir="/assets/"/>
+<description>Pick the poster image shown on the Upcoming Conferences card. 16:9 recommended. Leave blank to use the section placeholder image. Net new: June 1, 2026.</description>
+<browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
 </item>
 
 </container>
