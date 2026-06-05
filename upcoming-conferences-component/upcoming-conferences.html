@@ -30,12 +30,23 @@
     <!-- Source: centralized Events List Datum, filtered inline to:
            - conference events only (sitelocation contains 'conference')
            - current year (event_date year = today's year)
-           - upcoming (event_date YYYYMMDD >= today's YYYYMMDD)
+           - NOT fully ended: keep "happening now" + "future" events.
+             A conference is shown if EITHER:
+               * its start date (event_date) is >= today, OR
+               * it has an end date (event_date_end) that is >= today
+             So a multi-day event stays visible while it's in progress.
+             A single-day event with no end date hides the day after.
          This is a node-set, so the card + modal loops sort it directly with xsl:sort. -->
     <xsl:variable name="events" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
         contains(sitelocation, 'conference')
         and substring(event_date, 1, 4) = $CURRENT_YEAR
-        and number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)]"/>
+        and (
+          number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)
+          or (
+            normalize-space(event_date_end) != ''
+            and number(concat(substring(event_date_end, 1, 4), substring(event_date_end, 6, 2), substring(event_date_end, 9, 2))) &gt;= number($CURRENT_DATE)
+          )
+        )]"/>
  
     <xsl:variable name="upcomingCount" select="count($events)"/>
  
@@ -122,8 +133,14 @@
             </p>
           </xsl:if>
  
-          <!-- Filter / search bar (now active; JS populates Month + Region dropdowns from rendered card data) -->
+          <!-- Filter / search bar (now active; JS populates Month + Region dropdowns
+               from rendered card data). Hidden via inline style when there are 6 or
+               fewer rendered cards (all fit on screen, nothing to filter through);
+               shown automatically when the count grows to 7+. -->
           <div class="rbccm-upcoming-conferences__filters">
+            <xsl:if test="$upcomingCount &lt;= 6">
+              <xsl:attribute name="style">display: none;</xsl:attribute>
+            </xsl:if>
             <div class="rbccm-upcoming-conferences__filter-group">
               <span class="rbccm-upcoming-conferences__filter-label">
                 <xsl:value-of select="$filterLabel"/>
