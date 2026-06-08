@@ -50,16 +50,10 @@ This form is used to define a list of events
 <label>Open URL in New Window?</label>
     <radio required="t">
       <option label="Yes" value="y"/>
-      <option label="No" value="n" selected="t" /> 
+      <option label="No" value="n" selected="t" />
     </radio>
 </item>
- 
-<item name="event_image" pathid="event_image">
-<label>Event Image (optional)</label>
-<description>URL or asset path for the poster image shown on the Upcoming Conferences card. Recommended 16:9 aspect ratio. Leave blank to use the section placeholder image.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
- 
+
 <item name="location" pathid="location">
 <label>Event Location</label>
 <description>e.g. Toronto, ON</description>
@@ -67,7 +61,7 @@ This form is used to define a list of events
 </item>
  
   <item name="sitelocation" pathid="sitelocation">
-    <label>Location to Feature</label> 
+    <label>Location to Feature</label>
     <description>&lt;strong style='color: #f00;'&gt;*ONLY check approved locations*&lt;/strong&gt;</description>
     <checkbox required="f">
       <option label="RBCCM Homepage" value="rbccm-homepage" />
@@ -78,10 +72,111 @@ This form is used to define a list of events
       <option label="Sustainable Finance" value="sustainable-finance" />
       <option label="Realtime Geopolitics" value="realtime-geopolitics" />
       <option label="Trade and Tariffs" value="trade-and-tariffs" />
-      <option label="*(Conference and Events Team ONLY - Conference Page)*" value="conference" />     
+      <option label="*(Conference and Events Team ONLY - Conference Page)*" value="conference" />
     </checkbox>
   </item>
- 
+
+<!-- ================================================================
+     NET NEW FIELDS
+     All items below were added to the original event schema after launch.
+     Each description ends with a "Net new: <date>" stamp so authors can
+     see at a glance when each field was introduced.
+     ================================================================ -->
+
+<item name="event_image" pathid="event_image">
+<label>Event Image (optional)</label>
+<description>Pick the poster image shown on the Upcoming Conferences card. 16:9 recommended. Net new: June 1, 2026.</description>
+<browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
+</item>
+
+<item name="event_title_override" pathid="event_title_override">
+<label>Title Override (optional)</label>
+<description>Optional alternate display title. Leave blank to use Event Name. Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+
+<item name="event_format" pathid="event_format">
+<label>Format</label>
+<description>e.g. "In-person", "Virtual", "Hybrid", "In-person and virtual". Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+
+<item name="event_region" pathid="event_region">
+<label>Region</label>
+<description>Broader geographic region for filtering. Suggested values: US, Canada, Europe, UK, Asia, LATAM. Different from the city/state in Location above. Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+
+<!-- Featured Conferences - Overview tab fields (only used when this event
+     is one of the 3 featured conferences). Net new: June 5, 2026. -->
+
+<item name="event_overview_image" pathid="event_overview_image">
+<label>Overview Tab Image (optional)</label>
+<description>Pick the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
+<browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
+</item>
+
+<item name="event_brightcove_id" pathid="event_brightcove_id">
+<label>Brightcove Video ID (optional)</label>
+<description>If set, plays a Brightcove reel in the Overview tab. Fallback chain when blank: Overview Tab Image -&gt; Event Image -&gt; section placeholder. Net new: June 5, 2026.</description>
+<text required="f" size="40" maxlength="64" />
+</item>
+
+<item name="event_overview_body" pathid="event_overview_body">
+<label>Overview Body</label>
+<description>Main overview paragraph shown in the Featured Conferences Overview tab. WYSIWYG (TinyMCE) - supports rich text formatting. Net new: June 5, 2026.</description>
+<textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce"/>
+</item>
+
+<item name="event_key_themes" pathid="event_key_themes">
+<label>Key Themes (pipe-separated)</label>
+<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="256" />
+</item>
+
+<item name="event_overview_contact" pathid="event_overview_contact">
+<label>Overview Contact (override)</label>
+<description>Italic note at bottom of Overview tab. Default: "Please contact your RBC representative to attend or get more information." Leave blank to use the default. Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="256" />
+</item>
+
+<item name="event_speakers_footnote" pathid="event_speakers_footnote">
+<label>Speakers Footnote (override)</label>
+<description>Note below the speakers list. Default when speakers exist: "+ Additional speakers to be announced". Leave blank to use the default. (When no speakers are filled, the Speakers tab shows "Speakers coming soon".) Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="256" />
+</item>
+
+<!-- Featured Conferences - Speakers (repeating, up to 5).
+     Each speaker is a single pick from the author DCR. The XSL will
+     document() the picked file and pull the author's photo, name, title
+     (job title), and subtitle (company). 0 groups = Speakers tab hidden
+     or shows "Speakers coming soon". Net new: June 5, 2026. -->
+
+<container name="speaker" combination="and" max="5">
+
+<item name="author" pathid="author">
+<label>Speaker (pick author)</label>
+<description>Pick an author from templatedata/rbccm/authors/data. The speaker card displays the picked author's photo, name, title, and company. Guest/non-RBC speakers need to be added to the authors data first. Net new: June 5, 2026.</description>
+<browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm" required="f" readonly="f" />
+</item>
+
+</container>
+
+<!-- Featured Conferences - Insights (repeating, up to 3).
+     Each insight is a single pick from the article/story DCR. The XSL
+     will document() the picked file and pull title, image, description,
+     and read-time. Net new: June 5, 2026. -->
+
+<container name="insight" combination="and" max="3">
+
+<item name="story" pathid="story">
+<label>Insight Article</label>
+<description>Pick an article from templatedata/article/story/data. The Insights card displays the picked article's image, title, description, and read-time (single source of truth - if the article is edited later, the card updates automatically). Net new: June 5, 2026.</description>
+<browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata/article" required="f" readonly="f" />
+</item>
+
+</container>
+
 </container>
 </root-container>
  
