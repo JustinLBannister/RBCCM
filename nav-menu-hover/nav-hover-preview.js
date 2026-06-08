@@ -1,3 +1,613 @@
+$(document).ready(function () {
+  init();
+  setTimeout(tileScale, 500);
+  $('.accordion-toggle').click(function () {
+    $(this).find('.rotate').toggleClass('down');
+  });
+ 
+  var currentYear = new Date().getFullYear();
+  $('#copyright').text(
+    '\u00A9 RBC Dominion Securities Inc., 2001 \u2014 ' +
+      currentYear +
+      ' All Rights Reserved'
+  );
+ 
+  $('.legal-text-show').click(function () {
+    // Hide the Disclaimer button when popup opens
+    $('.legal-text-show').attr('aria-hidden', 'true');
+    $('#map-content').attr('aria-hidden', 'true');
+    $('.legal-hover-container').fadeIn(100, function () {
+      $('.legal-text-hide')[0].focus();
+    });
+  });
+  $('.legal-text-hide').click(function (e) {
+    e.preventDefault();
+    $('.legal-hover-container').fadeOut(50, function () {
+      // Show the Disclaimer button again when popup closes
+      $('.legal-text-show').removeAttr('aria-hidden');
+      $('#map-content').removeAttr('aria-hidden');
+      $('.legal-text-show').focus();
+    });
+  });
+ 
+  $(window).resize(function () {
+    $('.tile').css('height', 'auto');
+    tileScale();
+  });
+  $('.panel-group').on('show.bs.collapse', function () {
+    $(this).find('.tile').show();
+  });
+  $('.panel-group').on('shown.bs.collapse', function () {
+    $(this).find('.tile').fadeIn();
+    $(this).find('.tile').css('height', 'auto');
+    $(this)
+      .find('.row')
+      .each(function () {
+        _tileScale($(this));
+      });
+  });
+  $('a[data-toggle="tab"]').on('show.bs.tab', function (b) {
+    $('.tab-pane').find('.tile').hide();
+  });
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (b) {
+    $('.tab-pane').find('.tile').show();
+    $('.tab-pane').find('.tile').css('height', 'auto');
+    $('.tab-pane')
+      .find('.row')
+      .each(function () {
+        _tileScale($(this));
+      });
+  });
+/* var a = document.location.toString();
+  a.match('#') &&
+    ($('.nav-tabs a[href="#' + a.split('#')[1] + '"]').tab('show'),
+    setTimeout(function () {
+      $('body').scrollTop(0);
+    }, 50));*/
+ 
+  // Mobile Menu Toggle logic
+  $('button.navbar-toggle').click(function () {
+    $('body').toggleClass('navtoggle');
+    $('.navbar-collapse').toggle();
+    $('body').hasClass('navtoggle') ? disableBody() : enableBody();
+  });
+ 
+  // 1. Close other dropdowns when focus moves into a new dropdown toggle
+  // Bootstrap 3.4.1 doesn't handle it by default
+  $('.navbar').on('focusin', 'a, button', function () {
+    var $currentDropdown = $(this).closest('.dropdown');
+ 
+    $('.navbar .dropdown.open')
+      .not($currentDropdown)
+      .each(function () {
+        closeDropdown($(this));
+      });
+  });
+ 
+  // 2. Close all dropdowns when focus leaves the navbar
+  // Bootstrap 3.4.1 doesn't handle it by default
+  $('.navbar').on('focusout', function (e) {
+    var nav = this;
+    setTimeout(function () {
+      var activeEl = document.activeElement;
+      if (!activeEl || !nav.contains(activeEl)) {
+        closeAllDropdowns();
+      }
+    }, 0);
+  });
+ 
+  // 3. Escape key closes all open dropdowns (even if focus is on different dropdown)
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      $('.navbar .dropdown.open').each(function () {
+        closeDropdown($(this));
+      });
+    }
+ 
+    // Close disclaimer popup on Escape
+    if ($('.legal-hover-container').is(':visible')) {
+      $('.legal-hover-container').fadeOut(50, function () {
+        $('.legal-text-show').removeAttr('aria-hidden');
+        $('#map-content').removeAttr('aria-hidden');
+        $('.legal-text-show').focus();
+      });
+    }
+  });
+ 
+  // Handle navbar search form submission for both Desktop and Mobile
+  $('#desktop-search-form, .search-form').on('submit', function (e) {
+    e.preventDefault();
+ 
+    // Find the input within this specific form
+    var $input = $(this).find('input[type="text"]');
+    var query = $input.val().trim();
+ 
+    if (query) {
+      localStorage.setItem('search-referrer', window.location.pathname);
+      // Open in a new tab
+      var searchUrl = '/en/search?q=' + encodeURIComponent(query);
+      window.open(searchUrl, '_blank');
+    } else {
+      $input.focus();
+    }
+    return false;
+  });
+ 
+  var isNaturalGas =
+    window.location.href.indexOf('naturalgas') !== -1 ||
+    window.location.href.indexOf('gaznaturel') !== -1;
+ 
+  // 1. Logic for Natural Gas Pages (Redirect on click)
+  if (isNaturalGas) {
+    $('.dropdown-toggle').on('click', function (e) {
+      if ($('body').hasClass('navtoggle')) {
+        e.preventDefault();
+        window.location = $(this).attr('href');
+      }
+    });
+  }
+ 
+  $('.dropdown-expertise h3').click(function (b) {
+    $('body').hasClass('navtoggle') && $(this).next('.row').slideToggle(300);
+  });
+ 
+  $('.search-toggle').click(function (e) {
+    // 1. Prevent the default '#' jump to the top of the page
+    e.preventDefault();
+ 
+    $('.search-box').toggleClass('on invisible');
+    // Check if the box is now visible (is it NOT invisible?)
+    const isOpen = !$('.search-box').hasClass('invisible');
+ 
+    // Update the button's ARIA state
+    $(this).attr('aria-expanded', isOpen);
+ 
+    if (isOpen) {
+      // Accessibility: Move focus into the input field immediately
+      $('.search-box').find('input').focus();
+    }
+  });
+ 
+  $('.close').click(function () {
+    $('.search-box').removeClass('on').addClass('invisible');
+    $('.search-toggle').focus().attr('aria-expanded', 'false');
+  });
+ 
+  // Close search bar when any nav UL/LI is clicked
+  (function () {
+    var searchModal = document.getElementById('openSearchModal');
+    var closeBtn = searchModal
+      ? searchModal.querySelector('button.close')
+      : null;
+    if (!searchModal || !closeBtn) return;
+    document.querySelectorAll('nav ul').forEach(function (ul) {
+      ul.addEventListener(
+        'click',
+        function () {
+          if (searchModal.classList.contains('on')) {
+            closeBtn.click();
+          }
+        },
+        true
+      );
+    });
+  })();
+ 
+  $('#rbccm-navbar-collapse-1')
+    .find("a[href='" + window.location.pathname + "']")
+    .first()
+    .closest('.dropdown')
+    .addClass('active');
+  $('#rbccm-navbar-collapse-1')
+    .find("a[href='" + $('.breadcrumb a').eq(1).attr('href') + "']")
+    .first()
+    .closest('.dropdown')
+    .addClass('active');
+});
+ 
+function init() {
+  $('.gib-nav-wrap').scroll(function (a) {
+    $('.gib-nav-wrap').addClass('scrolled');
+  });
+ 
+  $('a[href="#mainContent"]').attr('href', '#content');
+ 
+  $(window).scroll(function () {
+    50 < $(document).scrollTop()
+      ? ($('nav').addClass('shrink'), $('.search-box').css('top', '60px'))
+      : ($('nav').removeClass('shrink'), $('.search-box').css('top', ''));
+  });
+  $('.active').closest('li.dropdown').addClass('active');
+  768 > $(window).width() &&
+    ($('.dropdown-expertise .row').hide(),
+    $('.dropdown-expertise .dropdown-menu').css('display', 'block'),
+    $('.search-box').remove(),
+    1 == $('.navbar-brand img[id="fr-logo"]').length
+      ? ($('#rbccm-navbar-collapse-1').prepend(
+          '<div class="search-box--m"><div class="input-group"><input placeholder="Recherche..." class="form-control" id="search" type="text"><span class="input-group-btn"><a class="input-group-btn btn btn-default go inline search-btn" id="search-btn"><i aria-hidden="true" class="fa fa-search"></i></a></span></div></div>'
+        ),
+        $('.dropdown-expertise').prepend(
+          '<div style="background: #EAEAEA; cursor: pointer; padding: 15px 35px; border: 0; height: 47px;"><a href="expertise" style="color: #002144;">Expertise</a></div>'
+        ),
+        $('.dropdown-expertise').css('width', '100%'))
+      : 1 == $('.navbar-brand img[id="jp-logo"]').length
+        ? ($('#rbccm-navbar-collapse-1').prepend(
+            '<div class="search-box--m"><div class="input-group"><input placeholder="\u691c\u7d22..." class="form-control" id="search" type="text"><span class="input-group-btn"><a class="input-group-btn btn btn-default go inline search-btn" id="search-btn"><i aria-hidden="true" class="fa fa-search"></i></a></span></div></div>'
+          ),
+          $('.dropdown-expertise').prepend(
+            '<div style="background: #EAEAEA; cursor: pointer; padding: 15px 35px; border: 0; height: 47px;"><a href="expertise" style="color: #002144;">Expertise</a></div>'
+          ),
+          $('.dropdown-expertise').css('width', '100%'))
+        : $('.dropdown-expertise').prepend(
+            '<div style="background: #C2DEEA; cursor: pointer; padding: 15px 35px; border: 0; height: 47px;"><a href="en/expertise" style="color: #002144;">Expertise</a></div>'
+          ));
+  $(".toggle-lang[href='/fr/']").click(toggleFrench);
+  addFileTracking();
+  initializeBootstrapCarousels();
+  modalFocusTrapAndInitialize();
+  enhanceBootstrapTabs();
+  // Sync on tab change
+  $(document).on('shown.bs.tab', function () {
+    enhanceBootstrapTabs();
+  });
+  // Initialize horizontal scroll for secondary nav
+  initHorizontalScroll({
+    containerSelector: '.scroll-container',
+    prevSelector: '.nav-btn.prev',
+    nextSelector: '.nav-btn.next',
+    scrollAmount: 150,
+  });
+  initGrayRolloverTiles();
+}
+ 
+function _tileScale(a) {
+  if (768 <= $(window).width()) {
+    var b = 0;
+    a.find('.tile').each(function () {
+      $(this).outerHeight() > b && (b = $(this).outerHeight());
+    });
+    0 < b &&
+      (a.find('.tile').css('height', b + 'px'),
+      a.find('.tile--half').css('height', (b - 25) / 2 + 'px'));
+  }
+}
+ 
+function tileScale() {
+  $('.row').each(function () {
+    var a = $(this);
+    0 < $(this).find('img').length
+      ? (_tileScale(a),
+        $(this)
+          .find('img')
+          .on('load', function () {
+            $(this).closest('.row').find('.tile').css('height', 'auto');
+            _tileScale(a);
+          }))
+      : _tileScale(a);
+  });
+}
+var getUrlParameter = function (a) {
+  var b = decodeURIComponent(window.location.search.substring(1)).split('&'),
+    c,
+    d;
+  for (d = 0; d < b.length; d++)
+    if (((c = b[d].split('=')), c[0] === a)) return void 0 === c[1] ? !0 : c[1];
+};
+ 
+function loadVideo(a) {
+  document.write(
+    "<div style='position: relative; height: 0; padding-bottom: 56.25%;'><iframe allowfullscreen='true'  src='" +
+      a.replace('/en', '/rbccm') +
+      "' frameBorder='0' style='width: 100%; height: 100%; position:absolute; left:0; top:0;' scrolling='no'></iframe></div>"
+  );
+}
+ 
+function toggleFrench(a) {
+  a.preventDefault();
+  a = window.location.pathname.replace('/en/', '').replace('/rbccm/', '');
+  -1 <
+  $.inArray(
+    a,
+    'home about-us about-us/culture-and-values about-us/leadership expertise careers careers/campus-recruiting careers/experienced-professionals careers/opportunities offices/our-offices offices/canada offices/united-states offices/europe offices/caribbean offices/asia offices/australia'.split(
+      ' '
+    )
+  )
+    ? (window.location = '/fr/' + a)
+    : (window.location = '/fr/');
+}
+ 
+function addFileTracking() {
+  var a = /\.(zip|exe|pdf|doc*|dot*|xls*|ppt*|mp3|oft|mp4)$/i;
+  $('a').each(function () {
+    var b = $(this).attr('href');
+    b && b.match(/^https?\:/i) && !b.match(document.domain)
+      ? ($(this).attr('target', '_blank'),
+        jQuery(this).click(function () {
+          var a = b.replace(/^https?\:\/\//i, '');
+          ga('send', 'event', 'External', 'Click', a);
+          if (
+            void 0 !== jQuery(this).attr('target') &&
+            '_blank' != jQuery(this).attr('target').toLowerCase()
+          )
+            return (
+              setTimeout(function () {
+                location.href = b;
+              }, 200),
+              !1
+            );
+        }))
+      : b && b.match(/^mailto\:/i)
+        ? jQuery(this).click(function () {
+            var a = b.replace(/^mailto\:/i, '');
+            ga('send', 'event', 'Email', 'Click', a);
+          })
+        : b &&
+          b.match(a) &&
+          ($(this).attr('target', '_blank'),
+          jQuery(this).click(function () {
+            var a = /[.]/.exec(b) ? /[^.]+$/.exec(b) : void 0;
+            ga('send', 'event', 'Download', 'Click-' + a, b);
+            if (
+              void 0 !== jQuery(this).attr('target') &&
+              '_blank' != jQuery(this).attr('target').toLowerCase()
+            )
+              return (
+                setTimeout(function () {
+                  location.href = '' + b;
+                }, 200),
+                !1
+              );
+          }));
+  });
+}
+ 
+// Page should not be keyboard focusable when menu is open in mobile
+function disableBody() {
+  var header = document.getElementById('rbccm-navbar-collapse-1');
+  var rows = document.querySelectorAll('.ls-row');
+  for (var i = 0; i < rows.length; i++) {
+    // Skip the row that contains the menu
+    if (!rows[i].contains(header)) {
+      rows[i].setAttribute('inert', '');
+    }
+  }
+}
+ 
+// Page should be keyboard focusable when menu is closed in mobile
+function enableBody() {
+  var inertRows = document.querySelectorAll('.ls-row[inert]');
+  for (var i = 0; i < inertRows.length; i++) {
+    inertRows[i].removeAttribute('inert');
+  }
+}
+ 
+// Shared search execution function
+function executeSearch(inputSelector) {
+  localStorage.setItem('search-referrer', window.location.pathname);
+  var query = $(inputSelector).val().trim();
+  if (query) {
+    window.open('/en/search?q=' + encodeURIComponent(query), '_blank');
+  }
+}
+ 
+// Make all bootstrap carousels accessible Logic
+function initializeBootstrapCarousels() {
+  $('.accessible-bootstrap-carousel').each(function () {
+    var $carousel = $(this);
+    $carousel.on('slid.bs.carousel', function () {
+      var $allIndicatorButtons = $carousel.find(
+        '.carousel-indicators li button'
+      );
+      $allIndicatorButtons.removeAttr('aria-current');
+      $carousel
+        .find('.carousel-indicators li.active button')
+        .attr('aria-current', 'true');
+    });
+  });
+}
+ 
+function modalFocusTrapAndInitialize() {
+  /**
+   * Modal Focus Trap Logic
+   * Ensures keyboard users stay inside the modal while it is open.
+   */
+  $(document).on('keydown', '.modal', function (e) {
+    if (e.which !== 9) return; // Listen only for Tab (9)
+ 
+    var $modal = $(this);
+    // Recalculate focusable elements in case iframe/content was injected
+    var $focusableElements = $modal
+      .find(
+        'button, [href], input, select, textarea, .iframe-wrapper, iframe, [tabindex]:not([tabindex="-1"])'
+      )
+      .filter(':visible');
+ 
+    if (!$focusableElements.length) return;
+ 
+    var $firstElement = $focusableElements[0];
+    var $lastElement = $focusableElements[$focusableElements.length - 1];
+ 
+    if (e.shiftKey) {
+      // SHIFT + TAB
+      if (document.activeElement === $firstElement) {
+        e.preventDefault();
+        $lastElement.focus();
+      }
+    } else {
+      // TAB
+      if (document.activeElement === $lastElement) {
+        e.preventDefault();
+        $firstElement.focus();
+      }
+    }
+  });
+ 
+  /**
+   * Initial Focus Management
+   * Moves focus to the first interactive element (usually the 'X' button)
+   */
+  $(document).on('shown.bs.modal', '.modal', function () {
+    var $modal = $(this);
+    // Delay slightly to allow Bootstrap transitions to finish
+    setTimeout(function () {
+      var $first = $modal
+        .find('button, [href], input')
+        .filter(':visible')
+        .first();
+      $first.focus();
+    }, 100);
+  });
+}
+ 
+function closeDropdown($dropdown) {
+  $dropdown
+    .removeClass('open')
+    .find('.dropdown-toggle')
+    .attr('aria-expanded', 'false');
+}
+ 
+function closeAllDropdowns() {
+  $('.dropdown.open').each(function () {
+    closeDropdown($(this));
+  });
+}
+ 
+function enhanceBootstrapTabs() {
+  // loop through every tablist
+  $('.nav[role="tablist"], .nav-tabs, .nav-pills').each(function () {
+    var $tablist = $(this);
+    $tablist.attr('role', 'tablist');
+    $tablist
+      .find('a[data-toggle="tab"], a[data-toggle="pill"]')
+      .each(function () {
+        var $tab = $(this);
+        var $li = $tab.parent();
+        var target = $tab.attr('href');
+        if (!target || target.indexOf('#') !== 0) return;
+ 
+        var $panel = $(target);
+        if (!$panel.length) return;
+ 
+        // Ensure proper roles
+        $li.attr('role', 'presentation');
+        $tab.attr('role', 'tab');
+        $panel.attr('role', 'tabpanel');
+ 
+        // Remove incorrect aria-expanded
+        $tab.removeAttr('aria-expanded');
+ 
+        // link tab and panel
+        $tab.attr('aria-controls', $panel.attr('id'));
+ 
+        // set aria-selected based on active state
+        var isActive = $li.hasClass('active');
+        $tab.attr('aria-selected', isActive ? 'true' : 'false');
+      });
+  });
+ 
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var $panel = $($(e.target).attr('href'));
+                $panel.attr('tabindex', '0')[0].focus({ preventScroll: true });
+  });
+}
+ 
+/* Initialise horizontal scroll for secondary nav items for smaller screens */
+function initHorizontalScroll({
+  containerSelector,
+  prevSelector,
+  nextSelector,
+  scrollAmount = 150,
+}) {
+  const container = document.querySelector(containerSelector);
+  const prevBtn = document.querySelector(prevSelector);
+  const nextBtn = document.querySelector(nextSelector);
+ 
+  if (!container || !prevBtn || !nextBtn) return;
+ 
+  prevBtn.addEventListener('click', () => {
+    container.scrollBy({
+      left: -scrollAmount,
+      behavior: 'smooth',
+    });
+  });
+ 
+  nextBtn.addEventListener('click', () => {
+    container.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth',
+    });
+  });
+}
+ 
+// Accessibility and interaction fixes for gray-rollover tiles.
+function initGrayRolloverTiles() {
+  var $tiles = $('.tile.gray-rollover');
+  if (!$tiles.length) return;
+ 
+  $tiles.each(function (index) {
+    var $tile = $(this);
+    var $rollover = $tile.find('.rollover');
+ 
+    $tile.attr({
+      role: 'button',
+      tabindex: '0',
+      'aria-expanded': 'false',
+    });
+ 
+    if ($rollover.length) {
+      if (!$rollover.attr('id')) {
+        $rollover.attr('id', 'rbccm-rollover-' + (index + 1));
+      }
+      $tile.attr('aria-controls', $rollover.attr('id'));
+      $rollover.attr('aria-hidden', 'true');
+    }
+  });
+  // Click Toggles
+  $(document).on('click', '.tile.gray-rollover', function (event) {
+    toggleGrayRollover($(this));
+  });
+ 
+  // Keyboard Toggles, using Enter or Space, escape closes
+  $(document).on('keydown', '.tile.gray-rollover', function (e) {
+    var $tile = $(this);
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      toggleGrayRollover($tile);
+    } else if (e.key === 'Escape' && $tile.hasClass('is-open')) {
+      toggleGrayRollover($tile);
+    }
+  });
+ 
+  // Click outside an open tile closes it
+  $(document).on('click', function (e) {
+    $('.tile.gray-rollover.is-open').each(function () {
+      var $openTile = $(this);
+      if (!$openTile.is(e.target) && !$.contains($openTile[0], e.target)) {
+        $openTile.removeClass('is-open').attr('aria-expanded', 'false');
+        var $rollover = $openTile.find('.rollover');
+        if ($rollover.length) {
+          $rollover.attr('aria-hidden', 'true');
+        }
+      }
+    });
+  });
+}
+ 
+function toggleGrayRollover($tile) {
+  var isOpen = $tile.toggleClass('is-open').hasClass('is-open');
+  $tile.attr('aria-expanded', isOpen);
+  var $rollover = $tile.find('.rollover');
+  if ($rollover.length) {
+    $rollover.attr('aria-hidden', !isOpen);
+  }
+ 
+  if (isOpen) {
+    $rollover.attr('tabindex', '0').focus();
+  } else {
+    $rollover.removeAttr('tabindex');
+    $tile.focus();
+  }
+}
 
 /*!
  * nav-hover-preview.js
