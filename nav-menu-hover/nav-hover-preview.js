@@ -971,6 +971,17 @@ scheduleClose($li);
     });
 
 
+// A pointer press (mouse or touch) on a toggle: let the click handler below be
+// the sole toggler. Without this, the focusin that follows the press opens the
+// menu, then the click sees it already open and closes it -- a visible
+// open/close "jump" on tap (most noticeable on mobile, where there is no hover
+// pre-open). Keyboard Tab focus has no preceding pointer press, so it still
+// opens the menu via the focusin handler as normal.
+$(document).on('mousedown.' + NS + ' touchstart.' + NS, SELECTOR_TOGGLE, function () {
+suppressFocusOpenUntil = performance.now() + ESC_SUPPRESS_MS;
+    });
+
+
 // Click on a top-level toggle: toggle keyboard state.
 $(document).on('click.' + NS, SELECTOR_TOGGLE, function (e) {
 var $tog = $(this);
