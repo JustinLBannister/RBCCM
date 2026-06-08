@@ -641,13 +641,9 @@ function toggleGrayRollover($tile) {
 'use strict';
 
 
-var LOG_PREFIX = '[nav-hover-preview]';
-
-
 // Silent guard: if jQuery is not present, this script does nothing useful.
 var $ = root.jQuery || root.$;
 if (!$) {
-    console.warn(LOG_PREFIX, 'jQuery not found - preview script disabled.');
     root.rbccmHoverPreview = {
 enable: function () {},
 disable: function () {},
@@ -714,7 +710,6 @@ closeLiNow($(this), { suppress: false });
     $li.removeAttr('data-rbccm-suppress');
     $li.addClass('open');
     $li.find('> a.dropdown-toggle').attr('aria-expanded', 'true');
-    console.log(LOG_PREFIX, 'open', labelOf($li));
   }
 
 
@@ -751,7 +746,6 @@ if (liEl.contains(document.activeElement) && document.activeElement !== $tog[0])
 if (opts.suppress !== false) {
       $li.attr('data-rbccm-suppress', 'true');
     }
-    console.log(LOG_PREFIX, 'close', labelOf($li), 'suppress=' + (opts.suppress !== false));
   }
 
 
@@ -763,8 +757,6 @@ var id = setTimeout(function () {
       closeTimers.delete(liEl);
 if (!isMouseInLiRegion($li)) {
 closeLiNow($li, { suppress: false });
-      } else {
-        console.log(LOG_PREFIX, 'close-skipped (mouse still in region)', labelOf($li));
       }
     }, CLOSE_DELAY_MS);
     closeTimers.set(liEl, id);
@@ -827,7 +819,6 @@ if (e.key !== 'Tab' && e.key !== 'Escape') return;
 if (e.key === 'Escape') {
 var $open = $('li.dropdown.open');
 if (!$open.length) return;
-        console.log(LOG_PREFIX, 'Escape pressed, closing open menus');
         suppressFocusOpenUntil = performance.now() + ESC_SUPPRESS_MS;
         $open.each(function () {
 var $li = $(this);
@@ -846,13 +837,11 @@ if (hadFocusInside && !wasToggleFocused) {
 // third-party script that might reopen state.
 setTimeout(function () {
 if ($('li.dropdown.open').length) {
-            console.warn(LOG_PREFIX, 'Escape recheck #1 found reopened menu, forcing close');
 forceCloseAll();
           }
         }, 50);
 setTimeout(function () {
 if ($('li.dropdown.open').length) {
-            console.warn(LOG_PREFIX, 'Escape recheck #2 found reopened menu, forcing close');
 forceCloseAll();
           }
         }, 150);
@@ -880,7 +869,6 @@ if (!$first.length) return;
         e.stopImmediatePropagation();
 openLiAsKeyboard($li);
         $first.focus();
-        console.log(LOG_PREFIX, 'Tab from hover ->', $first.text().trim().substring(0, 20));
       }
     };
   }
@@ -891,11 +879,9 @@ openLiAsKeyboard($li);
 
 function enable() {
 if (enabled) {
-      console.log(LOG_PREFIX, 'enable() called but already enabled');
 return;
     }
     enabled = true;
-    console.log(LOG_PREFIX, 'enable');
 
 
 injectStyle();
@@ -995,7 +981,6 @@ closeLiNow($li, { suppress: false });
 // in keyboard state. Suppressed briefly after Escape to avoid reopen loops.
 $(document).on('focusin.' + NS, SELECTOR_TOGGLE, function () {
 if (performance.now() < suppressFocusOpenUntil) {
-console.log(LOG_PREFIX, 'focusin suppressed (post-Escape window)');
 return;
       }
 var $li = $(this).closest('li.dropdown');
@@ -1047,7 +1032,6 @@ closeLiNow($(this), { suppress: false });
 function disable() {
 if (!enabled) return;
 enabled = false;
-console.log(LOG_PREFIX, 'disable');
 
 
 if (captureKeydownRef) {
@@ -1075,52 +1059,9 @@ isEnabled: isEnabled
   };
 
 
-// ---------- toggle button injection ----------
-// Renders a fixed-position button in the bottom-right corner that flips
-// between Enable and Disable. Injected on DOM ready. Default state on every
-// page load is disabled (no persistence across navigations).
-var BTN_ID = 'rbccm-hover-preview-toggle';
-var LABEL_ENABLE = 'Enable hover menu (preview)';
-var LABEL_DISABLE = 'Disable hover menu (preview)';
-
-function injectToggleButton() {
-if (document.getElementById(BTN_ID)) return;
-var btn = document.createElement('button');
-    btn.id = BTN_ID;
-    btn.type = 'button';
-    btn.textContent = LABEL_ENABLE;
-    btn.setAttribute('aria-pressed', 'false');
-var s = btn.style;
-    s.position = 'fixed';
-    s.right = '20px';
-    s.bottom = '20px';
-    s.zIndex = '2147483647';
-    s.padding = '12px 22px';
-    s.border = '0';
-    s.borderRadius = '999px';
-    s.background = '#1d6b4a';
-    s.color = '#ffffff';
-    s.font = '600 14px/1.2 Arial, Helvetica, sans-serif';
-    s.cursor = 'pointer';
-    s.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-    btn.addEventListener('mouseenter', function () { btn.style.background = '#175839'; });
-    btn.addEventListener('mouseleave', function () { btn.style.background = '#1d6b4a'; });
-    btn.addEventListener('click', function () {
-if (isEnabled()) {
-disable();
-        btn.textContent = LABEL_ENABLE;
-        btn.setAttribute('aria-pressed', 'false');
-      } else {
-enable();
-        btn.textContent = LABEL_DISABLE;
-        btn.setAttribute('aria-pressed', 'true');
-      }
-    });
-    document.body.appendChild(btn);
-    console.log(LOG_PREFIX, 'toggle button injected');
-  }
-
-$(function () { injectToggleButton(); });
+// ---------- enable hover by default ----------
+// Hover support is turned on automatically on every page load.
+$(function () { enable(); });
 
 
 })(window);
