@@ -949,6 +949,7 @@ $li.attr('data-rbccm-mode', 'hover');
 
 
 $(document).on('mouseleave.' + NS, SELECTOR_LI, function () {
+if (!canHover()) return;
 var $li = $(this);
 $li.removeAttr('data-rbccm-suppress');
 if (!$li.hasClass('open')) return;
@@ -963,6 +964,7 @@ $(document).on('mouseenter.' + NS, SELECTOR_SUBMENU, function () {
 cancelClose($(this).closest('li.dropdown'));
     });
 $(document).on('mouseleave.' + NS, SELECTOR_SUBMENU, function () {
+if (!canHover()) return;
 var $li = $(this).closest('li.dropdown');
 if (!$li.hasClass('open')) return;
 scheduleClose($li);
