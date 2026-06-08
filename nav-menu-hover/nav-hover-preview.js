@@ -1101,3 +1101,37 @@ $(function () { enable(); });
 
 
 })(window);
+
+
+/* ============================================================================
+ * ASANA NOTES -- Nav menu hover
+ * ----------------------------------------------------------------------------
+ * SUMMARY
+ *   Re-enabled hover-to-open on the primary nav dropdowns. Hover is layered on
+ *   top of the existing click/keyboard behavior; click, keyboard, and tap nav
+ *   are unchanged. Code is a self-contained IIFE appended after the existing
+ *   site nav JS (exposes only window.rbccmHoverPreview; no global collisions).
+ *
+ * CURRENT BEHAVIOR
+ *   - Hovering a top-level item opens its menu; moving away closes it after a
+ *     short grace delay (smooths the gap between toggle and panel).
+ *   - One menu open at a time; click-outside and Escape close.
+ *   - Hover is enabled only on desktop-width viewports (>= 768px) that also
+ *     have a true hover-capable, fine pointer (mouse/trackpad). Phones,
+ *     tablets, and touch hybrids -- including iPads with a mouse attached --
+ *     never get the hover layer and use tap-to-open as before. The gate is
+ *     re-evaluated on resize, so a desktop window dragged below 768px drops
+ *     out of hover mode automatically.
+ *   - On by default on every page load.
+ *
+ * TESTING
+ *   - Verified on live nav across all top-level menus (Client Solutions,
+ *     Insights, Impact, Who We Are, Careers, Other RBC sites) and on
+ *     high-traffic sub-pages (Strategic Alternatives, Podcasts, etc.).
+ *   - Confirmed hover open/close, keyboard Tab-through, and Escape behave
+ *     correctly with no conflicts against existing nav behavior.
+ *   - Resized a desktop window across the 768px breakpoint; hover disengages
+ *     below it and tap-to-open takes over.
+ *   - Mobile: first tap opens cleanly (no open/close "jump"), second tap
+ *     closes, submenu links navigate normally.
+ * ============================================================================ */
