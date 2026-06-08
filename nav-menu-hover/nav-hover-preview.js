@@ -628,9 +628,12 @@ function toggleGrayRollover($tile) {
  *   - Bootstrap's own dropdown data-api keydown/click handlers are replaced
  *     by this script to avoid double-handling.
  * 
- * Mobile note: This script is desktop-only by design. Mobile and touch devices
- * never fire mouseenter/mouseleave events the same way, so the hover layer is
- * effectively inert on touch. Existing tap-to-open behavior is preserved.
+ * Mobile note: Hover is gated to desktop-width viewports (>= 768px) that also
+ * have a true hover-capable, fine pointer (mouse/trackpad). Phones, tablets,
+ * and touch hybrids never get the hover layer -- including iPads with a mouse
+ * attached, since iPadOS still reports a coarse primary pointer. Their existing
+ * tap-to-open behavior is preserved. The gate is re-evaluated on resize, so a
+ * desktop window dragged below 768px drops out of hover mode automatically.
  * 
  * Public API:
  *   window.rbccmHoverPreview.enable()
@@ -680,6 +683,17 @@ return ($li.find('> a.dropdown-toggle').first().text() || '').trim().substring(0
 
 
 // ---------- helpers ----------
+
+
+// Hover is enabled only on desktop-width viewports (>= 768px, matching the
+// site's mobile breakpoint) that also expose a true hover-capable, fine
+// pointer. This keeps the hover layer off on phones, tablets, and touch
+// hybrids -- including iPads with a mouse attached, since iPadOS still reports
+// a coarse primary pointer regardless of an attached pointer device.
+function canHover() {
+return $(window).width() >= 768 &&
+       window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  }
 
 
 function isMouseInLiRegion($li) {
@@ -912,8 +926,16 @@ $(this).removeAttr('data-rbccm-suppress');
     });
 
 
+// Close any hover-opened menu if the viewport shrinks below desktop width
+// (e.g. a desktop window resized down into the mobile layout).
+$(window).on('resize.' + NS, function () {
+if (!canHover()) forceCloseAll();
+    });
+
+
 // Hover on the LI
 $(document).on('mouseenter.' + NS, SELECTOR_LI, function () {
+if (!canHover()) return;
 var $li = $(this);
 cancelClose($li);
 if ($li.attr('data-rbccm-suppress') === 'true') return;
@@ -1038,6 +1060,7 @@ if (captureKeydownRef) {
 window.removeEventListener('keydown', captureKeydownRef, true);
 captureKeydownRef = null;
     }
+$(window).off('resize.' + NS);
 $(document).off('.' + NS);
 $('li.dropdown')
       .removeClass('open opened-by-hover')
