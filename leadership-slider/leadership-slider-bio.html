@@ -472,6 +472,35 @@
             setFocusedCard(card);
           });
 
+          // Targeted Tab handler — only fires when focus is on a card stop.
+          // Native browser Tab refuses to walk to focusable elements inside
+          // slick's cloned slides (even with tabindex=0), so Tab from the
+          // last on-screen original lands on Next instead of the cloned cards
+          // beside it. Here we intercept Tab from a card and explicitly call
+          // .focus() on the next visible card stop — which works fine, as the
+          // restriction only applies to the browser's auto-walk algorithm.
+          $track.on('keydown', '.rbccm-leadership__card-action, .rbccm-leadership__card[tabindex="0"]', function (e) {
+            if (e.key !== 'Tab') return;
+            var slides = $track.find('.slick-slide').toArray();
+            var currentSlide = this.closest('.slick-slide');
+            var idx = slides.indexOf(currentSlide);
+            if (idx === -1) return;
+
+            function stopIn(slide) {
+              if (!isSlideInView(slide)) return null;
+              return slide.querySelector('.rbccm-leadership__card-action') ||
+                     slide.querySelector('.rbccm-leadership__card[tabindex="0"]');
+            }
+
+            var step = e.shiftKey ? -1 : 1;
+            for (var i = idx + step; i >= 0 &amp;&amp; i &lt; slides.length; i += step) {
+              var target = stopIn(slides[i]);
+              if (target) { e.preventDefault(); target.focus(); return; }
+            }
+            // No more visible cards in that direction — let Tab proceed
+            // naturally to Next (forward) or Prev (backward).
+          });
+
           var resizeTimer;
           $(window).on('resize', function () {
             clearTimeout(resizeTimer);
