@@ -52,8 +52,12 @@
 
     /* -- Slider wrapper -- */
     .rbccm-leadership__slider-track { margin: 0 -8px; }
-    @media (min-width: 1245px) {
+    @media (min-width: 1300px) {
       .rbccm-leadership__slider-track { margin: 0; overflow: hidden;}
+    }
+    /* Override slick's default 30px bottom margin on a dotted slider */
+    #rbccm-leadership .rbccm-leadership__slider-track.slick-dotted.slick-slider {
+      margin-bottom: 15px;
     }
 
     /* -- Slick overrides -- */
@@ -85,7 +89,7 @@
     @media (min-width: 1025px) {
       .rbccm-leadership__card { width: 273px !important; }
     }
-    @media (min-width: 1245px) {
+    @media (min-width: 1300px) {
       .rbccm-leadership__card { margin: 0 20px 0 0; width: 270px !important; }
     }
     #rbccm-leadership .slick-center .rbccm-leadership__card {
@@ -219,7 +223,54 @@
     .rbccm-leadership__card-linkedin:hover .li-default { display: none; }
     .rbccm-leadership__card-linkedin:hover .li-hover   { display: block; }
 
-    /* -- Controls row -- visible up to 1199px -- */
+    /* -- Carousel layout grid --
+       DOM order is [Prev] → [slides] → [Next] → [dots] (slick-default).
+       Visual layout reshuffles per breakpoint via grid-template-areas:
+         Mobile  → track on top, [Prev · Dots · Next] in a row below
+         Desktop → Prev flanks left of track, Next flanks right, dots
+                   centred in a row beneath the track. */
+    .rbccm-leadership__carousel {
+      align-items: center;
+      box-sizing: border-box;
+      display: grid;
+      gap: 24px 26px;
+      /* 5-column layout: empty 1fr · prev · dots · next · empty 1fr.
+         The two outer 1fr cells absorb all the slack, so the
+         [prev · dots · next] cluster sits centred together with 26px
+         gaps between the arrows and the dot strip — not pushed out to
+         the viewport edges. The track spans all five columns. */
+      grid-template-columns: 1fr auto auto auto 1fr;
+      grid-template-areas:
+        "track track track track track"
+        ".     prev  dots  next  .";
+      margin: 4px auto 0;        /* centre under the 1140 heading */
+      max-width: 1140px;         /* lines up with .rbccm-leadership__inner @1170+ */
+      width: 100%;
+    }
+    @media (min-width: 1300px) {
+      .rbccm-leadership__carousel {
+        /* Track is locked at 1140 (lines up with the heading inside __inner);
+           arrows live in their own auto-width columns OUTSIDE the 1140 rail.
+           Carousel itself extends beyond __inner via negative side margins
+           so the arrows can sit in the section's gutter without shrinking
+           the track. */
+        column-gap: 24px;
+        grid-template-areas:
+          "prev track next"
+          ".    dots  .";
+        grid-template-columns: auto 1140px auto;
+        margin: 4px -68px 0 -68px;
+        max-width: none;
+      }
+    }
+    #rbccm-leadership #rbccm-lead-prev                { grid-area: prev; }
+    #rbccm-leadership .rbccm-leadership__slider-track { grid-area: track; min-width: 0; }
+    #rbccm-leadership #rbccm-lead-next                { grid-area: next; }
+    #rbccm-leadership #rbccm-lead-dots                { grid-area: dots; justify-self: center; }
+
+    /* -- Controls row (LEGACY — kept in case other pages still emit this markup) --
+       The new carousel uses the CSS Grid layout above; this flex row is no
+       longer used by leadership-slider-bio.html but is retained for safety. */
     .rbccm-leadership__controls {
       align-items: center;
       display: flex;
@@ -245,6 +296,22 @@
       width: 14px;
     }
     .rbccm-leadership__btn svg { display: block; }
+
+    /* In the new __carousel grid the button must auto-size to whichever
+       icon SVG is showing (14×24 on mobile, 44×44 on desktop), so undo
+       the legacy fixed dimensions in that context only. */
+    .rbccm-leadership__carousel .rbccm-leadership__btn {
+      height: auto;
+      width: auto;
+    }
+    /* Specificity bumped (.btn + .icon = 0,2,0) so these win against the
+       generic ".rbccm-leadership__btn svg { display: block }" rule above. */
+    .rbccm-leadership__btn .rbccm-leadership__btn-icon--mobile     { display: block; }
+    .rbccm-leadership__btn .rbccm-leadership__btn-icon--desktop    { display: none; }
+    @media (min-width: 1300px) {
+      .rbccm-leadership__btn .rbccm-leadership__btn-icon--mobile   { display: none; }
+      .rbccm-leadership__btn .rbccm-leadership__btn-icon--desktop  { display: block; }
+    }
 
     /* -- Dots wrapper -- */
     .rbccm-leadership__dots-wrap {
@@ -312,8 +379,12 @@
       height: 11px !important;
       width: 11px !important;
     }
-    /* Active dot: filled circle + ring 4px out via box-shadow */
-    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li.slick-active button::before {
+    /* Active dot: filled circle + ring 4px out via box-shadow.
+       Same visual is reused for keyboard focus (:focus-visible) so a
+       focused dot picks up the active-state ring even if it isn't the
+       current slide. */
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li.slick-active button::before,
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button:focus-visible::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
       background-size: 11px 11px !important;
       border-radius: 50% !important;
@@ -322,8 +393,13 @@
       width: 11px !important;
       outline: 0px;
     }
+    #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li button:focus-visible {
+      outline: none;
+    }
 
-    /* -- Desktop arrows overlay >=1245px -- */
+    /* -- Desktop arrows overlay >=1245px (LEGACY — kept in case other pages
+          still emit this markup; the new __carousel grid handles arrow
+          placement at all viewports). -- */
     .rbccm-leadership__arrows-desktop {
       align-items: center;
       display: none;

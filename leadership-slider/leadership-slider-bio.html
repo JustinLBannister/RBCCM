@@ -57,7 +57,22 @@
           <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
           <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</p>
 
-          <div class="rbccm-leadership__slider-track"
+          <!-- ── Carousel: DOM order is Prev → slides → Next → dots (slick-default).
+                  Visual layout reshuffles via CSS grid template-areas in
+                  leadership-carousel.css. ── -->
+          <div class="rbccm-leadership__carousel">
+
+            <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="0">
+              <svg class="rbccm-leadership__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="rbccm-leadership__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+                <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <div class="rbccm-leadership__slider-track"
                role="region"
                aria-label="Leadership cards"
                aria-describedby="rbccm-lead-instructions">
@@ -160,35 +175,20 @@
 
           </div>
 
-          <!-- Mobile controls -->
-          <div class="rbccm-leadership__controls">
-            <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
-                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
             <button id="rbccm-lead-next" class="rbccm-leadership__btn" aria-label="Next slide" tabindex="0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+              <svg class="rbccm-leadership__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
                 <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
-            </button>
-          </div>
-          <!-- Desktop arrows -->
-          <div class="rbccm-leadership__arrows-desktop">
-            <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-                <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
-                <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+              <svg class="rbccm-leadership__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
                 <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
                 <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
             </button>
+
+            <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
+
           </div>
+          <!-- / .rbccm-leadership__carousel -->
 
         </div>
 
@@ -263,14 +263,13 @@
           }
           // === END DEBUG =========================================================
 
-          $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
-            .attr('tabindex', '0');
+          $('#rbccm-lead-prev, #rbccm-lead-next').attr('tabindex', '0');
 
           // Prev / Next advance the carousel
-          $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
+          $('#rbccm-lead-prev').on('click', function () {
             if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
           });
-          $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
+          $('#rbccm-lead-next').on('click', function () {
             if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
           });
 
@@ -281,7 +280,7 @@
             var isInfinite = slick.options.infinite;
 
             if (isInfinite) {
-              $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
+              $('#rbccm-lead-prev, #rbccm-lead-next')
                 .prop('disabled', false)
                 .attr('aria-disabled', 'false')
                 .css('opacity', 1);
@@ -296,11 +295,11 @@
             var atStart = current &lt;= 0;
             var atEnd   = current >= maxIndex;
 
-            $('#rbccm-lead-prev, #rbccm-lead-prev-desk')
+            $('#rbccm-lead-prev')
               .prop('disabled', atStart)
               .attr('aria-disabled', atStart ? 'true' : 'false')
               .css('opacity', atStart ? 0.3 : 1);
-            $('#rbccm-lead-next, #rbccm-lead-next-desk')
+            $('#rbccm-lead-next')
               .prop('disabled', atEnd)
               .attr('aria-disabled', atEnd ? 'true' : 'false')
               .css('opacity', atEnd ? 0.3 : 1);
@@ -351,7 +350,7 @@
               mobileFirst:     false,
               responsive: [
                 { breakpoint: 99999, settings: { centerMode:false, centerPadding:'0px', draggable:false, infinite:true,  slidesToScroll:1, swipe:false, touchMove:false, variableWidth:true } },
-                { breakpoint: 1245,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+                { breakpoint: 1300,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
                 { breakpoint: 1025,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
                 { breakpoint: 640,   settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
               ],
@@ -374,12 +373,15 @@
           }
 
           // ─────────────────────────────────────────────────────────────
-          // Accessibility: roving tabindex + logical Tab order.
-          // Order = Prev -> visible slides -> Next. Off-canvas / cloned
-          // slides (and their focusable children) are removed from the tab
-          // sequence and hidden from assistive tech. Cards without an
-          // action become the tab stop themselves so focus still moves
-          // through them.
+          // Accessibility: roving tabindex on slide content.
+          //
+          // The DOM is laid out in the slick-default order
+          //   [Prev] → [slides] → [Next] → [dots]
+          // so native browser tab order already produces the desired
+          // sequence. No Tab interceptor is needed. We only have to keep
+          // tabindex correct on slide children so off-canvas / cloned
+          // slides (and any cards without an action element) don't pull
+          // focus.
           // ─────────────────────────────────────────────────────────────
 
           // True for any slide (original OR cloned) essentially fully in view.
@@ -397,59 +399,29 @@
             return slideW > 0 &amp;&amp; (visWidth / slideW) >= 0.9;
           }
 
-          // The prev/next button visible at the current breakpoint.
-          function activeArrow(deskId, mobId) {
-            var desk = document.getElementById(deskId);
-            if (desk &amp;&amp; desk.offsetParent !== null) return desk;
-            return document.getElementById(mobId);
-          }
-
-          // Ordered focus ring: [Prev, ...visible card stops, Next].
-          // A "card stop" is the card's action element when present, OR
-          // the card itself when no action exists.
-          function getRing() {
-            var ring = [];
-            var prevBtn = activeArrow('rbccm-lead-prev-desk', 'rbccm-lead-prev');
-            var nextBtn = activeArrow('rbccm-lead-next-desk', 'rbccm-lead-next');
-            if (prevBtn) ring.push(prevBtn);
-            $track.find('.slick-slide').each(function () {
-              if (isSlideInView(this)) {
-                var a = this.querySelector('.rbccm-leadership__card-action');
-                if (a) { ring.push(a); return; }
-                var card = this.querySelector('.rbccm-leadership__card');
-                if (card) ring.push(card);
-              }
-            });
-            if (nextBtn) ring.push(nextBtn);
-            return ring;
-          }
-
-          // Roving tabindex + aria-hidden across all slides, then enable the ring.
+          // Per slide: aria-hidden when off-canvas, roving tabindex on
+          // children. For in-view slides, promote the card's action element
+          // (LinkedIn anchor / Biography button) to tabindex=0, OR the card
+          // itself when no action exists so focus still moves through it.
           function applyA11y() {
             $track.find('.slick-slide').each(function () {
-              if (isSlideInView(this)) { this.removeAttribute('aria-hidden'); }
-              else                     { this.setAttribute('aria-hidden', 'true'); }
+              var inView = isSlideInView(this);
+              if (inView) { this.removeAttribute('aria-hidden'); }
+              else        { this.setAttribute('aria-hidden', 'true'); }
+
+              // Start with every focusable child + the card itself at -1.
               var kids = this.querySelectorAll(FOCUSABLE);
               for (var i = 0; i &lt; kids.length; i++) kids[i].setAttribute('tabindex', '-1');
-              // Reset the card itself; set to 0 below only if it's in the ring.
               var card = this.querySelector('.rbccm-leadership__card');
               if (card) card.setAttribute('tabindex', '-1');
-            });
-            var ring = getRing();
-            for (var j = 0; j &lt; ring.length; j++) ring[j].setAttribute('tabindex', '0');
-          }
 
-          // Move focus to the tabbable element just outside the section. Used
-          // to exit backward from Prev, which sits AFTER the slides in the DOM.
-          function focusOutside(backward) {
-            var nodes = Array.prototype.slice.call(document.querySelectorAll(FOCUSABLE))
-              .filter(function (el) { return el.tabIndex >= 0 &amp;&amp; !el.disabled &amp;&amp; el.offsetParent !== null; });
-            var firstIn = -1, lastIn = -1;
-            for (var i = 0; i &lt; nodes.length; i++) {
-              if (section.contains(nodes[i])) { if (firstIn === -1) firstIn = i; lastIn = i; }
-            }
-            if (backward) { if (firstIn > 0) nodes[firstIn - 1].focus(); }
-            else          { if (lastIn !== -1 &amp;&amp; lastIn &lt; nodes.length - 1) nodes[lastIn + 1].focus(); }
+              if (!inView) return;
+
+              // Promote the appropriate tab stop on visible slides.
+              var action = this.querySelector('.rbccm-leadership__card-action');
+              if (action)    action.setAttribute('tabindex', '0');
+              else if (card) card.setAttribute('tabindex', '0');
+            });
           }
 
           // Re-evaluate after every settle.
@@ -459,38 +431,6 @@
             if (typeof currentSlide !== 'undefined' &amp;&amp; slick) {
               $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
             }
-          });
-
-          // ── Tab: enforce Prev -> slides -> Next, exit cleanly at the ends ──
-          var lastTabShift = null;
-          $(document).on('mousedown.rbccmA11y', function () { lastTabShift = null; });
-          $(document).on('keydown.rbccmA11y', function (e) {
-            if (e.key !== 'Tab') { lastTabShift = null; return; }
-            lastTabShift = e.shiftKey;
-            if (!section.contains(document.activeElement)) return; // entry handled in focusin
-            var ring = getRing();
-            if (!ring.length) return;
-            var idx = ring.indexOf(document.activeElement);
-            if (idx === -1) return; // e.g. a dot button -> default behaviour
-            if (e.shiftKey) {
-              e.preventDefault();
-              if (idx === 0) { focusOutside(true); }                 // on Prev -> leave widget backward
-              else           { ring[idx - 1].focus({ preventScroll: true }); }
-            } else {
-              if (idx === ring.length - 1) return;                   // on Next -> leave widget forward (natural)
-              e.preventDefault();
-              ring[idx + 1].focus({ preventScroll: true });
-            }
-          });
-
-          // ── Entry: forward-tab in -> Prev, shift-tab in -> Next ──
-          section.addEventListener('focusin', function (e) {
-            if (lastTabShift === null) return;                                // not via Tab (click etc.)
-            if (e.relatedTarget &amp;&amp; section.contains(e.relatedTarget)) return; // internal move
-            var ring = getRing();
-            if (!ring.length) return;
-            var target = lastTabShift ? ring[ring.length - 1] : ring[0];
-            if (target &amp;&amp; e.target !== target) target.focus({ preventScroll: true });
           });
 
           var resizeTimer;
