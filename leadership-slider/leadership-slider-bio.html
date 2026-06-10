@@ -433,6 +433,45 @@
             }
           });
 
+          // Force the focus border via inline style + !important on focusin.
+          // ALSO paint twin duplicates (original + slick clones of the same
+          // author) — slick can park keyboard focus on the off-canvas cloned
+          // copy while the on-canvas original is what the user is looking at.
+          // Painting both copies guarantees the visible one shows the border.
+          function setFocusedCard(card) {
+            // Clear card borders + action outlines on every card.
+            document.querySelectorAll('.rbccm-leadership__card').forEach(function (c) {
+              c.style.removeProperty('border-color');
+              c.classList.remove('is-focused');
+            });
+            document.querySelectorAll('.rbccm-leadership__card-action').forEach(function (a) {
+              a.style.removeProperty('outline');
+              a.style.removeProperty('border-radius');
+            });
+            if (!card) return;
+            var slide = card.closest('.slick-slide');
+            if (slide) slide.removeAttribute('aria-hidden');
+            var name = card.querySelector('.rbccm-leadership__card-name');
+            name = name ? name.textContent : null;
+            document.querySelectorAll('.rbccm-leadership__card').forEach(function (c) {
+              var n = c.querySelector('.rbccm-leadership__card-name');
+              var same = !name || (n &amp;&amp; n.textContent === name);
+              if (c === card || same) {
+                c.classList.add('is-focused');
+                c.style.setProperty('border-color', '#003168', 'important');
+                var action = c.querySelector('.rbccm-leadership__card-action');
+                if (action) {
+                  action.style.setProperty('outline', '2px solid #003168', 'important');
+                  action.style.setProperty('border-radius', '4px', 'important');
+                }
+              }
+            });
+          }
+          document.addEventListener('focusin', function (e) {
+            var card = e.target &amp;&amp; e.target.closest &amp;&amp; e.target.closest('.rbccm-leadership__card');
+            setFocusedCard(card);
+          });
+
           var resizeTimer;
           $(window).on('resize', function () {
             clearTimeout(resizeTimer);

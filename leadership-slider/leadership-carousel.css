@@ -177,10 +177,37 @@
          (2) cards whose inner action (LinkedIn anchor, Biography button)
              has keyboard focus (:has(:focus-visible)). */
     .rbccm-leadership__card:focus { outline: none; }
+    /* Primary focus indicator: :focus-within fires whenever the card OR
+       any descendant has focus. Works in every browser that supports
+       focus events; doesn't depend on :focus-visible or :has(). */
+    .rbccm-leadership__card:focus-within,
     .rbccm-leadership__card:focus-visible,
-    .rbccm-leadership__card:has(:focus-visible) {
-      border-color: #003168;
+    .rbccm-leadership__card.is-focused {
+      border-color: #003168 !important;
       outline: none;
+    }
+    /* :has() kept in its own rule so a browser that fails to parse it
+       can drop just this rule, not the one above. */
+    .rbccm-leadership__card:has(:focus-visible) {
+      border-color: #003168 !important;
+      outline: none;
+    }
+
+    /* Focus ring on the card's action element. Keyboard-only via
+       :focus-visible so mouse clicks don't show it. Uses #003168 so
+       all focus indicators across the component share the same colour. */
+    .rbccm-leadership__card-action:focus { outline: none; }
+    .rbccm-leadership__card-action:focus-visible {
+      outline: 2px solid #003168;
+      border-radius: 4px;
+    }
+
+    /* Focus ring on the Prev / Next arrow buttons — keyboard-only,
+       same #003168 as everything else so the system feels consistent. */
+    .rbccm-leadership__btn:focus { outline: none; }
+    .rbccm-leadership__btn:focus-visible {
+      outline: 2px solid #003168;
+      border-radius: 4px;
     }
 
     /* Hide the circular SVG icon — text-only link */
