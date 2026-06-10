@@ -373,3 +373,16 @@
 
 </body>
 </html>
+console.log('width:', window.innerWidth);
+var lr = document.querySelector('.slick-list').getBoundingClientRect();
+console.table([...document.querySelectorAll('.slick-slide')].map(s => {
+  var r = s.getBoundingClientRect();
+  var visL = Math.max(r.left, lr.left), visR = Math.min(r.right, lr.right);
+  var pct = r.width > 0 ? Math.max(0, visR - visL) / r.width : 0;
+  return {
+    name: s.querySelector('.rbccm-leadership__card-name')?.textContent || '',
+    pct: (pct * 100).toFixed(0) + '%',
+    cloned: s.classList.contains('slick-cloned'),
+    x: r.left.toFixed(0)
+  };
+}));
