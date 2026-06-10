@@ -467,7 +467,18 @@
               }
             });
           }
+          // Track input modality — only paint the focus state when focus
+          // arrives via keyboard (matches :focus-visible semantics).
+          var focusViaKeyboard = false;
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') focusViaKeyboard = true;
+          }, true);
+          document.addEventListener('mousedown',   function () { focusViaKeyboard = false; }, true);
+          document.addEventListener('touchstart',  function () { focusViaKeyboard = false; }, true);
+          document.addEventListener('pointerdown', function () { focusViaKeyboard = false; }, true);
+
           document.addEventListener('focusin', function (e) {
+            if (!focusViaKeyboard) { setFocusedCard(null); return; }  // click/touch — clear, don't paint
             var card = e.target &amp;&amp; e.target.closest &amp;&amp; e.target.closest('.rbccm-leadership__card');
             setFocusedCard(card);
           });
