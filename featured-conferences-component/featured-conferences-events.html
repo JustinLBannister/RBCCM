@@ -1,0 +1,741 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Featured Conferences (EVENTS-DRIVEN)
+       Pulls everything from the centralized Events List DCR instead of
+       per-component Conference groups.
+
+       Selection: events where event_featured = 'y', sorted by event_date
+       ascending, first 3. Renders only when at least 3 are flagged.
+
+       Per-event field sources:
+         Tab label / title  : event_title_override, else event_name
+         Date (info card)   : formatted from event_date / event_date_end
+         Location           : location
+         Format             : event_format
+         Media              : event_brightcove_id set = video facade,
+                              else static image
+         Poster chain       : event_overview_image -> event_image ->
+                              DefaultPoster (Properties)
+         Overview body      : event_overview_body
+         Key themes         : event_key_themes
+         Contact            : event_overview_contact (default supplied)
+         Speakers           : event/speaker/author picks -> document() ->
+                              author DCR fields (name, title, subtitle, photo)
+         Insights           : event/insight/story picks -> document() ->
+                              story DCR fields (thumbnail, title, description,
+                              time_to_read / time_to_watch + story_type,
+                              subcategory, can_url)
+
+       document() note: picked paths start with '/' and are workarea-relative
+       (e.g. /templatedata/rbccm/authors/data/dave-mckay). If document()
+       cannot resolve them as-is in this environment, set the DocPathPrefix
+       Datum in Properties to the required prefix (no markup change needed). -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- Featured events: flagged conference events from the Events List. -->
+    <xsl:variable name="featuredEvents" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
+        normalize-space(event_featured) = 'y']"/>
+    <xsl:variable name="featuredCount" select="count($featuredEvents)"/>
+
+    <!-- Render gate: at least 3 flagged. The soonest 3 (by event_date) are
+         used; flagging a 4th does not break anything, it just is not shown. -->
+    <xsl:if test="$featuredCount &gt;= 3">
+
+      <!-- == Heading == -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- == Aria label == -->
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- == Optional ARIA overrides (empty = fall back to JS default) == -->
+      <xsl:variable name="ariaSpeakersCarouselLabel" select="normalize-space(/Properties/Datum[@ID='AriaSpeakersCarouselLabel'])"/>
+      <xsl:variable name="ariaInsightsCarouselLabel" select="normalize-space(/Properties/Datum[@ID='AriaInsightsCarouselLabel'])"/>
+      <xsl:variable name="ariaPrevSpeakerLabel"      select="normalize-space(/Properties/Datum[@ID='AriaPrevSpeakerLabel'])"/>
+      <xsl:variable name="ariaNextSpeakerLabel"      select="normalize-space(/Properties/Datum[@ID='AriaNextSpeakerLabel'])"/>
+      <xsl:variable name="ariaPrevInsightLabel"      select="normalize-space(/Properties/Datum[@ID='AriaPrevInsightLabel'])"/>
+      <xsl:variable name="ariaNextInsightLabel"      select="normalize-space(/Properties/Datum[@ID='AriaNextInsightLabel'])"/>
+      <xsl:variable name="ariaSpeakersDotsLabel"     select="normalize-space(/Properties/Datum[@ID='AriaSpeakersDotsLabel'])"/>
+      <xsl:variable name="ariaInsightsDotsLabel"     select="normalize-space(/Properties/Datum[@ID='AriaInsightsDotsLabel'])"/>
+      <xsl:variable name="ariaViewAllInsightsLabel"  select="normalize-space(/Properties/Datum[@ID='AriaViewAllInsightsLabel'])"/>
+
+      <!-- == Brightcove globals == -->
+      <xsl:variable name="bcAccount">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCAccount']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCAccount'])"/>
+          </xsl:when>
+          <xsl:otherwise>6021289101001</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcPlayer">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCPlayer']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCPlayer'])"/>
+          </xsl:when>
+          <xsl:otherwise>VyvCc9BZx</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bcEmbed">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BCEmbed']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BCEmbed'])"/>
+          </xsl:when>
+          <xsl:otherwise>default</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Default poster for any event with no overview/card image of its own. -->
+      <xsl:variable name="defaultPoster">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='DefaultPoster']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DefaultPoster'])"/>
+          </xsl:when>
+          <xsl:otherwise>https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Prefix prepended to picked author/story paths before document().
+           Leave blank first; if speaker/insight content does not resolve,
+           set this to the base path document() needs in this environment. -->
+      <xsl:variable name="docPathPrefix" select="normalize-space(/Properties/Datum[@ID='DocPathPrefix'])"/>
+
+      <!-- Section-level copy defaults (author-overridable in Properties). -->
+      <xsl:variable name="ovHeading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='OverviewHeading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='OverviewHeading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Conference overview</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="topicsLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='KeyTopicsLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='KeyTopicsLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Key themes</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="spkHeading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SpeakersHeading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SpeakersHeading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured speakers</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="defaultContact">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='DefaultContact']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DefaultContact'])"/>
+          </xsl:when>
+          <xsl:otherwise>Please contact your RBC representative to attend or get more information.</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- == External CSS (scoped to .rbccm-featured-conferences) == -->
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/featured-conferences.css"/>
+
+      <section class="rbccm-featured-conferences" id="rbccm-featured-conferences">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+
+        <div class="rbccm-featured-conferences__container">
+
+          <h2 class="rbccm-featured-conferences__heading">
+            <xsl:value-of select="$heading"/>
+          </h2>
+
+          <!-- == OUTER TABS (soonest 3 flagged events) == -->
+          <div class="rbccm-featured-conferences__tablist" role="tablist">
+            <xsl:for-each select="$featuredEvents">
+              <xsl:sort select="event_date" order="ascending"/>
+              <xsl:if test="position() &lt;= 3">
+                <xsl:variable name="confKey" select="concat('conf-', position())"/>
+                <xsl:variable name="confName">
+                  <xsl:choose>
+                    <xsl:when test="normalize-space(event_title_override) != ''">
+                      <xsl:value-of select="normalize-space(event_title_override)"/>
+                    </xsl:when>
+                    <xsl:otherwise><xsl:value-of select="normalize-space(event_name)"/></xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+                <button type="button"
+                        class="rbccm-featured-conferences__tab"
+                        role="tab"
+                        aria-expanded="false">
+                  <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+                  <xsl:attribute name="aria-controls">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                  <xsl:value-of select="$confName"/>
+                </button>
+              </xsl:if>
+            </xsl:for-each>
+          </div>
+
+          <!-- == OUTER PANELS (one per featured event) == -->
+          <div class="rbccm-featured-conferences__panels">
+            <xsl:for-each select="$featuredEvents">
+              <xsl:sort select="event_date" order="ascending"/>
+              <xsl:if test="position() &lt;= 3">
+              <xsl:variable name="confKey" select="concat('conf-', position())"/>
+              <xsl:variable name="confName">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(event_title_override) != ''">
+                    <xsl:value-of select="normalize-space(event_title_override)"/>
+                  </xsl:when>
+                  <xsl:otherwise><xsl:value-of select="normalize-space(event_name)"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- Media: Brightcove ID present = click-to-play video facade,
+                   blank = static image. Poster chain:
+                   event_overview_image -> event_image -> DefaultPoster. -->
+              <xsl:variable name="videoId" select="normalize-space(event_brightcove_id)"/>
+              <xsl:variable name="effectivePoster">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(event_overview_image) != ''">
+                    <xsl:value-of select="normalize-space(event_overview_image)"/>
+                  </xsl:when>
+                  <xsl:when test="normalize-space(event_image) != ''">
+                    <xsl:value-of select="normalize-space(event_image)"/>
+                  </xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$defaultPoster"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- Date display built from ISO event_date / event_date_end:
+                     "June 2, 2026"          (single day)
+                     "June 2-3, 2026"        (range, same month)
+                     "June 30 - July 1, 2026" (range crossing months) -->
+              <xsl:variable name="startMonth">
+                <xsl:call-template name="month_full">
+                  <xsl:with-param name="iso_date" select="event_date"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="endMonth">
+                <xsl:call-template name="month_full">
+                  <xsl:with-param name="iso_date" select="event_date_end"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="yearOnly" select="substring(event_date, 1, 4)"/>
+              <xsl:variable name="startDay" select="number(substring(event_date, 9, 2))"/>
+              <xsl:variable name="dateDisplay">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(event_date_end) = '' or normalize-space(event_date_end) = normalize-space(event_date)">
+                    <xsl:value-of select="concat($startMonth, ' ', $startDay, ', ', $yearOnly)"/>
+                  </xsl:when>
+                  <xsl:when test="$endMonth = $startMonth">
+                    <xsl:value-of select="concat($startMonth, ' ', $startDay, '-', number(substring(event_date_end, 9, 2)), ', ', $yearOnly)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat($startMonth, ' ', $startDay, ' - ', $endMonth, ' ', number(substring(event_date_end, 9, 2)), ', ', $yearOnly)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <xsl:variable name="loc"    select="normalize-space(location)"/>
+              <xsl:variable name="format" select="normalize-space(event_format)"/>
+              <xsl:variable name="ovBody" select="event_overview_body"/>
+              <xsl:variable name="topics" select="normalize-space(event_key_themes)"/>
+              <xsl:variable name="contact">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(event_overview_contact) != ''">
+                    <xsl:value-of select="normalize-space(event_overview_contact)"/>
+                  </xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$defaultContact"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- Picked speakers / insights (non-empty browser picks only). -->
+              <xsl:variable name="speakerPicks" select="speaker/author[normalize-space(.) != '']"/>
+              <xsl:variable name="speakerCount" select="count($speakerPicks)"/>
+              <xsl:variable name="insightPicks" select="insight/story[normalize-space(.) != '']"/>
+              <xsl:variable name="insightCount" select="count($insightPicks)"/>
+
+              <xsl:variable name="spkFootnote">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(event_speakers_footnote) != ''">
+                    <xsl:value-of select="normalize-space(event_speakers_footnote)"/>
+                  </xsl:when>
+                  <xsl:when test="$speakerCount = 0">Speakers coming soon</xsl:when>
+                  <xsl:otherwise>+ Additional speakers to be announced</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <div class="rbccm-featured-conferences__panel" role="tabpanel">
+                <xsl:attribute name="id">panel-<xsl:value-of select="$confKey"/></xsl:attribute>
+                <xsl:attribute name="data-panel"><xsl:value-of select="$confKey"/></xsl:attribute>
+
+                <div class="rbccm-featured-conferences__inner-wrap">
+
+                <!-- INNER TAB + PANEL: OVERVIEW -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-overview</xsl:attribute>
+
+                  <div class="rbccm-featured-conferences__overview">
+
+                    <!-- Media: video facade when a Brightcove ID is set, else image. -->
+                    <div class="rbccm-featured-conferences__video video-reel-wrap">
+                      <div class="rbccm-featured-conferences__video-frame">
+                        <xsl:choose>
+                          <xsl:when test="$videoId != ''">
+                            <button type="button" class="rbccm-featured-conferences__video-facade" aria-label="Play video">
+                              <xsl:attribute name="data-bc-src">//players.brightcove.net/<xsl:value-of select="$bcAccount"/>/<xsl:value-of select="$bcPlayer"/>_<xsl:value-of select="$bcEmbed"/>/index.html?videoId=<xsl:value-of select="$videoId"/>&amp;autoplay=1</xsl:attribute>
+                              <img class="rbccm-featured-conferences__video-poster" alt="" loading="lazy" src="{$effectivePoster}"/>
+                              <span class="rbccm-featured-conferences__video-play" aria-hidden="true">
+                                <svg class="rbccm-featured-conferences__video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                  <path d="M8 5v14l11-7z" fill="currentColor"/>
+                                </svg>
+                              </span>
+                            </button>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <img class="rbccm-featured-conferences__video-poster" loading="lazy" src="{$effectivePoster}" alt="{$confName}"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </div>
+                    </div>
+
+                    <!-- Info card -->
+                    <div class="rbccm-featured-conferences__info">
+                      <xsl:if test="normalize-space(event_date) != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Date</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$dateDisplay"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$loc != ''">
+                        <div class="rbccm-featured-conferences__info-item">
+                          <div class="rbccm-featured-conferences__info-label">Location</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$loc"/></div>
+                        </div>
+                      </xsl:if>
+                      <xsl:if test="$format != ''">
+                        <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                          <div class="rbccm-featured-conferences__info-label">Format</div>
+                          <div class="rbccm-featured-conferences__info-value"><xsl:value-of select="$format"/></div>
+                        </div>
+                      </xsl:if>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="rbccm-featured-conferences__overview-body">
+                      <h3 class="rbccm-featured-conferences__overview-heading"><xsl:value-of select="$ovHeading"/></h3>
+                      <div class="rbccm-featured-conferences__overview-text">
+                        <xsl:value-of select="$ovBody" disable-output-escaping="yes"/>
+                      </div>
+
+                      <xsl:if test="$topics != ''">
+                        <p class="rbccm-featured-conferences__topics">
+                          <strong><xsl:value-of select="$topicsLabel"/></strong>
+                          <xsl:text> </xsl:text>
+                          <span class="rbccm-featured-conferences__topics-list">
+                            <xsl:value-of select="$topics" disable-output-escaping="yes"/>
+                          </span>
+                        </p>
+                      </xsl:if>
+
+                      <xsl:if test="normalize-space($contact) != ''">
+                        <p class="rbccm-featured-conferences__contact">
+                          <em><xsl:value-of select="$contact" disable-output-escaping="yes"/></em>
+                        </p>
+                      </xsl:if>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- INNER TAB + PANEL: SPEAKERS.
+                     Always rendered. With 0 picks: heading + slider are
+                     inline-hidden and the footnote reads "Speakers coming
+                     soon" with no top divider. -->
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-speakers</xsl:attribute>
+
+                  <h3 class="rbccm-featured-conferences__speakers-heading">
+                    <xsl:if test="$speakerCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$spkHeading"/>
+                  </h3>
+
+                  <div class="rbccm-featured-conferences__speakers-slider">
+                    <xsl:attribute name="data-conf"><xsl:value-of select="$confKey"/></xsl:attribute>
+                    <xsl:if test="$ariaSpeakersCarouselLabel != ''">
+                      <xsl:attribute name="aria-label"><xsl:value-of select="$ariaSpeakersCarouselLabel"/></xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="$speakerCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
+                    </xsl:if>
+
+                    <div class="rbccm-featured-conferences__speakers">
+                      <xsl:attribute name="id">rbccm-fc-speakers-<xsl:value-of select="$confKey"/></xsl:attribute>
+                      <!-- Each pick resolves the author DCR file via document()
+                           and reads name / title / subtitle / photo. -->
+                      <xsl:for-each select="$speakerPicks">
+                        <xsl:variable name="authorDoc" select="document(concat($docPathPrefix, normalize-space(.)))"/>
+                        <xsl:variable name="aName"     select="normalize-space($authorDoc/authorlist/name)"/>
+                        <xsl:variable name="aTitle"    select="normalize-space($authorDoc/authorlist/title)"/>
+                        <xsl:variable name="aCompany"  select="normalize-space($authorDoc/authorlist/subtitle)"/>
+                        <xsl:variable name="aPhoto"    select="normalize-space($authorDoc/authorlist/photo)"/>
+                        <xsl:variable name="aFullTitle">
+                          <xsl:choose>
+                            <xsl:when test="$aTitle != '' and $aCompany != ''">
+                              <xsl:value-of select="concat($aTitle, ', ', $aCompany)"/>
+                            </xsl:when>
+                            <xsl:when test="$aTitle != ''"><xsl:value-of select="$aTitle"/></xsl:when>
+                            <xsl:otherwise><xsl:value-of select="$aCompany"/></xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:variable>
+                        <xsl:call-template name="render-speaker">
+                          <xsl:with-param name="name"  select="$aName"/>
+                          <xsl:with-param name="title" select="$aFullTitle"/>
+                          <xsl:with-param name="image" select="$aPhoto"/>
+                          <xsl:with-param name="alt"   select="$aName"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </div>
+
+                    <!-- Carousel controls (arrows + dots). JS toggles
+                         `.has-overflow` based on count + viewport. -->
+                    <div class="rbccm-featured-conferences__speakers-controls">
+                      <button class="rbccm-featured-conferences__speakers-btn" type="button" tabindex="0">
+                        <xsl:attribute name="id">rbccm-fc-speakers-prev-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaPrevSpeakerLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaPrevSpeakerLabel"/></xsl:attribute>
+                        </xsl:if>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                      <div class="rbccm-featured-conferences__speakers-dots">
+                        <xsl:attribute name="id">rbccm-fc-speakers-dots-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaSpeakersDotsLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaSpeakersDotsLabel"/></xsl:attribute>
+                        </xsl:if>
+                      </div>
+                      <button class="rbccm-featured-conferences__speakers-btn" type="button" tabindex="0">
+                        <xsl:attribute name="id">rbccm-fc-speakers-next-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaNextSpeakerLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaNextSpeakerLabel"/></xsl:attribute>
+                        </xsl:if>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="rbccm-featured-conferences__speakers-footnote">
+                    <xsl:if test="$speakerCount = 0">
+                      <xsl:attribute name="style">border-top: 0px;</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$spkFootnote" disable-output-escaping="yes"/>
+                  </p>
+                </div>
+
+                <!-- INNER TAB + PANEL: INSIGHTS. Rendered only when at least
+                     one insight article is picked. All cards standard (the
+                     events DCR caps insights at 3; the featured tile layout
+                     requires 4). -->
+                <xsl:if test="$insightCount &gt; 0">
+                <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+                  <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+                  <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel">
+                  <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
+
+                  <div class="rbccm-featured-conferences__insights-slider">
+                    <xsl:attribute name="data-conf"><xsl:value-of select="$confKey"/></xsl:attribute>
+                    <xsl:if test="$ariaInsightsCarouselLabel != ''">
+                      <xsl:attribute name="aria-label"><xsl:value-of select="$ariaInsightsCarouselLabel"/></xsl:attribute>
+                    </xsl:if>
+
+                    <div class="rbccm-featured-conferences__insights">
+                      <xsl:attribute name="id">rbccm-fc-insights-<xsl:value-of select="$confKey"/></xsl:attribute>
+
+                      <div class="rbccm-featured-conferences__insights-row">
+                        <!-- Each pick resolves the story DCR file via document()
+                             and reads thumbnail / title / description / meta /
+                             can_url. Meta: "X min read" for text stories,
+                             "X min watch" for video, "X min listen" for audio. -->
+                        <xsl:for-each select="$insightPicks">
+                          <xsl:variable name="storyPath" select="normalize-space(.)"/>
+                          <xsl:variable name="storyDoc"  select="document(concat($docPathPrefix, $storyPath))"/>
+                          <xsl:variable name="sTitle"    select="normalize-space($storyDoc/press_release/title)"/>
+                          <xsl:variable name="sDesc"     select="normalize-space($storyDoc/press_release/description)"/>
+                          <xsl:variable name="sThumb"    select="normalize-space($storyDoc/press_release/thumbnail)"/>
+                          <xsl:variable name="sLabel"    select="normalize-space($storyDoc/press_release/subcategory)"/>
+                          <xsl:variable name="sType"     select="normalize-space($storyDoc/press_release/story_type)"/>
+                          <xsl:variable name="sMeta">
+                            <xsl:choose>
+                              <xsl:when test="$sType = 'video' and normalize-space($storyDoc/press_release/time_to_watch) != ''">
+                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_watch), ' watch')"/>
+                              </xsl:when>
+                              <xsl:when test="$sType = 'audio' and normalize-space($storyDoc/press_release/time_to_watch) != ''">
+                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_watch), ' listen')"/>
+                              </xsl:when>
+                              <xsl:when test="normalize-space($storyDoc/press_release/time_to_read) != ''">
+                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_read), ' read')"/>
+                              </xsl:when>
+                              <xsl:otherwise></xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:variable>
+                          <xsl:variable name="sHref">
+                            <xsl:choose>
+                              <xsl:when test="normalize-space($storyDoc/press_release/can_url) != ''">
+                                <xsl:value-of select="normalize-space($storyDoc/press_release/can_url)"/>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="concat('/en/story/story.page?dcr=', $storyPath)"/>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:variable>
+                          <xsl:call-template name="render-insight">
+                            <xsl:with-param name="mode"  select="'card'"/>
+                            <xsl:with-param name="label" select="$sLabel"/>
+                            <xsl:with-param name="title" select="$sTitle"/>
+                            <xsl:with-param name="desc"  select="$sDesc"/>
+                            <xsl:with-param name="meta"  select="$sMeta"/>
+                            <xsl:with-param name="image" select="$sThumb"/>
+                            <xsl:with-param name="alt"   select="$sTitle"/>
+                            <xsl:with-param name="href"  select="$sHref"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </div>
+                    </div>
+
+                    <!-- Mobile-only carousel controls -->
+                    <div class="rbccm-featured-conferences__insights-controls">
+                      <button class="rbccm-featured-conferences__insights-btn" type="button" tabindex="0">
+                        <xsl:attribute name="id">rbccm-fc-insights-prev-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaPrevInsightLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaPrevInsightLabel"/></xsl:attribute>
+                        </xsl:if>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                      <div class="rbccm-featured-conferences__insights-dots">
+                        <xsl:attribute name="id">rbccm-fc-insights-dots-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaInsightsDotsLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaInsightsDotsLabel"/></xsl:attribute>
+                        </xsl:if>
+                      </div>
+                      <button class="rbccm-featured-conferences__insights-btn" type="button" tabindex="0">
+                        <xsl:attribute name="id">rbccm-fc-insights-next-<xsl:value-of select="$confKey"/></xsl:attribute>
+                        <xsl:if test="$ariaNextInsightLabel != ''">
+                          <xsl:attribute name="aria-label"><xsl:value-of select="$ariaNextInsightLabel"/></xsl:attribute>
+                        </xsl:if>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                </xsl:if><!-- /insights present -->
+
+                </div><!-- /.inner-wrap -->
+              </div>
+              </xsl:if>
+            </xsl:for-each>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- == External JS (scoped to #rbccm-featured-conferences) == -->
+      <script src="/assets/rbccm/js/sub/test/featured-conferences.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- =============================================
+       Named templates
+       ============================================= -->
+
+  <!-- Convert ISO date 'YYYY-MM-DD' into full month name. Empty input = empty output. -->
+  <xsl:template name="month_full">
+    <xsl:param name="iso_date"/>
+    <xsl:variable name="m" select="substring($iso_date, 6, 2)"/>
+    <xsl:choose>
+      <xsl:when test="$m = '01'">January</xsl:when>
+      <xsl:when test="$m = '02'">February</xsl:when>
+      <xsl:when test="$m = '03'">March</xsl:when>
+      <xsl:when test="$m = '04'">April</xsl:when>
+      <xsl:when test="$m = '05'">May</xsl:when>
+      <xsl:when test="$m = '06'">June</xsl:when>
+      <xsl:when test="$m = '07'">July</xsl:when>
+      <xsl:when test="$m = '08'">August</xsl:when>
+      <xsl:when test="$m = '09'">September</xsl:when>
+      <xsl:when test="$m = '10'">October</xsl:when>
+      <xsl:when test="$m = '11'">November</xsl:when>
+      <xsl:when test="$m = '12'">December</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="render-speaker">
+    <xsl:param name="name"/>
+    <xsl:param name="title"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
+
+    <xsl:if test="$name != '' or $image != ''">
+      <xsl:variable name="altText">
+        <xsl:choose>
+          <xsl:when test="$alt != ''"><xsl:value-of select="$alt"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <div class="rbccm-featured-conferences__speaker">
+        <div class="rbccm-featured-conferences__speaker-avatar">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$altText"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__speaker-name"><xsl:value-of select="$name"/></div>
+        <div class="rbccm-featured-conferences__speaker-title"><xsl:value-of select="$title" disable-output-escaping="yes"/></div>
+      </div>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="render-insight">
+    <xsl:param name="mode"/>  <!-- 'featured' or 'card' -->
+    <xsl:param name="label"/>
+    <xsl:param name="title"/>
+    <xsl:param name="desc"/>
+    <xsl:param name="meta"/>
+    <xsl:param name="image"/>
+    <xsl:param name="alt"/>
+    <xsl:param name="href"/>
+
+    <xsl:if test="$title != '' or $image != ''">
+      <xsl:variable name="labelText">
+        <xsl:choose>
+          <xsl:when test="$label != ''"><xsl:value-of select="$label"/></xsl:when>
+          <xsl:otherwise>INSIGHTS</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="modifierClass">
+        <xsl:choose>
+          <xsl:when test="$mode = 'featured'">rbccm-featured-conferences__insight--featured</xsl:when>
+          <xsl:otherwise>rbccm-featured-conferences__insight--card</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <a>
+        <xsl:attribute name="class">rbccm-featured-conferences__insight <xsl:value-of select="$modifierClass"/></xsl:attribute>
+        <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+        <div class="rbccm-featured-conferences__insight-media">
+          <img loading="lazy">
+            <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+          </img>
+        </div>
+        <div class="rbccm-featured-conferences__insight-body">
+          <div class="rbccm-featured-conferences__insight-label"><xsl:value-of select="$labelText"/></div>
+          <div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>
+          <h4 class="rbccm-featured-conferences__insight-title"><xsl:value-of select="$title"/></h4>
+          <p class="rbccm-featured-conferences__insight-desc">
+            <xsl:value-of select="$desc" disable-output-escaping="yes"/>
+          </p>
+          <xsl:if test="$meta != ''">
+            <p class="rbccm-featured-conferences__insight-meta">
+              <span><xsl:value-of select="$meta"/></span>
+              <svg class="rbccm-featured-conferences__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+              </svg>
+            </p>
+          </xsl:if>
+        </div>
+      </a>
+    </xsl:if>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1554499053800">
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
+
+  <!-- Section-level copy defaults (each is overridable) -->
+  <Datum ID="OverviewHeading" Type="String" Name="Overview Heading">Conference overview</Datum>
+  <Datum ID="KeyTopicsLabel" Type="String" Name="Key Topics Label">Key themes</Datum>
+  <Datum ID="SpeakersHeading" Type="String" Name="Speakers Heading">Featured speakers</Datum>
+  <Datum ID="DefaultContact" Type="String" Name="Default Contact Text">Please contact your RBC representative to attend or get more information.</Datum>
+
+  <!-- Optional ARIA overrides (leave blank to use built-in defaults) -->
+  <Datum ID="AriaSpeakersCarouselLabel" Type="String" Name="ARIA: Speakers Carousel Label"></Datum>
+  <Datum ID="AriaInsightsCarouselLabel" Type="String" Name="ARIA: Insights Carousel Label"></Datum>
+  <Datum ID="AriaPrevSpeakerLabel"      Type="String" Name="ARIA: Previous Speaker Button"></Datum>
+  <Datum ID="AriaNextSpeakerLabel"      Type="String" Name="ARIA: Next Speaker Button"></Datum>
+  <Datum ID="AriaPrevInsightLabel"      Type="String" Name="ARIA: Previous Insight Button"></Datum>
+  <Datum ID="AriaNextInsightLabel"      Type="String" Name="ARIA: Next Insight Button"></Datum>
+  <Datum ID="AriaSpeakersDotsLabel"     Type="String" Name="ARIA: Speakers Dots Group"></Datum>
+  <Datum ID="AriaInsightsDotsLabel"     Type="String" Name="ARIA: Insights Dots Group"></Datum>
+  <Datum ID="AriaViewAllInsightsLabel"  Type="String" Name="ARIA: View All Insights Button"></Datum>
+
+  <!-- Brightcove defaults -->
+  <Datum ID="BCAccount" Type="String" Name="Brightcove Account">6021289101001</Datum>
+  <Datum ID="BCPlayer"  Type="String" Name="Brightcove Player">VyvCc9BZx</Datum>
+  <Datum ID="BCEmbed"   Type="String" Name="Brightcove Embed">default</Datum>
+
+  <!-- Fallback poster/image for any event with no image of its own -->
+  <Datum ID="DefaultPoster" Type="String" Name="Default Poster / Image">https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</Datum>
+
+  <!-- Prefix prepended to picked author/story paths before document().
+       Leave blank first. If speakers/insights render empty, the processor
+       cannot resolve the workarea-relative picks; set this to the base
+       path that works in this environment, e.g.
+       /iw-mount/default/main/internet/rbccm/WORKAREA/shared -->
+  <Datum ID="DocPathPrefix" Type="String" Name="Document Path Prefix"></Datum>
+</Properties>
+
+<Data>
+  <!-- Centralized Events List feed - same binding as upcoming-conferences. -->
+  <Datum ID="EventsList" Type="DCR" Name="Events List">
+    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data</DCR>
+  </Datum>
+</Data>
