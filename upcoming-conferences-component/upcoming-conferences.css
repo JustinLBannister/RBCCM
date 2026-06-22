@@ -201,7 +201,18 @@
 .rbccm-upcoming-conferences__empty[hidden] {
   display: none;
 }
- 
+
+/* Mobile + tablet (below the 992px desktop breakpoint): size the empty state
+   to its content instead of the fixed 594px frame, and pull it up by 40px to
+   cancel the parent .__container's `gap: 40px` so the no-results state does not
+   leave a tall vertical void. Desktop keeps the full 594px frame. */
+@media (max-width: 991.98px) {
+  .rbccm-upcoming-conferences__empty {
+    height: auto;
+    margin-top: -40px;
+  }
+}
+
 /* Circular icon wrapper (80x80) with thin blue outline + low-opacity blue fill.
    Asymmetric padding (19 top/right, 18 bottom/left) lifts the icon visually. */
 .rbccm-upcoming-conferences__empty-icon-wrap {

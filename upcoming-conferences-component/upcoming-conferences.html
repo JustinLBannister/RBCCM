@@ -188,6 +188,7 @@
               <xsl:variable name="eventDateEnd" select="event_date_end"/>
               <xsl:variable name="title"        select="normalize-space(event_name)"/>
               <xsl:variable name="loc"          select="normalize-space(location)"/>
+              <xsl:variable name="region"       select="normalize-space(event_region)"/>
               <xsl:variable name="href"         select="normalize-space(event_url)"/>
               <!-- Per-event poster image for the upcoming-conferences card:
                    author-supplied event_image from the Events List DCR if set,
@@ -235,11 +236,15 @@
                 <!-- Filter / search attributes used by the JS:
                      data-month = full month name ("June", "July"...) - feeds the Month dropdown
                      data-month-short = uppercase 3-letter abbreviation ("JUN") - reserved for future use
-                     data-region = exact location string ("New York", "Toronto", "London")
+                     data-region = broad region from the DCR event_region field
+                                   ("US", "Canada", "Europe"...) - feeds the Region dropdown.
+                                   This is the dedicated region field, NOT the city in Location.
+                                   Events with no event_region set emit an empty data-region,
+                                   so they won't appear under any specific region filter.
                      data-title  = lowercased event_name (for case-insensitive search) -->
                 <xsl:attribute name="data-month"><xsl:value-of select="$monthFull"/></xsl:attribute>
                 <xsl:attribute name="data-month-short"><xsl:value-of select="translate($monthAbbr, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute>
-                <xsl:attribute name="data-region"><xsl:value-of select="$loc"/></xsl:attribute>
+                <xsl:attribute name="data-region"><xsl:value-of select="$region"/></xsl:attribute>
                 <xsl:attribute name="data-title"><xsl:value-of select="translate($title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/></xsl:attribute>
                 <xsl:attribute name="aria-label"><xsl:value-of select="$title"/>, <xsl:value-of select="$monthLabel"/> <xsl:value-of select="$dayLabel"/>, <xsl:value-of select="$loc"/></xsl:attribute>
  
