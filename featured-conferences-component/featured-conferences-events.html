@@ -1,11 +1,14 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBCCM Featured Conferences (EVENTS-DRIVEN)
        Pulls everything from the centralized Events List DCR instead of
        per-component Conference groups.
 
-       Selection: events where event_featured = 'y', sorted by event_date
-       ascending, first 3. Renders only when at least 3 are flagged.
+       Selection: events with the dedicated event_featured flag set (y / yes /
+       true / 1) AND not already past (date safety net - a flagged event only
+       shows while upcoming/in-progress), sorted by event_date ascending,
+       first 3. Renders when at least MinFeatured (default 1) qualify.
+       XSLT 2.0 (current-date()), same engine basis as upcoming-conferences.
 
        Per-event field sources:
          Tab label / title  : event_title_override, else event_name
@@ -38,14 +41,30 @@
 
   <xsl:template match="/">
 
+    <!-- Today as YYYYMMDD (XSLT 2.0 current-date(), same approach as
+         upcoming-conferences) for numeric date comparison. -->
+    <xsl:variable name="CURRENT_DATE" select="format-date(current-date(), '[Y0001][M01][D01]')"/>
+
     <!-- All events in the centralized feed (binding sanity check). -->
     <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
 
-    <!-- Featured events: flag accepts y / yes / true / 1, any case, so the
-         exact stored radio value does not matter. -->
+    <!-- Featured events: dedicated event_featured flag (y / yes / true / 1, any
+         case; blank = never featured) AND not already past. The date safety net
+         means a flagged event only appears while it is upcoming or in progress,
+         so an old/past conference left flagged can never show:
+           * event_date (start) >= today, OR
+           * event_date_end is set and >= today (multi-day still in progress).
+         Kept separate from sitelocation so featuring is its own control. -->
     <xsl:variable name="featuredEvents" select="$allEvents[
-        contains('|y|yes|true|1|', concat('|', translate(normalize-space(event_featured), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '|'))
-        and normalize-space(event_featured) != '']"/>
+        normalize-space(event_featured) != ''
+        and contains('|y|yes|true|1|', concat('|', translate(normalize-space(event_featured), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '|'))
+        and (
+          number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)
+          or (
+            normalize-space(event_date_end) != ''
+            and number(concat(substring(event_date_end, 1, 4), substring(event_date_end, 6, 2), substring(event_date_end, 9, 2))) &gt;= number($CURRENT_DATE)
+          )
+        )]"/>
     <xsl:variable name="featuredCount" select="count($featuredEvents)"/>
 
     <!-- Always-emitted debug marker (visible only in page source).
@@ -289,10 +308,13 @@
               </xsl:variable>
 
               <!-- Picked speakers / insights (non-empty browser picks only). -->
-              <xsl:variable name="speakerPicks" select="speaker/author[normalize-space(.) != '']"/>
-              <xsl:variable name="speakerCount" select="count($speakerPicks)"/>
-              <xsl:variable name="insightPicks" select="insight/story[normalize-space(.) != '']"/>
-              <xsl:variable name="insightCount" select="count($insightPicks)"/>
+              <!-- PHASE 1: speaker/insight rendering needs XSLT document(), which
+                   LiveSite component skins disable. Counts are forced to 0 so
+                   both tabs always show their "coming soon" state and no
+                   document() is ever referenced. Restore count(...) here when a
+                   supported author/story lookup mechanism is wired up. -->
+              <xsl:variable name="speakerCount" select="0"/>
+              <xsl:variable name="insightCount" select="0"/>
 
               <xsl:variable name="spkFootnote">
                 <xsl:choose>
@@ -426,30 +448,13 @@
 
                     <div class="rbccm-featured-conferences__speakers">
                       <xsl:attribute name="id">rbccm-fc-speakers-<xsl:value-of select="$confKey"/></xsl:attribute>
-                      <!-- Each pick resolves the author DCR file via document()
-                           and reads name / title / subtitle / photo. -->
-                      <xsl:for-each select="$speakerPicks">
-                        <xsl:variable name="authorDoc" select="document(concat($docPathPrefix, normalize-space(.)))"/>
-                        <xsl:variable name="aName"     select="normalize-space($authorDoc/authorlist/name)"/>
-                        <xsl:variable name="aTitle"    select="normalize-space($authorDoc/authorlist/title)"/>
-                        <xsl:variable name="aCompany"  select="normalize-space($authorDoc/authorlist/subtitle)"/>
-                        <xsl:variable name="aPhoto"    select="normalize-space($authorDoc/authorlist/photo)"/>
-                        <xsl:variable name="aFullTitle">
-                          <xsl:choose>
-                            <xsl:when test="$aTitle != '' and $aCompany != ''">
-                              <xsl:value-of select="concat($aTitle, ', ', $aCompany)"/>
-                            </xsl:when>
-                            <xsl:when test="$aTitle != ''"><xsl:value-of select="$aTitle"/></xsl:when>
-                            <xsl:otherwise><xsl:value-of select="$aCompany"/></xsl:otherwise>
-                          </xsl:choose>
-                        </xsl:variable>
-                        <xsl:call-template name="render-speaker">
-                          <xsl:with-param name="name"  select="$aName"/>
-                          <xsl:with-param name="title" select="$aFullTitle"/>
-                          <xsl:with-param name="image" select="$aPhoto"/>
-                          <xsl:with-param name="alt"   select="$aName"/>
-                        </xsl:call-template>
-                      </xsl:for-each>
+                      <!-- PHASE 1: speaker rendering via XSLT document() is
+                           removed - LiveSite component skins disable document()
+                           (the story DCR resolves authors with edit-time AJAX
+                           instead). With $speakerCount forced to 0 below, this
+                           slider is hidden and the "coming soon" footnote shows.
+                           Re-introduce author lookups via a supported mechanism
+                           when speakers are needed. -->
                     </div>
 
                     <!-- Carousel controls (arrows + dots). JS toggles
@@ -518,53 +523,13 @@
                       <xsl:attribute name="id">rbccm-fc-insights-<xsl:value-of select="$confKey"/></xsl:attribute>
 
                       <div class="rbccm-featured-conferences__insights-row">
-                        <!-- Each pick resolves the story DCR file via document()
-                             and reads thumbnail / title / description / meta /
-                             can_url. Meta: "X min read" for text stories,
-                             "X min watch" for video, "X min listen" for audio. -->
-                        <xsl:for-each select="$insightPicks">
-                          <xsl:variable name="storyPath" select="normalize-space(.)"/>
-                          <xsl:variable name="storyDoc"  select="document(concat($docPathPrefix, $storyPath))"/>
-                          <xsl:variable name="sTitle"    select="normalize-space($storyDoc/press_release/title)"/>
-                          <xsl:variable name="sDesc"     select="normalize-space($storyDoc/press_release/description)"/>
-                          <xsl:variable name="sThumb"    select="normalize-space($storyDoc/press_release/thumbnail)"/>
-                          <xsl:variable name="sLabel"    select="normalize-space($storyDoc/press_release/subcategory)"/>
-                          <xsl:variable name="sType"     select="normalize-space($storyDoc/press_release/story_type)"/>
-                          <xsl:variable name="sMeta">
-                            <xsl:choose>
-                              <xsl:when test="$sType = 'video' and normalize-space($storyDoc/press_release/time_to_watch) != ''">
-                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_watch), ' watch')"/>
-                              </xsl:when>
-                              <xsl:when test="$sType = 'audio' and normalize-space($storyDoc/press_release/time_to_watch) != ''">
-                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_watch), ' listen')"/>
-                              </xsl:when>
-                              <xsl:when test="normalize-space($storyDoc/press_release/time_to_read) != ''">
-                                <xsl:value-of select="concat(normalize-space($storyDoc/press_release/time_to_read), ' read')"/>
-                              </xsl:when>
-                              <xsl:otherwise></xsl:otherwise>
-                            </xsl:choose>
-                          </xsl:variable>
-                          <xsl:variable name="sHref">
-                            <xsl:choose>
-                              <xsl:when test="normalize-space($storyDoc/press_release/can_url) != ''">
-                                <xsl:value-of select="normalize-space($storyDoc/press_release/can_url)"/>
-                              </xsl:when>
-                              <xsl:otherwise>
-                                <xsl:value-of select="concat('/en/story/story.page?dcr=', $storyPath)"/>
-                              </xsl:otherwise>
-                            </xsl:choose>
-                          </xsl:variable>
-                          <xsl:call-template name="render-insight">
-                            <xsl:with-param name="mode"  select="'card'"/>
-                            <xsl:with-param name="label" select="$sLabel"/>
-                            <xsl:with-param name="title" select="$sTitle"/>
-                            <xsl:with-param name="desc"  select="$sDesc"/>
-                            <xsl:with-param name="meta"  select="$sMeta"/>
-                            <xsl:with-param name="image" select="$sThumb"/>
-                            <xsl:with-param name="alt"   select="$sTitle"/>
-                            <xsl:with-param name="href"  select="$sHref"/>
-                          </xsl:call-template>
-                        </xsl:for-each>
+                        <!-- PHASE 1: insight rendering via XSLT document() is
+                             removed - LiveSite component skins disable document()
+                             (the story DCR resolves articles with edit-time AJAX
+                             instead). With $insightCount forced to 0 below, this
+                             slider is hidden and the "coming soon" footnote shows.
+                             Re-introduce story lookups via a supported mechanism
+                             when insights are needed. -->
                       </div>
                     </div>
 
