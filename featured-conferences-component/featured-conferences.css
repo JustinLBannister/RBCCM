@@ -418,6 +418,7 @@
   height: 128px;
   object-fit: cover;
   width: 100%;
+object-position: top;
 }
 
 .rbccm-featured-conferences__speaker-name {
@@ -648,68 +649,7 @@
   padding: 20px;
 }
 
-/* INSIGHTS eyebrow label */
-.rbccm-featured-conferences__insight-label {
-  color: #0051A5;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  letter-spacing: 2px;
-  line-height: normal;
-  margin: 0;
-  text-transform: uppercase;
-}
 
-/* Yellow divider line - 11px below the label. Width animates to 56px on
-   hover (matches the upcoming-conferences card pattern). */
-.rbccm-featured-conferences__insight-divider {
-  background: #FFC72C;
-  flex-shrink: 0;
-  height: 1.983px;
-  margin: 11px 0 0 0;
-  transition: width 0.3s ease;
-  width: 30.9px;
-}
-
-/* Card title - bold black, 16px above (from divider) */
-.rbccm-featured-conferences__insight-title {
-  color: #000;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  margin: 16px 0 0 0;
-}
-
-/* Card description - 16px above (from title) */
-.rbccm-featured-conferences__insight-desc {
-  color: #555;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  margin: 16px 0 0 0;
-}
-
-/* "X min read" + chevron arrow - pinned to the bottom of the body via
-   `margin-top: auto`, with the description's bottom edge taking whatever
-   space is left between the desc end and this row. */
-.rbccm-featured-conferences__insight-meta {
-  align-items: center;
-  color: #0051A5;
-  display: flex;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  gap: 7px;
-  letter-spacing: -0.526px;
-  line-height: normal;
-  margin: auto 0 0 0;      /* push to bottom */
-}
 
 /* -- Hover effects --
    Match the upcoming-conferences card pattern: divider widens from 30.9 ->
@@ -872,9 +812,13 @@
     width: 100%;
   }
 
+  /* Each tab is fixed at one third of the row (accounting for the two 10px
+     gaps), and does NOT grow to fill. So 3 tabs fill the row, 2 tabs take
+     two thirds, and a single tab spans just one third (left-aligned) rather
+     than stretching across the whole section. */
   .rbccm-featured-conferences__tab {
     align-self: auto;
-    flex: 1 1 0;
+    flex: 0 1 calc((100% - 20px) / 3);
     min-width: 0;
     width: auto;
   }
@@ -1157,4 +1101,91 @@
   .rbccm-featured-conferences .rbccm-featured-conferences__inner-tab:not(.is-active) * {
     font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
   }
+}
+
+/* INSIGHTS eyebrow label */
+.rbccm-featured-conferences__insight-label {
+  color: #0051A5;
+  color: rgb(0, 106, 195);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: normal;
+  margin: 0;
+  text-transform: uppercase;
+font-family:"Roboto Light", Roboto, Arial, Verdana, sans-serif !important;
+font-size:14px;
+height:19.6023px;
+letter-spacing:2px;
+line-height:19.6px;
+}
+
+/* Yellow divider line - 11px below the label. Width animates to 56px on
+   hover (matches the upcoming-conferences card pattern). */
+.rbccm-featured-conferences__insight-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 1.983px;
+  margin: 11px 0 0 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+
+/* Card title - bold black, 16px above (from divider) */
+.rbccm-featured-conferences__insight-title {
+  color: #000;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin: 16px 0 0 0;
+font-family:"Roboto Medium", Arial, sans-serif !important;
+font-size:20px;
+font-style:normal;
+font-weight:400;
+letter-spacing:normal;
+line-height:25px;
+}
+
+/* Card description - 16px above (from title) */
+.rbccm-featured-conferences__insight-desc {
+  color: #555;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 16px 0 0 0;
+color:rgb(85, 85, 85);
+cursor:pointer;
+font-family:"Roboto Light", Roboto, Arial, Verdana, sans-serif !important;
+font-size:13px;
+letter-spacing:0.5px;
+line-height:18.2px;
+}
+
+/* "X min read" + chevron arrow - pinned to the bottom of the body via
+   `margin-top: auto`, with the description's bottom edge taking whatever
+   space is left between the desc end and this row. */
+.rbccm-featured-conferences__insight-meta {
+  align-items: center;
+  color: #0051A5;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  gap: 7px;
+  letter-spacing: -0.526px;
+  line-height: normal;
+  margin: auto 0 0 0;      /* push to bottom */
+color:rgb(0, 106, 195);
+cursor:pointer;
+font-family:Roboto, Arial, Verdana, sans-serif !important;
+font-size:14px;
+font-weight:600;
+line-height:20px;
 }

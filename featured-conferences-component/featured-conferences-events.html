@@ -22,17 +22,16 @@
          Overview body      : event_overview_body
          Key themes         : event_key_themes
          Contact            : event_overview_contact (default supplied)
-         Speakers           : event/speaker/author picks -> document() ->
-                              author DCR fields (name, title, subtitle, photo)
-         Insights           : event/insight/story picks -> document() ->
-                              story DCR fields (thumbnail, title, description,
-                              time_to_read / time_to_watch + story_type,
-                              subcategory, can_url)
+         Speakers           : event/speaker/speaker_* (denormalized name,
+                              title, company, image)
+         Insights           : event/insight/insight_* (denormalized title,
+                              description, image, type, read/watch time,
+                              subcategory, href)
 
-       document() note: picked paths start with '/' and are workarea-relative
-       (e.g. /templatedata/rbccm/authors/data/dave-mckay). If document()
-       cannot resolve them as-is in this environment, set the DocPathPrefix
-       Datum in Properties to the required prefix (no markup change needed). -->
+       Speakers/insights are NOT resolved via XSLT document() (the component-
+       skin sandbox blocks it). Instead the events DCR copies the picked
+       author/story fields into the event's speaker_* / insight_* fields at
+       edit time (AJAX), and this skin reads them directly - fully render-safe. -->
 
   <xsl:strip-space elements="*"/>
 
@@ -155,11 +154,6 @@
           <xsl:otherwise>https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
-      <!-- Prefix prepended to picked author/story paths before document().
-           Leave blank first; if speaker/insight content does not resolve,
-           set this to the base path document() needs in this environment. -->
-      <xsl:variable name="docPathPrefix" select="normalize-space(/Properties/Datum[@ID='DocPathPrefix'])"/>
 
       <!-- Section-level copy defaults (author-overridable in Properties). -->
       <xsl:variable name="ovHeading">
@@ -308,20 +302,22 @@
               </xsl:variable>
 
               <!-- Picked speakers / insights (non-empty browser picks only). -->
-              <!-- PHASE 1: speaker/insight rendering needs XSLT document(), which
-                   LiveSite component skins disable. Counts are forced to 0 so
-                   both tabs always show their "coming soon" state and no
-                   document() is ever referenced. Restore count(...) here when a
-                   supported author/story lookup mechanism is wired up. -->
-              <xsl:variable name="speakerCount" select="0"/>
-              <xsl:variable name="insightCount" select="0"/>
+              <!-- Speakers / insights are denormalized into the event by the
+                   events DCR's edit-time AJAX: when an author picks a speaker
+                   (author) or insight (story), its fields are copied into the
+                   event's speaker_* / insight_* auto fields. We read those
+                   directly here - no document(). A slot counts as populated when
+                   its denormalized name/title OR image is set. -->
+              <xsl:variable name="speakerNodes" select="speaker[normalize-space(speaker_name) != '' or normalize-space(speaker_image) != '']"/>
+              <xsl:variable name="speakerCount" select="count($speakerNodes)"/>
+              <xsl:variable name="insightNodes" select="insight[normalize-space(insight_title) != '' or normalize-space(insight_image) != '']"/>
+              <xsl:variable name="insightCount" select="count($insightNodes)"/>
 
               <xsl:variable name="spkFootnote">
                 <xsl:choose>
                   <xsl:when test="normalize-space(event_speakers_footnote) != ''">
                     <xsl:value-of select="normalize-space(event_speakers_footnote)"/>
                   </xsl:when>
-                  <xsl:when test="$speakerCount = 0">Speakers coming soon</xsl:when>
                   <xsl:otherwise>+ Additional speakers to be announced</xsl:otherwise>
                 </xsl:choose>
               </xsl:variable>
@@ -448,13 +444,25 @@
 
                     <div class="rbccm-featured-conferences__speakers">
                       <xsl:attribute name="id">rbccm-fc-speakers-<xsl:value-of select="$confKey"/></xsl:attribute>
-                      <!-- PHASE 1: speaker rendering via XSLT document() is
-                           removed - LiveSite component skins disable document()
-                           (the story DCR resolves authors with edit-time AJAX
-                           instead). With $speakerCount forced to 0 below, this
-                           slider is hidden and the "coming soon" footnote shows.
-                           Re-introduce author lookups via a supported mechanism
-                           when speakers are needed. -->
+                      <!-- One card per populated speaker, read from the
+                           denormalized speaker_* fields (no document()). -->
+                      <xsl:for-each select="$speakerNodes">
+                        <xsl:variable name="sFullTitle">
+                          <xsl:choose>
+                            <xsl:when test="normalize-space(speaker_title) != '' and normalize-space(speaker_company) != ''">
+                              <xsl:value-of select="concat(normalize-space(speaker_title), ', ', normalize-space(speaker_company))"/>
+                            </xsl:when>
+                            <xsl:when test="normalize-space(speaker_title) != ''"><xsl:value-of select="normalize-space(speaker_title)"/></xsl:when>
+                            <xsl:otherwise><xsl:value-of select="normalize-space(speaker_company)"/></xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:variable>
+                        <xsl:call-template name="render-speaker">
+                          <xsl:with-param name="name"  select="normalize-space(speaker_name)"/>
+                          <xsl:with-param name="title" select="$sFullTitle"/>
+                          <xsl:with-param name="image" select="normalize-space(speaker_image)"/>
+                          <xsl:with-param name="alt"   select="normalize-space(speaker_name)"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
                     </div>
 
                     <!-- Carousel controls (arrows + dots). JS toggles
@@ -523,13 +531,37 @@
                       <xsl:attribute name="id">rbccm-fc-insights-<xsl:value-of select="$confKey"/></xsl:attribute>
 
                       <div class="rbccm-featured-conferences__insights-row">
-                        <!-- PHASE 1: insight rendering via XSLT document() is
-                             removed - LiveSite component skins disable document()
-                             (the story DCR resolves articles with edit-time AJAX
-                             instead). With $insightCount forced to 0 below, this
-                             slider is hidden and the "coming soon" footnote shows.
-                             Re-introduce story lookups via a supported mechanism
-                             when insights are needed. -->
+                        <!-- One card per populated insight, read from the
+                             denormalized insight_* fields (no document()). Meta
+                             is "X read/watch/listen" derived from insight_type +
+                             read/watch time. -->
+                        <xsl:for-each select="$insightNodes">
+                          <xsl:variable name="iType" select="normalize-space(insight_type)"/>
+                          <xsl:variable name="iMeta">
+                            <xsl:choose>
+                              <xsl:when test="$iType = 'video' and normalize-space(insight_watchtime) != ''">
+                                <xsl:value-of select="concat(normalize-space(insight_watchtime), ' watch')"/>
+                              </xsl:when>
+                              <xsl:when test="$iType = 'audio' and normalize-space(insight_watchtime) != ''">
+                                <xsl:value-of select="concat(normalize-space(insight_watchtime), ' listen')"/>
+                              </xsl:when>
+                              <xsl:when test="normalize-space(insight_readtime) != ''">
+                                <xsl:value-of select="concat(normalize-space(insight_readtime), ' read')"/>
+                              </xsl:when>
+                              <xsl:otherwise></xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:variable>
+                          <xsl:call-template name="render-insight">
+                            <xsl:with-param name="mode"  select="'card'"/>
+                            <xsl:with-param name="label" select="normalize-space(insight_subcategory)"/>
+                            <xsl:with-param name="title" select="normalize-space(insight_title)"/>
+                            <xsl:with-param name="desc"  select="insight_description"/>
+                            <xsl:with-param name="meta"  select="$iMeta"/>
+                            <xsl:with-param name="image" select="normalize-space(insight_image)"/>
+                            <xsl:with-param name="alt"   select="normalize-space(insight_title)"/>
+                            <xsl:with-param name="href"  select="normalize-space(insight_href)"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
                       </div>
                     </div>
 
@@ -565,7 +597,7 @@
                     <!-- Empty insights: reuse the speakers-footnote styling
                          (centered muted text, divider suppressed) for parity
                          with the empty Speakers state. No new CSS needed. -->
-                    <p class="rbccm-featured-conferences__speakers-footnote" style="border-top: 0px;">Insights coming soon</p>
+                    <p class="rbccm-featured-conferences__speakers-footnote" style="border-top: 0px;">+ Insights coming soon</p>
                   </xsl:if>
                 </div>
 
@@ -724,13 +756,6 @@
   <!-- Minimum flagged events required to render. Production rule = 3
        (all three tabs or nothing). Set to 1 to test with partial data. -->
   <Datum ID="MinFeatured" Type="String" Name="Minimum Featured Events">1</Datum>
-
-  <!-- Prefix prepended to picked author/story paths before document().
-       Leave blank first. If speakers/insights render empty, the processor
-       cannot resolve the workarea-relative picks; set this to the base
-       path that works in this environment, e.g.
-       /iw-mount/default/main/internet/rbccm/WORKAREA/shared -->
-  <Datum ID="DocPathPrefix" Type="String" Name="Document Path Prefix"></Datum>
 </Properties>
 
 <Data>

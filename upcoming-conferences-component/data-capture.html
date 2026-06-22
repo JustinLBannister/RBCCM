@@ -12,8 +12,75 @@ dcr-validation="none" name="">
 <description>
 This form is used to define a list of events
 </description>
- 
- 
+
+<!-- ================================================================
+     Edit-time denormalization (mirrors the article/story DCR pattern).
+     When an author picks a Speaker (author record) or an Insight (story
+     record) inside an event, these handlers AJAX-load the picked record
+     and copy its fields into the event's read-only auto fields. The
+     Featured Conferences component then reads those fields directly at
+     render - no XSLT document() (which the component-skin sandbox blocks).
+     Includes are copied from the working story DCR. Net new: June 5, 2026.
+     ================================================================ -->
+<script language="javascript" src="/iw-cc/livesite/javascript/livesite-util.jsp"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/LiveSiteDataCapture.class.js"></script>
+<script language="javascript" src="/iw-mount/default/main/intranet/cmweb/WORKAREA/shared/assets/js/jquery-1.9.1.js"></script>
+<script>
+<![CDATA[
+  // Base workarea path that picked DCR paths are relative to (same as the
+  // story DCR's populateAuthorNew). Picked values look like
+  // /templatedata/rbccm/authors/data/<id> or /templatedata/article/story/data/...
+  var IW_SHARED = "/iw-mount/default/main/internet/rbccm/WORKAREA/shared";
+
+  // Speaker pick -> copy author fields into the sibling auto fields.
+  function populateSpeaker(item) {
+    var base = item.getName().replace(/author$/, "");
+    var url = IW_SHARED + item.getValue();
+    jQuery.ajax({ type: "GET", url: url, dataType: "xml", success: function (xml) {
+      var x = jQuery(xml);
+      IWDatacapture.getItem(base + "speaker_name").setValue(x.find("name").first().text());
+      IWDatacapture.getItem(base + "speaker_title").setValue(x.find("title").first().text());
+      IWDatacapture.getItem(base + "speaker_company").setValue(x.find("subtitle").first().text());
+      IWDatacapture.getItem(base + "speaker_image").setValue(x.find("photo").first().text());
+    }});
+  }
+
+  // Insight pick -> copy story fields into the sibling auto fields.
+  function populateInsight(item) {
+    var base = item.getName().replace(/story$/, "");
+    var url = IW_SHARED + item.getValue();
+    jQuery.ajax({ type: "GET", url: url, dataType: "xml", success: function (xml) {
+      var x = jQuery(xml);
+      IWDatacapture.getItem(base + "insight_title").setValue(x.find("title").first().text());
+      IWDatacapture.getItem(base + "insight_description").setValue(x.find("description").first().text());
+      IWDatacapture.getItem(base + "insight_image").setValue(x.find("thumbnail").first().text());
+      IWDatacapture.getItem(base + "insight_type").setValue(x.find("story_type").first().text());
+      IWDatacapture.getItem(base + "insight_readtime").setValue(x.find("time_to_read").first().text());
+      IWDatacapture.getItem(base + "insight_watchtime").setValue(x.find("time_to_watch").first().text());
+      IWDatacapture.getItem(base + "insight_subcategory").setValue(x.find("subcategory").first().text());
+      IWDatacapture.getItem(base + "insight_href").setValue(x.find("can_url").first().text());
+    }});
+  }
+
+  // Register the pick handlers. Events can hold up to 400 entries, but only a
+  // handful realistically carry speakers/insights, so we register handlers for
+  // the first 60 events (x5 speakers + x3 insights = 480 handlers) to keep
+  // editor init light. Bump EVENT_CAP if events beyond #60 need auto-fill.
+  var EVENT_CAP = 60;
+  IWEventRegistry.addFormHandler("onFormInit", function () {
+    for (var i = 1; i <= EVENT_CAP; i++) {
+      for (var s = 1; s <= 5; s++) {
+        IWEventRegistry.addItemHandler("/events/event[" + i + "]/speaker[" + s + "]/author", "onItemChange", populateSpeaker);
+      }
+      for (var n = 1; n <= 3; n++) {
+        IWEventRegistry.addItemHandler("/events/event[" + i + "]/insight[" + n + "]/story", "onItemChange", populateInsight);
+      }
+    }
+  });
+]]>
+</script>
+
+
 <root-container name="events" location="events">
  
 <item name="title" pathid="title">
@@ -146,33 +213,113 @@ This form is used to define a list of events
 <text required="f" size="80" maxlength="256" />
 </item>
 
+<item name="event_featured" pathid="event_featured">
+<label>Feature in Featured Conferences?</label>
+<description>Yes = this event appears as one of the 3 Featured Conferences tabs. The soonest 3 flagged events (by start date) are used. Not required - existing events without a value are simply not featured. Net new: June 5, 2026.</description>
+<radio required="f">
+  <option label="Yes" value="y"/>
+  <option label="No" value="n" selected="t" />
+</radio>
+</item>
+
 <!-- Featured Conferences - Speakers (repeating, up to 5).
-     Each speaker is a single pick from the author DCR. The XSL will
-     document() the picked file and pull the author's photo, name, title
-     (job title), and subtitle (company). 0 groups = Speakers tab hidden
-     or shows "Speakers coming soon". Net new: June 5, 2026. -->
+     Each speaker is a single pick from the author DCR (templatedata/rbccm/
+     authors/data). On pick, the denormalization <script> at the top of this
+     file copies the author's name / title / company / photo into the
+     read-only speaker_* fields below. DENORMALIZED = a point-in-time snapshot,
+     NOT a live link: editing the author later does not update this event until
+     the author is re-picked / re-saved here. The Featured Conferences
+     component reads the snapshot fields directly at render (no XSLT document(),
+     which the component-skin sandbox blocks). 0 speakers filled = Speakers tab
+     shows "+ Additional speakers to be announced". Net new: June 5, 2026. -->
 
 <container name="speaker" combination="and" max="5">
 
 <item name="author" pathid="author">
 <label>Speaker (pick author)</label>
-<description>Pick an author from templatedata/rbccm/authors/data. The speaker card displays the picked author's photo, name, title, and company. Guest/non-RBC speakers need to be added to the authors data first. Net new: June 5, 2026.</description>
+<description>Pick an author from templatedata/rbccm/authors/data. On pick, the name/title/company/photo fields below auto-fill from the author record. &lt;strong style='color: #f00;'&gt;Denormalized snapshot: a copy is saved here, so if this author's name, title, or photo changes later, re-pick (or re-save) this event to refresh it.&lt;/strong&gt; Net new: June 5, 2026.</description>
 <browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm" required="f" readonly="f" />
+</item>
+
+<!-- DENORMALIZED snapshot fields - auto-filled from the picked author by the
+     denormalization <script> at the top of this file when the author is
+     selected. Read-only: do not edit by hand; to refresh, re-pick the author.
+     The Featured Conferences component reads these directly at render, so no
+     XSLT document() is needed (the skin sandbox blocks document()). -->
+<item name="speaker_name" pathid="speaker_name">
+<label>Speaker Name (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="speaker_title" pathid="speaker_title">
+<label>Speaker Title (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="speaker_company" pathid="speaker_company">
+<label>Speaker Company (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="speaker_image" pathid="speaker_image">
+<label>Speaker Image (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
 </item>
 
 </container>
 
 <!-- Featured Conferences - Insights (repeating, up to 3).
-     Each insight is a single pick from the article/story DCR. The XSL
-     will document() the picked file and pull title, image, description,
-     and read-time. Net new: June 5, 2026. -->
+     Each insight is a single pick from the article/story DCR (templatedata/
+     article/story/data). On pick, the denormalization <script> at the top of
+     this file copies the article's title / description / image / type /
+     read-watch time / subcategory / link into the read-only insight_* fields
+     below. DENORMALIZED = a point-in-time snapshot, NOT a live link: editing
+     the article later does not update this event until the article is
+     re-picked / re-saved here. The Featured Conferences component reads the
+     snapshot fields directly at render (no XSLT document()). 0 insights filled
+     = Insights tab shows "+ Insights coming soon". Net new: June 5, 2026. -->
 
 <container name="insight" combination="and" max="3">
 
 <item name="story" pathid="story">
 <label>Insight Article</label>
-<description>Pick an article from templatedata/article/story/data. The Insights card displays the picked article's image, title, description, and read-time (single source of truth - if the article is edited later, the card updates automatically). Net new: June 5, 2026.</description>
+<description>Pick an article from templatedata/article/story/data. On pick, the fields below auto-fill from the article record. &lt;strong style='color: #f00;'&gt;Denormalized snapshot: a copy is saved here, so if this article's title, image, or summary changes later, re-pick (or re-save) this event to refresh it.&lt;/strong&gt; Net new: June 5, 2026.</description>
 <browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata/article" required="f" readonly="f" />
+</item>
+
+<!-- DENORMALIZED snapshot fields - auto-filled from the picked article by the
+     denormalization <script> at the top of this file when the article is
+     selected. Read-only: do not edit by hand; to refresh, re-pick the article.
+     The Featured Conferences component reads these directly at render, so no
+     XSLT document() is needed (the skin sandbox blocks document()). -->
+<item name="insight_title" pathid="insight_title">
+<label>Insight Title (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="insight_description" pathid="insight_description">
+<label>Insight Description (auto)</label>
+<text required="f" size="80" maxlength="512" readonly="t" />
+</item>
+<item name="insight_image" pathid="insight_image">
+<label>Insight Image (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="insight_type" pathid="insight_type">
+<label>Insight Type (auto)</label>
+<text required="f" size="20" maxlength="32" readonly="t" />
+</item>
+<item name="insight_readtime" pathid="insight_readtime">
+<label>Insight Read Time (auto)</label>
+<text required="f" size="20" maxlength="32" readonly="t" />
+</item>
+<item name="insight_watchtime" pathid="insight_watchtime">
+<label>Insight Watch/Listen Time (auto)</label>
+<text required="f" size="20" maxlength="32" readonly="t" />
+</item>
+<item name="insight_subcategory" pathid="insight_subcategory">
+<label>Insight Eyebrow / Subcategory (auto)</label>
+<text required="f" size="50" maxlength="256" readonly="t" />
+</item>
+<item name="insight_href" pathid="insight_href">
+<label>Insight Link (auto)</label>
+<text required="f" size="80" maxlength="512" readonly="t" />
 </item>
 
 </container>
