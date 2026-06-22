@@ -38,14 +38,37 @@
 
   <xsl:template match="/">
 
-    <!-- Featured events: flagged conference events from the Events List. -->
-    <xsl:variable name="featuredEvents" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
-        normalize-space(event_featured) = 'y']"/>
+    <!-- All events in the centralized feed (binding sanity check). -->
+    <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
+
+    <!-- Featured events: flag accepts y / yes / true / 1, any case, so the
+         exact stored radio value does not matter. -->
+    <xsl:variable name="featuredEvents" select="$allEvents[
+        contains('|y|yes|true|1|', concat('|', translate(normalize-space(event_featured), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '|'))
+        and normalize-space(event_featured) != '']"/>
     <xsl:variable name="featuredCount" select="count($featuredEvents)"/>
 
-    <!-- Render gate: at least 3 flagged. The soonest 3 (by event_date) are
-         used; flagging a 4th does not break anything, it just is not shown. -->
-    <xsl:if test="$featuredCount &gt;= 3">
+    <!-- Always-emitted debug marker (visible only in page source).
+         totalEvents=0  -> the Events List DCR is not binding to this component
+         featured=0     -> binding OK but no event matched the featured flag
+         featured&lt;min -> not enough events flagged to pass the render gate -->
+    <xsl:comment> rbccm-fc-events debug: totalEvents=<xsl:value-of select="count($allEvents)"/> featured=<xsl:value-of select="$featuredCount"/> </xsl:comment>
+
+    <!-- Minimum flagged events required to render. Default 1 (render whatever
+         is flagged - the soonest 3 at most). Set the MinFeatured Properties
+         Datum to 3 to restore the strict "all three tabs or nothing" rule. -->
+    <xsl:variable name="minFeatured">
+      <xsl:choose>
+        <xsl:when test="normalize-space(/Properties/Datum[@ID='MinFeatured']) != ''">
+          <xsl:value-of select="normalize-space(/Properties/Datum[@ID='MinFeatured'])"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Render gate. The soonest 3 (by event_date) are shown at most;
+         flagging a 4th does not break anything, it just is not shown. -->
+    <xsl:if test="$featuredCount &gt;= number($minFeatured)">
 
       <!-- == Heading == -->
       <xsl:variable name="heading">
@@ -467,11 +490,11 @@
                   </p>
                 </div>
 
-                <!-- INNER TAB + PANEL: INSIGHTS. Rendered only when at least
-                     one insight article is picked. All cards standard (the
-                     events DCR caps insights at 3; the featured tile layout
-                     requires 4). -->
-                <xsl:if test="$insightCount &gt; 0">
+                <!-- INNER TAB + PANEL: INSIGHTS.
+                     Always rendered. With 0 picks: the slider is inline-hidden
+                     and an "Insights coming soon" message shows (mirrors the
+                     empty Speakers treatment). All cards standard (the events
+                     DCR caps insights at 3; the featured tile layout needs 4). -->
                 <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false">
                   <xsl:attribute name="data-inner"><xsl:value-of select="$confKey"/>-insights</xsl:attribute>
                   <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
@@ -486,6 +509,9 @@
                     <xsl:attribute name="data-conf"><xsl:value-of select="$confKey"/></xsl:attribute>
                     <xsl:if test="$ariaInsightsCarouselLabel != ''">
                       <xsl:attribute name="aria-label"><xsl:value-of select="$ariaInsightsCarouselLabel"/></xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="$insightCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
                     </xsl:if>
 
                     <div class="rbccm-featured-conferences__insights">
@@ -570,8 +596,13 @@
                       </button>
                     </div>
                   </div>
+                  <xsl:if test="$insightCount = 0">
+                    <!-- Empty insights: reuse the speakers-footnote styling
+                         (centered muted text, divider suppressed) for parity
+                         with the empty Speakers state. No new CSS needed. -->
+                    <p class="rbccm-featured-conferences__speakers-footnote" style="border-top: 0px;">Insights coming soon</p>
+                  </xsl:if>
                 </div>
-                </xsl:if><!-- /insights present -->
 
                 </div><!-- /.inner-wrap -->
               </div>
@@ -724,6 +755,10 @@
 
   <!-- Fallback poster/image for any event with no image of its own -->
   <Datum ID="DefaultPoster" Type="String" Name="Default Poster / Image">https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</Datum>
+
+  <!-- Minimum flagged events required to render. Production rule = 3
+       (all three tabs or nothing). Set to 1 to test with partial data. -->
+  <Datum ID="MinFeatured" Type="String" Name="Minimum Featured Events">1</Datum>
 
   <!-- Prefix prepended to picked author/story paths before document().
        Leave blank first. If speakers/insights render empty, the processor
