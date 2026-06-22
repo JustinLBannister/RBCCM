@@ -197,8 +197,8 @@ This form is used to define a list of events
 
 <item name="event_key_themes" pathid="event_key_themes">
 <label>Key Themes (pipe-separated)</label>
-<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
+<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026. Up to 512 characters.</description>
+<text required="f" size="80" maxlength="512" />
 </item>
 
 <item name="event_overview_contact" pathid="event_overview_contact">
@@ -233,7 +233,7 @@ This form is used to define a list of events
      which the component-skin sandbox blocks). 0 speakers filled = Speakers tab
      shows "+ Additional speakers to be announced". Net new: June 5, 2026. -->
 
-<container name="speaker" combination="and" max="5">
+<container name="speaker" location="speaker" combination="and" max="5">
 
 <item name="author" pathid="author">
 <label>Speaker (pick author)</label>
@@ -276,7 +276,7 @@ This form is used to define a list of events
      snapshot fields directly at render (no XSLT document()). 0 insights filled
      = Insights tab shows "+ Insights coming soon". Net new: June 5, 2026. -->
 
-<container name="insight" combination="and" max="3">
+<container name="insight" location="insight" combination="and" max="3">
 
 <item name="story" pathid="story">
 <label>Insight Article</label>
