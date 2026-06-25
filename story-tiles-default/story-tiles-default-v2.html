@@ -1,0 +1,1118 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- v2 stylesheet declared as 2.0 to match the skin's XSLT 2.0 rendering mode.
+     Was version="1.0" in v1, which forced the 2.0 engine into backwards-compat
+     mode and triggered the xs:double vs xs:string type error in PUBLISH_DATE. -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: default -->
+
+  <!-- Explicit HTML output method so void elements (<img>, <br>) serialise
+       as proper HTML 5 instead of XML self-closing form. -->
+  <xsl:output method="html" indent="no" />
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+
+  <xsl:variable name="FLAG_TILE_BG_WHITE" select="/Properties/Datum[@ID='TileBG'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_PLAY_BUTTON" select="/Properties/Datum[@ID='ShowPlayButton'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_SUBCAT" select="/Properties/Datum[@ID='ShowSubCat'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_YELLOW_LINE" select="/Properties/Datum[@ID='ShowYellowLine'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_DATE" select="/Properties/Datum[@ID='ShowDate'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_AUTHOR" select="/Properties/Datum[@ID='ShowAuthor'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_TITLE" select="/Properties/Datum[@ID='ShowTitle'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_DESC" select="/Properties/Datum[@ID='ShowDesc'] = 'true'" />
+  <xsl:variable name="FLAG_READWATCH_ICONS" select="/Properties/Datum[@ID='ReadWatchIcons'] = 'true'" />
+  <xsl:variable name="FLAG_OPEN_LINK_NEW_TAB" select="/Properties/Datum[@ID='OpenLinkInSamePage'] = 'false'" />
+  <xsl:variable name="FLAG_READWATCH_MIN" select="/Properties/Datum[@ID='ReadWatchMin'] = 'true'" />
+  <xsl:variable name="FLAG_CONTAINER" select="/Properties/Datum[@ID='Container'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_COMPONENT_HIDDEN" select="/Properties/Datum[@ID='ShowComponent'] = 'false'" />
+  <xsl:variable name="CFG_EYEBROW_DISPLAY" select="string(/Properties/Datum[@Name='Eyebrow display']/Option[@Selected='true']/Value)" />
+  <xsl:variable name="CFG_CUSTOM_TAG" select="/Properties/Datum[@ID='CustomTag']" />
+  <xsl:variable name="FLAG_DISPLAY_BOTH_CTA" select="/Properties/Datum[@ID='DisplayBothCTA'] = 'true'" />
+  <!-- v2: explicit number() cast so 2.0 strict-mode comparisons against
+       string-length() succeed without xs:double vs xs:string errors. -->
+  <xsl:variable name="CFG_CHARACTER_LIMIT" select="number(/Properties/Datum[@ID='CharacterLimit'])" />
+  <xsl:variable name="CFG_CONTAINER_ID" select="/Properties/Data/Datum[@ID='ContainerID']" />
+  <xsl:variable name="CFG_BEFORE_TEXT" select="/Properties/Data/Datum[@ID='before-text']" />
+  <xsl:variable name="CFG_AFTER_TEXT" select="/Properties/Data/Datum[@ID='after-text']" />
+
+  <!-- v2 Load-More feature: rolls "See more" / "More insights" buttons + the
+       previously-hidden follow-up tile component into this single component. -->
+  <xsl:variable name="FLAG_ENABLE_LOAD_MORE" select="/Properties/Datum[@ID='EnableLoadMore'] = 'true'" />
+  <xsl:variable name="CFG_INITIAL_VISIBLE" select="number(/Properties/Datum[@ID='InitialVisibleCount'])" />
+  <xsl:variable name="CFG_SEE_MORE_TEXT" select="/Properties/Datum[@ID='SeeMoreText']" />
+  <xsl:variable name="CFG_SEE_MORE_CLASS" select="/Properties/Datum[@ID='SeeMoreClass']" />
+  <xsl:variable name="CFG_AFTER_LOAD_TEXT" select="/Properties/Datum[@ID='AfterLoadButtonText']" />
+  <xsl:variable name="CFG_AFTER_LOAD_HREF" select="/Properties/Datum[@ID='AfterLoadButtonHref']" />
+  <xsl:variable name="CFG_AFTER_LOAD_CLASS" select="/Properties/Datum[@ID='AfterLoadButtonClass']" />
+
+
+  <xsl:template name="TILE_COLOUR_CLASS">
+    <xsl:param name="article_type" />
+    <xsl:choose>
+      <xsl:when test="$FLAG_TILE_BG_WHITE">tile--white</xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$article_type = 'text'">tile--white</xsl:when>
+          <xsl:when test="$article_type = 'video'">tile--lt-blue</xsl:when>
+          <xsl:when test="$article_type = 'audio'">tile--white</xsl:when>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template name="IMAGE_ALIGNMENT_STYLE">
+    <xsl:choose>
+      <xsl:when test="./Datum[@Name='Image alignment']/Option[@Selected='true']/Value = 'center'">background-position: center;</xsl:when>
+      <xsl:when test="./Datum[@Name='Image alignment']/Option[@Selected='true']/Value = 'left'">background-position: left;</xsl:when>
+      <xsl:when test="./Datum[@Name='Image alignment']/Option[@Selected='true']/Value = 'right'">background-position: right;</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template name="PLAY_BUTTON">
+    <xsl:param name="article_type" />
+    <!-- v2: <em> changed to <i> for FontAwesome convention + valid HTML 5 semantics. -->
+    <xsl:if test="$article_type = 'video' and $FLAG_SHOW_PLAY_BUTTON">
+      <div class="play-overlay-sm">
+        <i class="fa fa-play" aria-hidden="true">&nbsp;</i>
+      </div>
+    </xsl:if>
+    <xsl:if test="$article_type = 'audio' and $FLAG_SHOW_PLAY_BUTTON">
+      <div class="play-overlay-sm">
+        <i class="fa fa-microphone" aria-hidden="true">&nbsp;</i>
+      </div>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="LINK_TARGET_ATTRIBUTES">
+    <xsl:if test="$FLAG_READWATCH_ICONS">
+      <xsl:attribute name="target">_blank</xsl:attribute>
+    </xsl:if>
+    <xsl:if test="$FLAG_OPEN_LINK_NEW_TAB">
+      <xsl:attribute name="target">_blank</xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="IMAGE_BLOCK">
+    <xsl:param name="article_thumbnail" />
+    <xsl:param name="article_type" />
+    <xsl:variable name="IMAGE_DESCRIPTION">
+      <xsl:choose>
+        <xsl:when test="normalize-space(./Datum[@ID='ATM-4']) != ''">
+          <xsl:value-of select="normalize-space(./Datum[@ID='ATM-4'])" />
+        </xsl:when>
+        <xsl:when test="normalize-space(./Datum[@Name='Image Description']) != ''">
+          <xsl:value-of select="normalize-space(./Datum[@Name='Image Description'])" />
+        </xsl:when>
+        <xsl:otherwise />
+      </xsl:choose>
+    </xsl:variable>
+    <div class="img-stretch">
+      <xsl:attribute name="style">background-image: url('<xsl:value-of select="$article_thumbnail" />'); <xsl:call-template name="IMAGE_ALIGNMENT_STYLE" /></xsl:attribute>
+      <xsl:if test="normalize-space($IMAGE_DESCRIPTION) != ''">
+        <xsl:attribute name="role">img</xsl:attribute>
+        <xsl:attribute name="aria-label"><xsl:value-of select="$IMAGE_DESCRIPTION" /></xsl:attribute>
+      </xsl:if>
+      <xsl:call-template name="PLAY_BUTTON">
+        <xsl:with-param name="article_type" select="$article_type" />
+      </xsl:call-template>
+      <div class="tile-overlay"></div>
+    </div><!--end img-stretch-->
+  </xsl:template>
+
+
+  <xsl:template name="EYEBROW">
+    <xsl:param name="article_date" />
+    <xsl:param name="article_subcategory" />
+    <xsl:if test="$FLAG_SHOW_SUBCAT">
+      <p class="uppercase wide-text">
+        <!-- v2: compare to string literals '1'/'2' (Option Values are strings). -->
+        <xsl:choose>
+          <xsl:when test="$CFG_EYEBROW_DISPLAY = '2'">
+            <xsl:call-template name="PUBLISH_DATE">
+              <xsl:with-param name="publish_date" select="$article_date" />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$CFG_EYEBROW_DISPLAY = '1'">
+            <xsl:value-of select="$article_subcategory" disable-output-escaping="yes" />
+          </xsl:when>
+        </xsl:choose>
+      </p>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="TILE_METADATA">
+    <xsl:param name="article_date" />
+    <xsl:param name="author_name" />
+    <xsl:param name="show_yellow_line">true</xsl:param>
+    <xsl:if test="$show_yellow_line = 'true' and $FLAG_SHOW_YELLOW_LINE">
+      <div class="yellow-line-sm">&nbsp;</div>
+    </xsl:if>
+    <xsl:if test="$FLAG_SHOW_DATE">
+      <p class="date">
+        <xsl:call-template name="PUBLISH_DATE">
+          <xsl:with-param name="publish_date" select="$article_date" />
+        </xsl:call-template>
+      </p>
+    </xsl:if>
+    <xsl:if test="normalize-space($author_name) != '' and $FLAG_SHOW_AUTHOR">
+      <xsl:choose>
+        <xsl:when test="normalize-space($author_name) = 'RBC Capital Markets LLC'" />
+        <xsl:otherwise>
+          <p class="author" style="margin-bottom:10px;">
+            <xsl:choose>
+              <xsl:when test="normalize-space($author_name) = 'The Big Deal Podcast'" />
+              <xsl:otherwise>By </xsl:otherwise>
+            </xsl:choose>
+            <!-- v2: <object alt> was invalid HTML 5. Replaced with <span> wrapper. -->
+            <span>
+              <a>
+                <xsl:attribute name="href">/en/insights?author=<xsl:value-of select="$author_name" disable-output-escaping="yes" /></xsl:attribute>
+                <xsl:attribute name="aria-label">More from <xsl:value-of select="$author_name" disable-output-escaping="yes" /></xsl:attribute>
+                <xsl:value-of select="$author_name" disable-output-escaping="yes" />
+              </a>
+            </span>
+          </p>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="TILE_TITLE">
+    <xsl:param name="heading_level">h2</xsl:param>
+    <xsl:param name="overwrite_title" />
+    <xsl:param name="article_title" />
+    <xsl:param name="article_title_manual" />
+    <xsl:if test="$FLAG_SHOW_TITLE">
+      <xsl:element name="{$heading_level}">
+        <xsl:choose>
+          <xsl:when test="normalize-space($overwrite_title) = 'Yes'">
+            <xsl:value-of select="$article_title_manual" disable-output-escaping="yes" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$article_title" disable-output-escaping="yes" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:element>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="DESCRIPTION">
+    <xsl:param name="desc_class">description</xsl:param>
+    <xsl:param name="overwrite_title" />
+    <xsl:param name="article_desc_manual" />
+    <xsl:param name="article_description" />
+    <xsl:param name="character_limit" />
+    <xsl:if test="$FLAG_SHOW_DESC">
+      <p class="{$desc_class}">
+        <!-- Resolve the source text: manual override or DCR description -->
+        <xsl:variable name="desc_text">
+          <xsl:choose>
+            <xsl:when test="normalize-space($overwrite_title) = 'Yes'">
+              <xsl:value-of select="$article_desc_manual" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$article_description" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <!-- Output truncated or full description.
+             v2: '>' escaped to '&gt;' in test attribute, and $character_limit
+             is now pre-cast to number() at the top of the stylesheet. -->
+        <xsl:choose>
+          <xsl:when test="string-length($desc_text) &gt; $character_limit">
+            <xsl:for-each select="tokenize(substring($desc_text, 0, $character_limit), ' ')">
+              <xsl:if test="position() != last()">
+                <xsl:if test="position() != 1"><xsl:text> </xsl:text></xsl:if>
+                <xsl:choose>
+                  <!-- Strip trailing comma from the last visible word -->
+                  <xsl:when test="position() = last()-1">
+                    <xsl:choose>
+                      <xsl:when test="substring(normalize-space(.), string-length(normalize-space(.)), 1) = ','">
+                        <xsl:value-of select="substring(normalize-space(.), 1, string-length(normalize-space(.)) - 1)" disable-output-escaping="yes" />
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="." disable-output-escaping="yes" />
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="." disable-output-escaping="yes" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+            ...
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$desc_text" disable-output-escaping="yes" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </p>
+    </xsl:if>
+  </xsl:template>
+
+
+  <xsl:template name="CTA">
+    <xsl:param name="article_type" />
+    <xsl:param name="article_readtime" />
+    <xsl:param name="article_watchtime" />
+    <xsl:param name="read_icon" />
+    <xsl:param name="watch_icon" />
+    <xsl:param name="listen_icon" />
+    <xsl:param name="allow_icons_option">true</xsl:param>
+    <!-- When CustomTag is set AND DisplayBothCTA=true, render it as a <p> above the div -->
+    <xsl:if test="normalize-space($CFG_CUSTOM_TAG) != '' and $FLAG_DISPLAY_BOTH_CTA">
+      <p class="learn-more">
+        <xsl:value-of select="$CFG_CUSTOM_TAG" disable-output-escaping="yes" />
+      </p>
+    </xsl:if>
+    <div class="learn-more">
+      <xsl:choose>
+        <!-- Priority 1: Custom tag only (no time) -->
+        <xsl:when test="normalize-space($CFG_CUSTOM_TAG) != '' and not($FLAG_DISPLAY_BOTH_CTA)">
+          <span>
+            <xsl:value-of select="$CFG_CUSTOM_TAG" disable-output-escaping="yes" />
+          </span>
+        </xsl:when>
+        <!-- Priority 2: Icon-based read/watch/listen time display -->
+        <xsl:when test="$allow_icons_option = 'true' and $FLAG_READWATCH_ICONS">
+          <div class="read-watch">
+            <xsl:if test="$article_watchtime != ''">
+              <xsl:choose>
+                <xsl:when test="$article_type = 'video'">
+                  <img src="{$watch_icon}" alt="Watch Time" />
+                  <span style="flex-shrink:0;">&nbsp;<xsl:value-of select="$article_watchtime" /></span>
+                </xsl:when>
+                <xsl:otherwise>
+                  <img src="{$listen_icon}" alt="Listen Time" />
+                  <span style="flex-shrink:0;">&nbsp;<xsl:value-of select="$article_watchtime" /></span>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+            <xsl:if test="($article_readtime != '') and ($article_watchtime != '')">
+              <span class="separator" role="presentation"></span>
+            </xsl:if>
+            <xsl:if test="$article_readtime != ''">
+              <img src="{$read_icon}" alt="Read Time" />
+              <span style="flex-shrink:0;">&nbsp;<xsl:value-of select="$article_readtime" /></span>
+            </xsl:if>
+          </div>
+        </xsl:when>
+        <!-- Priority 3: Plain text time label or Download fallback -->
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$article_type = 'text'">
+              <span><xsl:value-of select="$article_readtime" /> read </span>
+            </xsl:when>
+            <xsl:when test="$article_type = 'video'">
+              <span><xsl:value-of select="$article_watchtime" /> watch </span>
+            </xsl:when>
+            <xsl:when test="$article_type = 'audio'">
+              <span>
+                <xsl:choose>
+                  <!-- Show listen time if available (works for both "5 min" and shortened "5m") -->
+                  <xsl:when test="$article_watchtime != ''">
+                    <xsl:value-of select="$article_watchtime" /> listen
+                  </xsl:when>
+                  <xsl:otherwise>Download</xsl:otherwise>
+                </xsl:choose>
+              </span>
+            </xsl:when>
+            <xsl:otherwise>Download</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </div>
+  </xsl:template>
+
+
+  <!-- ============================================================
+       MAIN TEMPLATE
+       ============================================================ -->
+  <xsl:template match="/">
+    <xsl:variable name="ARTICLES" select="/Properties/Data/Group[@Name='Story Tile']" />
+
+    <!-- Component styling variables -->
+    <xsl:variable name="CUSTOMBGCOLOUR" select="/Properties/Datum[@ID='bgcolour']" />
+    <xsl:variable name="PADDING" select="/Properties/Datum[@ID='Padding']" />
+
+    <!-- Outer wrapper: custom background + vertical padding -->
+    <div style="background: {$CUSTOMBGCOLOUR}; padding: {$PADDING} 0px;">
+      <!-- Inner container: ID defaults to 'mainContent' unless overridden by CMS -->
+      <div>
+        <xsl:attribute name="id">
+          <xsl:choose>
+            <xsl:when test="$CFG_CONTAINER_ID != ''">
+              <xsl:value-of select="$CFG_CONTAINER_ID" />
+            </xsl:when>
+            <xsl:otherwise>mainContent</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name="class">story-tiles <xsl:if test="$FLAG_CONTAINER">container</xsl:if>
+          <xsl:if test="$FLAG_SHOW_COMPONENT_HIDDEN"> story-tiles-archive</xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="style">
+          <xsl:if test="$FLAG_SHOW_COMPONENT_HIDDEN">display: none;</xsl:if>
+        </xsl:attribute>
+
+        <!-- Optional raw HTML injected before the tile grid -->
+        <xsl:if test="normalize-space($CFG_BEFORE_TEXT) != ''">
+          <xsl:value-of select="$CFG_BEFORE_TEXT" disable-output-escaping="yes" />
+        </xsl:if>
+
+        <!-- Bootstrap row containing all article tile columns.
+             v2: when load-more is enabled AND there are more articles than
+             the initial visible count, mark the row with data-load-more so
+             the inline JS at the bottom binds a click handler to this
+             specific instance only (multiple instances per page work). -->
+        <div class="row story-tile-row">
+          <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
+            <xsl:attribute name="data-load-more">true</xsl:attribute>
+          </xsl:if>
+          <xsl:for-each select="$ARTICLES">
+            <xsl:variable name="ARTICLE_DCR" select="./Datum[@Name='Source DCR']/DCR/press_release" />
+
+            <xsl:if test="$ARTICLE_DCR">
+              <!-- Per-article content variables from the linked Source DCR -->
+              <xsl:variable name="ARTICLE_TITLE" select="$ARTICLE_DCR/title" />
+              <xsl:variable name="ARTICLE_TITLE_MANUAL" select="./Datum[@Name='Manual Article Title']" />
+              <xsl:variable name="OVERWRITE_TITLE" select="./Datum[@Name='Overwrite Title']/Option[@Selected='true']/Value" />
+              <xsl:variable name="ARTICLE_DESCRIPTION" select="$ARTICLE_DCR/description" />
+              <xsl:variable name="ARTICLE_DESC_MANUAL" select="./Datum[@Name='Manual Article Description']" />
+              <xsl:variable name="ARTICLE_DATE" select="$ARTICLE_DCR/publish_date" />
+              <xsl:variable name="ARTICLE_THUMBNAIL" select="$ARTICLE_DCR/thumbnail" />
+              <xsl:variable name="ARTICLE_LINK" select="./Datum[@Name='Link']" />
+              <xsl:variable name="CAPTIVATE_ID" select="normalize-space(./Datum[@Name='Captivate ID'])" />
+              <xsl:variable name="ARTICLE_TYPE" select="$ARTICLE_DCR/story_type" />
+              <xsl:variable name="ARTICLE_SUBCATEGORY" select="$ARTICLE_DCR/subcategory" />
+
+              <!-- Read/watch time: shorten ' min' to 'm' when ReadWatchMin=true -->
+              <xsl:variable name="ARTICLE_READTIME">
+                <xsl:choose>
+                  <xsl:when test="$FLAG_READWATCH_MIN">
+                    <xsl:value-of select="replace($ARTICLE_DCR/time_to_read, ' min', 'm')" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$ARTICLE_DCR/time_to_read" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="ARTICLE_WATCHTIME">
+                <xsl:choose>
+                  <xsl:when test="$FLAG_READWATCH_MIN">
+                    <xsl:value-of select="replace($ARTICLE_DCR/time_to_watch, ' min', 'm')" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$ARTICLE_DCR/time_to_watch" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <xsl:variable name="ARTICLE_SPAN" select="./Datum[@Name='Span width']/Option[@Selected='true']/Value" />
+              <xsl:variable name="AUTHOR_NAME" select="$ARTICLE_DCR/author_name" />
+
+              <!-- Icon URLs: white variant used when the tile has no forced white background.
+                   v2: cleaned up paste artifacts (Outlook safelinks) that had mangled
+                   these <xsl:when> blocks into broken markdown link syntax. -->
+              <xsl:variable name="READ_ICON">
+                <xsl:choose>
+                  <xsl:when test="$ARTICLE_TYPE = 'video' and not($FLAG_TILE_BG_WHITE)">https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-white.svg</xsl:when>
+                  <xsl:otherwise>https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon.svg</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="WATCH_ICON">
+                <xsl:choose>
+                  <xsl:when test="$ARTICLE_TYPE = 'video' and not($FLAG_TILE_BG_WHITE)">https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-white.svg</xsl:when>
+                  <xsl:otherwise>https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon.svg</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="LISTEN_ICON">
+                <xsl:choose>
+                  <xsl:when test="$ARTICLE_TYPE = 'audio'">https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm.svg</xsl:when>
+                  <xsl:otherwise></xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- Tile column wrapper
+                   Bootstrap column class is assigned from the selected CMS span:
+                   col-sm-8 -> span 1/8/8h | col-md-4 -> span 4/4f/4o | col-sm-6 -> span 6/6o/6f
+                   no extra class -> full-row spans such as 12, 12r, 12L. -->
+              <div>
+                <xsl:attribute name="class"> col-xs-12 <xsl:choose>
+                    <xsl:when test="$ARTICLE_SPAN = '1' or $ARTICLE_SPAN = '8' or $ARTICLE_SPAN = '8h'">col-sm-8 </xsl:when>
+                    <xsl:when test="$ARTICLE_SPAN = '4' or $ARTICLE_SPAN = '4f' or $ARTICLE_SPAN = '4o'">col-md-4 </xsl:when>
+                    <xsl:when test="$ARTICLE_SPAN = '6' or $ARTICLE_SPAN = '6o' or $ARTICLE_SPAN = '6f'">col-sm-6 </xsl:when>
+                  </xsl:choose>
+                </xsl:attribute>
+                <!-- v2: hide articles past the initial visible count when
+                     load-more is on. Using the native HTML 5 [hidden]
+                     attribute means no CSS dependency — browsers apply
+                     display:none automatically. JS removes the attribute. -->
+                <xsl:if test="$FLAG_ENABLE_LOAD_MORE and position() &gt; $CFG_INITIAL_VISIBLE">
+                  <xsl:attribute name="hidden">hidden</xsl:attribute>
+                  <xsl:attribute name="data-hidden-by-loadmore">true</xsl:attribute>
+                </xsl:if>
+
+                <xsl:choose>
+
+                  <!-- ── SPAN 4 / 8 / 6 : Standard card (image top, text bottom) ──────────────
+                       Note: eyebrow is kept inline because when ShowTitle=false it displays
+                       the article title in the eyebrow position — unique to this variant. -->
+                  <xsl:when test="$ARTICLE_SPAN = '4' or $ARTICLE_SPAN = '8' or $ARTICLE_SPAN = '6'">
+                    <div class="story-card story-card--vertical">
+                      <a>
+                        <xsl:attribute name="class"> white-box tile--news tile--gib tile
+                          <xsl:call-template name="TILE_COLOUR_CLASS">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                          </xsl:call-template>
+                        </xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK" /></xsl:attribute>
+                        <xsl:call-template name="LINK_TARGET_ATTRIBUTES" />
+                        <xsl:call-template name="IMAGE_BLOCK">
+                          <xsl:with-param name="article_thumbnail" select="$ARTICLE_THUMBNAIL" />
+                          <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                        </xsl:call-template>
+                        <div class="text-wrapper">
+                          <div class="white-box-text">
+                            <!-- Eyebrow: when ShowTitle=true show subcategory/date;
+                                 when ShowTitle=false use this row to show the article title -->
+                            <p class="uppercase wide-text">
+                              <xsl:choose>
+                                <xsl:when test="$FLAG_SHOW_TITLE">
+                                  <xsl:if test="$FLAG_SHOW_SUBCAT">
+                                    <xsl:choose>
+                                      <xsl:when test="$CFG_EYEBROW_DISPLAY = '2'">
+                                        <xsl:call-template name="PUBLISH_DATE">
+                                          <xsl:with-param name="publish_date" select="$ARTICLE_DATE" />
+                                        </xsl:call-template>
+                                      </xsl:when>
+                                      <xsl:when test="$CFG_EYEBROW_DISPLAY = '1'">
+                                        <xsl:value-of select="$ARTICLE_SUBCATEGORY" disable-output-escaping="yes" />
+                                      </xsl:when>
+                                    </xsl:choose>
+                                  </xsl:if>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:choose>
+                                    <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes'">
+                                      <xsl:value-of select="$ARTICLE_TITLE_MANUAL" disable-output-escaping="yes" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                      <xsl:value-of select="$ARTICLE_TITLE" disable-output-escaping="yes" />
+                                    </xsl:otherwise>
+                                  </xsl:choose>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </p>
+
+                            <xsl:call-template name="TILE_METADATA">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="author_name" select="$AUTHOR_NAME" />
+                            </xsl:call-template>
+
+                            <xsl:call-template name="TILE_TITLE">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_title" select="$ARTICLE_TITLE" />
+                              <xsl:with-param name="article_title_manual" select="$ARTICLE_TITLE_MANUAL" />
+                            </xsl:call-template>
+
+                            <xsl:call-template name="DESCRIPTION">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_desc_manual" select="$ARTICLE_DESC_MANUAL" />
+                              <xsl:with-param name="article_description" select="$ARTICLE_DESCRIPTION" />
+                              <xsl:with-param name="character_limit" select="$CFG_CHARACTER_LIMIT" />
+                            </xsl:call-template>
+                          </div><!--end white-box-text-->
+                          <xsl:call-template name="CTA">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                            <xsl:with-param name="article_readtime" select="$ARTICLE_READTIME" />
+                            <xsl:with-param name="article_watchtime" select="$ARTICLE_WATCHTIME" />
+                            <xsl:with-param name="read_icon" select="$READ_ICON" />
+                            <xsl:with-param name="watch_icon" select="$WATCH_ICON" />
+                            <xsl:with-param name="listen_icon" select="$LISTEN_ICON" />
+                          </xsl:call-template>
+                        </div>
+                      </a>
+                      <xsl:if test="$CAPTIVATE_ID != ''">
+                        <div class="story-card__footer">
+                          <button type="button"
+                                  class="btn"
+                                  data-captivate-id="{$CAPTIVATE_ID}">
+                            <xsl:attribute name="aria-label">
+                              <xsl:choose>
+                                <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes' and normalize-space($ARTICLE_TITLE_MANUAL) != ''">Play <xsl:value-of select="$ARTICLE_TITLE_MANUAL" /> episode</xsl:when>
+                                <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                                <xsl:otherwise>Play episode</xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            Play episode
+                          </button>
+                        </div>
+                      </xsl:if>
+                    </div>
+                  </xsl:when>
+
+
+                  <!-- ── SPAN 1 / 4f : Feature tile (full-bleed image + gradient overlay) -->
+                  <xsl:when test="$ARTICLE_SPAN = '1' or $ARTICLE_SPAN = '4f'">
+                    <div class="story-card story-card--feature">
+                      <a>
+                        <xsl:attribute name="class">white-box tile--news tile--gib tile--feature</xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK" /></xsl:attribute>
+                        <xsl:call-template name="LINK_TARGET_ATTRIBUTES" />
+                        <xsl:call-template name="IMAGE_BLOCK">
+                          <xsl:with-param name="article_thumbnail" select="$ARTICLE_THUMBNAIL" />
+                          <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                        </xsl:call-template>
+                        <div class="text-wrapper">
+                          <div class="white-box-text">
+                            <xsl:call-template name="EYEBROW">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="article_subcategory" select="$ARTICLE_SUBCATEGORY" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_METADATA">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="author_name" select="$AUTHOR_NAME" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_TITLE">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_title" select="$ARTICLE_TITLE" />
+                              <xsl:with-param name="article_title_manual" select="$ARTICLE_TITLE_MANUAL" />
+                            </xsl:call-template>
+                            <xsl:call-template name="DESCRIPTION">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_desc_manual" select="$ARTICLE_DESC_MANUAL" />
+                              <xsl:with-param name="article_description" select="$ARTICLE_DESCRIPTION" />
+                              <xsl:with-param name="character_limit" select="$CFG_CHARACTER_LIMIT" />
+                            </xsl:call-template>
+                          </div><!--end white-box-text-->
+                          <xsl:call-template name="CTA">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                            <xsl:with-param name="article_readtime" select="$ARTICLE_READTIME" />
+                            <xsl:with-param name="article_watchtime" select="$ARTICLE_WATCHTIME" />
+                            <xsl:with-param name="read_icon" select="$READ_ICON" />
+                            <xsl:with-param name="watch_icon" select="$WATCH_ICON" />
+                            <xsl:with-param name="listen_icon" select="$LISTEN_ICON" />
+                          </xsl:call-template>
+                        </div>
+                      </a>
+                      <xsl:if test="$CAPTIVATE_ID != ''">
+                        <div class="story-card__footer">
+                          <button type="button"
+                                  class="btn"
+                                  data-captivate-id="{$CAPTIVATE_ID}">
+                            <xsl:attribute name="aria-label">
+                              <xsl:choose>
+                                <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes' and normalize-space($ARTICLE_TITLE_MANUAL) != ''">Play <xsl:value-of select="$ARTICLE_TITLE_MANUAL" /> episode</xsl:when>
+                                <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                                <xsl:otherwise>Play episode</xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            Play episode
+                          </button>
+                        </div>
+                      </xsl:if>
+                    </div>
+                  </xsl:when>
+
+
+                  <!-- ── SPAN 12 / 8h / 12L : Full-width horizontal tile (image left, text right) ──
+                       v2: 12L (Full width - lead) added to this branch so picking it from the
+                       authoring UI no longer renders an empty cell. -->
+                  <xsl:when test="$ARTICLE_SPAN = '12' or $ARTICLE_SPAN = '8h' or $ARTICLE_SPAN = '12L'">
+                    <div class="story-card story-card--horizontal">
+                      <a>
+                        <xsl:attribute name="class"> white-box tile--news tile--gib-full
+                          <xsl:call-template name="TILE_COLOUR_CLASS">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                          </xsl:call-template>
+                        </xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK" /></xsl:attribute>
+                        <xsl:call-template name="LINK_TARGET_ATTRIBUTES" />
+                        <xsl:call-template name="IMAGE_BLOCK">
+                          <xsl:with-param name="article_thumbnail" select="$ARTICLE_THUMBNAIL" />
+                          <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                        </xsl:call-template>
+                        <div class="text-wrapper">
+                          <div class="white-box-text">
+                            <xsl:call-template name="EYEBROW">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="article_subcategory" select="$ARTICLE_SUBCATEGORY" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_METADATA">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="author_name" select="$AUTHOR_NAME" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_TITLE">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_title" select="$ARTICLE_TITLE" />
+                              <xsl:with-param name="article_title_manual" select="$ARTICLE_TITLE_MANUAL" />
+                            </xsl:call-template>
+                            <xsl:call-template name="DESCRIPTION">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_desc_manual" select="$ARTICLE_DESC_MANUAL" />
+                              <xsl:with-param name="article_description" select="$ARTICLE_DESCRIPTION" />
+                              <xsl:with-param name="character_limit" select="$CFG_CHARACTER_LIMIT" />
+                            </xsl:call-template>
+                          </div><!--end white-box-text-->
+                          <xsl:call-template name="CTA">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                            <xsl:with-param name="article_readtime" select="$ARTICLE_READTIME" />
+                            <xsl:with-param name="article_watchtime" select="$ARTICLE_WATCHTIME" />
+                            <xsl:with-param name="read_icon" select="$READ_ICON" />
+                            <xsl:with-param name="watch_icon" select="$WATCH_ICON" />
+                            <xsl:with-param name="listen_icon" select="$LISTEN_ICON" />
+                          </xsl:call-template>
+                        </div><!--end text-wrapper-->
+                      </a>
+                      <xsl:if test="$CAPTIVATE_ID != ''">
+                        <div class="story-card__footer">
+                          <button type="button"
+                                  class="btn"
+                                  data-captivate-id="{$CAPTIVATE_ID}">
+                            <xsl:attribute name="aria-label">
+                              <xsl:choose>
+                                <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes' and normalize-space($ARTICLE_TITLE_MANUAL) != ''">Play <xsl:value-of select="$ARTICLE_TITLE_MANUAL" /> episode</xsl:when>
+                                <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                                <xsl:otherwise>Play episode</xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            Play episode
+                          </button>
+                        </div>
+                      </xsl:if>
+                    </div>
+                  </xsl:when>
+
+
+                  <!-- ── SPAN 12r : Full-width horizontal tile (image right, text left) ─────
+                       Uses the image-right modifier class; ordering is handled in CSS.
+                       CTA is rendered without icon parameters for this variant. -->
+                  <xsl:when test="$ARTICLE_SPAN = '12r'">
+                    <div class="story-card story-card--horizontal story-card--image-right">
+                      <a>
+                        <xsl:attribute name="class"> white-box tile--news tile--gib-full
+                          <xsl:call-template name="TILE_COLOUR_CLASS">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                          </xsl:call-template>
+                        </xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK" /></xsl:attribute>
+                        <xsl:call-template name="LINK_TARGET_ATTRIBUTES" />
+                        <xsl:call-template name="IMAGE_BLOCK">
+                          <xsl:with-param name="article_thumbnail" select="$ARTICLE_THUMBNAIL" />
+                          <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                        </xsl:call-template>
+                        <div class="text-wrapper">
+                          <div class="white-box-text">
+                            <xsl:call-template name="EYEBROW">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="article_subcategory" select="$ARTICLE_SUBCATEGORY" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_METADATA">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="author_name" select="$AUTHOR_NAME" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_TITLE">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_title" select="$ARTICLE_TITLE" />
+                              <xsl:with-param name="article_title_manual" select="$ARTICLE_TITLE_MANUAL" />
+                            </xsl:call-template>
+                            <xsl:call-template name="DESCRIPTION">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_desc_manual" select="$ARTICLE_DESC_MANUAL" />
+                              <xsl:with-param name="article_description" select="$ARTICLE_DESCRIPTION" />
+                              <xsl:with-param name="character_limit" select="$CFG_CHARACTER_LIMIT" />
+                            </xsl:call-template>
+                          </div><!--end white-box-text-->
+                          <xsl:call-template name="CTA">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                            <xsl:with-param name="article_readtime" select="$ARTICLE_READTIME" />
+                            <xsl:with-param name="article_watchtime" select="$ARTICLE_WATCHTIME" />
+                            <xsl:with-param name="read_icon" select="$READ_ICON" />
+                            <xsl:with-param name="watch_icon" select="$WATCH_ICON" />
+                            <xsl:with-param name="listen_icon" select="$LISTEN_ICON" />
+                          </xsl:call-template>
+                        </div>
+                      </a>
+                      <xsl:if test="$CAPTIVATE_ID != ''">
+                        <div class="story-card__footer">
+                          <button type="button"
+                                  class="btn"
+                                  data-captivate-id="{$CAPTIVATE_ID}">
+                            <xsl:attribute name="aria-label">
+                              <xsl:choose>
+                                <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes' and normalize-space($ARTICLE_TITLE_MANUAL) != ''">Play <xsl:value-of select="$ARTICLE_TITLE_MANUAL" /> episode</xsl:when>
+                                <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                                <xsl:otherwise>Play episode</xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            Play episode
+                          </button>
+                        </div>
+                      </xsl:if>
+                    </div>
+                  </xsl:when>
+
+
+                  <!-- ── SPAN 6o / 4o / 6f : Overlay tile (text over full-bleed image) -->
+                  <xsl:when test="$ARTICLE_SPAN = '6o' or $ARTICLE_SPAN = '4o' or $ARTICLE_SPAN = '6f'">
+                    <div class="story-card story-card--overlay">
+                      <a>
+                        <xsl:attribute name="class">white-box tile--news tile--gib-half</xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK" /></xsl:attribute>
+                        <xsl:call-template name="LINK_TARGET_ATTRIBUTES" />
+                        <xsl:call-template name="IMAGE_BLOCK">
+                          <xsl:with-param name="article_thumbnail" select="$ARTICLE_THUMBNAIL" />
+                          <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                        </xsl:call-template>
+                        <div class="text-wrapper">
+                          <div class="white-box-text">
+                            <xsl:call-template name="EYEBROW">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="article_subcategory" select="$ARTICLE_SUBCATEGORY" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_METADATA">
+                              <xsl:with-param name="article_date" select="$ARTICLE_DATE" />
+                              <xsl:with-param name="author_name" select="$AUTHOR_NAME" />
+                            </xsl:call-template>
+                            <xsl:call-template name="TILE_TITLE">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_title" select="$ARTICLE_TITLE" />
+                              <xsl:with-param name="article_title_manual" select="$ARTICLE_TITLE_MANUAL" />
+                            </xsl:call-template>
+                            <xsl:call-template name="DESCRIPTION">
+                              <xsl:with-param name="overwrite_title" select="$OVERWRITE_TITLE" />
+                              <xsl:with-param name="article_desc_manual" select="$ARTICLE_DESC_MANUAL" />
+                              <xsl:with-param name="article_description" select="$ARTICLE_DESCRIPTION" />
+                              <xsl:with-param name="character_limit" select="$CFG_CHARACTER_LIMIT" />
+                            </xsl:call-template>
+                            <!-- ReadWatchIcons not supported in this variant -->
+                          </div>
+                          <!-- ReadWatchIcons not supported in this variant -->
+                          <xsl:call-template name="CTA">
+                            <xsl:with-param name="article_type" select="$ARTICLE_TYPE" />
+                            <xsl:with-param name="article_readtime" select="$ARTICLE_READTIME" />
+                            <xsl:with-param name="article_watchtime" select="$ARTICLE_WATCHTIME" />
+                          </xsl:call-template>
+                        </div>
+                      </a>
+                      <xsl:if test="$CAPTIVATE_ID != ''">
+                        <div class="story-card__footer">
+                          <button type="button"
+                                  class="btn"
+                                  data-captivate-id="{$CAPTIVATE_ID}">
+                            <xsl:attribute name="aria-label">
+                              <xsl:choose>
+                                <xsl:when test="normalize-space($OVERWRITE_TITLE) = 'Yes' and normalize-space($ARTICLE_TITLE_MANUAL) != ''">Play <xsl:value-of select="$ARTICLE_TITLE_MANUAL" /> episode</xsl:when>
+                                <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                                <xsl:otherwise>Play episode</xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:attribute>
+                            Play episode
+                          </button>
+                        </div>
+                      </xsl:if>
+                    </div>
+                  </xsl:when>
+
+                </xsl:choose><!--end span layout switch-->
+
+              </div><!--end col wrapper-->
+            </xsl:if>
+          </xsl:for-each>
+
+          <!-- Optional raw HTML injected after all tiles, in a col-sm-4 sidebar column -->
+          <xsl:if test="normalize-space($CFG_AFTER_TEXT) != ''">
+            <div class="col-xs-12 col-sm-4">
+              <xsl:value-of select="$CFG_AFTER_TEXT" disable-output-escaping="yes" />
+            </div>
+          </xsl:if>
+
+          <!-- v2: Load-more controls. Renders only when the feature is
+               enabled AND there are more articles than the initial visible
+               count. "See more" is a <button> (interactive control, not
+               navigation); "More insights" is an <a> (real link to another
+               page). Wrapper is text-center to match the existing site
+               pattern. The after-load anchor is [hidden] initially; JS
+               swaps which is visible on click. -->
+          <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
+            <div class="col-xs-12 text-center story-tiles__load-more-row">
+              <button type="button">
+                <xsl:attribute name="class">
+                  story-tiles__see-more <xsl:if test="normalize-space($CFG_SEE_MORE_CLASS) != ''"><xsl:value-of select="$CFG_SEE_MORE_CLASS" /></xsl:if>
+                </xsl:attribute>
+                <xsl:choose>
+                  <xsl:when test="normalize-space($CFG_SEE_MORE_TEXT) != ''">
+                    <xsl:value-of select="$CFG_SEE_MORE_TEXT" disable-output-escaping="yes" />
+                  </xsl:when>
+                  <xsl:otherwise>See more</xsl:otherwise>
+                </xsl:choose>
+              </button>
+              <a hidden="hidden">
+                <xsl:attribute name="class">
+                  story-tiles__after-load <xsl:if test="normalize-space($CFG_AFTER_LOAD_CLASS) != ''"><xsl:value-of select="$CFG_AFTER_LOAD_CLASS" /></xsl:if>
+                </xsl:attribute>
+                <xsl:attribute name="href">
+                  <xsl:choose>
+                    <xsl:when test="normalize-space($CFG_AFTER_LOAD_HREF) != ''">
+                      <xsl:value-of select="$CFG_AFTER_LOAD_HREF" />
+                    </xsl:when>
+                    <xsl:otherwise>/en/insights</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:choose>
+                  <xsl:when test="normalize-space($CFG_AFTER_LOAD_TEXT) != ''">
+                    <xsl:value-of select="$CFG_AFTER_LOAD_TEXT" disable-output-escaping="yes" />
+                  </xsl:when>
+                  <xsl:otherwise>More insights</xsl:otherwise>
+                </xsl:choose>
+              </a>
+            </div>
+          </xsl:if>
+
+        </div><!--end row-->
+
+      </div><!--end inner container-->
+
+      <!-- v2: Inline JS for the See more → More insights swap. Self-contained,
+           scoped per-component-instance via the data-load-more attribute on the
+           row, and idempotent (won't double-bind if Teamsite injects the
+           component twice). Vanilla JS, no jQuery or external dependencies. -->
+      <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
+        <script>
+          (function () {
+            var rows = document.querySelectorAll('.story-tile-row[data-load-more]:not([data-load-more-bound])');
+            for (var i = 0; i &lt; rows.length; i++) {
+              (function (row) {
+                row.setAttribute('data-load-more-bound', 'true');
+                var seeMore   = row.querySelector('.story-tiles__see-more');
+                var afterLoad = row.querySelector('.story-tiles__after-load');
+                if (!seeMore) return;
+                seeMore.addEventListener('click', function (e) {
+                  e.preventDefault();
+                  var hidden = row.querySelectorAll('[data-hidden-by-loadmore]');
+                  for (var j = 0; j &lt; hidden.length; j++) {
+                    hidden[j].removeAttribute('hidden');
+                    hidden[j].removeAttribute('data-hidden-by-loadmore');
+                  }
+                  seeMore.setAttribute('hidden', 'hidden');
+                  if (afterLoad) afterLoad.removeAttribute('hidden');
+                });
+              })(rows[i]);
+            }
+          })();
+        </script>
+      </xsl:if>
+
+    </div><!--end outer wrapper-->
+  </xsl:template>
+
+
+  <!-- ============================================================
+       DATE HELPER TEMPLATE
+       ============================================================ -->
+
+  <!-- PUBLISH_DATE: converts YYYY-MM-DD → abbreviated format e.g. "MAR 15, 2024".
+       v2: $vnumMonth is xs:double (from number()). Comparisons now use numeric
+       literals 1..12 (was '1' or '01' strings in v1, which triggered the
+       "cannot compare xs:double to xs:string" error under strict XSLT 2.0). -->
+  <xsl:template name="PUBLISH_DATE">
+    <xsl:param name="publish_date" />
+    <xsl:variable name="vYear" select="substring-before($publish_date, '-')" />
+    <xsl:variable name="vnumMonth" select="number(substring-before(substring-after($publish_date, '-'), '-'))" />
+    <xsl:variable name="vDay" select="number(substring-after(substring-after($publish_date, '-'), '-'))" />
+    <xsl:choose>
+      <xsl:when test="$vnumMonth = 1">JAN</xsl:when>
+      <xsl:when test="$vnumMonth = 2">FEB</xsl:when>
+      <xsl:when test="$vnumMonth = 3">MAR</xsl:when>
+      <xsl:when test="$vnumMonth = 4">APR</xsl:when>
+      <xsl:when test="$vnumMonth = 5">MAY</xsl:when>
+      <xsl:when test="$vnumMonth = 6">JUN</xsl:when>
+      <xsl:when test="$vnumMonth = 7">JUL</xsl:when>
+      <xsl:when test="$vnumMonth = 8">AUG</xsl:when>
+      <xsl:when test="$vnumMonth = 9">SEP</xsl:when>
+      <xsl:when test="$vnumMonth = 10">OCT</xsl:when>
+      <xsl:when test="$vnumMonth = 11">NOV</xsl:when>
+      <xsl:when test="$vnumMonth = 12">DEC</xsl:when>
+    </xsl:choose>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="$vDay" />, <xsl:value-of select="$vYear" />
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<!-- v2: new ComponentID so Teamsite treats this as a distinct component from v1.
+     Bumped from 1550615201442 → 1782000000001 (anything unique works; Teamsite
+     may re-assign on import depending on how you upload it). -->
+<Properties ComponentID="1782000000001">
+  <Datum ID="Container" Type="Boolean" Name="Wrap in Container">true</Datum>
+  <Datum ID="Background" Type="SelectSingle" Name="Background Colour">
+    <Option Selected="true">
+      <Display>White</Display>
+      <Value>#FFFFFF</Value>
+    </Option>
+    <Option>
+      <Display>Light Blue</Display>
+      <Value>#F3F7F8</Value>
+    </Option>
+    <Option>
+      <Display>Blue</Display>
+      <Value>#E9F6FF</Value>
+    </Option>
+    <Option>
+      <Display>Dark Blue</Display>
+      <Value>#023058</Value>
+    </Option>
+    <Option>
+      <Display>Grey</Display>
+      <Value>#f3f3f3</Value>
+    </Option>
+    <Option>
+      <Display>Pastel Blue</Display>
+      <Value>#E7EDF1</Value>
+    </Option>
+  </Datum>
+  <Datum ID="bgcolour" Type="String" Name="Custom Background colour">#ffffff</Datum>
+  <Datum ID="Padding" Type="String" Name="Padding on Top + Bottom">0px</Datum>
+  <Datum ID="ShowPlayButton" Type="Boolean" Name="Show Video Play Button">true</Datum>
+  <Datum ID="ShowTitle" Type="Boolean" Name="Show Title">true</Datum>
+  <Datum ID="ShowDate" Type="Boolean" Name="Show Publish Date">false</Datum>
+  <Datum ID="ShowSubCat" Type="Boolean" Name="Show Subcategory">true</Datum>
+  <Datum ID="ShowYellowLine" Type="Boolean" Name="Show Yellow Line">true</Datum>
+  <Datum ID="ShowTriangle" Type="Boolean" Name="Show Triangle Gradient">false</Datum>
+  <Datum ID="ShowAuthor" Type="Boolean" Name="Show Author">true</Datum>
+  <Datum ID="ShowDesc" Type="Boolean" Name="Show Description">true</Datum>
+  <Datum ID="CharacterLimit" Type="Number" Name="Allowed characters for description">100</Datum>
+  <Datum ID="CustomTag" Type="String" Name="Custom 'Read More' CTA (Leave blank for default)"/>
+  <Datum ID="ReadWatchMin" Type="Boolean" Name="Display Time to Read as m instead of min">false</Datum>
+  <Datum ID="ReadWatchIcons" Type="Boolean" Name="Show Time to Read as icons">false</Datum>
+  <Datum ID="DisplayBothCTA" Type="Boolean" Name="Show both Custom Tag and Time to Read">false</Datum>
+  <Datum ID="EyebrowDisplay" Type="SelectSingle" Name="Eyebrow display">
+    <Option Selected="true">
+      <Display>Subcategory</Display>
+      <Value>1</Value>
+    </Option>
+    <Option>
+      <Display>Publish date</Display>
+      <Value>2</Value>
+    </Option>
+  </Datum>
+  <Datum ID="TileBG" Type="Boolean" Name="Force Tile Background White">false</Datum>
+  <Datum ID="OpenLinkInSamePage" Type="Boolean" Name="Open tile links in the same page">false</Datum>
+  <Datum ID="ShowComponent" Type="Boolean" Name="Show Component">true</Datum>
+
+  <!-- ===== v2 Load-More feature ===== -->
+  <Datum ID="EnableLoadMore" Type="Boolean" Name="Enable See More / Load More button">false</Datum>
+  <Datum ID="InitialVisibleCount" Type="Number" Name="Number of articles visible before See More click">4</Datum>
+  <Datum ID="SeeMoreText" Type="String" Name="See More button label (default: See more)">See more</Datum>
+  <Datum ID="SeeMoreClass" Type="String" Name="See More button CSS class (optional)">btn btn-inverse</Datum>
+  <Datum ID="AfterLoadButtonText" Type="String" Name="After-Load button label (default: More insights)">More insights</Datum>
+  <Datum ID="AfterLoadButtonHref" Type="String" Name="After-Load button URL">/en/insights</Datum>
+  <Datum ID="AfterLoadButtonClass" Type="String" Name="After-Load button CSS class (optional)">btn btn-blue</Datum>
+</Properties>
+
+<Data>
+  <Datum ID="ContainerID" Type="String" Name="Container ID"/>
+  <Group ID="G01-0" Name="Story Tile" Replicatable="true" CloneGroupID="iuh2chnu">
+    <Datum ID="L01-0" Type="String" Name="Link"/>
+    <Datum ID="D01-0" Type="DCR" Name="Source DCR">
+      <DCR Category="article" Type="insights"/>
+      <DCR-Category Name="article">
+        <DCR-Type Name=".*"/>
+      </DCR-Category>
+      <DCR-Category Name="rbccm">
+        <DCR-Type Name="episode"/>
+        <DCR-Type Name="imagine2025"/>
+        <DCR-Type Name="casestudy"/>
+      </DCR-Category>
+    </Datum>
+    <Datum ID="Spanwidth01" Type="SelectSingle" Name="Span width">
+      <Option>
+        <Display>Span8 - lead</Display>
+        <Value>1</Value>
+      </Option>
+      <Option>
+        <Display>Span8</Display>
+        <Value>8</Value>
+      </Option>
+      <Option>
+        <Display>Span 8 - horizontal</Display>
+        <Value>8h</Value>
+      </Option>
+      <Option Selected="true">
+        <Display>Span4</Display>
+        <Value>4</Value>
+      </Option>
+      <Option>
+        <Display>Span4 - feature</Display>
+        <Value>4f</Value>
+      </Option>
+      <Option>
+        <Display>Span4 - overlay</Display>
+        <Value>4o</Value>
+      </Option>
+      <Option>
+        <Display>Span6</Display>
+        <Value>6</Value>
+      </Option>
+      <Option>
+        <Display>Span6 - overlay</Display>
+        <Value>6o</Value>
+      </Option>
+      <Option>
+        <Display>Span6 - feature</Display>
+        <Value>6f</Value>
+      </Option>
+      <Option>
+        <Display>Full width</Display>
+        <Value>12</Value>
+      </Option>
+      <Option>
+        <Display>Full width - image on right</Display>
+        <Value>12r</Value>
+      </Option>
+      <Option>
+        <Display>Full width - lead</Display>
+        <Value>12L</Value>
+      </Option>
+    </Datum>
+    <Datum ID="OverwriteTitle" Type="SelectSingle" Name="Overwrite Title">
+      <Option Selected="true">
+        <Display>No</Display>
+        <Value>No</Value>
+      </Option>
+      <Option>
+        <Display>Yes</Display>
+        <Value>Yes</Value>
+      </Option>
+    </Datum>
+    <Datum ID="ATM-0" Type="String" Name="Manual Article Title"/>
+    <Datum ID="ATM-1" Type="String" Name="Manual Article Description"/>
+    <Datum ID="ATM-2" Type="String" Name="Manual CTA Text"/>
+    <Datum ID="ATM-3" Type="String" Name="Captivate ID"/>
+    <Datum ID="ATM-4" Type="String" Name="Image Description"/>
+    <Datum ID="ImageAlign" Type="SelectSingle" Name="Image alignment">
+      <Option Selected="true">
+        <Display>Center</Display>
+        <Value>center</Value>
+      </Option>
+      <Option>
+        <Display>Left</Display>
+        <Value>left</Value>
+      </Option>
+      <Option>
+        <Display>Right</Display>
+        <Value>right</Value>
+      </Option>
+    </Datum>
+  </Group>
+  <Datum ID="after-text" Type="Textarea" Name="After"/>
+  <Datum ID="ArchivePage" Type="PageLink" Name="Archive Page"><![CDATA[$PAGE_LINK[insights]]]></Datum>
+</Data>
