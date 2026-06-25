@@ -11,6 +11,52 @@
 
   var lmScroll = 0;
 
+  /* ------------------------------------------------------------------ */
+  /*  Transaction Type taxonomy                                          */
+  /*                                                                     */
+  /*  Maps every raw <type> value from the deals feed onto one of the    */
+  /*  four canonical categories used in the dropdown UI. Add new aliases */
+  /*  here as the feed introduces new strings — anything not in the map  */
+  /*  returns null and is silently dropped from the dropdown + filter.   */
+  /* ------------------------------------------------------------------ */
+  var TRANSACTION_TYPE_MAP = {
+    // Canonical (already correct)
+    'mergers and acquisitions': 'Mergers and Acquisitions',
+    'equity capital markets':   'Equity Capital Markets',
+    'debt capital markets':     'Debt Capital Markets',
+    'gold stream':              'Gold Stream',
+    // Abbreviations
+    'm&a':                      'Mergers and Acquisitions',
+    'ma':                       'Mergers and Acquisitions',
+    'ecm':                      'Equity Capital Markets',
+    'dcm':                      'Debt Capital Markets',
+    // Equity variants
+    'equity':                   'Equity Capital Markets',
+    'ipo':                      'Equity Capital Markets',
+    'joint bookrunner':         'Equity Capital Markets',
+    // Debt variants
+    'debt':                     'Debt Capital Markets',
+    'sustainable finance':      'Debt Capital Markets',
+    'capital structuring':      'Debt Capital Markets',
+    // M&A variants
+    'take private':             'Mergers and Acquisitions',
+    'spinout':                  'Mergers and Acquisitions'
+  };
+
+  /* Order canonical names appear in the dropdown. */
+  var TRANSACTION_TYPE_ORDER = [
+    'Mergers and Acquisitions',
+    'Equity Capital Markets',
+    'Debt Capital Markets',
+    'Gold Stream'
+  ];
+
+  function normalizeTransactionType(raw) {
+    if (!raw) return null;
+    var key = String(raw).trim().toLowerCase();
+    return TRANSACTION_TYPE_MAP[key] || null;
+  }
+
   function noop() {}
 
   function setPage(state) {
@@ -761,19 +807,16 @@
       function getTypeOptions() {
         var counts = {};
         getClosedItems().forEach(function (item) {
-          var type = trimText(item.type);
+          var type = normalizeTransactionType(item.type);
           if (type) {
             counts[type] = (counts[type] || 0) + 1;
           }
         });
 
-        return Object.keys(counts)
-          .map(function (type) {
-            return { value: type, count: counts[type] };
-          })
-          .sort(function (a, b) {
-            return b.count - a.count;
-          });
+        // Always return in canonical order, omitting any with 0 deals.
+        return TRANSACTION_TYPE_ORDER
+          .filter(function (name) { return counts[name]; })
+          .map(function (name) { return { value: name, count: counts[name] }; });
       }
 
       function buildLinkMap() {
@@ -821,7 +864,7 @@
       var typeButton = document.createElement('button');
       typeButton.id = 'yf-x-type-btn';
       typeButton.type = 'button';
-      typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
+      typeButton.innerHTML = 'Transaction type <span class="arrow">&#9660;</span>';
 
       var typeList = document.createElement('ul');
       typeList.id = 'yf-x-type-lb';
@@ -1000,9 +1043,9 @@
         // }
 
         // if (activeType) {
-        //   addTag('Product type: ' + activeType, function () {
+        //   addTag('Transaction type: ' + activeType, function () {
         //     activeType = null;
-        //     typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
+        //     typeButton.innerHTML = 'Transaction type <span class="arrow">&#9660;</span>';
         //     applyFilters();
         //   });
         // }
@@ -1035,9 +1078,9 @@
         }
 
         if (activeType) {
-          activeTags.push({ text: 'Product type: ' + activeType, onClear: function () {
+          activeTags.push({ text: 'Transaction type: ' + activeType, onClear: function () {
             activeType = null;
-            typeButton.innerHTML = 'Product type <span class="arrow">&#9660;</span>';
+            typeButton.innerHTML = 'Transaction type <span class="arrow">&#9660;</span>';
             applyFilters();
             var bar = document.getElementById('yf-filter-bar');
             if (bar) {
@@ -1287,7 +1330,7 @@
               var anchor = tile.querySelector('a[data-bind*="href: link"]') || tile.querySelector('a[href]');
               var tileLink = anchor ? trimText(anchor.getAttribute('href')) : '';
               var item = linkMap[tileLink] || null;
-              var tileType = item ? trimText(item.type) : '';
+              var tileType = item ? normalizeTransactionType(item.type) : null;
               passType = tileType === type;
             }
 
@@ -1408,7 +1451,7 @@
 
         typeButton.innerHTML = (value
           ? '<span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;">' + value + '</span>'
-          : 'Product type') + ' <span class="arrow">&#9660;</span>';
+          : 'Transaction type') + ' <span class="arrow">&#9660;</span>';
 
         closeDropdown(typeList, typeButton);
         applyFilters();
