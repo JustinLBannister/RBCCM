@@ -356,7 +356,7 @@
             <xsl:otherwise>mainContent</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <xsl:attribute name="class">story-tiles <xsl:if test="$FLAG_CONTAINER">container</xsl:if>
+        <xsl:attribute name="class"><xsl:if test="$FLAG_CONTAINER">container</xsl:if>
           <xsl:if test="$FLAG_SHOW_COMPONENT_HIDDEN"> story-tiles-archive</xsl:if>
         </xsl:attribute>
         <xsl:attribute name="style">
@@ -377,7 +377,7 @@
              the article count exceeds the initial visible count, so the
              inline JS at the bottom binds a click handler to this specific
              instance only (multiple instances per page work). -->
-        <div class="row story-tiles__row">
+        <div class="row">
           <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
             <xsl:attribute name="data-load-more">true</xsl:attribute>
             <xsl:attribute name="data-load-more-chunk"><xsl:value-of select="$CFG_LOAD_MORE_CHUNK" /></xsl:attribute>
@@ -861,7 +861,7 @@
                   <xsl:otherwise>See more</xsl:otherwise>
                 </xsl:choose>
               </button>
-              <a hidden="hidden">
+              <a hidden="hidden" style="display: none;">
                 <xsl:attribute name="class">
                   story-tiles__after-load <xsl:if test="normalize-space($CFG_AFTER_LOAD_CLASS) != ''"><xsl:value-of select="$CFG_AFTER_LOAD_CLASS" /></xsl:if>
                 </xsl:attribute>
@@ -894,7 +894,7 @@
       <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
         <script>
           (function () {
-            var rows = document.querySelectorAll('.story-tiles__row[data-load-more]:not([data-load-more-bound])');
+            var rows = document.querySelectorAll('.row[data-load-more]:not([data-load-more-bound])');
             for (var i = 0; i &lt; rows.length; i++) {
               (function (row) {
                 row.setAttribute('data-load-more-bound', 'true');
@@ -915,11 +915,17 @@
                   }
                   // Only swap to "More insights" once ALL hidden tiles have
                   // been revealed. Until then, keep "See more" visible for
-                  // the next click.
+                  // the next click. Toggle both the [hidden] attribute and
+                  // the inline display style on both buttons so the swap
+                  // works even if site CSS overrides one signal.
                   var stillHidden = row.querySelectorAll('[data-hidden-by-loadmore]');
                   if (stillHidden.length === 0) {
                     seeMore.setAttribute('hidden', 'hidden');
-                    if (afterLoad) afterLoad.removeAttribute('hidden');
+                    seeMore.style.display = 'none';
+                    if (afterLoad) {
+                      afterLoad.removeAttribute('hidden');
+                      afterLoad.style.display = '';
+                    }
                   }
                 });
               })(rows[i]);
