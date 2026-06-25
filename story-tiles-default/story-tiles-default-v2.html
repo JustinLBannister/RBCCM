@@ -39,6 +39,7 @@
        previously-hidden follow-up tile component into this single component. -->
   <xsl:variable name="FLAG_ENABLE_LOAD_MORE" select="/Properties/Datum[@ID='EnableLoadMore'] = 'true'" />
   <xsl:variable name="CFG_INITIAL_VISIBLE" select="number(/Properties/Datum[@ID='InitialVisibleCount'])" />
+  <xsl:variable name="CFG_LOAD_MORE_CHUNK" select="number(/Properties/Datum[@ID='LoadMoreChunkSize'])" />
   <xsl:variable name="CFG_SEE_MORE_TEXT" select="/Properties/Datum[@ID='SeeMoreText']" />
   <xsl:variable name="CFG_SEE_MORE_CLASS" select="/Properties/Datum[@ID='SeeMoreClass']" />
   <xsl:variable name="CFG_AFTER_LOAD_TEXT" select="/Properties/Datum[@ID='AfterLoadButtonText']" />
@@ -368,13 +369,18 @@
         </xsl:if>
 
         <!-- Bootstrap row containing all article tile columns.
-             v2: when load-more is enabled AND there are more articles than
-             the initial visible count, mark the row with data-load-more so
-             the inline JS at the bottom binds a click handler to this
-             specific instance only (multiple instances per page work). -->
-        <div class="row story-tile-row">
+             v2: renamed from "story-tile-row" to "story-tiles__row" so the
+             global slick auto-init on the page (which targets the legacy
+             class) does NOT pick up this grid. v1 components that still
+             use "story-tile-row" keep their slick behavior; v2 opts out.
+             Also: data-load-more flag is set when load-more is enabled and
+             the article count exceeds the initial visible count, so the
+             inline JS at the bottom binds a click handler to this specific
+             instance only (multiple instances per page work). -->
+        <div class="row story-tiles__row">
           <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
             <xsl:attribute name="data-load-more">true</xsl:attribute>
+            <xsl:attribute name="data-load-more-chunk"><xsl:value-of select="$CFG_LOAD_MORE_CHUNK" /></xsl:attribute>
           </xsl:if>
           <xsl:for-each select="$ARTICLES">
             <xsl:variable name="ARTICLE_DCR" select="./Datum[@Name='Source DCR']/DCR/press_release" />
@@ -888,22 +894,33 @@
       <xsl:if test="$FLAG_ENABLE_LOAD_MORE and count($ARTICLES) &gt; $CFG_INITIAL_VISIBLE">
         <script>
           (function () {
-            var rows = document.querySelectorAll('.story-tile-row[data-load-more]:not([data-load-more-bound])');
+            var rows = document.querySelectorAll('.story-tiles__row[data-load-more]:not([data-load-more-bound])');
             for (var i = 0; i &lt; rows.length; i++) {
               (function (row) {
                 row.setAttribute('data-load-more-bound', 'true');
                 var seeMore   = row.querySelector('.story-tiles__see-more');
                 var afterLoad = row.querySelector('.story-tiles__after-load');
                 if (!seeMore) return;
+                // Read the chunk size from the row's data attribute. Fall
+                // back to revealing all remaining hidden tiles if no chunk
+                // size is configured.
+                var chunkSize = parseInt(row.getAttribute('data-load-more-chunk'), 10);
                 seeMore.addEventListener('click', function (e) {
                   e.preventDefault();
                   var hidden = row.querySelectorAll('[data-hidden-by-loadmore]');
-                  for (var j = 0; j &lt; hidden.length; j++) {
+                  var toReveal = (chunkSize &gt; 0) ? Math.min(chunkSize, hidden.length) : hidden.length;
+                  for (var j = 0; j &lt; toReveal; j++) {
                     hidden[j].removeAttribute('hidden');
                     hidden[j].removeAttribute('data-hidden-by-loadmore');
                   }
-                  seeMore.setAttribute('hidden', 'hidden');
-                  if (afterLoad) afterLoad.removeAttribute('hidden');
+                  // Only swap to "More insights" once ALL hidden tiles have
+                  // been revealed. Until then, keep "See more" visible for
+                  // the next click.
+                  var stillHidden = row.querySelectorAll('[data-hidden-by-loadmore]');
+                  if (stillHidden.length === 0) {
+                    seeMore.setAttribute('hidden', 'hidden');
+                    if (afterLoad) afterLoad.removeAttribute('hidden');
+                  }
                 });
               })(rows[i]);
             }
@@ -1011,6 +1028,7 @@
   <!-- ===== v2 Load-More feature ===== -->
   <Datum ID="EnableLoadMore" Type="Boolean" Name="Enable See More / Load More button">false</Datum>
   <Datum ID="InitialVisibleCount" Type="Number" Name="Number of articles visible before See More click">4</Datum>
+  <Datum ID="LoadMoreChunkSize" Type="Number" Name="How many additional articles to reveal per See More click">3</Datum>
   <Datum ID="SeeMoreText" Type="String" Name="See More button label (default: See more)">See more</Datum>
   <Datum ID="SeeMoreClass" Type="String" Name="See More button CSS class (optional)">btn btn-inverse</Datum>
   <Datum ID="AfterLoadButtonText" Type="String" Name="After-Load button label (default: More insights)">More insights</Datum>
