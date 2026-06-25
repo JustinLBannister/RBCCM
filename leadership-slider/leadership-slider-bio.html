@@ -7,6 +7,51 @@
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
 
+  <!-- ─────────────────────────────────────────────────────────────
+       Helper templates
+       ───────────────────────────────────────────────────────────── -->
+
+  <!-- jsStr: escape a string for inlining inside a single-quoted JS literal.
+       Handles backslashes first (to avoid double-escaping), then apostrophes. -->
+  <xsl:template name="jsStr">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '\')">
+        <xsl:value-of select="substring-before($s, '\')"/>
+        <xsl:text>\\</xsl:text>
+        <xsl:call-template name="jsStr">
+          <xsl:with-param name="s" select="substring-after($s, '\')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, &quot;'&quot;)">
+        <xsl:value-of select="substring-before($s, &quot;'&quot;)"/>
+        <xsl:text>\'</xsl:text>
+        <xsl:call-template name="jsStr">
+          <xsl:with-param name="s" select="substring-after($s, &quot;'&quot;)"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$s"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- fmtName: substitute {name} placeholder in a template string. -->
+  <xsl:template name="fmtName">
+    <xsl:param name="tpl"/>
+    <xsl:param name="name"/>
+    <xsl:choose>
+      <xsl:when test="contains($tpl, '{name}')">
+        <xsl:value-of select="substring-before($tpl, '{name}')"/>
+        <xsl:value-of select="$name"/>
+        <xsl:value-of select="substring-after($tpl, '{name}')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$tpl"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="AUTHORS" select="/Properties/Data/Datum[@Name='Author']"/>
@@ -22,25 +67,180 @@
 
     <xsl:if test="$slideCount &gt;= 4 and $slideCount &lt;= 8">
 
+      <!-- ── Locale toggle: 'en' (default) or 'fr' ── -->
+      <xsl:variable name="locale">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Locale']) = 'fr'">fr</xsl:when>
+          <xsl:otherwise>en</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <!-- ── Heading ── -->
       <xsl:variable name="heading">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
           </xsl:when>
+          <xsl:when test="$locale = 'fr'">Direction européenne</xsl:when>
           <xsl:otherwise>European leadership</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Aria label ── -->
+      <!-- ── Carousel aria label ── -->
       <xsl:variable name="ariaLabel">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
           </xsl:when>
+          <xsl:when test="$locale = 'fr'">Carrousel de l'équipe de direction européenne</xsl:when>
           <xsl:otherwise>European leadership team carousel</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+
+      <!-- ── i18n strings ── per-instance override beats locale default beats English -->
+
+      <xsl:variable name="prevLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='PrevButtonLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PrevButtonLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Diapositive précédente</xsl:when>
+          <xsl:otherwise>Previous slide</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="nextLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='NextButtonLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NextButtonLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Diapositive suivante</xsl:when>
+          <xsl:otherwise>Next slide</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="trackRegionLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='TrackRegionLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='TrackRegionLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Cartes de l'équipe de direction</xsl:when>
+          <xsl:otherwise>Leadership cards</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="kbInstructions">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='KeyboardInstructions']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='KeyboardInstructions'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Utilisez les flèches gauche et droite pour naviguer entre les diapositives. Utilisez Tab pour passer d'une carte à l'autre.</xsl:when>
+          <xsl:otherwise>Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="bioBtnLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BioButtonLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BioButtonLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Biographie</xsl:when>
+          <xsl:otherwise>Biography</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="bioAriaTpl">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BioAriaTemplate']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BioAriaTemplate'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Lire la biographie de {name}</xsl:when>
+          <xsl:otherwise>Read {name}'s biography</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="linkedInAriaTpl">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='LinkedInAriaTemplate']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='LinkedInAriaTemplate'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">{name} sur LinkedIn, s'ouvre dans un nouvel onglet</xsl:when>
+          <xsl:otherwise>{name} on LinkedIn, opens in new tab</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="linkedInModalLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='LinkedInModalLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='LinkedInModalLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Voir le profil LinkedIn</xsl:when>
+          <xsl:otherwise>View LinkedIn profile</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="closeLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='CloseButtonLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CloseButtonLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Fermer</xsl:when>
+          <xsl:otherwise>Close</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="slideRoleDesc">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SlideRoleDescription']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SlideRoleDescription'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">diapositive</xsl:when>
+          <xsl:otherwise>slide</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="slideAriaTpl">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='SlideAriaTemplate']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='SlideAriaTemplate'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">diapositive {n} sur {total}</xsl:when>
+          <xsl:otherwise>slide {n} of {total}</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="dotAriaTpl">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='DotAriaTemplate']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DotAriaTemplate'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Aller à la diapositive {n}</xsl:when>
+          <xsl:otherwise>Go to slide {n}</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="announceTpl">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AnnounceTemplate']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AnnounceTemplate'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Diapositive {n} sur {total}</xsl:when>
+          <xsl:otherwise>Slide {n} of {total}</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Placeholder image text (URL-encoded value expected — defaults are already encoded). -->
+      <xsl:variable name="placeholderText">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='PlaceholderImageText']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PlaceholderImageText'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Membre%20de%20l%27%C3%A9quipe</xsl:when>
+          <xsl:otherwise>Team%20Member</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="placeholderUrl" select="concat('https://fpoimg.com/276x263?text=', $placeholderText, '&amp;text_color=8F8F8F&amp;bg_color=e6e6e6')"/>
 
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/leadership-carousel.css"/>
 
@@ -55,14 +255,15 @@
           </div>
 
           <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
-          <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</p>
+          <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only"><xsl:value-of select="$kbInstructions"/></p>
 
           <!-- ── Carousel: DOM order is Prev → slides → Next → dots (slick-default).
                   Visual layout reshuffles via CSS grid template-areas in
                   leadership-carousel.css. ── -->
           <div class="rbccm-leadership__carousel">
 
-            <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="0">
+            <button id="rbccm-lead-prev" class="rbccm-leadership__btn" tabindex="0">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$prevLabel"/></xsl:attribute>
               <svg class="rbccm-leadership__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
                 <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -74,8 +275,8 @@
 
             <div class="rbccm-leadership__slider-track"
                role="region"
-               aria-label="Leadership cards"
                aria-describedby="rbccm-lead-instructions">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$trackRegionLabel"/></xsl:attribute>
 
             <xsl:for-each select="$AUTHORS">
 
@@ -97,13 +298,14 @@
                       <img loading="lazy">
                         <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
                         <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>
-                        <xsl:attribute name="onerror">this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'</xsl:attribute>
+                        <xsl:attribute name="onerror">this.src='<xsl:value-of select="$placeholderUrl"/>'</xsl:attribute>
                       </img>
                     </xsl:when>
                     <xsl:otherwise>
-                      <img loading="lazy" src="https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6">
+                      <img loading="lazy">
                         <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
-                        <xsl:attribute name="onerror">this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$placeholderUrl"/></xsl:attribute>
+                        <xsl:attribute name="onerror">this.src='<xsl:value-of select="$placeholderUrl"/>'</xsl:attribute>
                       </img>
                     </xsl:otherwise>
                   </xsl:choose>
@@ -130,8 +332,13 @@
                                 class="rbccm-leadership__card-action rbccm-leadership__card-bio"
                                 tabindex="0">
                           <xsl:attribute name="data-bio-target"><xsl:value-of select="$bioId"/></xsl:attribute>
-                          <xsl:attribute name="aria-label">Read <xsl:value-of select="$name"/>'s biography</xsl:attribute>
-                          <span class="rbccm-leadership__card-bio-label">Biography</span>
+                          <xsl:attribute name="aria-label">
+                            <xsl:call-template name="fmtName">
+                              <xsl:with-param name="tpl" select="$bioAriaTpl"/>
+                              <xsl:with-param name="name" select="$name"/>
+                            </xsl:call-template>
+                          </xsl:attribute>
+                          <span class="rbccm-leadership__card-bio-label"><xsl:value-of select="$bioBtnLabel"/></span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
                             <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
                             <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
@@ -160,7 +367,12 @@
                            rel="noopener noreferrer"
                            tabindex="0">
                           <xsl:attribute name="href"><xsl:value-of select="$linkedin"/></xsl:attribute>
-                          <xsl:attribute name="aria-label"><xsl:value-of select="$name"/> on LinkedIn, opens in new tab</xsl:attribute>
+                          <xsl:attribute name="aria-label">
+                            <xsl:call-template name="fmtName">
+                              <xsl:with-param name="tpl" select="$linkedInAriaTpl"/>
+                              <xsl:with-param name="name" select="$name"/>
+                            </xsl:call-template>
+                          </xsl:attribute>
                           <svg class="li-default" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
                           <svg class="li-hover" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
                         </a>
@@ -175,7 +387,8 @@
 
           </div>
 
-            <button id="rbccm-lead-next" class="rbccm-leadership__btn" aria-label="Next slide" tabindex="0">
+            <button id="rbccm-lead-next" class="rbccm-leadership__btn" tabindex="0">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$nextLabel"/></xsl:attribute>
               <svg class="rbccm-leadership__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
                 <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -199,7 +412,10 @@
               <div class="modal-content">
                 <div>
                   <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
-                    <button class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" aria-label="Close">&#215;</button>
+                    <button class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal">
+                      <xsl:attribute name="aria-label"><xsl:value-of select="$closeLabel"/></xsl:attribute>
+                      <xsl:text>&#215;</xsl:text>
+                    </button>
                   </div>
                   <div class="modal-body" style="padding: 0px;">
                     <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
@@ -209,7 +425,7 @@
                         <div class="rbccm-leadership__modal-body"></div>
                         <p class="rbccm-leadership__modal-footer" style="margin-top: 20px;">
                           <a class="rbccm-leadership__modal-linkedin" target="_blank" rel="noopener noreferrer" hidden="hidden">
-                            View LinkedIn profile
+                            <xsl:value-of select="$linkedInModalLabel"/>
                           </a>
                         </p>
                       </div>
@@ -230,6 +446,38 @@
           var $dots     = $('#rbccm-lead-dots');
           var section   = document.getElementById('rbccm-leadership');
           var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
+          // i18n templates injected from XSL — pre-escaped for safe inlining inside
+          // single-quoted JS literals (handles backslashes + apostrophes).
+          var I18N = {
+            slideRoleDesc: '<xsl:call-template name="jsStr"><xsl:with-param name="s" select="$slideRoleDesc"/></xsl:call-template>',
+            slideAriaTpl:  '<xsl:call-template name="jsStr"><xsl:with-param name="s" select="$slideAriaTpl"/></xsl:call-template>',
+            dotAriaTpl:    '<xsl:call-template name="jsStr"><xsl:with-param name="s" select="$dotAriaTpl"/></xsl:call-template>',
+            announceTpl:   '<xsl:call-template name="jsStr"><xsl:with-param name="s" select="$announceTpl"/></xsl:call-template>'
+          };
+
+          // {n}/{total} placeholder substitution.
+          function fmt(tpl, vars) {
+            return String(tpl).replace(/\{(\w+)\}/g, function (_, k) {
+              return (vars &amp;&amp; vars[k] != null) ? vars[k] : '';
+            });
+          }
+
+          // Long-role detection: if any card's role text exceeds the
+          // threshold, add a class to the section so CSS can bump the
+          // bottom spacing on EVERY card uniformly (so they all match
+          // visually rather than only the long one looking different).
+          var LONG_ROLE_THRESHOLD = 70;
+          function checkLongRoles() {
+            var hasLong = false;
+            $('.rbccm-leadership__card-role').each(function () {
+              if ((this.textContent || '').trim().length > LONG_ROLE_THRESHOLD) {
+                hasLong = true; return false; // break
+              }
+            });
+            section.classList.toggle('rbccm-leadership--long-role', hasLong);
+          }
+          checkLongRoles();
 
           // === BEGIN DEBUG =======================================================
           // Tab / focus tracing for QA. Flip DEBUG to false to silence, or
@@ -363,12 +611,18 @@
           if (typeof $.fn.slick !== 'undefined') {
             initCarousel();
           } else {
+            // Prefer the accessible-slick build hosted on rbccm.com so we get
+            // the same SR experience as pages that already include it.
             var slickScript = document.createElement('script');
-            slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
-            slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
-            slickScript.crossOrigin = 'anonymous';
-            slickScript.referrerPolicy = 'no-referrer';
-            slickScript.onload = function () { initCarousel(); };
+            slickScript.src = '/assets/rbccm/js/accessible-slick.min.js';
+            slickScript.onload  = function () { initCarousel(); };
+            slickScript.onerror = function () {
+              // Last-resort fallback to vanilla slick from cdnjs.
+              var fallback = document.createElement('script');
+              fallback.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+              fallback.onload = function () { initCarousel(); };
+              document.head.appendChild(fallback);
+            };
             document.head.appendChild(slickScript);
           }
 
@@ -403,11 +657,29 @@
           // children. For in-view slides, promote the card's action element
           // (LinkedIn anchor / Biography button) to tabindex=0, OR the card
           // itself when no action exists so focus still moves through it.
+          //
+          // Also stamps slide grouping (role/aria-label/aria-roledescription)
+          // and aria-current on the active dot, so screen readers announce
+          // "slide N of TOTAL" and "Go to slide N (current)" regardless of
+          // which slick variant is loaded on the host page.
           function applyA11y() {
+            var slick      = $track.slick('getSlick');
+            var slideCount = slick ? slick.slideCount : 0;
+
             $track.find('.slick-slide').each(function () {
               var inView = isSlideInView(this);
               if (inView) { this.removeAttribute('aria-hidden'); }
               else        { this.setAttribute('aria-hidden', 'true'); }
+
+              // Slide grouping label. data-slick-index can be negative on
+              // pre-clones, so normalise into the 0..slideCount-1 range.
+              var raw = parseInt(this.getAttribute('data-slick-index'), 10);
+              if (!isNaN(raw) &amp;&amp; slideCount > 0) {
+                var n = ((raw % slideCount) + slideCount) % slideCount + 1;
+                this.setAttribute('role', 'group');
+                this.setAttribute('aria-roledescription', I18N.slideRoleDesc);
+                this.setAttribute('aria-label', fmt(I18N.slideAriaTpl, { n: n, total: slideCount }));
+              }
 
               // Start with every focusable child + the card itself at -1.
               var kids = this.querySelectorAll(FOCUSABLE);
@@ -422,6 +694,15 @@
               if (action)    action.setAttribute('tabindex', '0');
               else if (card) card.setAttribute('tabindex', '0');
             });
+
+            // aria-current + label overwrite on dot buttons (slick's own label
+            // is locale-locked English, so we always overwrite for consistency).
+            var current = slick ? slick.currentSlide : 0;
+            $dots.find('button').each(function (i) {
+              if (i === current) this.setAttribute('aria-current', 'true');
+              else               this.removeAttribute('aria-current');
+              this.setAttribute('aria-label', fmt(I18N.dotAriaTpl, { n: i + 1 }));
+            });
           }
 
           // Re-evaluate after every settle.
@@ -429,7 +710,10 @@
             applyA11y();
             syncArrows();
             if (typeof currentSlide !== 'undefined' &amp;&amp; slick) {
-              $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+              $('#rbccm-lead-announce').text(fmt(I18N.announceTpl, {
+                n: currentSlide + 1,
+                total: slick.slideCount
+              }));
             }
           });
 
@@ -578,12 +862,48 @@
 </xsl:stylesheet>
 
 <Properties ComponentID="1554499053453">
-  <!-- Content -->
+
+  <!-- ─── Content ─── -->
   <Datum ID="Heading" Type="String" Name="Section Heading">European leadership</Datum>
-  <!-- Accessibility -->
-  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label">European leadership team carousel</Datum>
-  <!-- Action mode: 'linkedin' (default) or 'biography' -->
+
+  <!-- ─── Behavior ─── -->
+  <!-- Card action mode: 'linkedin' (default) or 'biography' -->
   <Datum ID="LinkType" Type="String" Name="Card Action (linkedin or biography)">linkedin</Datum>
+
+  <!-- ─── Localization ─── -->
+  <!-- Locale: 'en' (default) or 'fr'. Switches all default strings below.
+       Any individual override beats the locale default. -->
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+  <!-- All strings below are OPTIONAL overrides. Leave blank to use the
+       locale-appropriate default baked into the skin. Templates use
+       {name}, {n}, {total} placeholders — keep them if you override. -->
+
+  <!-- Carousel-level aria -->
+  <Datum ID="CarouselAriaLabel"   Type="String" Name="Carousel Aria Label (override)"></Datum>
+  <Datum ID="TrackRegionLabel"    Type="String" Name="Card Region Aria Label (override)"></Datum>
+  <Datum ID="KeyboardInstructions" Type="String" Name="SR-only Keyboard Instructions (override)"></Datum>
+
+  <!-- Buttons -->
+  <Datum ID="PrevButtonLabel"     Type="String" Name="Previous Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextButtonLabel"     Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+  <Datum ID="CloseButtonLabel"    Type="String" Name="Modal Close Button Aria Label (override)"></Datum>
+
+  <!-- Card action labels -->
+  <Datum ID="BioButtonLabel"      Type="String" Name="Biography Button Text (override)"></Datum>
+  <Datum ID="BioAriaTemplate"     Type="String" Name="Biography Aria Label — use {name} placeholder (override)"></Datum>
+  <Datum ID="LinkedInAriaTemplate" Type="String" Name="LinkedIn Aria Label — use {name} placeholder (override)"></Datum>
+  <Datum ID="LinkedInModalLabel"  Type="String" Name="Modal LinkedIn Link Text (override)"></Datum>
+
+  <!-- Slide + dot announcements -->
+  <Datum ID="SlideRoleDescription" Type="String" Name="Slide Role Description (override)"></Datum>
+  <Datum ID="SlideAriaTemplate"   Type="String" Name="Slide Aria Label — use {n} and {total} (override)"></Datum>
+  <Datum ID="DotAriaTemplate"     Type="String" Name="Dot Aria Label — use {n} placeholder (override)"></Datum>
+  <Datum ID="AnnounceTemplate"    Type="String" Name="Live Region Announce — use {n} and {total} (override)"></Datum>
+
+  <!-- Placeholder image text (URL-encoded). Defaults: 'Team%20Member' / 'Membre%20de%20l%27%C3%A9quipe' -->
+  <Datum ID="PlaceholderImageText" Type="String" Name="Missing-image Placeholder Text, URL-encoded (override)"></Datum>
+
 </Properties>
 
 <Data>

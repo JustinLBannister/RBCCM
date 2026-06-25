@@ -140,6 +140,22 @@
       position: relative;
     }
 
+    /* -- Long-role mode --
+       JS sets `.rbccm-leadership--long-role` on the section when ANY card's
+       role text exceeds ~70 characters. We grow the card-body bottom
+       padding + lift the absolutely-positioned action button so multi-line
+       role text doesn't butt up against it. Applied uniformly to every
+       card so they all match visually. -- */
+    .rbccm-leadership--long-role .rbccm-leadership__card-body {
+      padding-bottom: 86px;
+      min-height: 225px;
+      max-height: 225px;
+    }
+    .rbccm-leadership--long-role .rbccm-leadership__card-bio,
+    .rbccm-leadership--long-role .rbccm-leadership__card-linkedin {
+      bottom: 44px;
+    }
+
     /* -- Biography -- absolute bottom-left of card body -- */
     .rbccm-leadership__card-bio {
       /* Strip button chrome */
