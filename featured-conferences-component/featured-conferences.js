@@ -916,21 +916,33 @@
       var slider = track.closest('.rbccm-featured-conferences__insights-slider');
       var panel  = track.closest('.rbccm-featured-conferences__inner-panel');
 
-      // Remove any prior "coming soon" placeholder so re-runs are idempotent.
+      // Remove EVERY existing "coming soon" placeholder inside this
+      // insights panel — both:
+      //   1) the XSL-rendered fallback that the component emits when an
+      //      event's denormalized $insightCount = 0, and
+      //   2) any placeholder this script appended on a previous run.
+      // Both use the .__speakers-footnote class (the XSL intentionally
+      // reuses that styling for parity with the empty Speakers state).
+      // Scoped to `panel` so we never touch the Speakers panel's own
+      // "Additional speakers to be announced" footnote.
       if (panel) {
-        var prior = panel.querySelector('.fc-preview-coming-soon');
-        if (prior) prior.parentNode.removeChild(prior);
+        var existing = panel.querySelectorAll('.rbccm-featured-conferences__speakers-footnote');
+        Array.prototype.forEach.call(existing, function (el) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        });
       }
 
       if (isPreview) {
         // Replace whatever's in the track (real cards + carousel clones)
-        // with the three hardcoded sample cards.
+        // with the three hardcoded sample cards. The XSL "coming soon"
+        // paragraph was removed above so it can't show beneath the cards.
         track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
                             PREVIEW_CARDS.map(buildCardHTML).join('') +
                           '</div>';
         if (slider) slider.style.display = '';
       } else {
-        // Default state: hide the slider entirely and append the placeholder.
+        // Default state: hide the slider and append a single fresh
+        // placeholder. Removal above guarantees we never double-stack.
         if (slider) slider.style.display = 'none';
         if (panel) {
           var msg = document.createElement('p');
