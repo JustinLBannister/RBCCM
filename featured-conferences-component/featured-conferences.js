@@ -851,11 +851,20 @@
   if (!root) return;
 
   // Read ?preview= from the URL. Default to false if the URL API isn't
-  // available (older browsers).
+  // available (older browsers). Also auto-enable preview when running on
+  // file:// or localhost so local-test.html shows the cards without
+  // needing to manually add the query string every time.
   var isPreview = false;
   try {
     isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
   } catch (e) { /* old browser - treat as no-preview */ }
+  if (!isPreview) {
+    var p = window.location.protocol;
+    var h = window.location.hostname;
+    if (p === 'file:' || h === 'localhost' || h === '127.0.0.1' || h === '') {
+      isPreview = true;
+    }
+  }
 
   // Chevron arrow used in the card meta line. Kept inline as a string so
   // we can stamp it into each card's innerHTML without DOM traversal.
@@ -889,18 +898,20 @@
       image:  'https://www.rbccm.com/assets/rbccm/images/insights/2025/rbc-economics-th.webp',
       alt:    'Capital Clash: Clean Energy vs Fossil Fuel Finance',
       title:  'Capital Clash: Clean Energy vs Fossil Fuel Finance',
-      desc:   'Global energy investment is entering a period of realignment. Tariffs, inflation and geopolitical tensions have disrupted financial models...',
-      meta:   '39 min listen'
+      desc:   'Listen to Bloomberg\'s Switched On podcast for more on how global energy investment is entering a period of realignment',
+      meta:   '39 min listen',
+      label:  'In The Media'   /* Bloomberg coverage - eyebrow swaps from "Insights" to "In The Media" */
     }
   ];
 
   function buildCardHTML(c) {
     var targetAttr = c.target ? ' target="' + c.target + '"' : '';
     var relAttr    = c.rel    ? ' rel="'    + c.rel    + '"' : '';
+    var label      = c.label  ? c.label     : 'Insights';
     return '<a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="' + c.href + '"' + targetAttr + relAttr + '>' +
              '<div class="rbccm-featured-conferences__insight-media"><img loading="lazy" src="' + c.image + '" alt="' + c.alt + '"></div>' +
              '<div class="rbccm-featured-conferences__insight-body">' +
-               '<div class="rbccm-featured-conferences__insight-label">Insights</div>' +
+               '<div class="rbccm-featured-conferences__insight-label">' + label + '</div>' +
                '<div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>' +
                '<h4 class="rbccm-featured-conferences__insight-title">' + c.title + '</h4>' +
                '<p class="rbccm-featured-conferences__insight-desc">' + c.desc + '</p>' +
