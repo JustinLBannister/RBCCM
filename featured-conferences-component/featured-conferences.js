@@ -827,3 +827,127 @@
     });
   });
 })();
+
+/* =========================================================================
+   TEMPORARY: Preview-mode override for the Insights tab
+   -------------------------------------------------------------------------
+   Per-event Insights selection isn't wired up for public viewing yet.
+   This block gates what the Insights tab shows on the URL query parameter:
+
+     ?preview=true → render 3 hardcoded sample cards (the same set used in
+                     local-test.html — Complexity multiplies, 2026 Global
+                     energy outlook, Capital Clash Bloomberg podcast).
+     (no param)    → hide the Insights track and append a
+                     "+ Insights coming soon" placeholder in its place.
+
+   Runs after the carousel IIFEs above have done their DOMContentLoaded init
+   so we overwrite whatever clone insertion / class tagging they applied.
+
+   When the per-event Insights data flow is ready for public, delete this
+   entire IIFE. Nothing else in the file depends on it.
+   ========================================================================= */
+(function () {
+  var root = document.getElementById('rbccm-featured-conferences');
+  if (!root) return;
+
+  // Read ?preview= from the URL. Default to false if the URL API isn't
+  // available (older browsers).
+  var isPreview = false;
+  try {
+    isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+  } catch (e) { /* old browser - treat as no-preview */ }
+
+  // Chevron arrow used in the card meta line. Kept inline as a string so
+  // we can stamp it into each card's innerHTML without DOM traversal.
+  var ARROW_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-featured-conferences__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>';
+
+  // The three hardcoded preview cards. Optional `target` / `rel` per card
+  // covers external links (the Bloomberg podcast); internal RBCCM stories
+  // omit those fields and open in the same tab.
+  var PREVIEW_CARDS = [
+    {
+      href:  'https://www.rbccm.com/en/story/story.page?dcr=templatedata/article/story/data/2026/06/complexity-multiplies-for-infrastructure-to-power-the-transition',
+      image: '/assets/rbccm/images/insights/2026/complexity-multiplies-for-infrastructure-to-power-the-transition-th.webp',
+      alt:   'Complexity multiplies for infrastructure to power the transition',
+      title: 'Complexity multiplies for infrastructure to power the transition',
+      desc:  'The power and infrastructure sector will be critical to the success of the energy transition – so how is it handling the record investment required?',
+      meta:  '23 min listen'
+    },
+    {
+      href:  'https://www.rbccm.com/en/story/story.page?dcr=templatedata/article/story/data/2025/12/selective-by-design-2026-global-energy-outlook',
+      image: '/assets/rbccm/images/insights/2025/selective-by-design-2026-global-energy-outlook-th.webp',
+      alt:   '2026 Global energy outlook: Selective by design',
+      title: '2026 Global energy outlook: Selective by design',
+      desc:  'Soft market fundamentals and an unpredictable geopolitical backdrop create a complex landscape for energy producers',
+      meta:  '4 min read'
+    },
+    {
+      // External resource - opens in a new tab.
+      href:   'https://www.bloomberg.com/news/audio/2025-10-22/capital-clash-clean-energy-vs-fossil-fuel-finance-podcast',
+      target: '_blank',
+      rel:    'noopener noreferrer',
+      image:  'https://www.rbccm.com/assets/rbccm/images/insights/2025/rbc-economics-th.webp',
+      alt:    'Capital Clash: Clean Energy vs Fossil Fuel Finance',
+      title:  'Capital Clash: Clean Energy vs Fossil Fuel Finance',
+      desc:   'Global energy investment is entering a period of realignment. Tariffs, inflation and geopolitical tensions have disrupted financial models...',
+      meta:   '39 min listen'
+    }
+  ];
+
+  function buildCardHTML(c) {
+    var targetAttr = c.target ? ' target="' + c.target + '"' : '';
+    var relAttr    = c.rel    ? ' rel="'    + c.rel    + '"' : '';
+    return '<a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="' + c.href + '"' + targetAttr + relAttr + '>' +
+             '<div class="rbccm-featured-conferences__insight-media"><img loading="lazy" src="' + c.image + '" alt="' + c.alt + '"></div>' +
+             '<div class="rbccm-featured-conferences__insight-body">' +
+               '<div class="rbccm-featured-conferences__insight-label">Insights</div>' +
+               '<div class="rbccm-featured-conferences__insight-divider" aria-hidden="true"></div>' +
+               '<h4 class="rbccm-featured-conferences__insight-title">' + c.title + '</h4>' +
+               '<p class="rbccm-featured-conferences__insight-desc">' + c.desc + '</p>' +
+               '<p class="rbccm-featured-conferences__insight-meta"><span>' + c.meta + '</span>' + ARROW_SVG + '</p>' +
+             '</div>' +
+           '</a>';
+  }
+
+  function applyPreview() {
+    var tracks = root.querySelectorAll('.rbccm-featured-conferences__insights');
+    for (var i = 0; i < tracks.length; i++) {
+      var track  = tracks[i];
+      var slider = track.closest('.rbccm-featured-conferences__insights-slider');
+      var panel  = track.closest('.rbccm-featured-conferences__inner-panel');
+
+      // Remove any prior "coming soon" placeholder so re-runs are idempotent.
+      if (panel) {
+        var prior = panel.querySelector('.fc-preview-coming-soon');
+        if (prior) prior.parentNode.removeChild(prior);
+      }
+
+      if (isPreview) {
+        // Replace whatever's in the track (real cards + carousel clones)
+        // with the three hardcoded sample cards.
+        track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
+                            PREVIEW_CARDS.map(buildCardHTML).join('') +
+                          '</div>';
+        if (slider) slider.style.display = '';
+      } else {
+        // Default state: hide the slider entirely and append the placeholder.
+        if (slider) slider.style.display = 'none';
+        if (panel) {
+          var msg = document.createElement('p');
+          msg.className = 'rbccm-featured-conferences__speakers-footnote fc-preview-coming-soon';
+          msg.style.borderTop = '0';
+          msg.textContent = '+ Insights coming soon';
+          panel.appendChild(msg);
+        }
+      }
+    }
+  }
+
+  // setTimeout(0) defers us to the next tick so the carousel IIFEs above
+  // have already cloned and tagged cards before we replace innerHTML.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(applyPreview, 0); });
+  } else {
+    setTimeout(applyPreview, 0);
+  }
+})();
