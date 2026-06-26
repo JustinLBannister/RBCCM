@@ -901,6 +901,7 @@
       desc:   'Listen to Bloomberg\'s Switched On podcast for more on how global energy investment is entering a period of realignment.',
       meta:   '39 min listen',
       label:  'In The Media'   /* Bloomberg coverage - eyebrow swaps from "Insights" to "In The Media" */
+      /* This label will be used to display the eyebrow text for the insight */
     }
   ];
 
