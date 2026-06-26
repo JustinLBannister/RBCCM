@@ -948,15 +948,7 @@ object-position: top;
      Cards flow as equal-width grid items (1/2/3 col responsive grid
      above governs the layout). All 1-3 cards take a 1/3 slot — no
      special full-width treatment for the first card right now.
-     The cards get a small title/desc margin bump for desktop. */
-  .rbccm-featured-conferences__insight .rbccm-featured-conferences__insight-title,
-  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-title {
-    margin-top: 20px;
-  }
-  .rbccm-featured-conferences__insight .rbccm-featured-conferences__insight-desc,
-  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-desc {
-    margin-top: 20px;
-  }
+     Title/desc margins come from the base rules (15px / 0). */
 
   /* -- Featured-card full-width treatment (DISABLED) --
      Preserved here for when product wants to bring it back. To re-enable:
@@ -1114,16 +1106,17 @@ object-position: top;
   width: 30.9px;
 }
 
-/* Card title — bold black, 10px below the divider. */
+/* Card title — bold black, 15px below the divider. */
 .rbccm-featured-conferences__insight-title {
   color: #000;
   font-weight: 700;
   font-size: 20px;
   line-height: 25px;
-  margin: 10px 0 10px 0;
+  margin: 15px 0 10px 0;
 }
 
-/* Card description — gray body copy, 20px breathing room below. */
+/* Card description — gray body copy, no top margin (sits tight under
+   the title), 20px breathing room below. */
 .rbccm-featured-conferences__insight-desc {
   color: #555;
   font-size: 14px;
