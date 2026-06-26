@@ -564,51 +564,72 @@ object-position: top;
   outline-offset: 4px;
 }
 
-/* -- Insights panel -- */
-/* `min-height: 675px` reserves layout space when the panel first becomes
-   display: block, so any nested slick instance (mobile carousel for the
-   insights cards) has known container dimensions to measure against on its
-   first layout pass - same reason as the speakers slider. */
-/* -- Insights slider wrapper --
-   On mobile: contains the cards row (.__insights) + arrows/dots controls.
-   On desktop: just contains the cards grid; controls hide because all 4
-   cards fit naturally and there's nothing to navigate. */
+/* -- Insights panel --
+   Simple responsive grid: 1 col mobile / 2 col tablet / 3 col desktop,
+   24px gap throughout. No carousel — cards just flow.
+   The featured card spans every column at every breakpoint and uses
+   row-reverse on tablet+ to put the image on the right of the body. */
+
+/* Slider wrapper is now just a flex column container — no overflow clip
+   (we're not translating anything), no transitions. Kept the class name
+   to avoid markup changes. */
 .rbccm-featured-conferences__insights-slider {
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 24px;
   margin: 0;
-  overflow: hidden;        /* clips the carousel translation on mobile */
   position: relative;
   width: 100%;
 }
 
-/* -- Insights track --
-   Mobile-first: a flex ROW of fixed-width cards that JS translates via
-   `transform: translateX(...)`. Desktop overrides to a grid (see media query). */
+/* Cards grid. The intermediate __insights-row wrapper is transparent via
+   display: contents so the cards participate directly in this grid.
+
+   The `transform: none !important` defeats any inline transform the legacy
+   carousel JS still applies on init (it tries to translate the track to
+   pin "card 0" to the slider's left edge — meaningless in a grid layout
+   and would push every card off-screen). */
 .rbccm-featured-conferences__insights {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 32px;
+  display: grid;
+  grid-template-columns: 1fr;             /* mobile: single column */
+  gap: 24px;
   margin: 0;
   padding: 0;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  transform: none !important;
+  transition: none !important;
 }
 
-/* -- Individual insight card (mobile) -- */
+/* Cloned cards inserted by the legacy carousel JS — hide at every
+   breakpoint so the grid only shows the real cards. */
+.rbccm-featured-conferences__insight[data-clone] {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .rbccm-featured-conferences__insights {
+    grid-template-columns: repeat(2, 1fr); /* tablet */
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-featured-conferences__insights {
+    grid-template-columns: repeat(3, 1fr); /* desktop */
+  }
+}
+
+.rbccm-featured-conferences__insights-row {
+  display: contents;
+}
+
+/* -- Individual insight card -- */
 .rbccm-featured-conferences__insight {
   align-items: flex-start;
   background: #FFFDFD;
   color: #000;
   display: flex;
-  flex: 0 0 346px;         /* fixed mobile card width */
   flex-direction: column;
-  height: 555px;
   text-decoration: none;
-  width: 346px;
+  width: 100%;
 }
 .rbccm-featured-conferences__insight:hover,
 .rbccm-featured-conferences__insight:focus-visible {
@@ -616,9 +637,8 @@ object-position: top;
   text-decoration: none;
 }
 
-/* Card image - fixed 240px tall, full card width. Image scales 1.08 on
-   hover; overflow: hidden on the media wrapper clips the zoom so the
-   surrounding card layout doesn't shift. */
+/* Card image - 240px tall, full card width. Hover scales 1.08; the wrapper
+   clips overflow so the layout doesn't shift. */
 .rbccm-featured-conferences__insight-media {
   align-self: stretch;
   flex-shrink: 0;
@@ -633,19 +653,16 @@ object-position: top;
   width: 100%;
 }
 
-/* Card body - fixed 315px tall, contains label / divider / title / desc / meta.
-   No `gap` because the spacing between each element is different (per Figma):
-     label   -> divider: 11px
-     divider -> title:   16px
-     title   -> desc:    16px
-     desc    -> meta:    auto (meta pinned to bottom) */
+/* Card body - contains label / divider / title / desc / meta.
+   Spacing between each element is handled by per-element margin-top
+   (label -> divider: 11px, divider -> title: 16px, title -> desc: 16px,
+   desc -> meta: auto so meta pins to the bottom of the body). */
 .rbccm-featured-conferences__insight-body {
   align-items: flex-start;
   align-self: stretch;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  flex-shrink: 0;
-  height: 315px;
   padding: 20px;
 }
 
@@ -680,20 +697,12 @@ object-position: top;
   width: 4px;
 }
 
-/* -- Slider controls (arrows + dots) - mobile only --
-   Hidden by default (display: none); shown via the `.has-overflow` class
-   that JS adds when cards overflow the slider's viewport (true on mobile,
-   false on desktop where the grid fits all 4). */
+/* -- Insights carousel controls -- DEPRECATED
+   The insights tab no longer uses a carousel — cards flow in a simple
+   responsive grid (1 / 2 / 3 col). Controls stay hidden at every
+   breakpoint regardless of any legacy `.has-overflow` class. */
 .rbccm-featured-conferences__insights-controls {
-  align-items: center;
-  display: none;
-  gap: 16px;
-  justify-content: center;
-  margin: 0;
-  padding: 5px 0;
-}
-.rbccm-featured-conferences__insights-slider.has-overflow .rbccm-featured-conferences__insights-controls {
-  display: flex;
+  display: none !important;
 }
 
 /* Arrow buttons - same shape as the speakers arrows */
@@ -936,43 +945,22 @@ object-position: top;
   }
 
   /* -- Insights desktop layout --
-     Desktop reflows the flat 4-card list into a 3-col grid where the FIRST
-     card spans the entire row (image left + content right), and the other
-     three sit as standard vertical cards beneath. No carousel - all 4 fit.
+     Grid is already responsive (1/2/3 col with 24px gap) from the base
+     declaration above; nothing further to do here for the grid itself.
+     The only desktop-specific work is:
+       - the FEATURED card spans every column and runs horizontal
+         (image right, body left), and
+       - both card variants get slightly bigger title/desc margins per Figma. */
 
-     Clones inserted by the mobile carousel JS are hidden via `[data-clone]`
-     so they don't take grid slots. */
-  .rbccm-featured-conferences__insights {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-    /* Reset the mobile flex-row carousel transform/transition */
-    transform: none !important;
-    transition: none;
-  }
-
-  /* Clones don't participate in the desktop grid */
-  .rbccm-featured-conferences__insight[data-clone] {
-    display: none;
-  }
-
-  /* All real cards: drop the mobile fixed dimensions; let grid sizing govern. */
-  .rbccm-featured-conferences__insight {
-    flex: 1 1 auto;
-    height: auto;
-    width: auto;
-  }
-
-  /* Featured card - spans all 3 cols. Image on the RIGHT, content on the LEFT
-     (flex-direction: row-reverse). Content area is fixed 540 x 280 with
-     justify-content: center so the text block is vertically centered against
-     the image; image fills the remaining row width. */
+  /* Featured card - spans the full grid row. Image on the RIGHT, content
+     on the LEFT via flex-direction: row-reverse. Body has a fixed width
+     so the image takes the rest of the row. */
   .rbccm-featured-conferences__insight--featured {
     flex-direction: row-reverse;
     grid-column: 1 / -1;
   }
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-media {
-    flex: 1;               /* takes the rest of the row */
+    flex: 1;
     height: 280px;
     width: auto;
   }
@@ -986,26 +974,18 @@ object-position: top;
     flex: 0 0 540px;
     flex-direction: column;
     height: 280px;
-    justify-content: center;  /* center the text block vertically */
+    justify-content: center;
     padding: 0 30px;
     width: 540px;
   }
 
-  /* Desktop featured typography overrides - slightly larger/looser than the
-     mobile card spec (16px label, 31px line-height, 1px tracking; description
-     #353535 / 300 weight). */
+  /* Featured typography overrides (label colour, divider, spacing). */
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-label {
-    color: #003168;        /* dark blue, vs mobile's #0051A5 bright blue */
+    color: #003168;
     font-size: 16px;
     letter-spacing: 1px;
     line-height: 31px;
   }
-  /* Spacing inside the featured body - each text element's `margin-top`
-     defines its gap from the preceding sibling.
-       label   -> line:  8px
-       line    -> title: 26px
-       title   -> desc:  12px
-       desc    -> meta:  26px */
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-divider {
     height: 2px;
     margin-top: 8px;
@@ -1024,28 +1004,25 @@ object-position: top;
     margin-top: 12px;
   }
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-meta {
-    margin: 26px 0 0 0;    /* override the mobile `margin-top: auto` */
+    margin: 26px 0 0 0;
   }
 
-  /* Non-featured cards on desktop ("--card" modifier).
-     Typography (label, divider, title, desc, meta) is the same as mobile,
-     so we only override the bits that differ on desktop:
-       - card has a 555px min-height (matches the mobile card dimension)
-       - body grows to fill card height (so meta's `margin-top: auto`
-         has space to push meta to the bottom of the grid-stretched card)
-       - title / desc margins bump from mobile's 16 -> 20 per Figma. */
-  .rbccm-featured-conferences__insight--card {
-    min-height: 555px;
-  }
-  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-body {
-    flex: 1;
-    height: auto;
-  }
+  /* Standard cards - title/desc margins per Figma desktop spec. */
   .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-title {
     margin-top: 20px;
   }
   .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-desc {
     margin-top: 20px;
+  }
+}
+
+/* -- Tablet: featured card stays stacked (image on top) until it hits the
+   desktop breakpoint, where it becomes horizontal. This keeps the layout
+   readable in the 768-991px range. Below 768px the featured card is just
+   a normal stacked card (it inherits the base styles). */
+@media (min-width: 768px) and (max-width: 991px) {
+  .rbccm-featured-conferences__insight--featured {
+    grid-column: 1 / -1;       /* still spans both tablet columns */
   }
 }
 
@@ -1103,89 +1080,77 @@ object-position: top;
   }
 }
 
+/* ============================================================
+   Insight card typography — matches the live RBCCM .story-card
+   .tile--news .tile--gib pattern exactly. Values pulled from the
+   live computed styles so the cards visually align with the rest
+   of the site (homepage tiles, GIB insights, etc.).
+   ============================================================ */
+
 /* INSIGHTS eyebrow label */
 .rbccm-featured-conferences__insight-label {
-  color: #0051A5;
-  color: rgb(0, 106, 195);
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 15px;
-  font-style: normal;
+  color: #006AC3 !important;
+  font-size: 14px;
   font-weight: 400;
   letter-spacing: 2px;
-  line-height: normal;
-  margin: 0;
+  line-height: 140%;
+  margin: 0 0 5px 0;
   text-transform: uppercase;
-font-family:"Roboto Light", Roboto, Arial, Verdana, sans-serif !important;
-font-size:14px;
-height:19.6023px;
-letter-spacing:2px;
-line-height:19.6px;
 }
 
-/* Yellow divider line - 11px below the label. Width animates to 56px on
-   hover (matches the upcoming-conferences card pattern). */
+/* Yellow divider line — short stub under the eyebrow label.
+   Width animates to 56px on hover (handled by the hover rule above). */
 .rbccm-featured-conferences__insight-divider {
   background: #FFC72C;
   flex-shrink: 0;
-  height: 1.983px;
-  margin: 11px 0 0 0;
+  height: 2px;
+  margin: 0;
   transition: width 0.3s ease;
   width: 30.9px;
 }
 
-/* Card title - bold black, 16px above (from divider) */
+/* Card title — bold black, 10px below the divider. */
 .rbccm-featured-conferences__insight-title {
   color: #000;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 20px;
-  font-style: normal;
   font-weight: 700;
-  line-height: normal;
-  margin: 16px 0 0 0;
-font-family:"Roboto Medium", Arial, sans-serif !important;
-font-size:20px;
-font-style:normal;
-font-weight:400;
-letter-spacing:normal;
-line-height:25px;
+  font-size: 20px;
+  line-height: 25px;
+  margin: 10px 0 10px 0;
 }
 
-/* Card description - 16px above (from title) */
+/* Card description — gray body copy, 20px breathing room below. */
 .rbccm-featured-conferences__insight-desc {
   color: #555;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
-  font-style: normal;
+  font-size: 14px;
   font-weight: 400;
-  line-height: normal;
-  margin: 16px 0 0 0;
-color:rgb(85, 85, 85);
-cursor:pointer;
-font-family:"Roboto Light", Roboto, Arial, Verdana, sans-serif !important;
-font-size:13px;
-letter-spacing:0.5px;
-line-height:18.2px;
+  line-height: 140%;
+  margin: 0 0 20px 0;
 }
 
-/* "X min read" + chevron arrow - pinned to the bottom of the body via
-   `margin-top: auto`, with the description's bottom edge taking whatever
-   space is left between the desc end and this row. */
+/* "X min read / watch / listen" + chevron arrow — pinned to the
+   bottom of the body via margin-top: auto. Same blue + hover-underline
+   as the live "learn-more" link pattern.
+
+   `display: inline-flex` + `width: fit-content` shrinks the meta to
+   wrap its content, so the hover border-bottom only runs the length of
+   the text + arrow rather than the full card width. `border-bottom`
+   beats `text-decoration: underline` here because text-decoration
+   stops at the SVG arrow boundary; a border extends underneath both. */
 .rbccm-featured-conferences__insight-meta {
   align-items: center;
-  color: #0051A5;
-  display: flex;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
-  font-style: normal;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-size: 14px;
   font-weight: 600;
   gap: 7px;
-  letter-spacing: -0.526px;
-  line-height: normal;
-  margin: auto 0 0 0;      /* push to bottom */
-color:rgb(0, 106, 195);
-cursor:pointer;
-font-family:Roboto, Arial, Verdana, sans-serif !important;
-font-size:14px;
-font-weight:600;
-line-height:20px;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-featured-conferences__insight:hover .rbccm-featured-conferences__insight-meta,
+.rbccm-featured-conferences__insight:focus-visible .rbccm-featured-conferences__insight-meta {
+  border-bottom-color: currentColor;
 }
