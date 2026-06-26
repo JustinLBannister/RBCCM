@@ -945,16 +945,27 @@ object-position: top;
   }
 
   /* -- Insights desktop layout --
-     Grid is already responsive (1/2/3 col with 24px gap) from the base
-     declaration above; nothing further to do here for the grid itself.
-     The only desktop-specific work is:
-       - the FEATURED card spans every column and runs horizontal
-         (image right, body left), and
-       - both card variants get slightly bigger title/desc margins per Figma. */
+     Cards flow as equal-width grid items (1/2/3 col responsive grid
+     above governs the layout). All 1-3 cards take a 1/3 slot — no
+     special full-width treatment for the first card right now.
+     The cards get a small title/desc margin bump for desktop. */
+  .rbccm-featured-conferences__insight .rbccm-featured-conferences__insight-title,
+  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-title {
+    margin-top: 20px;
+  }
+  .rbccm-featured-conferences__insight .rbccm-featured-conferences__insight-desc,
+  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-desc {
+    margin-top: 20px;
+  }
 
-  /* Featured card - spans the full grid row. Image on the RIGHT, content
-     on the LEFT via flex-direction: row-reverse. Body has a fixed width
-     so the image takes the rest of the row. */
+  /* -- Featured-card full-width treatment (DISABLED) --
+     Preserved here for when product wants to bring it back. To re-enable:
+     uncomment the block below; the JS already tags the first card with
+     the `--featured` modifier so it will pick these rules up automatically.
+     Behaviour: card 1 spans the full grid row, horizontal layout (image
+     right, content left in a 540px-wide body, image fills the remaining
+     row width). Typography bumps inside the featured body match Figma. */
+  /*
   .rbccm-featured-conferences__insight--featured {
     flex-direction: row-reverse;
     grid-column: 1 / -1;
@@ -978,8 +989,6 @@ object-position: top;
     padding: 0 30px;
     width: 540px;
   }
-
-  /* Featured typography overrides (label colour, divider, spacing). */
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-label {
     color: #003168;
     font-size: 16px;
@@ -1006,25 +1015,21 @@ object-position: top;
   .rbccm-featured-conferences__insight--featured .rbccm-featured-conferences__insight-meta {
     margin: 26px 0 0 0;
   }
-
-  /* Standard cards - title/desc margins per Figma desktop spec. */
-  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-title {
-    margin-top: 20px;
-  }
-  .rbccm-featured-conferences__insight--card .rbccm-featured-conferences__insight-desc {
-    margin-top: 20px;
-  }
+  */
 }
 
-/* -- Tablet: featured card stays stacked (image on top) until it hits the
-   desktop breakpoint, where it becomes horizontal. This keeps the layout
-   readable in the 768-991px range. Below 768px the featured card is just
-   a normal stacked card (it inherits the base styles). */
+/* -- Tablet featured-card grid-column override (DISABLED) --
+   Companion to the desktop featured block above. When the featured
+   treatment is re-enabled, uncomment this so the featured card spans
+   both tablet columns (stacked, not horizontal — horizontal kicks in
+   at desktop only). */
+/*
 @media (min-width: 768px) and (max-width: 991px) {
   .rbccm-featured-conferences__insight--featured {
-    grid-column: 1 / -1;       /* still spans both tablet columns */
+    grid-column: 1 / -1;
   }
 }
+*/
 
 /* =========================================
    Font-family lockdown.
