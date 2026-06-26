@@ -5,10 +5,10 @@
        per-component Conference groups.
 
        Selection: events with the dedicated event_featured flag set (y / yes /
-       true / 1) AND not already past (date safety net - a flagged event only
-       shows while upcoming/in-progress), sorted by event_date ascending,
-       first 3. Renders when at least MinFeatured (default 1) qualify.
-       XSLT 2.0 (current-date()), same engine basis as upcoming-conferences.
+       true / 1), sorted by event_date ascending, first 3. Renders when at
+       least MinFeatured (default 1) qualify. The flag is the ONLY gate —
+       authors are responsible for unflagging past conferences as part of
+       post-event cleanup.
 
        Per-event field sources:
          Tab label / title  : event_title_override, else event_name
@@ -40,30 +40,15 @@
 
   <xsl:template match="/">
 
-    <!-- Today as YYYYMMDD (XSLT 2.0 current-date(), same approach as
-         upcoming-conferences) for numeric date comparison. -->
-    <xsl:variable name="CURRENT_DATE" select="format-date(current-date(), '[Y0001][M01][D01]')"/>
-
     <!-- All events in the centralized feed (binding sanity check). -->
     <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
 
-    <!-- Featured events: dedicated event_featured flag (y / yes / true / 1, any
-         case; blank = never featured) AND not already past. The date safety net
-         means a flagged event only appears while it is upcoming or in progress,
-         so an old/past conference left flagged can never show:
-           * event_date (start) >= today, OR
-           * event_date_end is set and >= today (multi-day still in progress).
-         Kept separate from sitelocation so featuring is its own control. -->
+    <!-- Featured events: dedicated event_featured flag (y / yes / true / 1,
+         any case; blank = never featured). No date safety net — a flagged
+         event stays featured until an author manually unflags it. -->
     <xsl:variable name="featuredEvents" select="$allEvents[
         normalize-space(event_featured) != ''
-        and contains('|y|yes|true|1|', concat('|', translate(normalize-space(event_featured), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '|'))
-        and (
-          number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)
-          or (
-            normalize-space(event_date_end) != ''
-            and number(concat(substring(event_date_end, 1, 4), substring(event_date_end, 6, 2), substring(event_date_end, 9, 2))) &gt;= number($CURRENT_DATE)
-          )
-        )]"/>
+        and contains('|y|yes|true|1|', concat('|', translate(normalize-space(event_featured), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '|'))]"/>
     <xsl:variable name="featuredCount" select="count($featuredEvents)"/>
 
     <!-- Always-emitted debug marker (visible only in page source).
@@ -723,7 +708,7 @@
 
 </xsl:stylesheet>
 
-<Properties ComponentID="1554499053800">
+<Properties ComponentID="1554499053453">
   <!-- Content -->
   <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
   <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
