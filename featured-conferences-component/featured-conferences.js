@@ -898,7 +898,7 @@
       image:  'https://www.rbccm.com/assets/rbccm/images/insights/2025/rbc-economics-th.webp',
       alt:    'Capital Clash: Clean Energy vs Fossil Fuel Finance',
       title:  'Capital Clash: Clean Energy vs Fossil Fuel Finance',
-      desc:   'Listen to Bloomberg\'s Switched On podcast for more on how global energy investment is entering a period of realignment',
+      desc:   'Listen to Bloomberg\'s Switched On podcast for more on how global energy investment is entering a period of realignment.',
       meta:   '39 min listen',
       label:  'In The Media'   /* Bloomberg coverage - eyebrow swaps from "Insights" to "In The Media" */
     }
