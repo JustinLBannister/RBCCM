@@ -829,50 +829,34 @@
 })();
 
 /* =========================================================================
-   TEMPORARY: Preview-mode override for the Insights tab
+   TEMPORARY: Hardcoded Insights cards
    -------------------------------------------------------------------------
-   Per-event Insights selection isn't wired up for public viewing yet.
-   This block gates what the Insights tab shows on the URL query parameter:
+   Per-event Insights selection isn't wired into the XSL data flow yet.
+   Until it is, this IIFE replaces whatever the component renders into the
+   Insights track with a fixed set of 3 sample cards (Complexity multiplies,
+   2026 Global energy outlook, Capital Clash Bloomberg podcast). The same
+   set is mirrored in local-test.html for visual diffing.
 
-     ?preview=true → render 3 hardcoded sample cards (the same set used in
-                     local-test.html — Complexity multiplies, 2026 Global
-                     energy outlook, Capital Clash Bloomberg podcast).
-     (no param)    → hide the Insights track and append a
-                     "+ Insights coming soon" placeholder in its place.
+   Runs after the carousel IIFEs above so we overwrite whatever clone
+   insertion / class tagging they applied. Also strips any "+ Insights
+   coming soon" placeholder the XSL emitted when its $insightCount = 0,
+   so the cards never have stale text dangling beneath them.
 
-   Runs after the carousel IIFEs above have done their DOMContentLoaded init
-   so we overwrite whatever clone insertion / class tagging they applied.
-
-   When the per-event Insights data flow is ready for public, delete this
+   When the per-event Insights data flow is wired up via DCR, delete this
    entire IIFE. Nothing else in the file depends on it.
    ========================================================================= */
 (function () {
   var root = document.getElementById('rbccm-featured-conferences');
   if (!root) return;
 
-  // Read ?preview= from the URL. Default to false if the URL API isn't
-  // available (older browsers). Also auto-enable preview when running on
-  // file:// or localhost so local-test.html shows the cards without
-  // needing to manually add the query string every time.
-  var isPreview = false;
-  try {
-    isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
-  } catch (e) { /* old browser - treat as no-preview */ }
-  if (!isPreview) {
-    var p = window.location.protocol;
-    var h = window.location.hostname;
-    if (p === 'file:' || h === 'localhost' || h === '127.0.0.1' || h === '') {
-      isPreview = true;
-    }
-  }
-
   // Chevron arrow used in the card meta line. Kept inline as a string so
   // we can stamp it into each card's innerHTML without DOM traversal.
   var ARROW_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-featured-conferences__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>';
 
-  // The three hardcoded preview cards. Optional `target` / `rel` per card
-  // covers external links (the Bloomberg podcast); internal RBCCM stories
-  // omit those fields and open in the same tab.
+  // The three hardcoded cards. Optional `target` / `rel` per card covers
+  // external links (the Bloomberg podcast); internal RBCCM stories omit
+  // those fields and open in the same tab. Optional `label` overrides
+  // the default "Insights" eyebrow per card.
   var PREVIEW_CARDS = [
     {
       href:  'https://www.rbccm.com/en/story/story.page?dcr=templatedata/article/story/data/2026/06/complexity-multiplies-for-infrastructure-to-power-the-transition',
@@ -921,22 +905,16 @@
            '</a>';
   }
 
-  function applyPreview() {
+  function applyHardcodedInsights() {
     var tracks = root.querySelectorAll('.rbccm-featured-conferences__insights');
     for (var i = 0; i < tracks.length; i++) {
       var track  = tracks[i];
       var slider = track.closest('.rbccm-featured-conferences__insights-slider');
       var panel  = track.closest('.rbccm-featured-conferences__inner-panel');
 
-      // Remove EVERY existing "coming soon" placeholder inside this
-      // insights panel — both:
-      //   1) the XSL-rendered fallback that the component emits when an
-      //      event's denormalized $insightCount = 0, and
-      //   2) any placeholder this script appended on a previous run.
-      // Both use the .__speakers-footnote class (the XSL intentionally
-      // reuses that styling for parity with the empty Speakers state).
-      // Scoped to `panel` so we never touch the Speakers panel's own
-      // "Additional speakers to be announced" footnote.
+      // Strip any "+ Insights coming soon" the XSL emitted (rendered when
+      // an event has $insightCount = 0). Scoped to the insights panel so
+      // we never touch the Speakers panel's own footnote.
       if (panel) {
         var existing = panel.querySelectorAll('.rbccm-featured-conferences__speakers-footnote');
         Array.prototype.forEach.call(existing, function (el) {
@@ -944,34 +922,20 @@
         });
       }
 
-      if (isPreview) {
-        // Replace whatever's in the track (real cards + carousel clones)
-        // with the three hardcoded sample cards. The XSL "coming soon"
-        // paragraph was removed above so it can't show beneath the cards.
-        track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
-                            PREVIEW_CARDS.map(buildCardHTML).join('') +
-                          '</div>';
-        if (slider) slider.style.display = '';
-      } else {
-        // Default state: hide the slider and append a single fresh
-        // placeholder. Removal above guarantees we never double-stack.
-        if (slider) slider.style.display = 'none';
-        if (panel) {
-          var msg = document.createElement('p');
-          msg.className = 'rbccm-featured-conferences__speakers-footnote fc-preview-coming-soon';
-          msg.style.borderTop = '0';
-          msg.textContent = '+ Insights coming soon';
-          panel.appendChild(msg);
-        }
-      }
+      // Replace whatever's in the track (real cards + carousel clones)
+      // with the three hardcoded sample cards. Always — no URL gating.
+      track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
+                          PREVIEW_CARDS.map(buildCardHTML).join('') +
+                        '</div>';
+      if (slider) slider.style.display = '';
     }
   }
 
   // setTimeout(0) defers us to the next tick so the carousel IIFEs above
   // have already cloned and tagged cards before we replace innerHTML.
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(applyPreview, 0); });
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(applyHardcodedInsights, 0); });
   } else {
-    setTimeout(applyPreview, 0);
+    setTimeout(applyHardcodedInsights, 0);
   }
 })();
