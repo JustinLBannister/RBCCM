@@ -35,6 +35,13 @@
   <xsl:variable name="CFG_BEFORE_TEXT" select="/Properties/Data/Datum[@ID='before-text']" />
   <xsl:variable name="CFG_AFTER_TEXT" select="/Properties/Data/Datum[@ID='after-text']" />
 
+  <!-- v2: optional component-level <h2> heading. Renders above the BEFORE_TEXT
+       slot when ComponentHeading is non-empty. The class is configurable so
+       authors can match the existing typography on whichever page they drop
+       this into (e.g. "section-title", "component-heading"). -->
+  <xsl:variable name="CFG_COMPONENT_HEADING" select="/Properties/Datum[@ID='ComponentHeading']" />
+  <xsl:variable name="CFG_COMPONENT_HEADING_CLASS" select="/Properties/Datum[@ID='ComponentHeadingClass']" />
+
   <!-- v2 Load-More feature: rolls "See more" / "More insights" buttons + the
        previously-hidden follow-up tile component into this single component. -->
   <xsl:variable name="FLAG_ENABLE_LOAD_MORE" select="/Properties/Datum[@ID='EnableLoadMore'] = 'true'" />
@@ -362,6 +369,17 @@
         <xsl:attribute name="style">
           <xsl:if test="$FLAG_SHOW_COMPONENT_HIDDEN">display: none;</xsl:if>
         </xsl:attribute>
+
+        <!-- v2: Optional component <h2> heading. Renders above BEFORE_TEXT
+             so authors can use BEFORE_TEXT as a subhead / intro paragraph. -->
+        <xsl:if test="normalize-space($CFG_COMPONENT_HEADING) != ''">
+          <h2>
+            <xsl:if test="normalize-space($CFG_COMPONENT_HEADING_CLASS) != ''">
+              <xsl:attribute name="class"><xsl:value-of select="$CFG_COMPONENT_HEADING_CLASS" /></xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="$CFG_COMPONENT_HEADING" disable-output-escaping="yes" />
+          </h2>
+        </xsl:if>
 
         <!-- Optional raw HTML injected before the tile grid -->
         <xsl:if test="normalize-space($CFG_BEFORE_TEXT) != ''">
@@ -1040,6 +1058,9 @@
   <Datum ID="AfterLoadButtonText" Type="String" Name="After-Load button label (default: More insights)">More insights</Datum>
   <Datum ID="AfterLoadButtonHref" Type="String" Name="After-Load button URL">/en/insights</Datum>
   <Datum ID="AfterLoadButtonClass" Type="String" Name="After-Load button CSS class (optional)">btn btn-blue</Datum>
+  <!-- ===== v2 Component heading ===== -->
+  <Datum ID="ComponentHeading" Type="String" Name="Component heading (H2) — leave blank to hide"/>
+  <Datum ID="ComponentHeadingClass" Type="String" Name="Component heading CSS class (optional)"/>
 </Properties>
 
 <Data>
