@@ -1152,3 +1152,186 @@ object-position: top;
 .rbccm-featured-conferences__insight:focus-visible .rbccm-featured-conferences__insight-meta {
   border-bottom-color: currentColor;
 }
+
+
+/* =========================================================================
+   TABBED-AREA GRID — companion to the main component above.
+   -------------------------------------------------------------------------
+   Block: .rbccm-featured-conferences-tabbed
+   Emitted by featured-conferences-homepage.html (sibling XSL). Renders as
+   a simple 3-up grid inside a tabbed content area (e.g. on the homepage),
+   pulling from the same Events List DCR, filtered by
+   sitelocation = rbccm-homepage. Light-blue panel, dark text — visually
+   distinct from the dark-blue main featured-conferences component above.
+
+   Mobile-first: 1 column. Tablet/desktop (≥768px): 3 columns.
+   No carousel, no tabs of its own, no JS — pure static grid.
+   ========================================================================= */
+
+/* ---------- Block / section ---------- */
+.rbccm-featured-conferences-tabbed {
+  background: #EFF6FD;
+  padding: 40px 16px;
+}
+
+.rbccm-featured-conferences-tabbed__inner {
+  margin: 0 auto;
+  max-width: 1100px;
+  text-align: center;
+}
+
+
+/* ---------- Heading + icon ---------- */
+.rbccm-featured-conferences-tabbed__heading {
+  align-items: center;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-flex;
+  font-family: "RBCDisplay", Georgia, Times, serif;
+  font-size: 24px;
+  font-weight: 500;
+  gap: 12px;
+  justify-content: center;
+  letter-spacing: -0.789px;
+  line-height: normal;
+  margin: 0 0 32px 0;
+}
+
+.rbccm-featured-conferences-tabbed__icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  flex-shrink: 0;
+  height: 32px;
+  width: 32px;
+}
+
+
+/* ---------- List / grid ---------- */
+.rbccm-featured-conferences-tabbed__list {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .rbccm-featured-conferences-tabbed__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* ---------- Item / event ---------- */
+.rbccm-featured-conferences-tabbed__item {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  text-align: center;
+}
+
+
+/* ---------- Date circle ----------
+   98×98 white round on the light-blue panel. Flex-centered so the
+   month + day stack vertically with no padding hacks needed. */
+.rbccm-featured-conferences-tabbed__date {
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  height: 98px;
+  justify-content: center;
+  margin: 0 auto 20px;
+  width: 98px;
+}
+
+.rbccm-featured-conferences-tabbed__date-month {
+  color: #252525;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  line-height: normal;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+.rbccm-featured-conferences-tabbed__date-day {
+  color: #252525;
+  font-family: "Roboto Light", Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: normal;
+}
+
+
+/* ---------- Location ---------- */
+.rbccm-featured-conferences-tabbed__location {
+  color: #6f6f6f;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  line-height: normal;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Event name ---------- */
+.rbccm-featured-conferences-tabbed__name {
+  color: #252525;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  line-height: 26px;
+  margin: 0 0 10px 0;
+}
+
+.rbccm-featured-conferences-tabbed__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.rbccm-featured-conferences-tabbed__link:hover,
+.rbccm-featured-conferences-tabbed__link:focus-visible {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  text-decoration: underline;
+}
+
+
+/* ---------- Desktop padding bump ---------- */
+@media (min-width: 992px) {
+  .rbccm-featured-conferences-tabbed {
+    padding: 56px 16px;
+  }
+
+  .rbccm-featured-conferences-tabbed__heading {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+}
+
+
+/* ---------- Typography lockdown (same approach as the main component) ----------
+   External site stylesheets use broad selectors like `*` and bare `p` that
+   would otherwise override our font-family. Scoping !important rules to the
+   homepage block keeps universal selectors from leaking in. */
+.rbccm-featured-conferences-tabbed,
+.rbccm-featured-conferences-tabbed * {
+  font-family: Roboto, Arial, sans-serif !important;
+}
+
+/* Heading (kept RBCDisplay for when authors un-hide it via the HideHeading flag). */
+.rbccm-featured-conferences-tabbed h2,
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__heading {
+  font-family: "RBCDisplay", Georgia, Times, serif !important;
+}
+
+/* Day inside the date circle uses Roboto Light (legacy parity). */
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__date-day {
+  font-family: "Roboto Light", Roboto, Arial, sans-serif !important;
+}

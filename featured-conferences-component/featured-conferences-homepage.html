@@ -1,59 +1,167 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<!-- Featured Conferences — Homepage variant
-     ============================================
-     Simple 3-up strip for the RBCCM homepage. Pulls from the same
-     centralized Events List DCR as featured-conferences-events.html
-     (the main component), but filters by per-event sitelocation
-     checkbox (rbccm-homepage) instead of the event_featured flag.
-
-     Filter:
-       1. sitelocation contains 'rbccm-homepage'
-       2. Sorted by event_date ascending, capped at 3
-     No date safety net — flagged events stay until an author unflags
-     them (consistent with the main featured-conferences component).
-
-     TEMPORARY MARKUP NOTE
-     ---------------------
-     Markup matches the legacy homepage strip 1:1 (Bootstrap classes,
-     inline styles, .lblue-circle/.event-date/.tile naming). This is so
-     the existing site CSS for those classes picks it up unchanged.
-     A BEM/no-Bootstrap rewrite is queued — see featured-conferences-homepage.css
-     for the stubbed-out BEM rules that aren't currently used. -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <!-- Skin: default -->
+  <!-- Skin: RBCCM Featured Conferences - HOMEPAGE STRIP (BEM)
+       =====================================================
+       Companion to featured-conferences-events.html. Same centralized
+       Events List DCR; different filter, different layout.
+
+       Selection: events where the sitelocation checkbox includes the
+       value 'rbccm-homepage'. Sorted by event_date ascending, first 3
+       are rendered. No date safety net — flagged events stay until an
+       author unflags them (consistent with the main component).
+
+       Layout: a single 3-up strip (1 col mobile, 3 col 768+). Each cell:
+       circular date badge, location, event name (linked if event_url
+       is provided). BEM throughout, no Bootstrap, no inline styles. -->
+
+  <xsl:strip-space elements="*"/>
 
   <xsl:output method="html" indent="no" />
 
-  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
-  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- All conference items in the centralized feed (binding sanity check).
+         Path is conferences/data for this component (not events/event). -->
+    <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/conferences/data"/>
+
+    <!-- Homepage events: sitelocation checkbox includes 'rbccm-homepage'.
+         contains() on the stringified value handles every common Teamsite
+         checkbox serialization (delimited string, repeated value, etc.). -->
+    <xsl:variable name="homepageEvents" select="$allEvents[
+        contains(string(sitelocation), 'rbccm-homepage')
+      ]"/>
+    <xsl:variable name="homepageCount" select="count($homepageEvents)"/>
+
+    <!-- Always-emitted debug marker (visible only in page source).
+         totalEvents=0  -> the Events List DCR is not binding to this component
+         homepage=0     -> binding OK but no event has rbccm-homepage flagged
+         homepage&lt;min -> not enough events flagged to pass the render gate -->
+    <xsl:comment> rbccm-fc-homepage debug: totalEvents=<xsl:value-of select="count($allEvents)"/> homepage=<xsl:value-of select="$homepageCount"/> </xsl:comment>
+
+    <!-- Minimum flagged events required to render. Default 1 (render whatever
+         is flagged - the soonest 3 at most). Bump MinHomepage to 3 to require
+         a full strip before the component appears. -->
+    <xsl:variable name="minHomepage">
+      <xsl:choose>
+        <xsl:when test="normalize-space(/Properties/Datum[@ID='MinHomepage']) != ''">
+          <xsl:value-of select="normalize-space(/Properties/Datum[@ID='MinHomepage'])"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:if test="$homepageCount &gt;= number($minHomepage)">
+
+      <!-- == Heading == -->
+      <xsl:variable name="heading">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- == Aria label == -->
+      <xsl:variable name="ariaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='AriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='AriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Featured conferences</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- == Optional hide-heading flag (some pages style the heading elsewhere) == -->
+      <xsl:variable name="hideHeading" select="/Properties/Datum[@ID='HideHeading'] = 'true'"/>
+
+      <!-- == External CSS — shared with the main featured-conferences component.
+           The tabbed-area grid rules are appended to the bottom of the same
+           stylesheet, scoped to .rbccm-featured-conferences-tabbed. -->
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/featured-conferences.css"/>
+
+      <section class="rbccm-featured-conferences-tabbed" id="rbccm-featured-conferences-tabbed">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
+
+        <div class="rbccm-featured-conferences-tabbed__inner">
+
+          <h2 class="rbccm-featured-conferences-tabbed__heading">
+            <xsl:if test="$hideHeading">
+              <xsl:attribute name="style">display: none;</xsl:attribute>
+            </xsl:if>
+            <svg class="rbccm-featured-conferences-tabbed__icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 2v3M17 2v3M3 9h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <span class="rbccm-featured-conferences-tabbed__heading-text"><xsl:value-of select="$heading"/></span>
+          </h2>
+
+          <ul class="rbccm-featured-conferences-tabbed__list">
+            <xsl:for-each select="$homepageEvents">
+              <xsl:sort select="event_date" order="ascending"/>
+              <xsl:if test="position() &lt;= 3">
+
+                <li class="rbccm-featured-conferences-tabbed__item">
+
+                  <div class="rbccm-featured-conferences-tabbed__date" aria-hidden="true">
+                    <xsl:call-template name="format_date">
+                      <xsl:with-param name="start_date" select="event_date"/>
+                      <xsl:with-param name="end_date" select="event_date_end"/>
+                    </xsl:call-template>
+                  </div>
+
+                  <xsl:if test="normalize-space(location) != ''">
+                    <p class="rbccm-featured-conferences-tabbed__location">
+                      <xsl:value-of select="location"/>
+                    </p>
+                  </xsl:if>
+
+                  <p class="rbccm-featured-conferences-tabbed__name">
+                    <xsl:choose>
+                      <xsl:when test="normalize-space(event_url) != ''">
+                        <a class="rbccm-featured-conferences-tabbed__link">
+                          <xsl:attribute name="href"><xsl:value-of select="event_url" disable-output-escaping="yes"/></xsl:attribute>
+                          <xsl:value-of select="event_name"/>
+                        </a>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="event_name"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </p>
+
+                </li>
+
+              </xsl:if>
+            </xsl:for-each>
+          </ul>
+
+        </div>
+      </section>
+
+    </xsl:if>
+
+  </xsl:template>
 
 
-  <!-- ============================================================
-       PROPERTY VARIABLES
-       ============================================================ -->
-  <xsl:variable name="CFG_HEADING">
-    <xsl:choose>
-      <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
-        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])" />
-      </xsl:when>
-      <xsl:otherwise>Featured conferences</xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
+  <!-- =============================================
+       Named templates
+       ============================================= -->
 
+  <!-- Renders the date badge: month abbreviation + day (or day range when an
+       end date is provided, e.g. 19-21). Empty end date or same-day end date
+       collapses to a single day. -->
+  <xsl:template name="format_date">
+    <xsl:param name="start_date"/>
+    <xsl:param name="end_date"/>
 
-  <!-- ============================================================
-       DATE FORMATTER — converts YYYY-MM-DD into 3-letter month + day.
-       Returns the day range when an end date is provided (e.g. 19-21).
-       ============================================================ -->
-  <xsl:template name="FORMAT_EVENT_DATE">
-    <xsl:param name="start_date" />
-    <xsl:param name="end_date" />
+    <xsl:variable name="vMonth"  select="number(substring($start_date, 6, 2))"/>
+    <xsl:variable name="vDay"    select="number(substring($start_date, 9, 2))"/>
+    <xsl:variable name="vEndDay" select="number(substring($end_date, 9, 2))"/>
 
-    <xsl:variable name="vMonth" select="number(substring-before(substring-after($start_date, '-'), '-'))" />
-    <xsl:variable name="vDay"   select="number(substring-after(substring-after($start_date, '-'), '-'))" />
-    <xsl:variable name="vEndDay" select="number(substring-after(substring-after($end_date, '-'), '-'))" />
-
-    <span class="month">
+    <span class="rbccm-featured-conferences-tabbed__date-month">
       <xsl:choose>
         <xsl:when test="$vMonth = 1">Jan</xsl:when>
         <xsl:when test="$vMonth = 2">Feb</xsl:when>
@@ -69,103 +177,31 @@
         <xsl:when test="$vMonth = 12">Dec</xsl:when>
       </xsl:choose>
     </span>
-    <span class="day">
-      <xsl:value-of select="$vDay" />
+    <span class="rbccm-featured-conferences-tabbed__date-day">
+      <xsl:value-of select="$vDay"/>
       <xsl:if test="normalize-space($end_date) != '' and $vEndDay != $vDay">
         <xsl:text>-</xsl:text>
-        <xsl:value-of select="$vEndDay" />
+        <xsl:value-of select="$vEndDay"/>
       </xsl:if>
     </span>
-  </xsl:template>
-
-
-  <!-- ============================================================
-       MAIN TEMPLATE
-       ============================================================ -->
-  <xsl:template match="/">
-
-    <!-- All conference items in the centralized feed. Path is
-         conferences/data (not events/event) for this component. -->
-    <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/conferences/data" />
-
-    <!-- Homepage events: sitelocation checkbox includes 'rbccm-homepage'. -->
-    <xsl:variable name="homepageEvents" select="$allEvents[
-        contains(string(sitelocation), 'rbccm-homepage')
-      ]" />
-    <xsl:variable name="homepageCount" select="count($homepageEvents)" />
-
-    <!-- Debug marker (visible only in page source).
-         total=0     → Events List DCR not binding to this component
-         homepage=0  → binding OK but no event has rbccm-homepage flagged. -->
-    <xsl:comment> rbccm-fc-homepage debug: total=<xsl:value-of select="count($allEvents)" /> homepage=<xsl:value-of select="$homepageCount" /> </xsl:comment>
-
-    <xsl:if test="$homepageCount &gt; 0">
-
-      <div id="featured-conferences">
-        <div style="background-color:#EFF6FD; margin-bottom: 50px;" class="featured-conference-wrapper">
-          <div class="container">
-            <div class="conferences conferences-home text-center">
-
-              <h2 style="display: none;">
-                <img style="display:inline;margin-top: -8px;width: 39px;" src="/assets/rbccm/homepage/calendar.svg" alt="" aria-hidden="true" />
-                <xsl:text>&#160;&#160;</xsl:text>
-                <xsl:value-of select="$CFG_HEADING" />
-              </h2>
-
-              <div class="row">
-                <xsl:for-each select="$homepageEvents">
-                  <xsl:sort select="event_date" order="ascending" />
-                  <xsl:if test="position() &lt;= 3">
-
-                    <div class="col-xs-12 col-sm-4 tile" style="height: 238px;">
-
-                      <div class="lblue-circle event-date" style="background-color: #ffffff;">
-                        <p>
-                          <xsl:call-template name="FORMAT_EVENT_DATE">
-                            <xsl:with-param name="start_date" select="event_date" />
-                            <xsl:with-param name="end_date" select="event_date_end" />
-                          </xsl:call-template>
-                        </p>
-                      </div>
-
-                      <xsl:if test="normalize-space(location) != ''">
-                        <p class="location"><xsl:value-of select="location" /></p>
-                      </xsl:if>
-
-                      <p class="event-name">
-                        <xsl:choose>
-                          <xsl:when test="normalize-space(event_url) != ''">
-                            <a>
-                              <xsl:attribute name="href"><xsl:value-of select="event_url" disable-output-escaping="yes" /></xsl:attribute>
-                              <xsl:value-of select="event_name" />
-                            </a>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of select="event_name" />
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </p>
-
-                    </div>
-
-                  </xsl:if>
-                </xsl:for-each>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </xsl:if>
-
   </xsl:template>
 
 </xsl:stylesheet>
 
 <Properties ComponentID="">
-  <Datum ID="Heading" Type="String" Name="Section heading (hidden by default, kept for SEO/a11y)">Featured conferences</Datum>
-  <!-- Centralized Events List feed — same binding as the main
-       featured-conferences-events.html. -->
-  <Datum ID="EventsList" Type="DCR" Name="Events List"/>
+  <!-- Content -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Featured conferences</Datum>
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label">Featured conferences</Datum>
+  <Datum ID="HideHeading" Type="Boolean" Name="Hide visible heading (kept in DOM for SEO/a11y)">false</Datum>
+  <!-- Minimum flagged events required to render. Set to 3 to require a full
+       strip before the component appears. -->
+  <Datum ID="MinHomepage" Type="String" Name="Minimum Homepage-Flagged Events">1</Datum>
 </Properties>
+
+<Data>
+  <!-- Centralized Events List feed - same binding as the main
+       featured-conferences-events.html and upcoming-conferences. -->
+  <Datum ID="EventsList" Type="DCR" Name="Events List">
+    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data</DCR>
+  </Datum>
+</Data>
