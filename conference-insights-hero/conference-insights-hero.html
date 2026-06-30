@@ -1,0 +1,90 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- Conference Insights Hero
+     A simple hero variant for conference pages: breadcrumbs, H1, subtitle.
+     Mobile-first. BEM class names. Breadcrumbs are repeatable via a
+     Teamsite Group so authors can add 2, 3, 4+ levels as needed. -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: default -->
+
+  <xsl:output method="html" indent="no" />
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+
+  <!-- ============================================================
+       PROPERTY VARIABLES
+       ============================================================ -->
+  <xsl:variable name="CFG_HERO_TITLE"    select="/Properties/Datum[@ID='HeroTitle']" />
+  <xsl:variable name="CFG_HERO_SUBTITLE" select="/Properties/Datum[@ID='HeroSubtitle']" />
+  <xsl:variable name="CRUMBS"            select="/Properties/Data/Group[@Name='Breadcrumb']" />
+
+
+  <!-- ============================================================
+       MAIN TEMPLATE
+       ============================================================ -->
+  <xsl:template match="/">
+    <section class="rbccm-conference-insights-hero" id="rbccm-conference-insights-hero">
+      <div class="rbccm-conference-insights-hero__inner">
+
+        <!-- Breadcrumbs. Last crumb is current page (no link, aria-current). -->
+        <xsl:if test="count($CRUMBS) &gt; 0">
+          <nav class="rbccm-conference-insights-hero__breadcrumbs" aria-label="Breadcrumb">
+            <ol class="rbccm-conference-insights-hero__breadcrumb-list">
+              <xsl:for-each select="$CRUMBS">
+                <xsl:variable name="LABEL" select="./Datum[@Name='Label']" />
+                <xsl:variable name="HREF"  select="./Datum[@Name='Href']" />
+                <xsl:variable name="IS_CURRENT" select="./Datum[@Name='Is Current Page'] = 'true'" />
+                <li>
+                  <xsl:attribute name="class">
+                    rbccm-conference-insights-hero__breadcrumb<xsl:if test="$IS_CURRENT or position() = last()"> rbccm-conference-insights-hero__breadcrumb--current</xsl:if>
+                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="$IS_CURRENT or position() = last()">
+                      <xsl:attribute name="aria-current">page</xsl:attribute>
+                      <xsl:value-of select="$LABEL" disable-output-escaping="yes" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <a>
+                        <xsl:attribute name="href"><xsl:value-of select="$HREF" /></xsl:attribute>
+                        <xsl:value-of select="$LABEL" disable-output-escaping="yes" />
+                      </a>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </li>
+              </xsl:for-each>
+            </ol>
+          </nav>
+        </xsl:if>
+
+        <!-- H1 -->
+        <xsl:if test="normalize-space($CFG_HERO_TITLE) != ''">
+          <h1 class="rbccm-conference-insights-hero__title">
+            <xsl:value-of select="$CFG_HERO_TITLE" disable-output-escaping="yes" />
+          </h1>
+        </xsl:if>
+
+        <!-- Subtitle paragraph -->
+        <xsl:if test="normalize-space($CFG_HERO_SUBTITLE) != ''">
+          <p class="rbccm-conference-insights-hero__subtitle">
+            <xsl:value-of select="$CFG_HERO_SUBTITLE" disable-output-escaping="yes" />
+          </p>
+        </xsl:if>
+
+      </div>
+    </section>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="">
+  <Datum ID="HeroTitle"    Type="String" Name="Hero title (H1)">Conference insights</Datum>
+  <Datum ID="HeroSubtitle" Type="String" Name="Hero subtitle (paragraph)">Voices that shaped the market.</Datum>
+</Properties>
+
+<Data>
+  <Group ID="B01-0" Name="Breadcrumb" Replicatable="true">
+    <Datum Name="Label" Type="String"/>
+    <Datum Name="Href" Type="String"/>
+    <Datum Name="Is Current Page" Type="Boolean">false</Datum>
+  </Group>
+</Data>

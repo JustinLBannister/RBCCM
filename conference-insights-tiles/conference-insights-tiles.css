@@ -1,0 +1,361 @@
+/* =========================================================================
+   Conference Insights Tiles
+   -------------------------------------------------------------------------
+   BEM-first, no Bootstrap. CSS Grid layout.
+   Mobile-first: single column. Desktop (≥768px): 3 columns with the
+   --featured tile spanning all 3 and flipping to horizontal layout.
+
+   Markup mirrors the live featured-conferences insight cards.
+   Hover effects, typography, and colors ported from
+   .rbccm-featured-conferences__insight* for visual parity:
+     - No border, no border-radius, no box-shadow (flat card)
+     - Background #FFFDFD, body text #000
+     - Hover (gated by `@media (hover: hover)`):
+         · image scales to 1.08
+         · divider widens 30.9px → 56px
+         · meta gets a bottom border
+     - :focus-visible mirrors hover for keyboard users
+
+   Block: rbccm-conference-insights-tiles
+   ========================================================================= */
+
+/* ---------- Block ---------- */
+.rbccm-conference-insights-tiles {
+  padding: 40px 16px;
+  background: #ffffff;
+}
+
+.rbccm-conference-insights-tiles__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+/* ---------- Row / grid ----------
+   Mirrors the legacy responsive cadence:
+     - Mobile (<768px):  1 column
+     - Tablet (≥768px):  2 columns
+     - Desktop (≥992px): 3 columns
+   Row-gap 32px (between rows), column-gap 30px (between columns).
+   Featured card always spans the full row at every breakpoint via
+   grid-column: 1 / -1. */
+.rbccm-conference-insights-tiles__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin: 0 0 32px 0;
+}
+
+@media (min-width: 768px) {
+  .rbccm-conference-insights-tiles__row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 30px; /* row-gap column-gap */
+  }
+  /* NOTE: at tablet the featured card flows in the 2-col grid like any
+     other card — no full-row span, no horizontal layout. Full-width
+     featured treatment kicks in at desktop (≥992px) below. */
+}
+
+@media (min-width: 992px) {
+  .rbccm-conference-insights-tiles__row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Featured card spans the full row above the standard 3-up. */
+  .rbccm-conference-insights-tiles__insight--featured {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ---------- Card ----------
+   1px gray border + pure white background so the cards read clearly on the
+   white page background (the featured-conferences cards live in a tinted
+   panel, so they get away without a border — these don't).
+   Roboto declared at the card level so label, title, desc, and meta all
+   inherit it without each declaring font-family individually.
+   min-height: 555px (media 240 + body 315) — gives the card a fixed visual
+   minimum so the meta has room to push to the bottom even when the
+   description is short. */
+.rbccm-conference-insights-tiles__insight {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  min-height: 555px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.rbccm-conference-insights-tiles__insight:hover,
+.rbccm-conference-insights-tiles__insight:focus-visible {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Hidden by load-more — kept out of layout. */
+.rbccm-conference-insights-tiles__insight[hidden] {
+  display: none !important;
+}
+
+
+/* ---------- Media ----------
+   240px tall, full card width. Hover scales 1.08; the wrapper clips
+   overflow so the layout doesn't shift. */
+.rbccm-conference-insights-tiles__insight-media {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 240px;
+  overflow: hidden;
+}
+
+.rbccm-conference-insights-tiles__insight-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+
+
+/* ---------- Body ----------
+   Holds label / divider / title / desc / meta. Meta pins to the bottom
+   via margin-top: auto.
+   min-height: 315px ensures the body has enough vertical room for the
+   meta's auto-margin to actually create the visible gap between desc and
+   meta. Without this, short descriptions would collapse the gap. */
+.rbccm-conference-insights-tiles__insight-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 315px;
+  padding: 20px;
+}
+
+
+/* ---------- Label (eyebrow) ----------
+   11px below the label to the yellow divider. */
+.rbccm-conference-insights-tiles__insight-label {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: normal;
+  margin: 0 0 11px 0;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Divider (yellow line) ----------
+   Width animates from 30.9px → 56px on hover. */
+.rbccm-conference-insights-tiles__insight-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+
+
+/* ---------- Title ----------
+   16px above (from divider) and 16px below (to description). */
+.rbccm-conference-insights-tiles__insight-title {
+  color: var(--RBC-Black, #000);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: normal;
+  margin: 16px 0 16px 0;
+}
+
+
+/* ---------- Description ----------
+   No bottom margin — the meta uses margin-top: auto to pin itself to the
+   bottom of the body, so spacing between description and meta is handled
+   by the flex container, not the description's margin. */
+.rbccm-conference-insights-tiles__insight-desc {
+  color: #353535;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+}
+
+
+/* ---------- Meta (read time + arrow) ----------
+   `display: inline-flex` + `width: fit-content` shrinks the meta to wrap
+   its content, so the hover border-bottom only runs the length of the text
+   + arrow rather than the full card width. 7px gap between text and arrow. */
+.rbccm-conference-insights-tiles__insight-meta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: -0.526px;
+  line-height: normal;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+
+
+/* ---------- Arrow ----------
+   Render at the SVG's intrinsic 4x10 dimensions (set inline on the
+   element). Only fill and flex-shrink applied here. */
+.rbccm-conference-insights-tiles__insight-arrow {
+  fill: var(--Blue-Bright-Blue, #0051A5);
+  flex-shrink: 0;
+}
+
+
+/* ---------- Hover / focus effects ----------
+   Gated by `@media (hover: hover)` so touch-only devices skip the image
+   scale and divider stretch (where hover state doesn't make sense).
+   `:focus-visible` mirrors hover for keyboard users. */
+@media (hover: hover) {
+  .rbccm-conference-insights-tiles__insight:hover,
+  .rbccm-conference-insights-tiles__insight:focus-visible {
+    outline: none;
+  }
+  .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-media img,
+  .rbccm-conference-insights-tiles__insight:focus-visible .rbccm-conference-insights-tiles__insight-media img {
+    transform: scale(1.08);
+  }
+  .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-divider,
+  .rbccm-conference-insights-tiles__insight:focus-visible .rbccm-conference-insights-tiles__insight-divider {
+    width: 56px;
+  }
+  .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-meta,
+  .rbccm-conference-insights-tiles__insight:focus-visible .rbccm-conference-insights-tiles__insight-meta {
+    border-bottom-color: currentColor;
+  }
+}
+
+
+/* ---------- Featured card layout (≥992px only: image left, text right) ----------
+   At mobile and tablet the featured card behaves like any other card in the
+   grid. Only at desktop, when it has the full row to itself, does it flip
+   to the horizontal half-and-half layout.
+
+   Featured spacing per Figma:
+     - Body padding: 30px all around
+     - Content vertically centered in the body
+     - Label/divider → title: 26px
+     - Title → description: 12px
+     - Description → meta: 26px
+   Meta's `margin: auto 0 0 0` is overridden here so the meta flows in line
+   with the centered group (no auto-push to bottom). */
+@media (min-width: 992px) {
+  .rbccm-conference-insights-tiles__insight--featured {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 0; /* drop the 555px floor; horizontal featured sizes to content */
+  }
+
+  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-media {
+    flex: 0 0 50%;
+    height: auto;
+    min-height: 240px;
+  }
+
+  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-body {
+    flex: 1 1 50%;
+    justify-content: center;
+    min-height: 0; /* let featured body size to its centered content */
+    padding: 30px;
+  }
+
+  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-title {
+    font-size: 24px;
+    line-height: 30px;
+    margin: 26px 0 12px 0;
+  }
+
+  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-desc {
+    margin: 0 0 26px 0;
+  }
+
+  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-meta {
+    margin: 0;
+  }
+}
+
+
+/* ---------- Controls row (See More + View All) ---------- */
+.rbccm-conference-insights-tiles__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-conference-insights-tiles__controls {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.rbccm-conference-insights-tiles__see-more,
+.rbccm-conference-insights-tiles__view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: 14px 28px;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* See More: outline / secondary */
+.rbccm-conference-insights-tiles__see-more {
+  background: transparent;
+  color: var(--Blue-Dark-Blue, #003168);
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-conference-insights-tiles__see-more:hover,
+.rbccm-conference-insights-tiles__see-more:focus {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+/* View All: primary */
+.rbccm-conference-insights-tiles__view-all {
+  background: #006AC3;
+  color: #ffffff;
+  border: 1px solid #006AC3;
+}
+
+.rbccm-conference-insights-tiles__view-all:hover,
+.rbccm-conference-insights-tiles__view-all:focus {
+  background: #00558f;
+  border-color: #00558f;
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Desktop padding bump ---------- */
+@media (min-width: 992px) {
+  .rbccm-conference-insights-tiles {
+    padding: 64px 16px;
+  }
+}

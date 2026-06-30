@@ -1,0 +1,162 @@
+<!-- =========================================================================
+     Featured Conferences (Tabbed Grid) - STATIC OVERRIDE
+     =========================================================================
+     Self-contained snippet for use when the Teamsite component can't publish.
+     All CSS is inline in the <style> block below so this works on any page
+     regardless of whether featured-conferences.css has been deployed yet.
+
+     To use: paste this entire chunk (style + section) into the page or
+     content area where the dynamic component would normally render.
+
+     Data is hardcoded - update the three <li> blocks at the bottom to
+     change the events shown.
+     ========================================================================= -->
+<style>
+  .rbccm-featured-conferences-tabbed {
+    background: #EFF6FD;
+    padding: 40px 16px;
+  }
+  .rbccm-featured-conferences-tabbed__inner {
+    margin: 0 auto;
+    max-width: 1100px;
+    text-align: center;
+  }
+  .rbccm-featured-conferences-tabbed__heading {
+    align-items: center;
+    color: #003168 !important;
+    display: inline-flex;
+    font-family: "RBCDisplay", Georgia, Times, serif !important;
+    font-size: 24px;
+    font-weight: 500;
+    gap: 12px;
+    justify-content: center;
+    letter-spacing: -0.789px;
+    line-height: normal;
+    margin: 0 0 32px 0;
+  }
+  .rbccm-featured-conferences-tabbed__icon {
+    color: #003168;
+    flex-shrink: 0;
+    height: 32px;
+    width: 32px;
+  }
+  .rbccm-featured-conferences-tabbed__list {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: 1fr;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (min-width: 768px) {
+    .rbccm-featured-conferences-tabbed__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .rbccm-featured-conferences-tabbed__item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 0 12px;
+    text-align: center;
+  }
+  .rbccm-featured-conferences-tabbed__date {
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 98px;
+    justify-content: center;
+    margin: 0 auto 20px;
+    width: 98px;
+  }
+  .rbccm-featured-conferences-tabbed__date-month {
+    color: #003168 !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    line-height: normal;
+    text-transform: uppercase;
+  }
+  .rbccm-featured-conferences-tabbed__date-day {
+    color: #003168 !important;
+    font-family: "RBCDisplay", Georgia, Times, serif !important;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: normal;
+    margin-top: 2px;
+  }
+  .rbccm-featured-conferences-tabbed__location {
+    color: #353535 !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    line-height: normal;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+  }
+  .rbccm-featured-conferences-tabbed__name {
+    color: #003168 !important;
+    font-family: "RBCDisplay", Georgia, Times, serif !important;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 26px;
+    margin: 0;
+  }
+  @media (min-width: 992px) {
+    .rbccm-featured-conferences-tabbed {
+      padding: 56px 16px;
+    }
+    .rbccm-featured-conferences-tabbed__heading {
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+  }
+</style>
+
+<section class="rbccm-featured-conferences-tabbed" id="rbccm-featured-conferences-tabbed" aria-label="Featured conferences">
+  <div class="rbccm-featured-conferences-tabbed__inner">
+
+    <h2 class="rbccm-featured-conferences-tabbed__heading">
+      <svg class="rbccm-featured-conferences-tabbed__icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 2v3M17 2v3M3 9h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="rbccm-featured-conferences-tabbed__heading-text">Featured conferences</span>
+    </h2>
+
+    <ul class="rbccm-featured-conferences-tabbed__list">
+
+      <li class="rbccm-featured-conferences-tabbed__item">
+        <div class="rbccm-featured-conferences-tabbed__date" aria-hidden="true">
+          <span class="rbccm-featured-conferences-tabbed__date-month">Sep</span>
+          <span class="rbccm-featured-conferences-tabbed__date-day">21-22</span>
+        </div>
+        <p class="rbccm-featured-conferences-tabbed__location">Virtual</p>
+        <p class="rbccm-featured-conferences-tabbed__name">Biopharma CDMO Conference</p>
+      </li>
+
+      <li class="rbccm-featured-conferences-tabbed__item">
+        <div class="rbccm-featured-conferences-tabbed__date" aria-hidden="true">
+          <span class="rbccm-featured-conferences-tabbed__date-month">Sep</span>
+          <span class="rbccm-featured-conferences-tabbed__date-day">22</span>
+        </div>
+        <p class="rbccm-featured-conferences-tabbed__location">New York</p>
+        <p class="rbccm-featured-conferences-tabbed__name">Climate Week CEO Summit</p>
+      </li>
+
+      <li class="rbccm-featured-conferences-tabbed__item">
+        <div class="rbccm-featured-conferences-tabbed__date" aria-hidden="true">
+          <span class="rbccm-featured-conferences-tabbed__date-month">Sep</span>
+          <span class="rbccm-featured-conferences-tabbed__date-day">22-23</span>
+        </div>
+        <p class="rbccm-featured-conferences-tabbed__location">Toronto</p>
+        <p class="rbccm-featured-conferences-tabbed__name">Power, Energy &amp; Corporate Infrastructure Fixed Income Conference</p>
+      </li>
+
+    </ul>
+
+  </div>
+</section>
