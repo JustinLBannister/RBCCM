@@ -1247,32 +1247,32 @@ object-position: top;
 }
 
 .rbccm-featured-conferences-tabbed__date-month {
-  color: #252525;
+  color: var(--Blue-Dark-Blue, #003168);
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 3px;
+  font-weight: 500;
+  letter-spacing: 1px;
   line-height: normal;
-  margin-bottom: 3px;
   text-transform: uppercase;
 }
 
 .rbccm-featured-conferences-tabbed__date-day {
-  color: #252525;
-  font-family: "Roboto Light", Roboto, Arial, sans-serif;
-  font-size: 24px;
-  font-weight: 300;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: "RBCDisplay", Georgia, Times, serif;
+  font-size: 28px;
+  font-weight: 700;
   line-height: normal;
+  margin-top: 2px;
 }
 
 
 /* ---------- Location ---------- */
 .rbccm-featured-conferences-tabbed__location {
-  color: #6f6f6f;
+  color: #353535;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  letter-spacing: 3px;
+  letter-spacing: 1.5px;
   line-height: normal;
   margin: 0 0 8px 0;
   text-transform: uppercase;
@@ -1281,27 +1281,13 @@ object-position: top;
 
 /* ---------- Event name ---------- */
 .rbccm-featured-conferences-tabbed__name {
-  color: #252525;
-  font-family: Roboto, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 1px;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: "RBCDisplay", Georgia, Times, serif;
+  font-size: 20px;
+  font-weight: 500;
   line-height: 26px;
-  margin: 0 0 10px 0;
+  margin: 0;
 }
-
-.rbccm-featured-conferences-tabbed__link {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.rbccm-featured-conferences-tabbed__link:hover,
-.rbccm-featured-conferences-tabbed__link:focus-visible {
-  color: var(--Blue-Bright-Blue, #0051A5);
-  text-decoration: underline;
-}
-
 
 /* ---------- Desktop padding bump ---------- */
 @media (min-width: 992px) {
@@ -1325,13 +1311,11 @@ object-position: top;
   font-family: Roboto, Arial, sans-serif !important;
 }
 
-/* Heading (kept RBCDisplay for when authors un-hide it via the HideHeading flag). */
+/* RBCDisplay for heading, date day, and event name. */
 .rbccm-featured-conferences-tabbed h2,
-.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__heading {
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__heading,
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__date-day,
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__name,
+.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__name * {
   font-family: "RBCDisplay", Georgia, Times, serif !important;
-}
-
-/* Day inside the date circle uses Roboto Light (legacy parity). */
-.rbccm-featured-conferences-tabbed .rbccm-featured-conferences-tabbed__date-day {
-  font-family: "Roboto Light", Roboto, Arial, sans-serif !important;
 }

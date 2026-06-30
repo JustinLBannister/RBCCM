@@ -11,8 +11,8 @@
        author unflags them (consistent with the main component).
 
        Layout: a single 3-up strip (1 col mobile, 3 col 768+). Each cell:
-       circular date badge, location, event name (linked if event_url
-       is provided). BEM throughout, no Bootstrap, no inline styles. -->
+       circular date badge, location, event name (plain text — no link
+       wrapping for now). BEM throughout, no Bootstrap, no inline styles. -->
 
   <xsl:strip-space elements="*"/>
 
@@ -119,17 +119,7 @@
                   </xsl:if>
 
                   <p class="rbccm-featured-conferences-tabbed__name">
-                    <xsl:choose>
-                      <xsl:when test="normalize-space(event_url) != ''">
-                        <a class="rbccm-featured-conferences-tabbed__link">
-                          <xsl:attribute name="href"><xsl:value-of select="event_url" disable-output-escaping="yes"/></xsl:attribute>
-                          <xsl:value-of select="event_name"/>
-                        </a>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="event_name"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="event_name"/>
                   </p>
 
                 </li>
