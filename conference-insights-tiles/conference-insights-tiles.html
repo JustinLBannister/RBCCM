@@ -86,7 +86,19 @@
     <xsl:variable name="TITLE_MANUAL"       select="./Datum[@Name='Manual Article Title']" />
     <xsl:variable name="DESC_MANUAL"        select="./Datum[@Name='Manual Article Description']" />
     <xsl:variable name="OVERWRITE"          select="./Datum[@Name='Overwrite Title']/Option[@Selected='true']/Value" />
-    <xsl:variable name="LINK"               select="./Datum[@Name='Link']" />
+    <!-- Link resolution: manual Link Datum on the tile row wins (author
+         override for redirects, external URLs, etc.); otherwise fall back
+         to the article DCR's own can_url (canonical URL to the story
+         page). Matches the citizenship-carousel pattern so authors don't
+         have to type the URL for every article they add. -->
+    <xsl:variable name="LINK_MANUAL"        select="./Datum[@Name='Link']" />
+    <xsl:variable name="LINK_CANONICAL"     select="$ARTICLE_DCR/can_url" />
+    <xsl:variable name="LINK">
+      <xsl:choose>
+        <xsl:when test="normalize-space($LINK_MANUAL) != ''"><xsl:value-of select="$LINK_MANUAL" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$LINK_CANONICAL" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="EYEBROW_OVERRIDE"   select="./Datum[@Name='Eyebrow Override']" />
     <xsl:variable name="OPEN_NEW_TAB"       select="./Datum[@Name='Open in New Tab'] = 'true'" />
 
