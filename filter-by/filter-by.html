@@ -34,7 +34,7 @@
        ============================================================ -->
   <xsl:variable name="CFG_PRESET" select="/Properties/Datum[@ID='Preset']/Option[@Selected='true']/Value" />
 
-  <!-- ---- Theme ----
+  <!-- ==== Theme ====
        If author picked a Theme override, use it; otherwise derive from Preset. -->
   <xsl:variable name="CFG_THEME_RAW" select="/Properties/Datum[@ID='Theme']/Option[@Selected='true']/Value" />
   <xsl:variable name="THEME">
@@ -45,7 +45,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Container (CSS selector for the section wrapping the items) ----
+  <!-- ==== Container (CSS selector for the section wrapping the items) ====
        Filter finds items inside the container by [data-search-text] (default)
        or by a custom item selector. Auto-injects empty state + pagination
        into the container's end. -->
@@ -59,10 +59,10 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Optional custom item selector inside the container ---- -->
+  <!-- ==== Optional custom item selector inside the container ==== -->
   <xsl:variable name="CFG_ITEM_SELECTOR" select="normalize-space(/Properties/Datum[@ID='ItemSelector'])" />
 
-  <!-- ---- Padding overrides (blank = use CSS defaults 40 mobile, 43 desktop) ---- -->
+  <!-- ==== Padding overrides (blank = use CSS defaults 40 mobile, 43 desktop) ==== -->
   <xsl:variable name="CFG_PAD_TOP_MOBILE"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])" />
   <xsl:variable name="CFG_PAD_BOTTOM_MOBILE"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])" />
   <xsl:variable name="CFG_PAD_TOP_DESKTOP"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])" />
@@ -74,7 +74,7 @@
     or $CFG_PAD_BOTTOM_DESKTOP != ''
   " />
 
-  <!-- ---- Section aria label ---- -->
+  <!-- ==== Section aria label ==== -->
   <xsl:variable name="CFG_ARIA" select="normalize-space(/Properties/Datum[@ID='AriaLabel'])" />
   <xsl:variable name="ARIA_LABEL">
     <xsl:choose>
@@ -85,7 +85,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- "Filter by:" label ---- -->
+  <!-- ==== "Filter by:" label ==== -->
   <xsl:variable name="CFG_FILTER_BY_LABEL" select="normalize-space(/Properties/Datum[@ID='FilterByLabel'])" />
   <xsl:variable name="FILTER_BY_LABEL">
     <xsl:choose>
@@ -94,7 +94,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Month select "All" label ---- -->
+  <!-- ==== Month select "All" label ==== -->
   <xsl:variable name="CFG_MONTH_ALL" select="normalize-space(/Properties/Datum[@ID='MonthAllLabel'])" />
   <xsl:variable name="MONTH_ALL">
     <xsl:choose>
@@ -103,7 +103,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Region select "All" label ---- -->
+  <!-- ==== Region select "All" label ==== -->
   <xsl:variable name="CFG_REGION_ALL" select="normalize-space(/Properties/Datum[@ID='RegionAllLabel'])" />
   <xsl:variable name="REGION_ALL">
     <xsl:choose>
@@ -112,7 +112,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Industry select "All" label ---- -->
+  <!-- ==== Industry select "All" label ==== -->
   <xsl:variable name="CFG_INDUSTRY_ALL" select="normalize-space(/Properties/Datum[@ID='IndustryAllLabel'])" />
   <xsl:variable name="INDUSTRY_ALL">
     <xsl:choose>
@@ -121,7 +121,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Search placeholder ---- -->
+  <!-- ==== Search placeholder ==== -->
   <xsl:variable name="CFG_SEARCH_PH" select="normalize-space(/Properties/Datum[@ID='SearchPlaceholder'])" />
   <xsl:variable name="SEARCH_PLACEHOLDER">
     <xsl:choose>
@@ -132,7 +132,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Search aria label ---- -->
+  <!-- ==== Search aria label ==== -->
   <xsl:variable name="CFG_SEARCH_ARIA" select="normalize-space(/Properties/Datum[@ID='SearchAriaLabel'])" />
   <xsl:variable name="SEARCH_ARIA">
     <xsl:choose>
@@ -141,7 +141,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Clear filters button label ---- -->
+  <!-- ==== Clear filters button label ==== -->
   <xsl:variable name="CFG_CLEAR_LABEL" select="normalize-space(/Properties/Datum[@ID='ClearFiltersLabel'])" />
   <xsl:variable name="CLEAR_LABEL">
     <xsl:choose>
@@ -150,7 +150,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Empty state ---- -->
+  <!-- ==== Empty state ==== -->
   <xsl:variable name="CFG_EMPTY_HEADING" select="normalize-space(/Properties/Datum[@ID='EmptyHeading'])" />
   <xsl:variable name="EMPTY_HEADING">
     <xsl:choose>
@@ -179,7 +179,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Pagination page size (0 = disabled) ----
+  <!-- ==== Pagination page size (0 = disabled) ====
        Insights preset defaults to 4 (featured hero + 3 standard tiles).
        Custom/other presets fall back to the Datum value (default: 6). -->
   <xsl:variable name="CFG_PAGE_SIZE">
@@ -192,7 +192,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Pagination page size when filter is active (blank = use default) ----
+  <!-- ==== Pagination page size when filter is active (blank = use default) ====
        Editorial pattern: default view shows a featured hero + fewer tiles;
        active filtering flips to a denser utilitarian view. When blank, JS
        falls back to the default page size (no behavior change). -->
@@ -206,7 +206,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ---- Show/hide toggles ---- -->
+  <!-- ==== Show/hide toggles ==== -->
   <xsl:variable name="SHOW_MONTH"    select="not(/Properties/Datum[@ID='ShowMonth'] = 'false')" />
   <xsl:variable name="SHOW_REGION"   select="not(/Properties/Datum[@ID='ShowRegion'] = 'false')" />
   <xsl:variable name="SHOW_INDUSTRY" select="not(/Properties/Datum[@ID='ShowIndustry'] = 'false')" />
