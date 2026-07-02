@@ -18,12 +18,36 @@
   <xsl:variable name="CFG_HERO_SUBTITLE" select="/Properties/Datum[@ID='HeroSubtitle']" />
   <xsl:variable name="CRUMBS"            select="/Properties/Data/Group[@Name='Breadcrumb']" />
 
+  <!-- Padding overrides. Blank = use CSS default. Values are strings that
+       should include a unit (e.g. "24px", "0", "2rem"). Emitted as CSS
+       custom properties on the section's inline style so the CSS falls
+       back to its defaults for any variable that isn't set. -->
+  <xsl:variable name="CFG_PAD_TOP_MOBILE"    select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_MOBILE" select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])" />
+  <xsl:variable name="CFG_PAD_TOP_DESKTOP"   select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_DESKTOP" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])" />
+  <xsl:variable name="HAS_PAD_OVERRIDES" select="
+    $CFG_PAD_TOP_MOBILE != ''
+    or $CFG_PAD_BOTTOM_MOBILE != ''
+    or $CFG_PAD_TOP_DESKTOP != ''
+    or $CFG_PAD_BOTTOM_DESKTOP != ''
+  " />
+
 
   <!-- ============================================================
        MAIN TEMPLATE
        ============================================================ -->
   <xsl:template match="/">
+    <!-- Section labeled by its own H1 via aria-labelledby, so assistive
+         tech announces the section's accessible name as the page title
+         when entering the landmark. Only applied when the title exists. -->
     <section class="rbccm-conference-insights-hero" id="rbccm-conference-insights-hero">
+      <xsl:if test="normalize-space($CFG_HERO_TITLE) != ''">
+        <xsl:attribute name="aria-labelledby">rbccm-conference-insights-hero-title</xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$HAS_PAD_OVERRIDES">
+        <xsl:attribute name="style"><xsl:if test="$CFG_PAD_TOP_MOBILE != ''">--rbccm-cih-pt-m: <xsl:value-of select="$CFG_PAD_TOP_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_MOBILE != ''">--rbccm-cih-pb-m: <xsl:value-of select="$CFG_PAD_BOTTOM_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_TOP_DESKTOP != ''">--rbccm-cih-pt-d: <xsl:value-of select="$CFG_PAD_TOP_DESKTOP" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_DESKTOP != ''">--rbccm-cih-pb-d: <xsl:value-of select="$CFG_PAD_BOTTOM_DESKTOP" />;</xsl:if></xsl:attribute>
+      </xsl:if>
       <div class="rbccm-conference-insights-hero__inner">
 
         <!-- Breadcrumbs. Last crumb is current page (no link, aria-current). -->
@@ -38,27 +62,40 @@
                   <xsl:attribute name="class">
                     rbccm-conference-insights-hero__breadcrumb<xsl:if test="$IS_CURRENT or position() = last()"> rbccm-conference-insights-hero__breadcrumb--current</xsl:if>
                   </xsl:attribute>
-                  <xsl:choose>
-                    <xsl:when test="$IS_CURRENT or position() = last()">
+                  <!-- Every crumb is an <a> so Tab lands on it and screen
+                       readers announce the current page as "…, current page,
+                       link" (per WAI-ARIA Authoring Practices).
+
+                       Href fallback: when the author doesn't supply an Href
+                       on the current-page crumb, we fall back to "#" so the
+                       element stays focusable, AND add onclick="return false;"
+                       to neutralize the default (scroll-to-top + hash-in-URL).
+                       When an Href IS supplied, we use it verbatim — clicking
+                       the current page reloads that URL, matching APG. -->
+                  <a>
+                    <xsl:attribute name="href">
+                      <xsl:choose>
+                        <xsl:when test="normalize-space($HREF) != ''"><xsl:value-of select="$HREF" /></xsl:when>
+                        <xsl:otherwise>#</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:if test="$IS_CURRENT or position() = last()">
                       <xsl:attribute name="aria-current">page</xsl:attribute>
-                      <xsl:value-of select="$LABEL" disable-output-escaping="yes" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <a>
-                        <xsl:attribute name="href"><xsl:value-of select="$HREF" /></xsl:attribute>
-                        <xsl:value-of select="$LABEL" disable-output-escaping="yes" />
-                      </a>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                      <xsl:if test="normalize-space($HREF) = ''">
+                        <xsl:attribute name="onclick">return false;</xsl:attribute>
+                      </xsl:if>
+                    </xsl:if>
+                    <xsl:value-of select="$LABEL" disable-output-escaping="yes" />
+                  </a>
                 </li>
               </xsl:for-each>
             </ol>
           </nav>
         </xsl:if>
 
-        <!-- H1 -->
+        <!-- H1 — id matches the section's aria-labelledby -->
         <xsl:if test="normalize-space($CFG_HERO_TITLE) != ''">
-          <h1 class="rbccm-conference-insights-hero__title">
+          <h1 class="rbccm-conference-insights-hero__title" id="rbccm-conference-insights-hero-title">
             <xsl:value-of select="$CFG_HERO_TITLE" disable-output-escaping="yes" />
           </h1>
         </xsl:if>
@@ -79,6 +116,12 @@
 <Properties ComponentID="">
   <Datum ID="HeroTitle"    Type="String" Name="Hero title (H1)">Conference insights</Datum>
   <Datum ID="HeroSubtitle" Type="String" Name="Hero subtitle (paragraph)">Voices that shaped the market.</Datum>
+  <!-- Padding overrides. Leave blank to use component defaults
+       (mobile 40 / 40, desktop 64 / 48). Include a unit, e.g. "24px" or "2rem". -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 48px)"/>
 </Properties>
 
 <Data>

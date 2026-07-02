@@ -14,10 +14,18 @@
    Target rendered height on mobile is 198px. Because the default box-sizing
    is content-box, min-height does NOT include padding, so we subtract the
    80px of vertical padding: 198 − 80 = 118px. Content sits top-aligned by
-   default block flow (no flex centering). */
+   default block flow (no flex centering).
+
+   Padding is authored via CSS custom properties so Teamsite authors can
+   override just the top or bottom (mobile and desktop each) from the
+   component Datums without editing this file:
+     --rbccm-cih-pt-m   mobile padding-top     (default 40px)
+     --rbccm-cih-pb-m   mobile padding-bottom  (default 40px)
+     --rbccm-cih-pt-d   desktop padding-top    (default 64px, in the 992px block below)
+     --rbccm-cih-pb-d   desktop padding-bottom (default 48px, in the 992px block below) */
 .rbccm-conference-insights-hero {
   min-height: 118px;
-  padding: 40px 16px;
+  padding: var(--rbccm-cih-pt-m, 40px) 16px var(--rbccm-cih-pb-m, 40px);
   background: #ffffff;
 }
 
@@ -105,7 +113,7 @@
   .rbccm-conference-insights-hero {
     /* Target 258px rendered, minus 64+48 padding = 146px content min-height. */
     min-height: 146px;
-    padding: 64px 16px 48px;
+    padding: var(--rbccm-cih-pt-d, 64px) 16px var(--rbccm-cih-pb-d, 48px);
   }
 
   .rbccm-conference-insights-hero__breadcrumbs {
