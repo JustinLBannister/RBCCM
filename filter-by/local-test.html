@@ -45,13 +45,13 @@
 
       <div class="rbccm-filter__row">
 
-        <!-- Filter group: "Filter by:" label + Month + Region selects -->
+        <!-- Filter group: "Filter by:" label + Year + Region + Topic selects -->
         <div class="rbccm-filter__filter-group">
           <span class="rbccm-filter__filter-label">Filter by:</span>
 
-          <div class="rbccm-filter__select-wrap" data-filter="month">
-            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by month">
-              <span class="rbccm-filter__select-label">Month</span>
+          <div class="rbccm-filter__select-wrap" data-filter="year">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by year">
+              <span class="rbccm-filter__select-label">Year</span>
             </button>
             <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
               <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
@@ -67,11 +67,11 @@
             </svg>
           </div>
 
-          <!-- Industry: auto-populated from item data-industry values.
-               If no tile carries data-industry, this whole wrap hides.  -->
-          <div class="rbccm-filter__select-wrap" data-filter="industry">
-            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by industry">
-              <span class="rbccm-filter__select-label">Industry</span>
+          <!-- Topic: auto-populated from item data-topic values.
+               If no tile carries data-topic, this whole wrap hides.  -->
+          <div class="rbccm-filter__select-wrap" data-filter="topic">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by topic">
+              <span class="rbccm-filter__select-label">Topic</span>
             </button>
             <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
               <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
@@ -105,8 +105,8 @@
       <ul class="rbccm-conference-insights-tiles__row">
 
         <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
-            data-month="2026-06" data-region="global"
-            data-industry="timt financial-institutions"
+            data-year="2026" data-region="global"
+            data-topic="technology-innovation financial-institutions"
             data-search-text="the future of ai in financial services anthropic chief commercial officer artificial intelligence banking capital markets insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card rbccm-conference-insights-tiles__insight--featured" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -123,8 +123,8 @@
         </li>
 
         <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
-            data-month="2026-05" data-region="global gb"
-            data-industry="healthcare"
+            data-year="2026" data-region="global gb"
+            data-topic="healthcare"
             data-search-text="breakthrough innovations in precision medicine biotech executives investment opportunities insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Breakthrough Innovations in Precision Medicine. 6 min listen.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -141,8 +141,8 @@
         </li>
 
         <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
-            data-month="2026-06" data-region="global ca"
-            data-industry="energy-transition cross-sector"
+            data-year="2026" data-region="global ca"
+            data-topic="energy-transition"
             data-search-text="financing the clean energy transition capital requirements investment strategies renewable energy infrastructure">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Financing the Clean Energy Transition. 5 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -159,8 +159,8 @@
         </li>
 
         <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
-            data-month="2026-04" data-region="au"
-            data-industry="industrials"
+            data-year="2026" data-region="au"
+            data-topic="industrials"
             data-search-text="australian mining outlook resource sector iron ore lithium global commodity pricing insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Australian Mining Outlook. 4 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -177,8 +177,8 @@
         </li>
 
         <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
-            data-month="2026-03" data-region="de fr ae"
-            data-industry="financial-institutions"
+            data-year="2026" data-region="de fr ae"
+            data-topic="financial-institutions"
             data-search-text="european banking consolidation cross-border deals eurozone regulatory landscape 2026 insights emea uae dubai">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: European Banking Consolidation. 7 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -195,8 +195,8 @@
         </li>
 
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2025-12" data-region="sg hk"
-            data-industry="timt"
+            data-year="2025" data-region="sg hk"
+            data-topic="technology-innovation"
             data-search-text="asia pacific fintech innovations digital assets cross-border payment infrastructure singapore hong kong insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Asia Pacific FinTech Innovations. 5 min listen.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -214,7 +214,7 @@
 
         <!-- Card 7 — Global + US, Feb 2026 -->
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2026-02" data-region="global us"
+            data-year="2026" data-region="global us"
             data-search-text="global bond market outlook interest rates yield curve treasury macro fixed income insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Global Bond Market Outlook. 8 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -232,7 +232,7 @@
 
         <!-- Card 8 — UK / Ireland / Belgium (Europe), Jan 2026 -->
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2026-01" data-region="gb ie be"
+            data-year="2026" data-region="gb ie be"
             data-search-text="european esg regulations sustainability disclosure compliance sfdr taxonomy insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: European ESG Regulations Update. 6 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -250,7 +250,7 @@
 
         <!-- Card 9 — Canada, Nov 2025 -->
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2025-11" data-region="ca"
+            data-year="2025" data-region="ca"
             data-search-text="canadian tech sector deep dive innovation venture capital growth software ai insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Canadian Tech Sector Deep Dive. 4 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -268,7 +268,7 @@
 
         <!-- Card 10 — UAE + Global (EMEA logic), Oct 2025 -->
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2025-10" data-region="ae global"
+            data-year="2025" data-region="ae global"
             data-search-text="middle east oil dynamics energy transition opec production dubai abu dhabi insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Middle East Oil Dynamics. 5 min listen.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -286,7 +286,7 @@
 
         <!-- Card 11 — Australia + Malaysia + Global (APAC), Sep 2025 -->
         <li class="rbccm-conference-insights-tiles__item"
-            data-month="2025-09" data-region="au my global"
+            data-year="2025" data-region="au my global"
             data-search-text="emerging markets currency analysis fx trading volatility yuan ringgit rupiah asian currencies insights">
           <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Emerging Markets Currency Analysis. 7 min read.">
             <div class="rbccm-conference-insights-tiles__insight-media">
@@ -332,9 +332,9 @@
           <div class="rbccm-filter__filter-group">
             <span class="rbccm-filter__filter-label">Filter by:</span>
 
-            <div class="rbccm-filter__select-wrap" data-filter="month">
-              <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by month">
-                <span class="rbccm-filter__select-label">Month</span>
+            <div class="rbccm-filter__select-wrap" data-filter="year">
+              <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by year">
+                <span class="rbccm-filter__select-label">Year</span>
               </button>
               <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
                 <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -367,47 +367,47 @@
     </section>
 
     <div id="dark-scope" style="padding: 20px 16px; color: #fff; font-family: Roboto, Arial, sans-serif;">
-      <div data-month="2026-06" data-region="ca" data-search-text="canadian energy summit toronto"
+      <div data-year="2026" data-region="ca" data-search-text="canadian energy summit toronto"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Jun 15 • Toronto</strong> — Canadian Energy Summit
       </div>
-      <div data-month="2026-07" data-region="global gb" data-search-text="global markets outlook london"
+      <div data-year="2026" data-region="global gb" data-search-text="global markets outlook london"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Jul 10 • London</strong> — Global Markets Outlook
       </div>
-      <div data-month="2026-07" data-region="sg" data-search-text="asia pacific investor forum singapore"
+      <div data-year="2026" data-region="sg" data-search-text="asia pacific investor forum singapore"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Jul 22 • Singapore</strong> — Asia Pacific Investor Forum
       </div>
-      <div data-month="2026-08" data-region="global us" data-search-text="healthcare innovation summit new york biotech"
+      <div data-year="2026" data-region="global us" data-search-text="healthcare innovation summit new york biotech"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Aug 5 • New York</strong> — Healthcare Innovation Summit
       </div>
-      <div data-month="2026-08" data-region="au" data-search-text="australian resources forum sydney mining energy"
+      <div data-year="2026" data-region="au" data-search-text="australian resources forum sydney mining energy"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Aug 20 • Sydney</strong> — Australian Resources Forum
       </div>
-      <div data-month="2026-09" data-region="de" data-search-text="european insurance summit frankfurt reinsurance actuarial"
+      <div data-year="2026" data-region="de" data-search-text="european insurance summit frankfurt reinsurance actuarial"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Sep 8 • Frankfurt</strong> — European Insurance Summit
       </div>
-      <div data-month="2026-09" data-region="hk" data-search-text="apac tech investors day hong kong ai semiconductors venture"
+      <div data-year="2026" data-region="hk" data-search-text="apac tech investors day hong kong ai semiconductors venture"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Sep 22 • Hong Kong</strong> — APAC Tech Investors Day
       </div>
-      <div data-month="2026-10" data-region="ae" data-search-text="middle east investment forum dubai sovereign wealth infrastructure"
+      <div data-year="2026" data-region="ae" data-search-text="middle east investment forum dubai sovereign wealth infrastructure"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Oct 5 • Dubai</strong> — Middle East Investment Forum
       </div>
-      <div data-month="2026-10" data-region="global us" data-search-text="us financial services summit chicago banking regulation fed"
+      <div data-year="2026" data-region="global us" data-search-text="us financial services summit chicago banking regulation fed"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Oct 15 • Chicago</strong> — US Financial Services Summit
       </div>
-      <div data-month="2026-11" data-region="fr" data-search-text="european sustainability forum paris net zero climate finance"
+      <div data-year="2026" data-region="fr" data-search-text="european sustainability forum paris net zero climate finance"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Nov 10 • Paris</strong> — European Sustainability Forum
       </div>
-      <div data-month="2026-12" data-region="ca" data-search-text="canadian energy conference vancouver oil sands natural gas"
+      <div data-year="2026" data-region="ca" data-search-text="canadian energy conference vancouver oil sands natural gas"
            style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
         <strong>Dec 2 • Vancouver</strong> — Canadian Energy Conference
       </div>

@@ -218,15 +218,15 @@
             <xsl:variable name="HIDE_FOR_LM"  select="$HAS_HIDDEN_TILES and position() &gt; $CFG_INITIAL_VISIBLE" />
 
             <!-- ============================================================
-                 FILTER DATA ATTRIBUTES (net new July 2 wiring)
+                 FILTER DATA ATTRIBUTES (July 2 taxonomy)
                  The shared Filter By component (filter-by.html) reads
-                 these attributes off each tile to drive Month/Region/
-                 Industry dropdowns + full-text search. Each field is
+                 these attributes off each tile to drive Year/Region/
+                 Topic dropdowns + full-text search. Each field is
                  optional — the corresponding filter dropdown auto-hides
                  if no tile carries it. See article DCR for source fields:
-                   publish_date         → data-month  (YYYY-MM prefix)
+                   publish_date         → data-year   (YYYY prefix)
                    regional_relevancy   → data-region
-                   industry (checkbox)  → data-industry (space-separated)
+                   topic (checkbox)     → data-topic  (space-separated)
                    title + description  → data-search-text (lowercased)
                  ============================================================ -->
             <xsl:variable name="LI_DCR"    select="./Datum[@Name='Source DCR']/DCR/press_release" />
@@ -234,15 +234,15 @@
             <xsl:variable name="LI_REGION" select="normalize-space($LI_DCR/regional_relevancy)" />
 
             <li class="rbccm-conference-insights-tiles__item">
-              <xsl:if test="$LI_PUB != '' and string-length($LI_PUB) &gt;= 7">
-                <xsl:attribute name="data-month"><xsl:value-of select="substring($LI_PUB, 1, 7)" /></xsl:attribute>
+              <xsl:if test="$LI_PUB != '' and string-length($LI_PUB) &gt;= 4">
+                <xsl:attribute name="data-year"><xsl:value-of select="substring($LI_PUB, 1, 4)" /></xsl:attribute>
               </xsl:if>
               <xsl:if test="$LI_REGION != ''">
                 <xsl:attribute name="data-region"><xsl:value-of select="$LI_REGION" /></xsl:attribute>
               </xsl:if>
-              <xsl:if test="$LI_DCR/industry/*">
-                <xsl:attribute name="data-industry">
-                  <xsl:for-each select="$LI_DCR/industry/*">
+              <xsl:if test="$LI_DCR/topic/*">
+                <xsl:attribute name="data-topic">
+                  <xsl:for-each select="$LI_DCR/topic/*">
                     <xsl:if test="normalize-space(.) != ''">
                       <xsl:value-of select="normalize-space(.)" />
                       <xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>

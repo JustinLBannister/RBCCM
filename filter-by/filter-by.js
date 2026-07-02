@@ -14,7 +14,7 @@
 
    ---- Dimension-agnostic dropdowns -------------------------------------
    Every dropdown in the filter markup has `data-filter="<dim>"` (e.g.
-   "month", "region", "industry", "platform", "conference"). On init the
+   "year", "region", "topic", "platform", "conference"). On init the
    JS:
      - Scans all items for unique values of `data-<dim>`
      - Populates the dropdown with one option per unique value
@@ -29,7 +29,7 @@
 
    ---- Multi-value item attributes --------------------------------------
    Item data attributes can carry multiple values, whitespace / comma /
-   slash separated. e.g. data-industry="healthcare energy-transition"
+   slash separated. e.g. data-topic="healthcare energy-transition"
    or data-region="UK/US". The match logic checks if the selected
    dropdown value is any of the item's split values.
 
@@ -66,23 +66,31 @@
   };
 
   /* Known acronyms → keep uppercase in display labels rather than
-     title-casing them into "Timt", "Apac", etc. */
+     title-casing them into "Us", "Apac", etc. */
   var ACRONYM_LABELS = {
-    'timt':  'TIMT',
     'apac':  'APAC',
     'us':    'US',
     'usa':   'USA',
     'uk':    'UK',
     'ai':    'AI',
     'esg':   'ESG',
-    'pu&i':  'PU&I',
-    'pui':   'PU&I',
-    'fig':   'FIG',
     'emea':  'EMEA'
   };
 
-  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
-                     'July', 'August', 'September', 'October', 'November', 'December'];
+  /* Canonical Topic labels — kebab-case DCR values map to human-readable
+     labels with proper spaces and ampersands. Matches the July 2 taxonomy
+     Joe locked in (9 topics). Add here when new topics land in the DCR. */
+  var TOPIC_LABELS = {
+    'energy':                          'Energy',
+    'energy-transition':               'Energy Transition',
+    'financial-institutions':          'Financial Institutions',
+    'healthcare':                      'Healthcare',
+    'industrials':                     'Industrials',
+    'markets-economics':               'Markets & Economics',
+    'mining-materials':                'Mining & Materials',
+    'power-utilities-infrastructure':  'Power, Utilities & Infrastructure',
+    'technology-innovation':           'Technology & Innovation'
+  };
 
   var DEFAULT_STRINGS = {
     emptyHeading:           'No results found',
@@ -139,21 +147,25 @@
      hyphens replaced by spaces. */
   function formatValue(value, dim) {
     if (!value) return value;
-    if (dim === 'month') {
-      if (value.length >= 7 && /^\d{4}-\d{2}/.test(value)) {
-        var year  = value.substring(0, 4);
-        var month = parseInt(value.substring(5, 7), 10);
-        if (!isNaN(month) && month >= 1 && month <= 12) {
-          return MONTH_NAMES[month - 1] + ' ' + year;
-        }
-      }
+    /* Year is already display-ready ("2025", "2026") — pass through. */
+    if (dim === 'year') {
       return value;
     }
     if (dim === 'region') {
       return REGION_LABELS[value.toLowerCase()] || value;
     }
-    /* Title-case each space/hyphen-separated word, but keep known
-       acronyms all-caps ("timt" → "TIMT", not "Timt"). */
+    if (dim === 'topic') {
+      /* Canonical taxonomy label wins so ampersands, commas, and casing
+         match Joe's spreadsheet exactly. Falls back to generic title-case
+         for unknown topics (new taxonomy entries not yet added to map). */
+      return TOPIC_LABELS[value.toLowerCase()] || genericTitleCase(value);
+    }
+    /* Generic fallback for any other dimension: title-case each word,
+       keep known acronyms all-caps ("apac" → "APAC", not "Apac"). */
+    return genericTitleCase(value);
+  }
+
+  function genericTitleCase(value) {
     return value.replace(/[-_]+/g, ' ').replace(/\S+/g, function (word) {
       var lower = word.toLowerCase();
       if (ACRONYM_LABELS[lower]) return ACRONYM_LABELS[lower];
@@ -265,9 +277,9 @@
         }
       } else {
         values = rawTokens.slice();
-        /* Sort: month descending (newest first), everything else alphabetical. */
+        /* Sort: year descending (newest first), everything else alphabetical. */
         values.sort();
-        if (dim === 'month') values.reverse();
+        if (dim === 'year') values.reverse();
       }
 
       /* Read the default label from the button's initial text (e.g. "Month"). */

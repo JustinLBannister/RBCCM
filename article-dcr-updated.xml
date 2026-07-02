@@ -1,0 +1,1156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE data-capture-requirements SYSTEM "datacapture6.0.dtd">
+
+<!-- Note that the dtd-system-identifier may be changed to point to the correct location of pr.dtd
+if DTD validation is needed. -->
+
+<data-capture-requirements
+dtd-system-identifier=http://localhost/iw-cc/sample/press-release.dtd.txt
+dcr-validation="none" name="">
+<ruleset name="dct">
+
+<description>
+This form is used to write News Releases
+</description>
+<script language="javascript" src="/iw-cc/livesite/javascript/livesite-util.jsp"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/AjaxRequest.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/Map.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/DateFormat.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/DomUtil.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/StringUtil.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/HtmlUtil.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javasnavcript/VPathUtil.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/DependentItem.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/DependentUri.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/DependencyRegistry.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/FilenameSuggestion.class.js"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/LinkReplicant.class.jsp"></script>
+<script language="javascript" src="/iw-cc/livesite/javascript/formapi/LiveSiteDataCapture.class.js"></script>
+<script language="javascript" src="/iw-mount/default/main/intranet/cmweb/WORKAREA/shared/assets/js/jquery-1.9.1.js"></script>
+<script>
+<![CDATA[
+var lsContext = new LiveSiteDataCapture();
+var SCRIPT_LOCATION   = "/iw-bin/sync_metadata.ipl";
+
+function pad(n) {
+    return (n < 10) ? ("0" + n) : n;
+}
+
+function init() {
+    // set the publish date to today if not set
+    if ( IWDatacapture.getItem("/press_release/publish_date").getValue() == "")
+    {
+        var today = new Date();
+        IWDatacapture.getItem("/press_release/publish_date").setValue(today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(today.getDate()));
+    }
+
+   if ( IWDatacapture.getItem("/press_release/subcategory").getValue() == "")
+    {
+
+        IWDatacapture.getItem("/press_release/subcategory").setValue("Insights");
+    }
+
+
+populateParentPages();
+
+
+  FilenameSuggestion.setFilenameGenerator(getFilename);
+
+
+  //      IWEventRegistry.addItemHandler( "/press_release/myButton", "onCallout", handleOnCallout );
+
+
+    // ========== ADD THIS SECTION ==========
+    // BREADCRUMB DISPLAY ON LOAD - Show existing sitemap values
+    try {
+        // Only proceed if breadcrumb_display_text is blank
+        var existing_breadcrumb = "";
+        try {
+            existing_breadcrumb = IWDatacapture.getItem("/press_release/breadcrumb_display_text").getValue() || "";
+        } catch(e) {}
+
+        if (existing_breadcrumb == "") {
+            var parent_page = "";
+
+            // Get parent_page (Sitemap SELECT - hidden but may have saved values)
+            try {
+                var parent_item = IWDatacapture.getItem("/press_release/parent_page");
+                if (parent_item != null) {
+                    var selectedIdx = parent_item.getValue();
+                    var parentOptions = parent_item.getOptions();
+                    if (parentOptions != null && selectedIdx != null && selectedIdx !== "" && parentOptions[selectedIdx] != null) {
+                        parent_page = parentOptions[selectedIdx].value || "";
+                    }
+                }
+            } catch(e) {}
+
+            // Helper function to extract text from HTML li/a tags
+            function extractLabelsFromHtml(html) {
+                var labels = [];
+                var regex = />([^<]+)<\/a>/g;
+                var match;
+                while ((match = regex.exec(html)) !== null) {
+                    if (match[1].trim() != "") {
+                        labels.push(match[1].trim());
+                    }
+                }
+                return labels.join(" | ");
+            }
+
+            // If sitemap has values, display them on load
+            if (parent_page != "") {
+                var breadcrumb_value = extractLabelsFromHtml(parent_page);
+                if (breadcrumb_value == "") {
+                    breadcrumb_value = "Home | Insights"; // fallback
+                }
+                console.log("Sitemap breadcrumb on load: [" + breadcrumb_value + "]");
+                try {
+                    IWDatacapture.getItem("/press_release/breadcrumb_display_text").setValue(breadcrumb_value);
+                } catch(e) {}
+            }
+        } else {
+            console.log("Breadcrumb display text already has value: [" + existing_breadcrumb + "]");
+        }
+    } catch(e) {
+        console.log("Breadcrumb load error: " + e.message);
+    }
+    // ========== END OF ADDED SECTION ==========
+
+
+}
+
+function handleOnSaveDone() {
+
+  var service_url  = https:// + window.location.hostname + SCRIPT_LOCATION ;
+  var params                          = new Object();
+  params.dcr                        = IWDatacapture.getDCRPath();
+  IWDatacapture.callServer( service_url, params );
+  return true;
+}
+
+function handleOnSave ()
+  {
+   // replace $ signs in title and description
+      var title = IWDatacapture.getItem("/press_release/title").getValue();
+      title = title.replace(/\$/g, '&#36;');
+      /*title = title.replace(/\"/g, '&quot;');
+      title = title.replace(/\./g, '&period;');*/
+      IWDatacapture.getItem("/press_release/title").setValue(title);
+
+      var description = IWDatacapture.getItem("/press_release/description").getValue();
+      description = description.replace(/\$/g, '&#36;');
+      //description = description.replace(/\"/g, '&quot;');
+      IWDatacapture.getItem("/press_release/description").setValue(description);
+
+
+
+    // AUTHOR DISPLAY TEXT SECTION
+
+    var author_display_text = "";
+
+    if (IWDatacapture.getItem("/press_release/byline/author_name_byline").getValue() != "") {
+      console.log(IWDatacapture.getItem("/press_release/byline/author_name_byline").getValue());
+      author_display_text = IWDatacapture.getItem("/press_release/byline/author_name_byline").getValue();
+    }
+    else {
+
+      var authors = [];
+
+      for (let i = 1; i <= 11; i++) {
+      // Make sure this loops end value is the same as max number of authors in the root container
+        var author_item = IWDatacapture.getItem("/press_release/author-section[" + i.toString() + "]/author/author_name_new");
+        var author_company = IWDatacapture.getItem("/press_release/author-section[" + i.toString() + "]/author/author_company_new");
+        if (author_item != null && author_item.getValue() != "") {
+          var author_str = "";
+          if (author_company != null && author_company.getValue() != "" && IWDatacapture.getItem("/press_release/author-section[" + i.toString() + "]/author/title_append_new").getValue() == "0") {
+            author_str += ", " + author_company.getValue();
+          }
+
+          authors.push(author_item.getValue() + author_str);
+        }
+      }
+
+
+      if (authors.length == 1) {
+        author_display_text += "<strong>" + authors[0] + "</strong>";
+      }
+      else if (authors.length == 2) {
+        author_display_text += "<strong>" + authors[0] + "</strong>";
+        author_display_text += " and <strong>" + authors[1] + "</strong>";
+      }
+      else if (authors.length > 2) {
+        author_display_text += "<strong>" + authors[0] + "</strong>";
+        for (var i = 1; i < authors.length - 1; i++) {
+          if (author_display_text.charAt(author_display_text.length - 1) != ",") {
+            author_display_text += ","
+          }
+          author_display_text += " " + "<strong>" + authors[i] + "</strong>";
+        }
+        author_display_text += " & " + "<strong>" + authors[authors.length - 1] + "</strong>";
+      }
+    }
+
+    if (author_display_text.charAt(author_display_text.length - 1) == ",") {
+      author_display_text = author_display_text.slice(0, -1)
+    }
+
+    console.log(author_display_text)
+
+    IWDatacapture.getItem("/press_release/author_display_text").setValue(author_display_text);
+
+    console.log(IWDatacapture.getItem("/press_release/author_display_text").getValue());
+
+    console.log(IWDatacapture.getItem("/press_release/byline/author_title_byline").getValue());
+
+
+
+       // BREADCRUMB VALUE SECTION
+    try {
+        var breadcrumb_value = "";
+        var manual_breadcrumb = "";
+        var dropdown_breadcrumb = "";
+        var parent_page = "";
+
+        // Get manual-breadcrumb (text field)
+        try { manual_breadcrumb = IWDatacapture.getItem("/press_release/manual-breadcrumb").getValue() || ""; } catch(e) {}
+
+        // Get dropdown-breadcrumb (SELECT)
+        try {
+            var dropdown_item = IWDatacapture.getItem("/press_release/dropdown-breadcrumb");
+            if (dropdown_item != null) {
+                var selectedIndex = dropdown_item.getValue();
+                var options = dropdown_item.getOptions();
+                if (options != null && selectedIndex != null && selectedIndex !== "" && options[selectedIndex] != null) {
+                    dropdown_breadcrumb = options[selectedIndex].value || "";
+                }
+            }
+        } catch(e) {}
+
+        // Get parent_page (SELECT)
+        try {
+            var parent_item = IWDatacapture.getItem("/press_release/parent_page");
+            if (parent_item != null) {
+                var selectedIdx = parent_item.getValue();
+                var parentOptions = parent_item.getOptions();
+                if (parentOptions != null && selectedIdx != null && selectedIdx !== "" && parentOptions[selectedIdx] != null) {
+                    parent_page = parentOptions[selectedIdx].value || "";
+                }
+            }
+        } catch(e) {}
+
+        // Helper function to extract text from HTML li/a tags
+        function extractLabelsFromHtml(html) {
+            var labels = [];
+            // Match text between > and </a>
+            var regex = />([^<]+)<\/a>/g;
+            var match;
+            while ((match = regex.exec(html)) !== null) {
+                if (match[1].trim() != "") {
+                    labels.push(match[1].trim());
+                }
+            }
+            return labels.join(" | ");
+        }
+
+        if (manual_breadcrumb != "") {
+            // Extract labels from HTML
+            breadcrumb_value = extractLabelsFromHtml(manual_breadcrumb);
+            if (breadcrumb_value == "") {
+                breadcrumb_value = manual_breadcrumb; // fallback if not HTML
+            }
+        }
+        else if (dropdown_breadcrumb != "") {
+            // Format: /en/insights::Insights|/en/insights/ai::AI
+            var parts = dropdown_breadcrumb.split("|");
+            var labels = ["Home"];
+            for (var i = 0; i < parts.length; i++) {
+                var linkLabel = parts[i].split("::");
+                if (linkLabel.length == 2) {
+                    labels.push(linkLabel[1]);
+                }
+            }
+            breadcrumb_value = labels.join(" | ");
+        }
+        else if (parent_page != "") {
+            // Extract labels from HTML
+            breadcrumb_value = extractLabelsFromHtml(parent_page);
+            if (breadcrumb_value == "") {
+                breadcrumb_value = "Home | Insights"; // fallback
+            }
+        }
+        else {
+            breadcrumb_value = "Home | Insights";
+        }
+
+        console.log("breadcrumb_value: [" + breadcrumb_value + "]");
+
+        try { IWDatacapture.getItem("/press_release/breadcrumb_display_text").setValue(breadcrumb_value); } catch(e) {}
+    } catch(e) {
+        console.log("Breadcrumb error: " + e.message);
+    }
+
+
+
+
+    // AUTHOR DISPLAY TEXT SECTION
+
+    var time_to_read = IWDatacapture.getItem("/press_release/time_to_read").getValue();
+
+    var typeOptions = IWDatacapture.getItem("/press_release/story_type").getOptions();
+    var typeSelected = IWDatacapture.getItem("/press_release/story_type").getValue();
+    var type = typeOptions[typeSelected].value;
+
+  if ((time_to_read == '')&&(type=='text')&&(IWDatacapture.getItem("/press_release/content") != null))
+  {
+
+  var content = IWDatacapture.getItem("/press_release/content").getChildren()[0].getValue();
+  var time = Math.round($(content).text().split(" ").length / 250);
+   IWDatacapture.getItem("/press_release/time_to_read").setValue(time + " min");
+  }
+       var can_url = IWDatacapture.getItem("/press_release/can_url").getValue();
+
+                   if (can_url == '') {
+         var canonical_url = IWDatacapture.getDCRPath();
+         can_url = canonical_url.replace("//strplvact10001.fg.rbc.com/default/main/internet/rbccm/WORKAREA/shared/",https://www.rbccm.com/en/story/story.page?dcr=);
+       }
+      IWDatacapture.getItem("/press_release/can_url").setValue(can_url);
+      return true;
+  }
+
+
+/**
+* Gets the suggested filename.
+*/
+function getFilename()
+{
+
+    var date = IWDatacapture.getItem("/press_release/publish_date").getValue();
+    var dateArr = date.split("-");
+
+    var fileName = IWDatacapture.getItem("/press_release/title").getValue();
+      fileName = fileName.replace(/\$/g, '');
+      fileName = fileName.replace(/\"/g, '');
+      fileName = fileName.replace(/\./g, '');
+
+   if (IWDatacapture.getItem("/press_release/related_article_side").getValue() == "1") {
+     return "/related-articles/" +                  lsContext.getSafeFilename(fileName.toLowerCase()).replace(/\_/g, '-');
+  }
+  else if (IWDatacapture.getItem("/press_release/related_article_side").getValue() == "0") {
+    return dateArr[0] + "/" + dateArr[1] + "/" +                        lsContext.getSafeFilename(fileName.toLowerCase()).replace(/\_/g, '-');
+  }
+}
+
+
+
+
+function populateParentPages (){
+    var pathToXml = "/iw-mount/default/main/internet/rbccm/WORKAREA/shared/sites/rbccm/default.sitemap";
+  $.ajax({
+    type: "GET",
+    url: pathToXml,
+    dataType: "xml",
+    success: function(xml){
+    console.log(xml);
+
+
+        var rootNode = $(xml).find("segment").children("node");
+        console.log(rootNode.children("label").text());
+      console.log(rootNode.children("link").text());
+
+
+      IWDatacapture.getItem("/press_release/parent_page").addOption(new Option("Home", '<li><a href="/en/">Home</a></li>', false, false));
+
+
+      rootNode.children("node").each(function (){
+        var self = $(this);
+
+        if ($(this).attr('visible-in-breadcrumbs') !== 'true') {
+            return;
+        }
+
+        var label = $(this).children("label").text();
+        var link = $(this).children("link").children("value").text();
+        console.log(label + " | " + link);
+
+        var linkHref = link.startsWith('http') ? link : '/en/' + link;
+
+        IWDatacapture.getItem("/press_release/parent_page").addOption(new Option(label, '<li><a href="/en/">Home</a></li><li><a href="'+linkHref+'">' + label +'</a></li>', false, false));
+
+      });
+
+
+
+
+      rootNode.children("node").each(function (){
+        var self = $(this);
+
+        if ($(this).attr('visible-in-breadcrumbs') !== 'true') {
+            return;
+        }
+
+        var label = $(this).children("label").text();
+        var link = $(this).children("link").children("value").text();
+
+
+        if (label != "Policies and Disclaimers"){
+        self.children("node").each(function (){
+
+          if ($(this).attr('visible-in-breadcrumbs') !== 'true') {
+            return;
+        }
+
+        var clabel = $(this).children("label").text();
+        var clink = $(this).children("link").children("value").text();
+        console.log(label + " > " + clabel + " | " + clink);
+
+        var parentLinkHref = link.startsWith('http') ? link : '/en/' + link;
+        var childLinkHref = clink.startsWith('http') ? clink : '/en/' + clink;
+
+        IWDatacapture.getItem("/press_release/parent_page").addOption(new Option("  " + clabel, '<li><a href="/en/">Home</a></li><li><a href="'+parentLinkHref+'">' + label +'</a></li><li><a href="'+childLinkHref+'">' + clabel +'</a></li>', false, false));
+        });
+        }
+
+
+      });
+
+
+
+      }
+   });
+}
+
+function populateAuthor(item)
+{
+   console.log(item.getValue());
+
+   var pathToXml = "/iw-mount/default/main/internet/rbccm/WORKAREA/shared" + item.getValue();
+   $.ajax({
+    type: "GET",
+    url: pathToXml,
+    dataType: "xml",
+    success: function(xml){
+    console.log(xml);
+    IWDatacapture.getItem("/press_release/author_name").setValue($(xml).find("name").text());
+    IWDatacapture.getItem("/press_release/author_id").setValue($(xml).find("id").text());
+    IWDatacapture.getItem("/press_release/author_title").setValue($(xml).find("title").text() + ", " +  $(xml).find("subtitle").text());
+    IWDatacapture.getItem("/press_release/author_image").setValue($(xml).find("photo").text());
+    IWDatacapture.getItem("/press_release/author_email").setValue($(xml).find("email").text());
+    IWDatacapture.getItem("/press_release/author_linkedin").setValue($(xml).find("linkedin").text());
+    IWDatacapture.getItem("/press_release/author_twitter").setValue($(xml).find("twitter").text());
+    IWDatacapture.getItem("/press_release/author_bio").setValue($(xml).find("bio").text());
+      }
+   });
+}
+
+function populateAuthorNew(item)
+{
+   console.log(item);
+   console.log(item.getName());
+   console.log(item.getValue());
+
+   var itemPath = item.getName().replace("author_dcr_new", "");
+   console.log(itemPath)
+
+   var pathToXml = "/iw-mount/default/main/internet/rbccm/WORKAREA/shared" + item.getValue();
+   $.ajax({
+    type: "GET",
+    url: pathToXml,
+    dataType: "xml",
+    success: function(xml){
+    console.log(xml);
+    IWDatacapture.getItem(itemPath + "author_id_new").setValue($(xml).find("id").text());
+    IWDatacapture.getItem(itemPath + "author_name_new").setValue($(xml).find("name").text());
+    IWDatacapture.getItem(itemPath + "author_title_new").setValue($(xml).find("title").text());
+    IWDatacapture.getItem(itemPath + "author_company_new").setValue($(xml).find("subtitle").text());
+    IWDatacapture.getItem(itemPath + "author_image_new").setValue($(xml).find("photo").text());
+    IWDatacapture.getItem(itemPath + "author_email_new").setValue($(xml).find("email").text());
+    IWDatacapture.getItem(itemPath + "author_linkedin_new").setValue($(xml).find("linkedin").text());
+    IWDatacapture.getItem(itemPath + "author_twitter_new").setValue($(xml).find("twitter").text());
+    IWDatacapture.getItem(itemPath + "author_bio_new").setValue($(xml).find("bio").text());
+      }
+   });
+}
+
+// Call the initialization routine on load.
+IWEventRegistry.addFormHandler("onFormInit", init);
+IWEventRegistry.addFormHandler( "onSaveDone", handleOnSaveDone );
+IWEventRegistry.addFormHandler( "onSave", handleOnSave );
+IWEventRegistry.addItemHandler( "/press_release/author_dcr", "onItemChange", populateAuthor );
+// Add event handler for each author
+for (let i = 1; i <= 11; i++) { // Make sure this loops end value is the same as max number of authors in the root container
+    IWEventRegistry.addItemHandler( "/press_release/author-section[" + i.toString() + "]/author/author_dcr_new", "onItemChange", populateAuthorNew );
+}
+]]>
+</script>
+
+<root-container name="press_release" location="press_release">
+
+  <item name="related_article_side" pathid="related_article_side">
+    <label>Type of Article:</label>
+    <description>If Related Content selected, will be saved to related-content folder</description>
+    <radio>
+      <option label="Insights Article" value="1" selected="t" />
+      <option label="Related Content Article/Link" value="0" />
+    </radio>
+  </item>
+
+  <item name="publish_date" pathid="publish_date">
+    <label>Publish Date</label>
+    <description>Date format is YYYY-MM-DD (save with today date then change to 0000-00-00 before publishing for
+      preview)</description>
+    <text required="t" maxlength="10" validation-regex="^[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]$" />
+  </item>
+
+  <item name="title" pathid="title">
+    <label>Headline Title (under 70 chars)</label>
+    <description>Required: &lt;strong style='color: #f00;'&gt;Under 70 chars to abide by SEO guidelines (not exceed
+      this text field box)&lt;/strong&gt;</description>
+    <text required="t" size="60" maxlength="100" />
+  </item>
+
+  <item name="description" pathid="description">
+    <label>Summary (under 140 chars)</label>
+    <description>&lt;strong style='color: #f00;'&gt;No HTML syntax is allowed (incl no
+      breaks) 120 (max 140) chars&lt;/strong&gt;</description>
+    <textarea rows="4" cols="64" required="f" />
+  </item>
+
+  <item name="secondary_nav" pathid="secondary_nav">
+    <label>Secondary Navigation (only if requested)</label>
+    <description>Select for campaign episodes etc. (Default: No Navigation. )</description>
+    <select required="t">
+      <option label="No Navigation" value="none" selected="t"></option>
+      <option label="Customize Navigation" value="customize"></option>
+      <option label="Biopharma" value="biopharma"></option>
+      <option label="Healthcare" value="healthcare"></option>
+      <option label="Strategic Alternatives" value="strategic"></option>
+      <option label="Real-Time Geopolitics" value="geo"></option>
+      <option label="Partner of Choice" value="sterling"></option>
+    </select>
+  </item>
+
+  <container name="navlink" pathid="navlink" combination="and" max="4" location="navlink">
+        <label>Customize Secondary Navigation (only if requested)</label>
+        <description>Add up to 4 menu items.</description>
+        <container name="nav" pathid="nav" location="nav">
+          <item name="name" pathid="name">
+            <label>Menu Name</label>
+            <text required="f" size="50" maxlength="500" />
+          </item>
+
+          <item name="link" pathid="link">
+            <label>Menu Link</label>
+            <text required="f" size="50" maxlength="500" />
+          </item>
+        </container>
+  </container>
+
+  <item name="subcategory" pathid="subcategory">
+    <label>Subcategory Tiles (leave as Insights unless specified)</label>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="title_eyebrow" pathid="title_eyebrow">
+    <label>Above Title Eyebrow (ONLY if requested)</label>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="parent_page" pathid="parent_page" visible="false">
+    <label>Breadcrumb Link (from sitemap)</label>
+    <select>
+    </select>
+  </item>
+
+  <item name="breadcrumb_display_text" pathid="breadcrumb_display_text">
+    <label>Preview Breadcrumb Text</label>
+    <description>Autogenerated on form save.</description>
+    <text required="f" size="50" maxlength="500" readonly="t" />
+  </item>
+
+<item name="dropdown-breadcrumb" pathid="dropdown-breadcrumb">
+    <label> Breadcrumb Link (defaults Insights) </label>
+                <select>
+                                <option label="Australia" value="/en/australia::Australia"></option>
+        <option label="Artificial Intelligence" value="/en/insights::Insights|/en/insights/ai::Artificial Intelligence"></option>
+        <option label="Campus Recruiting" value="/en/careers::Careers|/en/careers/campus-recruiting::Campus Recruiting"></option>
+                                <option label="Cash Management – RBC Clear" value="/en/expertise::Expertise|/en/expertise/rbcclear::Cash Management - RBC Clear"></option>
+        <option label="Corporate Banking" value="/en/expertise::Expertise|/en/expertise/corporate-banking::Corporate Banking"></option>
+        <option label="Energy Transition" value="/en/expertise::Expertise|/en/expertise/energy-transition::Energy Transition"></option>
+        <option label="European Insights" value="/en/insights::Insights|/en/insights/european-insights::European Insights"></option>
+        <option label="Expertise" value="/en/expertise::Expertise"></option>
+        <option label="Geopolitics" value="/en/insights::Insights|/en/insights/real-time-geopolitics::Geopolitics"></option>
+        <option label="Global Investment Banking" value="/en/expertise::Expertise|/en/expertise/global-investment-banking::Global Investment Banking"></option>
+        <option label="Global Markets" value="/en/expertise::Expertise|/en/expertise/global-markets::Global Markets"></option>
+        <option label="Imagine" value="/en/insights::Insights|/en/insights/imagine::RBC Imagine"></option>
+
+        <option label="Insights" value="/en/insights::Insights"></option>
+        <option label="Outlook" value="/en/insights::Insights|/en/insights/outlook-2026::Outlook"></option>
+        <option label="Outlook - AI" value="/en/insights::Insights|/en/insights/ai::Artificial Intelligence|/en/insights/outlook-2026::Outlook"></option>
+        <option label="Outlook - Geopolitics" value="/en/insights::Insights|/en/insights/real-time-geopolitics::Geopolitics|/en/insights/outlook-2026::Outlook"></option>
+        <option label="Outlook - Markets in Motion" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/markets-in-motion::Markets in Motion|/en/insights/outlook-2026::Outlook"></option>
+        <option label="Outlook - Pathfinders in Biopharma " value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/biopharma::Pathfinders in Biopharma|/en/insights/outlook-2026::Outlook"></option>
+        <option label="Outlook - Strategic Alternatives" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/strategic-alternatives::Strategic Alternatives|/en/insights/outlook-2026::Outlook"></option>
+  <option label="Our Impact" value="/en/our-impact::Our Impact"></option>
+                                <option label="Podcasts" value="/en/insights::Insights|/en/insights/podcasts::Podcasts"></option>
+<option label="Macro Minutes" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/macro-minutes::Macro Minutes"></option>
+        <option label="Markets in Motion" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/markets-in-motion::Markets in Motion"></option>
+        <option label="Pathfinders in Biopharma" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/biopharma::Pathfinders in Biopharma"></option>
+        <option label="Powering Sustainable Ideas" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/powering-sustainable-ideas::Powering Sustainable Ideas"></option>
+        <option label="Strategic Alternatives" value="/en/insights::Insights|/en/insights/podcasts::Podcasts|/en/insights/podcasts/strategic-alternatives::Strategic Alternatives"></option>
+        <option label="Research" value="/en/expertise::Expertise|/en/insights/rbc-research::Research"></option>
+        <option label="RBC Elements" value="/en/expertise::Expertise|/en/expertise/elements/index::RBC Elements"></option>
+        <option label="Sustainable Finance" value="/en/expertise::Expertise|/en/expertise/sustainable-finance::Sustainable Finance"></option>
+        <option label="Transactions" value="/en/expertise::Expertise|/en/expertise/transactions::Transactions"></option>
+        <option label="Trade and Tariffs" value="/en/insights::Insights|/en/insights/trade-and-tariffs::Trade and Tariffs"></option>
+        <option label="US Municipal Finance" value="/en/expertise::Expertise|/en/expertise/us-municipal-finance::US Municipal Finance"></option>
+    </select>
+  </item>
+
+
+<item name="manual-breadcrumb" pathid="manual-breadcrumb">
+    <label>Enter Breadcrumbs manually as - a href inside li without ul, without space between li tag (ONLY if required) (ONLY if required)</label>
+    <text required="f" size="50" maxlength="400" />
+  </item>
+
+
+
+  <item name="business_line" pathid="business_line">
+    <label>Business Line (leave empty)</label>
+    <radio>
+      <option label="Research" value="research" />
+      <option label="Global Markets" value="globalmarkets" />
+      <option label="Global Investment Banking" value="globalinvestmentbanking" />
+    </radio>
+  </item>
+
+  <item name="theme" pathid="theme">
+    <label>Content Theme / Series (Technology, Healthcare etc.) (leave empty)</label>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+
+  <item name="thumbnail" pathid="thumbnail">
+    <label>Tile/Thumbnail Image (WEBP)</label>
+    <description>Required: Tile image on Insights feed (must be 1200x628 .webp)</description>
+    <browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
+  </item>
+
+  <item name="banner" pathid="banner">
+    <label>Banner Image (WEBP)</label>
+    <description>Required: Banner Image (must be 1920x475 .webp)</description>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="video" pathid="video">
+    <label>Video Link from Brightcove</label>
+    <description>Optional: video player URL&lt;br/&gt;IF IN PAGE - start brightcove player with
+      //players.brightcove.net&lt;br/&gt;&lt;strong style='color: #f00;'&gt;RBCCM Autoplay Player URL-- link must be
+      with our Brightcove account&lt;/strong&gt;&lt;br/&gt;IF EXTERNAL - use http[s]</description>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="podcast" pathid="podcast">
+    <label>Audio/Podcast Link from Captivate full URL</label>
+    <description>Optional: Captivate player embed URL</description>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="can_url" pathid="can_url">
+    <label>Canonical URL (leave empty will autofill)</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+<item name="video-title" pathid="video-title">
+    <label>Banner Video/Podcast Title (above Video Button)</label>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+<item name="video-title-order" pathid="video-title-order">
+    <label>Show Banner Video/Podcast Title AFTER Article Title</label>
+    <description>Yes, will display Video/Podcast Title AFTER Article Title and BEFORE Summry/Article Description</description>
+    <radio>
+      <option label="Yes" value="Y"/>
+      <option label="No" value="N"  selected="t" />
+    </radio>
+  </item>
+
+  <item name="podcast_type" pathid="podcast_type">
+    <label>Banner Audio links</label>
+    <select required="t">
+      <option label="No Links" value="none" selected="t"></option>
+      <option label="Custom Links" value="customize"></option>
+      <option label="Biopharma" value="biopharma"></option>
+      <option label="Industries in Motion" value="industries"></option>
+      <option label="Markets in Motion" value="markets"></option>
+      <option label="Strategic Alternatives" value="strategic"></option>
+      <option label="Powering Sustainable Ideas" value="psi"></option>
+      <option label="Macro Minutes" value="macrominutes" />
+    </select>
+  </item>
+
+
+    <container name="podcastlink" pathid="podcastlink" location="podcastlink">
+      <label>Custom Banner Audio Links (overwrite selection above)</label>
+      <item name="apple" pathid="apple">
+        <label>Apple</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+
+      <item name="spotify" pathid="spotify">
+        <label>Spotify</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+
+      <item name="google" pathid="google">
+        <label>Google</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+    </container>
+
+  <container name="podcastPlayer" pathid="podcastPlayer" combination="and" max="4" location="podcastPlayer">
+        <label>Podcast Player within Content section</label>
+        <description>Add up to 4 items.</description>
+        <container name="player" pathid="player" location="player">
+          <item name="link" pathid="link">
+            <label>Podcast Link</label>
+            <description>Captivate player embed URL</description>
+            <text required="f" size="50" maxlength="500" />
+          </item>
+        </container>
+  </container>
+
+  <container name="content" combination="or" max="1">
+    <item name="content" pathid="content">
+      <label>Content</label>
+      <textarea required="f" rows="30" cols="75" wrap="virtual" external-editor="tinymce" />
+    </item>
+    <item name="link" pathid="link">
+      <label>External URL</label>
+      <text required="f" size="50" maxlength="200" />
+    </item>
+  </container>
+
+  <item name="keypoints" pathid="keypoints">
+    <label>Keypoints (MAX three to five include periods . and MAX 215 chars each)</label>
+    <textarea required="f" rows="15" cols="75" wrap="virtual" external-editor="tinymce" />
+  </item>
+
+  <item name="article_transcript" pathid="article_transcript">
+    <label>Article Transcript</label>
+    <description>Put transcript page URL here</description>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="footnote_heading" pathid="footnote_heading">
+    <label>Custom Footnotes heading (Default: + Footnotes)</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="footnotes" pathid="footnotes">
+    <label>Footnotes</label>
+    <textarea required="f" rows="15" cols="75" wrap="virtual" external-editor="tinymce" />
+  </item>
+
+  <item name="story_type" pathid="story_type">
+    <label>Story Type</label>
+    <radio>
+      <option label="Text Only" value="text" selected="t" />
+      <option label="Video/Watch" value="video" />
+      <option label="Podcast/Audio/Listen" value="audio" />
+    </radio>
+  </item>
+
+  <item name="time_to_read" pathid="time_to_read">
+    <label>Time to read (autofill when Content added - X min) (leave blank when saving OR use wordcounter.net)</label>
+    <description>&lt;br/&gt;Enter time for other options (Whole number
+      round down &lt;strong style='color: #f00;'&gt;X min&lt;/strong&gt;)</description>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="time_to_watch" pathid="time_to_watch">
+                <label>Time to Watch or Listen in Banner (X min)</label>
+                <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="language" pathid="language">
+    <label>Language (always English)</label>
+    <description>Select the language of this article.</description>
+    <radio>
+      <option label="English" value="en" selected="t" />
+    </radio>
+  </item>
+
+  <item name="region" pathid="region">
+    <label>Region (always Global only)</label>
+    <description>Select the region of this article.</description>
+    <checkbox required="t">
+      <option label="Global" value="global" selected="t" />
+      <option label="Australia" value="au" />
+      <option label="Belgium" value="be" />
+      <option label="Canada" value="ca" />
+      <option label="China / Hong Kong" value="hk" />
+      <option label="France" value="fr" />
+      <option label="Germany" value="de" />
+      <option label="Italy" value="it" />
+      <option label="Ireland" value="ie" />
+      <option label="Luxembourg" value="lu" />
+      <option label="Malaysia" value="my" />
+      <option label="Singapore" value="sg" />
+      <option label="Switzerland" value="ch" />
+      <option label="United Arab Emirates" value="ae" />
+      <option label="United Kingdom" value="gb" />
+    </checkbox>
+  </item>
+
+  <!-- <item name="hostname" pathid="hostname">
+    <label>Host Name</label>
+    <text required="f" size="50" maxlength="500" />
+  </item> -->
+
+
+  <item name="author_heading" pathid="author_heading">
+    <label>Heading: Custom right side Authors (Defaults: Our experts)</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="author_side_hide" pathid="author_side_hide">
+    <label>Show Authors on right side or Content section bottom</label>
+    <description>Must always be Show on right side.</description>
+    <radio>
+      <option label="Hide Both" value="0" />
+      <option label="Show Right Side" value="1" selected="t" />
+      <option label="Show Bottom" value="2"  />
+      <option label="Show Both" value="3"  />
+    </radio>
+  </item>
+
+  <!-- Make sure max number of authors is the same in the for loop for adding event handlers -->
+  <container name="author-section" location="author-section" combination="and" max="15">
+    <label>Author(s)</label>
+    <description>Add up to four Authors. Use Update Manually section, if needed.</description>
+    <container name="author" pathid="author" location="author">
+      <item name="author_dcr_new" pathid="author_dcr_new">
+        <label>Select Existing Author</label>
+        <browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm/authors/data" required="f" readonly="f" />
+      </item>
+      <item name="author_id_new" pathid="author_id_new">
+        <label>Author ID</label>
+        <text required="f" size="50" maxlength="200" readonly="t" />
+      </item>
+      <item name="author_name_new" pathid="author_name_new">
+        <label>Author Name (Default Top Byline)</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="author_title_new" pathid="author_title_new">
+        <label>Author Title</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="author_company_new" pathid="author_company_new">
+        <label>Author Company</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="title_append_new" pathid="title_append_new">
+        <label>Show company name in the Byline</label>
+        <radio>
+          <option label="Yes" value="Y" />
+          <option label="No" value="N" selected="t" />
+        </radio>
+      </item>
+      <item name="author_image_new" pathid="author_image_new">
+        <label>Author Photo</label>
+        <browser required="f" extns='gif,jpg,png' initial-dir='/assets/' ceiling-dir='/assets/' />
+      </item>
+      <item name="author_email_new" pathid="author_email_new">
+        <label>Author Email</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="author_linkedin_new" pathid="author_linkedin_new">
+        <label>Author LinkedIn Profile Link</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="author_twitter_new" pathid="author_twitter_new">
+        <label>Author Twitter Profile Link</label>
+        <text required="f" size="50" maxlength="500" />
+      </item>
+      <item name="author_bio_new" pathid="author_bio_new">
+        <label>Author Bio Content</label>
+        <textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce" />
+      </item>
+    </container>
+  </container>
+
+  <item name="author_display_text" pathid="author_display_text">
+    <label>Preview Author Display Text</label>
+    <description>Autogenerated on form save.</description>
+    <text required="f" size="50" maxlength="500" readonly="t" />
+  </item>
+
+  <item name="featuring" pathid="featuring">
+    <label>Preview Featuring Display Text</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <container name="byline">
+    <label>(Optional) Update Manually - Top Author Byline</label>
+    <item name="author_name_byline" pathid="author_name_byline">
+      <label>Manually Update Author Byline 1st line</label>
+      <description>To manually update the top Author byline.</description>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+    <item name="author_title_byline" pathid="author_title_byline">
+      <label>Manually Update Author Byline 2nd line</label>
+      <description>To manually update the second Author byline.</description>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+  </container>
+
+<item name="guest_heading" pathid="guest_heading">
+  <label>Heading: Custom Featured guests (Default: Featured guest)</label>
+  <text required="f" size="50" maxlength="500" />
+</item>
+
+  <item name="guest_side_hide" pathid="guest_side_hide">
+    <label>Show Guests on the side or at bottom</label>
+    <description>Must always be Show on the side, few exceptions.</description>
+    <radio>
+      <option label="Hide Both" value="0" />
+      <option label="Show Right Side" value="1" selected="t"/>
+      <option label="Show Bottom" value="2" />
+      <option label="Show Both" value="3" />
+    </radio>
+  </item>
+
+<container name="guests" combination="and" max="6" location="guests">
+  <label>Featured Guest</label>
+  <container name="guest" pathid="guest" location="guest">
+
+    <item name="featured_guest" pathid="featured_guest">
+      <label>Featured Guest Name</label>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+
+    <item name="guest_image" pathid="guest_image">
+      <label>Featured Guest Photo</label>
+      <browser required="f" extns='gif,jpg,png' initial-dir='/assets/' ceiling-dir='/assets/' />
+    </item>
+
+    <item name="guest_title" pathid="guest_title">
+      <label>Guest Title</label>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+
+    <item name="guest_email" pathid="guest_email">
+      <label>Guest Email</label>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+
+    <item name="guest_linkedin" pathid="guest_linkedin">
+      <label>Guest Linkedin</label>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+
+    <item name="guest_twitter" pathid="guest_twitter">
+      <label>Guest Twitter</label>
+      <text required="f" size="50" maxlength="500" />
+    </item>
+
+    <item name="guest_bio" pathid="guest_bio">
+      <label>Guest Bio</label>
+      <textarea required="f" rows="20" cols="75" wrap="virtual" external-editor="tinymce" />
+    </item>
+  </container>
+</container>
+
+
+<container name="callout" pathid="callout" location="callout">
+  <label>Customize Right Side Callout Box (usually for series)</label>
+  <description>Will auto generate callout box for Markets in Motion article leave empty, fill in below to overwrite</description>
+  <item name="callout_title" pathid="callout_title">
+    <label>Callout Box Main Title</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="callout_description" pathid="callout_description">
+    <label>Callout Box Summary (optional)</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="callout_image" pathid="callout_image">
+    <label>Callout Box Background image</label>
+    <browser required="f" extns='gif,jpg,png' initial-dir='/assets/' ceiling-dir='/assets/'/>
+  </item>
+
+  <item name="callout_link" pathid="callout_link">
+    <label>Callout Box Tile Link</label>
+    <text required="f" size="50" maxlength="200" />
+  </item>
+
+  <item name="callout_linktext" pathid="callout_linktext">
+    <label>Callout Box Link Text</label>
+    <description>defaults to 'Download'</description>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+
+  <item name="callout_subtitle" pathid="callout_subtitle">
+    <label>Callout Box Eyebrow</label>
+    <text required="f" size="50" maxlength="500" />
+  </item>
+</container>
+
+<item name="related-th-image" pathid="related-th-image">
+    <label>Show First Related Content image?</label>
+    <description>Default Yes, if NO is selected, it will hide thumbnail image for Related Content section</description>
+    <radio>
+      <option label="Yes" value="Y" selected="t" />
+      <option label="No" value="N" />
+    </radio>
+  </item>
+
+  <container name="related-stories" combination="and" max="3">
+    <item name="story" pathid="story">
+      <label>Related Content story path - always starts with / (Right Side)</label>
+      <browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata" required="f" readonly="f" />
+    </item>
+  </container>
+
+  <container name="related-stories-bottom" combination="and" max="3">
+    <item name="story-bottom" pathid="story-bottom">
+      <label>Related Content story path - always starts with / (Bottom Below Content section)</label>
+      <browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata" required="f" readonly="f" />
+    </item>
+  </container>
+
+  <item name="sitelocation" pathid="sitelocation">
+    <label>Location to Feature - *Do not add these until ready to go live* AND Always check these pages after go live</label>
+    <description>&lt;strong style='color: #f00;'&gt;*Do not add these until ready to go live*&lt;/strong&gt;</description>
+    <checkbox required="f">
+      <option label="Insights" value="insights" />
+      <option label="AI" value="ai" />
+      <option label="Australia" value="australia" />
+      <option label="Beyond the Ballot" value="beyond the ballot" />
+      <option label="Biopharma" value="biopharma" />
+      <option label="Commercial Fx" value="commercial fx" />
+      <option label="Diversity &amp; Inclusion" value="diversity inclusion" />
+      <option label="Energy Transition" value="energy" />
+      <option label="ESG Stratify" value="esg stratify" />
+      <option label="European Insights" value="european insights" />
+      <option label="GIB Hub" value="gib" />
+      <option label="Geopolitics Insights" value="geopolitics insights" />
+      <!--<option label="Homepage" value="homepage" />-->
+      <!--<option label="Industries in Motion" value="industries-in-motion" />-->
+      <option label="Imagine" value="imagine" />
+      <option label="Macro Minutes" value="macro minutes" />
+      <option label="Markets in Motion" value="markets in motion" />
+      <option label="Mining Metals" value="mining-metals" />
+      <option label="Our Impact" value="our impact" />
+      <option label="Partner of Choice" value="partner of choice" />
+      <option label="Powering Sustainable Ideas" value="powering sustainable ideas" />
+      <option label="RBC Clear" value="rbc clear" />
+      <option label="Strategic Alternatives" value="strategic alternatives" />
+      <option label="Sustainable Finance Solutions" value="sustainable finance solutions" />
+      <option label="Tech &amp; Innovation" value="tech innovation" />
+      <option label="Technology" value="technology" />
+      <option label="Conference Insights" value="conference-insights" />
+    </checkbox>
+  </item>
+
+  <container name="metatags2">
+    <item name="descriptionmeta" pathid="descriptionmeta">
+      <label>SEO Description (provided by business)</label>
+      <description>Required - use Summary/Description if unavailable</description>
+      <textarea required="f" rows="4" cols="64" wrap="virtual" maxlength="160" />
+    </item>
+    <item name="keywordsmeta" pathid="keywordsmeta">
+      <label>SEO Keywords (provided by business)</label>
+      <description>Required - Comma separated, six to nine keywords only.</description>
+      <textarea required="f" rows="2" cols="64" wrap="virtual" />
+    </item>
+  </container>
+
+  <item name="tags" pathid="tags">
+    <label>Additional Tags / Keywords (must add a few from SEO Keywords if not provided)</label>
+    <text required="f" size="50" maxlength="265" />
+  </item>
+
+
+  <!-- ================================================================
+       NET NEW FIELDS FOR CONFERENCE INSIGHTS FILTER
+       Added to power the filter UI on the Conference Insights page
+       (Platform, Industry, Regional Origination, Regional Relevancy,
+       Associated Conference / Event). Populate these on every new
+       article going forward. Legacy articles will need a manual
+       backfill before the filter shows them under those buckets.
+       ================================================================ -->
+
+  <item name="platform" pathid="platform">
+    <label>Platform</label>
+    <description>&lt;strong style='color: #f00;'&gt;net new july 2 field for Conference Insights filter&lt;/strong&gt; - Which platform this article belongs to.</description>
+    <select required="f">
+      <option label="- select -" value="" selected="t" />
+      <option label="Conferences and Events" value="conferences-and-events" />
+      <option label="Strategy &amp; Economics" value="strategy-economics" />
+      <option label="Sustainability &amp; Transition" value="sustainability-transition" />
+      <option label="Strategic Alternatives" value="strategic-alternatives" />
+    </select>
+  </item>
+
+  <item name="topic" pathid="topic">
+    <label>Topic</label>
+    <description>&lt;strong style='color: #f00;'&gt;net new july 2 field for Conference Insights filter&lt;/strong&gt; - Check every topic this article covers. Multiple topics allowed — one article can be tagged with e.g. Energy Transition + Financial Institutions. Taxonomy locked in with Joe on July 2; "Topic" is broader than "Industry" so articles about Markets/Economics or Geopolitics fit cleanly.</description>
+    <checkbox required="f">
+      <option label="Energy" value="energy" />
+      <option label="Energy Transition" value="energy-transition" />
+      <option label="Financial Institutions" value="financial-institutions" />
+      <option label="Healthcare" value="healthcare" />
+      <option label="Industrials" value="industrials" />
+      <option label="Markets &amp; Economics" value="markets-economics" />
+      <option label="Mining &amp; Materials" value="mining-materials" />
+      <option label="Power, Utilities &amp; Infrastructure" value="power-utilities-infrastructure" />
+      <option label="Technology &amp; Innovation" value="technology-innovation" />
+    </checkbox>
+  </item>
+
+  <container name="associated-conferences" combination="and" max="3">
+    <label>Associated Conference / Event</label>
+    <description>&lt;strong style='color: #f00;'&gt;net new july 2 field for Conference Insights filter&lt;/strong&gt; - Pick the conference(s) this article covers from the existing upcoming-conferences data (browse into templatedata/about-us/conferences/data). Up to 3, for articles that cross multiple events. Bidirectional link: each conference's page can show articles that reference it.</description>
+    <item name="conference" pathid="conference">
+      <label>Conference / Event</label>
+      <browser initial-dir="templatedata/about-us/conferences/data" ceiling-dir="templatedata/about-us/conferences/data" required="f" readonly="f" />
+    </item>
+  </container>
+
+  <item name="regional_origination" pathid="regional_origination">
+    <label>Regional Origination</label>
+    <description>&lt;strong style='color: #f00;'&gt;net new july 2 field for Conference Insights filter&lt;/strong&gt; - Where the article was written / originated.</description>
+    <select required="f">
+      <option label="- select -" value="" selected="t" />
+      <option label="Global" value="global" />
+      <option label="Canada" value="canada" />
+      <option label="US" value="us" />
+      <option label="Europe" value="europe" />
+      <option label="APAC" value="apac" />
+    </select>
+  </item>
+
+  <item name="regional_relevancy" pathid="regional_relevancy">
+    <label>Regional Relevancy</label>
+    <description>&lt;strong style='color: #f00;'&gt;net new july 2 field for Conference Insights filter&lt;/strong&gt; - Which region the article is relevant to (target audience).</description>
+    <select required="f">
+      <option label="- select -" value="" selected="t" />
+      <option label="Global" value="global" />
+      <option label="Canada" value="canada" />
+      <option label="US" value="us" />
+      <option label="Europe" value="europe" />
+      <option label="APAC" value="apac" />
+    </select>
+  </item>
+
+  <!-- ================================================================
+       END NET NEW FIELDS
+       ================================================================ -->
+
+
+</root-container>
+
+</ruleset>
+</data-capture-requirements>

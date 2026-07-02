@@ -94,12 +94,12 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ==== Month select "All" label ==== -->
-  <xsl:variable name="CFG_MONTH_ALL" select="normalize-space(/Properties/Datum[@ID='MonthAllLabel'])" />
-  <xsl:variable name="MONTH_ALL">
+  <!-- ==== Year select "All" label ==== -->
+  <xsl:variable name="CFG_YEAR_ALL" select="normalize-space(/Properties/Datum[@ID='YearAllLabel'])" />
+  <xsl:variable name="YEAR_ALL">
     <xsl:choose>
-      <xsl:when test="$CFG_MONTH_ALL != ''"><xsl:value-of select="$CFG_MONTH_ALL" /></xsl:when>
-      <xsl:otherwise>Month</xsl:otherwise>
+      <xsl:when test="$CFG_YEAR_ALL != ''"><xsl:value-of select="$CFG_YEAR_ALL" /></xsl:when>
+      <xsl:otherwise>Year</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
 
@@ -112,12 +112,12 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- ==== Industry select "All" label ==== -->
-  <xsl:variable name="CFG_INDUSTRY_ALL" select="normalize-space(/Properties/Datum[@ID='IndustryAllLabel'])" />
-  <xsl:variable name="INDUSTRY_ALL">
+  <!-- ==== Topic select "All" label ==== -->
+  <xsl:variable name="CFG_TOPIC_ALL" select="normalize-space(/Properties/Datum[@ID='TopicAllLabel'])" />
+  <xsl:variable name="TOPIC_ALL">
     <xsl:choose>
-      <xsl:when test="$CFG_INDUSTRY_ALL != ''"><xsl:value-of select="$CFG_INDUSTRY_ALL" /></xsl:when>
-      <xsl:otherwise>Industry</xsl:otherwise>
+      <xsl:when test="$CFG_TOPIC_ALL != ''"><xsl:value-of select="$CFG_TOPIC_ALL" /></xsl:when>
+      <xsl:otherwise>Topic</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
 
@@ -207,9 +207,9 @@
   </xsl:variable>
 
   <!-- ==== Show/hide toggles ==== -->
-  <xsl:variable name="SHOW_MONTH"    select="not(/Properties/Datum[@ID='ShowMonth'] = 'false')" />
+  <xsl:variable name="SHOW_YEAR"    select="not(/Properties/Datum[@ID='ShowYear'] = 'false')" />
   <xsl:variable name="SHOW_REGION"   select="not(/Properties/Datum[@ID='ShowRegion'] = 'false')" />
-  <xsl:variable name="SHOW_INDUSTRY" select="not(/Properties/Datum[@ID='ShowIndustry'] = 'false')" />
+  <xsl:variable name="SHOW_TOPIC" select="not(/Properties/Datum[@ID='ShowTopic'] = 'false')" />
   <xsl:variable name="SHOW_SEARCH" select="not(/Properties/Datum[@ID='ShowSearch'] = 'false')" />
   <xsl:variable name="SHOW_RESET"  select="not(/Properties/Datum[@ID='ShowReset'] = 'false')" />
 
@@ -253,8 +253,8 @@
 
         <div class="rbccm-filter__row">
 
-          <!-- Filter group: "Filter by:" label + Month/Region selects -->
-          <xsl:if test="$SHOW_MONTH or $SHOW_REGION or $SHOW_INDUSTRY">
+          <!-- Filter group: "Filter by:" label + Year/Region/Topic selects -->
+          <xsl:if test="$SHOW_YEAR or $SHOW_REGION or $SHOW_TOPIC">
             <div class="rbccm-filter__filter-group">
               <span class="rbccm-filter__filter-label"><xsl:value-of select="$FILTER_BY_LABEL" /></span>
 
@@ -263,11 +263,11 @@
                    time from the target container's data-<dim> values. Wrap
                    auto-hides itself if no items carry the corresponding
                    attribute. -->
-              <xsl:if test="$SHOW_MONTH">
-                <div class="rbccm-filter__select-wrap" data-filter="month">
+              <xsl:if test="$SHOW_YEAR">
+                <div class="rbccm-filter__select-wrap" data-filter="year">
                   <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false">
-                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$MONTH_ALL" /></xsl:attribute>
-                    <span class="rbccm-filter__select-label"><xsl:value-of select="$MONTH_ALL" /></span>
+                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$YEAR_ALL" /></xsl:attribute>
+                    <span class="rbccm-filter__select-label"><xsl:value-of select="$YEAR_ALL" /></span>
                   </button>
                   <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
                     <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor" />
@@ -287,11 +287,11 @@
                 </div>
               </xsl:if>
 
-              <xsl:if test="$SHOW_INDUSTRY">
-                <div class="rbccm-filter__select-wrap" data-filter="industry">
+              <xsl:if test="$SHOW_TOPIC">
+                <div class="rbccm-filter__select-wrap" data-filter="topic">
                   <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false">
-                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$INDUSTRY_ALL" /></xsl:attribute>
-                    <span class="rbccm-filter__select-label"><xsl:value-of select="$INDUSTRY_ALL" /></span>
+                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$TOPIC_ALL" /></xsl:attribute>
+                    <span class="rbccm-filter__select-label"><xsl:value-of select="$TOPIC_ALL" /></span>
                   </button>
                   <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
                     <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor" />
@@ -383,7 +383,7 @@
        ============================================================= -->
   <Datum ID="AriaLabel"            Type="String" Name="Section aria-label">Filter conference insights</Datum>
   <Datum ID="FilterByLabel"        Type="String" Name="'Filter by:' label">Filter by:</Datum>
-  <Datum ID="MonthAllLabel"        Type="String" Name="Month 'all' option text">Month</Datum>
+  <Datum ID="YearAllLabel"        Type="String" Name="Year 'all' option text">Year</Datum>
   <Datum ID="RegionAllLabel"       Type="String" Name="Region 'all' option text">Region</Datum>
   <Datum ID="SearchPlaceholder"    Type="String" Name="Search input placeholder">Search conference insights articles</Datum>
   <Datum ID="SearchAriaLabel"      Type="String" Name="Search input aria-label">Search conference insights articles by title or keyword</Datum>
@@ -407,10 +407,10 @@
   <!-- =============================================================
        SHOW/HIDE TOGGLES
        ============================================================= -->
-  <Datum ID="ShowMonth"    Type="Boolean" Name="Show Month filter">true</Datum>
+  <Datum ID="ShowYear"    Type="Boolean" Name="Show Year filter">true</Datum>
   <Datum ID="ShowRegion"   Type="Boolean" Name="Show Region filter">true</Datum>
-  <Datum ID="ShowIndustry" Type="Boolean" Name="Show Industry filter (auto-hides if no articles carry data-industry)">true</Datum>
-  <Datum ID="IndustryAllLabel" Type="String" Name="Industry dropdown default label"/>
+  <Datum ID="ShowTopic" Type="Boolean" Name="Show Topic filter (auto-hides if no articles carry data-topic)">true</Datum>
+  <Datum ID="TopicAllLabel" Type="String" Name="Topic dropdown default label"/>
   <Datum ID="ShowSearch" Type="Boolean" Name="Show Search input">true</Datum>
   <Datum ID="ShowReset"  Type="Boolean" Name="Show Clear filters button">true</Datum>
 </Properties>
