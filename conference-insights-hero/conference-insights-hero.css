@@ -25,12 +25,16 @@
      --rbccm-cih-pb-d   desktop padding-bottom (default 48px, in the 992px block below) */
 .rbccm-conference-insights-hero {
   min-height: 118px;
+  /* Top margin clears the site's absolutely-positioned nav bar so the hero
+     content isn't hidden underneath it. 40px on mobile, bumped to 80px on
+     desktop in the 992px block below. */
+  margin-top: 40px;
   padding: var(--rbccm-cih-pt-m, 40px) 16px var(--rbccm-cih-pb-m, 40px);
   background: #ffffff;
 }
 
 .rbccm-conference-insights-hero__inner {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
@@ -48,8 +52,9 @@
   flex-wrap: wrap;
   align-items: center;
   color: var(--Blue-Dark-Blue, #003168);
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;   /* mobile default */
+  font-style: normal;
   font-weight: 400;
   line-height: normal;
 }
@@ -57,10 +62,15 @@
 .rbccm-conference-insights-hero__breadcrumb {
   display: inline-flex;
   align-items: center;
+  /* Explicit color on the <li> — beats the site-wide `li { color: #424242; }`
+     bare-tag override (BEM class specificity 0,1,0 beats tag 0,0,1). */
+  color: var(--Blue-Dark-Blue, #003168);
 }
 
 .rbccm-conference-insights-hero__breadcrumb a {
-  color: inherit;
+  /* Also set explicitly on the <a> — some site-wide `li a` rules apply
+     their own color and would still override `color: inherit`. */
+  color: var(--Blue-Dark-Blue, #003168);
   text-decoration: none;
 }
 
@@ -113,11 +123,16 @@
   .rbccm-conference-insights-hero {
     /* Target 258px rendered, minus 64+48 padding = 146px content min-height. */
     min-height: 146px;
+    margin-top: 80px;   /* clears the taller desktop nav bar */
     padding: var(--rbccm-cih-pt-d, 64px) 16px var(--rbccm-cih-pb-d, 48px);
   }
 
   .rbccm-conference-insights-hero__breadcrumbs {
     margin-bottom: 48px;
+  }
+
+  .rbccm-conference-insights-hero__breadcrumb-list {
+    font-size: 18px;   /* desktop bump */
   }
 
   .rbccm-conference-insights-hero__title {
