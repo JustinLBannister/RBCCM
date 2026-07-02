@@ -215,6 +215,52 @@
       </xsl:if>
       <div class="rbccm-conference-insights-tiles__inner">
 
+        <!-- Skeleton placeholders — shown until the Filter By JS finishes
+             initializing (marker attribute `data-filter-ready="true"`).
+             Same layout as the real row (1 featured card on top + 3-up
+             row below) so nothing shifts when real tiles cross-fade in.
+             aria-hidden so screen readers ignore the shimmer state. -->
+        <div class="rbccm-conference-insights-tiles__skeleton" aria-hidden="true">
+          <div class="rbccm-conference-insights-tiles__skeleton-card rbccm-conference-insights-tiles__skeleton-card--featured">
+            <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+            <div class="rbccm-conference-insights-tiles__skeleton-body">
+              <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+            </div>
+          </div>
+          <div class="rbccm-conference-insights-tiles__skeleton-row">
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Row is a semantic <ul> so screen readers announce "list of N".
              Each card sits inside a <li> with display: contents (see CSS)
              so the <a> remains the direct CSS Grid child — the li box

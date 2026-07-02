@@ -56,6 +56,150 @@
   list-style: none;
   margin: 0 0 32px 0;
   padding: 0;
+  /* Fade the real tile row in once the Filter By component has finished
+     initializing (see [data-filter-ready] below). Prevents the "all
+     tiles flash → some hide → visible tiles reveal" jump on page load. */
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+/* Once the filter JS attaches `data-filter-ready="true"` to the tiles
+   container, cross-fade the real row in and unmount the skeleton. */
+.rbccm-conference-insights-tiles[data-filter-ready="true"] .rbccm-conference-insights-tiles__row {
+  opacity: 1;
+}
+
+.rbccm-conference-insights-tiles[data-filter-ready="true"] .rbccm-conference-insights-tiles__skeleton {
+  display: none;
+}
+
+
+/* ---------- Skeleton ----------
+   Facebook-style tile placeholders shown before the filter JS finishes
+   initializing. Same layout as the real tile row (1 featured card on
+   top, then 3-up at desktop) so nothing shifts when real content lands.
+   The shimmer is a moving diagonal gradient overlaid on each card via
+   ::before pseudo. */
+
+.rbccm-conference-insights-tiles__skeleton {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin: 0 0 32px 0;
+}
+
+.rbccm-conference-insights-tiles__skeleton-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-conference-insights-tiles__skeleton-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Each skeleton card is a stack of gray blocks representing an image,
+   a title, and two description bars. Shimmer sweeps across via an
+   inner ::before pseudo. */
+.rbccm-conference-insights-tiles__skeleton-card {
+  background: #f0f0f0;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+}
+
+/* Featured card: horizontal layout (image left, text right) at desktop. */
+.rbccm-conference-insights-tiles__skeleton-card--featured {
+  min-height: 280px;
+}
+
+@media (min-width: 992px) {
+  .rbccm-conference-insights-tiles__skeleton-card--featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
+
+/* Image placeholder */
+.rbccm-conference-insights-tiles__skeleton-image {
+  background: #dcdcdc;
+  height: 240px;
+  width: 100%;
+}
+
+.rbccm-conference-insights-tiles__skeleton-card--featured .rbccm-conference-insights-tiles__skeleton-image {
+  height: 100%;
+  min-height: 240px;
+}
+
+/* Text area with faux title + description bars */
+.rbccm-conference-insights-tiles__skeleton-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rbccm-conference-insights-tiles__skeleton-title {
+  background: #cfcfcf;
+  border-radius: 4px;
+  height: 20px;
+  width: 75%;
+  margin-top: 12px;
+}
+
+.rbccm-conference-insights-tiles__skeleton-desc {
+  background: #dcdcdc;
+  border-radius: 4px;
+  height: 10px;
+  width: 100%;
+}
+
+.rbccm-conference-insights-tiles__skeleton-desc--short {
+  width: 60%;
+}
+
+.rbccm-conference-insights-tiles__skeleton-meta {
+  background: #dcdcdc;
+  border-radius: 4px;
+  height: 10px;
+  width: 30%;
+  margin-top: 12px;
+}
+
+/* Shimmer sweep — animated gradient overlay across every card. */
+.rbccm-conference-insights-tiles__skeleton-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0)   0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0)   100%);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  animation: rbccm-tiles-skeleton-shimmer 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes rbccm-tiles-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Reduced motion — kill the shimmer and just show static gray cards. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-conference-insights-tiles__skeleton-card::before {
+    display: none;
+  }
+  .rbccm-conference-insights-tiles__row {
+    transition: none;
+  }
 }
 
 /* Each <li> is a transparent wrapper — display: contents removes the li box

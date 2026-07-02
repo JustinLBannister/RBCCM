@@ -755,6 +755,13 @@
     if (resetBtn) resetBtn.addEventListener('click', resetFilters);
 
     apply(false);
+
+    /* Signal to consumer CSS that the filter has initialized and tiles
+       are in their correct visible/hidden state. Consumers can hide the
+       tile grid (opacity 0) + show a skeleton state until this attribute
+       lands, then cross-fade to the real tiles — kills the "everything
+       flashes then re-renders" moment on page load. */
+    container.setAttribute('data-filter-ready', 'true');
   }
 
   function init() {
