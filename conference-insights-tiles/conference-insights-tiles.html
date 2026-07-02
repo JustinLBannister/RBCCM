@@ -5,16 +5,12 @@
      to full-width horizontal (image left, text right at desktop).
 
      Markup mirrors the live featured-conferences insight cards:
-       <a class="...__insight ...__insight--card">
-         <div class="...__insight-media"><img></div>
-         <div class="...__insight-body">
-           <div class="...__insight-label">…</div>
-           <div class="...__insight-divider" aria-hidden="true"></div>
-           <h4 class="...__insight-title">…</h4>
-           <p class="...__insight-desc">…</p>
-           <p class="...__insight-meta"><span>…</span><svg>arrow</svg></p>
-         </div>
-       </a>
+     an <a> with the base "insight" + "insight (card modifier)" classes
+     wraps a media div (img) and a body div (label, divider, title, desc,
+     meta). BEM modifier separator is the standard double dash; the
+     literal sequence is reserved by the XML spec and cannot appear
+     inside a comment body. See the CSS file for the canonical class
+     list.
 
      Includes the v2 Load-More pattern with one new flag, ShowAfterLoadAlways,
      which un-gates the View All button so it renders unconditionally. -->
