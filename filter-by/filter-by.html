@@ -414,3 +414,9 @@
   <Datum ID="ShowSearch" Type="Boolean" Name="Show Search input">true</Datum>
   <Datum ID="ShowReset"  Type="Boolean" Name="Show Clear filters button">true</Datum>
 </Properties>
+
+<!-- Empty <Data> block required by Interwoven's DTD even though this
+     component has no Groups (all config is inline Datums). Without it,
+     the parser reaches EOF looking for <Data> and reports "premature
+     end of file" — mLine[-1] mColumn[-1]. -->
+<Data/>
