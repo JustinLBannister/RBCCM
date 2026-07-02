@@ -40,6 +40,34 @@
   <xsl:variable name="CFG_VIEW_ALL_CLASS"         select="/Properties/Datum[@ID='ViewAllClass']" />
   <xsl:variable name="CFG_EYEBROW_DEFAULT"        select="/Properties/Datum[@ID='EyebrowDefault']" />
 
+  <!-- Tile title heading level. Defaults to h2 so the tile grid is a
+       coherent secondary landmark under a page-level h1. Authors can drop
+       to h3/h4/h5/h6 via the TitleHeadingLevel SelectSingle Datum for pages
+       where h2 would break the outline (e.g. embedded under another h2). -->
+  <xsl:variable name="CFG_TITLE_LEVEL">
+    <xsl:choose>
+      <xsl:when test="normalize-space(/Properties/Datum[@ID='TitleHeadingLevel']/Option[@Selected='true']/Value) != ''">
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='TitleHeadingLevel']/Option[@Selected='true']/Value)" />
+      </xsl:when>
+      <xsl:otherwise>h2</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- Padding overrides. Blank = use CSS default. Values are strings that
+       should include a unit (e.g. "24px", "0", "2rem"). Emitted as CSS
+       custom properties on the section's inline style so the CSS falls
+       back to its defaults for any variable that isn't set. -->
+  <xsl:variable name="CFG_PAD_TOP_MOBILE"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_MOBILE"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])" />
+  <xsl:variable name="CFG_PAD_TOP_DESKTOP"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_DESKTOP" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])" />
+  <xsl:variable name="HAS_PAD_OVERRIDES" select="
+    $CFG_PAD_TOP_MOBILE != ''
+    or $CFG_PAD_BOTTOM_MOBILE != ''
+    or $CFG_PAD_TOP_DESKTOP != ''
+    or $CFG_PAD_BOTTOM_DESKTOP != ''
+  " />
+
   <xsl:variable name="HAS_HIDDEN_TILES" select="$FLAG_ENABLE_LOAD_MORE and count(/Properties/Data/Group[@Name='Story Tile']) &gt; $CFG_INITIAL_VISIBLE" />
   <xsl:variable name="RENDER_CONTROLS"  select="$HAS_HIDDEN_TILES or $FLAG_SHOW_VIEW_ALL_ALWAYS" />
 
@@ -89,11 +117,28 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- Screen-reader-only single announcement for the whole card link, so
+         SR users hear "Insights: The Future of AI in Financial Services. 2
+         min read. Opens in new window." rather than each child element
+         concatenated. Composed of eyebrow + title + meta + new-tab hint. -->
+    <xsl:variable name="ARIA_LABEL">
+      <xsl:value-of select="$EYEBROW" />
+      <xsl:text>: </xsl:text>
+      <xsl:value-of select="$TITLE_TEXT" />
+      <xsl:if test="normalize-space($META_TEXT) != ''">
+        <xsl:text>. </xsl:text>
+        <xsl:value-of select="$META_TEXT" />
+      </xsl:if>
+      <xsl:text>.</xsl:text>
+      <xsl:if test="$OPEN_NEW_TAB"><xsl:text> Opens in new window.</xsl:text></xsl:if>
+    </xsl:variable>
+
     <a>
       <xsl:attribute name="class">
         rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card<xsl:if test="$is_featured = 'true'"> rbccm-conference-insights-tiles__insight--featured</xsl:if>
       </xsl:attribute>
       <xsl:attribute name="href"><xsl:value-of select="$LINK" /></xsl:attribute>
+      <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL" /></xsl:attribute>
       <xsl:if test="$OPEN_NEW_TAB">
         <xsl:attribute name="target">_blank</xsl:attribute>
         <xsl:attribute name="rel">noopener noreferrer</xsl:attribute>
@@ -104,9 +149,11 @@
       </xsl:if>
 
       <div class="rbccm-conference-insights-tiles__insight-media">
-        <img loading="lazy">
+        <!-- alt="" because the visible title/description is right next to
+             the image inside the same link. Non-empty alt would cause the
+             title to be announced twice. -->
+        <img loading="lazy" alt="">
           <xsl:attribute name="src"><xsl:value-of select="$ARTICLE_THUMBNAIL" /></xsl:attribute>
-          <xsl:attribute name="alt"><xsl:value-of select="$TITLE_TEXT" /></xsl:attribute>
         </img>
       </div>
 
@@ -114,9 +161,10 @@
         <div class="rbccm-conference-insights-tiles__insight-label"><xsl:value-of select="$EYEBROW" /></div>
         <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
 
-        <h4 class="rbccm-conference-insights-tiles__insight-title">
+        <xsl:element name="{$CFG_TITLE_LEVEL}">
+          <xsl:attribute name="class">rbccm-conference-insights-tiles__insight-title</xsl:attribute>
           <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes" />
-        </h4>
+        </xsl:element>
 
         <p class="rbccm-conference-insights-tiles__insight-desc">
           <xsl:choose>
@@ -146,10 +194,24 @@
   <xsl:template match="/">
     <xsl:variable name="ARTICLES" select="/Properties/Data/Group[@Name='Story Tile']" />
 
+    <!-- Shared CSS + JS (relative path is /assets/rbccm/... in production).
+         Scoping these to the component keeps authors from having to touch
+         page-level settings — drop the tile component on any page and
+         everything renders correctly on its own. -->
+    <link rel="stylesheet" href="/assets/rbccm/css/components/conference-insights-tiles.css" />
+    <script src="/assets/rbccm/js/components/conference-insights-tiles.js"></script>
+
     <section class="rbccm-conference-insights-tiles" id="rbccm-conference-insights-tiles">
+      <xsl:if test="$HAS_PAD_OVERRIDES">
+        <xsl:attribute name="style"><xsl:if test="$CFG_PAD_TOP_MOBILE != ''">--rbccm-cit-pt-m: <xsl:value-of select="$CFG_PAD_TOP_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_MOBILE != ''">--rbccm-cit-pb-m: <xsl:value-of select="$CFG_PAD_BOTTOM_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_TOP_DESKTOP != ''">--rbccm-cit-pt-d: <xsl:value-of select="$CFG_PAD_TOP_DESKTOP" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_DESKTOP != ''">--rbccm-cit-pb-d: <xsl:value-of select="$CFG_PAD_BOTTOM_DESKTOP" />;</xsl:if></xsl:attribute>
+      </xsl:if>
       <div class="rbccm-conference-insights-tiles__inner">
 
-        <div class="rbccm-conference-insights-tiles__row">
+        <!-- Row is a semantic <ul> so screen readers announce "list of N".
+             Each card sits inside a <li> with display: contents (see CSS)
+             so the <a> remains the direct CSS Grid child — the li box
+             collapses out of the layout but its semantics are preserved. -->
+        <ul class="rbccm-conference-insights-tiles__row">
           <xsl:if test="$HAS_HIDDEN_TILES">
             <xsl:attribute name="data-load-more">true</xsl:attribute>
             <xsl:attribute name="data-load-more-chunk"><xsl:value-of select="$CFG_LOAD_MORE_CHUNK" /></xsl:attribute>
@@ -159,6 +221,44 @@
             <xsl:variable name="IS_FEATURED"  select="./Datum[@Name='Featured'] = 'true'" />
             <xsl:variable name="HIDE_FOR_LM"  select="$HAS_HIDDEN_TILES and position() &gt; $CFG_INITIAL_VISIBLE" />
 
+            <!-- ============================================================
+                 FILTER DATA ATTRIBUTES (net new July 2 wiring)
+                 The shared Filter By component (filter-by.html) reads
+                 these attributes off each tile to drive Month/Region/
+                 Industry dropdowns + full-text search. Each field is
+                 optional — the corresponding filter dropdown auto-hides
+                 if no tile carries it. See article DCR for source fields:
+                   publish_date         → data-month  (YYYY-MM prefix)
+                   regional_relevancy   → data-region
+                   industry (checkbox)  → data-industry (space-separated)
+                   title + description  → data-search-text (lowercased)
+                 ============================================================ -->
+            <xsl:variable name="LI_DCR"    select="./Datum[@Name='Source DCR']/DCR/press_release" />
+            <xsl:variable name="LI_PUB"    select="normalize-space($LI_DCR/publish_date)" />
+            <xsl:variable name="LI_REGION" select="normalize-space($LI_DCR/regional_relevancy)" />
+
+            <li class="rbccm-conference-insights-tiles__item">
+              <xsl:if test="$LI_PUB != '' and string-length($LI_PUB) &gt;= 7">
+                <xsl:attribute name="data-month"><xsl:value-of select="substring($LI_PUB, 1, 7)" /></xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$LI_REGION != ''">
+                <xsl:attribute name="data-region"><xsl:value-of select="$LI_REGION" /></xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$LI_DCR/industry/*">
+                <xsl:attribute name="data-industry">
+                  <xsl:for-each select="$LI_DCR/industry/*">
+                    <xsl:if test="normalize-space(.) != ''">
+                      <xsl:value-of select="normalize-space(.)" />
+                      <xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:attribute name="data-search-text">
+                <xsl:value-of select="translate(normalize-space($LI_DCR/title), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="translate(normalize-space($LI_DCR/description), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+              </xsl:attribute>
             <xsl:call-template name="TILE_CARD">
               <xsl:with-param name="is_featured">
                 <xsl:choose>
@@ -173,8 +273,9 @@
                 </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>
+            </li>
           </xsl:for-each>
-        </div>
+        </ul>
 
         <!-- Controls row: See More + View All. -->
         <xsl:if test="$RENDER_CONTROLS">
@@ -225,7 +326,14 @@
 
 </xsl:stylesheet>
 
-<Properties ComponentID="">
+<Properties ComponentID="1782500001003">
+  <!-- Padding overrides. Leave blank to use component defaults
+       (mobile 40 / 40, desktop 64 / 64). Include a unit, e.g. "24px" or "2rem". -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
   <!-- Load-more behavior -->
   <Datum ID="EnableLoadMore"        Type="Boolean" Name="Enable See More / Load More button">false</Datum>
   <Datum ID="ShowAfterLoadAlways"   Type="Boolean" Name="Always show View All button (independent of load-more)">true</Datum>
@@ -241,6 +349,16 @@
 
   <!-- Eyebrow default (per-tile override available via Eyebrow Override Datum) -->
   <Datum ID="EyebrowDefault"        Type="String"  Name="Default eyebrow label">Insights</Datum>
+
+  <!-- Tile title heading level. Default h2. Drop to h3/h4/h5/h6 when
+       embedding under another h2 so the page outline stays coherent. -->
+  <Datum ID="TitleHeadingLevel"     Type="SelectSingle" Name="Tile title heading level">
+    <Option Selected="true"><Display>H2 (default)</Display><Value>h2</Value></Option>
+    <Option><Display>H3</Display><Value>h3</Value></Option>
+    <Option><Display>H4</Display><Value>h4</Value></Option>
+    <Option><Display>H5</Display><Value>h5</Value></Option>
+    <Option><Display>H6</Display><Value>h6</Value></Option>
+  </Datum>
 </Properties>
 
 <Data>

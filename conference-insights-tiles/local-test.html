@@ -11,82 +11,90 @@
   </style>
 </head>
 <body>
-  <div class="local-test-header">Local test: conference-insights-tiles — resize the browser to test mobile-first behavior. Top card is --featured (full-width, image left/text right at ≥768px).</div>
+  <div class="local-test-header">Local test: conference-insights-tiles — resize the browser to test mobile-first behavior. Top card is --featured (full-width, image left/text right at ≥768px). Titles are &lt;h2&gt; by default; card links carry composed aria-labels; images are decorative (alt=""); grid is a semantic &lt;ul&gt; with &lt;li display:contents&gt; wrappers.</div>
 
   <section class="rbccm-conference-insights-tiles" id="rbccm-conference-insights-tiles">
     <div class="rbccm-conference-insights-tiles__inner">
 
-      <div class="rbccm-conference-insights-tiles__row">
+      <ul class="rbccm-conference-insights-tiles__row">
 
         <!-- Featured card -->
-        <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card rbccm-conference-insights-tiles__insight--featured" href="#">
-          <div class="rbccm-conference-insights-tiles__insight-media">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=60" alt="The Future of AI in Financial Services">
-          </div>
-          <div class="rbccm-conference-insights-tiles__insight-body">
-            <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
-            <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
-            <h4 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h4>
-            <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
-            <p class="rbccm-conference-insights-tiles__insight-meta">
-              <span>2 min read</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
-            </p>
-          </div>
-        </a>
+        <li class="rbccm-conference-insights-tiles__item">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card rbccm-conference-insights-tiles__insight--featured" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta">
+                <span>2 min read</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </div>
+          </a>
+        </li>
 
         <!-- Standard card 1 -->
-        <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#">
-          <div class="rbccm-conference-insights-tiles__insight-media">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=60" alt="The Future of AI in Financial Services">
-          </div>
-          <div class="rbccm-conference-insights-tiles__insight-body">
-            <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
-            <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
-            <h4 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h4>
-            <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
-            <p class="rbccm-conference-insights-tiles__insight-meta">
-              <span>2 min read</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
-            </p>
-          </div>
-        </a>
+        <li class="rbccm-conference-insights-tiles__item">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta">
+                <span>2 min read</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </div>
+          </a>
+        </li>
 
         <!-- Standard card 2 -->
-        <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#">
-          <div class="rbccm-conference-insights-tiles__insight-media">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=60" alt="Breakthrough Innovations in Precision Medicine">
-          </div>
-          <div class="rbccm-conference-insights-tiles__insight-body">
-            <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
-            <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
-            <h4 class="rbccm-conference-insights-tiles__insight-title">Breakthrough Innovations in Precision Medicine</h4>
-            <p class="rbccm-conference-insights-tiles__insight-desc">Leading biotech executives explore how precision medicine is transforming patient outcomes and creating new investment opportunities.</p>
-            <p class="rbccm-conference-insights-tiles__insight-meta">
-              <span>6 min listen</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
-            </p>
-          </div>
-        </a>
+        <li class="rbccm-conference-insights-tiles__item">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Breakthrough Innovations in Precision Medicine. 6 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Breakthrough Innovations in Precision Medicine</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Leading biotech executives explore how precision medicine is transforming patient outcomes and creating new investment opportunities.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta">
+                <span>6 min listen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </div>
+          </a>
+        </li>
 
         <!-- Standard card 3 -->
-        <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#">
-          <div class="rbccm-conference-insights-tiles__insight-media">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=60" alt="Financing the Clean Energy Transition">
-          </div>
-          <div class="rbccm-conference-insights-tiles__insight-body">
-            <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
-            <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
-            <h4 class="rbccm-conference-insights-tiles__insight-title">Financing the Clean Energy Transition</h4>
-            <p class="rbccm-conference-insights-tiles__insight-desc">RBC Capital Markets analysts provide commentary on capital requirements and investment strategies for renewable energy infrastructure.</p>
-            <p class="rbccm-conference-insights-tiles__insight-meta">
-              <span>5 min read</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
-            </p>
-          </div>
-        </a>
+        <li class="rbccm-conference-insights-tiles__item">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Financing the Clean Energy Transition. 5 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Financing the Clean Energy Transition</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">RBC Capital Markets analysts provide commentary on capital requirements and investment strategies for renewable energy infrastructure.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta">
+                <span>5 min read</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </div>
+          </a>
+        </li>
 
-      </div>
+      </ul>
 
       <div class="rbccm-conference-insights-tiles__controls">
         <a class="rbccm-conference-insights-tiles__view-all" href="/en/insights">View all conference insights</a>

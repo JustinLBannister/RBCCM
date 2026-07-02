@@ -19,19 +19,29 @@
    Block: rbccm-conference-insights-tiles
    ========================================================================= */
 
-/* ---------- Block ---------- */
+/* ---------- Block ----------
+   Padding is authored via CSS custom properties so Teamsite authors can
+   override just the top or bottom (mobile and desktop each) from the
+   component Datums without editing this file:
+     --rbccm-cit-pt-m   mobile padding-top     (default 40px)
+     --rbccm-cit-pb-m   mobile padding-bottom  (default 40px)
+     --rbccm-cit-pt-d   desktop padding-top    (default 64px, in the 992px block below)
+     --rbccm-cit-pb-d   desktop padding-bottom (default 64px, in the 992px block below) */
 .rbccm-conference-insights-tiles {
-  padding: 40px 16px;
+  padding: var(--rbccm-cit-pt-m, 40px) 16px var(--rbccm-cit-pb-m, 40px);
   background: #ffffff;
 }
 
 .rbccm-conference-insights-tiles__inner {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
 
 /* ---------- Row / grid ----------
+   Semantic <ul> so screen readers announce "list of N". List styling
+   (bullets, padding) reset to match the previous <div> visual.
+
    Mirrors the legacy responsive cadence:
      - Mobile (<768px):  1 column
      - Tablet (≥768px):  2 columns
@@ -43,7 +53,24 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 30px;
+  list-style: none;
   margin: 0 0 32px 0;
+  padding: 0;
+}
+
+/* Each <li> is a transparent wrapper — display: contents removes the li box
+   from the visual layout so the <a> card inside remains the direct CSS Grid
+   child and every existing card style (featured span, hover, focus) keeps
+   working unchanged. The list semantics stay in the accessibility tree. */
+.rbccm-conference-insights-tiles__item {
+  display: contents;
+}
+
+/* When the filter JS hides this <li>, the display: contents rule above
+   would beat the browser's default [hidden] { display: none }, so we need
+   an explicit high-specificity override for the filter-hidden state. */
+.rbccm-conference-insights-tiles__item[hidden] {
+  display: none !important;
 }
 
 @media (min-width: 768px) {
@@ -62,7 +89,7 @@
   }
 
   /* Featured card spans the full row above the standard 3-up. */
-  .rbccm-conference-insights-tiles__insight--featured {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured {
     grid-column: 1 / -1;
   }
 }
@@ -88,6 +115,7 @@
   height: 100%;
   min-height: 555px;
   text-decoration: none;
+  transition: border-color 0.15s ease;
   width: 100%;
 }
 
@@ -176,15 +204,17 @@
 
 
 /* ---------- Description ----------
-   No bottom margin — the meta uses margin-top: auto to pin itself to the
-   bottom of the body, so spacing between description and meta is handled
-   by the flex container, not the description's margin. */
+   The meta uses margin-top: auto to pin itself to the bottom of the body;
+   when the description is short, that auto absorbs the leftover space.
+   When the description grows long enough to consume all of that space,
+   the 16px bottom margin here guarantees a minimum breathing gap so the
+   text doesn't collide with the "X min read" anchor line. */
 .rbccm-conference-insights-tiles__insight-desc {
   color: #353535;
   font-size: 16px;
   font-weight: 400;
   line-height: normal;
-  margin: 0;
+  margin: 0 0 16px 0;
 }
 
 
@@ -223,8 +253,8 @@
    scale and divider stretch (where hover state doesn't make sense).
    `:focus-visible` mirrors hover for keyboard users. */
 @media (hover: hover) {
-  .rbccm-conference-insights-tiles__insight:hover,
-  .rbccm-conference-insights-tiles__insight:focus-visible {
+  .rbccm-conference-insights-tiles__insight:hover {
+    border-color: var(--Blue-Bright-Blue, #0051A5);
     outline: none;
   }
   .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-media img,
@@ -238,6 +268,41 @@
   .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-meta,
   .rbccm-conference-insights-tiles__insight:focus-visible .rbccm-conference-insights-tiles__insight-meta {
     border-bottom-color: currentColor;
+  }
+}
+
+
+/* ---------- Keyboard focus indicator (a11y) ----------
+   Suppress the default :focus outline (which fires on mouse clicks too)
+   and swap the card's existing 1px gray border to brand blue on
+   :focus-visible (keyboard / programmatic focus only). Sits outside
+   @media (hover: hover) so it applies to touch devices too. Using
+   border-color instead of outline keeps the visual to a single 1px line
+   — no stacked outline + border doubling effect, no offset to fiddle with. */
+.rbccm-conference-insights-tiles__insight:focus {
+  outline: none;
+}
+
+.rbccm-conference-insights-tiles__insight:focus-visible {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  outline: none;
+}
+
+
+/* ---------- Reduced-motion (a11y) ----------
+   Respect the OS `prefers-reduced-motion` setting: skip the image scale,
+   divider width animation, and border-color transition so motion-sensitive
+   users get an instantaneous state change instead of an animation. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-conference-insights-tiles__insight,
+  .rbccm-conference-insights-tiles__insight-media img,
+  .rbccm-conference-insights-tiles__insight-divider,
+  .rbccm-conference-insights-tiles__insight-meta {
+    transition: none !important;
+  }
+  .rbccm-conference-insights-tiles__insight:hover .rbccm-conference-insights-tiles__insight-media img,
+  .rbccm-conference-insights-tiles__insight:focus-visible .rbccm-conference-insights-tiles__insight-media img {
+    transform: none !important;
   }
 }
 
@@ -256,36 +321,37 @@
    Meta's `margin: auto 0 0 0` is overridden here so the meta flows in line
    with the centered group (no auto-push to bottom). */
 @media (min-width: 992px) {
-  .rbccm-conference-insights-tiles__insight--featured {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured {
     flex-direction: row;
     align-items: stretch;
     min-height: 0; /* drop the 555px floor; horizontal featured sizes to content */
+    max-height: 280px;
   }
 
-  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-media {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-media {
     flex: 0 0 50%;
     height: auto;
     min-height: 240px;
   }
 
-  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-body {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-body {
     flex: 1 1 50%;
     justify-content: center;
     min-height: 0; /* let featured body size to its centered content */
     padding: 30px;
   }
 
-  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-title {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-title {
     font-size: 24px;
     line-height: 30px;
     margin: 26px 0 12px 0;
   }
 
-  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-desc {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-desc {
     margin: 0 0 26px 0;
   }
 
-  .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-meta {
+  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-meta {
     margin: 0;
   }
 }
@@ -337,17 +403,17 @@
   outline: none;
 }
 
-/* View All: primary */
+/* View All: primary — Blue-Bright-Blue token with dark-blue hover state */
 .rbccm-conference-insights-tiles__view-all {
-  background: #006AC3;
+  background: var(--Blue-Bright-Blue, #0051A5);
   color: #ffffff;
-  border: 1px solid #006AC3;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
 }
 
 .rbccm-conference-insights-tiles__view-all:hover,
 .rbccm-conference-insights-tiles__view-all:focus {
-  background: #00558f;
-  border-color: #00558f;
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
   color: #ffffff;
   outline: none;
 }
@@ -356,6 +422,6 @@
 /* ---------- Desktop padding bump ---------- */
 @media (min-width: 992px) {
   .rbccm-conference-insights-tiles {
-    padding: 64px 16px;
+    padding: var(--rbccm-cit-pt-d, 64px) 16px var(--rbccm-cit-pb-d, 64px);
   }
 }
