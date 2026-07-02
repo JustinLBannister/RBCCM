@@ -359,7 +359,17 @@
 
 <Data>
   <Group ID="T01-0" Name="Story Tile" Replicatable="true">
-    <Datum ID="SourceDCR"         Name="Source DCR"                 Type="DCR"/>
+    <Datum ID="SourceDCR"         Name="Source DCR"                 Type="DCR">
+      <!-- Restrict the browser to conference-insights article DCRs so
+           authors don't accidentally pick unrelated DCR types (events,
+           podcasts, etc.). The RBCCM articles live at
+           templatedata/article/story/data/{year}/*.xml so the canonical
+           Category/Type is `article/story`. -->
+      <DCR Category="article" Type="story"/>
+      <DCR-Category Name="article">
+        <DCR-Type Name="story"/>
+      </DCR-Category>
+    </Datum>
     <Datum ID="ManualTitle"       Name="Manual Article Title"       Type="String"/>
     <Datum ID="ManualDescription" Name="Manual Article Description" Type="String"/>
     <Datum ID="OverwriteTitle"    Name="Overwrite Title"            Type="SelectSingle">
