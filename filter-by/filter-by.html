@@ -1,0 +1,416 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- Filter Component (shared XSL)
+     ===================================
+     Drop-in filter block for lists on the site. Author picks a Preset in
+     Teamsite and the component auto-fills theme + placeholders + empty
+     state text + container selector. Custom preset lets each Datum be
+     set manually.
+
+     Presets bundled:
+       - insights   → light theme, filters conference-insights tiles
+       - upcoming   → dark theme,  filters upcoming-conferences cards
+       - custom     → every value comes from the individual Datums
+
+     Deals / Transactions is NOT a preset here — it has its own filter
+     dimensions (year / transaction type / amount) and is fetched via
+     AJAX with knockout. Left alone intentionally. See deals-transactions/
+     for that implementation.
+
+     Depends on:
+       /assets/rbccm/css/components/filter-by.css
+       /assets/rbccm/js/components/filter-by.js
+     -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: default -->
+
+  <xsl:output method="html" indent="no" />
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+
+
+  <!-- ============================================================
+       PROPERTY VARIABLES + PRESET DEFAULTS
+       ============================================================ -->
+  <xsl:variable name="CFG_PRESET" select="/Properties/Datum[@ID='Preset']/Option[@Selected='true']/Value" />
+
+  <!-- ---- Theme ----
+       If author picked a Theme override, use it; otherwise derive from Preset. -->
+  <xsl:variable name="CFG_THEME_RAW" select="/Properties/Datum[@ID='Theme']/Option[@Selected='true']/Value" />
+  <xsl:variable name="THEME">
+    <xsl:choose>
+      <xsl:when test="normalize-space($CFG_THEME_RAW) != ''"><xsl:value-of select="$CFG_THEME_RAW" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">dark</xsl:when>
+      <xsl:otherwise>light</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Container (CSS selector for the section wrapping the items) ----
+       Filter finds items inside the container by [data-search-text] (default)
+       or by a custom item selector. Auto-injects empty state + pagination
+       into the container's end. -->
+  <xsl:variable name="CFG_CONTAINER" select="normalize-space(/Properties/Datum[@ID='Container'])" />
+  <xsl:variable name="CONTAINER">
+    <xsl:choose>
+      <xsl:when test="$CFG_CONTAINER != ''"><xsl:value-of select="$CFG_CONTAINER" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">#rbccm-conference-insights-tiles</xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">.rbccm-upcoming-conferences__cards</xsl:when>
+      <xsl:otherwise></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Optional custom item selector inside the container ---- -->
+  <xsl:variable name="CFG_ITEM_SELECTOR" select="normalize-space(/Properties/Datum[@ID='ItemSelector'])" />
+
+  <!-- ---- Padding overrides (blank = use CSS defaults 40 mobile, 43 desktop) ---- -->
+  <xsl:variable name="CFG_PAD_TOP_MOBILE"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_MOBILE"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])" />
+  <xsl:variable name="CFG_PAD_TOP_DESKTOP"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_DESKTOP" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])" />
+  <xsl:variable name="HAS_PAD_OVERRIDES" select="
+    $CFG_PAD_TOP_MOBILE != ''
+    or $CFG_PAD_BOTTOM_MOBILE != ''
+    or $CFG_PAD_TOP_DESKTOP != ''
+    or $CFG_PAD_BOTTOM_DESKTOP != ''
+  " />
+
+  <!-- ---- Section aria label ---- -->
+  <xsl:variable name="CFG_ARIA" select="normalize-space(/Properties/Datum[@ID='AriaLabel'])" />
+  <xsl:variable name="ARIA_LABEL">
+    <xsl:choose>
+      <xsl:when test="$CFG_ARIA != ''"><xsl:value-of select="$CFG_ARIA" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">Filter conference insights</xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">Filter upcoming conferences</xsl:when>
+      <xsl:otherwise>Filter results</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- "Filter by:" label ---- -->
+  <xsl:variable name="CFG_FILTER_BY_LABEL" select="normalize-space(/Properties/Datum[@ID='FilterByLabel'])" />
+  <xsl:variable name="FILTER_BY_LABEL">
+    <xsl:choose>
+      <xsl:when test="$CFG_FILTER_BY_LABEL != ''"><xsl:value-of select="$CFG_FILTER_BY_LABEL" /></xsl:when>
+      <xsl:otherwise>Filter by:</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Month select "All" label ---- -->
+  <xsl:variable name="CFG_MONTH_ALL" select="normalize-space(/Properties/Datum[@ID='MonthAllLabel'])" />
+  <xsl:variable name="MONTH_ALL">
+    <xsl:choose>
+      <xsl:when test="$CFG_MONTH_ALL != ''"><xsl:value-of select="$CFG_MONTH_ALL" /></xsl:when>
+      <xsl:otherwise>Month</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Region select "All" label ---- -->
+  <xsl:variable name="CFG_REGION_ALL" select="normalize-space(/Properties/Datum[@ID='RegionAllLabel'])" />
+  <xsl:variable name="REGION_ALL">
+    <xsl:choose>
+      <xsl:when test="$CFG_REGION_ALL != ''"><xsl:value-of select="$CFG_REGION_ALL" /></xsl:when>
+      <xsl:otherwise>Region</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Industry select "All" label ---- -->
+  <xsl:variable name="CFG_INDUSTRY_ALL" select="normalize-space(/Properties/Datum[@ID='IndustryAllLabel'])" />
+  <xsl:variable name="INDUSTRY_ALL">
+    <xsl:choose>
+      <xsl:when test="$CFG_INDUSTRY_ALL != ''"><xsl:value-of select="$CFG_INDUSTRY_ALL" /></xsl:when>
+      <xsl:otherwise>Industry</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Search placeholder ---- -->
+  <xsl:variable name="CFG_SEARCH_PH" select="normalize-space(/Properties/Datum[@ID='SearchPlaceholder'])" />
+  <xsl:variable name="SEARCH_PLACEHOLDER">
+    <xsl:choose>
+      <xsl:when test="$CFG_SEARCH_PH != ''"><xsl:value-of select="$CFG_SEARCH_PH" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">Search conference insights articles</xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">Search conferences by title</xsl:when>
+      <xsl:otherwise>Search</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Search aria label ---- -->
+  <xsl:variable name="CFG_SEARCH_ARIA" select="normalize-space(/Properties/Datum[@ID='SearchAriaLabel'])" />
+  <xsl:variable name="SEARCH_ARIA">
+    <xsl:choose>
+      <xsl:when test="$CFG_SEARCH_ARIA != ''"><xsl:value-of select="$CFG_SEARCH_ARIA" /></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$SEARCH_PLACEHOLDER" /></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Clear filters button label ---- -->
+  <xsl:variable name="CFG_CLEAR_LABEL" select="normalize-space(/Properties/Datum[@ID='ClearFiltersLabel'])" />
+  <xsl:variable name="CLEAR_LABEL">
+    <xsl:choose>
+      <xsl:when test="$CFG_CLEAR_LABEL != ''"><xsl:value-of select="$CFG_CLEAR_LABEL" /></xsl:when>
+      <xsl:otherwise>Clear filters</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Empty state ---- -->
+  <xsl:variable name="CFG_EMPTY_HEADING" select="normalize-space(/Properties/Datum[@ID='EmptyHeading'])" />
+  <xsl:variable name="EMPTY_HEADING">
+    <xsl:choose>
+      <xsl:when test="$CFG_EMPTY_HEADING != ''"><xsl:value-of select="$CFG_EMPTY_HEADING" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">No articles found</xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">No conferences found</xsl:when>
+      <xsl:otherwise>No results found</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="CFG_EMPTY_MSG" select="normalize-space(/Properties/Datum[@ID='EmptyMessage'])" />
+  <xsl:variable name="EMPTY_MESSAGE">
+    <xsl:choose>
+      <xsl:when test="$CFG_EMPTY_MSG != ''"><xsl:value-of select="$CFG_EMPTY_MSG" /></xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">We couldn't find any articles that match your current filters.</xsl:when>
+      <xsl:when test="$CFG_PRESET = 'upcoming'">We couldn't find any conferences that match your current filters.</xsl:when>
+      <xsl:otherwise>We couldn't find any results that match your current filters.</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="CFG_EMPTY_EMPH" select="normalize-space(/Properties/Datum[@ID='EmptyMessageEmphasis'])" />
+  <xsl:variable name="EMPTY_EMPH">
+    <xsl:choose>
+      <xsl:when test="$CFG_EMPTY_EMPH != ''"><xsl:value-of select="$CFG_EMPTY_EMPH" /></xsl:when>
+      <xsl:otherwise>Try adjusting your filters or search terms.</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Pagination page size (0 = disabled) ----
+       Insights preset defaults to 4 (featured hero + 3 standard tiles).
+       Custom/other presets fall back to the Datum value (default: 6). -->
+  <xsl:variable name="CFG_PAGE_SIZE">
+    <xsl:choose>
+      <xsl:when test="normalize-space(/Properties/Datum[@ID='PageSize']) != ''">
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PageSize'])" />
+      </xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">4</xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Pagination page size when filter is active (blank = use default) ----
+       Editorial pattern: default view shows a featured hero + fewer tiles;
+       active filtering flips to a denser utilitarian view. When blank, JS
+       falls back to the default page size (no behavior change). -->
+  <xsl:variable name="CFG_PAGE_SIZE_FILTERED">
+    <xsl:choose>
+      <xsl:when test="normalize-space(/Properties/Datum[@ID='PageSizeFiltered']) != ''">
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PageSizeFiltered'])" />
+      </xsl:when>
+      <xsl:when test="$CFG_PRESET = 'insights'">6</xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- ---- Show/hide toggles ---- -->
+  <xsl:variable name="SHOW_MONTH"    select="not(/Properties/Datum[@ID='ShowMonth'] = 'false')" />
+  <xsl:variable name="SHOW_REGION"   select="not(/Properties/Datum[@ID='ShowRegion'] = 'false')" />
+  <xsl:variable name="SHOW_INDUSTRY" select="not(/Properties/Datum[@ID='ShowIndustry'] = 'false')" />
+  <xsl:variable name="SHOW_SEARCH" select="not(/Properties/Datum[@ID='ShowSearch'] = 'false')" />
+  <xsl:variable name="SHOW_RESET"  select="not(/Properties/Datum[@ID='ShowReset'] = 'false')" />
+
+
+  <!-- ============================================================
+       MAIN TEMPLATE
+       ============================================================ -->
+  <xsl:template match="/">
+
+    <!-- Shared CSS + JS (relative path is /assets/rbccm/... in production).
+         Scoping these to the component keeps authors from having to touch
+         page-level settings — drop the filter on any page and everything
+         renders + wires up correctly on its own. JS is emitted at the
+         bottom of the template (below the section), not here. -->
+    <link rel="stylesheet" href="/assets/rbccm/css/components/filter-by.css" />
+
+    <section>
+      <xsl:attribute name="class">
+        rbccm-filter<xsl:if test="$THEME = 'dark'"> rbccm-filter--dark</xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL" /></xsl:attribute>
+      <xsl:attribute name="data-container"><xsl:value-of select="$CONTAINER" /></xsl:attribute>
+      <xsl:if test="$CFG_ITEM_SELECTOR != ''">
+        <xsl:attribute name="data-item-selector"><xsl:value-of select="$CFG_ITEM_SELECTOR" /></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$HAS_PAD_OVERRIDES">
+        <xsl:attribute name="style"><xsl:if test="$CFG_PAD_TOP_MOBILE != ''">--rbccm-filter-pt-m: <xsl:value-of select="$CFG_PAD_TOP_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_MOBILE != ''">--rbccm-filter-pb-m: <xsl:value-of select="$CFG_PAD_BOTTOM_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_TOP_DESKTOP != ''">--rbccm-filter-pt-d: <xsl:value-of select="$CFG_PAD_TOP_DESKTOP" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_DESKTOP != ''">--rbccm-filter-pb-d: <xsl:value-of select="$CFG_PAD_BOTTOM_DESKTOP" />;</xsl:if></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="number($CFG_PAGE_SIZE) &gt; 0">
+        <xsl:attribute name="data-page-size"><xsl:value-of select="$CFG_PAGE_SIZE" /></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="number($CFG_PAGE_SIZE_FILTERED) &gt; 0">
+        <xsl:attribute name="data-page-size-filtered"><xsl:value-of select="$CFG_PAGE_SIZE_FILTERED" /></xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="data-empty-heading"><xsl:value-of select="$EMPTY_HEADING" /></xsl:attribute>
+      <xsl:attribute name="data-empty-message"><xsl:value-of select="$EMPTY_MESSAGE" /></xsl:attribute>
+      <xsl:attribute name="data-empty-message-emphasis"><xsl:value-of select="$EMPTY_EMPH" /></xsl:attribute>
+      <xsl:attribute name="data-empty-clear-label"><xsl:value-of select="$CLEAR_LABEL" /></xsl:attribute>
+
+      <div class="rbccm-filter__inner">
+
+        <div class="rbccm-filter__row">
+
+          <!-- Filter group: "Filter by:" label + Month/Region selects -->
+          <xsl:if test="$SHOW_MONTH or $SHOW_REGION or $SHOW_INDUSTRY">
+            <div class="rbccm-filter__filter-group">
+              <span class="rbccm-filter__filter-label"><xsl:value-of select="$FILTER_BY_LABEL" /></span>
+
+              <!-- Each dropdown is a button trigger; the popup listbox (<ul>
+                   panel) is built dynamically by filter-by.js at bind
+                   time from the target container's data-<dim> values. Wrap
+                   auto-hides itself if no items carry the corresponding
+                   attribute. -->
+              <xsl:if test="$SHOW_MONTH">
+                <div class="rbccm-filter__select-wrap" data-filter="month">
+                  <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false">
+                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$MONTH_ALL" /></xsl:attribute>
+                    <span class="rbccm-filter__select-label"><xsl:value-of select="$MONTH_ALL" /></span>
+                  </button>
+                  <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                    <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </xsl:if>
+
+              <xsl:if test="$SHOW_REGION">
+                <div class="rbccm-filter__select-wrap" data-filter="region">
+                  <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false">
+                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$REGION_ALL" /></xsl:attribute>
+                    <span class="rbccm-filter__select-label"><xsl:value-of select="$REGION_ALL" /></span>
+                  </button>
+                  <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                    <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </xsl:if>
+
+              <xsl:if test="$SHOW_INDUSTRY">
+                <div class="rbccm-filter__select-wrap" data-filter="industry">
+                  <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false">
+                    <xsl:attribute name="aria-label">Filter by <xsl:value-of select="$INDUSTRY_ALL" /></xsl:attribute>
+                    <span class="rbccm-filter__select-label"><xsl:value-of select="$INDUSTRY_ALL" /></span>
+                  </button>
+                  <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                    <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor" />
+                  </svg>
+                </div>
+              </xsl:if>
+            </div>
+          </xsl:if>
+
+          <!-- Search input with magnifying-glass icon -->
+          <xsl:if test="$SHOW_SEARCH">
+            <label class="rbccm-filter__search">
+              <svg class="rbccm-filter__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor" />
+              </svg>
+              <span class="rbccm-filter__sr-only"><xsl:value-of select="$SEARCH_ARIA" /></span>
+              <input type="search" class="rbccm-filter__search-input" data-filter="search">
+                <xsl:attribute name="placeholder"><xsl:value-of select="$SEARCH_PLACEHOLDER" /></xsl:attribute>
+                <xsl:attribute name="aria-label"><xsl:value-of select="$SEARCH_ARIA" /></xsl:attribute>
+              </input>
+            </label>
+          </xsl:if>
+
+          <!-- Reset button -->
+          <xsl:if test="$SHOW_RESET">
+            <button type="button" class="rbccm-filter__reset">
+              <xsl:value-of select="$CLEAR_LABEL" />
+            </button>
+          </xsl:if>
+
+        </div>
+      </div>
+    </section>
+
+    <script src="/assets/rbccm/js/components/filter-by.js"></script>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1782500001002">
+  <!-- =============================================================
+       PRESET — one dropdown to rule them all. Auto-fills theme,
+       placeholders, empty state text, and data-target selector.
+       Pick "Custom" to author-configure every value manually.
+       ============================================================= -->
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset (auto-fills defaults)">
+    <Option Selected="true"><Display>Insights (light)</Display><Value>insights</Value></Option>
+    <Option><Display>Upcoming Conferences (dark)</Display><Value>upcoming</Value></Option>
+    <Option><Display>Custom</Display><Value>custom</Value></Option>
+  </Datum>
+
+  <!-- =============================================================
+       THEME OVERRIDE
+       Blank = use the preset's default. Set to force a different
+       theme regardless of preset.
+       ============================================================= -->
+  <Datum ID="Theme" Type="SelectSingle" Name="Theme override (blank = use preset default)">
+    <Option><Display>(use preset default)</Display><Value></Value></Option>
+    <Option><Display>Light</Display><Value>light</Value></Option>
+    <Option><Display>Dark</Display><Value>dark</Value></Option>
+  </Datum>
+
+  <!-- =============================================================
+       CONTAINER — the section whose items are being filtered.
+       Filter auto-injects empty state + pagination inside this
+       container, at the end. Editable defaults below reflect the
+       Insights preset. If author picks a different Preset above
+       AND leaves these blank, the XSL swaps in that preset's
+       container instead.
+       ============================================================= -->
+  <Datum ID="Container"    Type="String" Name="Container selector">#rbccm-conference-insights-tiles</Datum>
+  <Datum ID="ItemSelector" Type="String" Name="Item selector inside container (blank = [data-search-text])"/>
+
+  <!-- =============================================================
+       PADDING OVERRIDES
+       Blank = use component defaults (40px mobile, 43px desktop).
+       Include a unit, e.g. "24px" or "2rem". Only vertical padding
+       is overrideable; horizontal 16px gutter is fixed.
+       ============================================================= -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 43px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 43px)"/>
+
+  <!-- =============================================================
+       LABELS + PLACEHOLDERS
+       All are editable. Defaults reflect the Insights preset.
+       ============================================================= -->
+  <Datum ID="AriaLabel"            Type="String" Name="Section aria-label">Filter conference insights</Datum>
+  <Datum ID="FilterByLabel"        Type="String" Name="'Filter by:' label">Filter by:</Datum>
+  <Datum ID="MonthAllLabel"        Type="String" Name="Month 'all' option text">Month</Datum>
+  <Datum ID="RegionAllLabel"       Type="String" Name="Region 'all' option text">Region</Datum>
+  <Datum ID="SearchPlaceholder"    Type="String" Name="Search input placeholder">Search conference insights articles</Datum>
+  <Datum ID="SearchAriaLabel"      Type="String" Name="Search input aria-label">Search conference insights articles by title or keyword</Datum>
+  <Datum ID="ClearFiltersLabel"    Type="String" Name="Clear button + empty-state button label">Clear filters</Datum>
+
+  <!-- =============================================================
+       EMPTY STATE COPY
+       All editable. Defaults reflect the Insights preset.
+       ============================================================= -->
+  <Datum ID="EmptyHeading"          Type="String" Name="Empty state heading">No articles found</Datum>
+  <Datum ID="EmptyMessage"          Type="String" Name="Empty state primary message">We couldn't find any articles that match your current filters.</Datum>
+  <Datum ID="EmptyMessageEmphasis"  Type="String" Name="Empty state secondary message">Try adjusting your filters or search terms.</Datum>
+
+  <!-- =============================================================
+       PAGINATION
+       Blank / 0 = disabled. Set N to show N items per page.
+       ============================================================= -->
+  <Datum ID="PageSize" Type="String" Name="Items per page (blank / 0 = no pagination)">6</Datum>
+  <Datum ID="PageSizeFiltered" Type="String" Name="Items per page when filter is active (blank = same as default; insights preset = 6)"/>
+
+  <!-- =============================================================
+       SHOW/HIDE TOGGLES
+       ============================================================= -->
+  <Datum ID="ShowMonth"    Type="Boolean" Name="Show Month filter">true</Datum>
+  <Datum ID="ShowRegion"   Type="Boolean" Name="Show Region filter">true</Datum>
+  <Datum ID="ShowIndustry" Type="Boolean" Name="Show Industry filter (auto-hides if no articles carry data-industry)">true</Datum>
+  <Datum ID="IndustryAllLabel" Type="String" Name="Industry dropdown default label"/>
+  <Datum ID="ShowSearch" Type="Boolean" Name="Show Search input">true</Datum>
+  <Datum ID="ShowReset"  Type="Boolean" Name="Show Clear filters button">true</Datum>
+</Properties>

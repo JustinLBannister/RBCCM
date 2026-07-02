@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filter Component — Local Test</title>
+
+  <!-- Tiles CSS from sibling folder -->
+  <link rel="stylesheet" href="../conference-insights-tiles/conference-insights-tiles.css">
+
+  <!-- Shared filter CSS -->
+  <link rel="stylesheet" href="filter-by.css">
+
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; }
+    .local-test-header { padding: 12px 16px; background: #e7edf1; border-bottom: 1px solid #d0d8df; font-size: 13px; color: #555; }
+    .local-test-section-label { margin: 16px 16px 0; font-size: 14px; font-weight: 600; color: #003168; }
+    .dark-bg { background: #002144; padding: 8px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="local-test-header">
+    Shared filter component — layout ported from live upcoming-conferences filter. Chevrons and search icon are real SVG elements (not background-image data URIs) so they render reliably. Filter group left, search input right, reset button end. Two instances: LIGHT (insights) and DARK (upcoming-conferences bg).
+  </div>
+
+
+  <!-- ============================================================
+       INSTANCE 1 — LIGHT MODE (conference insights)
+       ============================================================ -->
+
+  <p class="local-test-section-label">1. LIGHT mode (conference insights)</p>
+
+  <section class="rbccm-filter"
+           data-container="#insights-scope"
+           data-page-size="4"
+           data-page-size-filtered="6"
+           data-empty-heading="No articles found"
+           data-empty-message="We couldn't find any articles that match your current filters."
+           data-empty-message-emphasis="Try adjusting your filters or search terms."
+           data-empty-clear-label="Clear filters"
+           aria-label="Filter conference insights">
+
+    <div class="rbccm-filter__inner">
+
+      <div class="rbccm-filter__row">
+
+        <!-- Filter group: "Filter by:" label + Month + Region selects -->
+        <div class="rbccm-filter__filter-group">
+          <span class="rbccm-filter__filter-label">Filter by:</span>
+
+          <div class="rbccm-filter__select-wrap" data-filter="month">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by month">
+              <span class="rbccm-filter__select-label">Month</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <div class="rbccm-filter__select-wrap" data-filter="region">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by region">
+              <span class="rbccm-filter__select-label">Region</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <!-- Industry: auto-populated from item data-industry values.
+               If no tile carries data-industry, this whole wrap hides.  -->
+          <div class="rbccm-filter__select-wrap" data-filter="industry">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by industry">
+              <span class="rbccm-filter__select-label">Industry</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Search: icon + input, right-aligned on desktop -->
+        <label class="rbccm-filter__search">
+          <svg class="rbccm-filter__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/>
+          </svg>
+          <span class="rbccm-filter__sr-only">Search articles</span>
+          <input type="search" class="rbccm-filter__search-input" data-filter="search" placeholder="Search conference insights articles" aria-label="Search conference insights articles by title or keyword">
+        </label>
+
+        <button type="button" class="rbccm-filter__reset">Clear filters</button>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       TILES — filtered by instance 1 above via data-filter-group
+       ============================================================ -->
+  <section class="rbccm-conference-insights-tiles" id="insights-scope">
+    <div class="rbccm-conference-insights-tiles__inner">
+
+      <ul class="rbccm-conference-insights-tiles__row">
+
+        <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
+            data-month="2026-06" data-region="global"
+            data-industry="timt financial-institutions"
+            data-search-text="the future of ai in financial services anthropic chief commercial officer artificial intelligence banking capital markets insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card rbccm-conference-insights-tiles__insight--featured" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>2 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
+            data-month="2026-05" data-region="global gb"
+            data-industry="healthcare"
+            data-search-text="breakthrough innovations in precision medicine biotech executives investment opportunities insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Breakthrough Innovations in Precision Medicine. 6 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Breakthrough Innovations in Precision Medicine</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Leading biotech executives explore how precision medicine is transforming patient outcomes and creating new investment opportunities.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>6 min listen</span></p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
+            data-month="2026-06" data-region="global ca"
+            data-industry="energy-transition cross-sector"
+            data-search-text="financing the clean energy transition capital requirements investment strategies renewable energy infrastructure">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Financing the Clean Energy Transition. 5 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Financing the Clean Energy Transition</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">RBC Capital Markets analysts provide commentary on capital requirements and investment strategies for renewable energy infrastructure.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>5 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
+            data-month="2026-04" data-region="au"
+            data-industry="industrials"
+            data-search-text="australian mining outlook resource sector iron ore lithium global commodity pricing insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Australian Mining Outlook. 4 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1518183261945-b0989c458ad0?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Australian Mining Outlook</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Deep dive on the Australian resource sector: iron ore, lithium, and how global commodity pricing shapes the year ahead.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>4 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-conference-insights-tiles__item" data-filter-group="insights"
+            data-month="2026-03" data-region="de fr ae"
+            data-industry="financial-institutions"
+            data-search-text="european banking consolidation cross-border deals eurozone regulatory landscape 2026 insights emea uae dubai">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: European Banking Consolidation. 7 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">European Banking Consolidation</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Cross-border deals across the eurozone are reshaping the regulatory landscape for 2026 and beyond. UAE included under EMEA.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>7 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2025-12" data-region="sg hk"
+            data-industry="timt"
+            data-search-text="asia pacific fintech innovations digital assets cross-border payment infrastructure singapore hong kong insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Asia Pacific FinTech Innovations. 5 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Asia Pacific FinTech Innovations</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Digital assets and cross-border payment infrastructure reshaping Singapore and Hong Kong's financial sectors.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>5 min listen</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 7 — Global + US, Feb 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-02" data-region="global us"
+            data-search-text="global bond market outlook interest rates yield curve treasury macro fixed income insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Global Bond Market Outlook. 8 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Global Bond Market Outlook</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Interest rate trajectories, yield-curve dynamics, and how central bank policy is reshaping fixed-income allocations for institutional investors.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>8 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 8 — UK / Ireland / Belgium (Europe), Jan 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-01" data-region="gb ie be"
+            data-search-text="european esg regulations sustainability disclosure compliance sfdr taxonomy insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: European ESG Regulations Update. 6 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">European ESG Regulations Update</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">SFDR, CSRD, and EU Taxonomy — the compliance playbook for asset managers as European sustainability disclosure rules tighten in 2026.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>6 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 9 — Canada, Nov 2025 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2025-11" data-region="ca"
+            data-search-text="canadian tech sector deep dive innovation venture capital growth software ai insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Canadian Tech Sector Deep Dive. 4 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Canadian Tech Sector Deep Dive</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Venture funding, IPO pipelines, and the maturation of Canada's AI ecosystem — what's driving growth into 2026.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>4 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 10 — UAE + Global (EMEA logic), Oct 2025 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2025-10" data-region="ae global"
+            data-search-text="middle east oil dynamics energy transition opec production dubai abu dhabi insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Middle East Oil Dynamics. 5 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1500089515077-d13da2b45c1c?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Middle East Oil Dynamics</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">OPEC+ production strategy, UAE's energy diversification, and how Gulf sovereign wealth funds are recycling oil proceeds into global markets.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>5 min listen</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 11 — Australia + Malaysia + Global (APAC), Sep 2025 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2025-09" data-region="au my global"
+            data-search-text="emerging markets currency analysis fx trading volatility yuan ringgit rupiah asian currencies insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Emerging Markets Currency Analysis. 7 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Emerging Markets Currency Analysis</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">FX volatility across emerging Asia and Latin America — where carry-trade opportunities are opening as G10 rate cuts progress.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>7 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+
+      <!-- Empty state + pagination auto-injected here by the filter JS -->
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       INSTANCE 2 — DARK MODE (upcoming-conferences style)
+       ============================================================ -->
+
+  <p class="local-test-section-label">2. DARK mode (for upcoming-conferences style backgrounds)</p>
+
+  <div class="dark-bg">
+    <section class="rbccm-filter rbccm-filter--dark"
+             data-container="#dark-scope"
+             data-page-size="6"
+             data-empty-heading="No conferences found"
+             data-empty-message="We couldn't find any conferences that match your current filters."
+             data-empty-message-emphasis="Try adjusting your filters or search terms."
+             data-empty-clear-label="Clear filters"
+             aria-label="Filter dark demo">
+      <div class="rbccm-filter__inner">
+
+        <div class="rbccm-filter__row">
+
+          <div class="rbccm-filter__filter-group">
+            <span class="rbccm-filter__filter-label">Filter by:</span>
+
+            <div class="rbccm-filter__select-wrap" data-filter="month">
+              <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by month">
+                <span class="rbccm-filter__select-label">Month</span>
+              </button>
+              <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filter__select-wrap" data-filter="region">
+              <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by region">
+                <span class="rbccm-filter__select-label">Region</span>
+              </button>
+              <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <label class="rbccm-filter__search">
+            <svg class="rbccm-filter__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/>
+            </svg>
+            <span class="rbccm-filter__sr-only">Search conferences</span>
+            <input type="search" class="rbccm-filter__search-input" data-filter="search" placeholder="Search conferences by title" aria-label="Search conferences by title">
+          </label>
+
+          <button type="button" class="rbccm-filter__reset">Clear filters</button>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div id="dark-scope" style="padding: 20px 16px; color: #fff; font-family: Roboto, Arial, sans-serif;">
+      <div data-month="2026-06" data-region="ca" data-search-text="canadian energy summit toronto"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Jun 15 • Toronto</strong> — Canadian Energy Summit
+      </div>
+      <div data-month="2026-07" data-region="global gb" data-search-text="global markets outlook london"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Jul 10 • London</strong> — Global Markets Outlook
+      </div>
+      <div data-month="2026-07" data-region="sg" data-search-text="asia pacific investor forum singapore"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Jul 22 • Singapore</strong> — Asia Pacific Investor Forum
+      </div>
+      <div data-month="2026-08" data-region="global us" data-search-text="healthcare innovation summit new york biotech"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Aug 5 • New York</strong> — Healthcare Innovation Summit
+      </div>
+      <div data-month="2026-08" data-region="au" data-search-text="australian resources forum sydney mining energy"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Aug 20 • Sydney</strong> — Australian Resources Forum
+      </div>
+      <div data-month="2026-09" data-region="de" data-search-text="european insurance summit frankfurt reinsurance actuarial"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Sep 8 • Frankfurt</strong> — European Insurance Summit
+      </div>
+      <div data-month="2026-09" data-region="hk" data-search-text="apac tech investors day hong kong ai semiconductors venture"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Sep 22 • Hong Kong</strong> — APAC Tech Investors Day
+      </div>
+      <div data-month="2026-10" data-region="ae" data-search-text="middle east investment forum dubai sovereign wealth infrastructure"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Oct 5 • Dubai</strong> — Middle East Investment Forum
+      </div>
+      <div data-month="2026-10" data-region="global us" data-search-text="us financial services summit chicago banking regulation fed"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Oct 15 • Chicago</strong> — US Financial Services Summit
+      </div>
+      <div data-month="2026-11" data-region="fr" data-search-text="european sustainability forum paris net zero climate finance"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Nov 10 • Paris</strong> — European Sustainability Forum
+      </div>
+      <div data-month="2026-12" data-region="ca" data-search-text="canadian energy conference vancouver oil sands natural gas"
+           style="border: 1px solid rgba(255,255,255,0.3); padding: 12px 16px; margin-bottom: 8px;">
+        <strong>Dec 2 • Vancouver</strong> — Canadian Energy Conference
+      </div>
+
+      <!-- Empty state + pagination auto-injected here -->
+    </div>
+  </div>
+
+
+  <script src="filter-by.js"></script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+/* =========================================================================
+   Filter Component (shared)
+   -------------------------------------------------------------------------
+   Reusable BEM filter block for any list of items on the site. Drives a
+   client-side filter UI (month + region + keyword search) against any
+   collection of DOM elements matching the block's `data-target` selector.
+
+   Currently consumed by:
+     - conference-insights (light bg)
+   Migration candidates:
+     - upcoming-conferences (dark bg — use --dark modifier)
+
+   Modifiers:
+     .rbccm-filter                    → light background (default)
+     .rbccm-filter--dark              → dark background (white text, transparent inputs)
+
+   Layout pattern ported from live .rbccm-upcoming-conferences__filters:
+     Mobile: everything stacks vertically
+     Desktop (≥768px): "Filter by: [Month] [Region]" compact group on the
+     left, search input pushed to the right, Clear button at the end.
+
+   SVG chevrons render as SIBLING elements inside .__select-wrap (not
+   background-image data-URIs) — more reliable across browsers.
+
+   Data contract on filtered elements:
+     data-month        "YYYY-MM"
+     data-region       space-separated region codes (e.g. "global gb au")
+     data-search-text  lowercased haystack of searchable text
+
+   Block: rbccm-filter
+   ========================================================================= */
+
+/* Vertical padding is authored via CSS custom properties so the filter
+   XSL can override just top/bottom via Datums when this component sits
+   on a page that needs different spacing:
+     --rbccm-filter-pt-m   mobile padding-top     (default 40px)
+     --rbccm-filter-pb-m   mobile padding-bottom  (default 40px)
+     --rbccm-filter-pt-d   desktop padding-top    (default 43px, in the 768px block)
+     --rbccm-filter-pb-d   desktop padding-bottom (default 43px, in the 768px block)
+   Horizontal (16px gutter) stays hardcoded. */
+.rbccm-filter {
+  padding: var(--rbccm-filter-pt-m, 40px) 16px var(--rbccm-filter-pb-m, 40px);
+}
+
+@media (min-width: 768px) {
+  .rbccm-filter {
+    padding: var(--rbccm-filter-pt-d, 43px) 16px var(--rbccm-filter-pb-d, 43px);
+  }
+}
+
+.rbccm-filter__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+/* ---------- Row ----------
+   Mobile: single column stack. Desktop: horizontal row, "Filter by:"
+   group left, search right, reset button end. */
+.rbccm-filter__row {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filter__row {
+    align-items: center;
+    flex-direction: row;
+    gap: 16px;
+    justify-content: flex-start;
+  }
+}
+
+
+/* ---------- Filter group ("Filter by:" label + Month + Region) ---------- */
+.rbccm-filter__filter-group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filter__filter-group {
+    flex: 0 0 auto;
+  }
+}
+
+
+/* ---------- "Filter by:" label ----------
+   Matching padding to the select buttons (11px top / 6px bottom)
+   so the label's baseline lines up with the button text's visual
+   center — RBC Display's ascender-heavy metrics push text up, so
+   symmetric padding would leave the label sitting lower. */
+.rbccm-filter__filter-label {
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-block;
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 11px 0 6px 0;
+}
+
+
+/* ---------- Select wrap (holds select + chevron SVG) ---------- */
+.rbccm-filter__select-wrap {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filter__select-wrap {
+    flex: 0 0 auto;
+    width: 160px;
+  }
+}
+
+
+/* ---------- Select button (custom dropdown trigger) ----------
+   The button visually mimics a native <select> but drives a custom
+   listbox popup so we can style the panel + options to spec. */
+.rbccm-filter__select {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #A8A8A8;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #252525;
+  cursor: pointer;
+  display: flex;
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 11px 20px 6px 20px;
+  text-align: left;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.rbccm-filter__select-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.rbccm-filter__select:hover,
+.rbccm-filter__select:focus,
+.rbccm-filter__select[aria-expanded="true"] {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  outline: none;
+}
+
+
+/* ---------- Chevron (right side of select) ---------- */
+.rbccm-filter__select-chevron {
+  color: var(--Blue-Dark-Blue, #003168);
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.15s ease;
+}
+
+/* When the button is expanded, flip the chevron to point up. */
+.rbccm-filter__select[aria-expanded="true"] + .rbccm-filter__select-chevron {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+
+/* ---------- Select panel (popup listbox) ----------
+   Absolutely positioned below the button. Per design spec: white bg,
+   subtle border, soft drop shadow, 10px vertical padding, no gap
+   between options. */
+.rbccm-filter__select-panel {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #929292;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  list-style: none;
+  margin: 4px 0 0 0;
+  min-width: 100%;
+  padding: 10px 0;
+  position: absolute;
+  top: 100%;
+  width: max-content;
+  max-width: min(320px, 100vw - 32px);
+  z-index: 30;
+}
+
+.rbccm-filter__select-panel[hidden] {
+  display: none;
+}
+
+
+/* ---------- Select options ---------- */
+.rbccm-filter__select-option {
+  align-items: flex-start;
+  background: #FFF;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.rbccm-filter__select-option:hover,
+.rbccm-filter__select-option:focus-visible {
+  background: rgba(0, 81, 165, 0.08);
+}
+
+.rbccm-filter__select-option[aria-selected="true"] {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-weight: 500;
+}
+
+
+/* ---------- Search (input + magnifying-glass icon) ----------
+   Design spec: flex row with 10px gap, 11px vertical / 10px horizontal
+   padding, 5px radius, 1px border, stretches to parent height. */
+.rbccm-filter__search {
+  align-items: center;
+  align-self: stretch;
+  background: #ffffff;
+  border: 1px solid #A8A8A8;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 10px;
+  padding: 6.5px 10px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.rbccm-filter__search:hover,
+.rbccm-filter__search:focus-within {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+}
+
+@media (min-width: 768px) {
+  .rbccm-filter__search {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 260px;
+    max-width: 420px;
+    margin-left: auto;
+  }
+}
+
+
+/* ---------- Tablet breakpoint (768px - 1024px) ----------
+   Layout switches to two rows:
+     Row 1: filter dropdowns (Month + Region + Industry + any others)
+            fill the full row, sharing space equally
+     Row 2: Search input + Clear button fill the second row
+   Desktop (1025px+) uses the single-row layout above. Mobile (<768px)
+   stays in the fully-stacked column layout. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rbccm-filter__filter-group {
+    flex: 1 1 100%;
+  }
+
+  .rbccm-filter__filter-group .rbccm-filter__select-wrap {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .rbccm-filter__search {
+    flex: 1 1 auto;
+    margin-left: 0;
+    max-width: none;
+  }
+}
+
+.rbccm-filter__search-icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  flex-shrink: 0;
+}
+
+.rbccm-filter__search-input {
+  background: transparent;
+  border: 0;
+  color: #252525;
+  flex: 1;
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  outline: none;
+  /* Asymmetric top padding shifts placeholder + typed text down ~2px
+     to visually center the ascender-heavy RBC Display serif inside the
+     flex-centered search bar. In a flex parent with align-items:center,
+     adding padding-top of N grows the input's box and recenters it,
+     netting a downward text shift of ~N/2. */
+  padding: 4px 0 0 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.rbccm-filter__search-input::placeholder {
+  color: #6f6f6f;
+  opacity: 1;
+}
+
+
+/* ---------- Reset button ---------- */
+.rbccm-filter__reset {
+  background: transparent;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 11px 20px 6px 20px;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.rbccm-filter__reset:hover,
+.rbccm-filter__reset:focus-visible {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Screen-reader-only utility ---------- */
+.rbccm-filter__sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+
+/* ---------- Empty-state (populated by JS) ----------
+   Rendered when the active filter matches zero items. Pattern ported from
+   .rbccm-upcoming-conferences__empty: circular icon + heading + two
+   messages + "Clear filters" button, stacked and centered. */
+.rbccm-filter__empty {
+  align-items: center;
+  align-self: stretch;
+  display: none;
+  flex-direction: column;
+  gap: 32px;
+  padding: 60px 16px;
+  text-align: center;
+}
+
+.rbccm-filter__empty.is-visible {
+  display: flex;
+}
+
+.rbccm-filter__empty[hidden] {
+  display: none;
+}
+
+.rbccm-filter__empty-icon-wrap {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background: rgba(0, 49, 104, 0.10);
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 100px;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: flex;
+  flex-shrink: 0;
+  height: 80px;
+  justify-content: center;
+  padding: 19px 19px 18px 18px;
+  width: 80px;
+}
+
+.rbccm-filter__empty-icon {
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  height: 43px;
+  width: 43px;
+}
+
+.rbccm-filter__empty-heading {
+  color: var(--Blue-Dark-Blue, #003168);
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0;
+}
+
+.rbccm-filter__empty-message {
+  color: var(--Blue-Dark-Blue, #003168);
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 120%;
+  margin: 0;
+  max-width: 640px;
+}
+
+.rbccm-filter__empty-message--emphasis {
+  font-weight: 500;
+  line-height: normal;
+}
+
+.rbccm-filter__empty-clear {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 10px;
+  color: var(--Blue-Dark-Blue, #003168);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  height: 50px;
+  justify-content: center;
+  line-height: 24px;
+  padding: 0 40px;
+  transition: background 0.15s ease, color 0.15s ease;
+  min-width: 212px;
+}
+
+.rbccm-filter__empty-clear:hover,
+.rbccm-filter__empty-clear:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Pagination (populated by JS) ---------- */
+.rbccm-filter__pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  justify-content: center;
+  margin: 32px 0;
+}
+
+.rbccm-filter__pagination:empty {
+  display: none;
+}
+
+.rbccm-filter__page-btn {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: #252525;
+  cursor: pointer;
+  display: inline-flex;
+  /* Production font stack — matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  height: 40px;
+  justify-content: center;
+  min-width: 40px;
+  /* Asymmetric top padding shifts the digit down ~2px to visually
+     center RBC Display's ascender-heavy metrics inside the square. */
+  padding: 4px 10px 0 10px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Arrow buttons: no visible border in rest state, but keep the 50%
+   border-radius so a hover/focus circle appears cleanly. Horizontal
+   padding stays asymmetric so each chevron nudges toward its
+   "pointing" edge — prev sits closer to the left, next sits closer
+   to the right. */
+.rbccm-filter__page-btn--prev,
+.rbccm-filter__page-btn--next {
+  border-color: transparent;
+  background: transparent;
+}
+
+.rbccm-filter__page-btn--prev {
+  padding: 0 10px 0 6px;
+}
+
+.rbccm-filter__page-btn--next {
+  padding: 0 6px 0 10px;
+}
+
+/* On hover/focus, the border re-emerges (same rule as number buttons
+   above) — giving the arrows a subtle circular ring for feedback. */
+
+.rbccm-filter__page-btn:hover,
+.rbccm-filter__page-btn:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+.rbccm-filter__page-btn--active,
+.rbccm-filter__page-btn--active:hover,
+.rbccm-filter__page-btn--active:focus,
+.rbccm-filter__page-btn--active:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  cursor: default;
+}
+
+.rbccm-filter__page-btn[disabled] {
+  cursor: default;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Chevron icon inside prev/next buttons. SVGs are emitted pre-mirrored
+   from JS (left chevron for prev, right chevron for next); this rule
+   only sets base color + block layout. Stroke uses currentColor so
+   hover/focus/dark/disabled states adapt automatically. */
+.rbccm-filter__page-btn-icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  display: block;
+  flex: none;
+  transition: color 0.2s ease;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-btn-icon {
+  color: currentColor;
+}
+
+/* ---------- Arrow button hover / focus ----------
+   Rest state: transparent bg + transparent border (chevron floats).
+   Hover / keyboard focus: circle fills blue, chevron flips to white,
+   with a smooth cross-fade — matches the leadership-slider desktop
+   arrow treatment. Skipping the visible ring at rest keeps the arrows
+   quiet in the pagination row until they're interacted with. */
+.rbccm-filter__page-btn--prev,
+.rbccm-filter__page-btn--next {
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.rbccm-filter__page-btn--prev:hover,
+.rbccm-filter__page-btn--next:hover,
+.rbccm-filter__page-btn--prev:focus-visible,
+.rbccm-filter__page-btn--next:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-filter__page-btn--prev:hover .rbccm-filter__page-btn-icon,
+.rbccm-filter__page-btn--next:hover .rbccm-filter__page-btn-icon,
+.rbccm-filter__page-btn--prev:focus-visible .rbccm-filter__page-btn-icon,
+.rbccm-filter__page-btn--next:focus-visible .rbccm-filter__page-btn-icon {
+  color: #ffffff;
+}
+
+.rbccm-filter__page-ellipsis {
+  align-items: center;
+  color: #6f6f6f;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  height: 40px;
+  justify-content: center;
+  min-width: 24px;
+  padding: 0 4px;
+  user-select: none;
+}
+
+
+/* =========================================================================
+   Modifier: --dark
+   -------------------------------------------------------------------------
+   Overrides for dark backgrounds (upcoming-conferences pattern).
+   ========================================================================= */
+
+.rbccm-filter--dark {
+  background: transparent;
+}
+
+.rbccm-filter--dark .rbccm-filter__filter-label {
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__select {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__select option {
+  background: #002144;
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__select-chevron {
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__select:hover,
+.rbccm-filter--dark .rbccm-filter__select:focus {
+  border-color: #FFC72C;
+}
+
+.rbccm-filter--dark .rbccm-filter__search {
+  background: transparent;
+  border-color: #FFF;
+}
+
+.rbccm-filter--dark .rbccm-filter__search:hover,
+.rbccm-filter--dark .rbccm-filter__search:focus-within {
+  border-color: #FFC72C;
+}
+
+.rbccm-filter--dark .rbccm-filter__search-icon {
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__search-input {
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rbccm-filter--dark .rbccm-filter__reset {
+  border-color: #FFC72C;
+  color: #FFC72C;
+}
+
+.rbccm-filter--dark .rbccm-filter__reset:hover,
+.rbccm-filter--dark .rbccm-filter__reset:focus-visible {
+  background: #FFC72C;
+  color: #002144;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #FFFDFD;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-btn:hover,
+.rbccm-filter--dark .rbccm-filter__page-btn:focus-visible {
+  border-color: #FFC72C;
+  color: #FFC72C;
+}
+
+/* Dark theme arrow hover/focus: fill yellow, dark-blue chevron.
+   Mirrors the light-theme "fill circle + invert chevron" treatment
+   using the RBC brand yellow accent. */
+.rbccm-filter--dark .rbccm-filter__page-btn--prev:hover,
+.rbccm-filter--dark .rbccm-filter__page-btn--next:hover,
+.rbccm-filter--dark .rbccm-filter__page-btn--prev:focus-visible,
+.rbccm-filter--dark .rbccm-filter__page-btn--next:focus-visible {
+  background: #FFC72C;
+  border-color: #FFC72C;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-btn--prev:hover .rbccm-filter__page-btn-icon,
+.rbccm-filter--dark .rbccm-filter__page-btn--next:hover .rbccm-filter__page-btn-icon,
+.rbccm-filter--dark .rbccm-filter__page-btn--prev:focus-visible .rbccm-filter__page-btn-icon,
+.rbccm-filter--dark .rbccm-filter__page-btn--next:focus-visible .rbccm-filter__page-btn-icon {
+  color: #002144;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-btn--active {
+  background: #FFC72C;
+  border-color: #FFC72C;
+  color: #002144;
+}
+
+.rbccm-filter--dark .rbccm-filter__page-ellipsis {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+/* Empty-state DARK variant.
+   Applied automatically by JS when the parent filter has --dark. */
+.rbccm-filter__empty--dark .rbccm-filter__empty-icon-wrap {
+  background: rgba(45, 106, 168, 0.20);
+  border-color: #1D86F0;
+  color: #FFFDFD;
+}
+
+.rbccm-filter__empty--dark .rbccm-filter__empty-heading,
+.rbccm-filter__empty--dark .rbccm-filter__empty-message {
+  color: #FFFDFD;
+}
+
+.rbccm-filter__empty--dark .rbccm-filter__empty-clear {
+  border-color: #FFFDFD;
+  color: #FFFDFD;
+}
+
+.rbccm-filter__empty--dark .rbccm-filter__empty-clear:hover,
+.rbccm-filter__empty--dark .rbccm-filter__empty-clear:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFDFD;
+}
