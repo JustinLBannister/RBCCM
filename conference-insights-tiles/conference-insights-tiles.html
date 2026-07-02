@@ -241,9 +241,25 @@
                    topic (checkbox)     → data-topic  (space-separated)
                    title + description  → data-search-text (lowercased)
                  ============================================================ -->
-            <xsl:variable name="LI_DCR"    select="./Datum[@Name='Source DCR']/DCR/press_release" />
-            <xsl:variable name="LI_PUB"    select="normalize-space($LI_DCR/publish_date)" />
-            <xsl:variable name="LI_REGION" select="normalize-space($LI_DCR/regional_relevancy)" />
+            <xsl:variable name="LI_DCR"        select="./Datum[@Name='Source DCR']/DCR/press_release" />
+            <xsl:variable name="LI_PUB"        select="normalize-space($LI_DCR/publish_date)" />
+            <!-- Combine both regional fields into data-region so the
+                 filter matches on either dimension. Article tagged
+                 Origination=US + Relevancy=Global gets data-region="us global"
+                 and matches both US and Global filter selections.
+                 REGION_BUCKETS in filter-by.js tokenizes on whitespace so
+                 the space-separated emission works out of the box. -->
+            <xsl:variable name="LI_REGION_ORIG" select="normalize-space($LI_DCR/regional_origination)" />
+            <xsl:variable name="LI_REGION_REL"  select="normalize-space($LI_DCR/regional_relevancy)" />
+            <xsl:variable name="LI_REGION">
+              <xsl:choose>
+                <xsl:when test="$LI_REGION_ORIG != '' and $LI_REGION_REL != '' and $LI_REGION_ORIG != $LI_REGION_REL">
+                  <xsl:value-of select="$LI_REGION_ORIG" /><xsl:text> </xsl:text><xsl:value-of select="$LI_REGION_REL" />
+                </xsl:when>
+                <xsl:when test="$LI_REGION_ORIG != ''"><xsl:value-of select="$LI_REGION_ORIG" /></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$LI_REGION_REL" /></xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
 
             <li class="rbccm-conference-insights-tiles__item">
               <xsl:if test="$LI_PUB != '' and string-length($LI_PUB) &gt;= 4">
