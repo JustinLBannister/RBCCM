@@ -240,15 +240,14 @@
               <xsl:if test="$LI_REGION != ''">
                 <xsl:attribute name="data-region"><xsl:value-of select="$LI_REGION" /></xsl:attribute>
               </xsl:if>
-              <xsl:if test="$LI_DCR/topic/*">
-                <xsl:attribute name="data-topic">
-                  <xsl:for-each select="$LI_DCR/topic/*">
-                    <xsl:if test="normalize-space(.) != ''">
-                      <xsl:value-of select="normalize-space(.)" />
-                      <xsl:if test="position() != last()"><xsl:text> </xsl:text></xsl:if>
-                    </xsl:if>
-                  </xsl:for-each>
-                </xsl:attribute>
+              <!-- Topic is a multi-checkbox in the DCR. Teamsite serializes
+                   selected values as text content on the <topic> element
+                   (space or comma separated for multi-select), not as
+                   child elements. Read the whole string value and pass
+                   through with whitespace normalized — the filter JS
+                   already tokenizes on space/comma/slash. -->
+              <xsl:if test="normalize-space($LI_DCR/topic) != ''">
+                <xsl:attribute name="data-topic"><xsl:value-of select="normalize-space($LI_DCR/topic)" /></xsl:attribute>
               </xsl:if>
               <xsl:attribute name="data-search-text">
                 <xsl:value-of select="translate(normalize-space($LI_DCR/title), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
