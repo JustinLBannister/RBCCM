@@ -38,6 +38,10 @@
        MAIN TEMPLATE
        ============================================================ -->
   <xsl:template match="/">
+
+    <!-- Shared CSS (relative path is /assets/rbccm/... in production) -->
+    <link rel="stylesheet" href="/assets/rbccm/css/components/conference-insights-hero.css" />
+
     <!-- Section labeled by its own H1 via aria-labelledby, so assistive
          tech announces the section's accessible name as the page title
          when entering the landmark. Only applied when the title exists. -->
