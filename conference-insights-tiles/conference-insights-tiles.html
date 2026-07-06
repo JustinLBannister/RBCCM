@@ -118,6 +118,93 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- Bottom-right date label: "Jul 2026" style. Sourced from the DCR's
+         publish_date, which arrives as ISO YYYY-MM-DD. XSL 1.0 has no
+         datetime type, so we substring the year (chars 1-4) and month
+         (chars 6-7), then map the numeric month to a 3-letter abbrev via
+         xsl:choose. Empty publish_date → empty DATE_LABEL → the bottom-
+         row wrapper collapses to just the meta on the left. -->
+    <xsl:variable name="ARTICLE_PUB" select="normalize-space($ARTICLE_DCR/publish_date)" />
+    <xsl:variable name="DATE_LABEL">
+      <xsl:if test="string-length($ARTICLE_PUB) &gt;= 7">
+        <xsl:variable name="MM" select="substring($ARTICLE_PUB, 6, 2)" />
+        <xsl:variable name="YYYY" select="substring($ARTICLE_PUB, 1, 4)" />
+        <xsl:choose>
+          <xsl:when test="$MM = '01'">Jan </xsl:when>
+          <xsl:when test="$MM = '02'">Feb </xsl:when>
+          <xsl:when test="$MM = '03'">Mar </xsl:when>
+          <xsl:when test="$MM = '04'">Apr </xsl:when>
+          <xsl:when test="$MM = '05'">May </xsl:when>
+          <xsl:when test="$MM = '06'">Jun </xsl:when>
+          <xsl:when test="$MM = '07'">Jul </xsl:when>
+          <xsl:when test="$MM = '08'">Aug </xsl:when>
+          <xsl:when test="$MM = '09'">Sep </xsl:when>
+          <xsl:when test="$MM = '10'">Oct </xsl:when>
+          <xsl:when test="$MM = '11'">Nov </xsl:when>
+          <xsl:when test="$MM = '12'">Dec </xsl:when>
+        </xsl:choose>
+        <xsl:value-of select="$YYYY" />
+      </xsl:if>
+    </xsl:variable>
+
+    <!-- Region label ("US", "Canada", "Global", "Europe", "APAC"). Pulls
+         from the DCR's regional_origination first, then regional_relevancy
+         as fallback. Codes get uppercased or mapped to their long form.
+         Feed emits region as lowercase codes so we map here — XSL 1.0's
+         translate() handles the tolower normalization. -->
+    <xsl:variable name="REGION_RAW">
+      <xsl:variable name="orig" select="normalize-space($ARTICLE_DCR/regional_origination)" />
+      <xsl:variable name="rel"  select="normalize-space($ARTICLE_DCR/regional_relevancy)" />
+      <xsl:choose>
+        <xsl:when test="$orig != ''"><xsl:value-of select="$orig" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$rel" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="REGION_KEY" select="translate($REGION_RAW, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+    <xsl:variable name="REGION_LABEL">
+      <xsl:choose>
+        <xsl:when test="$REGION_KEY = 'us'">US</xsl:when>
+        <xsl:when test="$REGION_KEY = 'ca'">Canada</xsl:when>
+        <xsl:when test="$REGION_KEY = 'canada'">Canada</xsl:when>
+        <xsl:when test="$REGION_KEY = 'global'">Global</xsl:when>
+        <xsl:when test="$REGION_KEY = 'eu'">Europe</xsl:when>
+        <xsl:when test="$REGION_KEY = 'europe'">Europe</xsl:when>
+        <xsl:when test="$REGION_KEY = 'apac'">APAC</xsl:when>
+        <xsl:otherwise><xsl:value-of select="$REGION_RAW" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Topic label. DCR ships this as a checkbox multi-select — we take
+         the first selected Option and pretty-print it. Slugs like
+         "energy-transition" are mapped to display names below. -->
+    <xsl:variable name="TOPIC_RAW" select="normalize-space($ARTICLE_DCR/topic/Option[@Selected='true'][1]/Value)" />
+    <xsl:variable name="TOPIC_KEY" select="translate($TOPIC_RAW, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-')" />
+    <xsl:variable name="TOPIC_LABEL">
+      <xsl:choose>
+        <xsl:when test="$TOPIC_KEY = 'energy'">Energy</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'energy-transition'">Energy Transition</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'financial-institutions'">Financial Institutions</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'healthcare'">Healthcare</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'industrials'">Industrials</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'markets-economics'">Markets &amp; Economics</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'mining-materials'">Mining &amp; Materials</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'power-utilities-infrastructure'">Power, Utilities &amp; Infrastructure</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'technology-innovation'">Technology &amp; Innovation</xsl:when>
+        <xsl:otherwise><xsl:value-of select="$TOPIC_RAW" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Concatenate region + date with " · " separator, mirroring JS. -->
+    <xsl:variable name="REGION_DATE">
+      <xsl:choose>
+        <xsl:when test="normalize-space($REGION_LABEL) != '' and normalize-space($DATE_LABEL) != ''">
+          <xsl:value-of select="normalize-space($REGION_LABEL)" /><xsl:text> &#183; </xsl:text><xsl:value-of select="normalize-space($DATE_LABEL)" />
+        </xsl:when>
+        <xsl:when test="normalize-space($REGION_LABEL) != ''"><xsl:value-of select="normalize-space($REGION_LABEL)" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space($DATE_LABEL)" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="TITLE_TEXT">
       <xsl:choose>
         <xsl:when test="normalize-space($OVERWRITE) = 'Yes' and normalize-space($TITLE_MANUAL) != ''"><xsl:value-of select="$TITLE_MANUAL" /></xsl:when>
@@ -185,11 +272,45 @@
           </xsl:choose>
         </p>
 
-        <xsl:if test="normalize-space($META_TEXT) != ''">
-          <p class="rbccm-conference-insights-tiles__insight-meta">
-            <span><xsl:value-of select="$META_TEXT" /></span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
-          </p>
+        <!-- Bottom row: meta ("14 min listen ›") on the left, taxonomy
+             stack (topic on top, "region · date" below) on the right.
+             Any side or piece can be absent — we only emit the wrappers
+             we have. If neither side has content, the whole row collapses
+             and the card reads as pre-taxonomy layout. -->
+        <xsl:variable name="HAS_TAXONOMY" select="normalize-space($TOPIC_LABEL) != '' or normalize-space($REGION_DATE) != ''" />
+        <xsl:if test="normalize-space($META_TEXT) != '' or $HAS_TAXONOMY">
+          <div class="rbccm-conference-insights-tiles__insight-bottom">
+            <xsl:if test="normalize-space($META_TEXT) != ''">
+              <p class="rbccm-conference-insights-tiles__insight-meta">
+                <span><xsl:value-of select="$META_TEXT" /></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-conference-insights-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </xsl:if>
+            <xsl:if test="$HAS_TAXONOMY">
+              <!-- Topic and region rendered as their own spans even though
+                   CSS currently hides them. Keeping the markup shape lets
+                   the team un-hide via a one-line CSS change once we
+                   confirm the extra taxonomy is welcome. Region carries
+                   its " · " separator inline so hiding it removes the
+                   orphan dot for free. -->
+              <div class="rbccm-conference-insights-tiles__insight-taxonomy">
+                <xsl:if test="normalize-space($TOPIC_LABEL) != ''">
+                  <span class="rbccm-conference-insights-tiles__insight-topic"><xsl:value-of select="normalize-space($TOPIC_LABEL)" /></span>
+                </xsl:if>
+                <xsl:if test="normalize-space($REGION_LABEL) != ''">
+                  <span class="rbccm-conference-insights-tiles__insight-region">
+                    <xsl:value-of select="normalize-space($REGION_LABEL)" />
+                    <xsl:if test="normalize-space($DATE_LABEL) != ''">
+                      <xsl:text> &#183; </xsl:text>
+                    </xsl:if>
+                  </span>
+                </xsl:if>
+                <xsl:if test="normalize-space($DATE_LABEL) != ''">
+                  <span class="rbccm-conference-insights-tiles__insight-date"><xsl:value-of select="normalize-space($DATE_LABEL)" /></span>
+                </xsl:if>
+              </div>
+            </xsl:if>
+          </div>
         </xsl:if>
       </div>
     </a>

@@ -652,6 +652,72 @@
 }
 
 
+/* ---------- Responsive pagination scale ----------
+   Desktop (default above) sits at 40px circles / 16px numerals / 26px
+   gap. That range hosts 9-11 circles comfortably. Below the desktop
+   breakpoint we scale everything down so a richer set of circles still
+   fits without wrapping to two rows.
+
+   Mobile (<768px)  → ~28px circles / 12px numerals / 12px gap (~70% of
+                      desktop). Max 7 circles fit inside a 375px viewport
+                      accounting for gap and container padding.
+   Tablet (768-1023) → ~34px circles / 14px numerals / 18px gap (~85% of
+                      desktop). Max 9 circles fit inside a 768-1023px
+                      viewport comfortably.
+
+   SVG chevrons + border thickness inherit the scale by being drawn
+   inline; setting the button dimensions is enough. */
+@media (max-width: 1023px) {
+  .rbccm-filter__pagination {
+    gap: 18px;
+    margin: 24px 0;
+  }
+  .rbccm-filter__page-btn,
+  .rbccm-filter__page-ellipsis {
+    font-size: 14px;
+    height: 34px;
+    min-width: 34px;
+    width: auto;
+  }
+  .rbccm-filter__page-ellipsis {
+    width: 34px;
+  }
+  .rbccm-filter__page-btn-icon {
+    height: 14px;
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .rbccm-filter__pagination {
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .rbccm-filter__page-btn,
+  .rbccm-filter__page-ellipsis {
+    font-size: 12px;
+    height: 28px;
+    min-width: 28px;
+    padding: 3px 6px 0 6px;
+    width: auto;
+  }
+  .rbccm-filter__page-ellipsis {
+    padding: 0;
+    width: 28px;
+  }
+  .rbccm-filter__page-btn--prev {
+    padding: 0 6px 0 4px;
+  }
+  .rbccm-filter__page-btn--next {
+    padding: 0 4px 0 6px;
+  }
+  .rbccm-filter__page-btn-icon {
+    height: 12px;
+    width: auto;
+  }
+}
+
+
 /* =========================================================================
    Modifier: --dark
    -------------------------------------------------------------------------

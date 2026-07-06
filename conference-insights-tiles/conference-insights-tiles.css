@@ -237,7 +237,7 @@
   }
 
   /* Featured card spans the full row above the standard 3-up. */
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured {
     grid-column: 1 / -1;
   }
 }
@@ -387,6 +387,94 @@
 }
 
 
+/* ---------- Bottom row ----------
+   Wrapper that pins the meta ("14 min listen ›") to the bottom-left and
+   the abbreviated month + year ("Jul 2026") to the bottom-right. Baseline-
+   aligned so the two sit on the same reading line. Only appears when the
+   feed produced a dateLabel; tiles without a date render the meta bare and
+   this wrapper isn't emitted. */
+.rbccm-conference-insights-tiles__insight-bottom {
+  /* `last baseline` aligns the LAST text baseline of each flex child.
+     For the meta (single line) that's its own baseline; for the
+     taxonomy stack (two lines) that's the "region · date" line. Result:
+     "14 min listen" sits on the exact same reading line as "US · Jun
+     2026". Falls back to flex-end in older engines — visually near-
+     identical, off by ~3px because of the meta's padding-bottom + hover
+     underline reservation. */
+  align-items: flex-end;
+  align-items: last baseline;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: auto 0 0 0;
+  width: 100%;
+}
+
+/* Reset the meta's own auto margin when it's inside the bottom-row
+   wrapper — the wrapper now handles the "push to bottom" behavior. */
+.rbccm-conference-insights-tiles__insight-bottom .rbccm-conference-insights-tiles__insight-meta {
+  margin: 0;
+}
+
+
+/* ---------- Taxonomy stack ----------
+   Right side of the bottom row: primary topic ("Healthcare") on top,
+   region + date ("US · Jul 2026") muted below. Right-aligned so the
+   text edge lines up with the card's right padding. Small line-height
+   so the two lines feel like one unit, not two paragraphs. */
+.rbccm-conference-insights-tiles__insight-taxonomy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 2px;
+  text-align: right;
+}
+
+/* Topic — same tone as the region · date line so the taxonomy stack
+   reads as a single muted block. #353535 at 70% opacity resolves to
+   ~#717171 against white; matches the muted body copy elsewhere on
+   the page and keeps enough contrast for WCAG AA at 13px. */
+.rbccm-conference-insights-tiles__insight-topic {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Region — same treatment as topic. Carries its " · " separator inline
+   so hiding the whole span removes the orphan dot for free. */
+.rbccm-conference-insights-tiles__insight-region {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Date — the piece we're keeping visible for now; region and topic are
+   suppressed via the temporary hide rule below. */
+.rbccm-conference-insights-tiles__insight-date {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+
+/* ---------- TEMPORARY: hide topic + region ----------
+   Markup for topic and region ships as its own spans so we can bring
+   them back with a one-line change if stakeholders approve. Until then,
+   both are hidden and only the date renders in the bottom-right slot.
+   To restore: delete this entire block. */
+.rbccm-conference-insights-tiles__insight-topic,
+.rbccm-conference-insights-tiles__insight-region {
+  display: none;
+}
+
+
 /* ---------- Arrow ----------
    Render at the SVG's intrinsic 4x10 dimensions (set inline on the
    element). Only fill and flex-shrink applied here. */
@@ -469,37 +557,37 @@
    Meta's `margin: auto 0 0 0` is overridden here so the meta flows in line
    with the centered group (no auto-push to bottom). */
 @media (min-width: 992px) {
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured {
     flex-direction: row;
     align-items: stretch;
     min-height: 0; /* drop the 555px floor; horizontal featured sizes to content */
     max-height: 280px;
   }
 
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-media {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-media {
     flex: 0 0 50%;
     height: auto;
     min-height: 240px;
   }
 
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-body {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-body {
     flex: 1 1 50%;
     justify-content: center;
     min-height: 0; /* let featured body size to its centered content */
     padding: 30px;
   }
 
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-title {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-title {
     font-size: 24px;
     line-height: 30px;
     margin: 26px 0 12px 0;
   }
 
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-desc {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-desc {
     margin: 0 0 26px 0;
   }
 
-  .rbccm-conference-insights-tiles:not(.is-filtered) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-meta {
+  .rbccm-conference-insights-tiles:not(.is-filtered):not(.is-past-first-page) .rbccm-conference-insights-tiles__insight--featured .rbccm-conference-insights-tiles__insight-meta {
     margin: 0;
   }
 }

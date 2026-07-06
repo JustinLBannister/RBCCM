@@ -571,6 +571,17 @@
         else matched[m].setAttribute('hidden', 'hidden');
       }
 
+      /* The featured-hero layout only makes sense on page 1 unfiltered,
+         since the featured tile is index 0. Mirror the `is-filtered`
+         class as `is-past-first-page` on page 2+ so the CSS grid can
+         collapse the hero back to a plain tile without needing a new
+         selector convention. */
+      if (!isFiltered && currentPage > 0) {
+        container.classList.add('is-past-first-page');
+      } else {
+        container.classList.remove('is-past-first-page');
+      }
+
       renderPagination(totalPages);
     }
 
@@ -669,17 +680,56 @@
       paginationHost.appendChild(nav);
     }
 
+    /* Responsive target circle count. Odd numbers keep the current-page
+       chip visually centered when it's in the middle of the range:
+         - Mobile   (<768px): 7 max, degrades to 5 when total ≤ 5
+         - Tablet   (768-1023): 9 max
+         - Desktop  (≥1024): 11 max
+       Fall back to 7 when window is unavailable (SSR/pre-hydrate). */
+    function getTargetPageCount() {
+      if (typeof window === 'undefined' || !window.matchMedia) return 7;
+      if (window.matchMedia('(min-width: 1024px)').matches) return 11;
+      if (window.matchMedia('(min-width: 768px)').matches) return 9;
+      return 7;
+    }
+
     function computePageList(current, total) {
-      /* Minimal pagination pattern: always show at most current +
-         ellipsis + last (3 items max). The leftmost number is the
-         current page, so it advances as the reader nexts through
-         (1, 2, 3…). No ellipsis when current and last are adjacent;
-         nothing but current when current === last. */
-      var out = [current];
-      if (current < total - 1) {
-        if (current + 1 < total - 1) out.push('…');
-        out.push(total - 1);
+      var target = getTargetPageCount();
+
+      /* Total fits in the window — show every page, no ellipsis. */
+      if (total <= target) {
+        var all = [];
+        for (var i = 0; i < total; i++) all.push(i);
+        return all;
       }
+
+      /* Reserve 4 slots for first + last + two ellipses, then a
+         centered window of the remaining N pages around current. */
+      var windowSize = target - 4;
+      var half = Math.floor(windowSize / 2);
+      var out;
+
+      /* Near start — no left ellipsis, extend right window. */
+      if (current <= half + 1) {
+        out = [];
+        for (var i = 0; i < target - 2; i++) out.push(i);
+        out.push('…');
+        out.push(total - 1);
+        return out;
+      }
+
+      /* Near end — no right ellipsis, extend left window. */
+      if (current >= total - half - 2) {
+        out = [0, '…'];
+        for (var i = total - (target - 2); i < total; i++) out.push(i);
+        return out;
+      }
+
+      /* Middle — both ellipses, current centered inside window. */
+      out = [0, '…'];
+      for (var i = current - half; i <= current + half; i++) out.push(i);
+      out.push('…');
+      out.push(total - 1);
       return out;
     }
 
@@ -764,6 +814,23 @@
       searchInput.addEventListener('search', function () { apply(true); });
     }
     if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+
+    /* Re-render pagination when the viewport crosses a breakpoint so the
+       circle count adapts (mobile 7 → tablet 9 → desktop 11). Debounced
+       so drag-resizes don't rebuild the DOM on every frame; matchMedia
+       fires the callback once per crossing, resize fires continuously so
+       we throttle it. Skipped when pageSize <= 0 (no pagination in play). */
+    var resizeRaf = 0;
+    function onViewportChange() {
+      if (resizeRaf) return;
+      resizeRaf = window.requestAnimationFrame(function () {
+        resizeRaf = 0;
+        apply(false);
+      });
+    }
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('resize', onViewportChange);
+    }
 
     apply(false);
 

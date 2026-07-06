@@ -70,6 +70,25 @@
     return m ? m[1] : '';
   }
 
+  /* Parse a human date string ("July 6, 2026") → abbreviated month + year
+     ("Jul 2026") for the bottom-right meta slot. Falls back to just the
+     year if we can't extract a month. */
+  var MONTH_ABBR = {
+    january: 'Jan', february: 'Feb', march: 'Mar', april: 'Apr',
+    may: 'May', june: 'Jun', july: 'Jul', august: 'Aug',
+    september: 'Sep', october: 'Oct', november: 'Nov', december: 'Dec'
+  };
+  function formatMonthYear(dateStr) {
+    if (!dateStr) return '';
+    var s = String(dateStr).trim();
+    var yearMatch = s.match(/(\d{4})/);
+    var year = yearMatch ? yearMatch[1] : '';
+    var monthMatch = s.match(/^([A-Za-z]+)/);
+    var monthAbbr = monthMatch ? MONTH_ABBR[monthMatch[1].toLowerCase()] : '';
+    if (monthAbbr && year) return monthAbbr + ' ' + year;
+    return year;
+  }
+
   /* Cap description at maxChars, snap back to the last word boundary
      if we can (so we don't cut mid-word), and append an ellipsis. */
   var DESC_MAX = 150;
@@ -84,6 +103,56 @@
     /* Trim trailing punctuation so we don't get "foo,…" */
     cut = cut.replace(/[\s,.;:!?\-–—]+$/, '');
     return cut + '…';
+  }
+
+  /* Human labels for topic tokens. Feed emits lowercase slugs like
+     "energy-transition" — we display "Energy Transition". Keeps a
+     lookup table for the multi-word cases and falls back to a generic
+     Title-Case with dash→space for anything unmapped. */
+  var TOPIC_LABELS = {
+    'energy':                        'Energy',
+    'energy-transition':             'Energy Transition',
+    'financial-institutions':        'Financial Institutions',
+    'healthcare':                    'Healthcare',
+    'industrials':                   'Industrials',
+    'markets-economics':             'Markets & Economics',
+    'mining-materials':              'Mining & Materials',
+    'power-utilities-infrastructure':'Power, Utilities & Infrastructure',
+    'technology-innovation':         'Technology & Innovation'
+  };
+  function labelForTopic(slug) {
+    if (!slug) return '';
+    var s = slug.toLowerCase();
+    if (TOPIC_LABELS[s]) return TOPIC_LABELS[s];
+    /* Generic fallback for unmapped slugs. */
+    return s.split(/[-_\s]+/).map(function (w) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+  }
+
+  /* Region tokens are short codes (us / ca / global / eu / apac). Uppercase
+     the 2-letter codes, title-case everything else. */
+  var REGION_LABELS = {
+    'us':     'US',
+    'ca':     'Canada',
+    'global': 'Global',
+    'eu':     'Europe',
+    'apac':   'APAC'
+  };
+  function labelForRegion(slug) {
+    if (!slug) return '';
+    var s = slug.toLowerCase();
+    if (REGION_LABELS[s]) return REGION_LABELS[s];
+    return s.length <= 3 ? s.toUpperCase() : (s.charAt(0).toUpperCase() + s.slice(1));
+  }
+
+  /* Pick the FIRST token from a space-separated tag string. Multi-topic
+     articles keep the first (primary) label — showing all of them would
+     crowd the corner and repeat what the filter dropdowns already surface. */
+  function firstToken(str) {
+    if (!str) return '';
+    var t = String(str).trim().split(/\s+/)[0];
+    return t || '';
   }
 
   /* "14 min" → "14 min listen" (or "read"/"watch") based on type. */
@@ -180,11 +249,56 @@
       '<path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>' +
       '</svg>');
 
+    /* Bottom row wraps the existing meta ("14 min listen ›") on the left
+       and the new date label ("Jul 2026") on the right. When there's no
+       date to show we skip the wrapper and append meta directly, so tiles
+       without dates keep the pre-existing layout. */
     body.appendChild(label);
     body.appendChild(divider);
     body.appendChild(h2);
     body.appendChild(desc);
-    body.appendChild(meta);
+    /* Build the right-side taxonomy stack: topic on top, "region · date"
+       on the bottom. Any of the three pieces can be absent — we only emit
+       the pieces we have. If nothing at all is present, the whole right
+       column collapses and meta renders bare like the original layout. */
+    var hasTaxonomy = !!(entry.topicLabel || entry.regionLabel || entry.dateLabel);
+    if (hasTaxonomy) {
+      var bottomRow = document.createElement('div');
+      bottomRow.className = 'rbccm-conference-insights-tiles__insight-bottom';
+
+      var taxonomy = document.createElement('div');
+      taxonomy.className = 'rbccm-conference-insights-tiles__insight-taxonomy';
+
+      /* Topic and region rendered as their own elements even though CSS
+         currently hides them — keeps the markup shape stable so we can
+         un-hide via CSS alone when stakeholders sign off on the extra
+         taxonomy. Region carries its " · " separator inline so hiding
+         the whole span removes the orphan dot for free. */
+      if (entry.topicLabel) {
+        var topicEl = document.createElement('span');
+        topicEl.className = 'rbccm-conference-insights-tiles__insight-topic';
+        topicEl.textContent = entry.topicLabel;
+        taxonomy.appendChild(topicEl);
+      }
+      if (entry.regionLabel) {
+        var regionEl = document.createElement('span');
+        regionEl.className = 'rbccm-conference-insights-tiles__insight-region';
+        regionEl.textContent = entry.dateLabel ? entry.regionLabel + ' · ' : entry.regionLabel;
+        taxonomy.appendChild(regionEl);
+      }
+      if (entry.dateLabel) {
+        var dateEl = document.createElement('span');
+        dateEl.className = 'rbccm-conference-insights-tiles__insight-date';
+        dateEl.textContent = entry.dateLabel;
+        taxonomy.appendChild(dateEl);
+      }
+
+      bottomRow.appendChild(meta);
+      bottomRow.appendChild(taxonomy);
+      body.appendChild(bottomRow);
+    } else {
+      body.appendChild(meta);
+    }
 
     a.appendChild(media);
     a.appendChild(body);
@@ -254,6 +368,9 @@
        the visible cap. Display uses the truncated version. */
     var searchText = (title + ' ' + description).toLowerCase();
     var displayDescription = truncateDescription(description, DESC_MAX);
+    var dateLabel = formatMonthYear(dateStr);
+    var topicLabel = labelForTopic(firstToken(topicTokens.join(' ')));
+    var regionLabel = labelForRegion(firstToken(regionTokens.join(' ')));
 
     return {
       title:       title,
@@ -262,6 +379,9 @@
       thumbnail:   thumb,
       eyebrow:     category,
       year:        year,
+      dateLabel:   dateLabel,
+      topicLabel:  topicLabel,
+      regionLabel: regionLabel,
       meta:        formatMeta(readtime, watchtime, type),
       dataRegion:  regionTokens.join(' '),
       dataTopic:   topicTokens.join(' '),
