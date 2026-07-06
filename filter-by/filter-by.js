@@ -238,6 +238,20 @@
       var button = wrap.querySelector('.rbccm-filter__select');
       if (!button) return null;
 
+      /* Reset any prior inline display state from a previous bind
+         (e.g. a rebind after tiles were populated by the feed script —
+         the first bind ran on an empty item set and hid the wrap;
+         this bind may find data and needs the wrap visible again). */
+      wrap.style.display = '';
+
+      /* On rebind, the previous bind's click/keydown listeners are still
+         attached to the button. Clone-and-replace drops them so we don't
+         stack a second set of listeners (which would fire twice per
+         click and net to open+close = no visible change). */
+      var freshButton = button.cloneNode(true);
+      button.parentNode.replaceChild(freshButton, button);
+      button = freshButton;
+
       /* Collect unique lowercased tokens across all items. */
       var seen = {};
       var rawTokens = [];
@@ -656,18 +670,15 @@
     }
 
     function computePageList(current, total) {
-      var set = {};
-      set[0] = true;
-      set[total - 1] = true;
-      set[current] = true;
-      if (current - 1 >= 0) set[current - 1] = true;
-      if (current + 1 < total) set[current + 1] = true;
-
-      var indices = Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
-      var out = [];
-      for (var i = 0; i < indices.length; i++) {
-        if (i > 0 && indices[i] - indices[i - 1] > 1) out.push('…');
-        out.push(indices[i]);
+      /* Minimal pagination pattern: always show at most current +
+         ellipsis + last (3 items max). The leftmost number is the
+         current page, so it advances as the reader nexts through
+         (1, 2, 3…). No ellipsis when current and last are adjacent;
+         nothing but current when current === last. */
+      var out = [current];
+      if (current < total - 1) {
+        if (current + 1 < total - 1) out.push('…');
+        out.push(total - 1);
       }
       return out;
     }

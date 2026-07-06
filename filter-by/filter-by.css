@@ -621,17 +621,34 @@
   color: #ffffff;
 }
 
+/* Ellipsis — styled as a circle matching the number buttons so the
+   three-item pagination row (current · ellipsis · last) reads as a
+   consistent shape sequence. Uses opacity: 0.4 to match the disabled
+   arrow-button treatment — reads as inactive/decorative using the
+   same "unavailable" language readers already learned from the
+   pagination arrows. Non-interactive (aria-hidden, no button
+   semantics). Inherits dark-blue border/text so dark-theme
+   variants get the right base color automatically. */
 .rbccm-filter__page-ellipsis {
   align-items: center;
-  color: #6f6f6f;
+  background: #ffffff;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: var(--Blue-Dark-Blue, #003168);
   display: inline-flex;
-  font-family: Roboto, Arial, sans-serif;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
   font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
   height: 40px;
   justify-content: center;
-  min-width: 24px;
-  padding: 0 4px;
+  line-height: normal;
+  min-width: 40px;
+  opacity: 0.4;
+  padding: 0;
   user-select: none;
+  width: 40px;
 }
 
 

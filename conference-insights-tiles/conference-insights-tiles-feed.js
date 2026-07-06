@@ -32,12 +32,22 @@
 (function () {
   'use strict';
 
-  /* ---------- Config ---------- */
-  var YEARS_TO_FETCH  = [2024, 2025, 2026]; /* additive — 404 years are ignored */
-  var FEED_URL_TEMPLATE = '/en/insights/data/{year}-insights';
-  var WHITELIST_URL   = '/assets/rbccm/js/components/data/conference-insights-whitelist.json';
-  var CONTAINER_SEL   = '#rbccm-conference-insights-tiles';
-  var ROW_SEL         = '.rbccm-conference-insights-tiles__row';
+  /* ---------- Config ----------
+     Defaults point at production RBCCM paths. A page can override any of
+     these by setting window.RBCCM_FEED_CONFIG BEFORE this script loads —
+     used by the local-test HTML to swap in fixture files without editing
+     this file. Config shape (all optional):
+       {
+         years:             [2024, 2025, 2026],
+         feedUrlTemplate:   '/path/{year}-insights.xml',
+         whitelistUrl:      '/path/to/whitelist.json'
+       } */
+  var CONFIG = (typeof window !== 'undefined' && window.RBCCM_FEED_CONFIG) || {};
+  var YEARS_TO_FETCH    = CONFIG.years            || [2024, 2025, 2026];
+  var FEED_URL_TEMPLATE = CONFIG.feedUrlTemplate  || '/en/insights/data/{year}-insights';
+  var WHITELIST_URL     = CONFIG.whitelistUrl     || '/assets/rbccm/js/components/data/conference-insights-whitelist.json';
+  var CONTAINER_SEL     = '#rbccm-conference-insights-tiles';
+  var ROW_SEL           = '.rbccm-conference-insights-tiles__row';
 
   /* ---------- Utilities ---------- */
 
@@ -168,12 +178,22 @@
 
   /* ---------- Data pipeline ---------- */
 
+  /* Escape bare `&` characters (i.e. not part of a valid XML entity) so
+     the strict XML parser doesn't choke on content like "S&P 500" or
+     "Software M&A" — the RBCCM feeds ship those un-escaped. Matches the
+     lenient behavior browsers apply to text/html but keeps us in the
+     application/xml code path so `<news>` etc. stay real elements. */
+  function escapeStrayAmpersands(s) {
+    if (!s) return s;
+    return s.replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+  }
+
   /* Parse an XML string into an array of raw news nodes. */
   function parseNewsNodes(xmlStr) {
     if (!xmlStr) return [];
     var doc;
     try {
-      doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
+      doc = new DOMParser().parseFromString(escapeStrayAmpersands(xmlStr), 'application/xml');
     } catch (e) {
       return [];
     }
