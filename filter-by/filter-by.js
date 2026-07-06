@@ -769,6 +769,36 @@
     for (var i = 0; i < roots.length; i++) bindFilter(roots[i]);
   }
 
+  /* When another script (e.g. conference-insights-tiles-feed.js) populates
+     tiles into a filter's target container AFTER our initial bind,
+     unbind and re-bind the matching filter root(s) so the dropdowns pick
+     up the fresh items. Safe no-op for filters bound to a container
+     that isn't the event's target. */
+  function rebindFilterForContainer(container) {
+    if (!container) return;
+    var roots = document.querySelectorAll('.rbccm-filter[data-container]');
+    for (var i = 0; i < roots.length; i++) {
+      var sel = roots[i].getAttribute('data-container');
+      if (!sel) continue;
+      var target = document.querySelector(sel);
+      if (target !== container) continue;
+      /* Reset bound flag and clear any listbox/popup panels the previous
+         bind attached so bindFilter can build fresh dropdowns from the
+         new item set. */
+      roots[i].removeAttribute('data-filter-bound');
+      var panels = roots[i].querySelectorAll('.rbccm-filter__select-panel');
+      for (var p = 0; p < panels.length; p++) panels[p].parentNode.removeChild(panels[p]);
+      bindFilter(roots[i]);
+    }
+  }
+
+  /* Listen for the tiles-populated signal. Bubbles up from the tiles
+     container, so we listen at the document level. */
+  document.addEventListener('rbccm:tiles-populated', function (e) {
+    var target = e.target;
+    rebindFilterForContainer(target);
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

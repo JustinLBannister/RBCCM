@@ -118,6 +118,18 @@
   position: relative;
 }
 
+/* Mobile-only: Topic dropdown drops to its own full-width row so the
+   button reads clearly ("Topic ▾") AND its longer option labels
+   ("Power, Utilities & Infrastructure", "Markets & Economics") aren't
+   truncated when the panel opens. Year and Region share the first row
+   since their button labels are short and their options are the ISO
+   bucket names (Global / US / Canada / Europe / APAC — all fit fine). */
+@media (max-width: 767px) {
+  .rbccm-filter__select-wrap[data-filter="topic"] {
+    flex: 1 1 100%;
+  }
+}
+
 @media (min-width: 768px) {
   .rbccm-filter__select-wrap {
     flex: 0 0 auto;

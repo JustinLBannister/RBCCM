@@ -208,6 +208,14 @@
          everything renders correctly on its own. -->
     <link rel="stylesheet" href="/assets/rbccm/css/components/conference-insights-tiles.css" />
     <script src="/assets/rbccm/js/components/conference-insights-tiles.js"></script>
+    <!-- Feed enhancement: auto-populates tiles by cross-referencing the
+         /en/insights/data/{year}-insights XML feeds against Joe's
+         whitelist JSON. When the Story Tile group is empty (which it
+         should be on the Conference Insights landing page), this fills
+         the row. When it's non-empty (curated preview modules), the
+         feed tiles append to the existing set. Safe to leave loaded
+         either way. -->
+    <script src="/assets/rbccm/js/components/conference-insights-tiles-feed.js"></script>
 
     <section class="rbccm-conference-insights-tiles" id="rbccm-conference-insights-tiles">
       <xsl:if test="$HAS_PAD_OVERRIDES">
