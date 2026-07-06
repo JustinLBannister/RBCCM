@@ -70,6 +70,22 @@
     return m ? m[1] : '';
   }
 
+  /* Cap description at maxChars, snap back to the last word boundary
+     if we can (so we don't cut mid-word), and append an ellipsis. */
+  var DESC_MAX = 150;
+  function truncateDescription(text, maxChars) {
+    if (!text) return '';
+    if (text.length <= maxChars) return text;
+    var cut = text.substring(0, maxChars);
+    var lastSpace = cut.lastIndexOf(' ');
+    /* Only snap back if the last space is reasonably far in — otherwise
+       fall back to a hard cut so a single long word doesn't empty us out. */
+    if (lastSpace > maxChars * 0.6) cut = cut.substring(0, lastSpace);
+    /* Trim trailing punctuation so we don't get "foo,…" */
+    cut = cut.replace(/[\s,.;:!?\-–—]+$/, '');
+    return cut + '…';
+  }
+
   /* "14 min" → "14 min listen" (or "read"/"watch") based on type. */
   function formatMeta(readtime, watchtime, type) {
     var t = (type || '').toLowerCase().trim();
@@ -234,11 +250,14 @@
 
     var topicTokens = (wl.topics && wl.topics.length) ? wl.topics.slice() : [];
 
+    /* Search uses the FULL description so filtering matches content past
+       the visible cap. Display uses the truncated version. */
     var searchText = (title + ' ' + description).toLowerCase();
+    var displayDescription = truncateDescription(description, DESC_MAX);
 
     return {
       title:       title,
-      description: description,
+      description: displayDescription,
       href:        link,
       thumbnail:   thumb,
       eyebrow:     category,
