@@ -36,18 +36,24 @@
       .rbccm-leadership__inner { max-width: 1140px; }
     }
 
-    /* -- Heading -- */
+    /* -- Heading --
+       Clamped to the 1140px content rail so it lines up with the carousel
+       row below. Side padding on mobile keeps text off the viewport edge
+       and drops away at the 1170px breakpoint where the max-width takes
+       over. Removed the old negative-16px pull-out — that was compensating
+       for the Bootstrap .container wrapper which no longer wraps this. */
     .rbccm-leadership__heading {
       color: #003168;
       font-family: RBCDisplay, Georgia, Times, serif;
       font-size: 29px;
       font-weight: 500;
       line-height: normal;
-      margin: 0 -16px 35px -16px;
+      margin: 0 auto 35px auto;
+      max-width: 1140px;
       padding: 0 16px;
     }
     @media (min-width: 1170px) {
-      .rbccm-leadership__heading { padding: 0;}
+      .rbccm-leadership__heading { padding: 0; }
     }
 
     /* -- Slider wrapper -- */
@@ -502,16 +508,17 @@
        Subheading + on-dark modifier
        ============================================================ */
 
-    /* -- Subheading -- optional paragraph below H2. Renders in the same
-          left-aligned column as the heading on light theme; centered on
-          dark theme. Only inserted when the Subheading Datum is set. */
+    /* -- Subheading -- optional paragraph below H2. Same 1140px content
+          rail as the heading so both align to the carousel row. Only
+          inserted when the Subheading Datum is set. */
     .rbccm-leadership__subheading {
       color: var(--Blue-Dark-Blue, #003168);
       font-family: Roboto, sans-serif;
       font-size: 16px;
       font-weight: 400;
       line-height: 24px;
-      margin: 0 -16px 35px -16px;
+      margin: 0 auto 35px auto;
+      max-width: 1140px;
       padding: 0 16px;
     }
     @media (min-width: 1170px) {

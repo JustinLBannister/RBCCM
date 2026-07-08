@@ -308,8 +308,9 @@
         <xsl:if test="$subheading != ''"><xsl:text> rbccm-leadership__heading--with-subhead</xsl:text></xsl:if>
       </xsl:variable>
 
-      <!-- Inline margin-bottom when a subheading follows the H2. Applied
-           inline so CSS specificity from any parent theme cant undercut it. -->
+      <!-- Inline margin-bottom on the H2 when a subheading follows so the
+           two pair as a header block. max-width + centering lives in
+           leadership-carousel.css so the constraint is discoverable. -->
       <xsl:variable name="headingStyle">
         <xsl:if test="$subheading != ''"><xsl:text>margin-bottom: 25px;</xsl:text></xsl:if>
       </xsl:variable>
@@ -322,16 +323,14 @@
 
         <div class="rbccm-leadership__inner">
 
-          <div class="container">
-            <h2>
-              <xsl:attribute name="class"><xsl:value-of select="$headingClass"/></xsl:attribute>
-              <xsl:attribute name="style"><xsl:value-of select="$headingStyle"/></xsl:attribute>
-              <xsl:value-of select="$heading"/>
-            </h2>
-            <xsl:if test="$subheading != ''">
-              <p class="rbccm-leadership__subheading" style="margin-bottom: 35px;"><xsl:value-of select="$subheading"/></p>
-            </xsl:if>
-          </div>
+          <h2>
+            <xsl:attribute name="class"><xsl:value-of select="$headingClass"/></xsl:attribute>
+            <xsl:attribute name="style"><xsl:value-of select="$headingStyle"/></xsl:attribute>
+            <xsl:value-of select="$heading"/>
+          </h2>
+          <xsl:if test="$subheading != ''">
+            <p class="rbccm-leadership__subheading" style="margin-bottom: 35px;"><xsl:value-of select="$subheading"/></p>
+          </xsl:if>
 
           <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
           <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only"><xsl:value-of select="$kbInstructions"/></p>
