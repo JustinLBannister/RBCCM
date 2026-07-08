@@ -497,3 +497,121 @@
         transition: none !important;
       }
     }
+
+    /* ============================================================
+       Subheading + on-dark modifier
+       ============================================================ */
+
+    /* -- Subheading -- optional paragraph below H2. Renders in the same
+          left-aligned column as the heading on light theme; centered on
+          dark theme. Only inserted when the Subheading Datum is set. */
+    .rbccm-leadership__subheading {
+      color: var(--Blue-Dark-Blue, #003168);
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      margin: 0 -16px 35px -16px;
+      padding: 0 16px;
+    }
+    @media (min-width: 1170px) {
+      .rbccm-leadership__subheading { padding: 0; }
+    }
+
+    /* -- Heading spacing when a subheading follows -- pull the H2 close
+          to the subheading (12px) so they read as a paired header block. */
+    .rbccm-leadership__heading--with-subhead {
+      margin-bottom: 12px;
+    }
+
+    /* ============================================================
+       Modifier: --on-dark
+       Dark blue section background + white heading/subheading text.
+       Cards stay light (white bg, dark text) — only the section
+       chrome switches. Arrow chevrons + dots invert to white for
+       legibility against the dark bg.
+       ============================================================ */
+
+    /* Section bg. Uses the RBC dark blue (#003168) so the component
+       matches other on-dark modules across the site. */
+    #rbccm-leadership.rbccm-leadership--on-dark {
+      background-color: #003168;
+    }
+
+    /* Heading + subheading go white on dark. Alignment is decoupled —
+       controlled by the separate `--headings-centered` modifier so
+       authors can pick left-align or center independent of scheme. */
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__heading,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__subheading {
+      color: #ffffff;
+    }
+
+    /* Card body needs an explicit white bg on the dark scheme; without
+       it the body inherits the dark section bg and card text becomes
+       unreadable. Card image already has its own #DADADA bg, so this
+       only affects the text half of the card. */
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card-body {
+      background-color: #ffffff;
+    }
+
+
+    /* ============================================================
+       Modifier: --headings-centered
+       Center-aligns the heading + subheading. Works in either color
+       scheme so authors can pick alignment independent of light/dark.
+       Default alignment (left) is inherited from the base heading rule.
+       ============================================================ */
+    .rbccm-leadership--headings-centered .rbccm-leadership__heading,
+    .rbccm-leadership--headings-centered .rbccm-leadership__subheading {
+      text-align: center;
+    }
+
+    /* Arrow chevrons + rings invert to white so they read on the dark
+       bg. Hover state fills the arrow white with a dark chevron
+       (mirror of the light-theme fill-blue-with-white-chevron). */
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn-icon--mobile path,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn-icon--desktop rect,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn-icon--desktop path {
+      stroke: #ffffff;
+    }
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn:hover .rbccm-leadership__btn-icon--desktop rect {
+      fill: #ffffff;
+    }
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn:hover .rbccm-leadership__btn-icon--desktop path {
+      stroke: #003168;
+    }
+
+    /* Dots — inactive outlined circles switch to white outline;
+       active/hover/focus circle fills white with a dark-blue ring
+       gap so the active dot still reads. */
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__dots-wrap .slick-dots li button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+    }
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__dots-wrap .slick-dots li.slick-active button::before,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__dots-wrap .slick-dots li button:focus-visible::before,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__dots-wrap .slick-dots li button:hover::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+      box-shadow: 0 0 0 4px #003168, 0 0 0 5px #ffffff !important;
+    }
+
+    /* Active card border — light-theme uses #003168 (dark blue) which
+       vanishes against the dark bg. Swap to white so the centered card
+       still reads as focused. */
+    #rbccm-leadership.rbccm-leadership--on-dark .slick-center .rbccm-leadership__card {
+      border-color: #ffffff;
+    }
+
+    /* Focus indicators on the dark scheme also flip to white for the
+       same contrast reason. */
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card:focus-within,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card:focus-visible,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card.is-focused,
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card:has(:focus-visible) {
+      border-color: #ffffff !important;
+    }
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__card-action:focus-visible {
+      outline-color: #ffffff;
+    }
+    #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn:focus-visible {
+      outline-color: #ffffff;
+    }

@@ -26,19 +26,21 @@
 <body>
 
   <div class="demo-toggle">
-    <strong>v2 demo</strong> — DOM order is Prev → slides → Next → dots (slick-default).
-    Native browser Tab order. Card 3 (Ayesha) intentionally has no LinkedIn anchor — focus should land on the card itself.
+    <strong>v2 demo</strong> — on-dark scheme + optional subheading + inline bg-image pattern layered over #003168.
+    To flip back to the light default: remove <code>rbccm-leadership--on-dark</code> from the section class, delete the inline <code>style</code> attribute, and delete the <code>&lt;p class="rbccm-leadership__subheading"&gt;</code>.
   </div>
 
   <!-- ====================================================
        Rendered output of <section class="rbccm-leadership">
        (what the new XSL emits — linkedin mode, 6 sample authors)
        ==================================================== -->
-  <section class="rbccm-leadership" id="rbccm-leadership" aria-label="European leadership team carousel" data-link-type="linkedin">
+  <!-- DEMO: on-dark scheme + subheading + bg image pattern -->
+  <section class="rbccm-leadership rbccm-leadership--on-dark rbccm-leadership--headings-centered" id="rbccm-leadership" aria-label="European leadership team carousel" data-link-type="linkedin" style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.06'%3E%3Cpath d='M60 0L60 120M0 60L120 60M0 0L120 120M120 0L0 120'/%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3C/g%3E%3C/svg%3E&quot;); background-position: center center; background-size: 240px 240px; background-repeat: repeat;">
     <div class="rbccm-leadership__inner">
 
       <div class="container">
-        <h2 class="rbccm-leadership__heading">European leadership</h2>
+        <h2 class="rbccm-leadership__heading rbccm-leadership__heading--with-subhead">Global Equity Capital Markets leadership</h2>
+        <p class="rbccm-leadership__subheading">The strength of our ECM lies in our people — a dedicated team of professionals with a track record of excellence in guiding companies through the complexities of equity financing.</p>
       </div>
 
       <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
