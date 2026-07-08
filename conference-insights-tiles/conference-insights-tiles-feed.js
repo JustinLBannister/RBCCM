@@ -426,8 +426,26 @@
 
       /* Cross-reference feed titles against the whitelist. Only matched
          articles get rendered. Dedupe by match key so multiple year
-         feeds carrying the same article don't produce duplicate tiles. */
+         feeds carrying the same article don't produce duplicate tiles.
+
+         SEED the seen{} map with any tiles ALREADY in the row — these
+         come from the XSL's Story Tile group (author-picked tiles baked
+         in at server render). Without this seed, the feed appends a
+         fresh tile for every article that's both author-picked AND in
+         the whitelist, producing visible duplicates on the grid.
+
+         Titles are read from the tile's <h2> since that's what the
+         XSL-rendered tile carries. Feed-appended tiles won't exist in
+         the DOM at this point yet, so they can't self-collide. */
       var seen = {};
+      var preExistingTiles = row.querySelectorAll('.rbccm-conference-insights-tiles__item');
+      for (var p = 0; p < preExistingTiles.length; p++) {
+        var titleEl = preExistingTiles[p].querySelector('.rbccm-conference-insights-tiles__insight-title');
+        if (titleEl) {
+          seen[normalizeTitle(titleEl.textContent || '')] = true;
+        }
+      }
+
       var entries = [];
       allNews.forEach(function (n) {
         var titleRaw = child(n, 'title').trim();
