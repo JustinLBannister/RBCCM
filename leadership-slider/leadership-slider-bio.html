@@ -86,61 +86,6 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Subheading (optional paragraph below H2) ── -->
-      <xsl:variable name="subheading" select="normalize-space(/Properties/Datum[@ID='Subheading'])"/>
-
-      <!-- ── Color scheme: 'light' (default, white bg) or 'dark' (blue bg) ── -->
-      <xsl:variable name="colorScheme">
-        <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='ColorScheme']) = 'dark'">dark</xsl:when>
-          <xsl:otherwise>light</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-
-      <!-- ── Heading alignment: 'left' (default) or 'center' ──
-           Independent of color scheme so authors can center on light
-           or left-align on dark. Adds the --headings-centered modifier
-           only when explicitly set to 'center'. -->
-      <xsl:variable name="headingAlignment">
-        <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='HeadingAlignment']) = 'center'">center</xsl:when>
-          <xsl:otherwise>left</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-
-      <!-- ── Background image (optional) ──
-           Layers ON TOP of the section's CSS background-color, so on the
-           dark scheme a texture/pattern PNG with alpha channel lets the
-           #003168 base show through. Long-form `background-image`,
-           `background-position`, `background-size`, `background-repeat`
-           are set via inline style so we don't touch background-color.
-           Blank BackgroundImage → nothing added, current chrome unchanged. -->
-      <xsl:variable name="bgImage" select="normalize-space(/Properties/Datum[@ID='BackgroundImage'])"/>
-      <xsl:variable name="bgPosition">
-        <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition']) != ''">
-            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition'])"/>
-          </xsl:when>
-          <xsl:otherwise>center center</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <xsl:variable name="bgSize">
-        <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageSize']) != ''">
-            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageSize'])"/>
-          </xsl:when>
-          <xsl:otherwise>cover</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <xsl:variable name="bgRepeat">
-        <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat']) != ''">
-            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat'])"/>
-          </xsl:when>
-          <xsl:otherwise>no-repeat</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-
       <!-- ── Carousel aria label ── -->
       <xsl:variable name="ariaLabel">
         <xsl:choose>
@@ -299,44 +244,14 @@
 
       <link rel="stylesheet" href="/assets/rbccm/css/sub/test/leadership-carousel.css"/>
 
-      <!-- Precompute the section's class + inline-style strings in
-           variables so the actual xsl:attribute calls below are simple
-           value-of statements. Avoids the compiler edge case where
-           xsl:if wrapping xsl:attribute (or xsl:if directly inside
-           xsl:attribute content) triggers a strict-parser rejection. -->
-      <xsl:variable name="sectionClass">
-        <xsl:text>rbccm-leadership</xsl:text>
-        <xsl:if test="$colorScheme = 'dark'"><xsl:text> rbccm-leadership--on-dark</xsl:text></xsl:if>
-        <xsl:if test="$headingAlignment = 'center'"><xsl:text> rbccm-leadership--headings-centered</xsl:text></xsl:if>
-      </xsl:variable>
-
-      <xsl:variable name="sectionStyle">
-        <xsl:if test="$bgImage != ''">
-          <xsl:text>background-image: url('</xsl:text><xsl:value-of select="$bgImage"/><xsl:text>'); background-position: </xsl:text><xsl:value-of select="$bgPosition"/><xsl:text>; background-size: </xsl:text><xsl:value-of select="$bgSize"/><xsl:text>; background-repeat: </xsl:text><xsl:value-of select="$bgRepeat"/><xsl:text>;</xsl:text>
-        </xsl:if>
-      </xsl:variable>
-
-      <xsl:variable name="headingClass">
-        <xsl:text>rbccm-leadership__heading</xsl:text>
-        <xsl:if test="$subheading != ''"><xsl:text> rbccm-leadership__heading--with-subhead</xsl:text></xsl:if>
-      </xsl:variable>
-
-      <section id="rbccm-leadership">
-        <xsl:attribute name="class"><xsl:value-of select="$sectionClass"/></xsl:attribute>
+      <section class="rbccm-leadership" id="rbccm-leadership">
         <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
         <xsl:attribute name="data-link-type"><xsl:value-of select="$linkType"/></xsl:attribute>
-        <xsl:attribute name="style"><xsl:value-of select="normalize-space($sectionStyle)"/></xsl:attribute>
 
         <div class="rbccm-leadership__inner">
 
           <div class="container">
-            <h2>
-              <xsl:attribute name="class"><xsl:value-of select="$headingClass"/></xsl:attribute>
-              <xsl:value-of select="$heading"/>
-            </h2>
-            <xsl:if test="$subheading != ''">
-              <p class="rbccm-leadership__subheading"><xsl:value-of select="$subheading"/></p>
-            </xsl:if>
+            <h2 class="rbccm-leadership__heading"><xsl:value-of select="$heading"/></h2>
           </div>
 
           <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
@@ -950,24 +865,10 @@
 
   <!-- ─── Content ─── -->
   <Datum ID="Heading" Type="String" Name="Section Heading">European leadership</Datum>
-  <Datum ID="Subheading"       Type="String" Name="Section Subheading (optional paragraph)"></Datum>
 
   <!-- ─── Behavior ─── -->
   <!-- Card action mode: 'linkedin' (default) or 'biography' -->
   <Datum ID="LinkType" Type="String" Name="Card Action (linkedin or biography)">linkedin</Datum>
-  <Datum ID="ColorScheme"      Type="String" Name="Color Scheme (light or dark)">light</Datum>
-  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment (left or center)">left</Datum>
-
-  <!-- ─── Background image ───
-       Layers on top of the section's CSS background-color, so on the
-       dark scheme a texture/pattern PNG with alpha channel lets the
-       #003168 base show through. Blank BackgroundImage → no image emitted.
-       Position / Size / Repeat mirror the CSS property values 1:1.
-       Position defaults to "center center", Size to "cover", Repeat to "no-repeat". -->
-  <Datum ID="BackgroundImage"         Type="String" Name="Background Image URL (optional)"></Datum>
-  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position (default: center center)"></Datum>
-  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size (default: cover)"></Datum>
-  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat (default: no-repeat)"></Datum>
 
   <!-- ─── Localization ─── -->
   <!-- Locale: 'en' (default) or 'fr'. Switches all default strings below.
