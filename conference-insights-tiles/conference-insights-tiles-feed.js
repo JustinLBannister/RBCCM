@@ -312,10 +312,23 @@
      the strict XML parser doesn't choke on content like "S&P 500" or
      "Software M&A" — the RBCCM feeds ship those un-escaped. Matches the
      lenient behavior browsers apply to text/html but keeps us in the
-     application/xml code path so `<news>` etc. stay real elements. */
+     application/xml code path so `<news>` etc. stay real elements.
+
+     CRITICAL: only escape ampersands OUTSIDE CDATA sections. Content
+     inside CDATA is literal text and doesn't need escaping — escaping
+     it corrupts the actual text (e.g., "M&A" → "M&amp;A" which then
+     survives XML parsing as the string "M&amp;A" because CDATA blocks
+     entity decoding). The 2024 feed wraps every field in CDATA while
+     2025/2026 use plain elements, so this only shows up on 2024 data. */
   function escapeStrayAmpersands(s) {
     if (!s) return s;
-    return s.replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+    /* Split on CDATA boundaries. Even indices are non-CDATA text (needs
+       escape); odd indices are CDATA sections (leave untouched). */
+    var parts = s.split(/(<!\[CDATA\[[\s\S]*?\]\]>)/);
+    for (var i = 0; i < parts.length; i += 2) {
+      parts[i] = parts[i].replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+    }
+    return parts.join('');
   }
 
   /* Parse an XML string into an array of raw news nodes. */
