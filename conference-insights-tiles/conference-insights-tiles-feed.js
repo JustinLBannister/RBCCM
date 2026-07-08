@@ -385,6 +385,12 @@
     var topicLabel = labelForTopic(firstToken(topicTokens.join(' ')));
     var regionLabel = labelForRegion(firstToken(regionTokens.join(' ')));
 
+    /* Numeric timestamp of the actual publish date for sorting. Falls
+       back to 0 (Jan 1 1970) if the date fails to parse, which pushes
+       unparseable entries to the end of the list — safer than nulling. */
+    var dateTs = dateStr ? Date.parse(dateStr) : 0;
+    if (isNaN(dateTs)) dateTs = 0;
+
     return {
       title:       title,
       description: displayDescription,
@@ -393,6 +399,7 @@
       eyebrow:     category,
       year:        year,
       dateLabel:   dateLabel,
+      dateTs:      dateTs,
       topicLabel:  topicLabel,
       regionLabel: regionLabel,
       meta:        formatMeta(readtime, watchtime, type),
@@ -470,12 +477,14 @@
         entries.push(makeEntry(n, wl));
       });
 
-      /* Sort newest first (by year descending). Ties keep feed order,
-         which is date-descending on the RBCCM side. */
+      /* Sort newest first by the ACTUAL publish date, not the whitelist
+         year. Whitelist year is Joe's editorial category (e.g., a Dec
+         2024 article can be tagged "2025" because it looks ahead), so
+         sorting by year would let older feed articles jump the queue.
+         Using dateTs keeps the visible order date-consistent while the
+         year attribute still drives the filter dropdown. */
       entries.sort(function (a, b) {
-        var ay = parseInt(a.year || '0', 10);
-        var by = parseInt(b.year || '0', 10);
-        return by - ay;
+        return (b.dateTs || 0) - (a.dateTs || 0);
       });
 
       /* Render. First tile gets the featured modifier — Filter By's
