@@ -308,11 +308,14 @@
         <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
         <xsl:attribute name="data-link-type"><xsl:value-of select="$linkType"/></xsl:attribute>
         <!-- Inline bg image style — long-form properties so we layer on
-             top of the CSS background-color without overwriting it. Only
-             emitted when BackgroundImage Datum is set. -->
-        <xsl:if test="$bgImage != ''">
-          <xsl:attribute name="style">background-image: url('<xsl:value-of select="$bgImage"/>'); background-position: <xsl:value-of select="$bgPosition"/>; background-size: <xsl:value-of select="$bgSize"/>; background-repeat: <xsl:value-of select="$bgRepeat"/>;</xsl:attribute>
-        </xsl:if>
+             top of the CSS background-color without overwriting it. The
+             xsl:attribute is emitted unconditionally (with empty content
+             when no bg image is set) so the compiler never sees an
+             attribute added inside a conditional AFTER other attributes.
+             Empty style="" is harmless HTML. -->
+        <xsl:attribute name="style">
+          <xsl:if test="$bgImage != ''">background-image: url('<xsl:value-of select="$bgImage"/>'); background-position: <xsl:value-of select="$bgPosition"/>; background-size: <xsl:value-of select="$bgSize"/>; background-repeat: <xsl:value-of select="$bgRepeat"/>;</xsl:if>
+        </xsl:attribute>
 
         <div class="rbccm-leadership__inner">
 
