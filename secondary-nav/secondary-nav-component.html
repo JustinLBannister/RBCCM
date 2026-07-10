@@ -1,0 +1,258 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: Secondary Nav
+       Consumes the Properties block declared below. Renders the
+       scrollable secondary-nav row and pulls in the external CSS + JS
+       that drive it. -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+
+  <!-- ─────────────────────────────────────────────────────────────
+       Helper templates
+       ───────────────────────────────────────────────────────────── -->
+
+  <!-- lastSegment: return the last "/"-separated segment of a URL
+       path. Recursively strips off everything before each slash
+       until no slash remains. Used to derive a fallback label when
+       the author leaves ItemLabel blank. -->
+  <xsl:template name="lastSegment">
+    <xsl:param name="path"/>
+    <xsl:choose>
+      <xsl:when test="contains($path, '/')">
+        <xsl:call-template name="lastSegment">
+          <xsl:with-param name="path" select="substring-after($path, '/')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$path"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- titleCaseWord: uppercase the first char of a word, lowercase
+       (well, unchanged for XSL 1.0 simplicity) the rest. Used
+       by titleCaseFromKebab. -->
+  <xsl:template name="titleCaseWord">
+    <xsl:param name="w"/>
+    <xsl:value-of select="translate(substring($w, 1, 1), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+    <xsl:value-of select="substring($w, 2)"/>
+  </xsl:template>
+
+  <!-- titleCaseFromKebab: convert `industry-coverage` → `Industry Coverage`.
+       Splits recursively on "-" and title-cases each token, joining
+       with spaces. -->
+  <xsl:template name="titleCaseFromKebab">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="contains($text, '-')">
+        <xsl:call-template name="titleCaseWord">
+          <xsl:with-param name="w" select="substring-before($text, '-')"/>
+        </xsl:call-template>
+        <xsl:text> </xsl:text>
+        <xsl:call-template name="titleCaseFromKebab">
+          <xsl:with-param name="text" select="substring-after($text, '-')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="titleCaseWord">
+          <xsl:with-param name="w" select="$text"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template match="/">
+
+    <!-- Collection of Nav Item rows. Component won't render
+         without at least one (matches MinReplicates="1" in the
+         Properties block). -->
+    <xsl:variable name="NAV_ITEMS" select="/Properties/Data/Group[@Name='Nav Item']"/>
+
+    <xsl:if test="count($NAV_ITEMS) &gt;= 1">
+
+      <!-- ── Locale toggle: 'en' (default) or 'fr' ── -->
+      <xsl:variable name="locale">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Locale']) = 'fr'">fr</xsl:when>
+          <xsl:otherwise>en</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Aria labels: individual override wins, else locale
+           default, else English. -->
+      <xsl:variable name="navAriaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='NavAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NavAriaLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Navigation secondaire</xsl:when>
+          <xsl:otherwise>Secondary navigation</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="prevAriaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Faire défiler la navigation secondaire vers la gauche</xsl:when>
+          <xsl:otherwise>Scroll secondary navigation left</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="nextAriaLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$locale = 'fr'">Faire défiler la navigation secondaire vers la droite</xsl:when>
+          <xsl:otherwise>Scroll secondary navigation right</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+
+      <!-- ── External stylesheet + script. Same path pattern as
+           other components (`/assets/rbccm/{css,js}/sub/test/…`)
+           so the file bundle stays modular. -->
+      <link rel="stylesheet" href="/assets/rbccm/css/components/secondary-nav.css"/>
+
+
+      <!-- ── Component markup ── -->
+      <nav class="secondary-nav">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$navAriaLabel"/></xsl:attribute>
+
+        <div class="secondary-nav__inner">
+
+          <button type="button" class="secondary-nav__arrow secondary-nav__arrow--prev is-not-needed"
+                  aria-controls="secondary-nav-wrapper">
+            <xsl:attribute name="aria-label"><xsl:value-of select="$prevAriaLabel"/></xsl:attribute>
+            <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <polyline points="8,2 3,6 8,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor"/>
+            </svg>
+          </button>
+
+          <div id="secondary-nav-wrapper" class="secondary-nav__wrapper">
+            <ul class="secondary-nav__list">
+
+              <xsl:for-each select="$NAV_ITEMS">
+
+                <xsl:variable name="LI_URL"    select="normalize-space(./Datum[@Name='Nav Item Link (URL picker)'])"/>
+                <xsl:variable name="LI_LABEL"  select="normalize-space(./Datum[@Name='Nav Item Label (blank = derive from URL slug)'])"/>
+                <xsl:variable name="LI_ACTIVE" select="normalize-space(./Datum[@Name='Set as active on this page?']) = 'true'"/>
+                <xsl:variable name="LI_NEWTAB" select="normalize-space(./Datum[@Name='Open link in new tab?']) = 'true'"/>
+
+                <!-- Resolved label: author-provided ItemLabel wins,
+                     else derived from the URL's final slug via
+                     kebab-case → Title Case. -->
+                <xsl:variable name="RESOLVED_LABEL">
+                  <xsl:choose>
+                    <xsl:when test="$LI_LABEL != ''">
+                      <xsl:value-of select="$LI_LABEL"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:variable name="slug">
+                        <xsl:call-template name="lastSegment">
+                          <xsl:with-param name="path" select="$LI_URL"/>
+                        </xsl:call-template>
+                      </xsl:variable>
+                      <xsl:call-template name="titleCaseFromKebab">
+                        <xsl:with-param name="text" select="$slug"/>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <li>
+                  <xsl:attribute name="class">
+                    <xsl:text>secondary-nav__item</xsl:text>
+                    <xsl:if test="$LI_ACTIVE"><xsl:text> active</xsl:text></xsl:if>
+                  </xsl:attribute>
+
+                  <a>
+                    <xsl:attribute name="href"><xsl:value-of select="$LI_URL"/></xsl:attribute>
+                    <xsl:if test="$LI_ACTIVE">
+                      <xsl:attribute name="aria-current">page</xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="$LI_NEWTAB">
+                      <xsl:attribute name="target">_blank</xsl:attribute>
+                      <xsl:attribute name="rel">noopener noreferrer</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$RESOLVED_LABEL"/>
+                  </a>
+                </li>
+
+              </xsl:for-each>
+
+            </ul>
+          </div>
+
+          <button type="button" class="secondary-nav__arrow secondary-nav__arrow--next is-not-needed"
+                  aria-controls="secondary-nav-wrapper">
+            <xsl:attribute name="aria-label"><xsl:value-of select="$nextAriaLabel"/></xsl:attribute>
+            <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <polyline points="4,2 9,6 4,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <div class="secondary-nav__progress-bar" aria-hidden="true">
+          <div class="secondary-nav__progress-fill"></div>
+        </div>
+      </nav>
+
+      <script src="/assets/rbccm/js/components/secondary-nav.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+
+<!-- ============================================================
+     Properties block — component authoring inputs
+     ============================================================ -->
+<Properties ComponentID="secondary-nav-v1">
+
+  <!-- ─── Localization ─── -->
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+  <!-- ─── Optional accessibility overrides ───
+       Blank = locale-appropriate default. Populate individual
+       overrides for one-off wording that differs from the standard
+       translation. -->
+  <Datum ID="NavAriaLabel"       Type="String" Name="Nav Aria Label (override)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+
+</Properties>
+
+<Data>
+  <!-- Nav Items are repeatable rows. Minimum 1 required (component
+       skips rendering when empty). Each row carries:
+         - Nav Item Link (URL picker, required)
+         - Nav Item Label (String; blank = derive from URL slug)
+         - Set as active on this page? (Boolean)
+         - Open link in new tab? (Boolean, default false because
+           these are typically internal links) -->
+  <Group ID="NAV-ITEMS"
+         Name="Nav Item"
+         Replicatable="true"
+         CloneGroupID="secondary-nav-item"
+         MinReplicates="1">
+
+    <Datum ID="ItemLink"     Type="Link"    Name="Nav Item Link (URL picker)" Required="true"></Datum>
+    <Datum ID="ItemLabel"    Type="String"  Name="Nav Item Label (blank = derive from URL slug)"></Datum>
+    <Datum ID="IsActive"     Type="Boolean" Name="Set as active on this page?">false</Datum>
+    <Datum ID="OpenInNewTab" Type="Boolean" Name="Open link in new tab?">false</Datum>
+
+  </Group>
+</Data>
+</content>
+</invoke>
