@@ -244,15 +244,12 @@
   <Group ID="NAV-ITEMS"
          Name="Nav Item"
          Replicatable="true"
-         CloneGroupID="secondary-nav-item"
-         MinReplicates="1">
+         CloneGroupID="secondary-nav-item">
 
-    <Datum ID="ItemLink"     Type="Link"    Name="Nav Item Link (URL picker)" Required="true"></Datum>
-    <Datum ID="ItemLabel"    Type="String"  Name="Nav Item Label (blank = derive from URL slug)"></Datum>
-    <Datum ID="IsActive"     Type="Boolean" Name="Set as active on this page?">false</Datum>
-    <Datum ID="OpenInNewTab" Type="Boolean" Name="Open link in new tab?">false</Datum>
+    <Datum ID="ItemLink"     Type="PageLink" Name="Nav Item Link (URL picker)"></Datum>
+    <Datum ID="ItemLabel"    Type="String"   Name="Nav Item Label (blank = derive from URL slug)"></Datum>
+    <Datum ID="IsActive"     Type="Boolean"  Name="Set as active on this page?">false</Datum>
+    <Datum ID="OpenInNewTab" Type="Boolean"  Name="Open link in new tab?">false</Datum>
 
   </Group>
 </Data>
-</content>
-</invoke>
