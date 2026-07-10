@@ -864,33 +864,28 @@
   // the default "Insights" eyebrow per card.
   var PREVIEW_CARDS = [
     {
-      href:  'https://www.rbccm.com/en/story/story.page?dcr=templatedata/article/story/data/2026/06/complexity-multiplies-for-infrastructure-to-power-the-transition',
-      image: '/assets/rbccm/images/insights/2026/complexity-multiplies-for-infrastructure-to-power-the-transition-th.webp',
-      alt:   'Complexity multiplies for infrastructure to power the transition',
-      title: 'Complexity multiplies for infrastructure to power the transition',
-      desc:  'The power and infrastructure sector will be critical to the success of the energy transition – so how is it handling the record investment required?',
-      meta:  '23 min listen'
+      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/05/natural-gas-powers-the-data-center-boom',
+      image: '/assets/rbccm/images/insights/2026/data-center-energy-article-thumbnail.webp',
+      alt:   'Natural gas powers the data center boom',
+      title: 'Natural gas powers the data center boom',
+      desc:  'Artificial intelligence is fueling unprecedented demand for reliable baseload power, creating new opportunities in U.S. natural gas markets.',
+      meta:  '8 min read'
     },
     {
-      href:  'https://www.rbccm.com/en/story/story.page?dcr=templatedata/article/story/data/2025/12/selective-by-design-2026-global-energy-outlook',
-      image: '/assets/rbccm/images/insights/2025/selective-by-design-2026-global-energy-outlook-th.webp',
-      alt:   '2026 Global energy outlook: Selective by design',
-      title: '2026 Global energy outlook: Selective by design',
-      desc:  'Soft market fundamentals and an unpredictable geopolitical backdrop create a complex landscape for energy producers',
-      meta:  '4 min read'
+      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/05/datacenter-equipment-demand-is-reshaping-industrial-markets',
+      image: '/assets/rbccm/images/insights/2026/datacenter-equipment-demand-is-reshaping-th.webp',
+      alt:   'Datacenter equipment demand is reshaping industrial markets',
+      title: 'Datacenter equipment demand is reshaping industrial markets',
+      desc:  'Datacenter power requirements are evolving rapidly, necessitating new architectural approaches and creating both disruption risks and new market opportunities.',
+      meta:  '7 min read'
     },
     {
-      // External resource - opens in a new tab.
-      href:   'https://www.bloomberg.com/news/audio/2025-10-22/capital-clash-clean-energy-vs-fossil-fuel-finance-podcast',
-      target: '_blank',
-      rel:    'noopener noreferrer',
-      image:  'https://www.rbccm.com/assets/rbccm/images/insights/2025/rbc-economics-th.webp',
-      alt:    'Capital Clash: Clean Energy vs Fossil Fuel Finance',
-      title:  'Capital Clash: Clean Energy vs Fossil Fuel Finance',
-      desc:   'Listen to Bloomberg\'s Switched On podcast for more on how global energy investment is entering a period of realignment.',
-      meta:   '39 min listen',
-      label:  'In The Media'   /* Bloomberg coverage - eyebrow swaps from "Insights" to "In The Media" */
-      /* This label will be used to display the eyebrow text for the insight */
+      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/04/the-great-recalibration-offers-a-roadmap-to-the-future',
+      image: '/assets/rbccm/images/insights/2026/the-great-recalibration-offers-a-roadmap-to-the-future-th.webp',
+      alt:   'The great recalibration offers a roadmap to the future',
+      title: 'The great recalibration offers a roadmap to the future',
+      desc:  'RBC Imagine explores disruptive new forces reshaping society. How will they play out and how can businesses and investors be ready?',
+      meta:  '17 min listen'
     }
   ];
 
