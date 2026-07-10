@@ -35,6 +35,7 @@
     if (!wrap || !prev || !next || !fill) return;
 
     cleanHrefs(nav);
+    cleanLabels(nav);
     autoLabelFromSlug(nav);
     autoDetectActive(nav);
 
@@ -159,6 +160,25 @@
       var raw = a.getAttribute('href') || '';
       var clean = cleanTeamSiteUrl(raw);
       if (clean !== raw) a.setAttribute('href', clean);
+    }
+  }
+
+  /* When the XSL derived a label from the URL slug (because the
+     author left ItemLabel blank), that derivation ran against the
+     raw Datum text — so the label inherits any trailing "]" or
+     ".page" cruft from PageLink. Strip it visually. If the label
+     becomes empty after cleanup, autoLabelFromSlug re-derives from
+     the now-clean href. */
+  function cleanLabels(nav) {
+    var links = nav.querySelectorAll('.secondary-nav__item a');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      var text = (a.textContent || '').trim();
+      if (!text) continue;
+      var bracket = text.indexOf(']');
+      var noBracket = bracket === -1 ? text : text.substring(0, bracket);
+      var cleaned = noBracket.replace(/\.page$/i, '').trim();
+      if (cleaned !== text) a.textContent = cleaned;
     }
   }
 
