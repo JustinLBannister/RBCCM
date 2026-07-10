@@ -141,7 +141,38 @@
 
               <xsl:for-each select="$NAV_ITEMS">
 
-                <xsl:variable name="LI_URL"    select="normalize-space(./Datum[@Name='Nav Item Link (URL picker)'])"/>
+                <xsl:variable name="LI_URL_RAW" select="normalize-space(./Datum[@Name='Nav Item Link (URL picker)'])"/>
+
+                <!-- Strip Interwoven PageLink cruft:
+                     1. Anything at/after "]" (TeamSite's internal
+                        parameter delimiter). Preserves everything
+                        before the bracket.
+                     2. Trailing ".page" extension (TeamSite's page
+                        file suffix). Only stripped when it's at the
+                        very end of the URL. -->
+                <xsl:variable name="LI_URL_NO_BRACKET">
+                  <xsl:choose>
+                    <xsl:when test="contains($LI_URL_RAW, ']')">
+                      <xsl:value-of select="substring-before($LI_URL_RAW, ']')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$LI_URL_RAW"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <xsl:variable name="LI_URL">
+                  <xsl:choose>
+                    <xsl:when test="string-length($LI_URL_NO_BRACKET) &gt;= 5
+                                    and substring($LI_URL_NO_BRACKET, string-length($LI_URL_NO_BRACKET) - 4) = '.page'">
+                      <xsl:value-of select="substring($LI_URL_NO_BRACKET, 1, string-length($LI_URL_NO_BRACKET) - 5)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$LI_URL_NO_BRACKET"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
                 <xsl:variable name="LI_LABEL"  select="normalize-space(./Datum[@Name='Nav Item Label (blank = derive from URL slug)'])"/>
                 <xsl:variable name="LI_ACTIVE" select="normalize-space(./Datum[@Name='Set as active on this page?']) = 'true'"/>
                 <xsl:variable name="LI_NEWTAB" select="normalize-space(./Datum[@Name='Open link in new tab?']) = 'true'"/>
