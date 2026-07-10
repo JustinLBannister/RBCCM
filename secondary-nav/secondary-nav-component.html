@@ -141,26 +141,12 @@
 
               <xsl:for-each select="$NAV_ITEMS">
 
-                <xsl:variable name="LI_URL_RAW" select="normalize-space(./Datum[@Name='Nav Item Link (URL picker)'])"/>
-
-                <!-- Strip Interwoven PageLink cruft.
-
-                     All variables use select= (not body) so each
-                     resolves to a real string, not an RTF. TeamSite's
-                     XSL 1.0 processor is stricter about RTF→string
-                     conversion than modern engines. -->
-
-                <!-- Step 1: strip anything at/after "]".
-                     Classic XSL 1.0 idiom: append the delimiter to
-                     guarantee substring-before() returns something. -->
-                <xsl:variable name="LI_URL_NO_BRACKET" select="substring-before(concat($LI_URL_RAW, ']'), ']')"/>
-
-                <!-- Step 2: if URL ends in ".page", chop those 5 chars.
-                     Branchless — `number(boolean)` gives 1 or 0, so
-                     we subtract 5 or 0 from the substring length. -->
-                <xsl:variable name="LI_URL_LAST5" select="substring($LI_URL_NO_BRACKET, string-length($LI_URL_NO_BRACKET) - 4)"/>
-                <xsl:variable name="LI_URL_TRIM" select="number($LI_URL_LAST5 = '.page') * 5"/>
-                <xsl:variable name="LI_URL" select="substring($LI_URL_NO_BRACKET, 1, string-length($LI_URL_NO_BRACKET) - $LI_URL_TRIM)"/>
+                <!-- PageLink Datum text may contain TeamSite cruft
+                     (trailing ".page" extension, "]" delimiter). Read
+                     raw here; JS strips those from anchor hrefs at
+                     runtime. Keeps the XSL minimal to avoid tripping
+                     TeamSite's build pipeline. -->
+                <xsl:variable name="LI_URL" select="normalize-space(./Datum[@Name='Nav Item Link (URL picker)'])"/>
 
                 <xsl:variable name="LI_LABEL"  select="normalize-space(./Datum[@Name='Nav Item Label (blank = derive from URL slug)'])"/>
                 <xsl:variable name="LI_ACTIVE" select="normalize-space(./Datum[@Name='Set as active on this page?']) = 'true'"/>

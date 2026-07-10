@@ -34,6 +34,7 @@
     var fill = nav.querySelector('.secondary-nav__progress-fill');
     if (!wrap || !prev || !next || !fill) return;
 
+    cleanHrefs(nav);
     autoLabelFromSlug(nav);
     autoDetectActive(nav);
 
@@ -136,6 +137,31 @@
     }
   }
 
+  /* Strip TeamSite PageLink cruft from every anchor's href. The
+     PageLink Datum's raw value can carry:
+       - a trailing ".page" extension (TeamSite's page file suffix)
+       - a "]" delimiter marking start of internal parameters
+     Live URLs don't want either. Both are stripped in place so the
+     DOM's href is clean for hover tooltip, right-click copy, and
+     the browser's own navigation. Downstream (label + active-match)
+     read the clean href. */
+  function cleanTeamSiteUrl(raw) {
+    if (!raw) return raw;
+    var bracket = raw.indexOf(']');
+    var noBracket = bracket === -1 ? raw : raw.substring(0, bracket);
+    return noBracket.replace(/\.page$/, '');
+  }
+
+  function cleanHrefs(nav) {
+    var links = nav.querySelectorAll('.secondary-nav__item a');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      var raw = a.getAttribute('href') || '';
+      var clean = cleanTeamSiteUrl(raw);
+      if (clean !== raw) a.setAttribute('href', clean);
+    }
+  }
+
   /* When no item has been flagged .active by the XSL, detect the
      current one at runtime via longest-prefix URL match. Uses
      window.location.pathname so query strings and hashes don't
@@ -169,5 +195,3 @@
   }
 
 })();
-</content>
-</invoke>
