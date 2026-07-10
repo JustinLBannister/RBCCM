@@ -829,21 +829,26 @@
 })();
 
 /* =========================================================================
-   TEMPORARY: Hardcoded Insights cards
+   FALLBACK: Sample Insights cards for events without DCR data
    -------------------------------------------------------------------------
-   Per-event Insights selection isn't wired into the XSL data flow yet.
-   Until it is, this IIFE replaces whatever the component renders into the
-   Insights track with a fixed set of 3 sample cards (Complexity multiplies,
-   2026 Global energy outlook, Capital Clash Bloomberg podcast). The same
-   set is mirrored in local-test.html for visual diffing.
+   Per-event Insights selection is being wired into the XSL data flow one
+   event at a time. Events that already have real DCR data (like Global
+   Communications Infrastructure Conference) render the author-selected
+   articles. Events that haven't been wired yet render nothing, or emit a
+   "+ Insights coming soon" placeholder — for those, this IIFE drops in
+   3 sample cards so the Insights tab never looks empty.
 
-   Runs after the carousel IIFEs above so we overwrite whatever clone
-   insertion / class tagging they applied. Also strips any "+ Insights
-   coming soon" placeholder the XSL emitted when its $insightCount = 0,
-   so the cards never have stale text dangling beneath them.
+   Behavior:
+     - Panel has 1+ real .rbccm-featured-conferences__insight--card → skip.
+     - Panel has 0 cards → replace track content with sample cards AND
+       strip any "+ Insights coming soon" placeholder.
 
-   When the per-event Insights data flow is wired up via DCR, delete this
-   entire IIFE. Nothing else in the file depends on it.
+   Runs after the carousel IIFEs above (via setTimeout 0) so clone insertion
+   has already finished. Since clones can only exist when originals exist,
+   the > 0 card check naturally captures "real data present."
+
+   When every event has DCR-driven Insights, delete this entire IIFE.
+   Nothing else in the file depends on it.
    ========================================================================= */
 (function () {
   var root = document.getElementById('rbccm-featured-conferences');
@@ -905,25 +910,33 @@
            '</a>';
   }
 
-  function applyHardcodedInsights() {
+  function applyFallbackInsights() {
     var tracks = root.querySelectorAll('.rbccm-featured-conferences__insights');
     for (var i = 0; i < tracks.length; i++) {
       var track  = tracks[i];
       var slider = track.closest('.rbccm-featured-conferences__insights-slider');
       var panel  = track.closest('.rbccm-featured-conferences__inner-panel');
 
-      // Strip any "+ Insights coming soon" the XSL emitted (rendered when
-      // an event has $insightCount = 0). Scoped to the insights panel so
-      // we never touch the Speakers panel's own footnote.
+      // If the XSL already emitted real Insight cards for this event
+      // (author-selected via the per-event DCR data flow), leave them
+      // alone. Fallback is only for events with 0 cards. Clones from
+      // the carousel IIFE also carry the --card class, but they can
+      // only exist when originals do — so the > 0 test is a safe
+      // "real content is present" heuristic.
+      var existingCards = track.querySelectorAll('.rbccm-featured-conferences__insight--card');
+      if (existingCards.length > 0) continue;
+
+      // No real cards - apply sample fallback. First strip any
+      // "+ Insights coming soon" placeholder the XSL emitted when its
+      // $insightCount = 0. Scoped to the panel so we never touch the
+      // Speakers panel's own footnote.
       if (panel) {
-        var existing = panel.querySelectorAll('.rbccm-featured-conferences__speakers-footnote');
-        Array.prototype.forEach.call(existing, function (el) {
+        var placeholders = panel.querySelectorAll('.rbccm-featured-conferences__speakers-footnote');
+        Array.prototype.forEach.call(placeholders, function (el) {
           if (el.parentNode) el.parentNode.removeChild(el);
         });
       }
 
-      // Replace whatever's in the track (real cards + carousel clones)
-      // with the three hardcoded sample cards. Always — no URL gating.
       track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
                           PREVIEW_CARDS.map(buildCardHTML).join('') +
                         '</div>';
@@ -932,10 +945,10 @@
   }
 
   // setTimeout(0) defers us to the next tick so the carousel IIFEs above
-  // have already cloned and tagged cards before we replace innerHTML.
+  // have already cloned and tagged cards before we count existing content.
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(applyHardcodedInsights, 0); });
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(applyFallbackInsights, 0); });
   } else {
-    setTimeout(applyHardcodedInsights, 0);
+    setTimeout(applyFallbackInsights, 0);
   }
 })();
