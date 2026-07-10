@@ -409,6 +409,58 @@
     };
   }
 
+  /* Build an entry object from a whitelist row's `manual` sub-object
+     when the article isn't in any year XML feed. Same output shape
+     as makeEntry() so downstream sort/render treat it identically.
+     Falls back gracefully on any missing manual field. */
+  function makeManualEntry(wl) {
+    var m = wl.manual || {};
+    var title       = wl.title || '';
+    var description = m.description || '';
+    var dateStr     = m.date || '';
+    var year        = wl.year || parseYear(dateStr);
+    var link        = m.link || '';
+    var thumb       = m.thumbnail || '';
+    var category    = m.category || 'Insights';
+    var readtime    = m.readtime || '';
+    var watchtime   = m.watchtime || '';
+    var type        = m.type || 'text';
+
+    var regionTokens = [];
+    if (wl.region_origination) regionTokens.push(wl.region_origination);
+    if (wl.region_relevancy && wl.region_relevancy !== wl.region_origination) {
+      regionTokens.push(wl.region_relevancy);
+    }
+
+    var topicTokens = (wl.topics && wl.topics.length) ? wl.topics.slice() : [];
+
+    var searchText = (title + ' ' + description).toLowerCase();
+    var displayDescription = truncateDescription(description, DESC_MAX);
+    var dateLabel = formatMonthYear(dateStr);
+    var topicLabel = labelForTopic(firstToken(topicTokens.join(' ')));
+    var regionLabel = labelForRegion(firstToken(regionTokens.join(' ')));
+
+    var dateTs = dateStr ? Date.parse(dateStr) : 0;
+    if (isNaN(dateTs)) dateTs = 0;
+
+    return {
+      title:       title,
+      description: displayDescription,
+      href:        link,
+      thumbnail:   thumb,
+      eyebrow:     category,
+      year:        year,
+      dateLabel:   dateLabel,
+      dateTs:      dateTs,
+      topicLabel:  topicLabel,
+      regionLabel: regionLabel,
+      meta:        formatMeta(readtime, watchtime, type),
+      dataRegion:  regionTokens.join(' '),
+      dataTopic:   topicTokens.join(' '),
+      searchText:  searchText,
+    };
+  }
+
   /* ---------- Main flow ---------- */
 
   function bootstrap() {
@@ -475,6 +527,20 @@
         if (seen[key]) return;         /* already rendered — dedupe */
         seen[key] = true;
         entries.push(makeEntry(n, wl));
+      });
+
+      /* Second pass: pick up any whitelist entries that never matched
+         a year-feed article but carry hand-authored `manual` data.
+         This is the escape hatch for articles that are live on the
+         site but haven't been added to the /en/insights/data/{year}-
+         insights XML feeds. As soon as content ops publishes them
+         to a feed, the feed match wins on the first pass and this
+         second pass is a no-op for that title. */
+      whitelist.articles.forEach(function (wl) {
+        if (!wl.manual) return;         /* no fallback data */
+        if (seen[wl.match_key]) return; /* already rendered from feed */
+        seen[wl.match_key] = true;
+        entries.push(makeManualEntry(wl));
       });
 
       /* Sort newest first by the ACTUAL publish date, not the whitelist
