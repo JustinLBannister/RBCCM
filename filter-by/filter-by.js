@@ -41,6 +41,16 @@
    ---- Data contract on filtered items -----------------------------------
      data-<dim>      value(s) for the dropdown labelled data-filter="<dim>"
      data-search-text lowercased searchable haystack (required to be found)
+
+   ---- Free-text search scope --------------------------------------------
+   Search matches data-search-text (title + description) PLUS every
+   registered dropdown dimension, so typing "financial" also returns
+   everything tagged data-topic="financial-institutions", and "europe"
+   returns everything tagged data-region="de".
+   Hyphens are flattened to spaces on both the query and the haystack, so
+   slugged values match either way ("financial institutions" == the slug).
+   Region codes are reverse-mapped to their bucket key + label first, since
+   nobody searches "de" — see haystackFor() / regionSearchTerms().
    ========================================================================= */
 
 (function () {
@@ -461,12 +471,82 @@
       apply(true);
     }
 
+    /* Search terms and haystacks are normalised the same way: lowercased,
+       hyphens flattened to spaces, whitespace collapsed. Dimension values
+       are slugs ("financial-institutions markets-economics"), so without
+       the hyphen flattening a search for "financial institutions" would
+       miss the very items the Topic dropdown returns. */
+    function normalizeSearch(raw) {
+      return String(raw || '').toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
     function getState() {
-      var state = { search: searchInput ? searchInput.value.trim().toLowerCase() : '' };
+      var state = { search: searchInput ? normalizeSearch(searchInput.value) : '' };
       for (var i = 0; i < dropdowns.length; i++) {
         state[dropdowns[i].dim] = dropdowns[i].getValue().trim();
       }
       return state;
+    }
+
+    /* ---------------------------------------------------------------
+       Search haystack
+       ---------------------------------------------------------------
+       data-search-text is built from title + description only, so the
+       taxonomy was invisible to search: typing "financial" returned just
+       the articles with the word in their copy, while the Financial
+       Institutions dropdown returned every article tagged with it.
+
+       The haystack is therefore the item's text PLUS every registered
+       dropdown dimension.
+
+       Region needs translating first. Items carry raw ISO codes
+       ("global us", "de"), while the dropdown offers buckets
+       (Global/US/Canada/Europe/APAC), so the codes alone are not what
+       anyone would type. regionSearchTerms() reverse-maps an item's OWN
+       codes to the bucket key + label it belongs to, and folds those in
+       alongside the codes.
+
+       Note it maps the item's own codes only — NOT the bucket's full code
+       list. Folding in the whole list would put every European code on a
+       German article, so searching "uk" would return it. The narrower map
+       keeps "europe"/"canada"/"apac" working without that false positive.
+       The trade-off: aliases that live only in the bucket list ("emea")
+       won't match an item tagged "de". Supporting those means expanding
+       the query through the buckets, which is a different mechanism.
+
+       Cached per element: apply() runs on every keystroke, and these
+       attributes don't change between renders. Feed re-renders produce new
+       elements, which get fresh caches. */
+    function regionSearchTerms(raw) {
+      var codes = tokenize(raw);
+      if (!codes.length) return '';
+      var out = codes.slice();
+      var seenBucket = {};
+      for (var b = 0; b < REGION_ORDER.length; b++) {
+        var bucketKey = REGION_ORDER[b];
+        var bucketCodes = REGION_BUCKETS[bucketKey] || [];
+        for (var c = 0; c < bucketCodes.length; c++) {
+          if (codes.indexOf(bucketCodes[c]) === -1) continue;
+          if (seenBucket[bucketKey]) break;
+          seenBucket[bucketKey] = true;
+          out.push(bucketKey);
+          if (REGION_LABELS[bucketKey]) out.push(REGION_LABELS[bucketKey]);
+          break;
+        }
+      }
+      return out.join(' ');
+    }
+
+    function haystackFor(item) {
+      if (item.__rbccmHaystack) return item.__rbccmHaystack;
+      var parts = [item.getAttribute('data-search-text') || item.getAttribute('data-title') || ''];
+      for (var i = 0; i < dropdowns.length; i++) {
+        var dim = dropdowns[i].dim;
+        var raw = item.getAttribute('data-' + dim) || '';
+        parts.push(dim === 'region' ? regionSearchTerms(raw) : raw);
+      }
+      item.__rbccmHaystack = normalizeSearch(parts.join(' '));
+      return item.__rbccmHaystack;
     }
 
     /* Region gets special bucketing via REGION_BUCKETS. */
@@ -513,8 +593,7 @@
         }
 
         if (pass && state.search) {
-          var haystack = ((item.getAttribute('data-search-text') || item.getAttribute('data-title') || '')).toLowerCase();
-          if (haystack.indexOf(state.search) === -1) pass = false;
+          if (haystackFor(item).indexOf(state.search) === -1) pass = false;
         }
 
         if (pass) matched.push(item);
