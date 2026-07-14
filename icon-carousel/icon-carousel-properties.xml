@@ -164,11 +164,18 @@
   <!-- ── ICON ITEMS ──
        One Group per icon + label pair.
 
-       MINIMUM 4. The XSL will not render the component with fewer —
-       the layout is a 4-across row on desktop, and 1–3 items would
-       either leave dead cells or stretch to absurd widths. No maximum:
-       the JS derives the slide and dot count from however many exist,
-       so adding a twelfth sector needs no code change anywhere.
+       MINIMUM 4, enforced by the XSL — it renders nothing at all with
+       fewer, because the layout is a 4-across row on desktop and 1-3
+       items would leave dead cells. No maximum: slick derives the page
+       and dot count from however many exist, so adding a twelfth sector
+       needs no code change anywhere.
+
+       NOTE: the minimum is NOT declared here as MinReplicates. Teamsite's
+       schema rejects that attribute ("Attribute 'MinReplicates' is not
+       allowed to appear in element 'Group'"), and no working component in
+       this codebase uses it. Same for Required on a Datum. Only ID, Name,
+       Type are permitted on Datum; only ID, Name, Replicatable,
+       CloneGroupID on Group. Validation lives in the XSL, not the schema.
 
        IMPORTANT — Datum @Name attributes MUST match the XSL's @Name
        selectors. Teamsite strips @ID on replicated Datums, so @Name is
@@ -177,8 +184,7 @@
   <Group ID="IconItem"
          Name="Icon Item"
          Replicatable="true"
-         CloneGroupID="icon-carousel-item"
-         MinReplicates="4">
+         CloneGroupID="icon-carousel-item">
 
     <!-- Asset picker. The nested <Image> skeleton is REQUIRED and must
          be left empty here — do not put a default path in it.
@@ -225,7 +231,10 @@
          doesn't. The XSL emits alt="" when this is empty. -->
     <Datum ID="IconAlt" Type="String" Name="Icon Alt Text"></Datum>
 
-    <Datum ID="Label" Type="String" Name="Label" Required="true">Sector name</Datum>
+    <!-- Required in practice: a row with no label is skipped by the XSL and
+         does not count toward the minimum of 4. (Teamsite's schema has no
+         Required attribute, so this is enforced in the template.) -->
+    <Datum ID="Label" Type="String" Name="Label">Sector name</Datum>
 
   </Group>
 
