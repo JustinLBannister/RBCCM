@@ -1,0 +1,924 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- Declared 2.0 to match Teamsite's "Rendering Mode: XSLT 2.0" (the house
+     setting per the Conference-Insights BRD). Do NOT set this to 1.0: that
+     forces the 2.0 engine into backwards-compat mode, which is the xs:double vs
+     xs:string error story-tiles v1 hit. -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: Deal Carousel (tombstones)
+       ===================================================================
+       Replaces the legacy creds-carousel, plus the two rich-text
+       components that sat around it (the heading block and the "More
+       transactions" button). One component now owns all three.
+
+       DCR-DRIVEN. Each card binds one deal DCR through a Type="DCR"
+       picker and renders from that deal's own fields, so a deal is
+       never retyped and a card never goes stale. Same binding
+       featured-conferences uses for its Events List:
+
+         /Properties/Data/Datum[@ID='EventsList']/DCR/conferences/data
+
+       The picker is scoped to templatedata/rbccm/deals, but the tree it
+       returns is rooted at the DCR's own root-container element, which
+       the datacapture config names `press_release`. Hence:
+
+         Group/Datum[@Name='Deal Record']/DCR/press_release
+
+       Deploy alongside this skin:
+         /assets/rbccm/css/components/deal-carousel.css
+         /assets/rbccm/js/components/deal-carousel.js
+
+       jQuery + slick (accessible-slick) are already site-wide; the JS
+       loads accessible-slick itself if it isn't present.
+       =================================================================== -->
+
+  <!-- HTML output, as filter-by / conference-insights-tiles / story-tiles all
+       declare. Void elements (img) then serialise as HTML rather than
+       self-closing XML. -->
+  <xsl:output method="html" indent="no" encoding="UTF-8"/>
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       decode — undo the deal DCR's own save-time escaping
+       ═══════════════════════════════════════════════════════════════════
+       The deal datacapture config runs a handleOnSave that rewrites certain
+       characters into HTML entities BEFORE the value is stored:
+
+         dealvalue     $ becomes the six characters &#36;
+         title         $ becomes &#36;, " becomes &quot;, . becomes &period;
+         description   same as title, minus the period
+
+       They are stored as LITERAL TEXT, not as markup. So the string sitting in
+       dealvalue is genuinely `&#36;150 million`, and a plain xsl:value-of will
+       escape that ampersand a second time and print `&#36;150 million` on the
+       page. (filter-deals.js hits the same thing on the transactions landing
+       page and strips it by hand in parseAmount.)
+
+       The obvious fix — disable-output-escaping — is a trap, twice over:
+
+         1. It does not work in an ATTRIBUTE. The alt text is built from `title`,
+            so a deal titled "Acme Corp. IPO" would emit alt="Acme Corp&period;
+            IPO" with no way to stop it.
+         2. It is WRONG for the fields the save handler never touches. `clients`
+            legitimately contains "&" ("Woodside Energy & Stone Peak"), which
+            arrives as a real ampersand; disabling escaping would emit it raw and
+            hand the browser invalid markup.
+
+       So: decode the three sequences the save handler actually writes, and then
+       output everything normally. Safe in text and in attributes, and a no-op on
+       any value that was never escaped.
+
+       NOTE the replacement `\$` — in XPath 2.0's replace(), a bare `$` in the
+       replacement string is a capture-group reference and must be escaped. -->
+  <xsl:template name="decode">
+    <xsl:param name="s" select="''"/>
+    <xsl:value-of select="replace(
+                            replace(
+                              replace($s, '&amp;#36;', '\$'),
+                            '&amp;quot;', '&quot;'),
+                          '&amp;period;', '.')"/>
+  </xsl:template>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       bool — read a Boolean Datum, case-insensitively, with a default
+       ═══════════════════════════════════════════════════════════════════
+       A BLANK Datum must fall back to the DEFAULT, not to false. Several of the
+       show/hide switches below default to true, and an author who never touches
+       them would otherwise get an empty card.
+
+       Case-insensitive because a free-text Datum will get "True" sooner or later,
+       and an exact match would silently do the wrong thing with no error to
+       explain why. -->
+  <xsl:template name="bool">
+    <xsl:param name="v"/>
+    <xsl:param name="default" select="'false'"/>
+    <xsl:variable name="raw"
+      select="translate(normalize-space($v),
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:choose>
+      <xsl:when test="$raw = 'true'">true</xsl:when>
+      <xsl:when test="$raw = 'false'">false</xsl:when>
+      <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       dcr-path — find the bound DCR's own path
+       ═══════════════════════════════════════════════════════════════════
+       A deal that has its own PAGE stores no URL. The datacapture config puts
+       content and link in a mutually exclusive container:
+
+         <container name="content" combination="or" max="1">
+           <item name="content"/>   the deal has its own page
+           <item name="link"/>      the deal points somewhere external
+         </container>
+
+       so exactly the deals we most want to link to are the ones with an empty
+       `link`. There is nothing in the record to link to.
+
+       But the deal's URL IS its DCR path, one for one:
+
+         templatedata/rbccm/deals/data/2026/06/fervo_energy_announces_...
+                /en/expertise/transactions/deals/2026/06/fervo_energy_announces_...
+
+       DO NOT try to rebuild the filename from the title. An earlier version of
+       this file did exactly that, reproducing the DCR's own getFilename() rule,
+       and it was checked against ONE live deal (Fervo), which happened to match.
+       Run against the whole deals feed it matched 2 of 15. It cannot work:
+
+         - filenames are TRUNCATED
+             "Vault Minerals has entered into a binding agreement to merge with
+              Regis Resources to create an $11 billion gold producer."
+           lives at  vault_minerals_has_entered_into_a_binding_agreement
+
+         - titles get EDITED after creation; the filename is frozen
+             "Baytex Energy acquires Ranger Oil"
+           lives at  chesapeake_divestiture_on_its_south_texas_eagle_ford_assets_to_ineos
+
+         - some filenames are simply hand typed
+             "Diamondback Energy completes acquisition of Double Eagle"
+           lives at  diamond_deal_tile
+
+         - the save-time escaping leaks INTO the filename
+             "$9.4 billion"  becomes  369period4_billion
+           because getFilename ran on the already escaped title.
+
+       getFilename() is a SUGGESTION offered once, at creation. It is not a rule
+       the URL keeps. So the path has to be read, never recomputed.
+
+       Which attribute Teamsite exposes it on is not documented anywhere we can
+       see, so this probes the plausible ones and the element's own text. If none
+       of them hold a path, it returns EMPTY and the card simply renders no link
+       — a missing link is recoverable, a confidently wrong one is not. -->
+  <xsl:template name="dcr-path">
+    <xsl:param name="dcrNode"/>
+    <xsl:choose>
+      <xsl:when test="normalize-space($dcrNode/@Path) != ''"><xsl:value-of select="normalize-space($dcrNode/@Path)"/></xsl:when>
+      <xsl:when test="normalize-space($dcrNode/@path) != ''"><xsl:value-of select="normalize-space($dcrNode/@path)"/></xsl:when>
+      <xsl:when test="normalize-space($dcrNode/@Location) != ''"><xsl:value-of select="normalize-space($dcrNode/@Location)"/></xsl:when>
+      <xsl:when test="normalize-space($dcrNode/@Href) != ''"><xsl:value-of select="normalize-space($dcrNode/@Href)"/></xsl:when>
+      <xsl:when test="normalize-space($dcrNode/@Src) != ''"><xsl:value-of select="normalize-space($dcrNode/@Src)"/></xsl:when>
+      <!-- The authored form carries the path as the element's TEXT. Only the
+           direct text children, so the parsed DCR content underneath cannot be
+           mistaken for a path. -->
+      <xsl:when test="normalize-space(string-join($dcrNode/text(), '')) != ''">
+        <xsl:value-of select="normalize-space(string-join($dcrNode/text(), ''))"/>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- The deal Groups. Matched on @ID or @Name because Teamsite strips @ID on
+       replicated Groups. -->
+  <xsl:variable name="dealGroups"
+    select="/Properties/Data/Group[@ID='Deal' or @Name='Deal']
+          | /Data/Group[@ID='Deal' or @Name='Deal']"/>
+
+  <!-- Only the Groups that will ACTUALLY RENDER: picker filled in, and the bound
+       DCR carries a deal value. A tombstone with no number on it is not a
+       tombstone.
+
+       The guard has to use exactly the same test the render loop does. Counting
+       raw Groups instead would let an empty row satisfy the minimum and then get
+       dropped downstream, leaving a carousel with no cards in it. -->
+  <xsl:variable name="liveDeals"
+    select="$dealGroups[normalize-space(
+              Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
+            ) != '']"/>
+
+  <xsl:template match="/">
+
+    <xsl:if test="count($liveDeals) >= 1">
+
+      <!-- ── Copy ── -->
+      <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+      <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+
+      <!-- ── Per-view counts, with the legacy's defaults ── -->
+      <xsl:variable name="pvDesktopRaw" select="normalize-space(/Properties/Datum[@ID='PerViewDesktop'])"/>
+      <xsl:variable name="pvTabletRaw"  select="normalize-space(/Properties/Datum[@ID='PerViewTablet'])"/>
+      <xsl:variable name="pvMobileRaw"  select="normalize-space(/Properties/Datum[@ID='PerViewMobile'])"/>
+
+      <xsl:variable name="pvDesktop">
+        <xsl:choose>
+          <xsl:when test="$pvDesktopRaw != ''"><xsl:value-of select="$pvDesktopRaw"/></xsl:when>
+          <xsl:otherwise>3</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="pvTablet">
+        <xsl:choose>
+          <xsl:when test="$pvTabletRaw != ''"><xsl:value-of select="$pvTabletRaw"/></xsl:when>
+          <xsl:otherwise>2</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="pvMobile">
+        <xsl:choose>
+          <xsl:when test="$pvMobileRaw != ''"><xsl:value-of select="$pvMobileRaw"/></xsl:when>
+          <xsl:otherwise>1</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Booleans. Case-insensitive: a free-text Datum will get "True" sooner
+           or later, and an exact match would silently do the wrong thing with no
+           error to explain why. -->
+      <xsl:variable name="loop">
+        <xsl:choose>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='Loop']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'false'">false</xsl:when>
+          <xsl:otherwise>true</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="autoplay">
+        <xsl:choose>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='Autoplay']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'true'">true</xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── Aria labels: override, then derive from heading, then generic ──
+           TWO labels, and they name different things — same split as
+           icon-carousel:
+
+             carouselAria   goes on the SECTION. Names the whole landmark
+                            ("Proven impact, trusted partnerships").
+             regionLabel    goes on the TRACK, and is what accessible-slick uses
+                            for its carousel region.
+
+           They matter when a page carries more than one carousel: without
+           distinct labels a screen reader announces two identical regions and
+           the user cannot tell them apart. -->
+      <xsl:variable name="carouselAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$heading != ''"><xsl:value-of select="$heading"/></xsl:when>
+          <xsl:otherwise>Transactions</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="regionLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='RegionLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='RegionLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$heading != ''"><xsl:value-of select="$heading"/></xsl:when>
+          <xsl:otherwise>Transactions carousel</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="prevAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Previous transactions</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="nextAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Next transactions</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="readMoreLabel" select="normalize-space(/Properties/Datum[@ID='ReadMoreLabel'])"/>
+
+      <!-- ══ WHICH LINES THE CARD SHOWS ══
+           Independent on/off per line. No inference from what happens to be
+           populated — that was the old cascade, and it was wrong.
+
+           Case-insensitive, and each carries its own default, so a blank Datum
+           behaves as documented rather than as `false`. -->
+      <xsl:variable name="showTitle">
+        <xsl:call-template name="bool">
+          <xsl:with-param name="v" select="/Properties/Datum[@ID='ShowTitle']"/>
+          <xsl:with-param name="default" select="'true'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="showDescription">
+        <xsl:call-template name="bool">
+          <xsl:with-param name="v" select="/Properties/Datum[@ID='ShowDescription']"/>
+          <xsl:with-param name="default" select="'true'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="showClients">
+        <xsl:call-template name="bool">
+          <xsl:with-param name="v" select="/Properties/Datum[@ID='ShowClients']"/>
+          <xsl:with-param name="default" select="'false'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="showRole">
+        <xsl:call-template name="bool">
+          <xsl:with-param name="v" select="/Properties/Datum[@ID='ShowRole']"/>
+          <xsl:with-param name="default" select="'true'"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <!-- The two halves of a derived deal URL. Datums, not constants, because
+           the slug half is a reconstruction of Interwoven's getSafeFilename and
+           may need tuning against a real deal page — better a config change than
+           a code change. -->
+      <xsl:variable name="dealBaseRaw" select="normalize-space(/Properties/Datum[@ID='DealBaseUrl'])"/>
+      <xsl:variable name="dealBase">
+        <xsl:choose>
+          <xsl:when test="$dealBaseRaw != ''">
+            <!-- Tolerate a missing trailing slash rather than silently producing
+                 ".../transactions2025/03/..." -->
+            <xsl:choose>
+              <xsl:when test="ends-with($dealBaseRaw, '/')"><xsl:value-of select="$dealBaseRaw"/></xsl:when>
+              <xsl:otherwise><xsl:value-of select="concat($dealBaseRaw, '/')"/></xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <!-- Note the /deals/ segment. The transactions LANDING page is at
+               /en/expertise/transactions, but an individual deal lives one level
+               deeper, under /deals/. -->
+          <xsl:otherwise>/en/expertise/transactions/deals/</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <!-- Blank by default, and blank is CORRECT: a real deal URL carries no file
+           extension. Kept as a Datum only so a future change of routing does not
+           need a code change. -->
+      <xsl:variable name="dealSuffix" select="normalize-space(/Properties/Datum[@ID='DealUrlSuffix'])"/>
+
+      <!-- The templatedata prefix stripped off a DCR path before the base is
+           prepended. Same constant the production deals component uses. -->
+      <xsl:variable name="dcrPrefixRaw" select="normalize-space(/Properties/Datum[@ID='DcrPathPrefix'])"/>
+      <xsl:variable name="dcrPrefix">
+        <xsl:choose>
+          <xsl:when test="$dcrPrefixRaw != ''"><xsl:value-of select="$dcrPrefixRaw"/></xsl:when>
+          <xsl:otherwise>templatedata/rbccm/deals/data/</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ── CTA ── -->
+      <xsl:variable name="ctaLabel"    select="normalize-space(/Properties/Datum[@ID='CtaLabel'])"/>
+      <xsl:variable name="ctaLink"     select="normalize-space(/Properties/Datum[@ID='CtaLink'])"/>
+      <xsl:variable name="ctaEventTag" select="normalize-space(/Properties/Datum[@ID='CtaEventTag'])"/>
+      <xsl:variable name="ctaNewTab">
+        <xsl:choose>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='CtaNewTab']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'true'">true</xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- ══ APPEARANCE ══
+           Same Datums as icon-carousel, parsed the same way. ColorScheme and
+           HeadingAlignment are independent of each other.
+
+           Case-insensitive throughout: a free-text Datum WILL get "Dark" or
+           "Center" sooner or later, and an exact match would silently fall back
+           to the default with no error to explain why. -->
+      <xsl:variable name="schemeRaw"
+        select="translate(normalize-space(/Properties/Datum[@ID='ColorScheme']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+      <xsl:variable name="colorScheme">
+        <xsl:choose>
+          <xsl:when test="$schemeRaw = 'dark'">dark</xsl:when>
+          <!-- Accept the obvious synonyms. An author looking at a pale blue comp
+               will type whichever word came to mind, and being wrong about the
+               noun should not silently give them a white section. -->
+          <xsl:when test="$schemeRaw = 'tinted' or $schemeRaw = 'tint'
+                       or $schemeRaw = 'light-blue' or $schemeRaw = 'lightblue'
+                       or $schemeRaw = 'blue'">tinted</xsl:when>
+          <xsl:otherwise>light</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Accepts center / centered, any casing. -->
+      <xsl:variable name="headingAlignRaw"
+        select="translate(normalize-space(/Properties/Datum[@ID='HeadingAlignment']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+      <xsl:variable name="headingAlignment">
+        <xsl:choose>
+          <xsl:when test="$headingAlignRaw = 'center' or $headingAlignRaw = 'centered'">center</xsl:when>
+          <xsl:otherwise>left</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Asset picker, so Image/Path rather than a plain string URL. -->
+      <xsl:variable name="bgImage" select="normalize-space(/Properties/Datum[@ID='BackgroundImage']/Image/Path)"/>
+      <xsl:variable name="bgPosition">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition'])"/>
+          </xsl:when>
+          <xsl:otherwise>center center</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bgSize">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageSize']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageSize'])"/>
+          </xsl:when>
+          <xsl:otherwise>cover</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bgRepeat">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat'])"/>
+          </xsl:when>
+          <xsl:otherwise>no-repeat</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Precomputed so the xsl:attribute calls on the section stay readable. -->
+      <xsl:variable name="sectionClass">
+        <xsl:text>rbccm-deal-carousel</xsl:text>
+        <xsl:if test="$colorScheme = 'tinted'"><xsl:text> rbccm-deal-carousel--tinted</xsl:text></xsl:if>
+        <xsl:if test="$colorScheme = 'dark'"><xsl:text> rbccm-deal-carousel--on-dark</xsl:text></xsl:if>
+        <xsl:if test="$headingAlignment = 'center'"><xsl:text> rbccm-deal-carousel--headings-centered</xsl:text></xsl:if>
+      </xsl:variable>
+
+      <xsl:variable name="instructions" select="normalize-space(/Properties/Datum[@ID='InstructionsText'])"/>
+
+      <!-- ── Section padding overrides, as CSS custom properties ──
+           Blank Datums must emit NOTHING. The CSS reads each custom property
+           with a fallback default, so writing an empty value would resolve to
+           `padding: ;` and destroy that default. Hence one xsl:if per property.
+
+           (Written without the literal CSS var() syntax because an XML comment
+           may not contain a double hyphen.) -->
+      <xsl:variable name="padTopMobile"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])"/>
+      <xsl:variable name="padBottomMobile"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])"/>
+      <xsl:variable name="padTopDesktop"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])"/>
+      <xsl:variable name="padBottomDesktop" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])"/>
+
+      <xsl:variable name="sectionStyle">
+        <xsl:if test="$padTopMobile != ''">
+          <xsl:text>--rbccm-dc-pt-m: </xsl:text><xsl:value-of select="$padTopMobile"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padBottomMobile != ''">
+          <xsl:text>--rbccm-dc-pb-m: </xsl:text><xsl:value-of select="$padBottomMobile"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padTopDesktop != ''">
+          <xsl:text>--rbccm-dc-pt-d: </xsl:text><xsl:value-of select="$padTopDesktop"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padBottomDesktop != ''">
+          <xsl:text>--rbccm-dc-pb-d: </xsl:text><xsl:value-of select="$padBottomDesktop"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <!-- Layered OVER the scheme colour, which is why the stylesheet sets its
+             backgrounds with background-color rather than the shorthand. -->
+        <xsl:if test="$bgImage != ''">
+          <xsl:text>background-image: url('</xsl:text><xsl:value-of select="$bgImage"/>
+          <xsl:text>'); background-position: </xsl:text><xsl:value-of select="$bgPosition"/>
+          <xsl:text>; background-size: </xsl:text><xsl:value-of select="$bgSize"/>
+          <xsl:text>; background-repeat: </xsl:text><xsl:value-of select="$bgRepeat"/><xsl:text>;</xsl:text>
+        </xsl:if>
+      </xsl:variable>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           Markup
+           ═══════════════════════════════════════════════════════════════ -->
+      <link rel="stylesheet" href="/assets/rbccm/css/components/deal-carousel.css"/>
+
+      <section class="{normalize-space($sectionClass)}"
+               aria-label="{$carouselAria}"
+               data-region-label="{$regionLabel}"
+               data-per-view-desktop="{normalize-space($pvDesktop)}"
+               data-per-view-tablet="{normalize-space($pvTablet)}"
+               data-per-view-mobile="{normalize-space($pvMobile)}"
+               data-loop="{$loop}"
+               data-autoplay="{$autoplay}">
+        <xsl:if test="normalize-space($sectionStyle) != ''">
+          <xsl:attribute name="style"><xsl:value-of select="normalize-space($sectionStyle)"/></xsl:attribute>
+        </xsl:if>
+
+        <div class="rbccm-deal-carousel__inner">
+
+          <!-- Header. Dropped entirely when both fields are blank — an empty
+               wrapper is still a flex child and would leave a phantom gap above
+               the cards. -->
+          <xsl:if test="$heading != '' or $intro != ''">
+            <div class="rbccm-deal-carousel__header">
+              <xsl:if test="$heading != ''">
+                <h2 class="rbccm-deal-carousel__heading"><xsl:value-of select="$heading"/></h2>
+              </xsl:if>
+              <xsl:if test="$intro != ''">
+                <p class="rbccm-deal-carousel__intro"><xsl:value-of select="$intro"/></p>
+              </xsl:if>
+            </div>
+          </xsl:if>
+
+          <!-- Optional screen-reader instructions, same Datum as icon-carousel.
+               Blank emits NOTHING: an empty paragraph in the a11y tree is noise,
+               and accessible-slick's own instructionsText behaves the same way. -->
+          <xsl:if test="$instructions != ''">
+            <p class="rbccm-deal-carousel__sr-only"><xsl:value-of select="$instructions"/></p>
+          </xsl:if>
+
+          <!-- Live region. accessible-slick labels the region and each slide but
+               does NOT announce the change, so without this the carousel moves
+               silently for a screen-reader user. -->
+          <div class="rbccm-deal-carousel__sr-only rbccm-deal-carousel__announce"
+               aria-live="polite" aria-atomic="true"></div>
+
+          <div class="rbccm-deal-carousel__viewport-row">
+
+            <!-- ── ARROWS ──
+                 TWO icons per button, not one. The stylesheet (ported wholesale
+                 from leadership) shows the 44px outlined circle from 1300px up,
+                 where the arrows flank the track in the gutter, and the bare
+                 14x24 chevron below that, where they drop onto the dots row and
+                 a circle would crowd the dots.
+
+                 They must be INLINE svg, not an <img> or a background: the
+                 desktop hover fills the rect and inverts the stroke to white,
+                 which only works if the shapes are in the document.
+
+                 An earlier pass emitted a single empty <span class="arrow-icon">
+                 here. The buttons were in the DOM and wired to slick, but had no
+                 content, so they collapsed to zero width and were invisible —
+                 which read exactly like "the arrows are missing". -->
+            <button type="button"
+                    class="rbccm-deal-carousel__arrow rbccm-deal-carousel__arrow--prev"
+                    aria-label="{$prevAria}">
+              <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--desktop"
+                   xmlns="http://www.w3.org/2000/svg" width="44" height="44"
+                   viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+                <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--mobile"
+                   xmlns="http://www.w3.org/2000/svg" width="14" height="24"
+                   viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <div class="rbccm-deal-carousel__viewport">
+              <div class="rbccm-deal-carousel__track">
+
+                <xsl:for-each select="$liveDeals">
+
+                  <!-- The bound DCR. Everything on the card comes from here. -->
+                  <xsl:variable name="dcr"
+                    select="Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release"/>
+
+                  <!-- ══ THE TWO LINES UNDER THE VALUE ══
+                       Bold grey = the DESCRIPTION of the deal. Bright blue =
+                       RBC's ROLE in it. That is all. No cascade, no promotion.
+
+                       An earlier version of this file had an elaborate rule that
+                       shuffled `clients`, `role` and `transactiontype` between
+                       the two slots depending on which were filled. It was built
+                       to reconcile the styleguide card with the LEGACY
+                       creds-carousel, and it was wrong: the legacy markup was
+                       hand-typed HTML, not a rendering of these fields, so it was
+                       never evidence of anything.
+
+                       The production deals component settles it:
+
+                         <p class="deal-desc">
+                           <xsl:value-of select="$DEAL_TITLE" .../>
+                         </p>
+
+                       The description falls back to the TITLE, because `title`
+                       on a deal record IS a sentence describing the deal ("Vault
+                       Minerals has entered into a binding agreement to merge with
+                       Regis Resources...") and `description` is very often blank.
+                       Production skips straight to the title; we prefer the
+                       description when an author has bothered to write one.
+
+                       `clients` and `transactiontype` do NOT appear on this card. -->
+                  <xsl:variable name="dealTitle" select="normalize-space($dcr/title)"/>
+                  <xsl:variable name="dealDesc"  select="normalize-space($dcr/description)"/>
+                  <xsl:variable name="clients"   select="normalize-space($dcr/clients)"/>
+                  <xsl:variable name="role"      select="normalize-space($dcr/role)"/>
+
+                  <!-- ══ DATE ══
+                       date_announced is the DEAL date ("Date Announced /
+                       Closed"). publish_date is when the page went up, which is
+                       a different thing and only a fallback. The datacapture
+                       regex pins both to YYYY-MM-DD, so the month name has to be
+                       built here. -->
+                  <xsl:variable name="rawDate">
+                    <xsl:choose>
+                      <xsl:when test="normalize-space($dcr/date_announced) != ''">
+                        <xsl:value-of select="normalize-space($dcr/date_announced)"/>
+                      </xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/publish_date)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <xsl:variable name="mm"   select="substring($rawDate, 6, 2)"/>
+                  <xsl:variable name="yyyy" select="substring($rawDate, 1, 4)"/>
+                  <xsl:variable name="monthName">
+                    <xsl:choose>
+                      <xsl:when test="$mm = '01'">January</xsl:when>
+                      <xsl:when test="$mm = '02'">February</xsl:when>
+                      <xsl:when test="$mm = '03'">March</xsl:when>
+                      <xsl:when test="$mm = '04'">April</xsl:when>
+                      <xsl:when test="$mm = '05'">May</xsl:when>
+                      <xsl:when test="$mm = '06'">June</xsl:when>
+                      <xsl:when test="$mm = '07'">July</xsl:when>
+                      <xsl:when test="$mm = '08'">August</xsl:when>
+                      <xsl:when test="$mm = '09'">September</xsl:when>
+                      <xsl:when test="$mm = '10'">October</xsl:when>
+                      <xsl:when test="$mm = '11'">November</xsl:when>
+                      <xsl:when test="$mm = '12'">December</xsl:when>
+                      <xsl:otherwise/>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <!-- The live ECM cards read "October 2024 | NASDAQ". There is
+                       NO exchange field anywhere in the deal DCR — that suffix
+                       was hand-typed into the old hardcoded carousel markup.
+                       Blank leaves the date alone, as the styleguide has it. -->
+                  <xsl:variable name="exchange" select="normalize-space(Datum[@ID='Exchange' or @Name='Exchange suffix (optional, e.g. NASDAQ)'])"/>
+
+                  <xsl:variable name="dateLabel">
+                    <xsl:choose>
+                      <!-- A parseable YYYY-MM-DD becomes "October 2024". -->
+                      <xsl:when test="$monthName != '' and $yyyy != ''">
+                        <xsl:value-of select="$monthName"/><xsl:text> </xsl:text><xsl:value-of select="$yyyy"/>
+                      </xsl:when>
+                      <!-- Anything else passes through verbatim. Better a date
+                           in the wrong shape than a blank line or a mangled
+                           fragment of one. -->
+                      <xsl:otherwise><xsl:value-of select="$rawDate"/></xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:if test="$exchange != ''">
+                      <xsl:text> | </xsl:text><xsl:value-of select="$exchange"/>
+                    </xsl:if>
+                  </xsl:variable>
+
+                  <!-- ══ LOGO ══
+                       ONE image. A multi-brand lockup (Woodside + Stonepeak) is
+                       baked into the asset itself, so the card never composes
+                       two marks.
+
+                       The alt names the company, which is the only thing a
+                       screen-reader user can use. The legacy hardcoded
+                       aria-label="SMS Logo" on every logo on every card, so
+                       fifteen different companies were all announced as "SMS
+                       Logo". -->
+                  <xsl:variable name="logo" select="normalize-space($dcr/thumbnail)"/>
+                  <!-- The TITLE, matching what production puts on the logo's
+                       aria-label. It names the deal, which is the only useful
+                       thing to say about a mark a screen-reader user cannot see.
+
+                       Decoded, because this lands in an ATTRIBUTE and the title
+                       is escaped at save time — a deal titled "Acme Corp. IPO"
+                       would otherwise announce as "Acme Corp&period; IPO". -->
+                  <xsl:variable name="logoAlt">
+                    <xsl:call-template name="decode">
+                      <xsl:with-param name="s" select="normalize-space($dcr/title)"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+
+                  <!-- ══ CARD LINK ══
+                       The DCR's `link` field only exists when the deal has NO
+                       page of its own — the datacapture config puts content and
+                       link in a mutually exclusive container. So a deal written
+                       up as a full page stores its own URL nowhere inside
+                       itself. The override Datum covers exactly that case. -->
+                  <xsl:variable name="linkOverride" select="normalize-space(Datum[@ID='LinkOverride' or @Name='Card link URL (blank = the deal DCR link field)'])"/>
+
+                  <!-- The deal's own page, MAPPED from its DCR path — read, not
+                       recomputed. See the dcr-path template for why recomputing
+                       it from the title is not an option.
+
+                         templatedata/rbccm/deals/data/2026/06/fervo_energy_...
+                                /en/expertise/transactions/deals/2026/06/fervo_energy_...
+
+                       Taking the LAST THREE segments rather than stripping a
+                       known prefix: the shape is always YYYY / MM / name, so
+                       this survives a change to the templatedata root and cannot
+                       be thrown off by the word "data" appearing mid-path. -->
+                  <xsl:variable name="dcrPath">
+                    <xsl:call-template name="dcr-path">
+                      <xsl:with-param name="dcrNode"
+                        select="Datum[@ID='DealRecord' or @Name='Deal Record']/DCR"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <!-- The prefix swap, copied from the production deals
+                       component (the search-driven tombstone grid), which does
+                       exactly this and is known to work:
+
+                         concat('/en/expertise/transactions/deals/',
+                                substring-after($ARTICLE_ID,
+                                                'templatedata/rbccm/deals/data/'))
+
+                       Kept as a Datum rather than hardcoded so a templatedata
+                       move is a config change. -->
+                  <xsl:variable name="afterPrefix"
+                    select="substring-after(normalize-space($dcrPath), $dcrPrefix)"/>
+
+                  <!-- Fallback for a path that does not carry the expected
+                       prefix: take the last three segments, which are always
+                       YYYY / MM / name. Without this, an unexpected templatedata
+                       root would make substring-after return empty and every
+                       card would silently lose its link. -->
+                  <xsl:variable name="segs" select="tokenize(normalize-space($dcrPath), '/')[. != '']"/>
+                  <xsl:variable name="n" select="count($segs)"/>
+
+                  <xsl:variable name="mappedLink">
+                    <xsl:choose>
+                      <xsl:when test="$afterPrefix != ''">
+                        <xsl:value-of select="concat($dealBase, $afterPrefix, $dealSuffix)"/>
+                      </xsl:when>
+                      <!-- Only with all three parts. A half-built URL is worse
+                           than none: it renders as a live link to a 404. -->
+                      <xsl:when test="$n >= 3">
+                        <xsl:value-of select="concat($dealBase,
+                                                     $segs[$n - 2], '/',
+                                                     $segs[$n - 1], '/',
+                                                     $segs[$n], $dealSuffix)"/>
+                      </xsl:when>
+                      <xsl:otherwise/>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <!-- Precedence: an explicit override always wins; then the
+                       DCR's own link field (an EXTERNAL deal); then the deal's
+                       own page, mapped from its path.
+
+                       If none of them resolve, the card renders NO link at all.
+                       That is the correct failure: a tombstone without a link is
+                       still a tombstone, whereas a tombstone linking to a 404 is
+                       a bug fifteen times over. -->
+                  <xsl:variable name="cardLink">
+                    <xsl:choose>
+                      <xsl:when test="$linkOverride != ''"><xsl:value-of select="$linkOverride"/></xsl:when>
+                      <xsl:when test="normalize-space($dcr/link) != ''">
+                        <xsl:value-of select="normalize-space($dcr/link)"/>
+                      </xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($mappedLink)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="linkNewTab">
+                    <xsl:choose>
+                      <xsl:when test="translate(normalize-space(Datum[@ID='LinkNewTab' or @Name='Open card link in a new tab']),
+                                      'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'true'">true</xsl:when>
+                      <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <div class="rbccm-deal-carousel__slide">
+                    <article class="rbccm-deal-carousel__card">
+
+                      <xsl:if test="normalize-space($dateLabel) != ''">
+                        <p class="rbccm-deal-carousel__date"><xsl:value-of select="normalize-space($dateLabel)"/></p>
+                      </xsl:if>
+
+                      <xsl:if test="$logo != ''">
+                        <div class="rbccm-deal-carousel__logos">
+                          <img class="rbccm-deal-carousel__logo"
+                               src="{$logo}"
+                               alt="{normalize-space($logoAlt)}"
+                               loading="lazy"/>
+                        </div>
+                      </xsl:if>
+
+                      <div class="rbccm-deal-carousel__content">
+                        <!-- Decoded, not disable-output-escaping. See the
+                             `decode` template at the top for why that would have
+                             been wrong in both directions. -->
+                        <p class="rbccm-deal-carousel__value">
+                          <xsl:call-template name="decode">
+                            <xsl:with-param name="s" select="normalize-space($dcr/dealvalue)"/>
+                          </xsl:call-template>
+                        </p>
+
+                        <!-- Each line: switched ON *and* actually has content.
+                             Both halves matter — a switched-on line with an empty
+                             field must emit NOTHING, not an empty <p>, or the
+                             flex gap opens a hole under the value. -->
+                        <xsl:if test="$showTitle = 'true' and $dealTitle != ''">
+                          <p class="rbccm-deal-carousel__desc">
+                            <xsl:call-template name="decode">
+                              <xsl:with-param name="s" select="$dealTitle"/>
+                            </xsl:call-template>
+                          </p>
+                        </xsl:if>
+
+                        <xsl:if test="$showDescription = 'true' and $dealDesc != ''">
+                          <p class="rbccm-deal-carousel__desc">
+                            <xsl:call-template name="decode">
+                              <xsl:with-param name="s" select="$dealDesc"/>
+                            </xsl:call-template>
+                          </p>
+                        </xsl:if>
+
+                        <xsl:if test="$showClients = 'true' and $clients != ''">
+                          <p class="rbccm-deal-carousel__desc">
+                            <xsl:call-template name="decode">
+                              <xsl:with-param name="s" select="$clients"/>
+                            </xsl:call-template>
+                          </p>
+                        </xsl:if>
+                      </div>
+
+                      <xsl:if test="$showRole = 'true' and $role != ''">
+                        <p class="rbccm-deal-carousel__role">
+                          <xsl:call-template name="decode">
+                            <xsl:with-param name="s" select="$role"/>
+                          </xsl:call-template>
+                        </p>
+                      </xsl:if>
+
+                      <!-- Needs BOTH a label and a destination. A link that goes
+                           nowhere is worse than no link. -->
+                      <xsl:if test="$readMoreLabel != '' and normalize-space($cardLink) != ''">
+                        <a class="rbccm-deal-carousel__readmore" href="{normalize-space($cardLink)}">
+                          <xsl:if test="$linkNewTab = 'true'">
+                            <xsl:attribute name="target">_blank</xsl:attribute>
+                            <xsl:attribute name="rel">noopener noreferrer</xsl:attribute>
+                          </xsl:if>
+                          <!-- Fifteen identical "Read More" links are useless in
+                               a screen reader's link list, so each names its own
+                               deal.
+
+                               Colon, not "about": the grey line is a full
+                               sentence, so "Read More about Vault Minerals has
+                               entered into a binding agreement..." does not
+                               parse. "Read More: Vault Minerals has entered..."
+                               does. -->
+                          <xsl:attribute name="aria-label">
+                            <xsl:value-of select="$readMoreLabel"/>
+                            <xsl:if test="normalize-space($logoAlt) != ''">
+                              <xsl:text>: </xsl:text>
+                              <xsl:value-of select="normalize-space($logoAlt)"/>
+                            </xsl:if>
+                          </xsl:attribute>
+                          <span><xsl:value-of select="$readMoreLabel"/></span>
+                          <!-- The same chevron conference-insights-tiles puts
+                               after "3 min read". Its intrinsic size is 4x10 and
+                               it is set inline, deliberately: the CSS only ever
+                               touches fill and transform, so the glyph cannot be
+                               squashed by a stray width rule.
+
+                               fill="currentColor" is what lets the arrow follow
+                               the link through its hover and focus colours
+                               without a second rule for each. -->
+                          <svg class="rbccm-deal-carousel__readmore-arrow"
+                               xmlns="http://www.w3.org/2000/svg" width="4" height="10"
+                               viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                            <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                          </svg>
+                        </a>
+                      </xsl:if>
+
+                    </article>
+                  </div>
+
+                </xsl:for-each>
+
+              </div>
+            </div>
+
+            <button type="button"
+                    class="rbccm-deal-carousel__arrow rbccm-deal-carousel__arrow--next"
+                    aria-label="{$nextAria}">
+              <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--desktop"
+                   xmlns="http://www.w3.org/2000/svg" width="44" height="44"
+                   viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <rect x="-1" y="1" width="42" height="42" rx="21"
+                      transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+                <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--mobile"
+                   xmlns="http://www.w3.org/2000/svg" width="14" height="24"
+                   viewBox="0 0 14 24" fill="none" aria-hidden="true">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+          </div>
+
+          <!-- slick appends its own ul.slick-dots in here. -->
+          <div class="rbccm-deal-carousel__dots"></div>
+
+          <xsl:if test="$ctaLabel != '' and $ctaLink != ''">
+            <div class="rbccm-deal-carousel__cta-wrap">
+              <a class="rbccm-deal-carousel__cta" href="{$ctaLink}">
+                <xsl:if test="$ctaEventTag != ''">
+                  <xsl:attribute name="data-event-tag"><xsl:value-of select="$ctaEventTag"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="$ctaNewTab = 'true'">
+                  <xsl:attribute name="target">_blank</xsl:attribute>
+                  <xsl:attribute name="rel">noopener noreferrer</xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="$ctaLabel"/>
+              </a>
+            </div>
+          </xsl:if>
+
+        </div>
+      </section>
+
+      <script src="/assets/rbccm/js/components/deal-carousel.js"></script>
+
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>

@@ -1,0 +1,792 @@
+/* =========================================================================
+   Deal Carousel (tombstones) — styles
+   =========================================================================
+   Replaces the legacy `.creds-carousel .tombstone.tile` markup, which was
+   styled by the site's GLOBAL CSS (unified2.css et al). This block is fully
+   self-contained: nothing here depends on a stylesheet we can't see.
+
+   Sits on top of slick (accessible-slick build). slick.min.css supplies the
+   mechanics; everything here is an override, same arrangement as
+   leadership-carousel.css and icon-carousel.css.
+
+   Mobile-first. Base block = phone; `min-width` queries layer up.
+
+   Theming hooks (set on .rbccm-deal-carousel or :root)
+   ----------------------------------------------------
+     --rbccm-dc-pt-m / --rbccm-dc-pb-m   mobile padding top / bottom  (40px)
+     --rbccm-dc-pt-d / --rbccm-dc-pb-d   desktop padding top / bottom (64px)
+     --rbccm-dc-gap                      gap between cards (24px)
+     --rbccm-dc-logo-h                   logo lockup height (72px)
+   ========================================================================= */
+
+.rbccm-deal-carousel {
+  padding: var(--rbccm-dc-pt-m, 40px) 16px var(--rbccm-dc-pb-m, 40px);
+  /* `background-color`, NOT the `background` shorthand. An author can also set a
+     BackgroundImage, which the XSL writes as an inline `background-image` — and
+     the shorthand would reset that to none wherever it won the cascade. Same
+     trap icon-carousel documents. */
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.rbccm-deal-carousel *,
+.rbccm-deal-carousel *::before,
+.rbccm-deal-carousel *::after {
+  box-sizing: border-box;
+}
+
+/* The content rail. Same two-step as leadership's __inner (1200 base, 1140 at
+   1170+) so this component lines up with the leadership and icon carousels
+   wherever they share a page.
+
+   The ARROWS sit OUTSIDE the rail, in the gutter — the carousel row breaks out
+   with negative side margins equal to one arrow column (44px button + 24px gap
+   = 68px), and only at a width where that gutter exists. Below that they drop
+   to the dots row, so the track always spans the full rail. */
+.rbccm-deal-carousel__inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin: 0 auto;
+  max-width: 1200px;
+  position: relative;
+}
+
+@media (min-width: 1170px) {
+  .rbccm-deal-carousel__inner { max-width: 1140px; }
+}
+
+/* ---- Header ------------------------------------------------------------- */
+/* LEFT-aligned, per the styleguide. The live page centres it via an inline
+   `style="text-align:center"` on both the h2 and the p — the comp does not, so
+   we follow the comp.
+
+   The legacy also had `margin-top: 75px; margin-bottom: 5%` on the wrapper. A
+   percentage margin resolves against the PARENT WIDTH, not height, so that
+   bottom gap grew on wide screens and collapsed on narrow ones. The flex gap
+   replaces it. */
+.rbccm-deal-carousel__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 12px;
+}
+
+.rbccm-deal-carousel__heading {
+  margin: 0;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.rbccm-deal-carousel__intro {
+  margin: 0;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---- Screen-reader-only -------------------------------------------------- */
+/* NOT display:none — that would drop the live region out of the a11y tree. */
+.rbccm-deal-carousel__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Viewport row: [prev] [track] [next] -------------------------------- */
+.rbccm-deal-carousel__viewport-row {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  gap: 24px;
+}
+
+.rbccm-deal-carousel__viewport {
+  flex: 1 1 auto;
+  min-width: 0;   /* lets slick's track shrink inside the flex row */
+}
+
+/* =========================================================================
+   slick overrides
+   ========================================================================= */
+
+.rbccm-deal-carousel__track .slick-list {
+  /* Cancels the per-slide padding below so the first and last cards sit flush
+     with the rail while the cards between them keep their gutter. */
+  margin: 0 calc(var(--rbccm-dc-gap, 24px) / -2);
+}
+
+.rbccm-deal-carousel__track .slick-track {
+  /* slick floats its slides, so they'd collapse to their own content height and
+     the cards would be ragged. Flex + stretch makes every card in a row the
+     same height — which is what the legacy faked with `height: auto` inline
+     styles and never quite got right. */
+  display: flex;
+  align-items: stretch;
+}
+
+.rbccm-deal-carousel__track .slick-slide {
+  height: auto;
+  padding: 0 calc(var(--rbccm-dc-gap, 24px) / 2);
+  float: none;
+}
+
+/* slick sets `display: inline-block` INLINE on every slide child, which beats
+   any class selector. The card must win that fight or it stops being a flex
+   column and the tile collapses. */
+.rbccm-deal-carousel__track .slick-slide > div {
+  display: flex !important;
+  height: 100%;
+}
+
+/* slick-theme adds `margin-bottom: 30px` to any dotted slider; our dots live in
+   our own container, so that's just a stray hole under the row. */
+.rbccm-deal-carousel__track.slick-dotted.slick-slider {
+  margin-bottom: 0;
+}
+
+/* ---- The card ----------------------------------------------------------- */
+/* Figma: 345x429, padding 30, flex column, justify-content: space-between,
+   align-items: flex-start.
+
+   `min-height`, not a fixed 429 — the description is a full sentence and wraps to
+   two or three lines routinely, which would overflow a fixed box. The card still fills the row because slick's track
+   is a stretch flex container, so the tallest card in a page sets the height and
+   the rest match it.
+
+   `display: flex !important` is load-bearing: slick writes an inline
+   `display: inline-block` onto every slide child, and an inline style beats any
+   class selector. Without it the card stops being a flex column and collapses.
+   Same fight leadership-carousel.css picks with slick. */
+.rbccm-deal-carousel__card {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  min-height: 429px;
+  padding: 30px;
+  border: 1px solid var(--Grey-Light, #E3E3E3);
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+/* ---- Card hover / focus (ported from leadership) ------------------------ */
+/* Leadership marks its active card by darkening the border from #A8A8A8 to
+   #003168, and reuses that same darkened border as the FOCUS indicator. Same
+   treatment here, on hover and on focus.
+
+   :focus-within, not :focus — the card is an <article>, not a control, so it
+   never takes focus itself. What takes focus is the Read More link INSIDE it.
+   :focus-within fires for either, in every browser that supports focus events,
+   without depending on :has(). That is exactly the reasoning in
+   leadership-carousel.css, and the same trap: a plain :focus here would appear
+   to work in testing and then never fire for a real keyboard user. */
+.rbccm-deal-carousel__card:hover,
+.rbccm-deal-carousel__card:focus-within {
+  border-color: var(--Blue-Dark-Blue, #003168);
+}
+
+/* Figma: #003168, Roboto 14/400, letter-spacing -0.5px. */
+.rbccm-deal-carousel__date {
+  margin: 0;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.5px;
+}
+
+/* Logo lockup. Figma: height 64.649px, align-self stretch.
+
+   ONE image, always. The comp shows two marks (Woodside Energy + Stonepeak) but
+   that is a single lockup ASSET, not two files composed by the card — the deal
+   DCR has exactly one `thumbnail` field and no second image to give us. So this
+   is a fixed-height box the one image is contained within, left-aligned.
+
+   The box keeps its height whether or not the image fills it, which is what
+   holds the deal value on a common baseline across the row. Without that, a
+   short wordmark and a tall stacked logo would push their values to different
+   heights and the row would look broken. */
+.rbccm-deal-carousel__logos {
+  display: flex;
+  align-items: center;
+  /* CENTRED in the box, both axes. Logo assets have wildly different aspect
+     ratios (a wide wordmark vs a tall stacked mark), so left-aligning them made
+     the row look ragged even though every box was the same size. Centring lets
+     each mark sit in the middle of its own fixed-height slot, which reads as
+     aligned across the row. */
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 65px;
+}
+
+/* `max-*` with `auto` dimensions, so the image is CONTAINED rather than
+   stretched: a wide wordmark hits the width cap, a tall stacked mark hits the
+   height cap, and neither is ever distorted. */
+.rbccm-deal-carousel__logo {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Figma: flex column, height 89px, gap 16, align-self stretch. */
+.rbccm-deal-carousel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+/* Figma: #12223D, Roboto 24/700. */
+.rbccm-deal-carousel__value {
+  margin: 0;
+  color: #12223D;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: normal;
+}
+
+/* Figma: #5C5C5C, Roboto 16/700, line-height 19px.
+   The deal DESCRIPTION, falling back to the title — a full sentence, so it wraps
+   to two or three lines routinely ("Vault Minerals has entered into a binding
+   agreement to merge with Regis Resources to create an $11 billion gold
+   producer."). That is exactly why the card uses min-height rather than the
+   Figma's fixed 429px: a long description must be allowed to push the card
+   taller, and slick's stretch track then levels the whole row to match. */
+.rbccm-deal-carousel__desc {
+  margin: 0;
+  color: #5C5C5C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+}
+
+/* Figma: #0051A5, Roboto 18/400, letter-spacing -0.526px. */
+.rbccm-deal-carousel__role {
+  margin: 0;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.526px;
+}
+
+/* ---- Read More (the conference-insights "3 min read" treatment) ---------
+   Ported from .rbccm-conference-insights-tiles__insight-meta, so the two
+   components read as the same link.
+
+   `inline-flex` + `width: fit-content` is the load-bearing pair: it shrinks the
+   anchor to wrap its own content, so the rule underneath runs the length of the
+   TEXT AND ARROW and no further. As a plain block-level anchor it would be a
+   flex child of the card and stretch to the full 285px column, and the underline
+   would shoot off past the words.
+
+   The line is a transparent `border-bottom` that FADES to currentColor on
+   hover — not a scaling pseudo-element and not a text-decoration. Straight port
+   of insights, so the two links behave identically. A border can fade but it
+   cannot grow (its width is dictated by the box), which is exactly why insights
+   fades it, and why matching insights means matching that too. */
+.rbccm-deal-carousel__readmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.526px;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+/* Intrinsic 4x10, set inline on the element. Only fill and flex-shrink, same as
+   the insights arrow — it does NOT move on hover. */
+.rbccm-deal-carousel__readmore-arrow {
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+/* Hovering ANYWHERE on the card drives the link, not just the link itself — the
+   card border darkens and the rule fades in together, so the tile responds as
+   one target. That is what insights gets for free, because there the whole tile
+   IS the anchor; here the card is an <article>, so the card's :hover has to
+   reach in and do it.
+
+   Gated behind `@media (hover: hover)`, as insights gates its own: on a
+   touchscreen `:hover` sticks after a tap, and the link would be left with its
+   rule showing until you tapped something else. */
+@media (hover: hover) {
+  .rbccm-deal-carousel__readmore:hover,
+  .rbccm-deal-carousel__card:hover .rbccm-deal-carousel__readmore {
+    border-bottom-color: currentColor;
+  }
+}
+
+/* Focus mirrors hover, but OUTSIDE the hover media query — a keyboard user on a
+   touch device still needs to see where they are. */
+.rbccm-deal-carousel__readmore:focus { outline: none; }
+
+.rbccm-deal-carousel__readmore:focus-visible {
+  border-bottom-color: currentColor;
+  /* The rule alone is not a sufficient focus indicator: it is 1px, it is the
+     same colour as the text, and it is also what hover does. Keyboard focus gets
+     a real outline on top, in the #003168 every other focus indicator in this
+     component uses. */
+  outline: 2px solid var(--Blue-Dark-Blue, #003168);
+  outline-offset: 3px;
+}
+
+/* ---- Arrows (ported from leadership) ------------------------------------ */
+.rbccm-deal-carousel__arrow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.rbccm-deal-carousel__arrow svg { display: block; }
+
+.rbccm-deal-carousel__arrow .rbccm-deal-carousel__arrow-icon--mobile  { display: block; }
+.rbccm-deal-carousel__arrow .rbccm-deal-carousel__arrow-icon--desktop { display: none; }
+
+.rbccm-deal-carousel__arrow-icon--desktop rect,
+.rbccm-deal-carousel__arrow-icon--desktop path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.rbccm-deal-carousel__arrow:hover .rbccm-deal-carousel__arrow-icon--desktop rect {
+  fill: #003168;
+}
+
+.rbccm-deal-carousel__arrow:hover .rbccm-deal-carousel__arrow-icon--desktop path {
+  stroke: #ffffff;
+}
+
+.rbccm-deal-carousel__arrow:focus { outline: none; }
+.rbccm-deal-carousel__arrow:focus-visible {
+  outline: 2px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 4px;
+}
+
+.rbccm-deal-carousel__arrow[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rbccm-deal-carousel__arrow[disabled]:hover .rbccm-deal-carousel__arrow-icon--desktop rect { fill: none; }
+.rbccm-deal-carousel__arrow[disabled]:hover .rbccm-deal-carousel__arrow-icon--desktop path { stroke: #003168; }
+
+/* Mobile: arrows sit on the dots row, not beside the track. */
+.rbccm-deal-carousel__viewport-row > .rbccm-deal-carousel__arrow {
+  display: none;
+}
+
+/* ---- Dots (ported from leadership) -------------------------------------- */
+/* Order is pinned with flex `order`, NOT DOM order: slick re-appends its <ul>
+   to this container on every re-init, which would otherwise leave the arrow
+   clones stranded together on one side. */
+.rbccm-deal-carousel__dots {
+  display: flex;
+  /* Centres the arrows against the dot BLOCK, so when the dots wrap to two rows
+     the arrows sit level with the middle of both rows rather than riding up
+     against the first. */
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  /* Never let the row itself push past the rail. */
+  max-width: 100%;
+
+  /* The rail's `gap: 32px` applies UNIFORMLY between every flex child, so it
+     cannot give the dots a different gap from the cards or the CTA. This margin
+     is how the dots row gets its own breathing space on top of that.
+
+     It ADDS to the flex gap rather than replacing it — flex gap and margins do
+     not collapse, unlike ordinary block margins — so the dots end up 38px from
+     the cards and 38px from the CTA, not 6px. Adjust with that in mind. */
+  margin: 6px 0;
+}
+
+.rbccm-deal-carousel__dots [data-clone="prev"] { order: 1; }
+.rbccm-deal-carousel__dots .slick-dots          { order: 2; }
+.rbccm-deal-carousel__dots [data-clone="next"]  { order: 3; }
+
+/* ---- Dot overflow ----
+   One dot per PAGE, and on mobile a page is one card — so fifteen deals means
+   fifteen dots. At 11px plus a 26px gap that is ~540px of dots, which does not
+   fit a 375px phone.
+
+   So the strip WRAPS instead of overflowing. Every deal keeps its dot (they are
+   the firm's credentials; silently hiding some on mobile is not on the table),
+   the row can never spill outside the rail at any deal count, and because the
+   parent centres on the cross axis the arrows stay level with the middle of
+   however many rows result.
+
+   `flex: 0 1 auto` is the load-bearing bit: it lets the strip SHRINK below its
+   content width, which is what forces the wrap. With the default `flex-shrink`
+   on a `width: auto` flex item the ul would happily overhang instead. */
+.rbccm-deal-carousel__dots .slick-dots {
+  display: flex !important;
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 16px 26px;   /* 16px between wrapped rows, 26px between dots */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  bottom: auto !important;
+  width: auto !important;
+  min-width: 0;     /* a flex item will not shrink past its content without this */
+}
+
+.rbccm-deal-carousel__dots .slick-dots li {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 11px !important;
+  height: 11px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+.rbccm-deal-carousel__dots .slick-dots li button {
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  position: static !important;
+  cursor: pointer;
+  outline: none;
+}
+
+/* accessible-slick draws its own glyph in each dot; we draw ours with ::before,
+   so hide theirs or you get two dots stacked. */
+.rbccm-deal-carousel__dots .slick-dots li button .slick-dot-icon {
+  display: none !important;
+}
+
+.rbccm-deal-carousel__dots .slick-dots li button::before {
+  content: '' !important;
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+
+.rbccm-deal-carousel__dots .slick-dots li.slick-active button::before,
+.rbccm-deal-carousel__dots .slick-dots li button:focus-visible::before,
+.rbccm-deal-carousel__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+  outline: 0;
+}
+
+.rbccm-deal-carousel__dots .slick-dots li button:focus-visible { outline: none; }
+
+.rbccm-deal-carousel__dots .rbccm-deal-carousel__arrow { display: flex; }
+
+/* ---- CTA ---------------------------------------------------------------- */
+/* Was a separate rich-text component with an inline `color:#ffffff` on a <span>
+   wrapping the <a>. Now a real button, and optional — no link, no button. */
+.rbccm-deal-carousel__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 24px;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 2px;
+  /* background-color, not the shorthand: the scheme modifiers below override the
+     colour, and a shorthand here would keep resetting what they set. */
+  background-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  /* border-color is in the list because all three schemes now change it on
+     hover. Leaving it out is the classic version of this bug: the fill fades
+     smoothly while the outline snaps. */
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover on the LIGHT (white) section: lighten to the bright blue. The button
+   stays solid and the label stays white, so it reads as the same button, lit.
+
+   It used to fill #ffffff on hover — on a white section. The button all but
+   disappeared into the page, leaving a 1px outline and dark text where a solid
+   blue button had been. Filling white only ever made sense against a colour, and
+   the light scheme is the one place there isn't one. */
+.rbccm-deal-carousel__cta:hover,
+.rbccm-deal-carousel__cta:focus {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  background-color: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.rbccm-deal-carousel__cta:focus { outline: none; }
+.rbccm-deal-carousel__cta:focus-visible {
+  outline: 2px solid var(--Blue-Dark-Blue, #003168);
+  outline-offset: 2px;
+}
+
+/* ---- Single page: no chrome -------------------------------------------- */
+.rbccm-deal-carousel.is-static .rbccm-deal-carousel__arrow,
+.rbccm-deal-carousel.is-static .rbccm-deal-carousel__dots {
+  display: none;
+}
+
+/* ---- Before slick initialises ------------------------------------------ */
+/* Cards are plain divs in a row until slick runs. Stack them so the
+   flash-of-unstyled moment looks like a list, not a broken carousel. */
+.rbccm-deal-carousel__track:not(.slick-initialized) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rbccm-dc-gap, 24px);
+}
+
+/* =========================================================================
+   Tablet — 768px+
+   ========================================================================= */
+@media (min-width: 768px) {
+  .rbccm-deal-carousel {
+    padding: var(--rbccm-dc-pt-d, 64px) 24px var(--rbccm-dc-pb-d, 64px);
+  }
+
+  /* 32px, per the annotated comp: header -> cards -> dots -> CTA are all 32px
+     apart. It was 40px here, which is the sort of value that comes from eyeballing
+     rather than measuring. */
+  .rbccm-deal-carousel__inner { gap: 32px; }
+
+  .rbccm-deal-carousel__heading { font-size: 32px; }
+  .rbccm-deal-carousel__intro   { font-size: 18px; }
+
+  .rbccm-deal-carousel__track:not(.slick-initialized) {
+    flex-direction: row;
+  }
+}
+
+/* =========================================================================
+   Desktop breakout — 1300px+
+   =========================================================================
+   Same technique as leadership (.rbccm-leadership__carousel @1300) and
+   icon-carousel: below this the arrows live on the dots row, because there's no
+   gutter to put them in. At 1300+ the row breaks out of __inner by exactly one
+   arrow column each side (44 + 24 = 68px) and the track holds the full rail.
+
+   `max-width: none` is required — it undoes the rail the row inherits from
+   __inner, which would otherwise clamp the broken-out grid straight back in.
+   ========================================================================= */
+@media (min-width: 1300px) {
+  .rbccm-deal-carousel__viewport-row {
+    display: grid;
+    grid-template-columns: auto 1140px auto;
+    column-gap: 24px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -68px;
+    max-width: none;
+    width: auto;
+  }
+
+  .rbccm-deal-carousel__viewport-row > .rbccm-deal-carousel__arrow { display: flex; }
+  .rbccm-deal-carousel__dots .rbccm-deal-carousel__arrow           { display: none; }
+
+  .rbccm-deal-carousel__arrow .rbccm-deal-carousel__arrow-icon--mobile  { display: none; }
+  .rbccm-deal-carousel__arrow .rbccm-deal-carousel__arrow-icon--desktop { display: block; }
+}
+
+/* =========================================================================
+   Reduced motion
+   ========================================================================= */
+/* The JS also passes speed: 0 to slick, which is what actually stops the
+   animation; this covers any transition slick's own CSS applies. */
+/* =========================================================================
+   Modifier: tinted
+   =========================================================================
+   The "Transaction Section UI" version of the comp — the same section on a pale
+   blue wash instead of white. Set by ColorScheme=tinted.
+
+   This is why ColorScheme here has THREE values where icon-carousel has two.
+   Tinted is not a shade of dark: the cards stay white, the text stays dark blue,
+   and nothing about the chrome flips. It is only the section's backdrop that
+   changes, which is exactly what makes the white cards read as raised off it.
+   Folding it into on-dark would have inverted text that must not invert.
+   ========================================================================= */
+.rbccm-deal-carousel--tinted {
+  background-color: var(--Blue-Light-Blue, #E7EEF1);
+}
+
+/* On a TINTED section the button hovers to TRANSPARENT: the wash shows through
+   and it becomes an outline button. That only works because there IS a colour
+   behind it — which is exactly why the white scheme lightens to #0051A5 instead.
+   Same gesture, opposite mechanics, because the backdrop differs. */
+.rbccm-deal-carousel--tinted .rbccm-deal-carousel__cta:hover,
+.rbccm-deal-carousel--tinted .rbccm-deal-carousel__cta:focus {
+  border-color: var(--Blue-Dark-Blue, #003168);
+  background-color: transparent;
+  color: var(--Blue-Dark-Blue, #003168);
+}
+
+/* =========================================================================
+   Modifier: on-dark
+   =========================================================================
+   Dark blue section, white text and chrome. Ported from icon-carousel and
+   leadership so all three switch schemes identically. Set by ColorScheme=dark,
+   and independent of headings-centered.
+   ========================================================================= */
+.rbccm-deal-carousel--on-dark {
+  background-color: var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__heading,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__intro {
+  color: #ffffff;
+}
+
+/* The CARDS stay white on a dark section — they are tombstones, and a white tile
+   on dark blue is the point. So nothing inside the card flips: the value stays
+   #12223D, the role stays #0051A5, the logo assets stay as supplied. This is the
+   whole reason on-dark is cheap here and expensive in icon-carousel, where the
+   icons sit directly on the section and need a dark artwork variant.
+
+   Only the section CHROME inverts. */
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow-icon--mobile path,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow-icon--desktop rect,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow-icon--desktop path {
+  stroke: #ffffff;
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow:hover .rbccm-deal-carousel__arrow-icon--desktop rect {
+  fill: #ffffff;
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow:hover .rbccm-deal-carousel__arrow-icon--desktop path {
+  stroke: var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow[disabled]:hover .rbccm-deal-carousel__arrow-icon--desktop rect { fill: none; }
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow[disabled]:hover .rbccm-deal-carousel__arrow-icon--desktop path { stroke: #ffffff; }
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__arrow:focus-visible {
+  outline-color: #ffffff;
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__dots .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__dots .slick-dots li.slick-active button::before,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__dots .slick-dots li button:focus-visible::before,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+  box-shadow: 0 0 0 4px #003168, 0 0 0 5px #ffffff !important;
+}
+
+/* The CTA is a solid #003168 button — invisible on a #003168 section. It has to
+   invert, or it disappears entirely. This is the one piece of the dark scheme
+   that is a real bug if you forget it.
+
+   SOLID WHITE at rest, and transparent on hover. Note the order: the resting
+   state had to become solid so that hovering to transparent is a CHANGE. An
+   earlier pass had it transparent at rest, which would have made "hover goes
+   transparent" a no-op — the button would have sat there doing nothing. */
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta {
+  border-color: #ffffff;
+  background-color: #ffffff;
+  color: var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta:hover,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta:focus {
+  border-color: #ffffff;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta:focus-visible {
+  outline-color: #ffffff;
+}
+
+/* =========================================================================
+   Modifier: headings-centered
+   =========================================================================
+   Centres the heading and intro. Works in any colour scheme, so alignment is
+   chosen independently of light/tinted/dark — same as icon-carousel.
+
+   The styleguide comp left-aligns; the live ECM page centres via an inline
+   `style="text-align:center"` on both the h2 and the p. Now it is a Datum
+   instead of hand-typed inline CSS, so the page can have what it already has
+   without anyone editing markup.
+   ========================================================================= */
+.rbccm-deal-carousel--headings-centered .rbccm-deal-carousel__header {
+  align-items: center;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-deal-carousel__track .slick-track {
+    transition: none !important;
+  }
+
+  /* Kill the MOTION, keep the STATE. The link's rule and the card's border still
+     change on hover and focus — they just arrive instantly instead of fading.
+
+     `transition: none` rather than suppressing the effect itself, deliberately:
+     the rule is part of how the link says it is focused, so removing it outright
+     would strip a focus indicator from the very users most likely to be
+     navigating by keyboard. */
+  .rbccm-deal-carousel__readmore,
+  .rbccm-deal-carousel__card {
+    transition: none !important;
+  }
+}

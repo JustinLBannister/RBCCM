@@ -1,0 +1,299 @@
+<!-- ============================================================
+     Deal Carousel (tombstones) — Properties + Data
+     ============================================================
+     Replaces three stacked Teamsite components — a rich-text
+     heading block, the creds-carousel, and a rich-text CTA
+     button — with one component that owns all three.
+
+     DCR-DRIVEN. There are no hand-typed card fields. Each card
+     binds ONE deal DCR (the press_release type) with a
+     Type="DCR" picker, exactly as featured-conferences binds the
+     Events List. The author picks a deal; the card renders from
+     that deal's own fields and stays in sync when it is edited.
+
+     Fields read from the bound DCR (per the datacapture config):
+       date_announced   the deal date  (falls back to publish_date)
+       thumbnail        the logo lockup (ONE image; a multi-brand
+                        lockup is baked into the asset itself)
+       dealvalue        the big number
+       clients          the brand names
+       role             RBC's role
+       transactiontype  the kind of deal
+       link             external URL, if the deal has no page
+
+     Deploy alongside the skin:
+       /assets/rbccm/css/components/deal-carousel.css
+       /assets/rbccm/js/components/deal-carousel.js
+
+     jQuery + slick (accessible-slick) are already site-wide.
+
+     SCHEMA NOTE: only ID, Name, Type are permitted on a Datum,
+     and only ID, Name, Replicatable, CloneGroupID on a Group.
+     MinReplicates and Required are NOT in Teamsite's schema and
+     will fail validation ("Attribute 'MinReplicates' is not
+     allowed to appear in element 'Group'"). Counts and required
+     fields are enforced in the XSL instead.
+     ============================================================ -->
+<Properties ComponentID="deal-carousel-v1">
+
+  <!-- ─── Copy (both optional) ───
+       The XSL drops the whole header block when neither is filled in — no empty
+       <h2>, no empty <p>, and no empty wrapper (which would still be a flex
+       child and leave a phantom gap above the cards). -->
+  <Datum ID="Heading" Type="String" Name="Section Heading (optional)">Proven impact, trusted partnerships</Datum>
+  <Datum ID="Intro" Type="Textarea" Name="Intro / Standfirst (optional)">Explore select recent leading global equity transactions.</Datum>
+
+  <!-- ─── Behaviour ───
+       Cards per page, per breakpoint. Matches the legacy slick config
+       (3 / 2 / 1), but NOT its paging: the legacy showed 3 and scrolled 1, which
+       produced one dot PER DEAL — fifteen dots for fifteen deals. Here a page is
+       a full row, so fifteen deals at 3-up give five dots. -->
+  <Datum ID="PerViewDesktop" Type="Number" Name="Cards per page — desktop (1100px+)">3</Datum>
+  <Datum ID="PerViewTablet"  Type="Number" Name="Cards per page — tablet (768–1099px)">2</Datum>
+  <Datum ID="PerViewMobile"  Type="Number" Name="Cards per page — mobile (under 768px)">1</Datum>
+
+  <!-- Infinite looping. Matches the legacy (infinite: true). -->
+  <Datum ID="Loop" Type="Boolean" Name="Infinite loop (wrap past the ends)">true</Datum>
+
+  <!-- Auto-advance. OFF by default and deliberately so: these are reference
+       tombstones, not a promo unit, and content that moves on its own while
+       someone is reading a deal value is hostile. Respects
+       prefers-reduced-motion and pauses on hover/focus when enabled. -->
+  <Datum ID="Autoplay" Type="Boolean" Name="Auto-advance cards">false</Datum>
+
+  <!-- ═══ WHAT THE CARD SHOWS ═══════════════════════════════════════════════
+       Each line on the card is an independent on/off. Nothing is inferred from
+       what happens to be filled in.
+
+       This replaces an earlier "cascade" that shuffled description, clients,
+       role and transactiontype between two slots depending on which were
+       populated. It was reverse-engineered from the LEGACY creds-carousel, whose
+       markup was hand-typed HTML and therefore evidence of nothing. It produced
+       different cards for different deals with no way to predict which, and no
+       way for an author to override it. Explicit toggles instead.
+
+       A line that is switched ON but whose field is EMPTY renders nothing — no
+       blank paragraph, no phantom gap. So turning everything on is safe: you get
+       whatever that deal actually has.
+
+       Render order under the deal value, top to bottom:
+         Title, Description, Clients   (bold grey, 16/700)
+         Role                          (bright blue, 18/400)
+       ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- The TITLE. On by default, and this is the one that matters against real
+       data: on nearly every live deal the `description` is EMPTY and the `title`
+       carries the sentence ("Vault Minerals has entered into a binding agreement
+       to merge with Regis Resources..."). The production deals component does not
+       read description at all — it renders the title into its `deal-desc` slot.
+       So a card with only description switched on would come up blank on most
+       deals. -->
+  <Datum ID="ShowTitle" Type="Boolean" Name="Show the deal title">true</Datum>
+
+  <!-- The DESCRIPTION. Also on: where an author has bothered to write one, it is
+       better copy than the title.
+
+       If a deal has BOTH, BOTH render, as two lines. That is deliberate and
+       predictable — switch one off if you do not want it. The alternative was to
+       silently pick one, which is exactly the guessing this replaced. -->
+  <Datum ID="ShowDescription" Type="Boolean" Name="Show the deal description">true</Datum>
+
+  <!-- The CLIENT names ("Woodside Energy &amp; Stone Peak"). Off by default because
+       not one deal in the live feed populates it — but the field exists, so the
+       option does too. -->
+  <Datum ID="ShowClients" Type="Boolean" Name="Show the client names">false</Datum>
+
+  <!-- RBC's ROLE ("Exclusive Financial Advisor"). The bright blue line. -->
+  <Datum ID="ShowRole" Type="Boolean" Name="Show RBC's role">true</Datum>
+
+  <!-- ─── Card link ───
+       One label for every card. Blank = no links on any card. The destination
+       comes from each deal DCR (or its per-card override below), so the label is
+       the only thing an author sets here. -->
+  <Datum ID="ReadMoreLabel" Type="String" Name="Card link label (blank = no card links)">Read More</Datum>
+
+  <!-- ─── Where a deal page lives ───
+       A deal with its OWN page stores no URL: the datacapture config makes
+       `content` and `link` mutually exclusive, so filling in the write-up leaves
+       `link` empty. Exactly the deals worth linking to are the ones with nothing
+       to link to.
+
+       So the XSL rebuilds the path from the DCR's own getFilename() rule —
+       base + YYYY / MM / slug(title) + suffix, with the year and month taken
+       from publish_date. No author effort, and it cannot go stale.
+
+       The URL is the DCR's own PATH, with the templatedata prefix swapped for
+       the public base. This is not a guess: it is what the production deals
+       component (the search-driven tombstone grid) already does.
+
+         concat('/en/expertise/transactions/deals/',
+                substring-after(@path, 'templatedata/rbccm/deals/data/'))
+
+       DO NOT rebuild the filename from the title. An earlier version of this
+       component did, faithfully reproducing the DCR's getFilename() rule, and it
+       matched 2 of the 15 deals in the live feed. Titles get edited after
+       creation while the filename stays frozen, filenames get truncated, and
+       some are simply hand typed (a deal titled "Diamondback Energy completes
+       acquisition of Double Eagle" lives at "diamond_deal_tile"). The path must
+       be read, never recomputed.
+
+       Kept as Datums so a routing change stays a config change. -->
+  <Datum ID="DealBaseUrl" Type="String" Name="Deal page base URL">/en/expertise/transactions/deals/</Datum>
+  <Datum ID="DcrPathPrefix" Type="String" Name="Templatedata prefix to strip from the DCR path">templatedata/rbccm/deals/data/</Datum>
+  <Datum ID="DealUrlSuffix" Type="String" Name="Deal page URL suffix (blank = none)"></Datum>
+
+  <!-- ═══ APPEARANCE ═══════════════════════════════════════════════════════
+       Same options as icon-carousel, configured the same way on purpose: an
+       author who has set up one of these components should not have to learn a
+       second vocabulary for the next.
+
+       ColorScheme and HeadingAlignment are INDEPENDENT. Centred headings on a
+       light section, or left-aligned on a tinted one, are both valid.
+       ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- light (default) | tinted | dark
+       Three values, where icon-carousel has two, because the comp ships this
+       section in two flavours that are NOT light-vs-dark:
+
+         light   white section, the styleguide "Wire" version
+         tinted  pale blue wash, the "Transaction Section UI" version
+                 (Blue-Light-Blue, #E7EEF1)
+         dark    dark blue section, white chrome, for parity with the other
+                 carousels
+
+       Tinted is not a shade of dark: the cards stay white and the text stays
+       dark blue, which is precisely what makes the white tombstones read as
+       raised off the wash. Folding it into `dark` would have inverted text that
+       must not invert.
+
+       Parsed case-insensitively, and `light` is the fallback for anything
+       unrecognised — a typo should give you the default section, not a broken
+       one. -->
+  <Datum ID="ColorScheme" Type="String" Name="Color Scheme (light, tinted or dark)">light</Datum>
+
+  <!-- left (default) | center
+       The styleguide comp left-aligns. The LIVE ECM page centres it, using a
+       hand-typed inline style="text-align:center" on both the h2 and the p —
+       which is exactly the sort of thing this component exists to delete. Now
+       it is a Datum. Accepts "center" or "centered", any casing. -->
+  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment (left or center)">left</Datum>
+
+  <!-- Optional background image, layered over the ColorScheme colour. The XSL
+       writes these as inline background-* properties, and the stylesheet sets
+       its colours with `background-color` rather than the `background`
+       shorthand precisely so the two can coexist — the shorthand would reset
+       the image to none. -->
+  <Datum ID="BackgroundImage" Type="Image" Name="Background Image">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position (default: center center)"></Datum>
+  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size (default: cover)"></Datum>
+  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat (default: no-repeat)"></Datum>
+
+  <!-- ─── Accessibility ───
+       RegionLabel is accessible-slick's `regionLabel`. It matters when a page
+       carries more than one carousel: without distinct labels a screen reader
+       announces two identical "region"s and the user cannot tell them apart.
+       Blank falls back to the Section Heading, then to a generic label. -->
+  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank = section heading)"></Datum>
+  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label (override)"></Datum>
+  <Datum ID="InstructionsText" Type="String" Name="Screen-reader Instructions (blank = none)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+
+  <!-- ─── CTA (optional) ───
+       Was a separate rich-text component holding a hand-written <a class="btn">
+       wrapped in a <span style="color:#ffffff">. Now a real Datum-driven button.
+
+       Blank link = NO button at all. The label alone will not render one — a
+       button that goes nowhere is worse than no button. -->
+  <Datum ID="CtaLabel" Type="String" Name="CTA Button Label (blank = no button)">More transactions</Datum>
+  <Datum ID="CtaLink" Type="String" Name="CTA Button Link (blank = no button)">/en/expertise/transactions</Datum>
+  <Datum ID="CtaNewTab" Type="Boolean" Name="Open CTA in a new tab">false</Datum>
+
+  <!-- Analytics hook. The legacy carried data-event-tag="ESG_T1APN1" on the
+       anchor; kept as a Datum so it is not lost, and so a different page can set
+       its own. Blank emits no attribute. -->
+  <Datum ID="CtaEventTag" Type="String" Name="CTA data-event-tag (analytics, optional)"></Datum>
+
+  <!-- ─── Section padding (optional overrides) ───
+       Same pattern as filter-by: blank uses the baked-in default, or supply any
+       CSS length. The XSL writes these as CSS custom properties on the section,
+       so the stylesheet keeps its defaults and an override is a one-Datum change.
+
+       This is what replaces the legacy's inline `margin-top: 75px;
+       margin-bottom: 5%` — a percentage margin resolves against the PARENT
+       WIDTH, not height, so that bottom gap grew on wide screens and collapsed
+       on narrow ones. -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
+</Properties>
+
+<Data>
+
+  <!-- ══ DEAL CARDS ══════════════════════════════════════════════════════
+       One Group per tombstone. Each Group binds ONE deal DCR.
+
+       MINIMUM 1, enforced by the XSL — it renders nothing at all with none.
+       No maximum: slick derives the page and dot count from however many exist.
+
+       A card whose DCR has no dealvalue is skipped and does not count toward the
+       minimum: a tombstone with no number on it is not a tombstone.
+
+       IMPORTANT — Datum @Name attributes MUST match the XSL's @Name selectors.
+       Teamsite strips @ID on replicated Datums, so @Name is the only reliable
+       match inside a Replicatable Group. Keep them plain: no apostrophes (they
+       break the single-quoted XPath), no em-dashes.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <Group ID="Deal"
+         Name="Deal"
+         Replicatable="true"
+         CloneGroupID="deal-carousel-card">
+
+    <!-- The picker. Teamsite fills in the path when the author chooses a deal;
+         the Category and Type below scope WHICH deals they can choose from.
+
+         Same binding featured-conferences uses for its Events List:
+           <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data</DCR>
+
+         Note the asymmetry, because it will bite whoever edits the XSL next: the
+         picker is scoped by the TEMPLATEDATA path (rbccm/deals), but the XML
+         tree it hands back is rooted at the DCR's own root-container element,
+         which the datacapture config names `press_release` — not `deals`. So the
+         XSL selects
+
+           Datum[@Name='Deal Record']/DCR/press_release
+
+         Those two names do not have to agree, and here they do not. -->
+    <Datum ID="DealRecord" Type="DCR" Name="Deal Record">
+      <DCR Category="rbccm" Type="deals">templatedata/rbccm/deals/data</DCR>
+    </Datum>
+
+    <!-- ── PER-CARD OVERRIDES (all optional) ──
+         The DCR is the source of truth. These exist only for the handful of
+         things the DCR genuinely cannot express, and each one is blank by
+         default so the DCR wins unless someone deliberately overrides it. -->
+
+    <!-- The live ECM cards read "October 2024 | NASDAQ". There is NO exchange
+         field anywhere in the deal DCR — that suffix was hand-typed into the old
+         hardcoded carousel markup. Supply it here and it is appended to the
+         date; leave it blank and the card shows the date alone, as the
+         styleguide does. -->
+    <Datum ID="Exchange" Type="String" Name="Exchange suffix (optional, e.g. NASDAQ)"></Datum>
+
+    <!-- The DCR carries `link` only when the deal has NO page of its own (the
+         datacapture config makes content and link mutually exclusive). So a deal
+         written up as a full page has no URL stored anywhere inside itself. Set
+         this to point the card at that page. -->
+    <Datum ID="LinkOverride" Type="String" Name="Card link URL (blank = the deal DCR link field)"></Datum>
+    <Datum ID="LinkNewTab" Type="Boolean" Name="Open card link in a new tab">false</Datum>
+
+  </Group>
+
+</Data>
