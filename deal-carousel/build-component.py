@@ -67,6 +67,28 @@ def main() -> int:
               'XSLT 2.0 rendering mode.', file=sys.stderr)
         return 1
 
+    # Datum NAMES must be plain ASCII: letters, digits and spaces only.
+    #
+    # This is not cosmetic. Teamsite serialises every Datum name into the
+    # propertyTabs form payload, and punctuation in a name breaks the save with a
+    # bare "Error in XMLHttpRequest [500/Internal Server Error]" — no field named,
+    # no clue what went wrong. It only fires once a repeated Group has enough rows
+    # to be worth saving, so it looks like a size limit and is not.
+    #
+    # Apostrophes are doubly fatal: the XSL matches replicated Datums with
+    # @Name='...', a single-quoted XPath string, which an apostrophe terminates.
+    #
+    # We shipped "Show RBC's role" and three em-dashes and it cost an afternoon.
+    names = re.findall(r'<Datum\b[^>]*\bName="([^"]+)"', re.sub(r'<!--.*?-->', '', props, flags=re.S))
+    dirty = [n for n in names if not re.fullmatch(r'[A-Za-z0-9 ]+', n)]
+    if dirty:
+        for n in dirty:
+            junk = ''.join(sorted({c for c in n if not re.match(r'[A-Za-z0-9 ]', c)}))
+            print(f'ERROR: Datum Name="{n}" contains {junk!r}. Names must be letters, '
+                  f'digits and spaces only, or Teamsite 500s on save.', file=sys.stderr)
+        return 1
+    print(f'  OK    all {len(names)} Datum names are plain ASCII')
+
     # Teamsite STRIPS @ID from Datums inside a Replicatable Group, so @Name is the
     # only thing the XSL can match on. That makes a renamed Datum a silent,
     # invisible break: the properties still validate, the XSL still compiles, the

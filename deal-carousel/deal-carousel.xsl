@@ -191,7 +191,7 @@
        then get dropped downstream, leaving a carousel with no cards in it. -->
   <xsl:variable name="liveDeals"
     select="$dealGroups[
-              normalize-space(Datum[@ID='ValueOverride' or @Name='Deal Value (blank = from the deal record)']) != ''
+              normalize-space(Datum[@ID='ValueOverride' or @Name='Deal Value']) != ''
               or normalize-space(
                    Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
                  ) != ''
@@ -609,14 +609,14 @@
                        The @Name fallbacks matter: Teamsite strips @ID on
                        replicated Datums, so inside this Group @Name is the only
                        reliable match. -->
-                  <xsl:variable name="ovTitle"   select="normalize-space(Datum[@ID='TitleOverride'       or @Name='Title (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovDesc"    select="normalize-space(Datum[@ID='DescriptionOverride' or @Name='Description (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovClients" select="normalize-space(Datum[@ID='ClientsOverride'     or @Name='Client names (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovRole"    select="normalize-space(Datum[@ID='RoleOverride'        or @Name='Role (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovValue"   select="normalize-space(Datum[@ID='ValueOverride'       or @Name='Deal Value (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovDate"    select="normalize-space(Datum[@ID='DateOverride'        or @Name='Date (blank = from the deal record)'])"/>
-                  <xsl:variable name="ovLogo"    select="normalize-space(Datum[@ID='LogoOverride'        or @Name='Logo (blank = from the deal record)']/Image/Path)"/>
-                  <xsl:variable name="ovLogoAlt" select="normalize-space(Datum[@ID='LogoAltOverride'     or @Name='Logo alt text (blank = the title)'])"/>
+                  <xsl:variable name="ovTitle"   select="normalize-space(Datum[@ID='TitleOverride'       or @Name='Title'])"/>
+                  <xsl:variable name="ovDesc"    select="normalize-space(Datum[@ID='DescriptionOverride' or @Name='Description'])"/>
+                  <xsl:variable name="ovClients" select="normalize-space(Datum[@ID='ClientsOverride'     or @Name='Client Names'])"/>
+                  <xsl:variable name="ovRole"    select="normalize-space(Datum[@ID='RoleOverride'        or @Name='Role'])"/>
+                  <xsl:variable name="ovValue"   select="normalize-space(Datum[@ID='ValueOverride'       or @Name='Deal Value'])"/>
+                  <xsl:variable name="ovDate"    select="normalize-space(Datum[@ID='DateOverride'        or @Name='Date'])"/>
+                  <xsl:variable name="ovLogo"    select="normalize-space(Datum[@ID='LogoOverride'        or @Name='Logo']/Image/Path)"/>
+                  <xsl:variable name="ovLogoAlt" select="normalize-space(Datum[@ID='LogoAltOverride'     or @Name='Logo Alt Text'])"/>
 
                   <xsl:variable name="dealTitle">
                     <xsl:choose>
@@ -688,7 +688,7 @@
                        NO exchange field anywhere in the deal DCR — that suffix
                        was hand-typed into the old hardcoded carousel markup.
                        Blank leaves the date alone, as the styleguide has it. -->
-                  <xsl:variable name="exchange" select="normalize-space(Datum[@ID='Exchange' or @Name='Exchange suffix (optional, e.g. NASDAQ)'])"/>
+                  <xsl:variable name="exchange" select="normalize-space(Datum[@ID='Exchange' or @Name='Exchange'])"/>
 
                   <xsl:variable name="dateLabel">
                     <xsl:choose>
@@ -754,7 +754,7 @@
                        link in a mutually exclusive container. So a deal written
                        up as a full page stores its own URL nowhere inside
                        itself. The override Datum covers exactly that case. -->
-                  <xsl:variable name="linkOverride" select="normalize-space(Datum[@ID='LinkOverride' or @Name='Card link URL (blank = from the deal record)'])"/>
+                  <xsl:variable name="linkOverride" select="normalize-space(Datum[@ID='LinkOverride' or @Name='Card Link URL'])"/>
 
                   <!-- The deal's own page, MAPPED from its DCR path — read, not
                        recomputed. See the dcr-path template for why recomputing
@@ -830,7 +830,7 @@
                   </xsl:variable>
                   <xsl:variable name="linkNewTab">
                     <xsl:choose>
-                      <xsl:when test="translate(normalize-space(Datum[@ID='LinkNewTab' or @Name='Open card link in a new tab']),
+                      <xsl:when test="translate(normalize-space(Datum[@ID='LinkNewTab' or @Name='Open Card Link In New Tab']),
                                       'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'true'">true</xsl:when>
                       <xsl:otherwise>false</xsl:otherwise>
                     </xsl:choose>
