@@ -1,5 +1,10 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<!-- Declared 2.0 to match the skin's XSLT 2.0 rendering mode (the house setting
+     per the Conference-Insights BRD). Do NOT set this to 1.0: story-tiles v1 did,
+     which forced the 2.0 engine into backwards-compat mode and produced an
+     xs:double vs xs:string type error. The stylesheet/rendering-mode versions
+     must agree. -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: Icon Carousel
        ===================================================================
        Datum-driven replacement for the Bootstrap 3 #ecm-carousel.
@@ -12,9 +17,12 @@
        three .item divs, which is why adding a sector meant rebalancing
        all three by hand.
 
-       Depends on:
+       Deploy alongside this skin:
          /assets/rbccm/css/components/icon-carousel.css
          /assets/rbccm/js/components/icon-carousel.js
+
+       jQuery + slick (accessible-slick build) are already site-wide; the JS
+       loads accessible-slick itself if it isn't present.
        =================================================================== -->
 
   <!-- HTML output, as filter-by / conference-insights-tiles / story-tiles all
@@ -22,7 +30,7 @@
        `&amp;&amp;` inside the inlined <script> — in HTML, script content is CDATA and
        is emitted raw. Without it the browser would receive literal &lt; in the
        JS and throw a SyntaxError. -->
-  <xsl:output method="html" indent="no"/>
+  <xsl:output method="html" indent="no" encoding="UTF-8"/>
 
   <xsl:strip-space elements="*"/>
 
