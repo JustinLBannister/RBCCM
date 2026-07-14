@@ -102,13 +102,15 @@
            because it's what fills the short final slide. -->
       <xsl:variable name="loop">
         <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='Loop']) = 'false'">false</xsl:when>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='Loop']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'false'">false</xsl:when>
           <xsl:otherwise>true</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="autoplay">
         <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='Autoplay']) = 'true'">true</xsl:when>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='Autoplay']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'true'">true</xsl:when>
           <xsl:otherwise>false</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -171,26 +173,43 @@
 
            ColorScheme and HeadingAlignment are independent — centred headings
            on a light section, or left-aligned on a dark one, are both valid. -->
+      <!-- Case-insensitive: a free-text Datum will get "Dark" sooner or later,
+           and an exact match would silently fall back to light with no error. -->
       <xsl:variable name="colorScheme">
         <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='ColorScheme']) = 'dark'">dark</xsl:when>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='ColorScheme']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'">dark</xsl:when>
           <xsl:otherwise>light</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
+      <!-- Accepts center / centered, any casing — same reasoning as ItemAlignment. -->
+      <xsl:variable name="headingAlignRaw" select="translate(normalize-space(/Properties/Datum[@ID='HeadingAlignment']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
       <xsl:variable name="headingAlignment">
         <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='HeadingAlignment']) = 'center'">center</xsl:when>
+          <xsl:when test="$headingAlignRaw = 'center' or $headingAlignRaw = 'centered'">center</xsl:when>
           <xsl:otherwise>left</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
       <!-- Item layout: 'inline' (icon beside label, per the Figma comp) or
-           'centered' (icon above label, both centred). Anything unrecognised
-           falls back to inline. -->
+           'centered' (icon above label, both centred).
+
+           Accepts "center" AND "centered", any casing. This is deliberately
+           forgiving: HeadingAlignment right above it takes "center", so an
+           author will reasonably type "center" here too — and an exact-match
+           test on "centered" would then silently do nothing, with no error to
+           explain why. A free-text Datum has to tolerate the obvious spelling.
+
+           Anything else falls back to inline. -->
+      <xsl:variable name="itemAlignRaw"
+        select="translate(normalize-space(/Properties/Datum[@ID='ItemAlignment']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+
       <xsl:variable name="itemAlignment">
         <xsl:choose>
-          <xsl:when test="normalize-space(/Properties/Datum[@ID='ItemAlignment']) = 'centered'">centered</xsl:when>
+          <xsl:when test="$itemAlignRaw = 'centered' or $itemAlignRaw = 'center'">centered</xsl:when>
           <xsl:otherwise>inline</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -537,7 +556,11 @@
        default absorbs long labels far more gracefully.
 
        Independent of ColorScheme and HeadingAlignment; any combination is
-       valid. Applies at every breakpoint, including the mobile stack. -->
+       valid. Applies at every breakpoint, including the mobile stack.
+
+       Accepts "centered" or "center", any casing — HeadingAlignment above uses
+       "center", so both spellings work here rather than one silently doing
+       nothing. Same tolerance applies to ColorScheme (dark) and the booleans. -->
   <Datum ID="ItemAlignment" Type="String" Name="Item Layout (inline or centered)">inline</Datum>
 
   <!-- Background image (optional). Layers over the section's background
