@@ -122,8 +122,34 @@
       <link rel="stylesheet" href="/assets/rbccm/css/components/secondary-nav.css"/>
 
 
+      <!-- ── Top border ──
+           The nav carries a 10px yellow rule along its top edge. On a page whose
+           HERO already ends in a border-bottom, that reads as a doubled line.
+           This switches ours off so the hero's own edge does the work.
+
+           Default TRUE: the rule is part of the component's identity, and every
+           page that has it today must keep it.
+
+           Case-insensitive via translate(), because this stylesheet is XSLT 1.0
+           (no lower-case()) and a free-text Boolean Datum will get "False" sooner
+           or later. Only an explicit false switches it off — anything
+           unrecognised keeps the border, so a typo cannot silently strip it. -->
+      <xsl:variable name="showBorderTop">
+        <xsl:choose>
+          <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='ShowBorderTop']),
+                          'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'false'">false</xsl:when>
+          <xsl:otherwise>true</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <!-- ── Component markup ── -->
-      <nav class="secondary-nav">
+      <nav>
+        <xsl:attribute name="class">
+          <xsl:text>secondary-nav</xsl:text>
+          <xsl:if test="$showBorderTop = 'false'">
+            <xsl:text> secondary-nav--no-border-top</xsl:text>
+          </xsl:if>
+        </xsl:attribute>
         <xsl:attribute name="aria-label"><xsl:value-of select="$navAriaLabel"/></xsl:attribute>
 
         <div class="secondary-nav__inner">
@@ -233,6 +259,15 @@
        Blank = locale-appropriate default. Populate individual
        overrides for one-off wording that differs from the standard
        translation. -->
+  <!-- ─── Top border ───
+       The nav has a 10px yellow rule on its top edge. Switch it OFF on pages
+       whose hero already ends in a border-bottom, where the two stack up and
+       read as one doubled line.
+
+       Defaults to true: every page using this component today has the rule, and
+       a blank Datum must not silently remove it. -->
+  <Datum ID="ShowBorderTop" Type="Boolean" Name="Show Top Border (off if the hero already has a bottom border)">true</Datum>
+
   <Datum ID="NavAriaLabel"       Type="String" Name="Nav Aria Label (override)"></Datum>
   <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
   <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>

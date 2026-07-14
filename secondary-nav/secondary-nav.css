@@ -23,6 +23,19 @@ html {
   position: relative;
 }
 
+/* -- Modifier: no top border --------------------------------------
+   Set by ShowBorderTop=false in the DCR. For pages whose HERO already
+   ends in a border-bottom: ours sits directly beneath it and the two
+   read as a single doubled rule.
+
+   `border-top: 0`, not `border-top-color: transparent` — a transparent
+   border still occupies 10px, so the nav would keep the gap and only
+   lose the colour, which looks like a rendering bug rather than a
+   choice. Removing the border removes the space with it. */
+.secondary-nav--no-border-top {
+  border-top: 0;
+}
+
 /* Inner row hosts prev arrow · wrapper · next arrow in a horizontal
    flex track. Kept separate from `.secondary-nav` so the progress
    bar can sit as a full-width sibling below. */
