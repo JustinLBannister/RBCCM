@@ -256,8 +256,10 @@
          Replicatable="true"
          CloneGroupID="deal-carousel-card">
 
-    <!-- The picker. Teamsite fills in the path when the author chooses a deal;
-         the Category and Type below scope WHICH deals they can choose from.
+    <!-- The picker. OPTIONAL — leave it empty and type the fields by hand below.
+
+         Teamsite fills in the path when the author chooses a deal; the Category
+         and Type below scope WHICH deals they can choose from.
 
          Same binding featured-conferences uses for its Events List:
            <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data</DCR>
@@ -275,23 +277,79 @@
       <DCR Category="rbccm" Type="deals">templatedata/rbccm/deals/data</DCR>
     </Datum>
 
-    <!-- ── PER-CARD OVERRIDES (all optional) ──
-         The DCR is the source of truth. These exist only for the handful of
-         things the DCR genuinely cannot express, and each one is blank by
-         default so the DCR wins unless someone deliberately overrides it. -->
+    <!-- ══ PER-CARD OVERRIDES ══════════════════════════════════════════════
+         EVERY field on the card can be typed in by hand here.
 
-    <!-- The live ECM cards read "October 2024 | NASDAQ". There is NO exchange
-         field anywhere in the deal DCR — that suffix was hand-typed into the old
-         hardcoded carousel markup. Supply it here and it is appended to the
-         date; leave it blank and the card shows the date alone, as the
-         styleguide does. -->
+         Each one is BLANK by default, and blank means "use the bound deal
+         record". So a card can be:
+
+           fully DCR-driven   pick a deal, fill in nothing. Everything comes
+                              from the record and stays in sync when it is edited.
+           fully MANUAL       leave the picker empty, type all the fields. Use
+                              this for a deal that has no record, or when the
+                              record does not carry what the carousel needs.
+           MIXED              pick a deal and override the one or two fields that
+                              are wrong or missing.
+
+         An override always wins over the record. It never merges.
+
+         NOTE: a manual card needs a Deal Value (below) and nothing else — that
+         is the one field the XSL treats as "is this a real card". Everything
+         else renders only if present.
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- ── The date ──
+         Free text, used VERBATIM. The record's date is YYYY-MM-DD and the XSL
+         turns it into "May 2026"; this bypasses that entirely, so type exactly
+         what should appear ("May 2026", "Q2 2026", whatever). -->
+    <Datum ID="DateOverride" Type="String" Name="Date (blank = from the deal record)"></Datum>
+
+    <!-- Appended to the date as "October 2024 | NASDAQ". There is NO exchange
+         field anywhere in the deal record — that suffix was hand-typed into the
+         old hardcoded carousel markup, which is why it can only ever be typed
+         here. Blank shows the date alone, as the styleguide card does. -->
     <Datum ID="Exchange" Type="String" Name="Exchange suffix (optional, e.g. NASDAQ)"></Datum>
 
-    <!-- The DCR carries `link` only when the deal has NO page of its own (the
-         datacapture config makes content and link mutually exclusive). So a deal
-         written up as a full page has no URL stored anywhere inside itself. Set
-         this to point the card at that page. -->
-    <Datum ID="LinkOverride" Type="String" Name="Card link URL (blank = the deal DCR link field)"></Datum>
+    <!-- ── The logo ──
+         The nested <Image> skeleton is REQUIRED and must be left EMPTY. Putting
+         a default path in it is what made past-speakers-attendees fail
+         validation with "Datum ID=[Image] Value is not a valid image". -->
+    <Datum ID="LogoOverride" Type="Image" Name="Logo (blank = from the deal record)">
+      <Image>
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+
+    <!-- The logo's alt text. Blank falls back to the title, which is what names
+         the deal for a screen-reader user. The legacy hardcoded aria-label="SMS
+         Logo" on every logo on every card, so fifteen different companies were
+         all announced as "SMS Logo". -->
+    <Datum ID="LogoAltOverride" Type="String" Name="Logo alt text (blank = the title)"></Datum>
+
+    <!-- ── The body ──
+         Deal Value is the big number, and it is the ONE field that makes a card
+         a card. A card with no value here AND no value on its record is dropped
+         entirely: a tombstone with no number on it is not a tombstone. -->
+    <Datum ID="ValueOverride" Type="String" Name="Deal Value (blank = from the deal record)"></Datum>
+
+    <!-- The bold grey lines. Which of these actually render is controlled by the
+         Show Title / Show Description / Show Clients switches above; these only
+         change WHAT they say. -->
+    <Datum ID="TitleOverride" Type="String" Name="Title (blank = from the deal record)"></Datum>
+    <Datum ID="DescriptionOverride" Type="Textarea" Name="Description (blank = from the deal record)"></Datum>
+    <Datum ID="ClientsOverride" Type="String" Name="Client names (blank = from the deal record)"></Datum>
+
+    <!-- The bright blue line. -->
+    <Datum ID="RoleOverride" Type="String" Name="Role (blank = from the deal record)"></Datum>
+
+    <!-- ── The link ──
+         Blank resolves, in order: the record's own `link` field (set only when
+         the deal points somewhere EXTERNAL), then the deal's own page, mapped
+         from its DCR path. Set this to override both. A manual card with no
+         record has nothing to fall back on, so it needs this or it renders no
+         link at all. -->
+    <Datum ID="LinkOverride" Type="String" Name="Card link URL (blank = from the deal record)"></Datum>
     <Datum ID="LinkNewTab" Type="Boolean" Name="Open card link in a new tab">false</Datum>
 
   </Group>

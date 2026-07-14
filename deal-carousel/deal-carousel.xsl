@@ -177,17 +177,25 @@
     select="/Properties/Data/Group[@ID='Deal' or @Name='Deal']
           | /Data/Group[@ID='Deal' or @Name='Deal']"/>
 
-  <!-- Only the Groups that will ACTUALLY RENDER: picker filled in, and the bound
-       DCR carries a deal value. A tombstone with no number on it is not a
-       tombstone.
+  <!-- Only the Groups that will ACTUALLY RENDER.
 
-       The guard has to use exactly the same test the render loop does. Counting
-       raw Groups instead would let an empty row satisfy the minimum and then get
-       dropped downstream, leaving a carousel with no cards in it. -->
+       A card is real if it has a DEAL VALUE — from its own override OR from a
+       bound record. That is the one field that makes a tombstone a tombstone.
+
+       BOTH halves of that test are load-bearing. Checking only the record would
+       silently drop every hand-authored card, which is the whole point of the
+       overrides. Checking only the override would drop every DCR-driven one.
+
+       And the guard has to use exactly the same test the render loop does:
+       counting raw Groups instead would let an empty row satisfy the minimum and
+       then get dropped downstream, leaving a carousel with no cards in it. -->
   <xsl:variable name="liveDeals"
-    select="$dealGroups[normalize-space(
-              Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
-            ) != '']"/>
+    select="$dealGroups[
+              normalize-space(Datum[@ID='ValueOverride' or @Name='Deal Value (blank = from the deal record)']) != ''
+              or normalize-space(
+                   Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
+                 ) != ''
+            ]"/>
 
   <xsl:template match="/">
 
@@ -588,10 +596,58 @@
                        description when an author has bothered to write one.
 
                        `clients` and `transactiontype` do NOT appear on this card. -->
-                  <xsl:variable name="dealTitle" select="normalize-space($dcr/title)"/>
-                  <xsl:variable name="dealDesc"  select="normalize-space($dcr/description)"/>
-                  <xsl:variable name="clients"   select="normalize-space($dcr/clients)"/>
-                  <xsl:variable name="role"      select="normalize-space($dcr/role)"/>
+                  <!-- ══ OVERRIDE, THEN RECORD ══
+                       Every field on the card resolves the same way: a per-card
+                       override wins, otherwise the bound record supplies it. A
+                       blank override is not an override.
+
+                       This is what lets one carousel mix DCR-driven cards with
+                       hand-authored ones, and lets a DCR-driven card have a
+                       single wrong field corrected without abandoning the record
+                       for the other six.
+
+                       The @Name fallbacks matter: Teamsite strips @ID on
+                       replicated Datums, so inside this Group @Name is the only
+                       reliable match. -->
+                  <xsl:variable name="ovTitle"   select="normalize-space(Datum[@ID='TitleOverride'       or @Name='Title (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovDesc"    select="normalize-space(Datum[@ID='DescriptionOverride' or @Name='Description (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovClients" select="normalize-space(Datum[@ID='ClientsOverride'     or @Name='Client names (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovRole"    select="normalize-space(Datum[@ID='RoleOverride'        or @Name='Role (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovValue"   select="normalize-space(Datum[@ID='ValueOverride'       or @Name='Deal Value (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovDate"    select="normalize-space(Datum[@ID='DateOverride'        or @Name='Date (blank = from the deal record)'])"/>
+                  <xsl:variable name="ovLogo"    select="normalize-space(Datum[@ID='LogoOverride'        or @Name='Logo (blank = from the deal record)']/Image/Path)"/>
+                  <xsl:variable name="ovLogoAlt" select="normalize-space(Datum[@ID='LogoAltOverride'     or @Name='Logo alt text (blank = the title)'])"/>
+
+                  <xsl:variable name="dealTitle">
+                    <xsl:choose>
+                      <xsl:when test="$ovTitle != ''"><xsl:value-of select="$ovTitle"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/title)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="dealDesc">
+                    <xsl:choose>
+                      <xsl:when test="$ovDesc != ''"><xsl:value-of select="$ovDesc"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/description)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="clients">
+                    <xsl:choose>
+                      <xsl:when test="$ovClients != ''"><xsl:value-of select="$ovClients"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/clients)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="role">
+                    <xsl:choose>
+                      <xsl:when test="$ovRole != ''"><xsl:value-of select="$ovRole"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/role)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="dealValue">
+                    <xsl:choose>
+                      <xsl:when test="$ovValue != ''"><xsl:value-of select="$ovValue"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/dealvalue)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
 
                   <!-- ══ DATE ══
                        date_announced is the DEAL date ("Date Announced /
@@ -636,6 +692,11 @@
 
                   <xsl:variable name="dateLabel">
                     <xsl:choose>
+                      <!-- An override is used VERBATIM — no month lookup, no
+                           reformatting. Someone typing "Q2 2026" or "Spring 2026"
+                           means it, and running it through a YYYY-MM-DD parser
+                           would mangle it. -->
+                      <xsl:when test="$ovDate != ''"><xsl:value-of select="$ovDate"/></xsl:when>
                       <!-- A parseable YYYY-MM-DD becomes "October 2024". -->
                       <xsl:when test="$monthName != '' and $yyyy != ''">
                         <xsl:value-of select="$monthName"/><xsl:text> </xsl:text><xsl:value-of select="$yyyy"/>
@@ -660,17 +721,30 @@
                        aria-label="SMS Logo" on every logo on every card, so
                        fifteen different companies were all announced as "SMS
                        Logo". -->
-                  <xsl:variable name="logo" select="normalize-space($dcr/thumbnail)"/>
-                  <!-- The TITLE, matching what production puts on the logo's
-                       aria-label. It names the deal, which is the only useful
-                       thing to say about a mark a screen-reader user cannot see.
+                  <xsl:variable name="logo">
+                    <xsl:choose>
+                      <xsl:when test="$ovLogo != ''"><xsl:value-of select="$ovLogo"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/thumbnail)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <!-- Falls back to the TITLE, matching what production puts on
+                       the logo's aria-label. It names the deal, which is the only
+                       useful thing to say about a mark a screen-reader user
+                       cannot see.
 
                        Decoded, because this lands in an ATTRIBUTE and the title
                        is escaped at save time — a deal titled "Acme Corp. IPO"
                        would otherwise announce as "Acme Corp&period; IPO". -->
+                  <xsl:variable name="logoAltRaw">
+                    <xsl:choose>
+                      <xsl:when test="$ovLogoAlt != ''"><xsl:value-of select="$ovLogoAlt"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dealTitle"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
                   <xsl:variable name="logoAlt">
                     <xsl:call-template name="decode">
-                      <xsl:with-param name="s" select="normalize-space($dcr/title)"/>
+                      <xsl:with-param name="s" select="$logoAltRaw"/>
                     </xsl:call-template>
                   </xsl:variable>
 
@@ -680,7 +754,7 @@
                        link in a mutually exclusive container. So a deal written
                        up as a full page stores its own URL nowhere inside
                        itself. The override Datum covers exactly that case. -->
-                  <xsl:variable name="linkOverride" select="normalize-space(Datum[@ID='LinkOverride' or @Name='Card link URL (blank = the deal DCR link field)'])"/>
+                  <xsl:variable name="linkOverride" select="normalize-space(Datum[@ID='LinkOverride' or @Name='Card link URL (blank = from the deal record)'])"/>
 
                   <!-- The deal's own page, MAPPED from its DCR path — read, not
                        recomputed. See the dcr-path template for why recomputing
@@ -784,7 +858,7 @@
                              been wrong in both directions. -->
                         <p class="rbccm-deal-carousel__value">
                           <xsl:call-template name="decode">
-                            <xsl:with-param name="s" select="normalize-space($dcr/dealvalue)"/>
+                            <xsl:with-param name="s" select="$dealValue"/>
                           </xsl:call-template>
                         </p>
 

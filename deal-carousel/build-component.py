@@ -67,6 +67,35 @@ def main() -> int:
               'XSLT 2.0 rendering mode.', file=sys.stderr)
         return 1
 
+    # Teamsite STRIPS @ID from Datums inside a Replicatable Group, so @Name is the
+    # only thing the XSL can match on. That makes a renamed Datum a silent,
+    # invisible break: the properties still validate, the XSL still compiles, the
+    # card just quietly loses that field in production and nowhere else.
+    #
+    # Already happened once — "Card link URL (blank = the deal DCR link field)"
+    # was renamed in the properties and the XSL kept matching the old string, so
+    # every hand-authored card silently lost its link.
+    #
+    # So: every @Name declared inside the repeatable Group must be matched
+    # somewhere in the XSL, and vice versa.
+    grp = re.search(r'<Group\b[^>]*>(.*?)</Group>', props, re.S)
+    if grp:
+        declared = set(re.findall(r'<Datum\b[^>]*\bName="([^"]+)"', grp.group(1)))
+        matched  = set(re.findall(r"@Name='([^']+)'", xsl))
+        orphaned = sorted(n for n in declared if n not in matched)
+        phantom  = sorted(n for n in matched if n not in declared
+                          and n not in {'Deal'})   # the Group's own name
+        if orphaned or phantom:
+            for n in orphaned:
+                print(f'ERROR: Datum Name="{n}" is declared in the Group but the XSL '
+                      f'never matches it. Teamsite strips @ID on replicated Datums, '
+                      f'so this field will silently render nothing.', file=sys.stderr)
+            for n in phantom:
+                print(f'ERROR: XSL matches @Name=\'{n}\' but no such Datum is declared '
+                      f'in the Group. Renamed and not updated?', file=sys.stderr)
+            return 1
+        print(f'  OK    all {len(declared)} replicated Datum names match the XSL')
+
     # --- 1. asset tags ---------------------------------------------------------
     # The XSL emits its own <link> and <script src> inside the guarded xsl:if, so
     # they are only written when the component actually renders — an empty
