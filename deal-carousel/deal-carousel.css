@@ -15,7 +15,7 @@
    ----------------------------------------------------
      --rbccm-dc-pt-m / --rbccm-dc-pb-m   mobile padding top / bottom  (40px)
      --rbccm-dc-pt-d / --rbccm-dc-pb-d   desktop padding top / bottom (64px)
-     --rbccm-dc-gap                      gap between cards (24px)
+     --rbccm-dc-gap                      gap between cards (32px, per the comp)
      --rbccm-dc-logo-h                   logo lockup height (72px)
    ========================================================================= */
 
@@ -126,7 +126,7 @@
 .rbccm-deal-carousel__track .slick-list {
   /* Cancels the per-slide padding below so the first and last cards sit flush
      with the rail while the cards between them keep their gutter. */
-  margin: 0 calc(var(--rbccm-dc-gap, 24px) / -2);
+  margin: 0 calc(var(--rbccm-dc-gap, 32px) / -2);
 }
 
 .rbccm-deal-carousel__track .slick-track {
@@ -140,7 +140,7 @@
 
 .rbccm-deal-carousel__track .slick-slide {
   height: auto;
-  padding: 0 calc(var(--rbccm-dc-gap, 24px) / 2);
+  padding: 0 calc(var(--rbccm-dc-gap, 32px) / 2);
   float: none;
 }
 
@@ -552,10 +552,49 @@
   font-weight: 500;
   line-height: 1.2;
   text-decoration: none;
+  /* NOTE: the `color` above is DEAD on the live site. See the :link/:visited rule
+     below, which is the one that actually applies. Kept here so the button is
+     still white in isolation (the local test, a styleguide page). */
   /* border-color is in the list because all three schemes now change it on
      hover. Leaving it out is the classic version of this bug: the fill fades
      smoothly while the outline snaps. */
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* ---- Beating unified2.css -----------------------------------------------
+   The site's global stylesheet has:
+
+     a:link, a:visited { color: #006ac3; }          specificity (0,1,1)
+
+   and our button is:
+
+     .rbccm-deal-carousel__cta { color: #fff; }     specificity (0,1,0)
+
+   One class loses to one class-plus-element. It does not matter which file loads
+   last — (0,1,1) beats (0,1,0) outright, so the CTA and the Read More link both
+   come out RBC's global link blue instead of the colour we set.
+
+   The fix is specificity, NOT !important. Adding :link/:visited to our own
+   selector makes it (0,2,0), which beats (0,1,1) cleanly and leaves the cascade
+   intact. Reaching for !important here would win the base state and then force
+   !important onto every hover, focus and colour-scheme override that follows —
+   an arms race, in a file that has three colour schemes.
+
+   Every anchor in this component needs it, not just the CTA. */
+.rbccm-deal-carousel__cta:link,
+.rbccm-deal-carousel__cta:visited {
+  color: #ffffff;
+}
+
+.rbccm-deal-carousel__readmore:link,
+.rbccm-deal-carousel__readmore:visited {
+  color: var(--Blue-Bright-Blue, #0051A5);
+}
+
+/* The scheme overrides need the same treatment, for the same reason. */
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta:link,
+.rbccm-deal-carousel--on-dark .rbccm-deal-carousel__cta:visited {
+  color: var(--Blue-Dark-Blue, #003168);
 }
 
 /* Hover on the LIGHT (white) section: lighten to the bright blue. The button
@@ -591,7 +630,7 @@
 .rbccm-deal-carousel__track:not(.slick-initialized) {
   display: flex;
   flex-direction: column;
-  gap: var(--rbccm-dc-gap, 24px);
+  gap: var(--rbccm-dc-gap, 32px);
 }
 
 /* =========================================================================
