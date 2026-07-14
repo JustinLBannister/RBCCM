@@ -40,26 +40,26 @@
        The XSL drops the whole header block when neither is filled in — no empty
        <h2>, no empty <p>, and no empty wrapper (which would still be a flex
        child and leave a phantom gap above the cards). -->
-  <Datum ID="Heading" Type="String" Name="Section Heading">Proven impact, trusted partnerships</Datum>
-  <Datum ID="Intro" Type="Textarea" Name="Intro Text">Explore select recent leading global equity transactions.</Datum>
+  <Datum ID="Heading" Type="String" Name="Section Heading (optional)">Proven impact, trusted partnerships</Datum>
+  <Datum ID="Intro" Type="Textarea" Name="Intro Text (optional)">Explore select recent leading global equity transactions.</Datum>
 
   <!-- ─── Behaviour ───
        Cards per page, per breakpoint. Matches the legacy slick config
        (3 / 2 / 1), but NOT its paging: the legacy showed 3 and scrolled 1, which
        produced one dot PER DEAL — fifteen dots for fifteen deals. Here a page is
        a full row, so fifteen deals at 3-up give five dots. -->
-  <Datum ID="PerViewDesktop" Type="Number" Name="Cards Per Page Desktop">3</Datum>
-  <Datum ID="PerViewTablet"  Type="Number" Name="Cards Per Page Tablet">2</Datum>
-  <Datum ID="PerViewMobile"  Type="Number" Name="Cards Per Page Mobile">1</Datum>
+  <Datum ID="PerViewDesktop" Type="Number" Name="Cards Per Page: Desktop (1100px and up)">3</Datum>
+  <Datum ID="PerViewTablet"  Type="Number" Name="Cards Per Page: Tablet (768 to 1099px)">2</Datum>
+  <Datum ID="PerViewMobile"  Type="Number" Name="Cards Per Page: Mobile (under 768px)">1</Datum>
 
   <!-- Infinite looping. Matches the legacy (infinite: true). -->
-  <Datum ID="Loop" Type="Boolean" Name="Infinite Loop">true</Datum>
+  <Datum ID="Loop" Type="Boolean" Name="Infinite Loop (wrap past the ends)">true</Datum>
 
   <!-- Auto-advance. OFF by default and deliberately so: these are reference
        tombstones, not a promo unit, and content that moves on its own while
        someone is reading a deal value is hostile. Respects
        prefers-reduced-motion and pauses on hover/focus when enabled. -->
-  <Datum ID="Autoplay" Type="Boolean" Name="Autoplay">false</Datum>
+  <Datum ID="Autoplay" Type="Boolean" Name="Autoplay (auto advance cards)">false</Datum>
 
   <!-- ═══ WHAT THE CARD SHOWS ═══════════════════════════════════════════════
        Each line on the card is an independent on/off. Nothing is inferred from
@@ -88,7 +88,7 @@
        read description at all — it renders the title into its `deal-desc` slot.
        So a card with only description switched on would come up blank on most
        deals. -->
-  <Datum ID="ShowTitle" Type="Boolean" Name="Show Title">true</Datum>
+  <Datum ID="ShowTitle" Type="Boolean" Name="Show Title (the deal headline)">true</Datum>
 
   <!-- The DESCRIPTION. Also on: where an author has bothered to write one, it is
        better copy than the title.
@@ -96,21 +96,62 @@
        If a deal has BOTH, BOTH render, as two lines. That is deliberate and
        predictable — switch one off if you do not want it. The alternative was to
        silently pick one, which is exactly the guessing this replaced. -->
-  <Datum ID="ShowDescription" Type="Boolean" Name="Show Description">true</Datum>
+  <Datum ID="ShowDescription" Type="Boolean" Name="Show Description (often blank on real deals)">true</Datum>
 
   <!-- The CLIENT names ("Woodside Energy &amp; Stone Peak"). Off by default because
        not one deal in the live feed populates it — but the field exists, so the
        option does too. -->
-  <Datum ID="ShowClients" Type="Boolean" Name="Show Clients">false</Datum>
+  <Datum ID="ShowClients" Type="Boolean" Name="Show Clients (the client names)">false</Datum>
 
   <!-- RBC's ROLE ("Exclusive Financial Advisor"). The bright blue line. -->
-  <Datum ID="ShowRole" Type="Boolean" Name="Show Role">true</Datum>
+  <Datum ID="ShowRole" Type="Boolean" Name="Show Role (the blue line)">true</Datum>
+
+  <!-- ═══ RAW CARDS HTML: THE ESCAPE HATCH ══════════════════════════════════
+       Paste the cards markup here and it REPLACES the whole track. The deal
+       records, the per-card overrides and every Show switch are ignored.
+
+       Blank means "build the cards from the deal records", which is the normal
+       path and what this component is for. This exists for the case the records
+       cannot express: a deal with no record, copy that has to read a specific
+       way, a one-off section that has to match a comp exactly.
+
+       WHAT TO PASTE: one block per card, exactly this shape.
+
+         <div class="rbccm-deal-carousel__slide">
+           <article class="rbccm-deal-carousel__card">
+             <p class="rbccm-deal-carousel__date">March 2025 | NYSE</p>
+             <div class="rbccm-deal-carousel__logos">
+               <img class="rbccm-deal-carousel__logo"
+                    src="/assets/rbccm/images/deals/gfl.svg"
+                    alt="GFL Environmental" loading="lazy">
+             </div>
+             <div class="rbccm-deal-carousel__content">
+               <p class="rbccm-deal-carousel__value">&#36;900 million</p>
+               <p class="rbccm-deal-carousel__desc">Sole Underwriter</p>
+             </div>
+             <p class="rbccm-deal-carousel__role">Block Trade</p>
+           </article>
+         </div>
+
+       The JS finds the slides by class and needs nothing else. Arrows, dots, the
+       heading and the CTA are still built by the component, so only the SLIDES go
+       in here.
+
+       THE ONE REAL RISK: if this field is edited through the WYSIWYG rather than
+       its source or code view, TinyMCE will rewrite the markup. It wraps loose
+       content in <p>, strips attributes it does not recognise, and can reorder
+       things. A <p> wrapped around the slides breaks slick, because slick expects
+       the slides to be the DIRECT children of the track. Always edit this in the
+       SOURCE view. -->
+  <Datum ID="CardsHtml" Type="Textarea" Name="Cards HTML (blank means build cards from the deal records)"></Datum>
 
   <!-- ─── Card link ───
        One label for every card. Blank = no links on any card. The destination
        comes from each deal DCR (or its per-card override below), so the label is
-       the only thing an author sets here. -->
-  <Datum ID="ReadMoreLabel" Type="String" Name="Card Link Label">Read More</Datum>
+       the only thing an author sets here.
+
+       Ignored when Cards HTML is used: that markup carries its own links. -->
+  <Datum ID="ReadMoreLabel" Type="String" Name="Card Link Label (blank means no card links)">Read More</Datum>
 
   <!-- ─── Where a deal page lives ───
        A deal with its OWN page stores no URL: the datacapture config makes
@@ -139,8 +180,8 @@
 
        Kept as Datums so a routing change stays a config change. -->
   <Datum ID="DealBaseUrl" Type="String" Name="Deal Page Base URL">/en/expertise/transactions/deals/</Datum>
-  <Datum ID="DcrPathPrefix" Type="String" Name="Templatedata Prefix">templatedata/rbccm/deals/data/</Datum>
-  <Datum ID="DealUrlSuffix" Type="String" Name="Deal Page URL Suffix"></Datum>
+  <Datum ID="DcrPathPrefix" Type="String" Name="Templatedata Prefix (stripped from the DCR path)">templatedata/rbccm/deals/data/</Datum>
+  <Datum ID="DealUrlSuffix" Type="String" Name="Deal Page URL Suffix (blank means none)"></Datum>
 
   <!-- ═══ APPEARANCE ═══════════════════════════════════════════════════════
        Same options as icon-carousel, configured the same way on purpose: an
@@ -169,14 +210,14 @@
        Parsed case-insensitively, and `light` is the fallback for anything
        unrecognised — a typo should give you the default section, not a broken
        one. -->
-  <Datum ID="ColorScheme" Type="String" Name="Color Scheme">light</Datum>
+  <Datum ID="ColorScheme" Type="String" Name="Color Scheme (light, tinted or dark)">light</Datum>
 
   <!-- left (default) | center
        The styleguide comp left-aligns. The LIVE ECM page centres it, using a
        hand-typed inline style="text-align:center" on both the h2 and the p —
        which is exactly the sort of thing this component exists to delete. Now
        it is a Datum. Accepts "center" or "centered", any casing. -->
-  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment">left</Datum>
+  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment (left or center)">left</Datum>
 
   <!-- Optional background image, layered over the ColorScheme colour. The XSL
        writes these as inline background-* properties, and the stylesheet sets
@@ -189,20 +230,20 @@
       <Description/>
     </Image>
   </Datum>
-  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position"></Datum>
-  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size"></Datum>
-  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat"></Datum>
+  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position (default: center center)"></Datum>
+  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size (default: cover)"></Datum>
+  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat (default: no-repeat)"></Datum>
 
   <!-- ─── Accessibility ───
        RegionLabel is accessible-slick's `regionLabel`. It matters when a page
        carries more than one carousel: without distinct labels a screen reader
        announces two identical "region"s and the user cannot tell them apart.
        Blank falls back to the Section Heading, then to a generic label. -->
-  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label"></Datum>
-  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label"></Datum>
-  <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions"></Datum>
-  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label"></Datum>
-  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label"></Datum>
+  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank uses the heading)"></Datum>
+  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label (override)"></Datum>
+  <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions (blank means none)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
 
   <!-- ─── CTA (optional) ───
        Was a separate rich-text component holding a hand-written <a class="btn">
@@ -210,14 +251,14 @@
 
        Blank link = NO button at all. The label alone will not render one — a
        button that goes nowhere is worse than no button. -->
-  <Datum ID="CtaLabel" Type="String" Name="CTA Button Label">More transactions</Datum>
-  <Datum ID="CtaLink" Type="String" Name="CTA Button Link">/en/expertise/transactions</Datum>
+  <Datum ID="CtaLabel" Type="String" Name="CTA Button Label (blank means no button)">More transactions</Datum>
+  <Datum ID="CtaLink" Type="String" Name="CTA Button Link (blank means no button)">/en/expertise/transactions</Datum>
   <Datum ID="CtaNewTab" Type="Boolean" Name="Open CTA In New Tab">false</Datum>
 
   <!-- Analytics hook. The legacy carried data-event-tag="ESG_T1APN1" on the
        anchor; kept as a Datum so it is not lost, and so a different page can set
        its own. Blank emits no attribute. -->
-  <Datum ID="CtaEventTag" Type="String" Name="CTA Event Tag"></Datum>
+  <Datum ID="CtaEventTag" Type="String" Name="CTA Event Tag (analytics, optional)"></Datum>
 
   <!-- ─── Section padding (optional overrides) ───
        Same pattern as filter-by: blank uses the baked-in default, or supply any
@@ -228,10 +269,10 @@
        margin-bottom: 5%` — a percentage margin resolves against the PARENT
        WIDTH, not height, so that bottom gap grew on wide screens and collapsed
        on narrow ones. -->
-  <Datum ID="PadTopMobile"     Type="String" Name="Mobile Padding Top"/>
-  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile Padding Bottom"/>
-  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop Padding Top"/>
-  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop Padding Bottom"/>
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile Padding Top (blank means 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile Padding Bottom (blank means 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop Padding Top (blank means 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop Padding Bottom (blank means 64px)"/>
 
 </Properties>
 

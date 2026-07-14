@@ -83,6 +83,52 @@
   </xsl:template>
 
   <!-- ═══════════════════════════════════════════════════════════════════
+       clean — an "empty" TinyMCE field is not empty
+       ═══════════════════════════════════════════════════════════════════
+       Teamsite edits Textarea Datums with TinyMCE, and TinyMCE cannot place a
+       caret inside a truly empty block, so it drops a placeholder in:
+
+         <br data-mce-bogus="1">
+
+       It is meant to strip that on serialise. It does not always. So a field the
+       author left blank comes through as that markup, and every emptiness guard
+       in this stylesheet is a string comparison:
+
+         <xsl:if test="$dealDesc != ''">
+
+       A field holding a bogus <br> is NOT the empty string. It sails through the
+       guard and renders a line that is either a stray line break or the tag
+       printed as literal text — putting back exactly the phantom gap those guards
+       exist to prevent.
+
+       So: strip tags, fold non-breaking spaces (TinyMCE leaves those too, and
+       normalize-space does not touch U+00A0), then normalize. A field containing
+       nothing but editor scaffolding now compares equal to ''.
+
+       Tag-stripping is safe here because every one of these values is emitted
+       with xsl:value-of, as TEXT. Any markup in them would be escaped and printed
+       on the page anyway, never interpreted.
+
+       Non-breaking spaces are folded TWICE, and both passes are needed:
+
+         translate on the CHARACTER    U+00A0 itself, which is what a normal
+                                       editor stores, and which normalize-space
+                                       does NOT treat as whitespace.
+         replace on the ENTITY NAMES   the literal entity TEXT. This DCR's own
+                                       handleOnSave already double-escapes (a
+                                       dollar sign becomes the six characters
+                                       that spell out its entity), so a
+                                       non-breaking space really can arrive spelled
+                                       out rather than as U+00A0. Observed, not
+                                       theorised. -->
+  <xsl:template name="clean">
+    <xsl:param name="s" select="''"/>
+    <xsl:variable name="noTags"   select="replace(string($s), '&lt;[^&gt;]*&gt;', '')"/>
+    <xsl:variable name="noEntity" select="replace($noTags, '&amp;nbsp;|&amp;#160;|&amp;#xA0;', ' ')"/>
+    <xsl:value-of select="normalize-space(translate($noEntity, '&#160;', ' '))"/>
+  </xsl:template>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
        bool — read a Boolean Datum, case-insensitively, with a default
        ═══════════════════════════════════════════════════════════════════
        A BLANK Datum must fall back to the DEFAULT, not to false. Several of the
@@ -191,19 +237,53 @@
        then get dropped downstream, leaving a carousel with no cards in it. -->
   <xsl:variable name="liveDeals"
     select="$dealGroups[
-              normalize-space(Datum[@ID='ValueOverride' or @Name='Deal Value']) != ''
-              or normalize-space(
+              normalize-space(replace(string(Datum[@ID='ValueOverride' or @Name='Deal Value']),
+                                      '&lt;[^&gt;]*&gt;', '')) != ''
+              or normalize-space(replace(string(
                    Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
-                 ) != ''
+                 ), '&lt;[^&gt;]*&gt;', '')) != ''
             ]"/>
+
+  <!-- ══ THE RAW CARDS ESCAPE HATCH ══
+       When this Datum has content, it REPLACES the track's slides wholesale and
+       the deal records are ignored.
+
+       Two separate values, and the distinction is load-bearing:
+
+         cardsHtmlRaw   what gets EMITTED. Untouched, so the markup survives.
+         cardsHtml      what the EMPTINESS TEST reads. Tags stripped, so a field
+                        holding nothing but TinyMCE's <br data-mce-bogus="1">
+                        counts as blank and the component falls back to the deal
+                        records instead of rendering an empty track.
+
+       Testing the raw value would mean a "blank" WYSIWYG field looks populated
+       and silently blanks the carousel. -->
+  <xsl:variable name="cardsHtmlRaw" select="/Properties/Datum[@ID='CardsHtml']"/>
+  <xsl:variable name="cardsHtml">
+    <xsl:call-template name="clean">
+      <xsl:with-param name="s" select="$cardsHtmlRaw"/>
+    </xsl:call-template>
+  </xsl:variable>
 
   <xsl:template match="/">
 
-    <xsl:if test="count($liveDeals) >= 1">
+    <!-- Render if there are deals to show OR raw markup to show. Testing only
+         liveDeals would mean a hand-pasted carousel with no deal records emits
+         nothing at all — which is precisely the case the escape hatch exists
+         for. -->
+    <xsl:if test="count($liveDeals) >= 1 or $cardsHtml != ''">
 
       <!-- ── Copy ── -->
-      <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
-      <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+      <xsl:variable name="heading">
+        <xsl:call-template name="clean">
+          <xsl:with-param name="s" select="/Properties/Datum[@ID='Heading']"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="intro">
+        <xsl:call-template name="clean">
+          <xsl:with-param name="s" select="/Properties/Datum[@ID='Intro']"/>
+        </xsl:call-template>
+      </xsl:variable>
 
       <!-- ── Per-view counts, with the legacy's defaults ── -->
       <xsl:variable name="pvDesktopRaw" select="normalize-space(/Properties/Datum[@ID='PerViewDesktop'])"/>
@@ -564,6 +644,24 @@
             <div class="rbccm-deal-carousel__viewport">
               <div class="rbccm-deal-carousel__track">
 
+                <!-- ══ RAW MARKUP WINS, WHOLESALE ══
+                     Not merged with the deal records, not appended to them —
+                     REPLACES them. Half a track from records and half from pasted
+                     HTML would be impossible to reason about, and impossible for
+                     an author to predict.
+
+                     disable-output-escaping is CORRECT here, and it is the one
+                     place in this stylesheet where it is. Everywhere else the
+                     values are TEXT, and disabling escaping would hand the
+                     browser broken markup (see the `decode` template). Here the
+                     value IS markup, and the entire point is that the browser
+                     interprets it. -->
+                <xsl:choose>
+                  <xsl:when test="$cardsHtml != ''">
+                    <xsl:value-of select="$cardsHtmlRaw" disable-output-escaping="yes"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+
                 <xsl:for-each select="$liveDeals">
 
                   <!-- The bound DCR. Everything on the card comes from here. -->
@@ -610,7 +708,12 @@
                        replicated Datums, so inside this Group @Name is the only
                        reliable match. -->
                   <xsl:variable name="ovTitle"   select="normalize-space(Datum[@ID='TitleOverride'       or @Name='Title'])"/>
-                  <xsl:variable name="ovDesc"    select="normalize-space(Datum[@ID='DescriptionOverride' or @Name='Description'])"/>
+                  <xsl:variable name="ovDescRaw" select="Datum[@ID='DescriptionOverride' or @Name='Description']"/>
+                  <xsl:variable name="ovDesc">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$ovDescRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:variable name="ovClients" select="normalize-space(Datum[@ID='ClientsOverride'     or @Name='Client Names'])"/>
                   <xsl:variable name="ovRole"    select="normalize-space(Datum[@ID='RoleOverride'        or @Name='Role'])"/>
                   <xsl:variable name="ovValue"   select="normalize-space(Datum[@ID='ValueOverride'       or @Name='Deal Value'])"/>
@@ -618,35 +721,60 @@
                   <xsl:variable name="ovLogo"    select="normalize-space(Datum[@ID='LogoOverride'        or @Name='Logo']/Image/Path)"/>
                   <xsl:variable name="ovLogoAlt" select="normalize-space(Datum[@ID='LogoAltOverride'     or @Name='Logo Alt Text'])"/>
 
-                  <xsl:variable name="dealTitle">
+                  <xsl:variable name="dealTitleRaw">
                     <xsl:choose>
                       <xsl:when test="$ovTitle != ''"><xsl:value-of select="$ovTitle"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/title)"/></xsl:otherwise>
+                      <xsl:otherwise><xsl:value-of select="$dcr/title"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="dealTitle">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealTitleRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="dealDescRaw">
+                    <xsl:choose>
+                      <xsl:when test="$ovDesc != ''"><xsl:value-of select="$ovDesc"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/description"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="dealDesc">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealDescRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="clientsRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovDesc != ''"><xsl:value-of select="$ovDesc"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/description)"/></xsl:otherwise>
+                      <xsl:when test="$ovClients != ''"><xsl:value-of select="$ovClients"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/clients"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="clients">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$clientsRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="roleRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovClients != ''"><xsl:value-of select="$ovClients"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/clients)"/></xsl:otherwise>
+                      <xsl:when test="$ovRole != ''"><xsl:value-of select="$ovRole"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/role"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="role">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$roleRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="dealValueRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovRole != ''"><xsl:value-of select="$ovRole"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/role)"/></xsl:otherwise>
+                      <xsl:when test="$ovValue != ''"><xsl:value-of select="$ovValue"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/dealvalue"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="dealValue">
-                    <xsl:choose>
-                      <xsl:when test="$ovValue != ''"><xsl:value-of select="$ovValue"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/dealvalue)"/></xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealValueRaw"/>
+                    </xsl:call-template>
                   </xsl:variable>
 
                   <!-- ══ DATE ══
@@ -945,6 +1073,9 @@
                   </div>
 
                 </xsl:for-each>
+
+                  </xsl:otherwise>
+                </xsl:choose>
 
               </div>
             </div>

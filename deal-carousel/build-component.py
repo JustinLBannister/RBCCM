@@ -67,27 +67,40 @@ def main() -> int:
               'XSLT 2.0 rendering mode.', file=sys.stderr)
         return 1
 
-    # Datum NAMES must be plain ASCII: letters, digits and spaces only.
+    # Datum NAMES: ban only what is actually dangerous, not all punctuation.
     #
-    # This is not cosmetic. Teamsite serialises every Datum name into the
-    # propertyTabs form payload, and punctuation in a name breaks the save with a
-    # bare "Error in XMLHttpRequest [500/Internal Server Error]" — no field named,
-    # no clue what went wrong. It only fires once a repeated Group has enough rows
-    # to be worth saving, so it looks like a size limit and is not.
+    # An earlier version of this lint required letters, digits and spaces only.
+    # That stripped every author-facing hint ("Color Scheme (light, tinted or
+    # dark)" became "Color Scheme") in the name of a rule that was mostly guilt by
+    # association — the real publish failure turned out to be a dangling <DCR>
+    # default, not punctuation. Parentheses and commas were never the problem.
     #
-    # Apostrophes are doubly fatal: the XSL matches replicated Datums with
-    # @Name='...', a single-quoted XPath string, which an apostrophe terminates.
+    # What IS dangerous:
     #
-    # We shipped "Show RBC's role" and three em-dashes and it cost an afternoon.
-    names = re.findall(r'<Datum\b[^>]*\bName="([^"]+)"', re.sub(r'<!--.*?-->', '', props, flags=re.S))
-    dirty = [n for n in names if not re.fullmatch(r'[A-Za-z0-9 ]+', n)]
-    if dirty:
-        for n in dirty:
-            junk = ''.join(sorted({c for c in n if not re.match(r'[A-Za-z0-9 ]', c)}))
-            print(f'ERROR: Datum Name="{n}" contains {junk!r}. Names must be letters, '
-                  f'digits and spaces only, or Teamsite 500s on save.', file=sys.stderr)
+    #   apostrophe   The XSL matches replicated Datums with @Name='...', a
+    #                single-quoted XPath string. An apostrophe terminates it.
+    #                "Show RBC's role" is a syntax error, not a label.
+    #   quote        Terminates the Name="..." attribute itself.
+    #   em/en dash   Bit us earlier in this project.
+    #   < > &        Break the XML.
+    #
+    # Parentheses, commas, colons and periods are fine, so the labels can stay
+    # useful to whoever has to fill this form in.
+    FORBIDDEN = {"'": 'apostrophe (terminates the single-quoted XPath in the XSL)',
+                 '"': 'double quote (terminates the Name attribute)',
+                 '—': 'em dash', '–': 'en dash',
+                 '<': 'angle bracket', '>': 'angle bracket', '&': 'ampersand'}
+    names = re.findall(r'<Datum\b[^>]*\bName="([^"]+)"',
+                       re.sub(r'<!--.*?-->', '', props, flags=re.S))
+    bad = False
+    for n in names:
+        for ch, why in FORBIDDEN.items():
+            if ch in n:
+                print(f'ERROR: Datum Name="{n}" contains {ch!r} — {why}.', file=sys.stderr)
+                bad = True
+    if bad:
         return 1
-    print(f'  OK    all {len(names)} Datum names are plain ASCII')
+    print(f'  OK    all {len(names)} Datum names free of apostrophes, dashes and XML metachars')
 
     # A <DCR> or <Image> default must be EMPTY.
     #

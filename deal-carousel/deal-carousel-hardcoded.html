@@ -1,0 +1,325 @@
+<!-- Deal Carousel — 15 ECM deals, hardcoded.
+     Same markup the XSL emits, so deal-carousel.css and deal-carousel.js work
+     against it unchanged. The JS binds to .rbccm-deal-carousel on DOMContentLoaded
+     and needs no configuration beyond the data attributes below.
+
+     Two things the legacy got wrong that are fixed here:
+
+       1. Every logo carried aria-label="SMS Logo". Fifteen different companies,
+          all announced as "SMS Logo" to a screen reader. Each now has its own alt.
+       2. The logo was a background-image on a div, so it was invisible to
+          assistive tech and did not print. It is a real <img> now.
+
+     Grey line = RBC's role, blue line = the transaction type, matching the live
+     page. In the Datum-driven version these come from the deal record; hardcoded,
+     they are just text. -->
+<section class="rbccm-deal-carousel"
+         aria-label="Proven impact, trusted partnerships"
+         data-region-label="Transactions carousel"
+         data-per-view-desktop="3"
+         data-per-view-tablet="2"
+         data-per-view-mobile="1"
+         data-loop="true"
+         data-autoplay="false">
+  <div class="rbccm-deal-carousel__inner">
+
+    <div class="rbccm-deal-carousel__header">
+      <h2 class="rbccm-deal-carousel__heading">Proven impact, trusted partnerships</h2>
+      <p class="rbccm-deal-carousel__intro">Explore select recent leading global equity transactions.</p>
+    </div>
+
+    <div class="rbccm-deal-carousel__sr-only rbccm-deal-carousel__announce"
+         aria-live="polite" aria-atomic="true"></div>
+
+    <div class="rbccm-deal-carousel__viewport-row">
+
+      <button type="button"
+              class="rbccm-deal-carousel__arrow rbccm-deal-carousel__arrow--prev"
+              aria-label="Previous transactions">
+        <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--desktop"
+             xmlns="http://www.w3.org/2000/svg" width="44" height="44"
+             viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--mobile"
+             xmlns="http://www.w3.org/2000/svg" width="14" height="24"
+             viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-deal-carousel__viewport">
+        <div class="rbccm-deal-carousel__track">
+
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">March 2025 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/deals/gfl.svg"
+                     alt="GFL Environmental"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$900 million</p>
+                <p class="rbccm-deal-carousel__desc">Sole Underwriter</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Block Trade</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">March 2025 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/standard-aero.svg"
+                     alt="StandardAero"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$1008 million</p>
+                <p class="rbccm-deal-carousel__desc">Senior Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Follow-On</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">March 2025 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/primo_brands.svg"
+                     alt="Primo Brands"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$1327.5 million</p>
+                <p class="rbccm-deal-carousel__desc">Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Follow-On</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">February 2025 | ASX</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/deals/goodman-group-logo.png"
+                     alt="Goodman Group"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">A$4000 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Lead Underwriter</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Underwritten Institutional Placement</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">February 2025 | NASDAQ</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/aardvark.svg"
+                     alt="Aardvark Therapeutics"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$94.2 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Initial Public Offering</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">January 2025 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/infinity.svg"
+                     alt="Infinity Natural Resources"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$265 million</p>
+                <p class="rbccm-deal-carousel__desc">Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Initial Public Offering</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">January 2025 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/msc-income-fund.svg"
+                     alt="MSC Income Fund"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$85.4 million</p>
+                <p class="rbccm-deal-carousel__desc">Lead Left Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Initial Public Offering</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">December 2024 | NASDAQ</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/core-scientific.svg"
+                     alt="Core Scientific"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$625 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Convertible Senior Notes</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">November 2024 | NASDAQ</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/cidara-therapeutics.svg"
+                     alt="Cidara Therapeutics"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$105 million</p>
+                <p class="rbccm-deal-carousel__desc">Sole Placement Agent</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Private Placement</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">November 2024 | TSX</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/groupe-dynamite.svg"
+                     alt="Groupe Dynamite"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">C$300 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Lead Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Initial Public Offering</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">October 2024 | NASDAQ</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/thryv.svg"
+                     alt="Thryv"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$80 million</p>
+                <p class="rbccm-deal-carousel__desc">Sole Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Follow-On</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">October 2024 | NASDAQ</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/VSE.svg"
+                     alt="VSE Corporation"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$150 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Follow-On</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">September 2024 | LSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/haleon.svg"
+                     alt="Haleon"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">£2432 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Follow-On</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">August 2024 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/Occidental-Petroleum.svg"
+                     alt="Occidental Petroleum"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$1723.4 million</p>
+                <p class="rbccm-deal-carousel__desc">Joint Underwriter</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Block Trade</p>
+            </article>
+          </div>
+          <div class="rbccm-deal-carousel__slide">
+            <article class="rbccm-deal-carousel__card">
+              <p class="rbccm-deal-carousel__date">May 2024 | NYSE</p>
+              <div class="rbccm-deal-carousel__logos">
+                <img class="rbccm-deal-carousel__logo"
+                     src="/assets/rbccm/images/gib/ecm/Specrum-Bands.svg"
+                     alt="Spectrum Brands"
+                     loading="lazy">
+              </div>
+              <div class="rbccm-deal-carousel__content">
+                <p class="rbccm-deal-carousel__value">$350 million</p>
+                <p class="rbccm-deal-carousel__desc">Active Bookrunner</p>
+              </div>
+              <p class="rbccm-deal-carousel__role">Exchangeable Senior Notes</p>
+            </article>
+          </div>
+
+        </div>
+      </div>
+
+      <button type="button"
+              class="rbccm-deal-carousel__arrow rbccm-deal-carousel__arrow--next"
+              aria-label="Next transactions">
+        <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--desktop"
+             xmlns="http://www.w3.org/2000/svg" width="44" height="44"
+             viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="-1" y="1" width="42" height="42" rx="21"
+                transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+          <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-deal-carousel__arrow-icon rbccm-deal-carousel__arrow-icon--mobile"
+             xmlns="http://www.w3.org/2000/svg" width="14" height="24"
+             viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <div class="rbccm-deal-carousel__dots"></div>
+
+    <div class="rbccm-deal-carousel__cta-wrap">
+      <a class="rbccm-deal-carousel__cta" href="/en/expertise/transactions">More transactions</a>
+    </div>
+
+  </div>
+</section>

@@ -16,6 +16,13 @@
                           '&amp;period;', '.')"/>
   </xsl:template>
 
+  <xsl:template name="clean">
+    <xsl:param name="s" select="''"/>
+    <xsl:variable name="noTags"   select="replace(string($s), '&lt;[^&gt;]*&gt;', '')"/>
+    <xsl:variable name="noEntity" select="replace($noTags, '&amp;nbsp;|&amp;#160;|&amp;#xA0;', ' ')"/>
+    <xsl:value-of select="normalize-space(translate($noEntity, '&#160;', ' '))"/>
+  </xsl:template>
+
   <xsl:template name="bool">
     <xsl:param name="v"/>
     <xsl:param name="default" select="'false'"/>
@@ -50,18 +57,34 @@
 
   <xsl:variable name="liveDeals"
     select="$dealGroups[
-              normalize-space(Datum[@ID='ValueOverride' or @Name='Deal Value']) != ''
-              or normalize-space(
+              normalize-space(replace(string(Datum[@ID='ValueOverride' or @Name='Deal Value']),
+                                      '&lt;[^&gt;]*&gt;', '')) != ''
+              or normalize-space(replace(string(
                    Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release/dealvalue
-                 ) != ''
+                 ), '&lt;[^&gt;]*&gt;', '')) != ''
             ]"/>
+
+  <xsl:variable name="cardsHtmlRaw" select="/Properties/Datum[@ID='CardsHtml']"/>
+  <xsl:variable name="cardsHtml">
+    <xsl:call-template name="clean">
+      <xsl:with-param name="s" select="$cardsHtmlRaw"/>
+    </xsl:call-template>
+  </xsl:variable>
 
   <xsl:template match="/">
 
-    <xsl:if test="count($liveDeals) >= 1">
+    <xsl:if test="count($liveDeals) >= 1 or $cardsHtml != ''">
 
-      <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
-      <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+      <xsl:variable name="heading">
+        <xsl:call-template name="clean">
+          <xsl:with-param name="s" select="/Properties/Datum[@ID='Heading']"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="intro">
+        <xsl:call-template name="clean">
+          <xsl:with-param name="s" select="/Properties/Datum[@ID='Intro']"/>
+        </xsl:call-template>
+      </xsl:variable>
 
       <xsl:variable name="pvDesktopRaw" select="normalize-space(/Properties/Datum[@ID='PerViewDesktop'])"/>
       <xsl:variable name="pvTabletRaw"  select="normalize-space(/Properties/Datum[@ID='PerViewTablet'])"/>
@@ -336,13 +359,24 @@
             <div class="rbccm-deal-carousel__viewport">
               <div class="rbccm-deal-carousel__track">
 
+                <xsl:choose>
+                  <xsl:when test="$cardsHtml != ''">
+                    <xsl:value-of select="$cardsHtmlRaw" disable-output-escaping="yes"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+
                 <xsl:for-each select="$liveDeals">
 
                   <xsl:variable name="dcr"
                     select="Datum[@ID='DealRecord' or @Name='Deal Record']/DCR/press_release"/>
 
                   <xsl:variable name="ovTitle"   select="normalize-space(Datum[@ID='TitleOverride'       or @Name='Title'])"/>
-                  <xsl:variable name="ovDesc"    select="normalize-space(Datum[@ID='DescriptionOverride' or @Name='Description'])"/>
+                  <xsl:variable name="ovDescRaw" select="Datum[@ID='DescriptionOverride' or @Name='Description']"/>
+                  <xsl:variable name="ovDesc">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$ovDescRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
                   <xsl:variable name="ovClients" select="normalize-space(Datum[@ID='ClientsOverride'     or @Name='Client Names'])"/>
                   <xsl:variable name="ovRole"    select="normalize-space(Datum[@ID='RoleOverride'        or @Name='Role'])"/>
                   <xsl:variable name="ovValue"   select="normalize-space(Datum[@ID='ValueOverride'       or @Name='Deal Value'])"/>
@@ -350,35 +384,60 @@
                   <xsl:variable name="ovLogo"    select="normalize-space(Datum[@ID='LogoOverride'        or @Name='Logo']/Image/Path)"/>
                   <xsl:variable name="ovLogoAlt" select="normalize-space(Datum[@ID='LogoAltOverride'     or @Name='Logo Alt Text'])"/>
 
-                  <xsl:variable name="dealTitle">
+                  <xsl:variable name="dealTitleRaw">
                     <xsl:choose>
                       <xsl:when test="$ovTitle != ''"><xsl:value-of select="$ovTitle"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/title)"/></xsl:otherwise>
+                      <xsl:otherwise><xsl:value-of select="$dcr/title"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="dealTitle">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealTitleRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="dealDescRaw">
+                    <xsl:choose>
+                      <xsl:when test="$ovDesc != ''"><xsl:value-of select="$ovDesc"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/description"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="dealDesc">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealDescRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="clientsRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovDesc != ''"><xsl:value-of select="$ovDesc"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/description)"/></xsl:otherwise>
+                      <xsl:when test="$ovClients != ''"><xsl:value-of select="$ovClients"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/clients"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="clients">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$clientsRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="roleRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovClients != ''"><xsl:value-of select="$ovClients"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/clients)"/></xsl:otherwise>
+                      <xsl:when test="$ovRole != ''"><xsl:value-of select="$ovRole"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/role"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="role">
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$roleRaw"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="dealValueRaw">
                     <xsl:choose>
-                      <xsl:when test="$ovRole != ''"><xsl:value-of select="$ovRole"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/role)"/></xsl:otherwise>
+                      <xsl:when test="$ovValue != ''"><xsl:value-of select="$ovValue"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$dcr/dealvalue"/></xsl:otherwise>
                     </xsl:choose>
                   </xsl:variable>
                   <xsl:variable name="dealValue">
-                    <xsl:choose>
-                      <xsl:when test="$ovValue != ''"><xsl:value-of select="$ovValue"/></xsl:when>
-                      <xsl:otherwise><xsl:value-of select="normalize-space($dcr/dealvalue)"/></xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:call-template name="clean">
+                      <xsl:with-param name="s" select="$dealValueRaw"/>
+                    </xsl:call-template>
                   </xsl:variable>
 
                   <xsl:variable name="rawDate">
@@ -573,6 +632,9 @@
 
                 </xsl:for-each>
 
+                  </xsl:otherwise>
+                </xsl:choose>
+
               </div>
             </div>
 
@@ -625,34 +687,36 @@
 
 <Properties ComponentID="deal-carousel-v1">
 
-  <Datum ID="Heading" Type="String" Name="Section Heading">Proven impact, trusted partnerships</Datum>
-  <Datum ID="Intro" Type="Textarea" Name="Intro Text">Explore select recent leading global equity transactions.</Datum>
+  <Datum ID="Heading" Type="String" Name="Section Heading (optional)">Proven impact, trusted partnerships</Datum>
+  <Datum ID="Intro" Type="Textarea" Name="Intro Text (optional)">Explore select recent leading global equity transactions.</Datum>
 
-  <Datum ID="PerViewDesktop" Type="Number" Name="Cards Per Page Desktop">3</Datum>
-  <Datum ID="PerViewTablet"  Type="Number" Name="Cards Per Page Tablet">2</Datum>
-  <Datum ID="PerViewMobile"  Type="Number" Name="Cards Per Page Mobile">1</Datum>
+  <Datum ID="PerViewDesktop" Type="Number" Name="Cards Per Page: Desktop (1100px and up)">3</Datum>
+  <Datum ID="PerViewTablet"  Type="Number" Name="Cards Per Page: Tablet (768 to 1099px)">2</Datum>
+  <Datum ID="PerViewMobile"  Type="Number" Name="Cards Per Page: Mobile (under 768px)">1</Datum>
 
-  <Datum ID="Loop" Type="Boolean" Name="Infinite Loop">true</Datum>
+  <Datum ID="Loop" Type="Boolean" Name="Infinite Loop (wrap past the ends)">true</Datum>
 
-  <Datum ID="Autoplay" Type="Boolean" Name="Autoplay">false</Datum>
+  <Datum ID="Autoplay" Type="Boolean" Name="Autoplay (auto advance cards)">false</Datum>
 
-  <Datum ID="ShowTitle" Type="Boolean" Name="Show Title">true</Datum>
+  <Datum ID="ShowTitle" Type="Boolean" Name="Show Title (the deal headline)">true</Datum>
 
-  <Datum ID="ShowDescription" Type="Boolean" Name="Show Description">true</Datum>
+  <Datum ID="ShowDescription" Type="Boolean" Name="Show Description (often blank on real deals)">true</Datum>
 
-  <Datum ID="ShowClients" Type="Boolean" Name="Show Clients">false</Datum>
+  <Datum ID="ShowClients" Type="Boolean" Name="Show Clients (the client names)">false</Datum>
 
-  <Datum ID="ShowRole" Type="Boolean" Name="Show Role">true</Datum>
+  <Datum ID="ShowRole" Type="Boolean" Name="Show Role (the blue line)">true</Datum>
 
-  <Datum ID="ReadMoreLabel" Type="String" Name="Card Link Label">Read More</Datum>
+  <Datum ID="CardsHtml" Type="Textarea" Name="Cards HTML (blank means build cards from the deal records)"></Datum>
+
+  <Datum ID="ReadMoreLabel" Type="String" Name="Card Link Label (blank means no card links)">Read More</Datum>
 
   <Datum ID="DealBaseUrl" Type="String" Name="Deal Page Base URL">/en/expertise/transactions/deals/</Datum>
-  <Datum ID="DcrPathPrefix" Type="String" Name="Templatedata Prefix">templatedata/rbccm/deals/data/</Datum>
-  <Datum ID="DealUrlSuffix" Type="String" Name="Deal Page URL Suffix"></Datum>
+  <Datum ID="DcrPathPrefix" Type="String" Name="Templatedata Prefix (stripped from the DCR path)">templatedata/rbccm/deals/data/</Datum>
+  <Datum ID="DealUrlSuffix" Type="String" Name="Deal Page URL Suffix (blank means none)"></Datum>
 
-  <Datum ID="ColorScheme" Type="String" Name="Color Scheme">light</Datum>
+  <Datum ID="ColorScheme" Type="String" Name="Color Scheme (light, tinted or dark)">light</Datum>
 
-  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment">left</Datum>
+  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment (left or center)">left</Datum>
 
   <Datum ID="BackgroundImage" Type="Image" Name="Background Image">
     <Image>
@@ -660,26 +724,26 @@
       <Description/>
     </Image>
   </Datum>
-  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position"></Datum>
-  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size"></Datum>
-  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat"></Datum>
+  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position (default: center center)"></Datum>
+  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size (default: cover)"></Datum>
+  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat (default: no-repeat)"></Datum>
 
-  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label"></Datum>
-  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label"></Datum>
-  <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions"></Datum>
-  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label"></Datum>
-  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label"></Datum>
+  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank uses the heading)"></Datum>
+  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label (override)"></Datum>
+  <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions (blank means none)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
 
-  <Datum ID="CtaLabel" Type="String" Name="CTA Button Label">More transactions</Datum>
-  <Datum ID="CtaLink" Type="String" Name="CTA Button Link">/en/expertise/transactions</Datum>
+  <Datum ID="CtaLabel" Type="String" Name="CTA Button Label (blank means no button)">More transactions</Datum>
+  <Datum ID="CtaLink" Type="String" Name="CTA Button Link (blank means no button)">/en/expertise/transactions</Datum>
   <Datum ID="CtaNewTab" Type="Boolean" Name="Open CTA In New Tab">false</Datum>
 
-  <Datum ID="CtaEventTag" Type="String" Name="CTA Event Tag"></Datum>
+  <Datum ID="CtaEventTag" Type="String" Name="CTA Event Tag (analytics, optional)"></Datum>
 
-  <Datum ID="PadTopMobile"     Type="String" Name="Mobile Padding Top"/>
-  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile Padding Bottom"/>
-  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop Padding Top"/>
-  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop Padding Bottom"/>
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile Padding Top (blank means 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile Padding Bottom (blank means 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop Padding Top (blank means 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop Padding Bottom (blank means 64px)"/>
 
 </Properties>
 
