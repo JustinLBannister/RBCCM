@@ -89,6 +89,33 @@ def main() -> int:
         return 1
     print(f'  OK    all {len(names)} Datum names are plain ASCII')
 
+    # A <DCR> or <Image> default must be EMPTY.
+    #
+    # Anything in there is a DEPENDENCY the publisher has to resolve, and it gets
+    # inherited by every cloned row of the repeated Group — including rows where
+    # the author never touched the picker. A path that doesn't resolve renders
+    # fine in PREVIEW (it just finds nothing) and then fails at PUBLISH, which is
+    # the worst possible place to find out.
+    #
+    # We shipped <DCR ...>templatedata/rbccm/deals/data</DCR>, which is the folder
+    # the deal records live under, not a record. Fifteen cards, fifteen dangling
+    # dependencies, publish blocked.
+    # Lint the MARKUP, not the prose — the comments quote example <DCR> elements
+    # (featured-conferences') to explain why this rule exists, and matching those
+    # would fail the build on its own documentation.
+    props_bare = re.sub(r'<!--.*?-->', '', props, flags=re.S)
+    for tag in ('DCR', 'Image'):
+        for m in re.finditer(rf'<{tag}\b[^>]*>(.*?)</{tag}>', props_bare, re.S):
+            inner = m.group(1)
+            # <Path/> and <Description/> are the required empty skeleton
+            text = re.sub(r'<[^>]+/>|<Path>\s*</Path>|<Description>\s*</Description>', '', inner).strip()
+            if text:
+                print(f'ERROR: <{tag}> default is not empty: {text[:60]!r}. A default path '
+                      f'is a dependency the publisher must resolve, inherited by every '
+                      f'cloned row. Renders in preview, fails at publish.', file=sys.stderr)
+                return 1
+    print('  OK    all DCR / Image defaults are empty (no dangling publish dependencies)')
+
     # Teamsite STRIPS @ID from Datums inside a Replicatable Group, so @Name is the
     # only thing the XSL can match on. That makes a renamed Datum a silent,
     # invisible break: the properties still validate, the XSL still compiles, the
@@ -145,22 +172,32 @@ def main() -> int:
         xsl = xsl[:m.start()] + assets + xsl[m.start():]
 
     # --- 2. Properties + Data -------------------------------------------------
-    banner = (
-        '<!-- ============================================================\n'
-        '     GENERATED FILE — do not edit.\n'
-        '     Built by build-component.py from:\n'
-        '       deal-carousel.xsl\n'
-        '       deal-carousel-properties.xml\n'
-        '     Edit those, then re-run:  python3 build-component.py\n'
-        '\n'
-        '     Deploy:\n'
-        f'       this file                ->  Teamsite component\n'
-        f'       deal-carousel.css        ->  {CSS_HREF}\n'
-        f'       deal-carousel.js         ->  {JS_SRC}\n'
-        '     ============================================================ -->\n'
-    )
     combined = xsl.rstrip() + '\n\n' + props.strip() + '\n'
-    combined = re.sub(r'(^<!DOCTYPE[^>]*>\n)', r'\1' + banner, combined, count=1)
+
+    # --- 3. STRIP EVERY COMMENT ----------------------------------------------
+    # This artifact goes into a live Teamsite component. The comments in the
+    # sources are for us: bug post-mortems, why a rule exists, what broke last
+    # time. None of that should be sitting in production, and a "GENERATED FILE"
+    # banner least of all.
+    #
+    # The sources keep all of it. Only the built file is stripped, which is the
+    # whole reason the build step exists.
+    #
+    # Pass --comments to keep them (useful when handing the file to someone who
+    # has to debug it in Teamsite without the repo).
+    if '--comments' not in sys.argv:
+        doctype = ''
+        m = re.match(r'^(<!DOCTYPE[^>]*>\n)', combined)
+        if m:                      # the DOCTYPE is not a comment; keep it
+            doctype = m.group(1)
+            combined = combined[m.end():]
+
+        before = combined.count('<!--')
+        combined = re.sub(r'<!--.*?-->\s*', '', combined, flags=re.S)
+        # collapse the blank lines the comments left behind
+        combined = re.sub(r'\n{3,}', '\n\n', combined)
+        combined = doctype + combined.lstrip('\n')
+        print(f'  OK    stripped {before} comments from the shipped artifact')
 
     OUT.write_text(combined)
 

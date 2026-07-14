@@ -273,8 +273,28 @@
            Datum[@Name='Deal Record']/DCR/press_release
 
          Those two names do not have to agree, and here they do not. -->
+    <!-- The DCR element is EMPTY. This matters, and it is the same lesson as the
+         <Image> skeleton below.
+
+         It used to default to:
+
+           <DCR Category="rbccm" Type="deals">templatedata/rbccm/deals/data</DCR>
+
+         which is NOT a DCR. It is the FOLDER the deal records live under
+         (.../data/2026/06/fervo_energy...). featured-conferences can point at
+         templatedata/about-us/conferences/data because that genuinely is a single
+         record; deals are one record per file, so there is nothing at that path.
+
+         Every card therefore declared a dependency on a DCR that does not exist,
+         and every cloned row inherited it from this default, even rows where the
+         author never touched the picker. PREVIEW does not care: it finds nothing
+         and renders the override fields. PUBLISH walks dependencies and has to
+         resolve every referenced DCR, so it fails.
+
+         Category and Type still scope which records the picker offers. The path
+         is filled in by Teamsite when an author actually chooses one. -->
     <Datum ID="DealRecord" Type="DCR" Name="Deal Record">
-      <DCR Category="rbccm" Type="deals">templatedata/rbccm/deals/data</DCR>
+      <DCR Category="rbccm" Type="deals"></DCR>
     </Datum>
 
     <!-- ══ PER-CARD OVERRIDES ══════════════════════════════════════════════
