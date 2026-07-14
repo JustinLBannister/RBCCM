@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Icon Carousel — local test</title>
+
+  <!-- Same CDN set the other component harnesses use. On rbccm.com these are
+       already on the page; accessible-slick is preferred at runtime by the JS. -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+  <link rel="stylesheet" href="icon-carousel.css">
+
+  <style>
+    /* Harness only — not part of the component. */
+    body { margin: 0; background: #f4f5f7; font-family: Roboto, Arial, sans-serif; }
+    .harness-note {
+      max-width: 1200px; margin: 0 auto; padding: 24px 16px 0;
+      color: #5b6770; font-size: 13px; line-height: 1.5;
+    }
+    .harness-note code { background: #e6e8eb; padding: 1px 4px; border-radius: 2px; }
+    .harness-frame { background: #fff; margin: 16px 0 40px; }
+    .harness-label {
+      max-width: 1200px; margin: 32px auto 0; padding: 0 16px;
+      font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #8b959e;
+    }
+    /* Icons are inline SVG here because /assets/rbccm/... won't resolve off-server.
+       In production these are <img src="/assets/rbccm/images/gib/ecm/icon-*.svg">. */
+    .rbccm-icon-carousel__icon { color: #003168; }
+  </style>
+</head>
+<body>
+
+  <div class="harness-note">
+    <strong>Local test harness.</strong> Icons are inline placeholder SVGs — production uses
+    <code>&lt;img src="/assets/rbccm/images/gib/ecm/icon-*.svg"&gt;</code>.
+    Resize the window across 768px and 992px: the pages re-flow, the dot count
+    changes to match, and the arrows move between the track flanks (desktop) and
+    the dots row (mobile). Try Tab + Enter on the arrows and dots, and swipe.
+    (There is deliberately no arrow-key handling — see the note in the JS.)
+    <br><strong>Instance 1 has <code>data-loop="true"</code></strong> — page past the
+    last slide and it wraps forward onto slide 1 with no rewind, and the arrows
+    never disable. Instance 2 is left non-looping for comparison.
+  </div>
+
+  <div class="harness-label">Default — 11 sectors, 4 per slide desktop</div>
+  <div class="harness-frame">
+
+    <section class="rbccm-icon-carousel"
+             data-per-view-mobile="4"
+             data-per-view-tablet="2"
+             data-per-view-desktop="4"
+             data-loop="true"
+             aria-roledescription="carousel"
+             aria-label="Equity Capital Markets coverage across industries">
+
+      <div class="rbccm-icon-carousel__inner">
+
+        <div class="rbccm-icon-carousel__header">
+          <h2 class="rbccm-icon-carousel__heading">
+            Equity Capital Markets coverage across industries
+          </h2>
+
+          <p class="rbccm-icon-carousel__intro">
+            Our solutions are built on deep sector expertise across the industries driving global capital markets.
+          </p>
+
+        </div>
+
+
+    <!-- Screen-reader affordances. These are what accessible-slick provides to
+         the slick-based carousels on the site; this component is vanilla, so it
+         supplies them itself.
+
+         announce   — polite live region. The JS writes "Slide 2 of 3" here on
+                      every user-initiated change. Without it, pressing Next
+                      moves the carousel silently for an SR user.
+         instructions — describes the keyboard model, referenced by the track's
+                      aria-describedby so it's read when focus enters. -->
+    <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+
+        <div class="rbccm-icon-carousel__viewport-row">
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev" aria-label="Previous industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+              <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <div class="rbccm-icon-carousel__viewport" role="region" aria-label="Industries">
+            <div class="rbccm-icon-carousel__track">
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="8" y="12" width="32" height="22" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M18 40h12" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Communications, Media &amp; Entertainment</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M12 16h24l-3 22H15L12 16Z" stroke="currentColor" stroke-width="1.5"/><path d="M19 16a5 5 0 0 1 10 0" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Consumer &amp; Retail</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M26 6 14 26h9l-2 16 13-21h-9l1-15Z" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Energy</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 20 24 8l18 12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M11 20v18h26V20" stroke="currentColor" stroke-width="1.5"/><path d="M19 38V27h10v11" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Institutions</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="15" stroke="currentColor" stroke-width="1.5"/><path d="M24 15v18M20 20h7a3 3 0 0 1 0 6h-6a3 3 0 0 0 0 6h7" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Sponsors</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 40S8 30 8 19a8 8 0 0 1 16-3 8 8 0 0 1 16 3c0 11-16 21-16 21Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 24h6l3-5 4 10 3-5h4" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Healthcare</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 40V20l10 6V20l10 6V12l12 8v20H8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M34 26v6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Industrial &amp; Diversified</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 34 24 10l14 24H10Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M19 34l5-9 5 9" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Mining &amp; Metals</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 8v12M32 8v12M12 20h24l-3 20H15L12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M24 26v8" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Power, Utilities &amp; Infrastructure</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22 24 9l16 13v18H8V22Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="19" y="28" width="10" height="12" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Real Estate</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="14" y="14" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M20 8v6M28 8v6M20 34v6M28 34v6M8 20h6M8 28h6M34 20h6M34 28h6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Technology</span>
+              </div>
+
+            </div>
+          </div>
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next" aria-label="Next industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+              <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <div class="rbccm-icon-carousel__dots"></div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <div class="harness-label">ItemAlignment = centered — icon above label (the alternative treatment)</div>
+  <div class="harness-frame">
+
+    <section class="rbccm-icon-carousel rbccm-icon-carousel--items-centered"
+             data-per-view-mobile="4"
+             data-per-view-tablet="2"
+             data-per-view-desktop="4"
+             data-loop="true"
+             aria-roledescription="carousel"
+             aria-label="Equity Capital Markets coverage across industries (centered)">
+
+      <div class="rbccm-icon-carousel__inner">
+
+        <div class="rbccm-icon-carousel__header">
+          <h2 class="rbccm-icon-carousel__heading">
+            Equity Capital Markets coverage across industries
+          </h2>
+
+          <p class="rbccm-icon-carousel__intro">
+            Our solutions are built on deep sector expertise across the industries driving global capital markets.
+          </p>
+
+        </div>
+
+
+    <!-- Screen-reader affordances. These are what accessible-slick provides to
+         the slick-based carousels on the site; this component is vanilla, so it
+         supplies them itself.
+
+         announce   — polite live region. The JS writes "Slide 2 of 3" here on
+                      every user-initiated change. Without it, pressing Next
+                      moves the carousel silently for an SR user.
+         instructions — describes the keyboard model, referenced by the track's
+                      aria-describedby so it's read when focus enters. -->
+    <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+
+        <div class="rbccm-icon-carousel__viewport-row">
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev" aria-label="Previous industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+              <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <div class="rbccm-icon-carousel__viewport" role="region" aria-label="Industries">
+            <div class="rbccm-icon-carousel__track">
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="8" y="12" width="32" height="22" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M18 40h12" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Communications, Media &amp; Entertainment</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M12 16h24l-3 22H15L12 16Z" stroke="currentColor" stroke-width="1.5"/><path d="M19 16a5 5 0 0 1 10 0" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Consumer &amp; Retail</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M26 6 14 26h9l-2 16 13-21h-9l1-15Z" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Energy</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 20 24 8l18 12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M11 20v18h26V20" stroke="currentColor" stroke-width="1.5"/><path d="M19 38V27h10v11" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Institutions</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="15" stroke="currentColor" stroke-width="1.5"/><path d="M24 15v18M20 20h7a3 3 0 0 1 0 6h-6a3 3 0 0 0 0 6h7" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Sponsors</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 40S8 30 8 19a8 8 0 0 1 16-3 8 8 0 0 1 16 3c0 11-16 21-16 21Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 24h6l3-5 4 10 3-5h4" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Healthcare</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 40V20l10 6V20l10 6V12l12 8v20H8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M34 26v6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Industrial &amp; Diversified</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 34 24 10l14 24H10Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M19 34l5-9 5 9" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Mining &amp; Metals</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 8v12M32 8v12M12 20h24l-3 20H15L12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M24 26v8" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Power, Utilities &amp; Infrastructure</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22 24 9l16 13v18H8V22Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="19" y="28" width="10" height="12" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Real Estate</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="14" y="14" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M20 8v6M28 8v6M20 34v6M28 34v6M8 20h6M8 28h6M34 20h6M34 28h6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Technology</span>
+              </div>
+
+            </div>
+          </div>
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next" aria-label="Next industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+              <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <div class="rbccm-icon-carousel__dots"></div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <div class="harness-label">Modifiers — ColorScheme=dark + HeadingAlignment=center + background image</div>
+  <div class="harness-frame">
+
+    <section class="rbccm-icon-carousel rbccm-icon-carousel--on-dark rbccm-icon-carousel--headings-centered"
+             data-per-view-mobile="4"
+             data-per-view-tablet="2"
+             data-per-view-desktop="4"
+             data-loop="true"
+             style="background-image: url('https://fpoimg.com/1440x520?text=Banner&amp;bg_color=002247&amp;text_color=002247'); background-position: center center; background-size: cover; background-repeat: no-repeat;"
+             aria-roledescription="carousel"
+             aria-label="Equity Capital Markets coverage across industries">
+
+      <div class="rbccm-icon-carousel__inner">
+
+        <div class="rbccm-icon-carousel__header">
+          <h2 class="rbccm-icon-carousel__heading">
+            Equity Capital Markets coverage across industries
+          </h2>
+
+          <p class="rbccm-icon-carousel__intro">
+            Our solutions are built on deep sector expertise across the industries driving global capital markets.
+          </p>
+
+        </div>
+
+
+    <!-- Screen-reader affordances. These are what accessible-slick provides to
+         the slick-based carousels on the site; this component is vanilla, so it
+         supplies them itself.
+
+         announce   — polite live region. The JS writes "Slide 2 of 3" here on
+                      every user-initiated change. Without it, pressing Next
+                      moves the carousel silently for an SR user.
+         instructions — describes the keyboard model, referenced by the track's
+                      aria-describedby so it's read when focus enters. -->
+    <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+
+        <div class="rbccm-icon-carousel__viewport-row">
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev" aria-label="Previous industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+              <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <div class="rbccm-icon-carousel__viewport" role="region" aria-label="Industries">
+            <div class="rbccm-icon-carousel__track">
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="8" y="12" width="32" height="22" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M18 40h12" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Communications, Media &amp; Entertainment</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M12 16h24l-3 22H15L12 16Z" stroke="currentColor" stroke-width="1.5"/><path d="M19 16a5 5 0 0 1 10 0" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Consumer &amp; Retail</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M26 6 14 26h9l-2 16 13-21h-9l1-15Z" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Energy</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 20 24 8l18 12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M11 20v18h26V20" stroke="currentColor" stroke-width="1.5"/><path d="M19 38V27h10v11" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Institutions</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="15" stroke="currentColor" stroke-width="1.5"/><path d="M24 15v18M20 20h7a3 3 0 0 1 0 6h-6a3 3 0 0 0 0 6h7" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Financial Sponsors</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 40S8 30 8 19a8 8 0 0 1 16-3 8 8 0 0 1 16 3c0 11-16 21-16 21Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 24h6l3-5 4 10 3-5h4" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Healthcare</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 40V20l10 6V20l10 6V12l12 8v20H8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M34 26v6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Industrial &amp; Diversified</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 34 24 10l14 24H10Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M19 34l5-9 5 9" stroke="#FEDF01" stroke-width="2" stroke-linejoin="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Mining &amp; Metals</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 8v12M32 8v12M12 20h24l-3 20H15L12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M24 26v8" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Power, Utilities &amp; Infrastructure</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22 24 9l16 13v18H8V22Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="19" y="28" width="10" height="12" stroke="#FEDF01" stroke-width="2"/></svg>
+                <span class="rbccm-icon-carousel__label">Real Estate</span>
+              </div>
+
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="14" y="14" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M20 8v6M28 8v6M20 34v6M28 34v6M8 20h6M8 28h6M34 20h6M34 28h6" stroke="#FEDF01" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="rbccm-icon-carousel__label">Technology</span>
+              </div>
+
+            </div>
+          </div>
+
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next" aria-label="Next industries">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+              <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <div class="rbccm-icon-carousel__dots"></div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <div class="harness-label">Edge case — 3 items (fits one desktop slide, chrome auto-hides)</div>
+  <div class="harness-frame">
+
+    <section class="rbccm-icon-carousel"
+             data-per-view-mobile="4"
+             data-per-view-tablet="2"
+             data-per-view-desktop="4"
+             aria-roledescription="carousel"
+             aria-label="Short list test">
+      <div class="rbccm-icon-carousel__inner">
+        <div class="rbccm-icon-carousel__header">
+          <h2 class="rbccm-icon-carousel__heading">Short list</h2>
+        </div>
+
+    <!-- Screen-reader affordances. These are what accessible-slick provides to
+         the slick-based carousels on the site; this component is vanilla, so it
+         supplies them itself.
+
+         announce   — polite live region. The JS writes "Slide 2 of 3" here on
+                      every user-initiated change. Without it, pressing Next
+                      moves the carousel silently for an SR user.
+         instructions — describes the keyboard model, referenced by the track's
+                      aria-describedby so it's read when focus enters. -->
+    <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+
+        <div class="rbccm-icon-carousel__viewport-row">
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev" aria-label="Previous">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+              <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="rbccm-icon-carousel__viewport" role="region" aria-label="Industries">
+            <div class="rbccm-icon-carousel__track">
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="15" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span class="rbccm-icon-carousel__label">Power, Utilities &amp; Infrastructure</span>
+              </div>
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="10" y="10" width="28" height="28" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span class="rbccm-icon-carousel__label">Real Estate</span>
+              </div>
+              <div class="rbccm-icon-carousel__item">
+                <svg class="rbccm-icon-carousel__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 38 24 10l14 28H10Z" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span class="rbccm-icon-carousel__label">Technology</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next" aria-label="Next">
+            <svg class="rbccm-icon-carousel__arrow-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="rbccm-icon-carousel__arrow-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+              <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+              <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="rbccm-icon-carousel__dots"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+  <script src="icon-carousel.js"></script>
+</body>
+</html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: Icon Carousel
+       ===================================================================
+       Datum-driven replacement for the Bootstrap 3 #ecm-carousel.
+
+       Authors supply a FLAT list of Icon Items (min 4). This template
+       emits them as a flat <li> list — it does NOT group them into
+       slides. The JS chunks them at runtime per breakpoint and rebuilds
+       on resize, so the slide count, dot count and the 4/4/3 split all
+       derive themselves. The legacy markup hardcoded that split across
+       three .item divs, which is why adding a sector meant rebalancing
+       all three by hand.
+
+       Depends on:
+         /assets/rbccm/css/components/icon-carousel.css
+         /assets/rbccm/js/components/icon-carousel.js
+       =================================================================== -->
+
+  <!-- HTML output, as filter-by / conference-insights-tiles / story-tiles all
+       declare. This is what stops the serializer re-escaping the `&lt;` and
+       `&amp;&amp;` inside the inlined <script> — in HTML, script content is CDATA and
+       is emitted raw. Without it the browser would receive literal &lt; in the
+       JS and throw a SyntaxError. -->
+  <xsl:output method="html" indent="no"/>
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- ── Item count guard ──
+         Min 4 (see icon-carousel-properties.xml). Below that the 4-across
+         desktop row can't be filled. No upper bound — the JS scales.
+
+         Counts only rows that will ACTUALLY RENDER, i.e. those with a
+         label. Counting raw Groups would let an author leave two of six
+         rows blank and still trip the guard into rendering a 4-across row
+         with four real items — the blank rows are dropped further down, so
+         the count here has to use the same test the render does. -->
+    <xsl:variable name="itemCount" select="count(
+        /Properties/Data/Group[(@ID='IconItem' or @Name='Icon Item')
+                               and normalize-space(Datum[@ID='Label' or @Name='Label']) != '']
+        | /Data/Group[(@ID='IconItem' or @Name='Icon Item')
+                      and normalize-space(Datum[@ID='Label' or @Name='Label']) != '']
+      )"/>
+
+    <xsl:if test="$itemCount >= 4">
+
+      <!-- ── Config ── -->
+      <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
+      <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+
+      <!-- Per-view counts. Fall back to the Figma defaults when unset, so a
+           half-configured DCR still renders the intended layout. -->
+      <xsl:variable name="pvDesktopRaw" select="normalize-space(/Properties/Datum[@ID='PerViewDesktop'])"/>
+      <xsl:variable name="pvTabletRaw"  select="normalize-space(/Properties/Datum[@ID='PerViewTablet'])"/>
+      <xsl:variable name="pvMobileRaw"  select="normalize-space(/Properties/Datum[@ID='PerViewMobile'])"/>
+
+      <xsl:variable name="pvDesktop">
+        <xsl:choose>
+          <xsl:when test="$pvDesktopRaw != ''"><xsl:value-of select="$pvDesktopRaw"/></xsl:when>
+          <xsl:otherwise>4</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="pvTablet">
+        <xsl:choose>
+          <xsl:when test="$pvTabletRaw != ''"><xsl:value-of select="$pvTabletRaw"/></xsl:when>
+          <xsl:otherwise>2</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="pvMobile">
+        <xsl:choose>
+          <xsl:when test="$pvMobileRaw != ''"><xsl:value-of select="$pvMobileRaw"/></xsl:when>
+          <xsl:otherwise>4</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Booleans arrive as the strings "true"/"false". Loop defaults ON
+           because it's what fills the short final slide. -->
+      <xsl:variable name="loop">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Loop']) = 'false'">false</xsl:when>
+          <xsl:otherwise>true</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="autoplay">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='Autoplay']) = 'true'">true</xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+
+      <!-- ── Aria labels: override → derive from heading → generic ── -->
+      <xsl:variable name="carouselAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$heading != ''"><xsl:value-of select="$heading"/></xsl:when>
+          <xsl:otherwise>Icon carousel</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="prevAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PrevArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Previous</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="nextAria">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NextArrowAriaLabel'])"/>
+          </xsl:when>
+          <xsl:otherwise>Next</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Region label (accessible-slick's `regionLabel`). Distinct labels are
+           what let a screen-reader user tell two carousels on the same page
+           apart, so this derives from the heading rather than being a fixed
+           string like "Industries" — two instances would otherwise be
+           indistinguishable. -->
+      <xsl:variable name="regionLabel">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='RegionLabel']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='RegionLabel'])"/>
+          </xsl:when>
+          <xsl:when test="$heading != ''"><xsl:value-of select="$heading"/></xsl:when>
+          <xsl:otherwise>Icon carousel</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Optional sr-only instructions (accessible-slick's `instructionsText`).
+           Blank by default — see the Datum comment for why. -->
+      <xsl:variable name="instructions" select="normalize-space(/Properties/Datum[@ID='InstructionsText'])"/>
+
+      <!-- Unique per instance. Two carousels on one page would otherwise emit
+           duplicate ids and every aria-describedby would resolve to the first. -->
+      <xsl:variable name="instructionsId" select="concat('rbccm-ic-instructions-', generate-id(.))"/>
+
+      <!-- ── Appearance modifiers ──
+           Mirrors leadership-slider-bio.html exactly: same Datum names, same
+           class suffixes, same background-image assembly and defaults. The two
+           components are configured the same way on purpose.
+
+           ColorScheme and HeadingAlignment are independent — centred headings
+           on a light section, or left-aligned on a dark one, are both valid. -->
+      <xsl:variable name="colorScheme">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='ColorScheme']) = 'dark'">dark</xsl:when>
+          <xsl:otherwise>light</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="headingAlignment">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='HeadingAlignment']) = 'center'">center</xsl:when>
+          <xsl:otherwise>left</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Item layout: 'inline' (icon beside label, per the Figma comp) or
+           'centered' (icon above label, both centred). Anything unrecognised
+           falls back to inline. -->
+      <xsl:variable name="itemAlignment">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='ItemAlignment']) = 'centered'">centered</xsl:when>
+          <xsl:otherwise>inline</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Asset picker → Image/Path, unlike leadership's plain String URL. -->
+      <xsl:variable name="bgImage" select="normalize-space(/Properties/Datum[@ID='BackgroundImage']/Image/Path)"/>
+
+      <xsl:variable name="bgPosition">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImagePosition'])"/>
+          </xsl:when>
+          <xsl:otherwise>center center</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bgSize">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageSize']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageSize'])"/>
+          </xsl:when>
+          <xsl:otherwise>cover</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="bgRepeat">
+        <xsl:choose>
+          <xsl:when test="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat']) != ''">
+            <xsl:value-of select="normalize-space(/Properties/Datum[@ID='BackgroundImageRepeat'])"/>
+          </xsl:when>
+          <xsl:otherwise>no-repeat</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- Precomputed class + style strings, so the xsl:attribute calls on the
+           <section> stay readable. -->
+      <xsl:variable name="sectionClass">
+        <xsl:text>rbccm-icon-carousel</xsl:text>
+        <xsl:if test="$colorScheme = 'dark'"><xsl:text> rbccm-icon-carousel--on-dark</xsl:text></xsl:if>
+        <xsl:if test="$headingAlignment = 'center'"><xsl:text> rbccm-icon-carousel--headings-centered</xsl:text></xsl:if>
+        <xsl:if test="$itemAlignment = 'centered'"><xsl:text> rbccm-icon-carousel--items-centered</xsl:text></xsl:if>
+      </xsl:variable>
+
+      <!-- Padding overrides, written as CSS custom properties (filter-by's
+           pattern). The stylesheet reads them via var() with the default as the
+           fallback, so a blank Datum must emit NOTHING — writing an empty value
+           would resolve to `padding: ;` and blow away the default. Hence one
+           xsl:if per property rather than a single unconditional block. -->
+      <xsl:variable name="padTopMobile"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])"/>
+      <xsl:variable name="padBottomMobile"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])"/>
+      <xsl:variable name="padTopDesktop"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])"/>
+      <xsl:variable name="padBottomDesktop" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])"/>
+
+      <!-- ONE style attribute carries BOTH the padding vars and the background
+           image. They have to be assembled into a single string — a second
+           xsl:attribute name="style" would silently overwrite the first, and
+           whichever ran last would win. That's the trap this variable avoids.
+
+           Emitted only when something is actually set; otherwise the section
+           carries no style attribute at all and the CSS defaults (including any
+           background-color the on-dark modifier set) show through untouched. -->
+      <xsl:variable name="sectionStyle">
+        <xsl:if test="$padTopMobile != ''">
+          <xsl:text>--rbccm-ic-pt-m: </xsl:text><xsl:value-of select="$padTopMobile"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padBottomMobile != ''">
+          <xsl:text>--rbccm-ic-pb-m: </xsl:text><xsl:value-of select="$padBottomMobile"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padTopDesktop != ''">
+          <xsl:text>--rbccm-ic-pt-d: </xsl:text><xsl:value-of select="$padTopDesktop"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$padBottomDesktop != ''">
+          <xsl:text>--rbccm-ic-pb-d: </xsl:text><xsl:value-of select="$padBottomDesktop"/><xsl:text>; </xsl:text>
+        </xsl:if>
+        <xsl:if test="$bgImage != ''">
+          <xsl:text>background-image: url('</xsl:text><xsl:value-of select="$bgImage"/><xsl:text>'); background-position: </xsl:text><xsl:value-of select="$bgPosition"/><xsl:text>; background-size: </xsl:text><xsl:value-of select="$bgSize"/><xsl:text>; background-repeat: </xsl:text><xsl:value-of select="$bgRepeat"/><xsl:text>;</xsl:text>
+        </xsl:if>
+      </xsl:variable>
+
+      <!-- Component stylesheet. Deployed alongside the other component CSS.
+           slick's own CSS (slick.min.css / accessible-slick) is already on the
+           page site-wide; this file only layers overrides on top of it. -->
+      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/icon-carousel.css"/>
+
+      <!-- ================================================================ -->
+      <section aria-roledescription="carousel">
+        <xsl:attribute name="class"><xsl:value-of select="$sectionClass"/></xsl:attribute>
+        <!-- Gated on the assembled string, not on $bgImage — a padding override
+             with no background image must still emit a style attribute. -->
+        <xsl:if test="normalize-space($sectionStyle) != ''">
+          <xsl:attribute name="style"><xsl:value-of select="normalize-space($sectionStyle)"/></xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="data-per-view-mobile"><xsl:value-of select="$pvMobile"/></xsl:attribute>
+        <xsl:attribute name="data-per-view-tablet"><xsl:value-of select="$pvTablet"/></xsl:attribute>
+        <xsl:attribute name="data-per-view-desktop"><xsl:value-of select="$pvDesktop"/></xsl:attribute>
+        <xsl:attribute name="data-loop"><xsl:value-of select="$loop"/></xsl:attribute>
+        <xsl:attribute name="data-autoplay"><xsl:value-of select="$autoplay"/></xsl:attribute>
+        <xsl:attribute name="aria-label"><xsl:value-of select="$carouselAria"/></xsl:attribute>
+
+        <div class="rbccm-icon-carousel__inner">
+
+          <!-- ── Header (optional) ──
+               Heading and intro are independently optional, and the WRAPPER is
+               conditional too. __inner is a flex column with a 64px gap, so an
+               empty __header div would still be a flex child — it would sit
+               there contributing a phantom 64px of space above the carousel.
+               Emit nothing at all when neither is authored.
+
+               Four valid states: both, heading only, intro only, neither. -->
+          <xsl:if test="$heading != '' or $intro != ''">
+            <div class="rbccm-icon-carousel__header">
+              <xsl:if test="$heading != ''">
+                <h2 class="rbccm-icon-carousel__heading">
+                  <xsl:value-of select="$heading" disable-output-escaping="yes"/>
+                </h2>
+              </xsl:if>
+              <xsl:if test="$intro != ''">
+                <p class="rbccm-icon-carousel__intro">
+                  <xsl:value-of select="$intro" disable-output-escaping="yes"/>
+                </p>
+              </xsl:if>
+            </div>
+          </xsl:if>
+
+          <!-- Polite live region. The JS writes "Slide 2 of 3" here on every
+               user-initiated change; without it the carousel moves silently for
+               a screen-reader user. This is what accessible-slick provides to
+               the slick-based carousels — we're vanilla, so we supply it. -->
+          <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+               aria-live="polite" aria-atomic="true"></div>
+
+          <!-- Optional sr-only instructions, at the START of the carousel per
+               accessible-slick's guidance. Emitted only when authored. -->
+          <xsl:if test="$instructions != ''">
+            <p class="rbccm-icon-carousel__sr-only">
+              <xsl:attribute name="id"><xsl:value-of select="$instructionsId"/></xsl:attribute>
+              <xsl:value-of select="$instructions"/>
+            </p>
+          </xsl:if>
+
+          <!-- ── Carousel row ── -->
+          <div class="rbccm-icon-carousel__viewport-row">
+
+            <!-- Two icons per arrow: bare chevron (mobile), circled chevron
+                 (desktop). CSS swaps them. Ported from the leadership slider
+                 so the two components read as one family. -->
+            <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$prevAria"/></xsl:attribute>
+              <svg class="rbccm-icon-carousel__arrow-icon--mobile" xmlns="http://www.w3.org/2000/svg"
+                   width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="rbccm-icon-carousel__arrow-icon--desktop" xmlns="http://www.w3.org/2000/svg"
+                   width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+                <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+                <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+            <!-- role=region + a DISTINCT aria-label (accessible-slick's
+                 regionLabel). aria-describedby only when instructions exist —
+                 pointing at a missing id would be a dangling reference. -->
+            <div class="rbccm-icon-carousel__viewport" role="region">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$regionLabel"/></xsl:attribute>
+              <xsl:if test="$instructions != ''">
+                <xsl:attribute name="aria-describedby"><xsl:value-of select="$instructionsId"/></xsl:attribute>
+              </xsl:if>
+              <div class="rbccm-icon-carousel__track">
+
+                <!-- ── Items ──
+                     Flat list. The JS groups them; the XSL must not.
+
+                     Matching on @ID *or* @Name: Teamsite strips @ID from
+                     Datums inside a Replicatable Group, so @Name is the only
+                     reliable selector. Keeping both means the template works
+                     whether or not the ID survives. -->
+                <xsl:for-each select="
+                    /Properties/Data/Group[@ID='IconItem' or @Name='Icon Item']
+                    | /Data/Group[@ID='IconItem' or @Name='Icon Item']
+                  ">
+                  <!-- Icon: pick the dark variant automatically on a dark section.
+                       CSS can't recolour an <img>-embedded SVG, so the only way to
+                       get white strokes while KEEPING the yellow accent is a second
+                       file. Selection is automatic (never an author choice), so a
+                       navy icon can't end up on a navy background.
+
+                       If the section is dark but no dark variant was supplied, fall
+                       back to the light icon — low contrast, but still renders. -->
+                  <xsl:variable name="iconLight" select="normalize-space(Datum[@ID='Icon'     or @Name='Icon']/Image/Path)"/>
+                  <xsl:variable name="iconDark"  select="normalize-space(Datum[@ID='IconDark' or @Name='Icon Dark Variant']/Image/Path)"/>
+                  <xsl:variable name="iconPath">
+                    <xsl:choose>
+                      <xsl:when test="$colorScheme = 'dark' and $iconDark != ''">
+                        <xsl:value-of select="$iconDark"/>
+                      </xsl:when>
+                      <xsl:otherwise><xsl:value-of select="$iconLight"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:variable name="iconAlt"  select="normalize-space(Datum[@ID='IconAlt' or @Name='Icon Alt Text'])"/>
+                  <xsl:variable name="label"    select="normalize-space(Datum[@ID='Label' or @Name='Label'])"/>
+
+                  <!-- Skip rows with no label: an icon with no name is
+                       meaningless here, and an empty cell would break the
+                       4-across rhythm. -->
+                  <xsl:if test="$label != ''">
+                    <div class="rbccm-icon-carousel__item">
+
+                      <xsl:if test="$iconPath != ''">
+                        <img class="rbccm-icon-carousel__icon" loading="lazy">
+                          <xsl:attribute name="src"><xsl:value-of select="$iconPath"/></xsl:attribute>
+                          <!-- alt="" by default: the label beside the icon already
+                               names the sector, so a duplicate alt makes a screen
+                               reader announce it twice. Authors can override. -->
+                          <xsl:attribute name="alt"><xsl:value-of select="$iconAlt"/></xsl:attribute>
+                        </img>
+                      </xsl:if>
+
+                      <span class="rbccm-icon-carousel__label">
+                        <xsl:value-of select="$label" disable-output-escaping="yes"/>
+                      </span>
+
+                    </div>
+                  </xsl:if>
+
+                </xsl:for-each>
+
+              </div>
+            </div>
+
+            <button type="button" class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next">
+              <xsl:attribute name="aria-label"><xsl:value-of select="$nextAria"/></xsl:attribute>
+              <svg class="rbccm-icon-carousel__arrow-icon--mobile" xmlns="http://www.w3.org/2000/svg"
+                   width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="rbccm-icon-carousel__arrow-icon--desktop" xmlns="http://www.w3.org/2000/svg"
+                   width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+                <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+                <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+
+          </div>
+
+          <!-- Dots are generated by the JS (count follows the slide count),
+               so there is nothing to author or maintain here. -->
+          <div class="rbccm-icon-carousel__dots"></div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           Component JS, inlined in the skin (same as leadership-slider-bio).
+           `&` and `<` are XML-escaped — this is a stylesheet, not an HTML file.
+           =================================================================== -->
+      <script>
+        /* =========================================================================
+           Icon Carousel — accessible-slick implementation
+           =========================================================================
+           Uses the same carousel stack as the rest of rbccm.com: jQuery + slick,
+           preferring the accessible-slick build. Mirrors the loader, the arrow
+           wiring, the dots container and the sr-only announce region used by the
+           leadership carousel, so the two behave and are maintained the same way.
+
+           Why slick rather than a bespoke engine: every other carousel on the site
+           is slick, accessible-slick's a11y behaviour is already vetted, and a
+           one-off implementation would be a maintenance island.
+
+           ---- Config (data attributes on .rbccm-icon-carousel) --------------------
+             data-per-view-mobile   items per page  &lt; 768px   (default 4, STACKED)
+             data-per-view-tablet   items per page  768–991px (default 2)
+             data-per-view-desktop  items per page  >= 992px  (default 4)
+             data-loop              "true" = infinite (default true)
+             data-autoplay          "true" = auto-advance (default false)
+
+           ---- Layout note ---------------------------------------------------------
+           Mobile stacks its items vertically (4 in a column, per the comp). That is
+           slick's GRID MODE — `rows: 4, slidesPerRow: 1` — not four separate slides.
+           Desktop is the normal case: `slidesToShow: 4, rows: 1`.
+
+           Infinite mode is also what fills the short final page: 11 items at 4-up
+           would leave a dead cell, and slick's clones wrap the first items into it.
+           ========================================================================= */
+        (function () {
+          'use strict';
+
+          var BOUND_FLAG = 'data-icon-carousel-bound';
+
+          /* Prefer the accessible-slick build hosted on rbccm.com so we get the same
+             screen-reader experience as every page that already includes it; fall back
+             to vanilla slick from cdnjs only if that 404s. Straight port of the
+             leadership carousel's loader. */
+          function ensureSlickLoaded(cb) {
+            if (typeof window.jQuery === 'undefined') return;           /* no jQuery, no carousel */
+            if (typeof window.jQuery.fn.slick !== 'undefined') { cb(); return; }
+
+            var s = document.createElement('script');
+            s.src = '/assets/rbccm/js/accessible-slick.min.js';
+            s.onload = function () { cb(); };
+            s.onerror = function () {
+              var fallback = document.createElement('script');
+              fallback.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+              fallback.onload = function () { cb(); };
+              document.head.appendChild(fallback);
+            };
+            document.head.appendChild(s);
+          }
+
+          function intAttr(root, name, fallback) {
+            var n = parseInt(root.getAttribute(name), 10);
+            return (!n || n &lt; 1) ? fallback : n;
+          }
+
+          function init(root) {
+            var $ = window.jQuery;
+            if (root.getAttribute(BOUND_FLAG) === 'true') return;
+
+            var $root  = $(root);
+            var $track = $root.find('.rbccm-icon-carousel__track');
+            var $dots  = $root.find('.rbccm-icon-carousel__dots');
+            var $prev  = $root.find('.rbccm-icon-carousel__arrow--prev');
+            var $next  = $root.find('.rbccm-icon-carousel__arrow--next');
+            var $announce = $root.find('.rbccm-icon-carousel__announce');
+
+            if (!$track.length || !$track.children().length) return;
+            if ($track.hasClass('slick-initialized')) return;
+            root.setAttribute(BOUND_FLAG, 'true');
+
+            var pvDesktop = intAttr(root, 'data-per-view-desktop', 4);
+            var pvTablet  = intAttr(root, 'data-per-view-tablet', 2);
+            var pvMobile  = intAttr(root, 'data-per-view-mobile', 4);
+
+            /* Loop defaults ON — it's what wraps the first items into the short final
+               page (11 items at 4-up would otherwise leave an empty cell). */
+            var infinite = root.getAttribute('data-loop') !== 'false';
+            var autoplay = root.getAttribute('data-autoplay') === 'true';
+
+            var reducedMotion = window.matchMedia &amp;&amp;
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* ---- Fill the short last page ---------------------------------------
+               11 items at 4-per-page leaves the final page with 3 and a dead cell.
+
+               On desktop/tablet slick's infinite clones paper over this — the track
+               simply continues into them. GRID MODE DOES NOT: slick chops the items
+               into fixed sections of `rows` BEFORE cloning, so the last section really
+               is short and you get an empty 4th row (a tall void above the dots).
+
+               Fix it at the source: pad the item list up to a whole multiple of the
+               page size, with clones of the leading items, so every page is full at
+               every breakpoint. Same trick as the pre-slick build, now applied once to
+               the DOM up front, before slick initialises.
+
+               Only when looping — without a wrap, a copy of item 1 dangling off the end
+               is a non-sequitur, so a non-looping carousel keeps its gap by design. */
+            if (infinite) {
+              var $items = $track.children();
+              var count  = $items.length;
+
+              /* Pad to a multiple of the MOBILE page size only — not the LCM of all
+                 three breakpoints.
+
+                 Desktop and tablet don't need padding: they run rows:1, so slick's
+                 infinite clones sit in the same track and the last page simply
+                 continues into them. No dead cell. Only grid mode chops the items into
+                 fixed sections up front, so only mobile can strand a short one.
+
+                 Padding to the LCM instead looked tidier but was a trap: an author
+                 setting PerViewDesktop=5 makes LCM(5,2,4) = 20, so a 5-item carousel
+                 would pad to 20 — 15 clones, three quarters of it duplicates. Far worse
+                 than the gap it set out to fix. Mobile's stride is at most 4, so the
+                 padding is at most 3 items. */
+              var stride = pvMobile;
+              var short  = (stride - (count % stride)) % stride;
+
+              /* Belt and braces: never let the padding outweigh the real content. If a
+                 config somehow asks for that, take the gap instead. */
+              if (short >= count) short = 0;
+
+              for (var p = 0; p &lt; short; p++) {
+                var $pad = $items.eq(p % count).clone(false);
+                $pad.addClass('is-pad');
+                /* Duplicate content — keep it out of the a11y tree. The real item is
+                   still announced on the page it belongs to. */
+                $pad.attr('aria-hidden', 'true');
+                $track.append($pad);
+              }
+            }
+
+
+            /* Arrows are OUR buttons, in the markup, outside the 1100px rail — slick's
+               own arrows can't live there, so `arrows: false` and we drive slick by
+               command. Same approach as leadership and upcoming-conferences. */
+            $track.slick({
+              slidesToShow:   pvDesktop,
+              slidesToScroll: pvDesktop,   /* page by a full row, not one item */
+              rows:           1,
+              slidesPerRow:   1,
+              infinite:       infinite,
+              arrows:         false,
+              dots:           true,
+              dotsClass:      'slick-dots',
+              appendDots:     $dots,
+              autoplay:       autoplay,
+              autoplaySpeed:  6000,
+              pauseOnHover:   true,
+              pauseOnFocus:   true,
+              speed:          reducedMotion ? 0 : 400,
+              cssEase:        reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+              useCSS:         true,
+              useTransform:   true,
+              adaptiveHeight: false,
+              draggable:      true,
+              swipe:          true,
+              swipeToSlide:   false,       /* snap by page, not by item */
+              touchMove:      true,
+              waitForAnimate: true,
+              respondTo:      'window',
+              /* regionLabel is accessible-slick's; it's what lets a screen-reader user
+                 tell two carousels on one page apart. Taken from the section's own
+                 aria-label so it's authored once in the DCR. */
+              regionLabel:    root.getAttribute('aria-label') || 'Icon carousel',
+
+              responsive: [
+                {
+                  breakpoint: 992,          /* &lt; 992: tablet */
+                  settings: {
+                    slidesToShow:   pvTablet,
+                    slidesToScroll: pvTablet,
+                    rows:           1,
+                    slidesPerRow:   1
+                  }
+                },
+                {
+                  breakpoint: 768,          /* &lt; 768: mobile — GRID MODE, items stack */
+                  settings: {
+                    slidesToShow:   1,
+                    slidesToScroll: 1,
+                    rows:           pvMobile,   /* 4 rows of 1 = the stacked column */
+                    slidesPerRow:   1
+                  }
+                }
+              ]
+            });
+
+            /* ---- Arrows ----------------------------------------------------------
+               Our buttons, driving slick by command. */
+            $prev.on('click', function () {
+              try { $track.slick('slickPrev'); } catch (e) { /* mid-teardown */ }
+            });
+            $next.on('click', function () {
+              try { $track.slick('slickNext'); } catch (e) { /* mid-teardown */ }
+            });
+
+            /* Non-looping carousels dead-end, so grey the arrow out at the stop.
+               Infinite ones never do, so they stay live. */
+            function syncArrows() {
+              if (infinite) return;
+              var slick = $track.slick('getSlick');
+              if (!slick) return;
+              var atStart = slick.currentSlide === 0;
+              var atEnd   = slick.currentSlide >= slick.slideCount - slick.options.slidesToShow;
+
+              $prev.add($dots.find('[data-clone="prev"]'))
+                .prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false');
+              $next.add($dots.find('[data-clone="next"]'))
+                .prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false');
+            }
+
+            /* ---- Announce --------------------------------------------------------
+               accessible-slick labels the region and each slide, but does not announce
+               the CHANGE. Without this, pressing Next moves the carousel silently.
+               Leadership does the same thing with its own live region. */
+            $track.on('afterChange', function (e, slick, currentSlide) {
+              syncArrows();
+              if (!$announce.length) return;
+              var perPage = slick.options.slidesToScroll || 1;
+              var page  = Math.floor(currentSlide / perPage) + 1;
+              var total = Math.ceil(slick.slideCount / perPage);
+              $announce.text('Slide ' + page + ' of ' + total);
+            });
+
+            /* Single page = nothing to page to, so hide the arrows and dots.
+               slick still initialises (it must, for the responsive re-layout), it just
+               has one dot. Recomputed on breakpoint change because a 5-item carousel is
+               static at 4-up on desktop but pages on tablet at 2-up. */
+            function syncStatic() {
+              var slick = $track.slick('getSlick');
+              if (!slick) return;
+
+              /* slideCount is the number of SLIDES slick is paging between — and in
+                 grid mode (mobile) a "slide" is a whole SECTION of rows, not an item.
+                 With 11 items at rows:4 that's 3, not 11.
+
+                 So compare against slidesToShow ALONE. Multiplying by `rows` was the
+                 bug: 3 sections &lt;= (1 x 4) resolved true, the carousel declared itself
+                 static, and the arrows and dots vanished on mobile. */
+              $root.toggleClass('is-static', slick.slideCount &lt;= slick.options.slidesToShow);
+            }
+
+            /* Mobile puts the arrows either side of the dots; desktop puts them either
+               side of the track. Rather than duplicating markup, clone the real buttons
+               into the dots row and let CSS show whichever pair the breakpoint wants.
+               Clones delegate straight back to the originals. */
+            function mountMobileArrows() {
+              if (!$dots.length || !$prev.length || !$next.length) return;
+              if ($dots.find('[data-clone]').length) return;   /* already mounted */
+
+              var $mPrev = $prev.clone(false).attr('data-clone', 'prev')
+                .on('click', function () { $prev.trigger('click'); });
+              var $mNext = $next.clone(false).attr('data-clone', 'next')
+                .on('click', function () { $next.trigger('click'); });
+
+              $dots.prepend($mPrev);
+              $dots.append($mNext);
+            }
+
+            $track.on('init reInit breakpoint', function () {
+              syncArrows();
+              syncStatic();
+              mountMobileArrows();
+            });
+
+            syncArrows();
+            syncStatic();
+            mountMobileArrows();
+          }
+
+          function initAll(ctx) {
+            var $ = window.jQuery;
+            if (!$) return;
+            var roots = (ctx || document).querySelectorAll('.rbccm-icon-carousel');
+            for (var i = 0; i &lt; roots.length; i++) {
+              (function (root) {
+                ensureSlickLoaded(function () { init(root); });
+              })(roots[i]);
+            }
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { initAll(); });
+          } else {
+            initAll();
+          }
+
+          /* Exposed so a page that injects markup later (feed scripts, TeamSite
+             preview re-render) can bind the new instances. */
+          window.RBCCMIconCarousel = { init: initAll };
+        })();
+
+      </script>
+
+    </xsl:if>
+
+  </xsl:template>
+</xsl:stylesheet>
+
+<!-- ============================================================
+     Icon Carousel — Properties + Data
+     ============================================================
+     Component-level authoring inputs (Properties) and the
+     repeatable icon/label rows (Data).
+
+     Consumed by icon-carousel.xsl.
+
+     Depends on:
+       /assets/rbccm/css/components/icon-carousel.css
+       /assets/rbccm/js/components/icon-carousel.js
+     ============================================================ -->
+<Properties ComponentID="icon-carousel-v1">
+
+  <!-- ─── Copy (both optional) ───
+       Heading and intro are independently optional, and the XSL drops the
+       whole header block when neither is filled in — no empty <h2>, no empty
+       <p>, and no empty wrapper div either (an empty wrapper would still be a
+       flex child and leave a phantom 64px gap above the carousel).
+
+       All four combinations render correctly: both, heading only, intro only,
+       neither (carousel alone, sitting flush under whatever precedes it).
+
+       No default copy on purpose. This is a generic component now, not the ECM
+       one — a baked-in "Equity Capital Markets…" default would quietly ship
+       that heading onto any other page an author drops this on. -->
+  <Datum ID="Heading" Type="String" Name="Section Heading (optional)"></Datum>
+
+  <!-- Textarea: the comp's standfirst runs long and may want inline markup. -->
+  <Datum ID="Intro" Type="Textarea" Name="Intro / Standfirst (optional)"></Datum>
+
+  <!-- ─── Behaviour ───
+       Items per slide, per breakpoint. The XSL passes these straight
+       through to the data attributes the JS reads; it re-chunks the
+       flat item list on resize, so these are the ONLY place the slide
+       count is decided. Authors never group items into slides.
+
+       Defaults match the Figma comp: 4 across on desktop, 4 stacked on
+       mobile. Tablet is 2 because 4 across at 768–991px squeezes the
+       longer sector names. -->
+  <Datum ID="PerViewDesktop" Type="Number" Name="Items per slide — desktop (992px+)">4</Datum>
+  <Datum ID="PerViewTablet"  Type="Number" Name="Items per slide — tablet (768–991px)">2</Datum>
+  <Datum ID="PerViewMobile"  Type="Number" Name="Items per slide — mobile (under 768px)">4</Datum>
+
+  <!-- Infinite looping. When on, the carousel wraps past the ends, the
+       arrows never disable, AND a short final slide is padded with the
+       leading items so there's no empty cell (11 items at 4-per-slide
+       would otherwise leave a hole). Recommended ON for this reason. -->
+  <Datum ID="Loop" Type="Boolean" Name="Infinite loop (wrap past the ends)">true</Datum>
+
+  <!-- Auto-advance. OFF by default and deliberately so: this is
+       reference content, not a promo unit. The legacy Bootstrap
+       carousel auto-advanced (data-ride="carousel") and moved the
+       content out from under people mid-read. Respects
+       prefers-reduced-motion and pauses on hover/focus when enabled. -->
+  <Datum ID="Autoplay" Type="Boolean" Name="Auto-advance slides">false</Datum>
+
+
+  <!-- ─── Appearance ───
+       Same modifier system as the leadership slider, same Datum names and
+       same BEM modifier suffixes, so the two components are configured
+       identically:
+
+         ColorScheme = dark        adds the "on-dark" modifier class
+         HeadingAlignment = center adds the "headings-centered" modifier class
+
+       (Written out in words because an XML comment may not contain a double
+       hyphen, so the literal BEM class names can't be quoted here.)
+
+       The two are deliberately INDEPENDENT: an author can centre the headings
+       on a light section, or left-align them on a dark one. -->
+  <Datum ID="ColorScheme" Type="String" Name="Color Scheme (light or dark)">light</Datum>
+  <Datum ID="HeadingAlignment" Type="String" Name="Heading Alignment (left or center)">left</Datum>
+
+  <!-- Item layout. Two ways to arrange the icon against its label:
+
+         inline   (default) icon BESIDE the label, pair left-aligned in its
+                  column. This is what the Figma comp specs.
+         centered icon ABOVE the label, both centred in the column. Reads as a
+                  tile rather than a list row.
+
+       "centered" suits short labels ("Energy", "Healthcare") and looks
+       deliberate with 4 across. Be aware it costs vertical space and that a
+       long label — "Power, Utilities & Infrastructure" — will wrap to two or
+       three centred lines, which makes the row noticeably taller. The inline
+       default absorbs long labels far more gracefully.
+
+       Independent of ColorScheme and HeadingAlignment; any combination is
+       valid. Applies at every breakpoint, including the mobile stack. -->
+  <Datum ID="ItemAlignment" Type="String" Name="Item Layout (inline or centered)">inline</Datum>
+
+  <!-- Background image (optional). Layers over the section's background
+       colour, so it composites correctly with ColorScheme=dark.
+
+       The three modifiers below only take effect when an image is set; the
+       XSL defaults them to center center / cover / no-repeat, which is what
+       the leadership banner uses. Leave them blank unless the art direction
+       needs otherwise.
+
+       NOTE: this is a Type="Image" asset picker, whereas leadership uses a
+       plain String URL. Same reasoning as the item icons — the picker works
+       given the empty <Image> skeleton below. Authors get a browse dialog
+       instead of pasting /assets/rbccm/images/... by hand. -->
+  <Datum ID="BackgroundImage" Type="Image" Name="Background Image">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position (default: center center)"></Datum>
+  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size (default: cover)"></Datum>
+  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat (default: no-repeat)"></Datum>
+
+  <!-- ─── Section padding (optional overrides) ───
+       Same pattern as filter-by: leave blank to use the baked-in default,
+       or supply any CSS length (e.g. "80px", "5rem", "0") to override.
+
+       The XSL writes these out as CSS custom properties on the section, so
+       the stylesheet keeps its defaults and an override is a one-Datum change
+       with no CSS edit. Blank Datums emit nothing at all — the var() fallback
+       in the CSS is what supplies the default.
+
+       Note leadership has no equivalent; filter-by is the precedent here.
+
+       Horizontal padding is deliberately NOT exposed. The side gutters are
+       load-bearing: they're where the arrows live, outside the 1100px rail.
+       An author setting a large left/right padding would clamp the content box
+       and pull the arrows back inside the rail, squeezing the icon grid. If a
+       page ever needs a different rail width, that's a CSS change, not a Datum. -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
+  <!-- ─── Accessibility ───
+
+       RegionLabel — the aria-label on the carousel's region wrapper. This is
+       accessible-slick's `regionLabel` setting, and it matters most when a page
+       has MORE THAN ONE carousel: without distinct labels a screen reader
+       announces two identical "region"s and the user can't tell them apart.
+       Blank falls back to the Section Heading, then to a generic label.
+
+       InstructionsText — accessible-slick's `instructionsText`. Optional
+       screen-reader-only text emitted at the START of the carousel, explaining
+       any behaviour that isn't obvious. Blank by default and that is the right
+       default here: this carousel's behaviour IS obvious (Prev / Next / numbered
+       dot buttons, all reachable by Tab), and there is no arrow-key handling to
+       explain. Fill it in only for genuinely non-obvious behaviour — e.g. if two
+       carousels are ever synced, say so. Per accessible-slick's own tip, reuse
+       the RegionLabel wording here so users know what to listen for. -->
+  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank = section heading)"></Datum>
+  <Datum ID="InstructionsText" Type="String" Name="Screen-reader Instructions (blank = none)"></Datum>
+
+  <!-- All optional. Sensible defaults are baked into the XSL; fill
+       these in only when the generic wording isn't right for the page. -->
+  <Datum ID="CarouselAriaLabel" Type="String" Name="Carousel Aria Label (override)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ── ICON ITEMS ──
+       One Group per icon + label pair.
+
+       MINIMUM 4. The XSL will not render the component with fewer —
+       the layout is a 4-across row on desktop, and 1–3 items would
+       either leave dead cells or stretch to absurd widths. No maximum:
+       the JS derives the slide and dot count from however many exist,
+       so adding a twelfth sector needs no code change anywhere.
+
+       IMPORTANT — Datum @Name attributes MUST match the XSL's @Name
+       selectors. Teamsite strips @ID on replicated Datums, so @Name is
+       the only reliable match inside a Replicatable Group. Same trap
+       documented in past-speakers-attendees. -->
+  <Group ID="IconItem"
+         Name="Icon Item"
+         Replicatable="true"
+         CloneGroupID="icon-carousel-item"
+         MinReplicates="4">
+
+    <!-- Asset picker. The nested <Image> skeleton is REQUIRED and must
+         be left empty here — do not put a default path in it.
+
+         A previous attempt to use Type="Image" in past-speakers-attendees
+         was rolled back after the validator threw "Datum ID=[Image] Value
+         is not a valid image". That failure was the schema, not the picker:
+         Type="Image" needs this exact empty Path/Description skeleton, as
+         proven by imagine-2025/components/themes. Copy it verbatim.
+
+         The XSL reads the path from Datum[@Name='Icon']/Image/Path. -->
+    <Datum ID="Icon" Type="Image" Name="Icon">
+      <Image Width="40" Height="40">
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+
+    <!-- Dark-background variant of the same icon (e.g. icon-energy-dark.svg,
+         with the navy strokes redrawn in white and the yellow accent kept).
+
+         WHY a second file rather than a CSS trick: the icons are referenced as
+         <img src="*.svg">, and CSS cannot reach inside an image to recolour it.
+         A `filter: brightness(0) invert(1)` would work but flattens everything
+         to solid white and destroys the yellow accent.
+
+         The XSL selects this AUTOMATICALLY whenever ColorScheme = dark — the
+         author never picks a variant, so nobody can pair a navy icon with a
+         navy background by mistake.
+
+         Optional. If ColorScheme is dark and this is blank, the light icon is
+         used as a fallback, which will be low-contrast. Fill it in for any
+         section that runs dark. -->
+    <Datum ID="IconDark" Type="Image" Name="Icon Dark Variant">
+      <Image Width="40" Height="40">
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+
+    <!-- Decorative by default: the label next to the icon already names
+         the sector, so a matching alt would make a screen reader say it
+         twice. Leave BLANK unless the icon carries meaning the label
+         doesn't. The XSL emits alt="" when this is empty. -->
+    <Datum ID="IconAlt" Type="String" Name="Icon Alt Text"></Datum>
+
+    <Datum ID="Label" Type="String" Name="Label" Required="true">Sector name</Datum>
+
+  </Group>
+
+</Data>

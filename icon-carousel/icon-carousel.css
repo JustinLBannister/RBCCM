@@ -1,0 +1,709 @@
+/* =========================================================================
+   Icon Carousel — styles
+   =========================================================================
+   Sits on top of slick (accessible-slick build). slick.min.css provides the
+   structural rules for .slick-list / .slick-track / .slick-slide; everything
+   here is an override on top of that, same arrangement as
+   leadership-carousel.css and upcoming-conferences.css.
+
+   Mobile-first. Base block = phone; `min-width` queries layer on tablet and
+   desktop. No Bootstrap grid, no `.row` / `.col-*`.
+
+   Layout strategy
+   ---------------
+   The legacy markup nested a `.row` inside every `.col`, so each icon/label
+   pair was its own 12-column grid (`col-xs-2` icon + `col-xs-10` text) — which
+   is why the labels never lined up when one wrapped to two lines. Here each
+   item is a 2-column CSS grid: fixed icon column, content-sized text column,
+   label vertically centred against the icon. Wrapping can't break alignment.
+
+   Slides / paging / clones are all slick's job. This file never counts items.
+
+   Theming hooks (set on .rbccm-icon-carousel or :root)
+   ----------------------------------------------------
+     --rbccm-ic-pt-m / --rbccm-ic-pb-m   mobile padding top / bottom  (40px)
+     --rbccm-ic-pt-d / --rbccm-ic-pb-d   desktop padding top / bottom (64px)
+     --rbccm-ic-icon-size                icon WIDTH (40px at every breakpoint —
+                                         Figma does not scale it up on desktop).
+                                         Height follows the artwork's own ratio.
+     --rbccm-ic-icon-max-h               optional height cap; unset by default
+     --rbccm-ic-gap                      gap between items (12px)
+   ========================================================================= */
+
+.rbccm-icon-carousel {
+  padding: var(--rbccm-ic-pt-m, 40px) 16px var(--rbccm-ic-pb-m, 40px);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.rbccm-icon-carousel *,
+.rbccm-icon-carousel *::before,
+.rbccm-icon-carousel *::after {
+  box-sizing: border-box;
+}
+
+/* The content rail — a byte-for-byte copy of leadership's .rbccm-leadership__inner:
+   1200px base, tightening to 1140px at 1170+. Not just the end value, the whole
+   two-step, so the two components line up at every width rather than only at
+   desktop.
+
+   Heading, intro, dots and the icon track all inherit it, so nothing below needs
+   its own max-width.
+
+   NOTE: the Figma comp specs a 1100px rail (1440 frame, 170px side padding). We
+   deliberately use leadership's rail instead — the two carousels can appear on
+   the same page, and a 40px difference in rail width would read as a
+   misalignment between sections. Consistency beat the comp here; worth a word to
+   the designer.
+
+   The ARROWS are the one exception: they sit OUTSIDE the rail, in the section's
+   gutter. They get there the same way leadership does it — the carousel row
+   breaks out of __inner with negative side margins equal to one arrow column
+   (44px button + 24px gap = 68px), and only at a width where that gutter is
+   guaranteed to exist. Below that, the arrows drop to the dots row instead, so
+   the track always spans the full rail and stays aligned with the heading.
+
+   Vertical rhythm comes from the flex `gap`, not margins on the children:
+   Figma specs a single 64px gap between header / carousel row / dots. */
+.rbccm-icon-carousel__inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;              /* → 64px at desktop, per Figma */
+  margin: 0 auto;
+  max-width: 1200px;
+  position: relative;
+}
+
+@media (min-width: 1170px) {
+  .rbccm-icon-carousel__inner { max-width: 1140px; }
+}
+
+
+/* ---- Heading + intro ---------------------------------------------------- */
+/* Figma: flex column, align-items flex-start, gap 16px.
+   The legacy markup had `style="margin-top: 7%; margin-bottom: -1%"` inline —
+   a percentage margin resolves against the PARENT WIDTH, not height, so the
+   gap grew on wide screens and collapsed on narrow ones. Gap replaces it. */
+/* No max-width: __inner already IS the 1140px rail. */
+.rbccm-icon-carousel__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 16px;
+}
+
+.rbccm-icon-carousel__heading {
+  margin: 0;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.rbccm-icon-carousel__intro {
+  margin: 0;
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---- Screen-reader-only utility ----------------------------------------- */
+/* Visually hidden but still announced. NOT `display: none` / `visibility:
+   hidden` — both remove the node from the a11y tree, which would silence the
+   live region entirely. */
+.rbccm-icon-carousel__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Viewport row: [prev] [track] [next] -------------------------------- */
+/* Mobile: arrows are hidden here (they move to the dots row), so this is just
+   the track, full-bleed to the section padding. Flex, not grid — a grid with
+   empty auto columns would still pay the column gaps and inset the track by
+   48px for no reason. Desktop swaps to the grid below. */
+.rbccm-icon-carousel__viewport-row {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  gap: 24px;
+}
+
+.rbccm-icon-carousel__viewport {
+  flex: 1 1 auto;
+  min-width: 0; /* lets a flex child actually shrink; without it slick's track
+                   forces the row wider than its container */
+}
+
+/* =========================================================================
+   slick overrides
+   =========================================================================
+   slick.min.css supplies the mechanics (absolute track, floated slides,
+   transform paging). These rules only adjust spacing and height.
+   ========================================================================= */
+
+.rbccm-icon-carousel__track .slick-list {
+  /* Negative margin cancels the per-slide padding below, so the FIRST and LAST
+     items still sit flush against the 1140px rail while the items between them
+     get their 12px gutter. Without this the row is inset by half a gap on each
+     side and no longer aligns with the heading. */
+  margin: 0 calc(var(--rbccm-ic-gap, 12px) / -2);
+}
+
+.rbccm-icon-carousel__track .slick-track {
+  /* slick floats its slides, so they collapse to the tallest content rather
+     than matching each other. Flex makes every slide equal height, which keeps
+     the icons on a consistent baseline when one label wraps to two lines. */
+  display: flex;
+  align-items: stretch;
+}
+
+.rbccm-icon-carousel__track .slick-slide {
+  height: auto;                                    /* undo slick's fixed height */
+  padding: 0 calc(var(--rbccm-ic-gap, 12px) / 2);  /* the 12px inter-item gutter */
+  float: none;                                     /* flex track owns placement */
+}
+
+/* Grid mode (mobile). slick wraps each row in a plain div; this is the only
+   hook for the vertical rhythm between the four stacked items. */
+.rbccm-icon-carousel__track .slick-slide > div + div {
+  margin-top: var(--rbccm-ic-gap, 12px);
+}
+
+/* slick-theme adds `margin-bottom: 30px` to any dotted slider. Our dots are
+   appended to our OWN container outside the track, so that margin is just a
+   stray 30px hole under the row. */
+.rbccm-icon-carousel__track.slick-dotted.slick-slider {
+  margin-bottom: 0;
+}
+
+/* ---- Item: icon + label ------------------------------------------------- */
+/* Figma: height 50px, align-items center, gap 15px.
+
+   Column sizing: the icon is a fixed track, the label is `auto` — NOT `1fr`.
+   With `1fr` the label track stretches to the end of its quarter whatever the
+   text is, so a short label like "Energy" left a large void before the next
+   icon while a long one ran right up against it. Sizing the track to the text
+   and centring the pair gives every item symmetric space on both sides.
+
+   Don't rewrite this as min(max-content, calc(...)) — CSS math functions can't
+   take intrinsic keywords, so the browser drops the whole declaration. */
+.rbccm-icon-carousel__item {
+  /* !important is load-bearing, not laziness.
+
+     slick's buildRows() runs whenever `rows > 0` and writes an INLINE
+     `display: inline-block` onto every original child — our items. An inline
+     style outranks any class selector, so without !important the grid silently
+     collapses and the icon stacks ON TOP of the label instead of sitting beside
+     it. This is the same fight leadership-carousel.css picks with slick, and
+     the same reason nearly every rule in that file carries !important. */
+  display: grid !important;
+  grid-template-columns: var(--rbccm-ic-icon-size, 40px) auto;
+  align-items: center;
+  justify-content: center;   /* centre the icon+label pair within its column */
+  gap: 15px;
+  min-height: 50px;   /* min-, not fixed: a label that wraps to two lines must
+                         be allowed to grow rather than overflow its box */
+  margin: 0;
+}
+
+/* Mobile stacks the items one per row, where centring would leave each pair
+   floating mid-row with a ragged left edge. Hard left rail there — a vertical
+   list reads as a list, so the icons must line up.
+
+   Scoped with :not() so it doesn't fight the items-centered modifier, which
+   wants its items centred at EVERY breakpoint, mobile included. */
+@media (max-width: 767px) {
+  .rbccm-icon-carousel:not(.rbccm-icon-carousel--items-centered) .rbccm-icon-carousel__item {
+    grid-template-columns: var(--rbccm-ic-icon-size, 40px) 1fr;
+    justify-content: start;
+  }
+}
+
+/* =========================================================================
+   Modifier: items-centered
+   =========================================================================
+   Icon ABOVE the label, both centred — a tile rather than a list row. Set by
+   ItemAlignment=centered in the DCR. The Figma comp specs the inline default;
+   this is the alternative treatment.
+
+   One grid column instead of two, so the icon and label stack; `justify-items`
+   centres each within that column, and text-align handles a label that wraps to
+   more than one line (justify-items alone would centre the text BLOCK but leave
+   its lines ragged-left inside it).
+
+   `display: grid !important` is repeated here for the same reason the base rule
+   carries it — slick writes an inline `display: inline-block` on every item and
+   an inline style beats any class selector. A modifier that only changed
+   grid-template-columns would be silently ignored on a slick-initialised track.
+   ========================================================================= */
+.rbccm-icon-carousel--items-centered .rbccm-icon-carousel__item {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  gap: 12px;              /* tighter than the 15px inline gap: vertical spacing
+                             between an icon and its caption reads larger than
+                             the same value does horizontally */
+}
+
+/* The icon's own box must centre too — without this it hugs the column's start
+   edge on browsers that resolve the auto margin differently. */
+.rbccm-icon-carousel--items-centered .rbccm-icon-carousel__icon {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Icon: WIDTH is the constraint, height follows the artwork.
+
+   Previously this locked a 40x40 box with `aspect-ratio: 1/1` and
+   `object-fit: contain`, which is wrong for anything that isn't square: a 2:1
+   icon got letterboxed down to 40x20 inside the square, so it rendered SMALLER
+   than its siblings rather than simply wider. Now the width is pinned at 40 and
+   the height resolves from the icon's own ratio, so a tall icon is tall and a
+   wide icon is wide — all of them exactly 40 across, which is what keeps the
+   labels on a common left edge.
+
+   Works for both an <img src="...svg"> (intrinsic ratio from the file) and the
+   inline <svg viewBox> used in the test harness (ratio from the viewBox).
+
+   --rbccm-ic-icon-max-h is an escape hatch, unset by default: every item on a
+   page shares the tallest one's height, so one unusually tall icon lifts the
+   whole row. Set it if a set of artwork turns out to be badly proportioned. */
+.rbccm-icon-carousel__icon {
+  width: var(--rbccm-ic-icon-size, 40px);
+  max-width: var(--rbccm-ic-icon-size, 40px);
+  height: auto;
+  max-height: var(--rbccm-ic-icon-max-h, none);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Figma: Blue-Bright-Blue #0051A5 — NOT the dark navy used for the heading. */
+.rbccm-icon-carousel__label {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+/* =========================================================================
+   Arrows + dots — ported from leadership-carousel.css
+   =========================================================================
+   Lifted from the leadership slider so the two components read as one family.
+   Deviations are deliberate and noted inline.
+   ========================================================================= */
+
+/* ---- Arrows ------------------------------------------------------------- */
+/* Two SVGs per button, same as leadership: a bare 14×24 chevron for mobile, a
+   circled 44×44 chevron for desktop. CSS swaps them; the JS never touches it.
+   These are OUR buttons — slick runs with `arrows: false` and we drive it with
+   slickPrev / slickNext, because slick's own arrows can't sit outside the
+   1140px rail. */
+.rbccm-icon-carousel__arrow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.rbccm-icon-carousel__arrow svg { display: block; }
+
+.rbccm-icon-carousel__arrow .rbccm-icon-carousel__arrow-icon--mobile  { display: block; }
+.rbccm-icon-carousel__arrow .rbccm-icon-carousel__arrow-icon--desktop { display: none; }
+
+/* Desktop arrow hover — fills the circle blue, turns the chevron white.
+   Straight port of the leadership rule, retargeted at our class names. */
+.rbccm-icon-carousel__arrow-icon--desktop rect,
+.rbccm-icon-carousel__arrow-icon--desktop path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.rbccm-icon-carousel__arrow:hover .rbccm-icon-carousel__arrow-icon--desktop rect {
+  fill: #003168;
+}
+
+.rbccm-icon-carousel__arrow:hover .rbccm-icon-carousel__arrow-icon--desktop path {
+  stroke: #ffffff;
+}
+
+/* Focus ring — keyboard-only, same #003168 and same 4px radius as
+   leadership's .rbccm-leadership__btn, including the plain `:focus` reset so a
+   mouse click never leaves a ring behind. */
+.rbccm-icon-carousel__arrow:focus { outline: none; }
+
+.rbccm-icon-carousel__arrow:focus-visible {
+  outline: 2px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 4px;
+}
+
+/* Non-looping only: slick's infinite mode never dead-ends, so the disabled
+   state only ever appears when data-loop="false". */
+.rbccm-icon-carousel__arrow[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rbccm-icon-carousel__arrow[disabled]:hover .rbccm-icon-carousel__arrow-icon--desktop rect {
+  fill: none;
+}
+
+.rbccm-icon-carousel__arrow[disabled]:hover .rbccm-icon-carousel__arrow-icon--desktop path {
+  stroke: #003168;
+}
+
+/* Mobile: arrows sit on the dots row, not beside the track. */
+.rbccm-icon-carousel__viewport-row > .rbccm-icon-carousel__arrow {
+  display: none;
+}
+
+/* ---- Dots row ----------------------------------------------------------- */
+/* The container is ours (slick's `appendDots` target); the <ul class="slick-dots">
+   inside it is slick's. Leadership geometry: 11px dots, 26px gaps. */
+/* Layout is pinned with `order`, NOT DOM order.
+
+   The JS prepends the prev-arrow clone and appends the next-arrow clone, which
+   gives the right sequence on first init — but slick RE-APPENDS its own
+   <ul class="slick-dots"> to this container every time it re-initialises (any
+   breakpoint change). The ul then lands after both clones and you get
+   [‹][›][dots] instead of [‹][dots][›].
+
+   Flex `order` is immune to that: whatever sequence slick leaves in the DOM,
+   the arrows render either side of the dot strip. */
+.rbccm-icon-carousel__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+}
+
+.rbccm-icon-carousel__dots [data-clone="prev"] { order: 1; }
+.rbccm-icon-carousel__dots .slick-dots           { order: 2; }
+.rbccm-icon-carousel__dots [data-clone="next"]   { order: 3; }
+/* accessible-slick's autoplay toggle, when present, sits after the arrows. */
+.rbccm-icon-carousel__dots .slick-autoplay-toggle-button { order: 4; }
+
+.rbccm-icon-carousel__dots .slick-dots {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;   /* slick-theme absolutely-positions these */
+  bottom: auto !important;
+  width: auto !important;
+}
+
+.rbccm-icon-carousel__dots .slick-dots li {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 11px !important;
+  height: 11px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+.rbccm-icon-carousel__dots .slick-dots li button {
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  position: static !important;
+  cursor: pointer;
+  outline: none;
+}
+
+/* accessible-slick renders its own <span class="slick-dot-icon"> glyph inside
+   each dot button. We draw the dot with ::before (leadership's treatment), so
+   the built-in glyph has to go or you get two dots stacked on each other. */
+.rbccm-icon-carousel__dots .slick-dots li button .slick-dot-icon {
+  display: none !important;
+}
+
+/* Inactive dot: outlined circle (leadership's data URI, unchanged). */
+.rbccm-icon-carousel__dots .slick-dots li button::before {
+  content: '' !important;
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+
+/* Active dot: filled circle + a ring 4px out via box-shadow. The same visual is
+   reused for hover and keyboard focus, exactly as leadership does it. */
+.rbccm-icon-carousel__dots .slick-dots li.slick-active button::before,
+.rbccm-icon-carousel__dots .slick-dots li button:focus-visible::before,
+.rbccm-icon-carousel__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+  outline: 0;
+}
+
+.rbccm-icon-carousel__dots .slick-dots li button:focus-visible {
+  outline: none;
+}
+
+/* Mobile arrow clones injected into the dots row by the JS. */
+.rbccm-icon-carousel__dots .rbccm-icon-carousel__arrow {
+  display: flex;
+}
+
+/* ---- Autoplay pause/play toggle ----------------------------------------- */
+/* accessible-slick adds this button automatically whenever autoplay is on —
+   WCAG 2.2.2 requires a way to pause auto-moving content, and hover/focus
+   pausing doesn't satisfy it (no touch equivalent, not discoverable). We only
+   have to style it. */
+.rbccm-icon-carousel .slick-autoplay-toggle-button {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--Blue-Dark-Blue, #003168);
+  opacity: 1;
+  cursor: pointer;
+}
+
+.rbccm-icon-carousel .slick-autoplay-toggle-button:focus { outline: none; }
+.rbccm-icon-carousel .slick-autoplay-toggle-button:focus-visible {
+  outline: 2px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 4px;
+}
+
+/* ---- Single page: no chrome -------------------------------------------- */
+/* When every item fits in one view there's nothing to page to, so the arrows
+   and dots are noise. The JS sets this flag from slick's slideCount. */
+.rbccm-icon-carousel.is-static .rbccm-icon-carousel__arrow,
+.rbccm-icon-carousel.is-static .rbccm-icon-carousel__dots {
+  display: none;
+}
+
+/* ---- Before slick initialises ------------------------------------------ */
+/* Between HTML parse and slick init the items are plain divs in a row. Stack
+   them rather than letting them spill sideways, so the flash-of-unstyled
+   moment looks like a list instead of a broken carousel. slick adds
+   .slick-initialized as soon as it's up. */
+.rbccm-icon-carousel__track:not(.slick-initialized) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rbccm-ic-gap, 12px);
+}
+
+/* =========================================================================
+   Modifier: on-dark
+   =========================================================================
+   Dark blue section + white text and chrome. Ported from leadership's
+   equivalent so the two components switch schemes identically. Set by
+   ColorScheme=dark in the DCR. Independent of headings-centered.
+
+   `background-color`, not the `background` shorthand: an author can also set a
+   BackgroundImage, which the XSL writes as an inline `background-image`. The
+   shorthand would be clobbered by it and the colour would vanish wherever the
+   image didn't cover.
+   ========================================================================= */
+.rbccm-icon-carousel--on-dark {
+  background-color: #003168;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__heading,
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__intro {
+  color: #ffffff;
+}
+
+/* Labels go white too. On the light scheme they're bright blue (#0051A5),
+   which fails contrast against #003168 — this is the one item token that MUST
+   flip with the scheme. */
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__label {
+  color: #ffffff;
+}
+
+/* Icons are <img src="*.svg">, and CSS cannot reach inside an image — so there
+   is deliberately NO icon rule here. A dark section needs a dark ARTWORK file:
+   fill in the "Icon Dark Variant" picker on each item and the XSL swaps to it
+   automatically whenever ColorScheme = dark. */
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow-icon--mobile path,
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow-icon--desktop rect,
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow-icon--desktop path {
+  stroke: #ffffff;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow:hover .rbccm-icon-carousel__arrow-icon--desktop rect {
+  fill: #ffffff;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow:hover .rbccm-icon-carousel__arrow-icon--desktop path {
+  stroke: #003168;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow[disabled]:hover .rbccm-icon-carousel__arrow-icon--desktop rect {
+  fill: none;
+}
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow[disabled]:hover .rbccm-icon-carousel__arrow-icon--desktop path {
+  stroke: #ffffff;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__arrow:focus-visible {
+  outline-color: #ffffff;
+}
+
+.rbccm-icon-carousel--on-dark .slick-autoplay-toggle-button { color: #ffffff; }
+.rbccm-icon-carousel--on-dark .slick-autoplay-toggle-button:focus-visible { outline-color: #ffffff; }
+
+/* Dots invert: white outline when inactive, solid white when active. The ring
+   flips too — 4px of the DARK bg, then a white edge — so the active dot still
+   reads as a ringed dot rather than a white blob. */
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__dots .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+}
+
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__dots .slick-dots li.slick-active button::before,
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__dots .slick-dots li button:focus-visible::before,
+.rbccm-icon-carousel--on-dark .rbccm-icon-carousel__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+  box-shadow: 0 0 0 4px #003168, 0 0 0 5px #ffffff !important;
+}
+
+/* =========================================================================
+   Modifier: headings-centered
+   =========================================================================
+   Centres the heading + intro. Works in either colour scheme, so alignment is
+   chosen independently of light/dark. Set by HeadingAlignment=center.
+
+   __header is a flex column with align-items: flex-start, so text-align alone
+   wouldn't move it — the items must be re-aligned too, or the block stays
+   hugging the left edge and only its internal text centres.
+   ========================================================================= */
+.rbccm-icon-carousel--headings-centered .rbccm-icon-carousel__header {
+  align-items: center;
+}
+
+.rbccm-icon-carousel--headings-centered .rbccm-icon-carousel__heading,
+.rbccm-icon-carousel--headings-centered .rbccm-icon-carousel__intro {
+  text-align: center;
+}
+
+/* =========================================================================
+   Tablet — 768px+
+   ========================================================================= */
+@media (min-width: 768px) {
+  .rbccm-icon-carousel {
+    padding: var(--rbccm-ic-pt-d, 64px) 24px var(--rbccm-ic-pb-d, 64px);
+  }
+
+  /* Figma: 64px between header / carousel row / dots. */
+  .rbccm-icon-carousel__inner {
+    gap: 64px;
+  }
+
+
+  .rbccm-icon-carousel__heading { font-size: 36px; }
+  .rbccm-icon-carousel__intro   { font-size: 18px; }
+
+
+
+  /* Items sit side by side from here up — slick handles the columns. */
+  .rbccm-icon-carousel__track:not(.slick-initialized) {
+    flex-direction: row;
+  }
+}
+
+/* =========================================================================
+   Desktop breakout — 1300px+
+   =========================================================================
+   Straight port of leadership's technique (.rbccm-leadership__carousel @1300).
+
+   Up to here the arrows live on the DOTS row, below the track — because there
+   is no gutter to put them in, and forcing them alongside would either squeeze
+   the icon track or push them off-screen. The track therefore spans the full
+   1140px rail at every width below 1300 and stays aligned with the heading.
+
+   At 1300+ there IS a gutter, so the row breaks out of __inner by exactly one
+   arrow column each side (44px button + 24px gap = 68px — leadership uses the
+   same -68px) and lays out as [prev | 1140px track | next]. The track stays
+   locked at 1140, so the icons still line up with the heading; only the arrows
+   move outside the rail.
+
+   `max-width: none` is required — it undoes the 1140px the row inherits from
+   __inner, which would otherwise clamp the broken-out grid straight back in.
+   ========================================================================= */
+@media (min-width: 1300px) {
+  .rbccm-icon-carousel__viewport-row {
+    display: grid;
+    grid-template-columns: auto 1140px auto;
+    column-gap: 24px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -68px;
+    max-width: none;
+    width: auto;
+  }
+
+  .rbccm-icon-carousel__viewport {
+    min-width: 0;   /* let the 1140px track hold its width inside the grid cell */
+  }
+
+  /* Arrows come up out of the dots row and flank the track. */
+  .rbccm-icon-carousel__viewport-row > .rbccm-icon-carousel__arrow {
+    display: flex;
+  }
+
+  .rbccm-icon-carousel__dots .rbccm-icon-carousel__arrow {
+    display: none;
+  }
+
+  /* Icon swap happens at the SAME breakpoint as the layout move — leadership
+     splits these (1245 / 1300) and gets a 55px window where the arrows have
+     moved but still show the mobile chevron. */
+  .rbccm-icon-carousel__arrow .rbccm-icon-carousel__arrow-icon--mobile  { display: none; }
+  .rbccm-icon-carousel__arrow .rbccm-icon-carousel__arrow-icon--desktop { display: block; }
+}
+
+/* =========================================================================
+   Reduced motion
+   ========================================================================= */
+/* The JS also passes speed: 0 to slick, which is what actually stops the
+   animation; this covers any transition slick's own CSS applies. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-icon-carousel__track .slick-track {
+    transition: none !important;
+  }
+}

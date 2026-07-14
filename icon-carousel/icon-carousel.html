@@ -1,0 +1,193 @@
+<!-- =========================================================================
+     Icon Carousel — markup block
+     =========================================================================
+     Replaces the Bootstrap 3 #ecm-carousel (`.carousel.slide` + `.row`
+     + `.col-sm-3.col-xs-12`). No Bootstrap, no Font Awesome.
+
+     Runs on jQuery + slick (accessible-slick build preferred), the same
+     carousel stack as the leadership slider and upcoming-conferences.
+
+     ---- Authoring -----------------------------------------------------------
+     Author a FLAT list of items. Do NOT pre-chunk them into slides — the old
+     markup hardcoded 4/4/3 across three `.item` divs, which meant adding a
+     twelfth sector required re-balancing all three by hand. slick pages the
+     flat list per breakpoint, so you add or remove items and the pages and
+     dots derive themselves.
+
+     ---- Config (data attributes on .rbccm-icon-carousel) --------------------
+       data-per-view-mobile   items per slide < 768px   (default 4)
+       data-per-view-tablet   items per slide 768–991px (default 2)
+       data-per-view-desktop  items per slide >= 992px  (default 4)
+       data-loop              "true" for infinite looping (default off). The
+                              JS clones the first and last slides so wrapping
+                              is seamless; arrows stop disabling at the ends.
+       data-autoplay          "true" to cycle (default off — this is
+                              reference content, not a promo unit; the old
+                              data-ride="carousel" auto-advanced and stole
+                              focus mid-read)
+
+     ---- Dependencies --------------------------------------------------------
+       /assets/rbccm/css/components/icon-carousel.css
+       /assets/rbccm/js/components/icon-carousel.js
+
+     Chevrons are inline SVG (not `<em class="fa fa-angle-left">`) so they
+     render without the Font Awesome dependency and can be recoloured by CSS.
+     ========================================================================= -->
+
+<section class="rbccm-icon-carousel"
+         data-per-view-mobile="4"
+         data-per-view-tablet="2"
+         data-per-view-desktop="4"
+         data-loop="true"
+         aria-roledescription="carousel"
+         aria-label="Equity Capital Markets coverage across industries">
+
+  <div class="rbccm-icon-carousel__inner">
+
+    <!-- Header — BOTH the h2 and the p are optional, and so is this wrapper.
+         Delete whichever isn't needed. If NEITHER is needed, delete the whole
+         __header div: __inner is a flex column with a 64px gap, so an empty
+         wrapper is still a flex child and would leave a phantom 64px of space
+         above the carousel. The XSL applies the same rule. -->
+    <div class="rbccm-icon-carousel__header">
+      <h2 class="rbccm-icon-carousel__heading">
+        Equity Capital Markets coverage across industries
+      </h2>
+
+      <p class="rbccm-icon-carousel__intro">
+        Our solutions are built on deep sector expertise across the industries driving global capital markets.
+      </p>
+
+    </div>
+
+
+    <!-- Screen-reader affordances. These are what accessible-slick provides to
+         the slick-based carousels on the site; this component is vanilla, so it
+         supplies them itself.
+
+         announce   — polite live region. The JS writes "Slide 2 of 3" here on
+                      every user-initiated change. Without it, pressing Next
+                      moves the carousel silently for an SR user.
+         instructions — describes the keyboard model, referenced by the track's
+                      aria-describedby so it's read when focus enters. -->
+    <div class="rbccm-icon-carousel__announce rbccm-icon-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+
+    <div class="rbccm-icon-carousel__viewport-row">
+
+      <!-- Two icons per arrow, same pattern as the leadership slider: bare
+           chevron on mobile, circled chevron on desktop. CSS swaps them at
+           768px; both SVGs ship in the markup. -->
+      <button type="button"
+              class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--prev"
+              aria-label="Previous industries">
+        <svg class="rbccm-icon-carousel__arrow-icon--mobile" xmlns="http://www.w3.org/2000/svg"
+             width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-icon-carousel__arrow-icon--desktop" xmlns="http://www.w3.org/2000/svg"
+             width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- The JS moves the <li>s into generated slide wrappers inside here.
+           Live region announces slide changes to screen readers. -->
+      <div class="rbccm-icon-carousel__viewport"
+           role="region"
+           aria-label="Equity Capital Markets coverage across industries">
+        <div class="rbccm-icon-carousel__track">
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-cme.svg">
+            <span class="rbccm-icon-carousel__label">Communications, Media &amp; Entertainment</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-consumer-retail.svg">
+            <span class="rbccm-icon-carousel__label">Consumer &amp; Retail</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-energy.svg">
+            <span class="rbccm-icon-carousel__label">Energy</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-financial-institutions.svg">
+            <span class="rbccm-icon-carousel__label">Financial Institutions</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-financial-sponsors.svg">
+            <span class="rbccm-icon-carousel__label">Financial Sponsors</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-healthcare.svg">
+            <span class="rbccm-icon-carousel__label">Healthcare</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-industrial-diversified.svg">
+            <span class="rbccm-icon-carousel__label">Industrial &amp; Diversified</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-mining-metals.svg">
+            <span class="rbccm-icon-carousel__label">Mining &amp; Metals</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-pui.svg">
+            <span class="rbccm-icon-carousel__label">Power, Utilities &amp; Infrastructure</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-real-estate.svg">
+            <span class="rbccm-icon-carousel__label">Real Estate</span>
+          </div>
+
+          <div class="rbccm-icon-carousel__item">
+            <img class="rbccm-icon-carousel__icon" alt=""
+                 src="/assets/rbccm/images/gib/ecm/icon-technology.svg">
+            <span class="rbccm-icon-carousel__label">Technology</span>
+          </div>
+
+        </div>
+      </div>
+
+      <button type="button"
+              class="rbccm-icon-carousel__arrow rbccm-icon-carousel__arrow--next"
+              aria-label="Next industries">
+        <svg class="rbccm-icon-carousel__arrow-icon--mobile" xmlns="http://www.w3.org/2000/svg"
+             width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-icon-carousel__arrow-icon--desktop" xmlns="http://www.w3.org/2000/svg"
+             width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+          <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- Dots. Generated by JS (count follows the slide count), so nothing to
+         maintain here. Real <button>s, not the old <li data-slide-to> which
+         wasn't keyboard reachable. -->
+    <div class="rbccm-icon-carousel__dots"></div>
+
+  </div>
+</section>
