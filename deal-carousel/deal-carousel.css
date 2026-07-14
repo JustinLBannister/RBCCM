@@ -124,9 +124,22 @@
    ========================================================================= */
 
 .rbccm-deal-carousel__track .slick-list {
-  /* Cancels the per-slide padding below so the first and last cards sit flush
-     with the rail while the cards between them keep their gutter. */
-  margin: 0 calc(var(--rbccm-dc-gap, 32px) / -2);
+  /* NO negative margin.
+     It used to be `margin: 0 calc(var(--rbccm-dc-gap) / -2)`, which cancelled the
+     outer half of the per-slide padding so the first and last cards sat FLUSH
+     with the rail.
+
+     That is wrong here, and the site's global CSS was accidentally hiding it: the
+     global `.slick-slide` margin (16px a side) survived the cancellation and held
+     the outer cards off the arrows. Zeroing that margin to fix the gutter would
+     have removed the inset with it, and the end cards would have slid outward
+     into the arrows.
+
+     Keeping the padding uncancelled does the same job deliberately: the outer
+     cards keep HALF the gutter (16px) as breathing room against the arrows, and
+     that inset is now derived from our own token instead of a global rule we do
+     not control. */
+  margin: 0;
 }
 
 .rbccm-deal-carousel__track .slick-track {
