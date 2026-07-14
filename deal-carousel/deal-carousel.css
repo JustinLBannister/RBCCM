@@ -142,6 +142,17 @@
   height: auto;
   padding: 0 calc(var(--rbccm-dc-gap, 32px) / 2);
   float: none;
+
+  /* `margin: 0` is load-bearing, not tidying.
+     The site's global CSS puts a horizontal MARGIN on .slick-slide (the legacy
+     creds-carousel relied on it for its gutter). Margin and padding do not
+     override each other — they STACK. So our 32px of padding was landing on top
+     of the global 24px of margin and rendering a 56px gap, and every attempt to
+     fix it by changing --rbccm-dc-gap just moved the wrong number.
+
+     Zeroing the margin makes --rbccm-dc-gap the single source of the gutter,
+     which is the whole point of having the token. */
+  margin: 0;
 }
 
 /* slick sets `display: inline-block` INLINE on every slide child, which beats
