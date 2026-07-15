@@ -1,0 +1,457 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM - Insights new -->
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+  <xsl:template match="/">
+
+    <!-- Initial server-side render for first page of stories. -->
+    <div class="insights-stories initial">
+      <div>
+        <xsl:attribute name="class">
+          <xsl:if test="/Properties/Datum[@ID='Container'] = 'true'">container</xsl:if>
+        </xsl:attribute>
+
+
+        <div class="white-box content--wrapper">
+          <xsl:if test="normalize-space(/Properties/Data/Datum[@ID='Title']) != ''">
+            <h2>
+              <xsl:value-of select="/Properties/Data/Datum[@ID='Title']" />
+            </h2>
+          </xsl:if>
+
+          <!-- TeamSite search result container; each metaResult is an article row. -->
+          <xsl:variable name="ARTICLES" select="Properties/Data/Result/records" />
+
+          <div class="row story-tile-row">
+            <xsl:for-each select="$ARTICLES/metaResult">
+              <!-- Newest first by publish date, then creation date. -->
+              <xsl:sort select="concat(./attr[ @key = 'TeamSite/Metadata/publishdate' ], ' ', ./attr[ @key = 'TeamSite/Metadata/CreationDate' ])" order="descending" />
+
+              <!-- Render first 9 rows initially; KO section handles progressive reveal. -->
+              <xsl:if test="position() &lt; 10">
+
+                <xsl:variable name="ARTICLE_TITLE" select="./attr[ @key = 'TeamSite/Metadata/Title' ]" />
+                <xsl:variable name="ARTICLE_DATE" select="./attr[ @key = 'TeamSite/Metadata/publishdate' ]" />
+                <xsl:variable name="ARTICLE_DESCRIPTION" select="./attr[ @key = 'TeamSite/Metadata/Description' ]" />
+                <xsl:variable name="ARTICLE_THUMBNAIL" select="./attr[ @key = 'TeamSite/Metadata/thumbnail' ]" />
+                <xsl:variable name="ARTICLE_SERIES" select="./attr[ @key = 'TeamSite/Metadata/sitelocation' ]" />
+                <xsl:variable name="ARTICLE_ID" select="./@path" />
+                <xsl:variable name="ARTICLE_ID_SHORT" select="substring-after(substring-after(substring-after(substring-after($ARTICLE_ID, '/'), '/'), '/'), '/')" />
+                <xsl:variable name="ARTICLE_PODCAST" select="./attr[ @key = 'TeamSite/Metadata/podcast' ]" />
+                <xsl:variable name="ARTICLE_TEMPLATE_TITLE" select="tokenize($ARTICLE_ID,'/')[last()]" />
+                <xsl:variable name="ARTICLE_TYPE" select="./attr[ @key = 'TeamSite/Metadata/story_type' ]" />
+                <xsl:variable name="ARTICLE_READTIME" select="./attr[ @key = 'TeamSite/Metadata/time_to_read' ]" />
+                <xsl:variable name="ARTICLE_WATCHTIME" select="./attr[ @key = 'TeamSite/Metadata/time_to_watch' ]" />
+                <xsl:variable name="ARTICLE_TRANSCRIPT_LINK" select="./attr[ @key = 'TeamSite/Metadata/article_transcript' ]" />
+                <xsl:variable name="ARTICLE_TRANSCRIPT_SHOW" select="./attr[ @key = 'TeamSite/Metadata/article_transcript_show' ]" />
+                <xsl:variable name="CHARACTER_LIMIT" select="/Properties/Datum[@ID='CharacterLimit']" />
+                <xsl:variable name="ARTICLE_LINK" select="./attr[ @key = 'TeamSite/Metadata/link' ]" />
+                <xsl:variable name="ARTICLE_TITLE_ID" select="concat('episode-title-', position())" />
+                <xsl:variable name="READ_ICON">https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg</xsl:variable>
+                <xsl:variable name="WATCH_ICON">https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg</xsl:variable>
+                <xsl:variable name="LISTEN_ICON">https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg</xsl:variable>
+
+                <xsl:variable name="ARTICLE_URL">
+                  <!-- Prefer explicit link metadata; otherwise derive path from DCR location pattern. -->
+                  <xsl:choose>
+                    <xsl:when test="$ARTICLE_LINK != ''"><xsl:value-of select="$ARTICLE_LINK" /></xsl:when>
+                    <xsl:otherwise>
+                      <xsl:choose>
+                        <xsl:when test="contains($ARTICLE_ID, 'episode/data/biopharma')">/en/gib/biopharma/episode/<xsl:value-of select="$ARTICLE_TEMPLATE_TITLE" /></xsl:when>
+                        <xsl:when test="contains($ARTICLE_ID, 'episode/data/energy')">/en/insights/energy-transition/episode/<xsl:value-of select="$ARTICLE_TEMPLATE_TITLE" /></xsl:when>
+                        <xsl:when test="contains($ARTICLE_ID, 'episode/data/ma')">/en/gib/ma-inflection-points/episode/<xsl:value-of select="$ARTICLE_TEMPLATE_TITLE" /></xsl:when>
+                        <xsl:when test="contains($ARTICLE_ID, 'article/podcast')">/en/insights/<xsl:value-of select="$ARTICLE_ID_SHORT" /></xsl:when>
+                        <xsl:when test="contains($ARTICLE_ID, 'article/story')">/en/insights/<xsl:value-of select="$ARTICLE_ID_SHORT" /></xsl:when>
+                        <xsl:otherwise>/en/insights/<xsl:value-of select="$ARTICLE_ID_SHORT" /></xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <div class="col-xs-12 col-sm-12 col-md-12">
+                  <!-- Horizontal card layout: image left, content right. -->
+                  <div class="story-card story-card--horizontal img-span-4">
+                    <a class="white-box tile--news tile--gib-full tile--white">
+
+                    <xsl:if test="$ARTICLE_TRANSCRIPT_SHOW != 'yes'">
+                       <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_URL" /></xsl:attribute>
+                    </xsl:if>
+
+                    <xsl:if test="$ARTICLE_TRANSCRIPT_SHOW = 'yes'">
+                       <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_TRANSCRIPT_LINK" /></xsl:attribute>
+                    </xsl:if>
+
+                      <div class="img-stretch">
+                        <xsl:attribute name="style">background-image: url('<xsl:value-of select="$ARTICLE_THUMBNAIL" />');</xsl:attribute>
+                        <div class="tile-overlay" aria-hidden="true"></div>
+                      </div>
+
+                      <div class="text-wrapper">
+                        <div class="white-box-text">
+                          <div class="uppercase wide-text">
+                            <div class="news-date">
+                              <p class="date">
+                                <xsl:call-template name="PUBLISH_DATE">
+                                  <xsl:with-param name="publish_date" select="$ARTICLE_DATE" />
+                                </xsl:call-template>
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="yellow-line-sm" aria-hidden="true"></div>
+
+                          <xsl:if test="$ARTICLE_TITLE != ''">
+                            <h2>
+                              <xsl:attribute name="id"><xsl:value-of select="$ARTICLE_TITLE_ID" /></xsl:attribute>
+                              <xsl:value-of select="$ARTICLE_TITLE" disable-output-escaping="yes" />
+                            </h2>
+                          </xsl:if>
+
+                          <xsl:if test="$ARTICLE_DESCRIPTION != ''">
+                            <p class="description">
+                              <xsl:choose>
+                                <xsl:when test="string-length($ARTICLE_DESCRIPTION) > $CHARACTER_LIMIT">
+                                  <xsl:for-each select="tokenize(substring($ARTICLE_DESCRIPTION, 0, $CHARACTER_LIMIT), ' ')">
+                                    <xsl:if test="position() != last()">
+                                      <xsl:if test="position() != 1"><xsl:text> </xsl:text></xsl:if>
+                                      <xsl:value-of select="." disable-output-escaping="yes" />
+                                    </xsl:if>
+                                  </xsl:for-each>...
+                                </xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:value-of select="$ARTICLE_DESCRIPTION" disable-output-escaping="yes" />
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </p>
+                          </xsl:if>
+                        </div>
+                        <!-- Read/watch/listen metadata row with icon by story type. -->
+                        <xsl:if test="$ARTICLE_WATCHTIME != '' or $ARTICLE_READTIME != ''">
+                          <div class="learn-more">
+                            <p class="read-watch">
+                              <xsl:if test="$ARTICLE_WATCHTIME != ''">
+                                <xsl:choose>
+                                  <xsl:when test="$ARTICLE_TYPE = 'video'">
+                                    <img src="{$WATCH_ICON}" alt="" aria-hidden="true"/><span aria-label="{$ARTICLE_WATCHTIME} video">&#160;<xsl:value-of select="$ARTICLE_WATCHTIME"/></span>
+                                  </xsl:when>
+                                  <xsl:otherwise>
+                                    <img src="{$LISTEN_ICON}" alt="" aria-hidden="true"/><span aria-label="{$ARTICLE_WATCHTIME} audio">&#160;<xsl:value-of select="$ARTICLE_WATCHTIME"/></span>
+                                  </xsl:otherwise>
+                                </xsl:choose>
+                              </xsl:if>
+                              <xsl:if test="($ARTICLE_READTIME != '') and ($ARTICLE_WATCHTIME != '')">
+                                <span class="separator" role="presentation" aria-hidden="true"></span>
+                              </xsl:if>
+
+                            <xsl:if test="$ARTICLE_TRANSCRIPT_SHOW != 'yes'">
+
+                              <xsl:if test="$ARTICLE_READTIME != ''">
+                                <img src="{$READ_ICON}" alt="" aria-hidden="true"/><span aria-label="{$ARTICLE_READTIME} read">&#160;<xsl:value-of select="$ARTICLE_READTIME"/></span>
+                              </xsl:if>
+
+                            </xsl:if>
+                            <xsl:if test="$ARTICLE_TRANSCRIPT_SHOW = 'yes'">
+
+                                <img src="{$READ_ICON}" alt="" aria-hidden="true"/><span aria-label="{$ARTICLE_TITLE} transcript">&#160;Transcript</span>
+
+                            </xsl:if>
+
+                            </p>
+                          </div>
+                        </xsl:if>
+                      </div>
+                    </a>
+                    <div class="story-card__footer">
+                      <xsl:if test="$ARTICLE_PODCAST != ''">
+                        <!-- Show play trigger only when podcast URL exists. -->
+                        <button type="button" class="btn audio-play">
+                          <xsl:attribute name="aria-label">
+                            <xsl:choose>
+                              <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Play <xsl:value-of select="$ARTICLE_TITLE" /> episode</xsl:when>
+                              <xsl:otherwise>Play episode</xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:attribute>
+                          <span>Play episode</span>
+                        </button>
+                      </xsl:if>
+                    </div>
+                  </div>
+                  <!-- Podcast player is toggled by JS; iframe src is reset to stop audio. -->
+                  <div class="story-podcast-playing" tabindex="-1" style="display: none;">
+                    <button type="button" aria-label="Close player" class="btn-close-player close-btn">
+                      <img src="/assets/rbccm/images/campaign/player-x.svg" alt="" aria-hidden="true" />
+                    </button>
+                    <iframe width="100%" height="200" scrolling="no" frameborder="no" allow="autoplay" src="{$ARTICLE_PODCAST}">
+                      <xsl:attribute name="title">
+                        <xsl:choose>
+                          <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Podcast player: <xsl:value-of select="$ARTICLE_TITLE" /></xsl:when>
+                          <xsl:otherwise>Podcast player</xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:attribute>
+                      <xsl:attribute name="aria-label">
+                        <xsl:choose>
+                          <xsl:when test="normalize-space($ARTICLE_TITLE) != ''">Podcast player: <xsl:value-of select="$ARTICLE_TITLE" /></xsl:when>
+                          <xsl:otherwise>Podcast player</xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:attribute>
+                    </iframe>
+                  </div>
+                </div>
+
+              </xsl:if>
+            </xsl:for-each>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Knockout-driven mirror list for load-more and client-side filtering states. -->
+    <div class="insights-stories ko">
+      <div class="container" style="display: none" data-bind="visible: show() &gt;= 0">
+        <div class="text-center"
+             data-bind="if: (loaded()==true)&amp;&amp;(filteredItems().length &lt; 1)">
+          <div class="insights-alert" role="alert" aria-live="assertive" aria-atomic="true">
+            There are no articles matching your criteria.
+          </div>
+        </div>
+
+        <!-- Client-rendered items from KO view model. -->
+        <div class="row story-tile-row" data-bind="foreach: filteredItems">
+          <div class="col-xs-12 col-sm-12 col-md-12" data-bind="visible: $index() &lt; $parent.show()">
+            <div class="story-card story-card--horizontal img-span-4">
+
+              <!-- When NOT show transcript, show link to article. -->
+              <a class="white-box tile--news tile--gib-full tile--white" data-bind="visible: articletranscriptshow &amp;&amp; articletranscriptshow === 'no', attr: {{ href: (link || '') }}">
+
+                <div class="img-stretch" data-bind="attr: {{ style: 'background-image: url(\'' + (thumbnail || '') + '\')' }}">
+                  <div class="tile-overlay" aria-hidden="true"></div>
+                </div>
+
+                <div class="text-wrapper">
+                  <div class="white-box-text">
+                    <div class="uppercase wide-text">
+                      <div class="news-date">
+                        <p class="date" data-bind="html: (date || newdate || '')"></p>
+                      </div>
+                    </div>
+
+                    <div class="yellow-line-sm" aria-hidden="true"></div>
+
+
+                    <h2 data-bind="text: (title || '').replace(/&amp;quot;|&quot;|&amp;#34;|&#34;/g, '"'), attr: {{ id: 'episode-title-' + $index() }}"></h2>
+
+
+
+                    <p class="description">
+                      <xsl:attribute name="data-bind">html: (description &amp;&amp; description.length &gt; <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" /> ? description.substring(0, <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" />).replace(/\s+\S*$/, '') + '...' : description)</xsl:attribute>
+                    </p>
+
+                  </div>
+                  <div class="learn-more" data-bind="visible: (watchtime &amp;&amp; watchtime != '') || (readtime &amp;&amp; readtime != '')">
+                    <p class="read-watch">
+                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type === 'video'" />
+                      <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type !== 'video'" />
+                      <span class="date" data-bind="visible: watchtime &amp;&amp; watchtime != '', html: watchtime, attr: {{ 'aria-label': watchtime + (type === 'video' ? ' video' : ' audio') }}"></span>
+
+                      <span class="separator" role="presentation" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; readtime &amp;&amp; readtime != ''"></span>
+
+                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="" aria-hidden="true" data-bind="visible: readtime &amp;&amp; readtime != ''" />
+
+                      <span class="date" data-bind="visible: readtime &amp;&amp; readtime != '', html: readtime, attr: {{ 'aria-label': readtime + ' read' }}"></span>
+
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+              <!-- When show transcript selected, NOT show link to article. -->
+              <a class="white-box tile--news tile--gib-full tile--white" data-bind="visible: articletranscriptshow &amp;&amp; articletranscriptshow === 'yes', attr: {{ href: (articletranscript || '') }}">
+
+
+                <div class="img-stretch" data-bind="attr: {{ style: 'background-image: url(\'' + (thumbnail || '') + '\')' }}">
+                  <div class="tile-overlay" aria-hidden="true"></div>
+                </div>
+
+                <div class="text-wrapper">
+                  <div class="white-box-text">
+                    <div class="uppercase wide-text">
+                      <div class="news-date">
+                        <p class="date" data-bind="html: (date || newdate || '')"></p>
+                      </div>
+                    </div>
+
+                    <div class="yellow-line-sm" aria-hidden="true"></div>
+
+
+                    <h2 data-bind="text: (title || '').replace(/&amp;quot;|&quot;|&amp;#34;|&#34;/g, '"'), attr: {{ id: 'episode-title-' + $index() }}"></h2>
+
+
+
+                    <p class="description">
+                      <xsl:attribute name="data-bind">html: (description &amp;&amp; description.length &gt; <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" /> ? description.substring(0, <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" />).replace(/\s+\S*$/, '') + '...' : description)</xsl:attribute>
+                    </p>
+
+                  </div>
+                  <div class="learn-more" data-bind="visible: (watchtime &amp;&amp; watchtime != '') || (readtime &amp;&amp; readtime != '')">
+                    <p class="read-watch">
+                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type === 'video'" />
+                      <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type !== 'video'" />
+                      <span class="date" data-bind="visible: watchtime &amp;&amp; watchtime != '', html: watchtime, attr: {{ 'aria-label': watchtime + (type === 'video' ? ' video' : ' audio') }}"></span>
+
+                      <span class="separator" role="presentation" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; readtime &amp;&amp; readtime != ''"></span>
+
+                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="" aria-hidden="true" data-bind="visible: readtime &amp;&amp; readtime != ''" />
+
+                      <span class="date" data-bind="attr: {{ 'aria-label': title + ' transcript' }}">Transcript</span>
+
+                    </p>
+                  </div>
+                </div>
+              </a>
+
+
+
+              <div class="story-card__footer">
+                <button type="button" class="btn audio-play" data-bind="visible: podcast &amp;&amp; podcast !== '', attr: {{ 'aria-label': (title &amp;&amp; title != '' ? 'Play ' + title + ' episode' : 'Play episode') }}">
+                  <span>Play episode</span>
+                </button>
+              </div>
+            </div>
+            <!-- KO version of inline podcast player block. -->
+            <div class="story-podcast-playing" tabindex="-1" style="display: none;">
+              <button type="button" aria-label="Close player" class="btn-close-player close-btn pull-right">
+                <img src="/assets/rbccm/images/campaign/player-x.svg" alt="" aria-hidden="true" />
+              </button>
+              <iframe width="100%" height="200" scrolling="no" frameborder="no" allow="autoplay" data-bind="visible: podcast &amp;&amp; podcast != '', attr: {{ src: podcast, title: (title ? 'Podcast player: ' + title : 'Podcast player'), 'aria-label': (title ? 'Podcast player: ' + title : 'Podcast player') }}"></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="container">
+        <div class="text-center" data-bind="visible: (show()==9)||(show() &lt; filteredItems().length)">
+          <a id="load-more" href="javascript:void(0);" class="btn btn-inverse"
+             data-bind="click: loadMore">Load more episodes</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interaction handlers: keep a single active podcast player and stop audio on close. -->
+    <script>
+      $(document).ready(function () {
+
+      $(document).on("click", ".audio-play", function (e) {
+      e.preventDefault();
+      var triggerButton = $(this);
+
+      // Close any currently open player and unload iframe audio.
+      $(".story-podcast-playing:visible").each(function () {
+      var iframe = $(this).find("iframe");
+      iframe.data("src", iframe.attr("src"));
+      iframe.attr("src", "");
+      $(this).hide();
+      });
+
+      // story-podcast-playing is a sibling of .story-card
+      var podcastElement = $(this).closest(".story-card").siblings(".story-podcast-playing");
+      var iframe = podcastElement.find("iframe");
+      podcastElement.data("triggerButton", triggerButton);
+
+      // Open the selected player and restore its source URL.
+      if (!podcastElement.is(":visible")) {
+      podcastElement.show();
+      iframe.attr("src", iframe.data("src") || iframe.attr("src"));
+      var closeButton = podcastElement.find(".close-btn");
+      if (closeButton.length) {
+      closeButton.focus();
+      }
+      }
+      });
+
+      $(document).on("click", ".close-btn", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var podcastElement = $(this).closest(".story-podcast-playing");
+      var iframe = podcastElement.find("iframe");
+
+      // Explicit close: hide and unload iframe to stop playback.
+      podcastElement.hide();
+      iframe.data("src", iframe.attr("src"));
+      iframe.attr("src", "");
+
+      var triggerButton = podcastElement.data("triggerButton");
+      if (triggerButton &amp;&amp; triggerButton.length) {
+      triggerButton.focus();
+      }
+      });
+
+      });
+    </script>
+
+<script>
+$(document).ready(function() {
+  //all articles on page
+  $(".insights-stories .col-xs-12 a").each(function() {
+    $(this).attr("href", function(index, oldhref){
+      var rbccm = new RegExp("templatedata/article/story/data/", "g");
+      return oldhref.replace(rbccm, "");
+    });
+  });
+  //when click load more
+  $(".insights-stories #load-more").on("click", function() {
+    $(".news-listing .col-xs-12 a").each(function() {
+      $(this).attr("href", function(index, oldhref){
+        var rbccm = new RegExp("templatedata/article/story/data/", "g");
+        return oldhref.replace(rbccm, "");
+      });
+    });
+  });
+  //on keyup search
+  $("#insights-search-bar #text").on("keyup", function() {
+    $(".insights-stories.ko a.tile.story").each(function() {
+      $(this).attr("href", function(index, oldhref){
+        var rbccm = new RegExp("templatedata/article/story/data/", "g");
+        return oldhref.replace(rbccm, "");
+      });
+    });
+  });
+  $(".insights-stories.ko a.tile--news").each(function() {
+    $(this).attr("href", function(index, oldhref){
+      var rbccm = new RegExp("story/story.page?dcr=", "g");
+      return oldhref.replace(rbccm, "insights/");
+    });
+  });
+
+});
+</script>
+
+  </xsl:template>
+
+  <!-- Helper: convert YYYY-MM-DD to MON D, YYYY. -->
+  <xsl:template name="PUBLISH_DATE">
+    <xsl:param name="publish_date" />
+    <xsl:variable name="vYear" select="substring-before($publish_date, '-')" />
+    <xsl:variable name="vnumMonth" select="number(substring-before(substring-after($publish_date, '-'), '-'))" />
+    <xsl:variable name="vDay" select="number(substring-after(substring-after($publish_date, '-'), '-'))" />
+    <xsl:choose>
+      <xsl:when test="$vnumMonth = '1' or $vnumMonth = '01'">JAN</xsl:when>
+      <xsl:when test="$vnumMonth = '2' or $vnumMonth = '02'">FEB</xsl:when>
+      <xsl:when test="$vnumMonth = '3' or $vnumMonth = '03'">MAR</xsl:when>
+      <xsl:when test="$vnumMonth = '4' or $vnumMonth = '04'">APR</xsl:when>
+      <xsl:when test="$vnumMonth = '5' or $vnumMonth = '05'">MAY</xsl:when>
+      <xsl:when test="$vnumMonth = '6' or $vnumMonth = '06'">JUN</xsl:when>
+      <xsl:when test="$vnumMonth = '7' or $vnumMonth = '07'">JUL</xsl:when>
+      <xsl:when test="$vnumMonth = '8' or $vnumMonth = '08'">AUG</xsl:when>
+      <xsl:when test="$vnumMonth = '9' or $vnumMonth = '09'">SEP</xsl:when>
+      <xsl:when test="$vnumMonth = '10'">OCT</xsl:when>
+      <xsl:when test="$vnumMonth = '11'">NOV</xsl:when>
+      <xsl:when test="$vnumMonth = '12'">DEC</xsl:when>
+    </xsl:choose>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="$vDay" />, <xsl:value-of select="$vYear" />
+  </xsl:template>
+</xsl:stylesheet>
