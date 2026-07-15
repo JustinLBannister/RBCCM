@@ -103,6 +103,15 @@
   letter-spacing: -0.789px;
 }
 
+/* Collapse spacing when a content block is the last thing in the hero
+   (e.g. subtitle Datum is blank so the <p> doesn't render, or breadcrumbs
+   are the only content). Keeps the hero visually compact instead of
+   trailing an orphan 16/40px gap before the section padding. */
+.rbccm-conference-insights-hero__title:last-child,
+.rbccm-conference-insights-hero__breadcrumbs:last-child {
+  margin-bottom: 0;
+}
+
 
 /* ---------- Subtitle ---------- */
 .rbccm-conference-insights-hero__subtitle {
