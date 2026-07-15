@@ -222,8 +222,14 @@
           <div class="col-xs-12 col-sm-12 col-md-12" data-bind="visible: $index() &lt; $parent.show()">
             <div class="story-card story-card--horizontal img-span-4">
 
-              <!-- When NOT show transcript, show link to article. -->
-              <a class="white-box tile--news tile--gib-full tile--white" data-bind="visible: articletranscriptshow &amp;&amp; articletranscriptshow === 'no', attr: {{ href: (link || '') }}">
+              <!-- Single anchor. Href swaps to the transcript link when
+                   the author opted in (articletranscriptshow === 'yes') AND
+                   a transcript URL is actually present. Anything else -
+                   'no', empty, or undefined (all legacy articles) - falls
+                   through to the article link. No duplicate anchors, no
+                   KO comment-based if/else (Interwoven strips HTML
+                   comments before KO sees them). -->
+              <a class="white-box tile--news tile--gib-full tile--white" data-bind="attr: {{ href: (articletranscriptshow === 'yes' &amp;&amp; articletranscript) ? articletranscript : (link || '#') }}">
 
                 <div class="img-stretch" data-bind="attr: {{ style: 'background-image: url(\'' + (thumbnail || '') + '\')' }}">
                   <div class="tile-overlay" aria-hidden="true"></div>
@@ -249,69 +255,31 @@
                     </p>
 
                   </div>
-                  <div class="learn-more" data-bind="visible: (watchtime &amp;&amp; watchtime != '') || (readtime &amp;&amp; readtime != '')">
+                  <!-- learn-more is visible when there's ANY meta to show:
+                       watchtime, readtime, OR transcript mode. -->
+                  <div class="learn-more" data-bind="visible: (watchtime &amp;&amp; watchtime != '') || (readtime &amp;&amp; readtime != '') || (articletranscriptshow === 'yes' &amp;&amp; articletranscript)">
                     <p class="read-watch">
                       <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type === 'video'" />
                       <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type !== 'video'" />
                       <span class="date" data-bind="visible: watchtime &amp;&amp; watchtime != '', html: watchtime, attr: {{ 'aria-label': watchtime + (type === 'video' ? ' video' : ' audio') }}"></span>
 
-                      <span class="separator" role="presentation" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; readtime &amp;&amp; readtime != ''"></span>
+                      <!-- Separator shows when watchtime is present AND
+                           something (transcript OR readtime) follows. -->
+                      <span class="separator" role="presentation" aria-hidden="true" data-bind="visible: (watchtime &amp;&amp; watchtime != '') &amp;&amp; ((articletranscriptshow === 'yes' &amp;&amp; articletranscript) || (readtime &amp;&amp; readtime != ''))"></span>
 
-                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="" aria-hidden="true" data-bind="visible: readtime &amp;&amp; readtime != ''" />
+                      <!-- Read icon shows for both readtime and transcript
+                           modes (same icon in both). -->
+                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="" aria-hidden="true" data-bind="visible: (articletranscriptshow === 'yes' &amp;&amp; articletranscript) || (readtime &amp;&amp; readtime != '')" />
 
-                      <span class="date" data-bind="visible: readtime &amp;&amp; readtime != '', html: readtime, attr: {{ 'aria-label': readtime + ' read' }}"></span>
-
-                    </p>
-                  </div>
-                </div>
-              </a>
-
-              <!-- When show transcript selected, NOT show link to article. -->
-              <a class="white-box tile--news tile--gib-full tile--white" data-bind="visible: articletranscriptshow &amp;&amp; articletranscriptshow === 'yes', attr: {{ href: (articletranscript || '') }}">
-
-
-                <div class="img-stretch" data-bind="attr: {{ style: 'background-image: url(\'' + (thumbnail || '') + '\')' }}">
-                  <div class="tile-overlay" aria-hidden="true"></div>
-                </div>
-
-                <div class="text-wrapper">
-                  <div class="white-box-text">
-                    <div class="uppercase wide-text">
-                      <div class="news-date">
-                        <p class="date" data-bind="html: (date || newdate || '')"></p>
-                      </div>
-                    </div>
-
-                    <div class="yellow-line-sm" aria-hidden="true"></div>
-
-
-                    <h2 data-bind="text: (title || '').replace(/&amp;quot;|&quot;|&amp;#34;|&#34;/g, '"'), attr: {{ id: 'episode-title-' + $index() }}"></h2>
-
-
-
-                    <p class="description">
-                      <xsl:attribute name="data-bind">html: (description &amp;&amp; description.length &gt; <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" /> ? description.substring(0, <xsl:value-of select="/Properties/Datum[@ID='CharacterLimit']" />).replace(/\s+\S*$/, '') + '...' : description)</xsl:attribute>
-                    </p>
-
-                  </div>
-                  <div class="learn-more" data-bind="visible: (watchtime &amp;&amp; watchtime != '') || (readtime &amp;&amp; readtime != '')">
-                    <p class="read-watch">
-                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/watch-icon-dark.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type === 'video'" />
-                      <img src="https://www.rbccm.com/assets/rbccm/images/campaign/podcast-sm-bl.svg" alt="" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; type !== 'video'" />
-                      <span class="date" data-bind="visible: watchtime &amp;&amp; watchtime != '', html: watchtime, attr: {{ 'aria-label': watchtime + (type === 'video' ? ' video' : ' audio') }}"></span>
-
-                      <span class="separator" role="presentation" aria-hidden="true" data-bind="visible: watchtime &amp;&amp; watchtime != '' &amp;&amp; readtime &amp;&amp; readtime != ''"></span>
-
-                      <img src="https://www.rbccm.com/assets/rbccm/images/gib/icons/read-icon-bl.svg" alt="" aria-hidden="true" data-bind="visible: readtime &amp;&amp; readtime != ''" />
-
-                      <span class="date" data-bind="attr: {{ 'aria-label': title + ' transcript' }}">Transcript</span>
+                      <!-- Single span: text is "Transcript" in transcript
+                           mode, else the readtime string. aria-label
+                           follows the same swap. -->
+                      <span class="date" data-bind="visible: (articletranscriptshow === 'yes' &amp;&amp; articletranscript) || (readtime &amp;&amp; readtime != ''), html: (articletranscriptshow === 'yes' &amp;&amp; articletranscript) ? 'Transcript' : readtime, attr: {{ 'aria-label': (articletranscriptshow === 'yes' &amp;&amp; articletranscript) ? (title + ' transcript') : (readtime + ' read') }}"></span>
 
                     </p>
                   </div>
                 </div>
               </a>
-
-
 
               <div class="story-card__footer">
                 <button type="button" class="btn audio-play" data-bind="visible: podcast &amp;&amp; podcast !== '', attr: {{ 'aria-label': (title &amp;&amp; title != '' ? 'Play ' + title + ' episode' : 'Play episode') }}">
