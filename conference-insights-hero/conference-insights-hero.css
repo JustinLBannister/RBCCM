@@ -92,15 +92,18 @@
 }
 
 
-/* ---------- Title ---------- */
+/* ---------- Title ----------
+   RBCDisplay serif / weight 500 / 1.2 line-height. Letter-spacing left
+   undeclared so whatever site-wide cascade applies to H1 wins — component
+   doesn't force its own tracking. Mobile keeps 24px; desktop bumps to
+   29px below. */
 .rbccm-conference-insights-hero__title {
-  margin: 0 0 16px 0;
+  margin: 0 0 25px 0;
   color: var(--Blue-Dark-Blue, #003168);
-  font-family: "RBC Display", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: RBCDisplay, Georgia, Times, serif;
   font-size: 24px;
   font-weight: 500;
-  line-height: normal;
-  letter-spacing: -0.789px;
+  line-height: 1.2;
 }
 
 /* Collapse spacing when a content block is the last thing in the hero
@@ -113,20 +116,24 @@
 }
 
 
-/* ---------- Subtitle ---------- */
+/* ---------- Subtitle ----------
+   Matches the live rbccm.com body-paragraph pattern: Roboto Light /
+   14–15px / 140% line-height / +0.5px tracking. */
 .rbccm-conference-insights-hero__subtitle {
   margin: 0;
   color: var(--Blue-Dark-Blue, #003168);
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 15px;
   font-weight: 400;
-  line-height: 26px; /* 162.5% */
+  line-height: 140%;
+  letter-spacing: 0.5px;
 }
 
 
 /* ---------- Desktop (≥992px) ----------
    64px top, 48px bottom, 48px between breadcrumbs and H1.
-   H1→subtitle stays at 16px from the base rule.
+   Title / subtitle typography matches the site standard (measured from
+   the shared header/paragraph pattern on production pages).
    Horizontal gutters come from __inner's max-width centering at 1100px. */
 @media (min-width: 992px) {
   .rbccm-conference-insights-hero {
@@ -144,12 +151,10 @@
     font-size: 18px;   /* desktop bump */
   }
 
+  /* Title — matches live rbccm.com desktop H1: 29px / 1.2 lh / +1px
+     tracking / 25px margin-bottom (collapsed via :last-child when the
+     subtitle is blank). */
   .rbccm-conference-insights-hero__title {
-    font-size: 32px;
-  }
-
-  .rbccm-conference-insights-hero__subtitle {
-    font-size: 18px;
-    line-height: normal;
+    font-size: 29px;
   }
 }
