@@ -1,0 +1,70 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: RBCCM Structured Data (JSON-LD)
+       ============================================
+       Emits a <script type="application/ld+json"> block into the page
+       for search engine consumption (Google rich results, Bing, etc.).
+
+       The author pastes the full JSON-LD payload (including the outer
+       braces, but WITHOUT the <script> tags) into the Content Datum.
+       This component wraps it in the correct script tag and drops it
+       into the page's rendered HTML.
+
+       Server-rendered (not JS-injected) so all crawlers see it on first
+       fetch — most reliable indexing path.
+
+       Reusable: any page can drop this component in and emit any
+       schema.org type (Article, PodcastEpisode, VideoObject, Event,
+       Organization, WebSite, BreadcrumbList, CollectionPage, ItemList,
+       FAQPage, HowTo, etc.). Use @graph to combine multiple entities
+       in a single block, as Google recommends. -->
+
+  <xsl:strip-space elements="*"/>
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- Only emit the script tag when there's actual content, so a
+         blank instance on a page doesn't produce an empty <script>. -->
+    <xsl:variable name="JSON_LD_CHECK" select="normalize-space(/Properties/Datum[@ID='JsonLdContent'])"/>
+
+    <xsl:if test="$JSON_LD_CHECK != ''">
+      <script type="application/ld+json">
+        <!-- disable-output-escaping preserves literal JSON characters
+             (quotes, braces, brackets) exactly as the author typed
+             them. Without it, XSL would double-escape " into &amp;quot;
+             and break the JSON. -->
+        <xsl:value-of select="/Properties/Datum[@ID='JsonLdContent']" disable-output-escaping="yes"/>
+      </script>
+    </xsl:if>
+
+  </xsl:template>
+
+</xsl:stylesheet>
+
+
+<!-- ============================================================
+     Properties block — component authoring input
+     ============================================================ -->
+<Properties ComponentID="structured-data-v1">
+
+  <!-- Full JSON-LD payload. Paste the entire JSON object here (or an
+       @graph with multiple entities). Do NOT include the <script>
+       opening or closing tags — the XSL adds those.
+
+       Validate before pasting:
+       - Google Rich Results Test: https://search.google.com/test/rich-results
+       - Schema.org validator: https://validator.schema.org/
+
+       Example minimum content (Organization):
+       {
+         "@context": "https://schema.org",
+         "@type": "Organization",
+         "name": "RBC Capital Markets",
+         "url": "https://www.rbccm.com/en/"
+       } -->
+  <Datum ID="JsonLdContent" Type="Textarea" Name="JSON-LD Content (paste full JSON, no script tags)"></Datum>
+
+</Properties>
