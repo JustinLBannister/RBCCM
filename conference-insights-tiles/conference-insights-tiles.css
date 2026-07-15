@@ -316,13 +316,14 @@
 
 
 /* ---------- Label (eyebrow) ----------
-   11px below the label to the yellow divider. */
+   Figma spec: Roboto / 400 / 15px / 100% line-height / 2px letter-spacing
+   / uppercase. 11px below the label to the yellow divider. */
 .rbccm-conference-insights-tiles__insight-label {
   color: var(--Blue-Bright-Blue, #0051A5);
   font-size: 15px;
   font-weight: 400;
   letter-spacing: 2px;
-  line-height: normal;
+  line-height: 100%;
   margin: 0 0 11px 0;
   text-transform: uppercase;
 }
@@ -341,12 +342,14 @@
 
 
 /* ---------- Title ----------
-   16px above (from divider) and 16px below (to description). */
+   Figma spec: Roboto / 700 / 20px / 120% line-height / 0 letter-spacing
+   / #000. 16px above (from divider) and 16px below (to description). */
 .rbccm-conference-insights-tiles__insight-title {
   color: var(--RBC-Black, #000);
   font-weight: 700;
   font-size: 20px;
-  line-height: normal;
+  line-height: 120%;
+  letter-spacing: 0;
   margin: 16px 0 16px 0;
 }
 
@@ -361,7 +364,8 @@
   color: #353535;
   font-size: 16px;
   font-weight: 400;
-  line-height: normal;
+  line-height: 100%;
+  letter-spacing: 0;
   margin: 0 0 16px 0;
 }
 
@@ -378,8 +382,8 @@
   font-size: 16px;
   font-weight: 400;
   gap: 7px;
-  letter-spacing: -0.526px;
-  line-height: normal;
+  letter-spacing: -0.5257px; /* Figma spec */
+  line-height: 100%;
   margin: auto 0 0 0;
   padding-bottom: 2px;
   transition: border-color 0.2s ease;
@@ -660,4 +664,51 @@
   .rbccm-conference-insights-tiles {
     padding: var(--rbccm-cit-pt-d, 64px) 16px var(--rbccm-cit-pb-d, 64px);
   }
+}
+
+
+/* ============================================================
+   DEMO MODIFIER — .--spec-legacy
+   ------------------------------------------------------------
+   Apply .rbccm-conference-insights-tiles--spec-legacy on the block
+   to preview typography that matches the current live rbccm.com
+   insights tiles (Roboto Light 14px, 140% line-heights, muted grays).
+   Default (no modifier) uses the Figma spec.
+
+   Intended for A/B comparison only — remove once a spec is chosen. */
+.rbccm-conference-insights-tiles--spec-legacy .rbccm-conference-insights-tiles__insight-label {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  line-height: 19.6px; /* 140% */
+  margin: 0 0 5px 0;
+}
+
+.rbccm-conference-insights-tiles--spec-legacy .rbccm-conference-insights-tiles__insight-title {
+  color: #000;
+  font-family: "Roboto Medium", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 25px; /* 125% */
+  letter-spacing: normal;
+  margin: 10px 0 10px 0;
+}
+
+.rbccm-conference-insights-tiles--spec-legacy .rbccm-conference-insights-tiles__insight-desc {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px; /* 140% */
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+}
+
+.rbccm-conference-insights-tiles--spec-legacy .rbccm-conference-insights-tiles__insight-meta {
+  color: #006AC3;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: normal;
 }
