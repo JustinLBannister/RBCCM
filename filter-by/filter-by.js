@@ -812,6 +812,28 @@
       return out;
     }
 
+    /* ---------- Scroll to first visible result after pagination ----------
+       On page change (page number or prev/next arrow), smooth-scroll the
+       viewport so the first visible item in the current page is at the
+       top of the results area. Prevents users landing mid-page after
+       clicking "Page 3" and having to hunt for where the new tiles start.
+
+       Filter changes do NOT trigger this — user's eye is already at the
+       filter when they interact, and the results updating in place is
+       the expected micro-iteration flow.
+
+       Respects prefers-reduced-motion: skips animation, jumps instantly.
+
+       Offset for sticky headers is handled via CSS `scroll-margin-top`
+       on the target element — set it in the consuming component's CSS
+       if the page has a fixed top bar. */
+    function scrollToFirstResult() {
+      var first = container.querySelector(itemSelector + ':not([hidden])');
+      if (!first) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      first.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    }
+
     /* ---------- Focus retention after pagination clicks ----------
        paginate() rebuilds the entire nav on every click, so the button
        the user just activated is destroyed and replaced. Without help,
@@ -853,6 +875,7 @@
         currentPage = pageIndex;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
+        scrollToFirstResult();
         focusRebuiltPageBtn(pageIndex);
       });
       return btn;
@@ -880,6 +903,7 @@
         if (dir === 'next') currentPage++;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
+        scrollToFirstResult();
         focusRebuiltArrowBtn(dir);
       });
       return btn;
