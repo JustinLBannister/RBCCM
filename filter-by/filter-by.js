@@ -466,7 +466,26 @@
     var currentPage = 0;
 
     function resetFilters() {
-      for (var i = 0; i < dropdowns.length; i++) dropdowns[i].setValue('');
+      /* Clear each dropdown via its setValue('') closure, which resets
+         currentValue, aria-selected states, and labelEl.textContent to
+         the default. Also close any open panel so a mid-interaction
+         reset doesn't leave a stray panel visible. Belt-and-suspenders:
+         re-query the visible label span from the DOM and force it back
+         to the button's aria-label as a fallback in case setValue's
+         labelEl closure reference got detached. */
+      for (var i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].setValue('');
+        dropdowns[i].close();
+        var btn = dropdowns[i].button;
+        if (btn) {
+          var lbl = btn.querySelector('.rbccm-filter__select-label');
+          var fallback = (btn.getAttribute('aria-label') || '').replace(/^Filter by\s+/i, '');
+          if (lbl && fallback) {
+            // Capitalize first letter to match default (e.g. "year" → "Year")
+            lbl.textContent = fallback.charAt(0).toUpperCase() + fallback.slice(1);
+          }
+        }
+      }
       if (searchInput) searchInput.value = '';
       apply(true);
     }
