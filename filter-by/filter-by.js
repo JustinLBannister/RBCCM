@@ -306,13 +306,27 @@
         if (dim === 'year') values.reverse();
       }
 
-      /* Read the default label from the button's initial text (e.g. "Month"). */
+      /* Derive the default label from the button's aria-label (e.g. "Filter
+         by topic" → "Topic"). Sourcing from aria-label rather than the
+         current visible text is important: if URL params or an earlier
+         setValue call have already changed the button's visible text to
+         (say) "Energy", rebuilding the dropdown would otherwise capture
+         "Energy" as the default and stamp it on the clear-filter option,
+         producing a duplicate "Energy" at the top of the list.
+
+         Falls back to the current visible text only if aria-label is
+         missing, and to the dimension name last of all. */
       var labelEl = button.querySelector('.rbccm-filter__select-label');
+      var ariaLabel = (button.getAttribute('aria-label') || '').replace(/^Filter by\s+/i, '').trim();
       var defaultLabel;
-      if (labelEl) {
+      if (ariaLabel) {
+        defaultLabel = ariaLabel.charAt(0).toUpperCase() + ariaLabel.slice(1);
+      } else if (labelEl) {
         defaultLabel = labelEl.textContent.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
       } else {
-        defaultLabel = button.textContent.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+        defaultLabel = dim.charAt(0).toUpperCase() + dim.slice(1);
+      }
+      if (!labelEl) {
         button.textContent = '';
         labelEl = document.createElement('span');
         labelEl.className = 'rbccm-filter__select-label';
