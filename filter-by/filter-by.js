@@ -685,7 +685,69 @@
 
       paginate(r.matched, r.unmatched, isFiltered);
       renderEmptyState(r.matched.length === 0 && isFiltered);
+
+      /* Sync URL. Filter changes use replaceState (no history bloat as
+         the user tries combos). Pagination handlers below use pushState
+         so back button walks page steps. Init call uses replaceState. */
+      writeUrlState(false);
     }
+
+
+    /* ---------- URL param sync ----------
+       Deep-link support. Reads state from
+       ?year=…&region=…&topic=…&search=…&page=… on load, writes it back
+       on every filter/page change. Popstate re-applies from URL so
+       browser back/forward works.
+
+       Param names match dimension keys 1:1 (year, region, topic — whatever
+       the filter's dropdown data-dim attributes are), plus `search` for
+       the search input and `page` for the 1-indexed page number. All
+       values lowercase for readable, shareable URLs. */
+    function writeUrlState(pushHistory) {
+      if (!window.history || !window.URLSearchParams) return;
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var owned = ['search', 'page'];
+        for (var i = 0; i < dropdowns.length; i++) owned.push(dropdowns[i].dim.toLowerCase());
+        for (var j = 0; j < owned.length; j++) params.delete(owned[j]);
+
+        for (var k = 0; k < dropdowns.length; k++) {
+          var v = (dropdowns[k].getValue() || '').trim();
+          if (v) params.set(dropdowns[k].dim.toLowerCase(), v);
+        }
+        if (searchInput && searchInput.value && searchInput.value.trim()) {
+          params.set('search', searchInput.value.trim());
+        }
+        if (currentPage > 0) params.set('page', String(currentPage + 1));
+
+        var query = params.toString();
+        var newUrl = window.location.pathname + (query ? '?' + query : '') + window.location.hash;
+        var method = pushHistory ? 'pushState' : 'replaceState';
+        window.history[method]({ page: currentPage }, '', newUrl);
+      } catch (e) { /* sandboxed iframes / older browsers — silent fail */ }
+    }
+
+    function readUrlState() {
+      if (!window.URLSearchParams) return;
+      var params = new URLSearchParams(window.location.search);
+      for (var i = 0; i < dropdowns.length; i++) {
+        var val = params.get(dropdowns[i].dim.toLowerCase());
+        if (val !== null) dropdowns[i].setValue(val);
+      }
+      if (searchInput) {
+        var s = params.get('search');
+        if (s !== null) searchInput.value = s;
+      }
+      var p = parseInt(params.get('page'), 10);
+      if (!isNaN(p) && p > 0) currentPage = p - 1;
+    }
+
+    /* Back / forward — re-apply state from the URL that the browser
+       just restored. Don't reset page — the URL is authoritative. */
+    window.addEventListener('popstate', function () {
+      readUrlState();
+      apply(false);
+    });
 
     /* ---------- Empty state ---------- */
     function renderEmptyState(show) {
@@ -910,6 +972,7 @@
         currentPage = pageIndex;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
+        writeUrlState(true); // pushState — back button walks page steps
         scrollToFirstResult();
         focusRebuiltPageBtn(pageIndex);
       });
@@ -938,6 +1001,7 @@
         if (dir === 'next') currentPage++;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
+        writeUrlState(true); // pushState — back button walks page steps
         scrollToFirstResult();
         focusRebuiltArrowBtn(dir);
       });
@@ -970,6 +1034,10 @@
       window.addEventListener('resize', onViewportChange);
     }
 
+    /* Hydrate filter + page state from the URL BEFORE the first apply()
+       so a deep link like ?year=2026&region=us&page=3 lands directly
+       on that filtered page instead of flashing page 1 first. */
+    readUrlState();
     apply(false);
 
     /* Signal to consumer CSS that the filter has initialized and tiles
