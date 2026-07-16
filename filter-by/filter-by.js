@@ -834,14 +834,26 @@
          used and the fresh content in a single glance.
 
          Override with [data-scroll-target="#some-id"] on the filter root
-         if the page prefers landing somewhere else (e.g. the tiles
-         section, a specific anchor). */
+         if the page prefers landing somewhere else. */
       var targetSelector = filterRoot.getAttribute('data-scroll-target');
       var target = targetSelector ? document.querySelector(targetSelector) : filterRoot;
       if (!target) return;
 
+      /* Use window.scrollTo with an explicitly computed top rather than
+         scrollIntoView. Some browsers (notably Chrome) no-op scrollIntoView
+         when the target is already partially in the viewport — which
+         happens on page 2+ once the initial page-1 scroll leaves the
+         filter partway visible. window.scrollTo always scrolls.
+
+         Respect the target's scroll-margin-top (set in filter-by.css
+         via the --rbccm-filter-scroll-offset custom property) so the
+         landing position clears any sticky nav. */
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      var computed = window.getComputedStyle ? window.getComputedStyle(target) : null;
+      var offset = computed ? (parseInt(computed.scrollMarginTop, 10) || 0) : 0;
+      var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+
+      window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
     }
 
     /* ---------- Focus retention after pagination clicks ----------
