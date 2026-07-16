@@ -912,12 +912,17 @@
        These helpers restore focus to the equivalent button after
        re-render, preserving the "focus stays on the thing I clicked"
        expectation that lets keyboard users rapid-fire pagination. */
+    /* All focus() calls in these helpers pass { preventScroll: true } so
+       the browser's default "scroll focused element into view" doesn't
+       yank the viewport back down and undo scrollToFirstResult's
+       scroll-to-top. Focus semantics preserved, scroll semantics owned
+       entirely by scrollToFirstResult. */
     function focusRebuiltPageBtn(pageIndex) {
       var buttons = paginationHost.querySelectorAll('.rbccm-filter__page-btn:not(.rbccm-filter__page-btn--prev):not(.rbccm-filter__page-btn--next)');
       /* Match by the button label (page number, 1-indexed). */
       var target = String(pageIndex + 1);
       for (var i = 0; i < buttons.length; i++) {
-        if (buttons[i].textContent === target) { buttons[i].focus(); return; }
+        if (buttons[i].textContent === target) { buttons[i].focus({ preventScroll: true }); return; }
       }
     }
 
@@ -926,9 +931,9 @@
       /* If the arrow is now disabled (reached start/end of range), fall
          back to the newly-current page number so focus doesn't land on
          an unreachable control. */
-      if (arrow && !arrow.hasAttribute('disabled')) { arrow.focus(); return; }
+      if (arrow && !arrow.hasAttribute('disabled')) { arrow.focus({ preventScroll: true }); return; }
       var active = paginationHost.querySelector('.rbccm-filter__page-btn--active');
-      if (active) active.focus();
+      if (active) active.focus({ preventScroll: true });
     }
 
     function buildPageBtn(pageIndex) {
