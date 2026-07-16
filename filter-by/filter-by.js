@@ -828,10 +828,20 @@
        on the target element — set it in the consuming component's CSS
        if the page has a fixed top bar. */
     function scrollToFirstResult() {
-      var first = container.querySelector(itemSelector + ':not([hidden])');
-      if (!first) return;
+      /* Default: scroll to the filter root itself. Puts the filter bar
+         at the top of the viewport with the first result of the new
+         page immediately below — user has both the controls they just
+         used and the fresh content in a single glance.
+
+         Override with [data-scroll-target="#some-id"] on the filter root
+         if the page prefers landing somewhere else (e.g. the tiles
+         section, a specific anchor). */
+      var targetSelector = filterRoot.getAttribute('data-scroll-target');
+      var target = targetSelector ? document.querySelector(targetSelector) : filterRoot;
+      if (!target) return;
+
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      first.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     }
 
     /* ---------- Focus retention after pagination clicks ----------
