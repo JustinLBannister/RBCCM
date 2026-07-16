@@ -901,34 +901,8 @@
       var target = targetSelector ? document.querySelector(targetSelector) : filterRoot;
       if (!target) return;
 
-      /* Use window.scrollTo with an explicitly computed top rather than
-         scrollIntoView. Some browsers (notably Chrome) no-op scrollIntoView
-         when the target is already partially in the viewport — which
-         happens on page 2+ once the initial page-1 scroll leaves the
-         filter partway visible. window.scrollTo always scrolls.
-
-         Respect the target's scroll-margin-top (set in filter-by.css
-         via the --rbccm-filter-scroll-offset custom property) so the
-         landing position clears any sticky nav. */
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var computed = window.getComputedStyle ? window.getComputedStyle(target) : null;
-      var offset = computed ? (parseInt(computed.scrollMarginTop, 10) || 0) : 0;
-      var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-
-      /* Verification log — confirms the handler fired, which target it
-         resolved to, the CSS offset it picked up, and the pixel it's
-         scrolling to. Remove once satisfied the scroll is landing right. */
-      if (window.console && console.log) {
-        console.log('[filter-by] scrollToFirstResult →', {
-          target: target,
-          targetSelector: targetSelector || '(filterRoot default)',
-          offset: offset + 'px',
-          scrollTo: Math.round(top) + 'px',
-          behavior: reduce ? 'auto (reduced-motion)' : 'smooth'
-        });
-      }
-
-      window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     }
 
     /* ---------- Focus retention after pagination clicks ----------
