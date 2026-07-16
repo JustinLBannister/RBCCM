@@ -853,6 +853,19 @@
       var offset = computed ? (parseInt(computed.scrollMarginTop, 10) || 0) : 0;
       var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
 
+      /* Verification log — confirms the handler fired, which target it
+         resolved to, the CSS offset it picked up, and the pixel it's
+         scrolling to. Remove once satisfied the scroll is landing right. */
+      if (window.console && console.log) {
+        console.log('[filter-by] scrollToFirstResult →', {
+          target: target,
+          targetSelector: targetSelector || '(filterRoot default)',
+          offset: offset + 'px',
+          scrollTo: Math.round(top) + 'px',
+          behavior: reduce ? 'auto (reduced-motion)' : 'smooth'
+        });
+      }
+
       window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
     }
 
