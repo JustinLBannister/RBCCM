@@ -1,4 +1,24 @@
 /* =========================================================================
+   Pagination scroll offset
+   -------------------------------------------------------------------------
+   filter-by.js's pagination handler calls scrollIntoView on the filter
+   root (or the [data-scroll-target] selector) whenever a page number
+   or prev/next arrow is clicked. This rule keeps that scroll from
+   parking the filter behind a fixed site nav.
+
+   Applied via [data-filter-bound="true"] — filter-by.js sets that
+   attribute on any element it initializes, so every consumer of
+   filter-by picks up the offset without extra markup.
+
+   Override per-consumer by setting --rbccm-filter-scroll-offset on
+   the filter root (e.g. `.rbccm-conference-insights-filter { --rbccm-filter-scroll-offset: 80px; }`).
+   ========================================================================= */
+[data-filter-bound="true"] {
+  scroll-margin-top: var(--rbccm-filter-scroll-offset, 100px);
+}
+
+
+/* =========================================================================
    Filter Component (shared)
    -------------------------------------------------------------------------
    Reusable BEM filter block for any list of items on the site. Drives a

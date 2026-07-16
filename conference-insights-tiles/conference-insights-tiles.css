@@ -214,15 +214,6 @@
   display: contents;
 }
 
-/* Offset scroll targeting so when filter-by's pagination handler calls
-   scrollIntoView on the first visible tile, the sticky site nav (~80px
-   on desktop) doesn't crop the top of the card. Applied to the direct
-   card <a> instead of the display:contents <li>, since scrollIntoView
-   targets the element and display:contents removes the box. */
-.rbccm-conference-insights-tiles__insight {
-  scroll-margin-top: 100px;
-}
-
 /* When the filter JS hides this <li>, the display: contents rule above
    would beat the browser's default [hidden] { display: none }, so we need
    an explicit high-specificity override for the filter-hidden state. */
