@@ -1,0 +1,148 @@
+/* ==========================================================================
+   search-fixes.css
+   Mobile-only layout/visual fixes for the RBC Capital Markets search page.
+   Applies at 0–767px. Load AFTER the page's existing stylesheets.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+
+  /* 1. Banner: remove dead space above breadcrumb/title, left-align to gutter */
+  .page-banner--title {
+    margin-top: 0 !important;
+    padding-left: 0 !important;
+  }
+  .page-banner .container {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* 2. Search header: flex row, search bar left, filter control right */
+  .search-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 15px !important;
+    margin-bottom: 15px !important;
+    box-sizing: border-box !important;
+  }
+  .search-header .coveo-search-section {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .search-header .coveo-search-section .CoveoSearchbox,
+  .search-header .coveo-search-section .CoveoOmnibox,
+  .search-header .coveo-search-section .magic-box,
+  .search-header .coveo-search-section .magic-box-input {
+    width: 100% !important;
+  }
+  .search-header .coveo-dropdown-header-wrapper {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+  }
+
+  /* 3. Filter button: funnel icon matching the search button */
+  .search-header .coveo-facet-dropdown-header {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    padding: 0 !important;
+    background: rgb(0, 81, 165) !important;
+    border: none !important;
+    border-radius: 2px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .CoveoSearchInterface.coveo-small-facets .coveo-dropdown-header-wrapper a {
+    margin-right: 0 !important;
+  }
+  .search-header .coveo-facet-dropdown-header p { display: none !important; }
+  .search-header .coveo-facet-dropdown-header::before {
+    content: "" !important;
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    background-color: #fff !important;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' d='M3 4h18v2.6l-7 7V22l-4-2v-6.4l-7-7V4z'/></svg>") no-repeat center / contain;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' d='M3 4h18v2.6l-7 7V22l-4-2v-6.4l-7-7V4z'/></svg>") no-repeat center / contain;
+  }
+
+  /* 4. Results: full width, no dead space, flush-left */
+  .CoveoSearchInterface .container { width: 100% !important; }
+  .CoveoSearchInterface .coveo-results-column {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .CoveoSearchInterface .CoveoResultList,
+  .CoveoSearchInterface #coveo-result-list1 {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  .CoveoSearchInterface .CoveoQuerySummary,
+  .CoveoQuerySummary { margin-left: 0 !important; }
+  .coveo-result-frame > .coveo-result-cell:first-child,
+  .coveo-result-cell[style*="width:28px"],
+  .coveo-result-cell[style*="width: 28px"] { display: none !important; }
+  .coveo-result-frame > .coveo-result-cell[style*="padding-left"],
+  .coveo-result-frame > .coveo-result-cell:nth-child(2) { padding-left: 0 !important; }
+
+  /* 5. Facet show-more / show-fewer: gray row, blue circle, thin white chevron */
+  .coveo-facet-more,
+  .coveo-facet-less {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f2f4f6 !important;
+    min-height: 48px !important;
+    padding: 8px 0 !important;
+    cursor: pointer !important;
+  }
+  .coveo-facet-more-icon,
+  .coveo-facet-less-icon {
+    position: relative !important;
+    top: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: rgb(0, 81, 165) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    transition: background 0.15s ease !important;
+  }
+  .coveo-facet-more:hover .coveo-facet-more-icon,
+  .coveo-facet-less:hover .coveo-facet-less-icon {
+    background: rgb(0, 89, 179) !important;
+  }
+  .coveo-facet-more-icon svg,
+  .coveo-facet-less-icon svg { display: none !important; }
+  .coveo-facet-more-icon::after,
+  .coveo-facet-less-icon::after {
+    content: "" !important;
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    background-color: #fff !important;
+  }
+  .coveo-facet-more-icon::after {
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat center / contain;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat center / contain;
+  }
+  .coveo-facet-less-icon::after {
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>") no-repeat center / contain;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>") no-repeat center / contain;
+  }
+
+} /* end @media (max-width: 767px) */
