@@ -186,13 +186,24 @@ $(document).ready(function () {
      we don't have to hardcode "Filter by topic" here. The chevron icon
      (<i class="fa fa-angle-down">) is captured separately and reappended
      after the "Filter: X" prefix so the trigger visually stays consistent. */
-  var $topicButton       = $('#etTopicMenu');
-  var defaultButtonHtml  = $topicButton.html();
-  var $topicButtonIcon   = $topicButton.find('i').first();
-  var iconHtml           = $topicButtonIcon.length ? $topicButtonIcon[0].outerHTML : '';
+  /* Captured lazily on first use — the button may not exist in the DOM
+     when this IIFE first runs, so we defer the initial HTML/icon capture
+     until we actually need to update the label. */
+  var defaultButtonHtml = null;
+  var iconHtml          = null;
+
+  function captureButtonDefaults($btn) {
+    if (defaultButtonHtml !== null) return; // already captured
+    defaultButtonHtml = $btn.html();
+    var $icon = $btn.find('i').first();
+    iconHtml = $icon.length ? $icon[0].outerHTML : '';
+  }
 
   function updateTopicButtonLabel($checkedBoxes) {
+    var $topicButton = $('#etTopicMenu');
     if (!$topicButton.length) return;
+
+    captureButtonDefaults($topicButton);
 
     if ($checkedBoxes.length === 0) {
       // Nothing selected — restore the exact default HTML (text + icon)
@@ -299,13 +310,17 @@ $(document).ready(function () {
     // Filter checkboxes — enforce single-select behavior. When one is
     // checked, uncheck all the others so only one topic is ever active.
     // Unchecking the current one still works (clears the filter).
-    $filterCheckboxes.off('change').on('change', function () {
-      var $this = $(this);
-      if ($this.is(':checked')) {
-        $filterCheckboxes.not($this).prop('checked', false);
-      }
-      filterFunc(false);
-    });
+    // Delegated from document for the same reason as the button toggle:
+    // markup order / re-render safety.
+    $(document).off('change.cal-filter').on('change.cal-filter',
+      CONFIG.filterDropdown + ' input[type="checkbox"]',
+      function () {
+        var $this = $(this);
+        if ($this.is(':checked')) {
+          $(CONFIG.filterDropdown + ' input[type="checkbox"]').not($this).prop('checked', false);
+        }
+        filterFunc(false);
+      });
 
     // Explore button — show all tiles
     $exploreButton.off('click').on('click', function (e) {
@@ -319,9 +334,40 @@ $(document).ready(function () {
       filterFunc(true);
     });
 
-    // Prevent dropdown from closing on click inside
-    $(CONFIG.filterDropdown).on('click', function (e) {
+    // Prevent dropdown from closing when the user clicks a checkbox or
+    // its wrapping label. Scoped narrowly (labels/inputs only, not the
+    // whole <ul>) so Bootstrap's own dropdown open/close click handling
+    // isn't blocked by the propagation stop.
+    $(CONFIG.filterDropdown).on('click', 'label, input[type="checkbox"]', function (e) {
       e.stopPropagation();
+    });
+
+    /* Manual open/close for the trigger button, bound via document-level
+       DELEGATION so it fires regardless of:
+        - whether the button existed when our script ran
+        - whether the button gets re-rendered by a later theme script
+        - whether Bootstrap dropdown JS is loaded / working
+       Owning this ourselves also sidesteps whatever was intercepting
+       the click on desktop viewports (mobile worked with Bootstrap,
+       desktop didn't). */
+    $(document).off('click.cal-toggle').on('click.cal-toggle', '#etTopicMenu', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var $btn  = $(this);
+      var $menu = $(CONFIG.filterDropdown);
+      var willOpen = !$menu.hasClass('show');
+      $menu.toggleClass('show', willOpen);
+      $btn.attr('aria-expanded', willOpen ? 'true' : 'false');
+    });
+
+    // Outside click closes the dropdown (matches Bootstrap behavior).
+    $(document).off('click.cal-outside').on('click.cal-outside', function (e) {
+      var $btn  = $('#etTopicMenu');
+      var $menu = $(CONFIG.filterDropdown);
+      if (!$btn.is(e.target) && !$menu.has(e.target).length && !$btn.has(e.target).length) {
+        $menu.removeClass('show');
+        $btn.attr('aria-expanded', 'false');
+      }
     });
 
     // Also equalize on window resize (debounced)
