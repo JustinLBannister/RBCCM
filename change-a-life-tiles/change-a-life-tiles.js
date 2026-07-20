@@ -358,6 +358,34 @@ $(document).ready(function () {
       var willOpen = !$menu.hasClass('show');
       $menu.toggleClass('show', willOpen);
       $btn.attr('aria-expanded', willOpen ? 'true' : 'false');
+
+      /* Full inline-JS control — do not trust the site CSS at all. Some
+         external rules use !important to hide the dropdown on hover;
+         normal inline styles can't beat that. `setProperty(..., 'important')`
+         writes an inline !important which does beat external !important
+         per CSS specificity rules. Also pin position/z-index inline so
+         the menu can't get clipped or hidden behind other stacking
+         contexts. Everything cleared on close so no residue in the DOM. */
+      var menu = $menu[0];
+      if (!menu) return;
+
+      if (willOpen) {
+        menu.style.setProperty('display',   'block',    'important');
+        menu.style.setProperty('position',  'absolute', 'important');
+        menu.style.setProperty('top',       '100%',     'important');
+        menu.style.setProperty('left',      '0',        'important');
+        menu.style.setProperty('z-index',   '9999',     'important');
+        menu.style.setProperty('visibility','visible',  'important');
+        menu.style.setProperty('opacity',   '1',        'important');
+      } else {
+        menu.style.removeProperty('display');
+        menu.style.removeProperty('position');
+        menu.style.removeProperty('top');
+        menu.style.removeProperty('left');
+        menu.style.removeProperty('z-index');
+        menu.style.removeProperty('visibility');
+        menu.style.removeProperty('opacity');
+      }
     });
 
     // Outside click closes the dropdown (matches Bootstrap behavior).
@@ -367,6 +395,13 @@ $(document).ready(function () {
       if (!$btn.is(e.target) && !$menu.has(e.target).length && !$btn.has(e.target).length) {
         $menu.removeClass('show');
         $btn.attr('aria-expanded', 'false');
+        // Strip every inline !important we set on open so the site CSS
+        // can control the closed state without our overrides lingering.
+        var menu = $menu[0];
+        if (menu) {
+          ['display', 'position', 'top', 'left', 'z-index', 'visibility', 'opacity']
+            .forEach(function (prop) { menu.style.removeProperty(prop); });
+        }
       }
     });
 
