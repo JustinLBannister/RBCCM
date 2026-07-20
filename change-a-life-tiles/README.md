@@ -8,7 +8,7 @@ The Change a Life page renders as multiple separate CMS sections. Authors add ti
 
 1. Copies every tile from the hidden sections into the main section's grid, so the page renders as a single visual grid.
 2. Hides the copied-in tiles by default (only revealed on filter change or "Explore" click).
-3. Wires up the topic filter dropdown so ticking a category shows tiles whose `data-category` matches.
+3. Wires up the topic filter dropdown so ticking a category shows tiles whose eyebrow label (`p.content-label`) matches. A small normalizer bridges checkbox slug values (e.g. `ai-and-innovation`) with the visible label text (e.g. `AI & Innovation`) so `&` vs `and`, casing, and spacing don't break the match.
 4. Equalizes tile heights per row (text box + image box) so the grid stays tidy when content varies.
 5. Re-equalizes on window resize (debounced).
 

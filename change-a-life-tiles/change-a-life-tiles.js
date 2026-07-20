@@ -166,19 +166,64 @@ $(document).ready(function () {
   }
 
 
-  /* ---------- Filter ----------
+  /* ---------- Normalizer ----------
+     Bridges checkbox slug values (e.g. "ai-and-innovation") to the visible
+     eyebrow label text (e.g. "AI & Innovation"). Also unifies "&" vs "and",
+     collapses whitespace, and lowercases everything. Result: comparing a
+     checkbox value to a label always matches even when the CMS surfaces
+     them in different formats. */
+  function normTopic(s) {
+    return (s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '');
+  }
+
+
+  /* ---------- Dropdown button label ----------
+     Single-select mode (only one topic allowed at a time). Trigger text:
+       0 checked → default HTML captured at page load (e.g. "Filter by topic ⌄")
+       1 checked → "Filter: <topic>" with the chevron preserved
+
+     Captured default handles whatever the CMS put in the button at load so
+     we don't have to hardcode "Filter by topic" here. The chevron icon
+     (<i class="fa fa-angle-down">) is captured separately and reappended
+     after the "Filter: X" prefix so the trigger visually stays consistent. */
+  var $topicButton       = $('#etTopicMenu');
+  var defaultButtonHtml  = $topicButton.html();
+  var $topicButtonIcon   = $topicButton.find('i').first();
+  var iconHtml           = $topicButtonIcon.length ? $topicButtonIcon[0].outerHTML : '';
+
+  function updateTopicButtonLabel($checkedBoxes) {
+    if (!$topicButton.length) return;
+
+    if ($checkedBoxes.length === 0) {
+      // Nothing selected — restore the exact default HTML (text + icon)
+      $topicButton.html(defaultButtonHtml);
+      return;
+    }
+
+    // Escape the label text (it's static content but $.text() is safest)
+    var label = $checkedBoxes.first().closest('label').text().trim();
+    var escapedLabel = $('<div>').text(label).html();
+
+    $topicButton.html('Filter: ' + escapedLabel + iconHtml);
+  }
+
+
+  /* ---------- Filter (matches on p.content-label eyebrow, not data-category) ----------
      showAll = true is the "Explore" button path: reveal every tile,
      ignore checkbox state, hide the Explore button afterward. */
   function filterFunc(showAll) {
     var $filterCheckboxes  = $(CONFIG.filterDropdown + ' input[type="checkbox"]');
-    var $exploreButton     = $('#load-more');
+    var $checkedBoxes      = $filterCheckboxes.filter(':checked');
     var $exploreButtonWrap = $('#load-more-wrap');
 
-    // Get selected categories
+    // Get selected categories (normalized)
     var selectedCategories = [];
-    $filterCheckboxes.filter(':checked').each(function () {
-      selectedCategories.push($(this).val());
+    $checkedBoxes.each(function () {
+      selectedCategories.push(normTopic($(this).val()));
     });
+
+    // Keep the dropdown trigger label in sync with the current selection
+    updateTopicButtonLabel($checkedBoxes);
 
     console.log('Filtering with categories:', selectedCategories);
 
@@ -191,7 +236,7 @@ $(document).ready(function () {
       console.log('Showing all ' + $allTiles.length + ' tiles');
 
     } else if (selectedCategories.length === 0) {
-      // No filters — show only original tiles
+      // No filters — show only original (non-consolidated) tiles
       $allTiles.each(function () {
         var $tile = $(this);
         if ($tile.hasClass(CONFIG.consolidatedMarker)) {
@@ -203,41 +248,27 @@ $(document).ready(function () {
       $exploreButtonWrap.show();
 
     } else {
-      // Apply filters
+      // Apply filters by eyebrow label text
       $exploreButtonWrap.show();
 
       $allTiles.each(function () {
-        var $tile = $(this);
-        var $categoryElement = $tile.find('[data-category]').first();
+        var $tile  = $(this);
+        var $label = $tile.find('p.content-label').first();
+        var shouldShow = false;
 
-        if ($categoryElement.length > 0) {
-          var categories = $categoryElement.attr('data-category');
-          var shouldShow = false;
-
-          if (categories) {
-            var tileCategories = categories.split(' ');
-            for (var i = 0; i < selectedCategories.length; i++) {
-              if (tileCategories.indexOf(selectedCategories[i]) !== -1) {
-                shouldShow = true;
-                break;
-              }
-            }
-          }
-
-          $tile.toggle(shouldShow);
-        } else {
-          $tile.hide();
+        if ($label.length) {
+          var tileTopic = normTopic($label.text());
+          shouldShow = selectedCategories.indexOf(tileTopic) !== -1;
         }
+
+        $tile.toggle(shouldShow);
       });
     }
 
     var visibleCount = $allTiles.filter(':visible').length;
     console.log('Visible tiles: ' + visibleCount);
 
-    // Equalize heights after filtering
-    setTimeout(function () {
-      equalizeTileHeights();
-    }, 50);
+    setTimeout(function () { equalizeTileHeights(); }, 50);
   }
 
 
@@ -265,8 +296,14 @@ $(document).ready(function () {
     var $filterCheckboxes = $(CONFIG.filterDropdown + ' input[type="checkbox"]');
     var $exploreButton    = $('#load-more');
 
-    // Filter checkboxes
+    // Filter checkboxes — enforce single-select behavior. When one is
+    // checked, uncheck all the others so only one topic is ever active.
+    // Unchecking the current one still works (clears the filter).
     $filterCheckboxes.off('change').on('change', function () {
+      var $this = $(this);
+      if ($this.is(':checked')) {
+        $filterCheckboxes.not($this).prop('checked', false);
+      }
       filterFunc(false);
     });
 
