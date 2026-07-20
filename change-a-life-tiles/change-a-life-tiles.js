@@ -197,6 +197,23 @@ $(document).ready(function () {
     defaultButtonHtml = $btn.html();
     var $icon = $btn.find('i').first();
     iconHtml = $icon.length ? $icon[0].outerHTML : '';
+
+    /* Force the button label to wrap to a new line when it runs out of
+       horizontal room. The confirmed-working combo is:
+         padding: 5px 10px    (breathing room inside the button)
+         overflow: hidden     (prevents any stray horizontal spill)
+         white-space: break-spaces  (allows wrap to second line)
+       Plus max-width: 100% + display: inline-block so the button sizes
+       to its container. All inline !important via setProperty so no
+       external CSS can override. */
+    var btn = $btn[0];
+    if (btn) {
+      btn.style.setProperty('padding',       '5px 10px',     'important');
+      btn.style.setProperty('overflow',      'hidden',       'important');
+      btn.style.setProperty('white-space',   'break-spaces', 'important');
+      btn.style.setProperty('max-width',     '100%',         'important');
+      btn.style.setProperty('display',       'inline-block', 'important');
+    }
   }
 
   function updateTopicButtonLabel($checkedBoxes) {
