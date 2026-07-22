@@ -18,10 +18,8 @@
 <section class="rbccm-leadership" id="rbccm-leadership" aria-label="Energy Transition leadership" data-link-type="linkedin">
   <div class="rbccm-leadership__inner">
 
-    <div class="container">
-      <h2 class="rbccm-leadership__heading">Energy Transition leadership</h2>
-      <p class="rbccm-leadership__subheading">The strength of our Energy Transition platform lies in our specialists.</p>
-    </div>
+    <h2 class="rbccm-leadership__heading">Energy Transition leadership</h2>
+    <p class="rbccm-leadership__subheading">The strength of our Energy Transition platform lies in our specialists.</p>
 
     <!-- Screen reader live region + keyboard instructions (kept for a11y parity with the component) -->
     <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
@@ -337,12 +335,16 @@
     }
     // === END DEBUG =========================================================
 
-    $('#rbccm-lead-prev, #rbccm-lead-next').attr('tabindex', '0');
+    // Both mobile controls (#rbccm-lead-prev/next) AND desktop arrows
+    // (#rbccm-lead-prev-desk/next-desk) exist in the DOM; only one set is
+    // visible per breakpoint via CSS. Wire click on BOTH so the carousel
+    // advances no matter which set the user clicks. Same for tabindex.
+    $('#rbccm-lead-prev, #rbccm-lead-next, #rbccm-lead-prev-desk, #rbccm-lead-next-desk').attr('tabindex', '0');
 
-    $('#rbccm-lead-prev').on('click', function () {
+    $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
       if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
     });
-    $('#rbccm-lead-next').on('click', function () {
+    $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
       if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
     });
 
@@ -353,7 +355,7 @@
       var isInfinite = slick.options.infinite;
 
       if (isInfinite) {
-        $('#rbccm-lead-prev, #rbccm-lead-next')
+        $('#rbccm-lead-prev, #rbccm-lead-next, #rbccm-lead-prev-desk, #rbccm-lead-next-desk')
           .prop('disabled', false)
           .attr('aria-disabled', 'false')
           .css('opacity', 1);
@@ -368,8 +370,8 @@
       var atStart = current <= 0;
       var atEnd   = current >= maxIndex;
 
-      $('#rbccm-lead-prev').prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
-      $('#rbccm-lead-next').prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
+      $('#rbccm-lead-prev, #rbccm-lead-prev-desk').prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
+      $('#rbccm-lead-next, #rbccm-lead-next-desk').prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
     }
 
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -537,7 +539,7 @@
       }
     });
 
-    $('#rbccm-lead-prev').on('keydown', function (e) {
+    $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('keydown', function (e) {
       if (e.key !== 'Tab' || e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
       for (var i = 0; i < slides.length; i++) {
@@ -546,7 +548,7 @@
       }
     });
 
-    $('#rbccm-lead-next').on('keydown', function (e) {
+    $('#rbccm-lead-next, #rbccm-lead-next-desk').on('keydown', function (e) {
       if (e.key !== 'Tab' || !e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
       for (var i = slides.length - 1; i >= 0; i--) {
