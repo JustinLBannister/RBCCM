@@ -25,7 +25,22 @@
     <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
     <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</p>
 
-    <div class="rbccm-leadership__slider-track"
+    <!-- Wrap prev + track + next + dots in one carousel container so the
+         shared CSS positions the arrows on the sides of the track
+         (matches the current live dynamic component's layout). -->
+    <div class="rbccm-leadership__carousel">
+
+      <button id="rbccm-lead-prev" class="rbccm-leadership__btn" tabindex="0" aria-label="Previous slide">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-leadership__slider-track"
          role="region"
          aria-label="Leadership cards"
          aria-describedby="rbccm-lead-instructions">
@@ -253,38 +268,21 @@
         </div>
       </div>
 
-    </div><!-- /.slider-track -->
+      </div><!-- /.slider-track -->
 
-    <!-- Mobile controls -->
-    <div class="rbccm-leadership__controls">
-      <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
-          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
-      <button id="rbccm-lead-next" class="rbccm-leadership__btn" aria-label="Next slide" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+      <button id="rbccm-lead-next" class="rbccm-leadership__btn" tabindex="0" aria-label="Next slide">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
           <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
         </svg>
-      </button>
-    </div>
-
-    <!-- Desktop arrows -->
-    <div class="rbccm-leadership__arrows-desktop">
-      <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
-          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
-          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
           <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
           <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-    </div>
+
+      <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
+
+    </div><!-- /.carousel -->
 
   </div><!-- /.inner -->
 </section>
@@ -339,12 +337,12 @@
     // (#rbccm-lead-prev-desk/next-desk) exist in the DOM; only one set is
     // visible per breakpoint via CSS. Wire click on BOTH so the carousel
     // advances no matter which set the user clicks. Same for tabindex.
-    $('#rbccm-lead-prev, #rbccm-lead-next, #rbccm-lead-prev-desk, #rbccm-lead-next-desk').attr('tabindex', '0');
+    $('#rbccm-lead-prev, #rbccm-lead-next').attr('tabindex', '0');
 
-    $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
+    $('#rbccm-lead-prev').on('click', function () {
       if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
     });
-    $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
+    $('#rbccm-lead-next').on('click', function () {
       if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
     });
 
@@ -355,7 +353,7 @@
       var isInfinite = slick.options.infinite;
 
       if (isInfinite) {
-        $('#rbccm-lead-prev, #rbccm-lead-next, #rbccm-lead-prev-desk, #rbccm-lead-next-desk')
+        $('#rbccm-lead-prev, #rbccm-lead-next')
           .prop('disabled', false)
           .attr('aria-disabled', 'false')
           .css('opacity', 1);
@@ -370,8 +368,8 @@
       var atStart = current <= 0;
       var atEnd   = current >= maxIndex;
 
-      $('#rbccm-lead-prev, #rbccm-lead-prev-desk').prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
-      $('#rbccm-lead-next, #rbccm-lead-next-desk').prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
+      $('#rbccm-lead-prev').prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
+      $('#rbccm-lead-next').prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
     }
 
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -539,7 +537,7 @@
       }
     });
 
-    $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('keydown', function (e) {
+    $('#rbccm-lead-prev').on('keydown', function (e) {
       if (e.key !== 'Tab' || e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
       for (var i = 0; i < slides.length; i++) {
@@ -548,7 +546,7 @@
       }
     });
 
-    $('#rbccm-lead-next, #rbccm-lead-next-desk').on('keydown', function (e) {
+    $('#rbccm-lead-next').on('keydown', function (e) {
       if (e.key !== 'Tab' || !e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
       for (var i = slides.length - 1; i >= 0; i--) {
