@@ -1,0 +1,532 @@
+<!-- =========================================================================
+     Global Investment Banking Leadership — hardcoded slider markup
+     -------------------------------------------------------------------------
+     Static HTML replacement for the leadership-slider component on the
+     Global Investment Banking page where the CMS component was hanging
+     the publish state. Uses the same `.rbccm-leadership__*` BEM classes
+     as the component so the shared CSS + slick init both hook in.
+
+     Uses the Biography-button pattern (not LinkedIn icons on the card):
+     each card has a bio button that opens the shared modal, and each
+     card carries a hidden `.rbccm-leadership__bio-source` block holding
+     name / role / image / linkedin / bio HTML that the modal reads.
+
+     Fully self-contained: stylesheet linked at top, slick init script
+     inlined at bottom (with dynamic slick CDN fallback loader). Content
+     sourced from the previous owl-carousel implementation for this
+     page. 5 leaders total.
+     ========================================================================= -->
+
+<link rel="stylesheet" href="/assets/rbccm/css/sub/test/leadership-carousel.css">
+
+<section class="rbccm-leadership rbccm-leadership--long-role" id="rbccm-leadership" aria-label="Global Investment Banking leadership" data-link-type="biography">
+  <div class="rbccm-leadership__inner">
+
+    <h2 class="rbccm-leadership__heading">Our team</h2>
+
+    <!-- Screen reader live region + keyboard instructions -->
+    <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
+    <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</p>
+
+    <!-- prev + track + next + dots all in one carousel wrapper so arrows sit on the sides -->
+    <div class="rbccm-leadership__carousel">
+
+      <button id="rbccm-lead-prev" class="rbccm-leadership__btn" tabindex="0" aria-label="Previous slide">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-leadership__slider-track"
+           role="region"
+           aria-label="Leadership cards"
+           aria-describedby="rbccm-lead-instructions">
+
+        <!-- 1. Matthew R. Stopnik -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Matthew R. Stopnik" src="/assets/rbccm/images/authors/matthew-stopnik.webp" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'">
+            <div class="rbccm-leadership__fpo" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/>
+                <path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Matthew R. Stopnik</h3>
+            <p class="rbccm-leadership__card-role">Head, Global Investment Banking</p>
+            <button type="button" class="rbccm-leadership__card-action rbccm-leadership__card-bio" tabindex="0" data-bio-target="rbccm-bio-1" aria-label="Read Matthew R. Stopnik's biography">
+              <span class="rbccm-leadership__card-bio-label">Biography</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
+                <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-leadership__bio-source" hidden id="rbccm-bio-1" data-name="Matthew R. Stopnik" data-role="Head, Global Investment Banking" data-image="/assets/rbccm/images/authors/matthew-stopnik.webp" data-linkedin="https://www.linkedin.com/in/matthew-stopnik-044070173/">
+              <p><strong>Matthew Stopnik</strong> is Head, Global Investment Banking. He joined RBC Capital Markets in January 2015 as the Co-Head of Financial Sponsors. Prior to joining RBC, Matthew spent 20 years at UBS Investment Bank where his most recent role was serving as its U.S. Head of Financial Sponsors.</p>
+              <p>At RBC, Matthew is responsible for U.S. Investment Banking. He shares responsibility for coverage of banking clients and prospects, including corporate finance industry groups, mergers and acquisitions, equity capital markets, leveraged finance, and loan and high-yield capital markets teams. Matthew is also responsible for managing RBC's relationships with some of the largest and most active private equity firms in the world. He serves on the firm's Global Capital Markets and U.S. Regional Operating Committees and he is a member of the firm's Commitments Committee.</p>
+              <p>Matthew is Vice Chair and a member of the Board of Trustees of the TEAK Fellowship, a member of the Board of Youth, INC. and a David Rockefeller Fellow of the Partnership for New York City. He received a B.A from the University of Michigan. Matthew and his wife live in New York City with their two children.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Trevor Gardner -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Trevor Gardner" src="/assets/rbccm/images/leadership/trevor-gardner.webp" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'">
+            <div class="rbccm-leadership__fpo" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/>
+                <path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Trevor Gardner</h3>
+            <p class="rbccm-leadership__card-role">Head, Global Investment Banking Coverage</p>
+            <button type="button" class="rbccm-leadership__card-action rbccm-leadership__card-bio" tabindex="0" data-bio-target="rbccm-bio-2" aria-label="Read Trevor Gardner's biography">
+              <span class="rbccm-leadership__card-bio-label">Biography</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
+                <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-leadership__bio-source" hidden id="rbccm-bio-2" data-name="Trevor Gardner" data-role="Head, Global Investment Banking Coverage" data-image="/assets/rbccm/images/leadership/trevor-gardner.webp" data-linkedin="https://www.linkedin.com/in/trevor-gardner-36a772180/">
+              <p><strong>Trevor Gardner</strong> is Head, Global Investment Banking Coverage and a member of the Capital Markets Operating Committee at RBC Capital Markets. With more than 25 years of capital markets experience at RBC, Trevor has held roles across Investment Banking and Equity Capital Markets in Toronto and Calgary. He was previously Head of Canadian Investment Banking and Co-Head of Canadian Energy Investment Banking.</p>
+              <p>Trevor brings extensive experience advising clients on a broad range of transactions, including mergers and acquisitions as well as debt and equity financing. He is actively engaged in senior client coverage and provides advice to clients across industries.</p>
+              <p>Trevor is an executive member of RBC Capital Markets' Canadian Diversity Leadership Council. Beyond his professional responsibilities, Trevor is deeply involved in community initiatives, serving as Chair of Right To Play's Canadian Advisory Board and Chair of the Board of Directors for YMCA Calgary. He is also a member of the Dean's Advisory Council for the Lazaridis School of Business and Economics at Wilfrid Laurier University.</p>
+              <p>Originally from Saskatchewan, Trevor holds a Bachelor of Business Administration (Honours) from Wilfrid Laurier University and is a Chartered Financial Analyst (CFA).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Jim Wolfe -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Jim Wolfe" src="/assets/rbccm/images/authors/jim-wolfe.webp" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'">
+            <div class="rbccm-leadership__fpo" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/>
+                <path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Jim Wolfe</h3>
+            <p class="rbccm-leadership__card-role">Head, Global Investment Banking Capital Markets</p>
+            <button type="button" class="rbccm-leadership__card-action rbccm-leadership__card-bio" tabindex="0" data-bio-target="rbccm-bio-3" aria-label="Read Jim Wolfe's biography">
+              <span class="rbccm-leadership__card-bio-label">Biography</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
+                <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-leadership__bio-source" hidden id="rbccm-bio-3" data-name="Jim Wolfe" data-role="Head, Global Investment Banking Capital Markets" data-image="/assets/rbccm/images/authors/jim-wolfe.webp" data-linkedin="https://www.linkedin.com/in/jimwolfe1/">
+              <p><strong>Jim Wolfe</strong> is Head, Global Investment Banking Capital Markets, overseeing the firm's financing products across debt and equity in both the public and private markets.</p>
+              <p>Prior to assuming his current role in May 2024, Jim served as Co-Head of U.S. Investment Banking from 2018-2024, where he shared responsibility for the coverage of banking clients and prospects, as well as oversight of the industry sector coverage groups, mergers and acquisitions, equity capital markets, leveraged finance and loan and high-yield capital markets teams.</p>
+              <p>From 2008 to 2018, Jim was responsible for the firm's leveraged finance business in the U.S and Europe, leading an experienced team of specialized professionals in raising capital for corporate acquisitions, leveraged buyouts, recapitalizations and refinancings. Jim also serves on the Global Capital Markets Operating Committee and is a member of the firm's Commitments and Underwriting Distribution Committees. He joined RBC in June 2008 after a 15-year tenure at Bear Stearns where he served as a Senior Managing Director in the Leveraged Finance Group.</p>
+              <p>With over 32 years of experience, Jim has successfully executed transactions of all sizes across a broad range of industry sectors.</p>
+              <p>Jim holds a B.S. in Accounting from the University of Southern California and an MBA from The Wharton School of the University of Pennsylvania. He served on the Board of Trustees at Greens Farms Academy in Westport, CT, from 2012 to 2018, and alongside his wife, chaired the Parents Executive Committee of Bowdoin College from 2014 to 2019.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Ben Mandell -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Ben Mandell" src="/assets/rbccm/images/authors/ben-mandell.webp" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'">
+            <div class="rbccm-leadership__fpo" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/>
+                <path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Ben Mandell</h3>
+            <p class="rbccm-leadership__card-role">Head, Global Mergers &amp; Acquisitions</p>
+            <button type="button" class="rbccm-leadership__card-action rbccm-leadership__card-bio" tabindex="0" data-bio-target="rbccm-bio-4" aria-label="Read Ben Mandell's biography">
+              <span class="rbccm-leadership__card-bio-label">Biography</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
+                <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-leadership__bio-source" hidden id="rbccm-bio-4" data-name="Ben Mandell" data-role="Head, Global Mergers &amp; Acquisitions" data-image="/assets/rbccm/images/authors/ben-mandell.webp" data-linkedin="https://www.linkedin.com/in/benjamin-mandell-388a871">
+              <p><strong>Ben Mandell</strong> is Head, Global Mergers &amp; Acquisitions at RBC Capital Markets. He has been in the M&amp;A group at RBC over 10 years with prior experience working at an independent financial advisory firm in Toronto, in the Investment Management Division at Goldman Sachs in both New York and Toronto as well as working as a Consultant with Monitor Group in London.</p>
+              <p>Ben received his Bachelor's degree in Economics from Queen's University, an MBA from Harvard Business School and he holds the CFA designation.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Dominic Hudson -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Dominic Hudson" src="/assets/rbccm/images/leadership/dominic-hudson.webp" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&text_color=8F8F8F&bg_color=e6e6e6'">
+            <div class="rbccm-leadership__fpo" aria-hidden="true">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/>
+                <path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Dominic Hudson</h3>
+            <p class="rbccm-leadership__card-role">Head, Investment Banking, Europe and APAC</p>
+            <button type="button" class="rbccm-leadership__card-action rbccm-leadership__card-bio" tabindex="0" data-bio-target="rbccm-bio-5" aria-label="Read Dominic Hudson's biography">
+              <span class="rbccm-leadership__card-bio-label">Biography</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+                <circle cx="22" cy="22" r="21" stroke="#0051A5" stroke-width="2"/>
+                <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="rbccm-leadership__bio-source" hidden id="rbccm-bio-5" data-name="Dominic Hudson" data-role="Head, Investment Banking, Europe and APAC" data-image="/assets/rbccm/images/leadership/dominic-hudson.webp" data-linkedin="https://www.linkedin.com/in/dominic-hudson-bb139715/">
+              <p><strong>Dominic Hudson</strong> is Head, Investment Banking, leading our investment banking sector, product and country teams across Europe and APAC, and is a member of the RBC Capital Markets Operating Committee.</p>
+              <p>Dominic is responsible for executing the regional growth strategy for our investment banking franchises in Europe and APAC, focused on achieving our client, revenue and market share goals, building upon our existing robust client franchise and deepening our incredibly strong bench of talent.</p>
+              <p>Dominic began his career as a chartered accountant at Ernst &amp; Young. He then held roles at Deutsche Bank and Rothschild before joining RBC in 2006 to lead our infrastructure, transport and utilities team in Australia. In 2012, he was appointed as Head of Investment Banking Asia-Pacific and then chief country officer Head for RBC Capital Markets Australia in 2015.</p>
+              <p>Dominic was appointed to the newly-created position of Head of European Sector Coverage in 2018, relocating to the UK. In this role, he was instrumental in the growth of our ten industry teams providing strong connectivity across sectors, products and European country teams, before assuming his current role of Head of Investment Banking, Europe and APAC in November 2022.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.slider-track -->
+
+      <button id="rbccm-lead-next" class="rbccm-leadership__btn" tabindex="0" aria-label="Next slide">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-leadership__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+          <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
+
+    </div><!-- /.carousel -->
+
+  </div><!-- /.inner -->
+
+  <!-- Biography modal — populated per-tile by the click handler in the init script -->
+  <div class="modal fade" id="rbccm-lead-modal" tabindex="-1" role="dialog" aria-labelledby="rbccm-lead-modal-name" aria-hidden="true">
+    <div class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;" role="document">
+      <div class="modal-content">
+        <div>
+          <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+            <button class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" aria-label="Close">×</button>
+          </div>
+          <div class="modal-body" style="padding: 0px;">
+            <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+              <div style="margin-bottom: 20px;">
+                <h2 class="rbccm-leadership__modal-name" id="rbccm-lead-modal-name" style="font-size: 20px;"></h2>
+                <p class="rbccm-leadership__modal-role" style="margin: 4px 0 16px 0; color: #4a4a4a;"></p>
+                <div class="rbccm-leadership__modal-body"></div>
+                <p class="rbccm-leadership__modal-footer" style="margin-top: 20px;">
+                  <a class="rbccm-leadership__modal-linkedin" target="_blank" rel="noopener noreferrer" hidden>View LinkedIn profile</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     Slick init + a11y + focus handling + Tab navigation + bio modal.
+     Same init as the European hardcoded version. Dynamic slick CDN loader
+     if $.fn.slick isn't already present. DEBUG = true prints Tab / focus
+     events to the console; flip to false for production once verified.
+     ========================================================================= -->
+<script>
+  jQuery(document).ready(function ($) {
+    var $track    = $('.rbccm-leadership__slider-track');
+    var $dots     = $('#rbccm-lead-dots');
+    var section   = document.getElementById('rbccm-leadership');
+    var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
+    var DEBUG = true;
+    if (DEBUG) {
+      var __describeEl = function (el) {
+        if (!el || el === document.body) return '(body)';
+        var tag  = el.tagName.toLowerCase();
+        var id   = el.id ? '#' + el.id : '';
+        var cls  = el.className && typeof el.className === 'string'
+                   ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : '';
+        var name = el.getAttribute('aria-label')
+                   || (el.textContent || '').trim().slice(0, 40);
+        var ti   = el.getAttribute('tabindex');
+        var inCarousel = section && section.contains(el) ? ' [in carousel]' : ' [OUTSIDE]';
+        return tag + id + cls + ' "' + name + '"' + (ti !== null ? ' tabindex=' + ti : '') + inCarousel;
+      };
+      $(document).on('keydown.rbccmDebug', function (e) {
+        if (e.key === 'Tab') {
+          console.log('%c[TAB ' + (e.shiftKey ? 'shift' : 'fwd') + ']',
+            'color:#fff;background:#003168;padding:2px 6px;border-radius:3px;',
+            'from:', __describeEl(document.activeElement));
+        }
+      });
+      document.addEventListener('focusin', function (e) {
+        console.log('%c[FOCUS]',
+          'color:#003168;background:#FFC72C;padding:2px 6px;border-radius:3px;',
+          __describeEl(e.target));
+      });
+    }
+
+    $('#rbccm-lead-prev, #rbccm-lead-next').attr('tabindex', '0');
+
+    $('#rbccm-lead-prev').on('click', function () {
+      if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
+    });
+    $('#rbccm-lead-next').on('click', function () {
+      if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
+    });
+
+    function syncArrows() {
+      var slick      = $track.slick('getSlick');
+      var current    = slick.currentSlide;
+      var total      = slick.slideCount;
+      var isInfinite = slick.options.infinite;
+
+      if (isInfinite) {
+        $('#rbccm-lead-prev, #rbccm-lead-next')
+          .prop('disabled', false)
+          .attr('aria-disabled', 'false')
+          .css('opacity', 1);
+        return;
+      }
+
+      var cardWidth    = $('.rbccm-leadership__card').first().outerWidth(true);
+      var trackWidth   = $track.width();
+      var visibleCards = Math.ceil(trackWidth / cardWidth);
+      var maxIndex     = total - visibleCards;
+
+      var atStart = current <= 0;
+      var atEnd   = current >= maxIndex;
+
+      $('#rbccm-lead-prev').prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
+      $('#rbccm-lead-next').prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
+    }
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function initCarousel() {
+      $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
+      $track.slick({
+        slidesToShow:    1,
+        slidesToScroll:  1,
+        variableWidth:   true,
+        infinite:        true,
+        initialSlide:    0,
+        arrows:          false,
+        dots:            true,
+        dotsClass:       'slick-dots',
+        appendDots:      $dots,
+        speed:           reducedMotion ? 0 : 350,
+        cssEase:         reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+        easing:          'linear',
+        useCSS:          true,
+        useTransform:    true,
+        fade:            false,
+        centerMode:      true,
+        centerPadding:   '0px',
+        adaptiveHeight:  false,
+        rows:            1,
+        slidesPerRow:    1,
+        vertical:        false,
+        verticalSwiping: false,
+        rtl:             false,
+        draggable:       false,
+        swipe:           true,
+        swipeToSlide:    false,
+        touchMove:       true,
+        touchThreshold:  5,
+        edgeFriction:    0.35,
+        autoplay:        false,
+        autoplaySpeed:   3000,
+        accessibility:   false,
+        pauseOnHover:    true,
+        pauseOnFocus:    true,
+        pauseOnDotsHover: false,
+        respondTo:       'window',
+        mobileFirst:     false,
+        responsive: [
+          { breakpoint: 99999, settings: { centerMode:false, centerPadding:'0px', draggable:false, infinite:true,  slidesToScroll:1, swipe:false, touchMove:false, variableWidth:true } },
+          { breakpoint: 1300,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+          { breakpoint: 1025,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+          { breakpoint: 640,   settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
+        ],
+        asNavFor:       null,
+        waitForAnimate: true,
+        zIndex:         1000
+      });
+    }
+
+    if (typeof $.fn.slick !== 'undefined') {
+      initCarousel();
+    } else {
+      var slickScript = document.createElement('script');
+      slickScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+      slickScript.integrity = 'sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==';
+      slickScript.crossOrigin = 'anonymous';
+      slickScript.referrerPolicy = 'no-referrer';
+      slickScript.onload = function () { initCarousel(); };
+      document.head.appendChild(slickScript);
+    }
+
+    function isSlideInView(slideEl) {
+      var list = $track.find('.slick-list')[0];
+      if (!list) return false;
+      var lr = list.getBoundingClientRect();
+      var sr = slideEl.getBoundingClientRect();
+      var visLeft  = Math.max(sr.left, lr.left);
+      var visRight = Math.min(sr.right, lr.right);
+      var visWidth = Math.max(0, visRight - visLeft);
+      var slideW   = sr.right - sr.left;
+      return slideW > 0 && (visWidth / slideW) >= 0.9;
+    }
+
+    function applyA11y() {
+      $track.find('.slick-slide').each(function () {
+        var inView = isSlideInView(this);
+        if (inView) { this.removeAttribute('aria-hidden'); }
+        else        { this.setAttribute('aria-hidden', 'true'); }
+
+        var kids = this.querySelectorAll(FOCUSABLE);
+        for (var i = 0; i < kids.length; i++) kids[i].setAttribute('tabindex', '-1');
+        var card = this.querySelector('.rbccm-leadership__card');
+        if (card) card.setAttribute('tabindex', '-1');
+
+        if (!inView) return;
+
+        var action = this.querySelector('.rbccm-leadership__card-action');
+        if (action)    action.setAttribute('tabindex', '0');
+        else if (card) card.setAttribute('tabindex', '0');
+      });
+    }
+
+    $track.on('afterChange', function (e, slick, currentSlide) {
+      applyA11y();
+      syncArrows();
+      if (typeof currentSlide !== 'undefined' && slick) {
+        $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+      }
+    });
+
+    function setFocusedCard(card) {
+      document.querySelectorAll('.rbccm-leadership__card').forEach(function (c) {
+        c.style.removeProperty('border-color');
+        c.classList.remove('is-focused');
+      });
+      document.querySelectorAll('.rbccm-leadership__card-action').forEach(function (a) {
+        a.style.removeProperty('outline');
+        a.style.removeProperty('border-radius');
+      });
+      if (!card) return;
+      var slide = card.closest('.slick-slide');
+      if (slide) slide.removeAttribute('aria-hidden');
+      var name = card.querySelector('.rbccm-leadership__card-name');
+      name = name ? name.textContent : null;
+      document.querySelectorAll('.rbccm-leadership__card').forEach(function (c) {
+        var n = c.querySelector('.rbccm-leadership__card-name');
+        var same = !name || (n && n.textContent === name);
+        if (c === card || same) {
+          c.classList.add('is-focused');
+          c.style.setProperty('border-color', '#003168', 'important');
+          var action = c.querySelector('.rbccm-leadership__card-action');
+          if (action) {
+            action.style.setProperty('outline', '2px solid #003168', 'important');
+            action.style.setProperty('border-radius', '4px', 'important');
+          }
+        }
+      });
+    }
+
+    var focusViaKeyboard = false;
+    document.addEventListener('keydown', function (e) { if (e.key === 'Tab') focusViaKeyboard = true; }, true);
+    document.addEventListener('mousedown',   function () { focusViaKeyboard = false; }, true);
+    document.addEventListener('touchstart',  function () { focusViaKeyboard = false; }, true);
+    document.addEventListener('pointerdown', function () { focusViaKeyboard = false; }, true);
+
+    document.addEventListener('focusin', function (e) {
+      if (!focusViaKeyboard) { setFocusedCard(null); return; }
+      var card = e.target && e.target.closest && e.target.closest('.rbccm-leadership__card');
+      setFocusedCard(card);
+    });
+
+    function visibleStopIn(slide) {
+      if (!isSlideInView(slide)) return null;
+      return slide.querySelector('.rbccm-leadership__card-action') ||
+             slide.querySelector('.rbccm-leadership__card[tabindex="0"]');
+    }
+
+    $track.on('keydown', '.rbccm-leadership__card-action, .rbccm-leadership__card[tabindex="0"]', function (e) {
+      if (e.key !== 'Tab') return;
+      var slides = $track.find('.slick-slide').toArray();
+      var currentSlide = this.closest('.slick-slide');
+      var idx = slides.indexOf(currentSlide);
+      if (idx === -1) return;
+      var step = e.shiftKey ? -1 : 1;
+      for (var i = idx + step; i >= 0 && i < slides.length; i += step) {
+        var target = visibleStopIn(slides[i]);
+        if (target) { e.preventDefault(); target.focus(); return; }
+      }
+    });
+
+    $('#rbccm-lead-prev').on('keydown', function (e) {
+      if (e.key !== 'Tab' || e.shiftKey) return;
+      var slides = $track.find('.slick-slide').toArray();
+      for (var i = 0; i < slides.length; i++) {
+        var target = visibleStopIn(slides[i]);
+        if (target) { e.preventDefault(); target.focus(); return; }
+      }
+    });
+
+    $('#rbccm-lead-next').on('keydown', function (e) {
+      if (e.key !== 'Tab' || !e.shiftKey) return;
+      var slides = $track.find('.slick-slide').toArray();
+      for (var i = slides.length - 1; i >= 0; i--) {
+        var target = visibleStopIn(slides[i]);
+        if (target) { e.preventDefault(); target.focus(); return; }
+      }
+    });
+
+    var resizeTimer;
+    $(window).on('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if ($track.hasClass('slick-initialized')) {
+          $track.slick('setPosition');
+          syncArrows();
+          applyA11y();
+        }
+      }, 50);
+    });
+
+    // Biography modal — populated per-tile
+    var $modal     = $('#rbccm-lead-modal');
+    var $modalName = $modal.find('.rbccm-leadership__modal-name');
+    var $modalRole = $modal.find('.rbccm-leadership__modal-role');
+    var $modalBody = $modal.find('.rbccm-leadership__modal-body');
+    var $modalLi   = $modal.find('.rbccm-leadership__modal-linkedin');
+
+    $(document).on('click', '.rbccm-leadership__card-bio', function (e) {
+      e.preventDefault();
+      var $src = $('#' + $(this).attr('data-bio-target'));
+      if (!$src.length) return;
+      $modalName.text($src.attr('data-name') || '');
+      $modalRole.text($src.attr('data-role') || '');
+      $modalBody.html($src.html());
+      var li = $src.attr('data-linkedin') || '';
+      if (li) { $modalLi.attr('href', li).removeAttr('hidden'); }
+      else    { $modalLi.attr('hidden', 'hidden'); }
+      $modal.modal('show');
+    });
+  });
+</script>
