@@ -1,0 +1,1044 @@
+<!doctype html>
+<!--
+  MAAS+MATA CMS — prototype
+  ------------------------------------------------------------------
+  Same pattern as leadership-cms-prototype.html, but for the full
+  MAAS+MATA page schema.
+
+  How to use:
+    1. Open this file locally, fill in / edit content
+    2. Click "Download JSON" (or "Copy JSON") in the top bar
+    3. Send maas-mata.json to the dev
+    4. Dev drops it into /js/data/maas-mata.json on the RBCCM server
+    5. Page picks it up on next load via rbccm-json-bind.js
+
+  Structure:
+    - Left sidebar: section navigation
+    - Middle: form for the selected section
+    - Right: live JSON preview
+    - Top bar: Copy JSON, Download, Load JSON, Load sample
+
+  Auto-saves drafts to localStorage between refreshes.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAAS+MATA CMS — Prototype</title>
+<style>
+  :root {
+    --navy: #003168; --navy-dark: #002144; --yellow: #FBDE00;
+    --blue: #0051A5; --grey-100: #f5f5f5; --grey-200: #e6e6e6;
+    --grey-300: #d0d3d7; --grey-400: #b0b0b0; --grey-600: #595959;
+    --grey-800: #333; --red: #c62828; --green: #2e7d32;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--grey-100);
+    color: var(--grey-800);
+    line-height: 1.4;
+    height: 100vh; overflow: hidden;
+  }
+  header {
+    background: var(--navy); color: #fff;
+    padding: 10px 20px;
+    border-top: 6px solid var(--yellow);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  header h1 { margin: 0; font-size: 16px; font-weight: 500; }
+  header .actions { display: flex; gap: 8px; }
+  button {
+    font: inherit; padding: 6px 12px;
+    border: 1px solid var(--navy); background: #fff; color: var(--navy);
+    border-radius: 3px; cursor: pointer; font-size: 12px;
+  }
+  button:hover { background: var(--navy); color: #fff; }
+  button.primary { background: var(--navy); color: #fff; }
+  button.primary:hover { background: var(--navy-dark); }
+  button.ghost { border-color: var(--grey-400); color: var(--grey-600); background: transparent; }
+  button.ghost:hover { background: var(--grey-200); color: var(--grey-800); }
+  button.danger { border-color: var(--red); color: var(--red); }
+  button.danger:hover { background: var(--red); color: #fff; }
+  button.small { padding: 3px 7px; font-size: 11px; }
+  button.yellow { background: var(--yellow); color: var(--navy-dark); border-color: var(--yellow); }
+  button.yellow:hover { background: #e6ca00; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 400px;
+    height: calc(100vh - 50px);
+  }
+  .pane { overflow-y: auto; }
+  .pane--nav {
+    background: #fff;
+    border-right: 1px solid var(--grey-200);
+    padding: 16px 0;
+  }
+  .pane--form {
+    background: #fff;
+    border-right: 1px solid var(--grey-200);
+    padding: 20px 28px;
+  }
+  .pane--json {
+    background: #fafafa;
+    padding: 16px;
+  }
+  .section-nav {
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .section-nav li {
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--grey-800);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .section-nav li:hover { background: var(--grey-100); }
+  .section-nav li.active { background: var(--grey-100); border-left-color: var(--navy); color: var(--navy-dark); font-weight: 600; }
+  .section-nav-header {
+    padding: 4px 20px 8px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--grey-600);
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  h2.section-title {
+    font-size: 18px;
+    color: var(--navy-dark);
+    margin: 0 0 4px 0;
+  }
+  .section-path {
+    font-size: 11px;
+    color: var(--grey-600);
+    font-family: monospace;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  .field { margin-bottom: 14px; }
+  .field-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--grey-600);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .field-hint { font-size: 11px; color: var(--grey-600); margin-top: 3px; }
+  input[type="text"], input[type="email"], input[type="url"], textarea, select {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--grey-300);
+    border-radius: 3px;
+    font: inherit;
+    font-size: 13px;
+    background: #fff;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 2px rgba(0,49,104,0.12);
+  }
+  textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+  label.check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .group {
+    border: 1px solid var(--grey-200);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fdfdfd;
+  }
+  .group-title {
+    font-size: 12px; font-weight: 600;
+    color: var(--grey-800);
+    margin-bottom: 8px;
+  }
+
+  .array {
+    margin-bottom: 12px;
+  }
+  .array-item {
+    border: 1px solid var(--grey-200);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #fdfdfd;
+    position: relative;
+  }
+  .array-item-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .array-item-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--grey-600); font-weight: 600;
+  }
+  .array-item-actions { display: flex; gap: 4px; }
+  .array-add {
+    margin-top: 4px;
+  }
+
+  .cta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .json-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--grey-600); font-weight: 600;
+  }
+  .json-preview {
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 11px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 12px;
+    border-radius: 4px;
+    overflow: auto;
+    white-space: pre;
+    height: calc(100vh - 130px);
+    line-height: 1.5;
+  }
+  .json-preview .json-key { color: #9cdcfe; }
+  .json-preview .json-str { color: #ce9178; }
+  .json-preview .json-num { color: #b5cea8; }
+  .json-preview .json-bool { color: #569cd6; }
+  .json-preview .json-null { color: #569cd6; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 4px;
+    width: 700px; max-width: 90vw;
+    max-height: 90vh;
+    display: flex; flex-direction: column;
+    border-top: 6px solid var(--yellow);
+  }
+  .modal-header { padding: 14px 18px; border-bottom: 1px solid var(--grey-200); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { margin: 0; font-size: 15px; color: var(--navy-dark); }
+  .modal-header .close { border: none; background: none; font-size: 24px; color: var(--grey-600); cursor: pointer; padding: 0 8px; }
+  .modal-body { padding: 18px; overflow-y: auto; flex: 1; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #fff;
+    padding: 8px 14px; border-radius: 3px;
+    font-size: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0; transition: all 0.2s;
+    pointer-events: none;
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  .badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--navy-dark);
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 8px;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MAAS+MATA CMS · Prototype</h1>
+  <div class="actions">
+    <button class="ghost" id="btn-load-json">Load JSON</button>
+    <button class="ghost" id="btn-reset">Load sample</button>
+    <button id="btn-copy">Copy JSON</button>
+    <button class="yellow" id="btn-download">Download .json</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT: section nav -->
+  <nav class="pane pane--nav">
+    <div class="section-nav-header">Sections</div>
+    <ul class="section-nav" id="section-nav"></ul>
+    <div class="section-nav-header">Reference</div>
+    <ul class="section-nav">
+      <li id="btn-show-schema">View data shape</li>
+    </ul>
+  </nav>
+
+  <!-- MIDDLE: form -->
+  <div class="pane pane--form" id="form-pane"></div>
+
+  <!-- RIGHT: JSON preview -->
+  <div class="pane pane--json">
+    <div class="json-header">
+      <span>Live JSON <span class="badge">saved locally</span></span>
+    </div>
+    <pre class="json-preview" id="json-out"></pre>
+  </div>
+</div>
+
+<!-- Load JSON modal -->
+<div class="modal-backdrop" id="modal-load">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Load from JSON</h3>
+      <button class="close" id="modal-load-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600);">Paste an existing maas-mata.json to load it for editing. This will replace all current content.</p>
+      <textarea id="load-json-input" style="min-height: 300px; font-family: monospace; font-size: 11px;" placeholder='{"meta": {...}, "hero": {...}, ...}'></textarea>
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+        <button class="ghost" id="modal-load-cancel">Cancel</button>
+        <button class="primary" id="modal-load-apply">Replace all with pasted JSON</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schema modal -->
+<div class="modal-backdrop" id="modal-schema">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Data shape</h3>
+      <button class="close" id="modal-schema-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600);">The MAAS+MATA page reads this shape from <code>/js/data/maas-mata.json</code>. Every editable text on the page maps to a path here.</p>
+      <pre class="json-preview" id="schema-preview" style="height: 500px;"></pre>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v1';
+
+  // ==============================================================
+  // SAMPLE / SEED DATA — full MAAS+MATA content
+  // ==============================================================
+  var SAMPLE = {
+    meta: { title: "MAAS + MATA · RBC Capital Markets" },
+    hero: {
+      eyebrow: "Introducing MAAS + MATA",
+      headlineLines: ["Fewer blind spots.", "Faster decisions.", "One desk."],
+      subtitle: "One institutional trading ecosystem: MAAS executes across asset classes; MATA explains every outcome with greater consistency, visibility and control.",
+      primaryCta: { label: "See the platform", href: "#platform" },
+      secondaryCta: { label: "Watch the video", href: "#video" }
+    },
+    chartCard: {
+      leftLabel: "MAAS · Execution Engine",
+      rightLabel: "MATA · Analytics",
+      leftHeadline: "Consistent trades",
+      leftValue: "+13,200 M",
+      quotes: [
+        { label: "Notify Inc.",   value: "$921.87", delta: "+2.14%", positive: true },
+        { label: "GLD / USD",     value: "0.7372",  delta: "-0.16%", positive: false },
+        { label: "Notify Dec 26", value: "$245.80", delta: "+0.62%", positive: true }
+      ],
+      quality: { label: "Execution quality", score: "98.2", trend: "+ 1.4% vs 30-day avg" }
+    },
+    awards: {
+      eyebrow: "Platform recognition",
+      items: [
+        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
+        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
+        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
+        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" }
+      ]
+    },
+    platforms: {
+      eyebrow: "One ecosystem · Two engines",
+      heading: "Where execution meets analytics",
+      cards: [
+        { theme: "light", eyebrow: "Execution platform", title: "Multi-Asset Agency Solutions", acronym: "MAAS", body: "MAAS brings multi asset trading into one connected execution platform, helping institutional trading desks streamline workflows, improve consistency, and execute with greater confidence.", cta: { label: "Explore MAAS", href: "/maas" } },
+        { theme: "dark",  eyebrow: "Analytics platform", title: "Multi-Asset Trade Analytics",   acronym: "MATA", body: "MATA delivers cross asset trade analytics that provide deeper execution insights, portfolio wide visibility, and the intelligence needed to optimize future trading decisions.", cta: { label: "Explore MATA", href: "/mata" } }
+      ]
+    },
+    closeTheLoop: {
+      heading: "Built to close the loop between trade and insight",
+      body: "MAAS and MATA work together to bridge the gap between execution and analytics so every trade makes the next one smarter.",
+      features: [
+        { number: "01", title: "Connected Execution",   body: "Execute across multiple asset classes through a consistent trading experience." },
+        { number: "02", title: "Cross-Asset Analytics", body: "Understand execution quality and uncover insights across your entire portfolio." },
+        { number: "03", title: "Data-Driven Decisions", body: "Leverage actionable analytics that help optimize future execution strategies." }
+      ]
+    },
+    whyRbc: {
+      eyebrow: "Our Numbers",
+      heading: "Why RBC Capital Markets",
+      body: "They power the innovation, capabilities, and culture that have ranked us among the world's top financial institutions.",
+      stats: [
+        { value: "700+",      label: "Asset coverage",         body: "700+ trading and risk specialists across 4 continents" },
+        { value: "$1T+",      label: "Balance sheet strength", body: "In RBC balance-sheet capacity behind every trade." },
+        { value: "AI-driven", label: "Innovation leadership",  body: "Award-winning trading powered by THOR and Aiden®." },
+        { value: "1:1",       label: "Client partnership",     body: "Trusted relationships built on stability and expertise." }
+      ]
+    },
+    assetCoverage: {
+      eyebrow: "Asset coverage",
+      heading: "Connected across the desk",
+      assets: [
+        { icon: "equities", title: "Equities",         body: "Connected execution and performance insights." },
+        { icon: "futures",  title: "Futures",          body: "Streamlined workflows across complex strategies." },
+        { icon: "fx",       title: "FX",               body: "Unified trading with cross asset visibility." },
+        { icon: "index",    title: "Index strategies", body: "Integrated analytics for event driven execution." }
+      ]
+    },
+    thoughtLeadership: {
+      heading: "Thought leadership",
+      featured: {
+        eyebrow: "Insights · Featured story",
+        title: "Connected execution for an increasingly fragmented market",
+        body: "Institutional markets continue to evolve as liquidity becomes more distributed across venues, asset classes, and geographies. Managing this complexity requires more than access — it requires connectivity.",
+        cta: { label: "Read the story", href: "/insights/connected-execution", readTime: "3 min" }
+      }
+    },
+    demoCta: {
+      eyebrow: "See the platform",
+      headlinePrefix: "Trade with total",
+      headlineHighlight: "clarity.",
+      body: "Discover how MAAS and MATA help institutional trading desks simplify multi asset workflows, uncover deeper execution insights, and make more informed trading decisions.",
+      cta: { label: "Request a demo", href: "/request-demo" }
+    },
+    newsletter: {
+      heading: "Stay informed",
+      body: "Get the latest updates and insights from RBC Capital Markets delivered to your inbox.",
+      fields: [
+        { id: "first",   type: "text",  label: "First Name",     required: true  },
+        { id: "last",    type: "text",  label: "Last Name",      required: true  },
+        { id: "title",   type: "text",  label: "Title",          required: false },
+        { id: "company", type: "text",  label: "Company",        required: true  },
+        { id: "email",   type: "email", label: "Business Email", required: true  }
+      ],
+      linkedinAutofillLabel: "Autofill with LinkedIn",
+      consent: "Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets.",
+      privacyLabel: "View Privacy Policy",
+      privacyHref: "/privacy",
+      submitLabel: "Sign up"
+    }
+  };
+
+  // ==============================================================
+  // SCHEMA — describes each section's form
+  // ==============================================================
+  // Field types:
+  //   text, textarea, url, checkbox
+  //   select { options: [...] }
+  //   cta   → composite (label + href) — writes to {label, href}
+  //   ctaWithRead → cta + readTime
+  //   stringArray → array of strings (chips)
+  //   object → nested { fields: {...} }
+  //   array  → array of objects { itemFields: {...}, itemLabelKey, defaultItem }
+  var SCHEMA = {
+    hero: {
+      label: 'Hero',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        headlineLines: { type: 'stringArray', label: 'Headline lines', hint: 'Each line is a separate row in the H1' },
+        subtitle: { type: 'textarea', label: 'Subtitle' },
+        primaryCta: { type: 'cta', label: 'Primary CTA' },
+        secondaryCta: { type: 'cta', label: 'Secondary CTA' }
+      }
+    },
+    chartCard: {
+      label: 'Chart Card',
+      fields: {
+        leftLabel: { type: 'text', label: 'Top left label' },
+        rightLabel: { type: 'text', label: 'Top right label' },
+        leftHeadline: { type: 'text', label: 'Headline label' },
+        leftValue: { type: 'text', label: 'Headline value' },
+        quotes: {
+          type: 'array',
+          label: 'Quotes (right column)',
+          itemLabelKey: 'label',
+          defaultItem: { label: '', value: '', delta: '', positive: true },
+          itemFields: {
+            label: { type: 'text', label: 'Instrument' },
+            value: { type: 'text', label: 'Value' },
+            delta: { type: 'text', label: 'Delta' },
+            positive: { type: 'checkbox', label: 'Positive (green delta)' }
+          }
+        },
+        quality: {
+          type: 'object',
+          label: 'Execution quality box',
+          fields: {
+            label: { type: 'text', label: 'Label' },
+            score: { type: 'text', label: 'Score' },
+            trend: { type: 'text', label: 'Trend text' }
+          }
+        }
+      }
+    },
+    awards: {
+      label: 'Awards',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        items: {
+          type: 'array',
+          label: 'Award badges',
+          itemLabelKey: 'title',
+          defaultItem: { year: '', title: '', issuer: '' },
+          itemFields: {
+            year: { type: 'text', label: 'Year' },
+            title: { type: 'text', label: 'Title' },
+            issuer: { type: 'text', label: 'Issuer' }
+          }
+        }
+      }
+    },
+    platforms: {
+      label: 'Platforms (MAAS/MATA cards)',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Section heading' },
+        cards: {
+          type: 'array',
+          label: 'Cards',
+          itemLabelKey: 'title',
+          defaultItem: { theme: 'light', eyebrow: '', title: '', acronym: '', body: '', cta: { label: '', href: '' } },
+          itemFields: {
+            theme: { type: 'select', label: 'Theme', options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ] },
+            eyebrow: { type: 'text', label: 'Eyebrow' },
+            title: { type: 'text', label: 'Title' },
+            acronym: { type: 'text', label: 'Acronym' },
+            body: { type: 'textarea', label: 'Body' },
+            cta: { type: 'cta', label: 'CTA' }
+          }
+        }
+      }
+    },
+    closeTheLoop: {
+      label: 'Close the Loop',
+      fields: {
+        heading: { type: 'text', label: 'Heading' },
+        body: { type: 'textarea', label: 'Body' },
+        features: {
+          type: 'array',
+          label: 'Features',
+          itemLabelKey: 'title',
+          defaultItem: { number: '', title: '', body: '' },
+          itemFields: {
+            number: { type: 'text', label: 'Number (e.g. "01")' },
+            title: { type: 'text', label: 'Title' },
+            body: { type: 'textarea', label: 'Body' }
+          }
+        }
+      }
+    },
+    whyRbc: {
+      label: 'Why RBC',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        body: { type: 'textarea', label: 'Body' },
+        stats: {
+          type: 'array',
+          label: 'Stats',
+          itemLabelKey: 'label',
+          defaultItem: { value: '', label: '', body: '' },
+          itemFields: {
+            value: { type: 'text', label: 'Value (e.g. "700+", "$1T+")' },
+            label: { type: 'text', label: 'Label' },
+            body: { type: 'textarea', label: 'Body' }
+          }
+        }
+      }
+    },
+    assetCoverage: {
+      label: 'Asset Coverage',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        heading: { type: 'text', label: 'Heading' },
+        assets: {
+          type: 'array',
+          label: 'Assets',
+          itemLabelKey: 'title',
+          defaultItem: { icon: 'equities', title: '', body: '' },
+          itemFields: {
+            icon: { type: 'select', label: 'Icon', options: [
+              { value: 'equities', label: 'Equities (line chart)' },
+              { value: 'futures', label: 'Futures (bars)' },
+              { value: 'fx', label: 'FX (arrows)' },
+              { value: 'index', label: 'Index (crosshair)' }
+            ] },
+            title: { type: 'text', label: 'Title' },
+            body: { type: 'textarea', label: 'Body' }
+          }
+        }
+      }
+    },
+    thoughtLeadership: {
+      label: 'Thought Leadership',
+      fields: {
+        heading: { type: 'text', label: 'Section heading' },
+        featured: {
+          type: 'object',
+          label: 'Featured story',
+          fields: {
+            eyebrow: { type: 'text', label: 'Eyebrow' },
+            title: { type: 'text', label: 'Title' },
+            body: { type: 'textarea', label: 'Body' },
+            cta: { type: 'ctaWithRead', label: 'CTA' }
+          }
+        }
+      }
+    },
+    demoCta: {
+      label: 'Demo CTA',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow' },
+        headlinePrefix: { type: 'text', label: 'Headline prefix (regular text)' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word (yellow italic)' },
+        body: { type: 'textarea', label: 'Body' },
+        cta: { type: 'cta', label: 'CTA' }
+      }
+    },
+    newsletter: {
+      label: 'Newsletter',
+      fields: {
+        heading: { type: 'text', label: 'Heading' },
+        body: { type: 'textarea', label: 'Body' },
+        fields: {
+          type: 'array',
+          label: 'Form fields',
+          itemLabelKey: 'label',
+          defaultItem: { id: '', type: 'text', label: '', required: false },
+          itemFields: {
+            id: { type: 'text', label: 'Field id' },
+            type: { type: 'select', label: 'Input type', options: [ { value: 'text', label: 'text' }, { value: 'email', label: 'email' }, { value: 'url', label: 'url' } ] },
+            label: { type: 'text', label: 'Label / placeholder' },
+            required: { type: 'checkbox', label: 'Required' }
+          }
+        },
+        linkedinAutofillLabel: { type: 'text', label: 'LinkedIn button text' },
+        consent: { type: 'textarea', label: 'Consent copy' },
+        privacyLabel: { type: 'text', label: 'Privacy link label' },
+        privacyHref: { type: 'text', label: 'Privacy link URL' },
+        submitLabel: { type: 'text', label: 'Submit button label' }
+      }
+    }
+  };
+
+  // ==============================================================
+  // STATE
+  // ==============================================================
+  var state = deepClone(SAMPLE);
+  var currentSection = 'hero';
+
+  function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+  function getPath(obj, path) {
+    var parts = String(path).split('.');
+    var cur = obj;
+    for (var i = 0; i < parts.length; i++) { if (cur == null) return undefined; cur = cur[parts[i]]; }
+    return cur;
+  }
+  function setPath(obj, path, value) {
+    var parts = String(path).split('.');
+    var cur = obj;
+    for (var i = 0; i < parts.length - 1; i++) {
+      if (cur[parts[i]] == null) cur[parts[i]] = {};
+      cur = cur[parts[i]];
+    }
+    cur[parts[parts.length - 1]] = value;
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    renderJson();
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      state = JSON.parse(raw);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // ==============================================================
+  // FORM RENDERING (schema-driven)
+  // ==============================================================
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+
+  function fieldWrap(labelText, innerHtml, hint) {
+    return '<div class="field">'
+      + '<label class="field-label">' + esc(labelText) + '</label>'
+      + innerHtml
+      + (hint ? '<div class="field-hint">' + esc(hint) + '</div>' : '')
+      + '</div>';
+  }
+
+  function renderField(key, def, basePath) {
+    var path = basePath + (basePath ? '.' : '') + key;
+    var val = getPath(state, path);
+
+    if (def.type === 'text' || def.type === 'url') {
+      return fieldWrap(def.label,
+        '<input type="text" data-path="' + esc(path) + '" value="' + esc(val || '') + '">',
+        def.hint);
+    }
+    if (def.type === 'textarea') {
+      return fieldWrap(def.label,
+        '<textarea data-path="' + esc(path) + '">' + esc(val || '') + '</textarea>',
+        def.hint);
+    }
+    if (def.type === 'checkbox') {
+      return '<div class="field"><label class="check">'
+        + '<input type="checkbox" data-path="' + esc(path) + '" ' + (val ? 'checked' : '') + '>'
+        + esc(def.label)
+        + '</label></div>';
+    }
+    if (def.type === 'select') {
+      var opts = def.options.map(function (o) {
+        return '<option value="' + esc(o.value) + '"' + (o.value === val ? ' selected' : '') + '>' + esc(o.label) + '</option>';
+      }).join('');
+      return fieldWrap(def.label,
+        '<select data-path="' + esc(path) + '">' + opts + '</select>',
+        def.hint);
+    }
+    if (def.type === 'cta') {
+      var cta = val || { label: '', href: '' };
+      return fieldWrap(def.label,
+        '<div class="cta-row">'
+        + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta.label || '') + '">'
+        + '<input type="text" placeholder="URL / #anchor" data-path="' + esc(path) + '.href" value="' + esc(cta.href || '') + '">'
+        + '</div>',
+        def.hint);
+    }
+    if (def.type === 'ctaWithRead') {
+      var cta2 = val || { label: '', href: '', readTime: '' };
+      return fieldWrap(def.label,
+        '<div class="cta-row" style="grid-template-columns: 2fr 2fr 1fr;">'
+        + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta2.label || '') + '">'
+        + '<input type="text" placeholder="URL" data-path="' + esc(path) + '.href" value="' + esc(cta2.href || '') + '">'
+        + '<input type="text" placeholder="Read time" data-path="' + esc(path) + '.readTime" value="' + esc(cta2.readTime || '') + '">'
+        + '</div>',
+        def.hint);
+    }
+    if (def.type === 'object') {
+      var inner = '';
+      Object.keys(def.fields).forEach(function (k) {
+        inner += renderField(k, def.fields[k], path);
+      });
+      return '<div class="group"><div class="group-title">' + esc(def.label) + '</div>' + inner + '</div>';
+    }
+    if (def.type === 'stringArray') {
+      var arr = Array.isArray(val) ? val : [];
+      var itemsHtml = arr.map(function (s, i) {
+        return '<div class="array-item">'
+          + '<div class="array-item-header">'
+          +   '<span class="array-item-title">Item ' + (i + 1) + '</span>'
+          +   '<div class="array-item-actions">'
+          +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+          +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr.length - 1 ? ' disabled' : '') + '>↓</button>'
+          +     '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '">×</button>'
+          +   '</div>'
+          + '</div>'
+          + '<input type="text" data-path="' + esc(path) + '.' + i + '" value="' + esc(s) + '">'
+          + '</div>';
+      }).join('');
+      return '<div class="field">'
+        + '<label class="field-label">' + esc(def.label) + '</label>'
+        + (def.hint ? '<div class="field-hint" style="margin-top:0;margin-bottom:8px;">' + esc(def.hint) + '</div>' : '')
+        + '<div class="array">' + itemsHtml + '</div>'
+        + '<button class="ghost small array-add" data-array-action="add-string" data-array-path="' + esc(path) + '">+ Add item</button>'
+        + '</div>';
+    }
+    if (def.type === 'array') {
+      var arr2 = Array.isArray(val) ? val : [];
+      var itemsHtml2 = arr2.map(function (item, i) {
+        var itemPath = path + '.' + i;
+        var itemLabel = def.itemLabelKey && item[def.itemLabelKey] ? item[def.itemLabelKey] : ('Item ' + (i + 1));
+        var itemInner = '';
+        Object.keys(def.itemFields).forEach(function (k) {
+          itemInner += renderField(k, def.itemFields[k], itemPath);
+        });
+        return '<div class="array-item">'
+          + '<div class="array-item-header">'
+          +   '<span class="array-item-title">' + esc(itemLabel) + '</span>'
+          +   '<div class="array-item-actions">'
+          +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+          +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr2.length - 1 ? ' disabled' : '') + '>↓</button>'
+          +     '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '">Delete</button>'
+          +   '</div>'
+          + '</div>'
+          + itemInner
+          + '</div>';
+      }).join('');
+      var defaultJson = JSON.stringify(def.defaultItem).replace(/'/g, "&#39;");
+      return '<div class="field">'
+        + '<label class="field-label">' + esc(def.label) + '</label>'
+        + (def.hint ? '<div class="field-hint" style="margin-top:0;margin-bottom:8px;">' + esc(def.hint) + '</div>' : '')
+        + '<div class="array">' + itemsHtml2 + '</div>'
+        + '<button class="ghost small array-add" data-array-action="add-obj" data-array-path="' + esc(path) + '" data-default=\'' + defaultJson + '\'>+ Add item</button>'
+        + '</div>';
+    }
+    return '';
+  }
+
+  function renderSection(sectionId) {
+    var def = SCHEMA[sectionId];
+    if (!def) return;
+    currentSection = sectionId;
+    var container = document.getElementById('form-pane');
+    var html = '<h2 class="section-title">' + esc(def.label) + '</h2>'
+             + '<div class="section-path">state.' + esc(sectionId) + '</div>';
+    Object.keys(def.fields).forEach(function (key) {
+      html += renderField(key, def.fields[key], sectionId);
+    });
+    container.innerHTML = html;
+    container.scrollTop = 0;
+
+    // highlight in nav
+    var lis = document.querySelectorAll('#section-nav li');
+    for (var i = 0; i < lis.length; i++) {
+      lis[i].classList.toggle('active', lis[i].getAttribute('data-section') === sectionId);
+    }
+  }
+
+  function renderNav() {
+    var html = '';
+    Object.keys(SCHEMA).forEach(function (id) {
+      html += '<li data-section="' + esc(id) + '">' + esc(SCHEMA[id].label) + '</li>';
+    });
+    document.getElementById('section-nav').innerHTML = html;
+  }
+
+  // ==============================================================
+  // JSON PREVIEW
+  // ==============================================================
+  function syntaxHighlight(json) {
+    return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'json-num';
+        if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-str';
+        else if (/true|false/.test(match)) cls = 'json-bool';
+        else if (/null/.test(match)) cls = 'json-null';
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+  }
+  function renderJson() {
+    document.getElementById('json-out').innerHTML = syntaxHighlight(JSON.stringify(state, null, 2));
+  }
+
+  // ==============================================================
+  // TOAST
+  // ==============================================================
+  var toastTimer;
+  function toast(msg, isError) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.className = 'toast'; }, 2200);
+  }
+
+  // ==============================================================
+  // EVENT WIRING
+  // ==============================================================
+
+  // Nav clicks
+  document.getElementById('section-nav').addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-section]');
+    if (!li) return;
+    renderSection(li.getAttribute('data-section'));
+  });
+
+  // Form input changes (delegated)
+  document.getElementById('form-pane').addEventListener('input', function (e) {
+    var el = e.target;
+    var path = el.getAttribute('data-path');
+    if (!path) return;
+    var val;
+    if (el.type === 'checkbox') val = el.checked;
+    else val = el.value;
+    setPath(state, path, val);
+    save();
+    // Note: NOT re-rendering here — that would blow away focus. Only
+    // re-render when array structure changes (add/remove/move).
+  });
+  document.getElementById('form-pane').addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.tagName !== 'SELECT' && el.type !== 'checkbox') return;
+    var path = el.getAttribute('data-path');
+    if (!path) return;
+    var val = el.type === 'checkbox' ? el.checked : el.value;
+    setPath(state, path, val);
+    save();
+  });
+
+  // Array actions (add/remove/move)
+  document.getElementById('form-pane').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-array-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-array-action');
+    var arrPath = btn.getAttribute('data-array-path');
+    var idx = parseInt(btn.getAttribute('data-array-index'), 10);
+    var arr = getPath(state, arrPath);
+    if (!Array.isArray(arr) && (action !== 'add-string' && action !== 'add-obj')) return;
+
+    if (action === 'up' && idx > 0) {
+      var t = arr[idx - 1]; arr[idx - 1] = arr[idx]; arr[idx] = t;
+    } else if (action === 'down' && idx < arr.length - 1) {
+      var t2 = arr[idx + 1]; arr[idx + 1] = arr[idx]; arr[idx] = t2;
+    } else if (action === 'delete') {
+      arr.splice(idx, 1);
+    } else if (action === 'add-string') {
+      if (!Array.isArray(arr)) setPath(state, arrPath, []);
+      getPath(state, arrPath).push('');
+    } else if (action === 'add-obj') {
+      var def = JSON.parse(btn.getAttribute('data-default'));
+      if (!Array.isArray(arr)) setPath(state, arrPath, []);
+      getPath(state, arrPath).push(deepClone(def));
+    }
+
+    save();
+    renderSection(currentSection);
+  });
+
+  // Top-bar actions
+  document.getElementById('btn-copy').addEventListener('click', function () {
+    var json = JSON.stringify(state, null, 2);
+    navigator.clipboard.writeText(json).then(
+      function () { toast('Copied to clipboard'); },
+      function () { toast('Copy failed', true); }
+    );
+  });
+
+  document.getElementById('btn-download').addEventListener('click', function () {
+    var json = JSON.stringify(state, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'maas-mata.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Downloaded maas-mata.json');
+  });
+
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    if (!confirm('Replace all content with the sample data?')) return;
+    state = deepClone(SAMPLE);
+    save();
+    renderSection(currentSection);
+    toast('Sample content loaded');
+  });
+
+  document.getElementById('btn-load-json').addEventListener('click', function () {
+    document.getElementById('load-json-input').value = '';
+    document.getElementById('modal-load').classList.add('open');
+  });
+  document.getElementById('modal-load-close').addEventListener('click', function () {
+    document.getElementById('modal-load').classList.remove('open');
+  });
+  document.getElementById('modal-load-cancel').addEventListener('click', function () {
+    document.getElementById('modal-load').classList.remove('open');
+  });
+  document.getElementById('modal-load-apply').addEventListener('click', function () {
+    var raw = document.getElementById('load-json-input').value.trim();
+    if (!raw) { toast('Paste JSON first', true); return; }
+    try {
+      var parsed = JSON.parse(raw);
+      state = parsed;
+      save();
+      renderSection(currentSection);
+      document.getElementById('modal-load').classList.remove('open');
+      toast('JSON loaded');
+    } catch (e) {
+      toast('Invalid JSON: ' + e.message, true);
+    }
+  });
+
+  document.getElementById('btn-show-schema').addEventListener('click', function () {
+    // Show a friendly, human-readable schema derived from the SCHEMA
+    var out = {};
+    Object.keys(SCHEMA).forEach(function (sid) {
+      out[sid] = describeSection(SCHEMA[sid]);
+    });
+    document.getElementById('schema-preview').innerHTML = syntaxHighlight(JSON.stringify(out, null, 2));
+    document.getElementById('modal-schema').classList.add('open');
+  });
+  document.getElementById('modal-schema-close').addEventListener('click', function () {
+    document.getElementById('modal-schema').classList.remove('open');
+  });
+
+  function describeSection(def) {
+    var out = {};
+    Object.keys(def.fields).forEach(function (k) {
+      out[k] = describeField(def.fields[k]);
+    });
+    return out;
+  }
+  function describeField(f) {
+    if (f.type === 'text' || f.type === 'textarea' || f.type === 'url') return 'string';
+    if (f.type === 'checkbox') return 'boolean';
+    if (f.type === 'select') return 'string (' + f.options.map(function (o) { return o.value; }).join(' | ') + ')';
+    if (f.type === 'cta') return { label: 'string', href: 'string' };
+    if (f.type === 'ctaWithRead') return { label: 'string', href: 'string', readTime: 'string' };
+    if (f.type === 'stringArray') return ['string', '...'];
+    if (f.type === 'object') return describeSection(f);
+    if (f.type === 'array') return [describeSection({ fields: f.itemFields }), '...'];
+    return f.type;
+  }
+
+  // Modal backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) m.classList.remove('open'); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop.open').forEach(function (m) { m.classList.remove('open'); });
+    }
+  });
+
+  // ==============================================================
+  // INIT
+  // ==============================================================
+  load(); // hydrate from localStorage if present
+  renderNav();
+  renderSection('hero');
+  renderJson();
+})();
+</script>
+
+</body>
+</html>

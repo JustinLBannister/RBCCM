@@ -1,0 +1,807 @@
+<!doctype html>
+<!--
+  MAAS + MATA page · v2
+  ------------------------------------------------------------------
+  Pre-rendered HTML with data-* attributes. Content is populated
+  from /js/data/maas-mata.json by rbccm-json-bind.js.
+
+  Publishing model (what changes vs what stays):
+    - Dev owns:    HTML markup, CSS, JS binding runtime
+    - Editor owns: maas-mata.json (edited via CMS form, sent to dev,
+                   dev drops into /js/data/)
+
+  The placeholder copy in this file IS the fallback:
+    - If fetch succeeds → JSON values overwrite placeholders
+    - If fetch fails    → inline #fallback-data (bottom of file) is
+                          tried
+    - If neither        → the visible placeholder stays put; page is
+                          still meaningful for SEO / no-JS / crawlers
+
+  Binding attributes used (see rbccm-json-bind.js header for the full
+  reference):
+    data-json               textContent
+    data-json-html          innerHTML
+    data-json-attr-<name>   setAttribute (href, src, alt, etc.)
+    data-json-list          clone <template> per array item
+    data-json-class         append value as a class (theme variants)
+    data-json-class-<name>  toggle class by truthiness (pos/neg)
+    data-json-list-item     marker on clones (managed by runtime)
+    data-json-list-fallback marker on placeholder list children
+                            (removed by runtime before render)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAAS + MATA · RBC Capital Markets</title>
+
+<style>
+  :root {
+    --navy-900: #001E3C; --navy-800: #002144; --navy-700: #003168; --navy-600: #0051A5;
+    --yellow:   #FBDE00; --yellow-dk: #F4C020;
+    --cream:    #F6F1E7; --off-white: #FAFAF7;
+    --grey-100: #F3F4F5; --grey-300: #D9DBDE; --grey-500: #8A8F97; --grey-700: #4A4E55;
+    --ink:      #1B1F27; --white: #FFFFFF;
+    --serif:    Georgia, "Times New Roman", serif;
+    --sans:     "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--sans); color: var(--ink); background: var(--white); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--yellow-dk); font-weight: 500; margin: 0 0 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px; font-weight: 500; font-size: 14px; border: 1px solid transparent; cursor: pointer; }
+  .btn-primary { background: var(--navy-600); color: #fff; }
+  .btn-primary:hover { background: var(--navy-700); }
+  .btn-yellow { background: var(--yellow); color: var(--navy-800); }
+  .btn-yellow:hover { background: var(--yellow-dk); }
+  .btn-link { padding: 0; background: none; color: var(--navy-600); font-weight: 500; }
+  .btn .arrow { display: inline-block; transform: translateY(-1px); }
+
+  /* Header */
+  .topbar { background: #fff; border-bottom: 1px solid var(--grey-300); font-size: 12px; color: var(--grey-700); }
+  .topbar-inner { display: flex; justify-content: flex-end; gap: 20px; padding: 8px 24px; }
+  .site-header { background: #fff; padding: 14px 0; border-bottom: 1px solid var(--grey-300); }
+  .site-header-inner { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 8px; }
+  .logo::before { content: ""; display: inline-block; width: 22px; height: 22px; background: var(--yellow); border-radius: 4px; }
+  .nav ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 28px; font-size: 14px; color: var(--navy-800); }
+  .nav a { padding: 8px 0; }
+  .nav a:hover { color: var(--navy-600); }
+
+  /* Hero */
+  .hero { padding: 72px 0 40px; text-align: center; }
+  .hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(40px, 6vw, 68px); line-height: 1.05; letter-spacing: -0.5px; margin: 16px 0 24px; }
+  .hero h1 span { display: block; }
+  .hero .subtitle { max-width: 640px; margin: 0 auto 32px; color: var(--grey-700); font-size: 15px; line-height: 1.6; }
+  .hero .cta-row { display: inline-flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+  /* Chart card */
+  .chart-wrap { max-width: 1080px; margin: 40px auto -140px; padding: 0 24px; position: relative; z-index: 2; }
+  .chart-card { background: var(--navy-900); color: #fff; border-radius: 12px; padding: 20px 24px; box-shadow: 0 24px 60px rgba(0,0,0,0.25); overflow: hidden; }
+  .chart-topbar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-500); padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .chart-topbar-dots { display: flex; gap: 4px; }
+  .chart-topbar-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .chart-body { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; padding-top: 16px; }
+  @media (max-width: 720px) { .chart-body { grid-template-columns: 1fr; } }
+  .chart-left .headline-value { font-family: var(--serif); font-size: 26px; color: var(--yellow); margin: 4px 0 12px; }
+  .chart-left .headline-label { font-size: 12px; color: var(--grey-500); text-transform: uppercase; letter-spacing: 1px; }
+  .chart-svg { width: 100%; height: 140px; margin-top: 8px; }
+  .chart-right { border-left: 1px solid rgba(255,255,255,0.08); padding-left: 24px; }
+  @media (max-width: 720px) { .chart-right { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; } }
+  .quote-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dotted rgba(255,255,255,0.08); font-size: 13px; }
+  .quote-row:last-of-type { border-bottom: none; }
+  .quote-label { color: #fff; font-weight: 500; }
+  .quote-value { color: #fff; font-variant-numeric: tabular-nums; }
+  .quote-delta { font-size: 11px; margin-left: 6px; color: #F87171; }
+  .quote-delta.pos { color: #4ADE80; }
+  .quality { margin-top: 14px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 6px; display: flex; justify-content: space-between; align-items: baseline; }
+  .quality .qlabel { font-size: 11px; color: var(--grey-500); text-transform: uppercase; letter-spacing: 1px; }
+  .quality .qscore { font-family: var(--serif); font-size: 22px; color: var(--yellow); }
+  .quality .qtrend { font-size: 11px; color: var(--grey-500); display: block; margin-top: 2px; }
+
+  /* Dark strip */
+  .dark-strip { background: var(--navy-900); color: #fff; padding: 200px 0 120px; }
+  .awards { max-width: 1080px; margin: 0 auto 100px; padding: 0 24px; text-align: center; }
+  .awards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 8px; }
+  @media (max-width: 720px) { .awards-grid { grid-template-columns: repeat(2, 1fr); } }
+  .award-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 18px 16px; border-radius: 8px; text-align: left; font-size: 13px; }
+  .award-card .year { display: inline-block; background: var(--yellow); color: var(--navy-800); padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; margin-bottom: 12px; letter-spacing: 1px; }
+  .award-card .title { color: #fff; font-weight: 600; line-height: 1.3; margin: 4px 0; font-size: 14px; }
+  .award-card .issuer { color: var(--grey-500); font-size: 11px; }
+
+  .platforms { max-width: 1080px; margin: 0 auto; padding: 0 24px; text-align: center; }
+  .platforms h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 42px); margin: 0 0 40px; color: #fff; }
+  .platforms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; text-align: left; }
+  @media (max-width: 720px) { .platforms-grid { grid-template-columns: 1fr; } }
+  .platform-card { padding: 28px; border-radius: 10px; display: flex; flex-direction: column; min-height: 260px; }
+  .platform-card.light { background: #fff; color: var(--ink); }
+  .platform-card.dark  { background: var(--navy-700); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+  .platform-card .p-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .platform-card.dark .p-eyebrow { border-bottom-color: rgba(255,255,255,0.15); }
+  .platform-card .p-title { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .platform-card .p-acronym { font-size: 12px; letter-spacing: 3px; color: var(--grey-500); font-weight: 600; margin-bottom: 12px; }
+  .platform-card.dark .p-acronym { color: rgba(255,255,255,0.6); }
+  .platform-card .p-body { font-size: 14px; line-height: 1.6; flex: 1; }
+  .platform-card .p-cta { margin-top: 20px; font-weight: 500; color: var(--navy-600); }
+  .platform-card.dark .p-cta { color: var(--yellow); }
+
+  /* Close the loop */
+  .close-loop { background: var(--grey-100); padding: 88px 0; }
+  .close-loop .header-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 56px; }
+  @media (max-width: 720px) { .close-loop .header-row { grid-template-columns: 1fr; } }
+  .close-loop h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 40px); margin: 0; line-height: 1.15; }
+  .close-loop .subcopy { color: var(--grey-700); font-size: 15px; max-width: 460px; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  @media (max-width: 720px) { .features-grid { grid-template-columns: 1fr; } }
+  .feature-item { border-top: 1px solid var(--grey-300); padding-top: 20px; }
+  .feature-num { font-size: 12px; letter-spacing: 1px; color: var(--yellow-dk); font-weight: 600; margin-bottom: 12px; }
+  .feature-title { font-size: 17px; font-weight: 600; color: var(--ink); margin: 4px 0 8px; }
+  .feature-body { font-size: 14px; color: var(--grey-700); }
+
+  /* Why RBC */
+  .why-rbc { padding: 88px 0; }
+  .why-rbc .header-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; margin-bottom: 48px; }
+  @media (max-width: 720px) { .why-rbc .header-row { grid-template-columns: 1fr; } }
+  .why-rbc h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 40px); margin: 4px 0 0; }
+  .why-rbc .subcopy { color: var(--grey-700); font-size: 15px; max-width: 460px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat { border-top: 1px solid var(--grey-300); padding-top: 20px; }
+  .stat .value { font-family: var(--serif); font-size: 40px; color: var(--navy-800); margin: 0 0 6px; line-height: 1; }
+  .stat .value .under { text-decoration: underline; text-decoration-color: var(--yellow); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+  .stat .label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey-500); font-weight: 600; margin-bottom: 8px; }
+  .stat .body { font-size: 13px; color: var(--grey-700); }
+
+  /* Asset coverage */
+  .asset-coverage { background: var(--navy-900); color: #fff; padding: 88px 0; text-align: center; }
+  .asset-coverage h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 40px); margin: 0 0 48px; }
+  .assets-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: left; }
+  @media (max-width: 900px) { .assets-grid { grid-template-columns: repeat(2, 1fr); } }
+  .asset-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 24px; border-radius: 8px; min-height: 160px; }
+  .asset-icon { width: 32px; height: 32px; color: var(--yellow); margin-bottom: 16px; }
+  .asset-icon g { display: none; }
+  .asset-icon[data-icon="equities"] g.equities { display: block; }
+  .asset-icon[data-icon="futures"]  g.futures  { display: block; }
+  .asset-icon[data-icon="fx"]       g.fx       { display: block; }
+  .asset-icon[data-icon="index"]    g.index    { display: block; }
+  .asset-card .a-title { font-size: 16px; font-weight: 600; margin: 4px 0 6px; }
+  .asset-card .a-body { font-size: 13px; color: var(--grey-500); }
+
+  /* Thought leadership */
+  .thought-leadership { padding: 88px 0; }
+  .thought-leadership .heading { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--yellow-dk); font-weight: 500; margin-bottom: 24px; text-align: center; }
+  .featured-card { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 20px rgba(0,0,0,0.06); border: 1px solid var(--grey-300); max-width: 1000px; margin: 0 auto; }
+  @media (max-width: 720px) { .featured-card { grid-template-columns: 1fr; } }
+  .featured-body { padding: 32px; }
+  .featured-body .fl-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--yellow-dk); font-weight: 600; margin-bottom: 12px; }
+  .featured-body .fl-title { font-family: var(--serif); font-size: 22px; font-weight: 400; line-height: 1.2; margin: 0 0 12px; }
+  .featured-body .fl-copy { font-size: 14px; color: var(--grey-700); margin-bottom: 20px; }
+  .featured-body .fl-cta { font-size: 13px; font-weight: 500; color: var(--navy-600); }
+  .featured-body .fl-cta .rt { color: var(--grey-500); margin-left: 6px; }
+  .featured-illo { background: var(--navy-800); display: flex; align-items: center; justify-content: center; min-height: 240px; }
+  .featured-illo svg { width: 90%; max-width: 380px; opacity: 0.7; }
+  .featured-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+  .featured-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--grey-300); }
+  .featured-dots span.active { background: var(--navy-800); }
+
+  /* Demo CTA */
+  .demo-cta { background: var(--navy-900); color: #fff; padding: 88px 0; text-align: center; }
+  .demo-cta h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(36px, 5vw, 56px); margin: 0 0 20px; line-height: 1.1; }
+  .demo-cta h2 .hi { color: var(--yellow); font-style: italic; }
+  .demo-cta .subcopy { max-width: 620px; margin: 0 auto 28px; color: var(--grey-500); font-size: 14px; }
+
+  /* Newsletter */
+  .newsletter { background: var(--cream); padding: 60px 0; }
+  .newsletter h2 { font-family: var(--sans); font-size: 22px; font-weight: 600; margin: 0 0 8px; }
+  .newsletter .lead { font-size: 14px; color: var(--grey-700); margin-bottom: 24px; }
+  .newsletter-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 720px) { .newsletter-form { grid-template-columns: 1fr; } }
+  .newsletter-form label { display: none; }
+  .newsletter-form input { padding: 12px 14px; border: 1px solid var(--grey-300); background: transparent; font: inherit; font-size: 14px; border-radius: 3px; }
+  .newsletter-form input:focus { outline: none; border-color: var(--navy-600); }
+  .newsletter-linkedin { grid-column: 1 / -1; display: inline-flex; align-items: center; gap: 8px; color: #fff; background: #0A66C2; padding: 8px 12px; border-radius: 3px; font-size: 13px; justify-self: start; cursor: pointer; border: none; }
+  .consent { grid-column: 1 / -1; font-size: 12px; color: var(--grey-700); }
+  .consent a { color: var(--navy-600); text-decoration: underline; }
+  .newsletter-submit { grid-column: 1 / -1; justify-self: start; background: var(--yellow); color: var(--navy-800); border: none; padding: 12px 30px; font-size: 14px; font-weight: 600; border-radius: 3px; cursor: pointer; }
+  .newsletter-submit:hover { background: var(--yellow-dk); }
+
+  /* Footer */
+  .site-footer { background: var(--navy-900); color: var(--grey-500); padding: 32px 0; font-size: 12px; }
+  .site-footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .site-footer .links { display: flex; gap: 20px; }
+  .site-footer .socials { display: flex; gap: 10px; }
+  .site-footer .socials span { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; }
+
+  /* Debug pill */
+  .debug-bar { position: fixed; bottom: 12px; right: 12px; background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-family: monospace; opacity: 0.7; z-index: 999; }
+  .debug-bar.err { background: #c62828; opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="#">Other RBC sites</a>
+    <a href="#">English</a>
+    <a href="#">Our Offices</a>
+    <a href="#">Sign In</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container site-header-inner">
+    <div class="logo">Capital Markets</div>
+    <nav class="nav">
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Insights</a></li>
+        <li><a href="#">Our Impact</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+<!-- The whole editable page lives inside #maas-mata-page — that's the
+     root the binding runtime scans. -->
+<div id="maas-mata-page">
+
+  <!-- ================================================================
+       HERO
+       ================================================================ -->
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow" data-json="hero.eyebrow">Introducing MAAS + MATA</p>
+
+      <h1 data-json-list="hero.headlineLines">
+        <template><span data-json=""></span></template>
+        <span data-json-list-fallback>Fewer blind spots.</span>
+        <span data-json-list-fallback>Faster decisions.</span>
+        <span data-json-list-fallback>One desk.</span>
+      </h1>
+
+      <p class="subtitle" data-json="hero.subtitle">
+        One institutional trading ecosystem: MAAS executes across asset classes; MATA explains every outcome with greater consistency, visibility and control.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#platform" data-json-attr-href="hero.primaryCta.href">
+          <span data-json="hero.primaryCta.label">See the platform</span> <span class="arrow">→</span>
+        </a>
+        <a class="btn btn-link" href="#video" data-json-attr-href="hero.secondaryCta.href">
+          <span data-json="hero.secondaryCta.label">Watch the video</span> <span class="arrow">▶</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       CHART CARD
+       ================================================================ -->
+  <div class="chart-wrap">
+    <div class="chart-card">
+      <div class="chart-topbar">
+        <div class="chart-topbar-dots"><span></span><span></span><span></span></div>
+        <div data-json="chartCard.leftLabel">MAAS · Execution Engine</div>
+        <div data-json="chartCard.rightLabel">MATA · Analytics</div>
+      </div>
+      <div class="chart-body">
+        <div class="chart-left">
+          <div class="headline-label" data-json="chartCard.leftHeadline">Consistent trades</div>
+          <div class="headline-value" data-json="chartCard.leftValue">+13,200 M</div>
+          <svg class="chart-svg" viewBox="0 0 500 140" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradYellow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FBDE00" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#FBDE00" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,110 C40,105 60,90 100,85 C140,80 170,95 210,70 C250,50 290,60 330,40 C370,25 410,45 450,30 L500,25 L500,140 L0,140 Z" fill="url(#gradYellow)"/>
+            <path d="M0,110 C40,105 60,90 100,85 C140,80 170,95 210,70 C250,50 290,60 330,40 C370,25 410,45 450,30 L500,25" stroke="#FBDE00" stroke-width="2" fill="none"/>
+            <path d="M0,120 C40,115 80,118 130,105 C180,92 220,110 270,95 C320,80 360,90 410,75 C450,63 480,68 500,60" stroke="#4A90E2" stroke-width="2" fill="none" stroke-dasharray="4,4" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="chart-right" data-json-list="chartCard.quotes">
+          <template>
+            <div class="quote-row">
+              <span class="quote-label" data-json="label"></span>
+              <span>
+                <span class="quote-value" data-json="value"></span>
+                <span class="quote-delta" data-json="delta" data-json-class-pos="positive"></span>
+              </span>
+            </div>
+          </template>
+          <div class="quote-row" data-json-list-fallback>
+            <span class="quote-label">Notify Inc.</span>
+            <span><span class="quote-value">$921.87</span><span class="quote-delta pos">+2.14%</span></span>
+          </div>
+          <div class="quote-row" data-json-list-fallback>
+            <span class="quote-label">GLD / USD</span>
+            <span><span class="quote-value">0.7372</span><span class="quote-delta">-0.16%</span></span>
+          </div>
+          <div class="quote-row" data-json-list-fallback>
+            <span class="quote-label">Notify Dec 26</span>
+            <span><span class="quote-value">$245.80</span><span class="quote-delta pos">+0.62%</span></span>
+          </div>
+          <div class="quality">
+            <div>
+              <div class="qlabel" data-json="chartCard.quality.label">Execution quality</div>
+              <span class="qtrend" data-json="chartCard.quality.trend">+ 1.4% vs 30-day avg</span>
+            </div>
+            <div class="qscore" data-json="chartCard.quality.score">98.2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       DARK STRIP: awards + platforms
+       ================================================================ -->
+  <div class="dark-strip">
+    <div class="awards">
+      <p class="eyebrow" data-json="awards.eyebrow">Platform recognition</p>
+      <div class="awards-grid" data-json-list="awards.items">
+        <template>
+          <div class="award-card">
+            <span class="year" data-json="year"></span>
+            <div class="title" data-json="title"></div>
+            <div class="issuer" data-json="issuer"></div>
+          </div>
+        </template>
+        <div class="award-card" data-json-list-fallback>
+          <span class="year">2025</span>
+          <div class="title">Best Cross-Asset Trading Platform</div>
+          <div class="issuer">Institutional Trading 2025</div>
+        </div>
+        <div class="award-card" data-json-list-fallback>
+          <span class="year">2025</span>
+          <div class="title">Best Cross-Asset Trading Platform</div>
+          <div class="issuer">Institutional Trading 2025</div>
+        </div>
+        <div class="award-card" data-json-list-fallback>
+          <span class="year">2025</span>
+          <div class="title">Best Cross-Asset Trading Platform</div>
+          <div class="issuer">Institutional Trading 2025</div>
+        </div>
+        <div class="award-card" data-json-list-fallback>
+          <span class="year">2025</span>
+          <div class="title">Best Cross-Asset Trading Platform</div>
+          <div class="issuer">Institutional Trading 2025</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="platforms">
+      <p class="eyebrow" data-json="platforms.eyebrow">One ecosystem · Two engines</p>
+      <h2 data-json="platforms.heading">Where execution meets analytics</h2>
+      <div class="platforms-grid" data-json-list="platforms.cards">
+        <template>
+          <div class="platform-card" data-json-class="theme">
+            <div class="p-eyebrow" data-json="eyebrow"></div>
+            <div class="p-title" data-json="title"></div>
+            <div class="p-acronym" data-json="acronym"></div>
+            <div class="p-body" data-json="body"></div>
+            <a class="p-cta" data-json-attr-href="cta.href">
+              <span data-json="cta.label"></span> <span class="arrow">→</span>
+            </a>
+          </div>
+        </template>
+        <div class="platform-card light" data-json-list-fallback>
+          <div class="p-eyebrow">Execution platform</div>
+          <div class="p-title">Multi-Asset Agency Solutions</div>
+          <div class="p-acronym">MAAS</div>
+          <div class="p-body">MAAS brings multi asset trading into one connected execution platform, helping institutional trading desks streamline workflows, improve consistency, and execute with greater confidence.</div>
+          <a class="p-cta" href="/maas">Explore MAAS <span class="arrow">→</span></a>
+        </div>
+        <div class="platform-card dark" data-json-list-fallback>
+          <div class="p-eyebrow">Analytics platform</div>
+          <div class="p-title">Multi-Asset Trade Analytics</div>
+          <div class="p-acronym">MATA</div>
+          <div class="p-body">MATA delivers cross asset trade analytics that provide deeper execution insights, portfolio wide visibility, and the intelligence needed to optimize future trading decisions.</div>
+          <a class="p-cta" href="/mata">Explore MATA <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       CLOSE THE LOOP
+       ================================================================ -->
+  <section class="close-loop">
+    <div class="container">
+      <div class="header-row">
+        <h2 data-json="closeTheLoop.heading">Built to close the loop between trade and insight</h2>
+        <p class="subcopy" data-json="closeTheLoop.body">
+          MAAS and MATA work together to bridge the gap between execution and analytics so every trade makes the next one smarter.
+        </p>
+      </div>
+      <div class="features-grid" data-json-list="closeTheLoop.features">
+        <template>
+          <div class="feature-item">
+            <div class="feature-num">/ <span data-json="number"></span></div>
+            <div class="feature-title" data-json="title"></div>
+            <div class="feature-body" data-json="body"></div>
+          </div>
+        </template>
+        <div class="feature-item" data-json-list-fallback>
+          <div class="feature-num">/ 01</div>
+          <div class="feature-title">Connected Execution</div>
+          <div class="feature-body">Execute across multiple asset classes through a consistent trading experience.</div>
+        </div>
+        <div class="feature-item" data-json-list-fallback>
+          <div class="feature-num">/ 02</div>
+          <div class="feature-title">Cross-Asset Analytics</div>
+          <div class="feature-body">Understand execution quality and uncover insights across your entire portfolio.</div>
+        </div>
+        <div class="feature-item" data-json-list-fallback>
+          <div class="feature-num">/ 03</div>
+          <div class="feature-title">Data-Driven Decisions</div>
+          <div class="feature-body">Leverage actionable analytics that help optimize future execution strategies.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       WHY RBC
+       ================================================================ -->
+  <section class="why-rbc">
+    <div class="container">
+      <div class="header-row">
+        <div>
+          <p class="eyebrow" data-json="whyRbc.eyebrow">Our Numbers</p>
+          <h2 data-json="whyRbc.heading">Why RBC Capital Markets</h2>
+        </div>
+        <p class="subcopy" data-json="whyRbc.body">
+          They power the innovation, capabilities, and culture that have ranked us among the world's top financial institutions.
+        </p>
+      </div>
+      <div class="stats-grid" data-json-list="whyRbc.stats">
+        <template>
+          <div class="stat">
+            <div class="value"><span class="under" data-json="value"></span></div>
+            <div class="label" data-json="label"></div>
+            <div class="body" data-json="body"></div>
+          </div>
+        </template>
+        <div class="stat" data-json-list-fallback>
+          <div class="value"><span class="under">700+</span></div>
+          <div class="label">Asset coverage</div>
+          <div class="body">700+ trading and risk specialists across 4 continents</div>
+        </div>
+        <div class="stat" data-json-list-fallback>
+          <div class="value"><span class="under">$1T+</span></div>
+          <div class="label">Balance sheet strength</div>
+          <div class="body">In RBC balance-sheet capacity behind every trade.</div>
+        </div>
+        <div class="stat" data-json-list-fallback>
+          <div class="value"><span class="under">AI-driven</span></div>
+          <div class="label">Innovation leadership</div>
+          <div class="body">Award-winning trading powered by THOR and Aiden®.</div>
+        </div>
+        <div class="stat" data-json-list-fallback>
+          <div class="value"><span class="under">1:1</span></div>
+          <div class="label">Client partnership</div>
+          <div class="body">Trusted relationships built on stability and expertise.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       ASSET COVERAGE
+       ================================================================ -->
+  <section class="asset-coverage">
+    <div class="container">
+      <p class="eyebrow" data-json="assetCoverage.eyebrow">Asset coverage</p>
+      <h2 data-json="assetCoverage.heading">Connected across the desk</h2>
+      <div class="assets-grid" data-json-list="assetCoverage.assets">
+        <template>
+          <div class="asset-card">
+            <svg class="asset-icon" data-json-attr-data-icon="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <g class="equities"><path d="M3 12l6-6 4 4 8-8"/><path d="M14 2h7v7"/></g>
+              <g class="futures"><rect x="3" y="10" width="4" height="10"/><rect x="10" y="6" width="4" height="14"/><rect x="17" y="3" width="4" height="17"/></g>
+              <g class="fx"><path d="M3 12h18"/><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/></g>
+              <g class="index"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></g>
+            </svg>
+            <div class="a-title" data-json="title"></div>
+            <div class="a-body" data-json="body"></div>
+          </div>
+        </template>
+        <div class="asset-card" data-json-list-fallback>
+          <svg class="asset-icon" data-icon="equities" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <g class="equities"><path d="M3 12l6-6 4 4 8-8"/><path d="M14 2h7v7"/></g>
+          </svg>
+          <div class="a-title">Equities</div>
+          <div class="a-body">Connected execution and performance insights.</div>
+        </div>
+        <div class="asset-card" data-json-list-fallback>
+          <svg class="asset-icon" data-icon="futures" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <g class="futures"><rect x="3" y="10" width="4" height="10"/><rect x="10" y="6" width="4" height="14"/><rect x="17" y="3" width="4" height="17"/></g>
+          </svg>
+          <div class="a-title">Futures</div>
+          <div class="a-body">Streamlined workflows across complex strategies.</div>
+        </div>
+        <div class="asset-card" data-json-list-fallback>
+          <svg class="asset-icon" data-icon="fx" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <g class="fx"><path d="M3 12h18"/><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/></g>
+          </svg>
+          <div class="a-title">FX</div>
+          <div class="a-body">Unified trading with cross asset visibility.</div>
+        </div>
+        <div class="asset-card" data-json-list-fallback>
+          <svg class="asset-icon" data-icon="index" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <g class="index"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></g>
+          </svg>
+          <div class="a-title">Index strategies</div>
+          <div class="a-body">Integrated analytics for event driven execution.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       THOUGHT LEADERSHIP
+       ================================================================ -->
+  <section class="thought-leadership">
+    <div class="container">
+      <p class="heading" data-json="thoughtLeadership.heading">Thought leadership</p>
+      <div class="featured-card">
+        <div class="featured-body">
+          <p class="fl-eyebrow" data-json="thoughtLeadership.featured.eyebrow">Insights · Featured story</p>
+          <h3 class="fl-title" data-json="thoughtLeadership.featured.title">
+            Connected execution for an increasingly fragmented market
+          </h3>
+          <p class="fl-copy" data-json="thoughtLeadership.featured.body">
+            Institutional markets continue to evolve as liquidity becomes more distributed across venues, asset classes, and geographies. Managing this complexity requires more than access — it requires connectivity.
+          </p>
+          <a class="fl-cta" href="/insights/connected-execution" data-json-attr-href="thoughtLeadership.featured.cta.href">
+            <span data-json="thoughtLeadership.featured.cta.label">Read the story</span>
+            <span class="rt">· <span data-json="thoughtLeadership.featured.cta.readTime">3 min</span></span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+        <div class="featured-illo">
+          <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#FBDE00" stroke-width="1">
+            <g opacity="0.6">
+              <line x1="80" y1="60" x2="180" y2="120"/>
+              <line x1="180" y1="120" x2="320" y2="80"/>
+              <line x1="180" y1="120" x2="140" y2="220"/>
+              <line x1="320" y1="80" x2="280" y2="200"/>
+              <line x1="280" y1="200" x2="140" y2="220"/>
+              <line x1="140" y1="220" x2="60" y2="180"/>
+              <line x1="60" y1="180" x2="80" y2="60"/>
+              <line x1="180" y1="120" x2="280" y2="200"/>
+            </g>
+            <g fill="#FBDE00">
+              <circle cx="80" cy="60" r="4"/>
+              <circle cx="180" cy="120" r="6"/>
+              <circle cx="320" cy="80" r="4"/>
+              <circle cx="140" cy="220" r="5"/>
+              <circle cx="280" cy="200" r="4"/>
+              <circle cx="60" cy="180" r="3"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="featured-dots"><span class="active"></span><span></span><span></span></div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       DEMO CTA
+       ================================================================ -->
+  <section class="demo-cta">
+    <div class="container">
+      <p class="eyebrow" data-json="demoCta.eyebrow">See the platform</p>
+      <h2>
+        <span data-json="demoCta.headlinePrefix">Trade with total</span>
+        <span class="hi" data-json="demoCta.headlineHighlight">clarity.</span>
+      </h2>
+      <p class="subcopy" data-json="demoCta.body">
+        Discover how MAAS and MATA help institutional trading desks simplify multi asset workflows, uncover deeper execution insights, and make more informed trading decisions.
+      </p>
+      <a class="btn btn-yellow" href="/request-demo" data-json-attr-href="demoCta.cta.href">
+        <span data-json="demoCta.cta.label">Request a demo</span> <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       NEWSLETTER
+       ================================================================ -->
+  <section class="newsletter">
+    <div class="container">
+      <h2 data-json="newsletter.heading">Stay informed</h2>
+      <p class="lead" data-json="newsletter.body">
+        Get the latest updates and insights from RBC Capital Markets delivered to your inbox.
+      </p>
+      <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Demo only — would POST to newsletter endpoint');">
+        <div class="newsletter-fields" data-json-list="newsletter.fields" style="display: contents;">
+          <template>
+            <div>
+              <label data-json="label"></label>
+              <input data-json-attr-type="type" data-json-attr-placeholder="label">
+            </div>
+          </template>
+          <div data-json-list-fallback><input type="text" placeholder="First Name"></div>
+          <div data-json-list-fallback><input type="text" placeholder="Last Name"></div>
+          <div data-json-list-fallback><input type="text" placeholder="Title"></div>
+          <div data-json-list-fallback><input type="text" placeholder="Company"></div>
+          <div data-json-list-fallback><input type="email" placeholder="Business Email"></div>
+        </div>
+        <button type="button" class="newsletter-linkedin">
+          in · <span data-json="newsletter.linkedinAutofillLabel">Autofill with LinkedIn</span>
+        </button>
+        <label class="consent">
+          <input type="checkbox">
+          <span data-json="newsletter.consent">
+            Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets.
+          </span>
+          <a href="/privacy" data-json-attr-href="newsletter.privacyHref" data-json="newsletter.privacyLabel">View Privacy Policy</a>
+        </label>
+        <button type="submit" class="newsletter-submit" data-json="newsletter.submitLabel">Sign up</button>
+      </form>
+    </div>
+  </section>
+
+</div><!-- /#maas-mata-page -->
+
+
+<footer class="site-footer">
+  <div class="container site-footer-inner">
+    <div class="links">
+      <a href="#">Privacy</a>
+      <a href="#">Legal &amp; Disclaimers</a>
+      <a href="#">Accessibility</a>
+    </div>
+    <div class="socials">
+      <span>in</span><span>X</span><span>Y</span><span>f</span>
+    </div>
+  </div>
+</footer>
+
+
+<!-- =========================================================
+     Inline JSON fallback — used only if the /js/data/ fetch
+     fails. Safe to strip in production if fetch is guaranteed.
+     ========================================================= -->
+<script id="fallback-data" type="application/json">
+{
+  "meta": { "title": "MAAS + MATA · RBC Capital Markets" },
+  "hero": {
+    "eyebrow": "Introducing MAAS + MATA",
+    "headlineLines": ["Fewer blind spots.", "Faster decisions.", "One desk."],
+    "subtitle": "One institutional trading ecosystem: MAAS executes across asset classes; MATA explains every outcome with greater consistency, visibility and control.",
+    "primaryCta":   { "label": "See the platform", "href": "#platform" },
+    "secondaryCta": { "label": "Watch the video",  "href": "#video" }
+  },
+  "chartCard": {
+    "leftLabel": "MAAS · Execution Engine",
+    "rightLabel": "MATA · Analytics",
+    "leftHeadline": "Consistent trades",
+    "leftValue": "+13,200 M",
+    "quotes": [
+      { "label": "Notify Inc.",   "value": "$921.87", "delta": "+2.14%", "positive": true },
+      { "label": "GLD / USD",     "value": "0.7372",  "delta": "-0.16%", "positive": false },
+      { "label": "Notify Dec 26", "value": "$245.80", "delta": "+0.62%", "positive": true }
+    ],
+    "quality": { "label": "Execution quality", "score": "98.2", "trend": "+ 1.4% vs 30-day avg" }
+  },
+  "awards": {
+    "eyebrow": "Platform recognition",
+    "items": [
+      { "year": "2025", "title": "Best Cross-Asset Trading Platform", "issuer": "Institutional Trading 2025" },
+      { "year": "2025", "title": "Best Cross-Asset Trading Platform", "issuer": "Institutional Trading 2025" },
+      { "year": "2025", "title": "Best Cross-Asset Trading Platform", "issuer": "Institutional Trading 2025" },
+      { "year": "2025", "title": "Best Cross-Asset Trading Platform", "issuer": "Institutional Trading 2025" }
+    ]
+  },
+  "platforms": {
+    "eyebrow": "One ecosystem · Two engines",
+    "heading": "Where execution meets analytics",
+    "cards": [
+      { "theme": "light", "eyebrow": "Execution platform", "title": "Multi-Asset Agency Solutions", "acronym": "MAAS", "body": "MAAS brings multi asset trading into one connected execution platform, helping institutional trading desks streamline workflows, improve consistency, and execute with greater confidence.", "cta": { "label": "Explore MAAS", "href": "/maas" } },
+      { "theme": "dark",  "eyebrow": "Analytics platform", "title": "Multi-Asset Trade Analytics", "acronym": "MATA", "body": "MATA delivers cross asset trade analytics that provide deeper execution insights, portfolio wide visibility, and the intelligence needed to optimize future trading decisions.", "cta": { "label": "Explore MATA", "href": "/mata" } }
+    ]
+  },
+  "closeTheLoop": {
+    "heading": "Built to close the loop between trade and insight",
+    "body": "MAAS and MATA work together to bridge the gap between execution and analytics so every trade makes the next one smarter.",
+    "features": [
+      { "number": "01", "title": "Connected Execution",   "body": "Execute across multiple asset classes through a consistent trading experience." },
+      { "number": "02", "title": "Cross-Asset Analytics", "body": "Understand execution quality and uncover insights across your entire portfolio." },
+      { "number": "03", "title": "Data-Driven Decisions", "body": "Leverage actionable analytics that help optimize future execution strategies." }
+    ]
+  },
+  "whyRbc": {
+    "eyebrow": "Our Numbers",
+    "heading": "Why RBC Capital Markets",
+    "body": "They power the innovation, capabilities, and culture that have ranked us among the world's top financial institutions.",
+    "stats": [
+      { "value": "700+", "label": "Asset coverage", "body": "700+ trading and risk specialists across 4 continents" },
+      { "value": "$1T+", "label": "Balance sheet strength", "body": "In RBC balance-sheet capacity behind every trade." },
+      { "value": "AI-driven", "label": "Innovation leadership", "body": "Award-winning trading powered by THOR and Aiden®." },
+      { "value": "1:1", "label": "Client partnership", "body": "Trusted relationships built on stability and expertise." }
+    ]
+  },
+  "assetCoverage": {
+    "eyebrow": "Asset coverage",
+    "heading": "Connected across the desk",
+    "assets": [
+      { "icon": "equities", "title": "Equities", "body": "Connected execution and performance insights." },
+      { "icon": "futures", "title": "Futures", "body": "Streamlined workflows across complex strategies." },
+      { "icon": "fx", "title": "FX", "body": "Unified trading with cross asset visibility." },
+      { "icon": "index", "title": "Index strategies", "body": "Integrated analytics for event driven execution." }
+    ]
+  },
+  "thoughtLeadership": {
+    "heading": "Thought leadership",
+    "featured": {
+      "eyebrow": "Insights · Featured story",
+      "title": "Connected execution for an increasingly fragmented market",
+      "body": "Institutional markets continue to evolve as liquidity becomes more distributed across venues, asset classes, and geographies. Managing this complexity requires more than access — it requires connectivity.",
+      "cta": { "label": "Read the story", "href": "/insights/connected-execution", "readTime": "3 min" }
+    }
+  },
+  "demoCta": {
+    "eyebrow": "See the platform",
+    "headlinePrefix": "Trade with total",
+    "headlineHighlight": "clarity.",
+    "body": "Discover how MAAS and MATA help institutional trading desks simplify multi asset workflows, uncover deeper execution insights, and make more informed trading decisions.",
+    "cta": { "label": "Request a demo", "href": "/request-demo" }
+  },
+  "newsletter": {
+    "heading": "Stay informed",
+    "body": "Get the latest updates and insights from RBC Capital Markets delivered to your inbox.",
+    "fields": [
+      { "id": "first",   "type": "text",  "label": "First Name",     "required": true },
+      { "id": "last",    "type": "text",  "label": "Last Name",      "required": true },
+      { "id": "title",   "type": "text",  "label": "Title",          "required": false },
+      { "id": "company", "type": "text",  "label": "Company",        "required": true },
+      { "id": "email",   "type": "email", "label": "Business Email", "required": true }
+    ],
+    "linkedinAutofillLabel": "Autofill with LinkedIn",
+    "consent": "Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets.",
+    "privacyLabel": "View Privacy Policy",
+    "privacyHref": "/privacy",
+    "submitLabel": "Sign up"
+  }
+}
+</script>
+
+
+<!-- Binding runtime + bootstrap -->
+<script src="./rbccm-json-bind.js"></script>
+<script>
+  RBCCMBind.load({
+    url: './maas-mata.json',                     // in production: /js/data/maas-mata.json
+    fallbackSelector: '#fallback-data',
+    root: document.getElementById('maas-mata-page')
+  });
+
+  // Simple debug pill so you can see which source loaded
+  (function () {
+    var origLog = console.log;
+    console.log = function () {
+      origLog.apply(console, arguments);
+      var msg = [].slice.call(arguments).join(' ');
+      if (msg.indexOf('[JSON-Bind] Rendered from') === 0) {
+        var el = document.createElement('div');
+        el.className = 'debug-bar';
+        el.textContent = 'Rendered · source: ' + msg.replace('[JSON-Bind] Rendered from ', '');
+        document.body.appendChild(el);
+      }
+    };
+  })();
+</script>
+
+</body>
+</html>
