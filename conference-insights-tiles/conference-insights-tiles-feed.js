@@ -355,7 +355,11 @@
     var year       = wl.year || parseYear(dateStr);
     var link       = child(newsNode, 'link').trim();
     var thumb      = child(newsNode, 'thumbnail').trim();
-    var category   = child(newsNode, 'category').trim() || 'Insights';
+    /* Whitelist `category` overrides the feed's category (which comes
+       from the article's DCR) so the Conference Insights listing can
+       relabel a tile's eyebrow without touching the DCR itself. If the
+       whitelist entry omits `category`, the feed value wins. */
+    var category   = wl.category || child(newsNode, 'category').trim() || 'Insights';
     var readtime   = child(newsNode, 'readtime').trim();
     var watchtime  = child(newsNode, 'watchtime').trim();
     var type       = child(newsNode, 'type').trim();

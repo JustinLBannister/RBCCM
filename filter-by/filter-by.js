@@ -51,6 +51,17 @@
    slugged values match either way ("financial institutions" == the slug).
    Region codes are reverse-mapped to their bucket key + label first, since
    nobody searches "de" — see haystackFor() / regionSearchTerms().
+
+   ---- Plural + synonym handling -----------------------------------------
+   Query "financials" would normally miss "financial institutions" because
+   the substring match is too literal. normalizeSearch() therefore also:
+     1. Applies a phrase-level SEARCH_SYNONYMS lookup (whole-query match)
+        so common paraphrases route to the canonical taxonomy label
+        (e.g. "financial services" → "financial institutions").
+     2. Strips trailing "s" per word so plurals fold onto their singular
+        (financials → financial, services → service). Skips short words
+        (≤3 chars) and double-s words (class → class, not clas).
+   Both are applied to query AND haystack so they stay in sync.
    ========================================================================= */
 
 (function () {
@@ -85,6 +96,16 @@
     'ai':    'AI',
     'esg':   'ESG',
     'emea':  'EMEA'
+  };
+
+  /* Whole-query synonyms — route common paraphrases to the canonical
+     taxonomy phrase so search finds articles tagged under the official
+     Topic label. Applied by normalizeSearch() before the plural strip.
+     Keys and values are lowercased, hyphen-flattened, whitespace-collapsed
+     — i.e. the same shape normalizeSearch produces. Extend as content ops
+     identifies gaps between what editors write and what users type. */
+  var SEARCH_SYNONYMS = {
+    'financial services': 'financial institutions'
   };
 
   /* Canonical Topic labels — kebab-case DCR values map to human-readable
@@ -508,9 +529,28 @@
        hyphens flattened to spaces, whitespace collapsed. Dimension values
        are slugs ("financial-institutions markets-economics"), so without
        the hyphen flattening a search for "financial institutions" would
-       miss the very items the Topic dropdown returns. */
+       miss the very items the Topic dropdown returns.
+
+       Also does two matching-friendlier passes:
+         1. Whole-query synonym lookup so "financial services" folds to
+            "financial institutions" before comparison. Applied to the
+            haystack too, harmlessly: an item tagged "financial services"
+            would surface under a "financial institutions" query as well.
+         2. Trailing-s strip per word so plurals match singulars
+            (financials → financial). Skips length ≤3 (spare "as", "is",
+            "us", "his") and words ending in "ss" (spare "class"). */
+    function stripTrailingS(word) {
+      if (word.length <= 3) return word;
+      if (word.charAt(word.length - 1) !== 's') return word;
+      if (word.charAt(word.length - 2) === 's') return word;
+      return word.slice(0, -1);
+    }
     function normalizeSearch(raw) {
-      return String(raw || '').toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+      var s = String(raw || '').toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!s) return '';
+      if (SEARCH_SYNONYMS[s]) s = SEARCH_SYNONYMS[s];
+      s = s.split(' ').map(stripTrailingS).join(' ');
+      return s;
     }
 
     function getState() {
