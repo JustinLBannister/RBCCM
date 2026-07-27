@@ -119,12 +119,19 @@
   .rbccm-story-carousel__dots-wrap { grid-area: dots; justify-self: center; }
 }
 
+/* Zero the padding accessible-slick puts on .slick-list and the margin
+   it puts on .slick-slide — both were pushing the tile inward from
+   the track's actual edge. With these zeroed, the tile flushes with
+   the container edges (and the H2 above). */
+.rbccm-story-carousel__track .slick-list  { padding: 0 !important; }
+.rbccm-story-carousel__track .slick-track { margin: 0 !important; }
+
 /* Equal-height slides — desktop only */
 @media (min-width: 768px) {
   .rbccm-story-carousel__track .slick-track { display: flex !important; }
-  .rbccm-story-carousel__track .slick-slide { height: auto !important; }
-  .rbccm-story-carousel__track .slick-slide > * { height: 100%; }
-  .rbccm-story-carousel__tile { height: 100%; }
+  .rbccm-story-carousel__track .slick-slide { height: auto !important; width: 100% !important; margin: 0 !important; }
+  .rbccm-story-carousel__track .slick-slide > * { height: 100%; width: 100%; }
+  .rbccm-story-carousel__tile { height: 100%; width: 100%; }
 }
 
 /* ---- Arrows ---------------------------------------------------------- */
@@ -220,8 +227,12 @@
 }
 .rbccm-story-carousel__dots-wrap .slick-dots li button::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-color: transparent !important;
   background-repeat: no-repeat !important;
   background-size: 11px 11px !important;
+  border: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
   content: '' !important;
   display: block !important;
   height: 11px !important;

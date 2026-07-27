@@ -154,6 +154,14 @@
   .rbccm-story-carousel__dots-wrap { grid-area: dots; justify-self: center; }
 }
 
+/* Zero any padding accessible-slick puts on the list — if centerPadding
+   is left at its default ("50px") even with centerMode:false, slick's
+   own CSS still applies it, which is what was pushing the tile inward
+   from the track's actual edge. Same override for the track's own
+   margin so nothing shifts the slides horizontally. */
+.rbccm-story-carousel__track .slick-list  { padding: 0 !important; }
+.rbccm-story-carousel__track .slick-track { margin: 0 !important; }
+
 /* Equal-height slides — desktop only. Paired with adaptiveHeight:false
    at the desktop breakpoint in story-carousel.js so the track locks to
    the tallest slide and every tile stretches to that height. Mobile
@@ -161,9 +169,14 @@
    grows/shrinks per slide, which is fine when everything is stacked. */
 @media (min-width: 768px) {
   .rbccm-story-carousel__track .slick-track { display: flex !important; }
-  .rbccm-story-carousel__track .slick-slide { height: auto !important; }
-  .rbccm-story-carousel__track .slick-slide > * { height: 100%; }
-  .rbccm-story-carousel__tile { height: 100%; }
+  /* margin:0 on .slick-slide — slick's own CSS applies a per-slide
+     margin based on slidesToShow / centerPadding, which was pushing
+     the tile inward from the track edge. Zeroing it here lines the
+     tile up flush with the H2 above. Same trick paired with the
+     .slick-list padding:0 further up. */
+  .rbccm-story-carousel__track .slick-slide { height: auto !important; width: 100% !important; margin: 0 !important; }
+  .rbccm-story-carousel__track .slick-slide > * { height: 100%; width: 100%; }
+  .rbccm-story-carousel__tile { height: 100%; width: 100%; }
 }
 
 /* Arrows — matches leadership-carousel exactly so the two components
@@ -279,8 +292,12 @@
 }
 .rbccm-story-carousel__dots-wrap .slick-dots li button::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-color: transparent !important;
   background-repeat: no-repeat !important;
   background-size: 11px 11px !important;
+  border: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
   content: '' !important;
   display: block !important;
   height: 11px !important;
