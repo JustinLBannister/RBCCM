@@ -50,11 +50,12 @@
   }
 }
 
-/* Container centers the content at the shared 1180 max-width. Horizontal
-   gutter is now owned by the section (above) so both the H2 and the
-   carousel share the same content edge. */
+/* Container centers the content at the shared 1140 max-width — matches
+   the live-site rail the other components use. Horizontal gutter is
+   owned by the section (above) so both the H2 and the carousel share
+   the same content edge. */
 .rbccm-story-carousel__container {
-  max-width: 1180px;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
@@ -268,6 +269,14 @@
   position: static !important;
   width: 11px !important;
 }
+/* accessible-slick injects its own <span class="slick-dot-icon"> glyph
+   inside each dot button. We draw the dot with ::before (leadership's
+   pattern), so the built-in glyph has to be hidden or two dots stack
+   on each other and the active state shows THREE rings (their outer +
+   ours + our fill). Same fix icon-carousel applies. */
+.rbccm-story-carousel__dots-wrap .slick-dots li button .slick-dot-icon {
+  display: none !important;
+}
 .rbccm-story-carousel__dots-wrap .slick-dots li button::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
@@ -310,6 +319,21 @@
   color: inherit;
   min-height: var(--rbccm-story-carousel-tile-h);
 }
+/* Live-site cascade puts a `a:hover / a:focus { text-decoration: underline }`
+   rule on every anchor, which then propagates the underline down into the
+   tile's title, description, and CTA. Explicit override on the tile itself
+   + its inline children, with the `a.` type-prefix bumping specificity
+   above the site-wide `a:hover` rule (0,2,1 beats 0,1,1). */
+a.rbccm-story-carousel__tile,
+a.rbccm-story-carousel__tile:hover,
+a.rbccm-story-carousel__tile:focus,
+a.rbccm-story-carousel__tile:visited,
+a.rbccm-story-carousel__tile:active { text-decoration: none; }
+
+a.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-title,
+a.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-description,
+a.rbccm-story-carousel__tile:focus .rbccm-story-carousel__tile-title,
+a.rbccm-story-carousel__tile:focus .rbccm-story-carousel__tile-description { text-decoration: none; }
 /* Focus indicator — same intent as leadership-carousel's card focus:
      - fires on :focus-within (any descendant has focus)
      - fires on :focus-visible (keyboard focus on the tile itself)

@@ -60,7 +60,7 @@
 }
 
 .rbccm-story-carousel__container {
-  max-width: 1180px;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
@@ -212,6 +212,12 @@
   position: static !important;
   width: 11px !important;
 }
+/* Hide accessible-slick's injected <span class="slick-dot-icon"> glyph
+   — we draw the dot via ::before, so leaving theirs visible stacks
+   two dots and the active state shows an extra outer ring. */
+.rbccm-story-carousel__dots-wrap .slick-dots li button .slick-dot-icon {
+  display: none !important;
+}
 .rbccm-story-carousel__dots-wrap .slick-dots li button::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
   background-repeat: no-repeat !important;
@@ -247,6 +253,18 @@
   color: inherit;
   min-height: var(--rbccm-story-carousel-tile-h);
 }
+/* Live-site cascade puts a:hover/focus underline on every anchor; type-
+   prefixed selectors (0,2,1) beat that (0,1,1) so the title + description
+   inside the tile stay clean. CTA keeps its own border-bottom underline. */
+a.rbccm-story-carousel__tile,
+a.rbccm-story-carousel__tile:hover,
+a.rbccm-story-carousel__tile:focus,
+a.rbccm-story-carousel__tile:visited,
+a.rbccm-story-carousel__tile:active { text-decoration: none; }
+a.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-title,
+a.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-description,
+a.rbccm-story-carousel__tile:focus .rbccm-story-carousel__tile-title,
+a.rbccm-story-carousel__tile:focus .rbccm-story-carousel__tile-description { text-decoration: none; }
 .rbccm-story-carousel__tile:focus { outline: none; }
 .rbccm-story-carousel__tile:focus-within,
 .rbccm-story-carousel__tile:focus-visible,
