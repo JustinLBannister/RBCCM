@@ -72,6 +72,10 @@
       <!-- ── Config ── -->
       <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
       <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+      <!-- Optional anchor id on the H2 so /page#slug jumps to this section.
+           CSS supplies scroll-margin-top so the target sits below any
+           sticky nav. Blank Datum → no id attribute (no dangling target). -->
+      <xsl:variable name="headingId" select="normalize-space(/Properties/Datum[@ID='HeadingId'])"/>
 
       <!-- Per-view counts. Fall back to the Figma defaults when unset, so a
            half-configured DCR still renders the intended layout. -->
@@ -323,6 +327,9 @@
             <div class="rbccm-icon-carousel__header">
               <xsl:if test="$heading != ''">
                 <h2 class="rbccm-icon-carousel__heading">
+                  <xsl:if test="$headingId != ''">
+                    <xsl:attribute name="id"><xsl:value-of select="$headingId"/></xsl:attribute>
+                  </xsl:if>
                   <xsl:value-of select="$heading" disable-output-escaping="yes"/>
                 </h2>
               </xsl:if>
@@ -498,6 +505,14 @@
 
   <!-- Textarea: the comp's standfirst runs long and may want inline markup. -->
   <Datum ID="Intro" Type="Textarea" Name="Intro / Standfirst (optional)"></Datum>
+
+  <!-- Optional id="…" on the H2 so anchor links (…#our-industries) can jump
+       to the section. When set, the CSS also applies scroll-margin-top so
+       the target sits below any sticky nav (default 167px, overridable
+       via --rbccm-ic-scroll-offset).
+       Blank by default — most pages don't need a jump target. Use a slug
+       (lowercase, dashes) like "our-industries" or "sector-coverage". -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional, e.g. our-industries)"></Datum>
 
   <!-- ─── Behaviour ───
        Items per slide, per breakpoint. The XSL passes these straight

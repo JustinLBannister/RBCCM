@@ -60,6 +60,10 @@
       <!-- ── Config ── -->
       <xsl:variable name="heading" select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
       <xsl:variable name="intro"   select="normalize-space(/Properties/Datum[@ID='Intro'])"/>
+      <!-- Optional anchor id on the H2 so /page#slug jumps to this section.
+           CSS supplies scroll-margin-top so the target sits below any
+           sticky nav. Blank Datum → no id attribute (no dangling target). -->
+      <xsl:variable name="headingId" select="normalize-space(/Properties/Datum[@ID='HeadingId'])"/>
 
       <!-- Per-view counts. Fall back to the Figma defaults when unset, so a
            half-configured DCR still renders the intended layout. -->
@@ -304,6 +308,9 @@
             <div class="rbccm-icon-carousel__header">
               <xsl:if test="$heading != ''">
                 <h2 class="rbccm-icon-carousel__heading">
+                  <xsl:if test="$headingId != ''">
+                    <xsl:attribute name="id"><xsl:value-of select="$headingId"/></xsl:attribute>
+                  </xsl:if>
                   <xsl:value-of select="$heading" disable-output-escaping="yes"/>
                 </h2>
               </xsl:if>

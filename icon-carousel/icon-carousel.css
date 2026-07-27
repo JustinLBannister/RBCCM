@@ -102,6 +102,12 @@
   font-size: 24px;
   line-height: 1.2;
   font-weight: 400;
+  /* Offset for sticky nav when anchor-scrolling to the heading via
+     /page#some-id. Only takes effect when a page navigates to the id
+     (which requires the optional HeadingId Datum). 167px default
+     matches the site's sticky nav; overridable per page via
+     --rbccm-ic-scroll-offset without touching this file. */
+  scroll-margin-top: var(--rbccm-ic-scroll-offset, 167px);
 }
 
 .rbccm-icon-carousel__intro {

@@ -31,6 +31,14 @@
   <!-- Textarea: the comp's standfirst runs long and may want inline markup. -->
   <Datum ID="Intro" Type="Textarea" Name="Intro / Standfirst (optional)"></Datum>
 
+  <!-- Optional id="…" on the H2 so anchor links (…#our-industries) can jump
+       to the section. When set, the CSS also applies scroll-margin-top so
+       the target sits below any sticky nav (default 167px, overridable
+       via --rbccm-ic-scroll-offset).
+       Blank by default — most pages don't need a jump target. Use a slug
+       (lowercase, dashes) like "our-industries" or "sector-coverage". -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional, e.g. our-industries)"></Datum>
+
   <!-- ─── Behaviour ───
        Items per slide, per breakpoint. The XSL passes these straight
        through to the data attributes the JS reads; it re-chunks the
