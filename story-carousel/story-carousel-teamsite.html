@@ -1,0 +1,693 @@
+<!--
+  Story Carousel · Single-file TeamSite component
+  ==================================================================
+  Full-width story tile carousel with alternating image-left / image-
+  right layout. Section heading sits above the carousel. Everything
+  (CSS + markup + JS) is inlined here so this file can be pasted
+  straight into a TeamSite component slot.
+
+  BEM naming:
+    Block:    .rbccm-story-carousel
+    Element:  .rbccm-story-carousel__<name>
+    Modifier: .rbccm-story-carousel__<name>--<variant>
+
+  Slide flip:
+    Default = image on the left, body on the right
+    .rbccm-story-carousel__slide--flipped = image on the right, body on the left
+    (Add the modifier per slide — commonly on every other slide to
+    alternate, but explicit so it's controllable.)
+
+  Config on the root element (all optional, sensible defaults):
+    data-autoplay="true|false"   default: false
+    data-arrows="true|false"     default: true
+    data-dots="true|false"       default: true
+    data-speed="350"             ms transition speed
+    data-autoplay-speed="6000"   ms between advances when autoplay=true
+
+  Requires jQuery + slick-carousel to be present on the page. The
+  script lazy-loads Slick from a CDN if it isn't already loaded.
+-->
+
+<style>
+/* =========================================================================
+   Story Carousel · BEM styles
+   ========================================================================= */
+
+:root {
+  --rbccm-story-carousel-navy:      #003168;
+  --rbccm-story-carousel-navy-dark: #002144;
+  --rbccm-story-carousel-yellow:    #FBDE00;
+  --rbccm-story-carousel-ink:       #1B1F27;
+  --rbccm-story-carousel-body:      #4A4E55;
+  --rbccm-story-carousel-border:    #D9DBDE;
+  --rbccm-story-carousel-tile-h:    275px;
+  --rbccm-sc-pt-m: 40px;
+  --rbccm-sc-pb-m: 40px;
+  --rbccm-sc-pt-d: 64px;
+  --rbccm-sc-pb-d: 64px;
+  --rbccm-sc-px-m: 16px;
+  --rbccm-sc-px-d: 24px;
+}
+
+.rbccm-story-carousel {
+  padding: var(--rbccm-sc-pt-m, 40px) var(--rbccm-sc-px-m, 16px) var(--rbccm-sc-pb-m, 40px);
+  background: #fff;
+}
+@media (min-width: 768px) {
+  .rbccm-story-carousel {
+    padding: var(--rbccm-sc-pt-d, 64px) var(--rbccm-sc-px-d, 24px) var(--rbccm-sc-pb-d, 64px);
+  }
+}
+
+.rbccm-story-carousel__container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.rbccm-story-carousel__section-heading {
+  color: #002144;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 38.4px;
+  margin: 0 0 35px;
+  scroll-margin-top: var(--rbccm-story-carousel-scroll-offset, 167px);
+}
+
+.rbccm-story-carousel__sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---- Carousel layout ------------------------------------------------- */
+.rbccm-story-carousel__carousel {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px 26px;
+  justify-content: center;
+  margin: 0 auto;
+  width: 100%;
+}
+.rbccm-story-carousel__track     { flex-basis: 100%; min-width: 0; order: 0; }
+.rbccm-story-carousel__btn--prev { order: 1; }
+.rbccm-story-carousel__dots-wrap { order: 2; }
+.rbccm-story-carousel__btn--next { order: 3; }
+
+@media (min-width: 1300px) {
+  .rbccm-story-carousel__carousel {
+    display: grid;
+    align-items: center;
+    column-gap: 24px;
+    row-gap: 24px;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "prev track next"
+      ".    dots  .";
+    margin: 0 -68px;
+    max-width: none;
+    width: calc(100% + 136px);
+  }
+  .rbccm-story-carousel__btn--prev { grid-area: prev; }
+  .rbccm-story-carousel__btn--next { grid-area: next; }
+  .rbccm-story-carousel__track     { grid-area: track; min-width: 0; flex-basis: auto; }
+  .rbccm-story-carousel__dots-wrap { grid-area: dots; justify-self: center; }
+}
+
+/* Equal-height slides — desktop only */
+@media (min-width: 768px) {
+  .rbccm-story-carousel__track .slick-track { display: flex !important; }
+  .rbccm-story-carousel__track .slick-slide { height: auto !important; }
+  .rbccm-story-carousel__track .slick-slide > * { height: 100%; }
+  .rbccm-story-carousel__tile { height: 100%; }
+}
+
+/* ---- Arrows ---------------------------------------------------------- */
+.rbccm-story-carousel__btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rbccm-story-carousel-navy);
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.rbccm-story-carousel__btn-icon { display: block; }
+
+.rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--mobile  { display: block; }
+.rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--desktop { display: none; }
+@media (min-width: 1300px) {
+  .rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--mobile  { display: none; }
+  .rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--desktop { display: block; }
+}
+
+.rbccm-story-carousel__btn-icon--desktop rect,
+.rbccm-story-carousel__btn-icon--desktop path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.rbccm-story-carousel__btn:hover .rbccm-story-carousel__btn-icon--desktop rect {
+  fill: #003168;
+}
+.rbccm-story-carousel__btn:hover .rbccm-story-carousel__btn-icon--desktop path {
+  stroke: #ffffff;
+}
+.rbccm-story-carousel__btn:focus { outline: none; }
+.rbccm-story-carousel__btn:focus-visible {
+  outline: 2px solid #003168;
+  border-radius: 4px;
+}
+.rbccm-story-carousel__btn[disabled],
+.rbccm-story-carousel__btn[aria-disabled="true"] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ---- Dots ------------------------------------------------------------ */
+.rbccm-story-carousel__dots-wrap {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: inline-flex !important;
+  gap: 26px !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  width: auto !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li button {
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li.slick-active button::before,
+.rbccm-story-carousel__dots-wrap .slick-dots li button:focus-visible::before,
+.rbccm-story-carousel__dots-wrap .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+}
+
+/* ---- Slide + tile ---------------------------------------------------- */
+.rbccm-story-carousel__slide {
+  box-sizing: border-box;
+}
+.rbccm-story-carousel__tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "media body";
+  background: #fff;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  min-height: var(--rbccm-story-carousel-tile-h);
+}
+.rbccm-story-carousel__tile:focus { outline: none; }
+.rbccm-story-carousel__tile:focus-within,
+.rbccm-story-carousel__tile:focus-visible,
+.rbccm-story-carousel__tile.is-focused {
+  outline: 2px solid #003168;
+  outline-offset: -2px;
+}
+.rbccm-story-carousel__tile:has(:focus-visible) {
+  outline: 2px solid #003168;
+  outline-offset: -2px;
+}
+.rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile {
+  grid-template-areas: "body media";
+}
+
+.rbccm-story-carousel__tile-media {
+  grid-area: media;
+  position: relative;
+  min-height: var(--rbccm-story-carousel-tile-h);
+  overflow: hidden;
+}
+.rbccm-story-carousel__media-image {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.rbccm-story-carousel__media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,33,68,0) 0%, rgba(0,33,68,0.15) 100%);
+  pointer-events: none;
+}
+
+.rbccm-story-carousel__tile-body {
+  grid-area: body;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile-body {
+    padding-left: 0;
+  }
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:focus-within .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:focus-visible .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile.is-focused .rbccm-story-carousel__tile-body {
+    padding-left: 32px;
+  }
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:has(:focus-visible) .rbccm-story-carousel__tile-body {
+    padding-left: 32px;
+  }
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile-body {
+    padding-right: 0;
+  }
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:focus-within .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:focus-visible .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile.is-focused .rbccm-story-carousel__tile-body {
+    padding-right: 32px;
+  }
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:has(:focus-visible) .rbccm-story-carousel__tile-body {
+    padding-right: 32px;
+  }
+}
+
+.rbccm-story-carousel__tile-title {
+  color: #003168;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 33.6px;
+  letter-spacing: normal;
+  margin: 0;
+}
+.rbccm-story-carousel__tile-description {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: 0.5px;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rbccm-story-carousel__tile-cta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-cta,
+.rbccm-story-carousel__tile-cta:hover {
+  border-bottom-color: currentColor;
+}
+.rbccm-story-carousel__tile-cta-arrow {
+  fill: var(--Blue-Bright-Blue, #0051A5);
+  flex-shrink: 0;
+}
+
+/* ---- Mobile stacking ------------------------------------------------- */
+@media (max-width: 767px) {
+  .rbccm-story-carousel__tile,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "body";
+    min-height: 0;
+  }
+  .rbccm-story-carousel__tile-media { min-height: 200px; }
+  .rbccm-story-carousel__tile-body { padding: 20px 0; }
+  .rbccm-story-carousel__tile-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+  .rbccm-story-carousel__carousel { gap: 16px 20px; }
+  .rbccm-story-carousel__btn-icon { width: 32px; height: 32px; }
+  .rbccm-story-carousel__btn-icon rect,
+  .rbccm-story-carousel__btn-icon path { transform-origin: center; }
+}
+</style>
+
+
+<section class="rbccm-story-carousel"
+         id="rbccm-story-carousel"
+         aria-labelledby="regional-projects"
+         data-autoplay="false"
+         data-arrows="true"
+         data-dots="true">
+
+  <div class="rbccm-story-carousel__container">
+
+    <h2 id="regional-projects" class="rbccm-story-carousel__section-heading">
+      Regional impact projects
+    </h2>
+
+    <div id="rbccm-story-carousel-announce"
+         class="rbccm-story-carousel__announce rbccm-story-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+    <p id="rbccm-story-carousel-instructions" class="rbccm-story-carousel__sr-only">
+      Use left and right arrow keys to navigate between slides.
+    </p>
+
+    <div class="rbccm-story-carousel__carousel">
+
+      <button class="rbccm-story-carousel__btn rbccm-story-carousel__btn--prev"
+              id="rbccm-story-carousel-prev"
+              type="button"
+              aria-label="Previous slide">
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-story-carousel__track"
+           id="rbccm-story-carousel-track"
+           role="region"
+           aria-label="Regional impact projects carousel"
+           aria-describedby="rbccm-story-carousel-instructions">
+
+        <!-- Slide 1 — image LEFT -->
+        <div class="rbccm-story-carousel__slide">
+          <a class="rbccm-story-carousel__tile" href="/en/our-impact/the-theatre-royal-sydney">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image" style="background-image: url('/assets/rbccm/images/insights/2025/theatre-royal-sydney-th.webp');" role="img" aria-label="RBC partners with Theatre Royal Sydney"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">RBC partners with Theatre Royal Sydney to support arts and culture</h2>
+              <p class="rbccm-story-carousel__tile-description">RBC Capital Markets, Theatre Royal Sydney and Youth Off The Streets come together to give youth in crisis a unique theatre experience.</p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 2 — image RIGHT (flipped) -->
+        <div class="rbccm-story-carousel__slide rbccm-story-carousel__slide--flipped">
+          <a class="rbccm-story-carousel__tile" href="/en/insights/2025/03/bear-cottages-big-day-out">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image" style="background-image: url('/assets/rbccm/images/insights/2025/theatre-royal-sydney-bear-cottage-th.webp');" role="img" aria-label="Bear Cottage's big day out"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">Bear Cottage's big day out</h2>
+              <p class="rbccm-story-carousel__tile-description">RBC Capital Markets, Theatre Royal Sydney and Bear Cottage come together to give children in care and their families a unique day out.</p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 3 — image LEFT -->
+        <div class="rbccm-story-carousel__slide">
+          <a class="rbccm-story-carousel__tile" href="/en/insights/2025/10/another-successful-year-for-rbc-race-for-the-kids-at-the-tcs-sydney-marathon">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image" style="background-image: url('/assets/rbccm/images/insights/2025/20251008-another-successful-year-for-rbc-race-banner.webp');" role="img" aria-label="RBC Race for the Kids Sydney"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">RBC Race for the Kids teams up with the TCS Sydney Marathon</h2>
+              <p class="rbccm-story-carousel__tile-description">Team RBC runners joined 50,000+ runners participating in the marathon, 10km and mini marathon race distances.</p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 4 — image RIGHT (flipped) -->
+        <div class="rbccm-story-carousel__slide rbccm-story-carousel__slide--flipped">
+          <a class="rbccm-story-carousel__tile" href="/en/our-impact/change-a-life">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image" style="background-image: url('/assets/rbccm/images/insights/2025/change-a-life-podcast-th.webp');" role="img" aria-label="Change a Life podcast"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">Change a Life podcast</h2>
+              <p class="rbccm-story-carousel__tile-description">RBC, through its Purpose Framework, is committed to a net-zero economy, future-ready skills, and equitable opportunities. Together with nonprofit partners, RBC turns innovative ideas into lasting impact.</p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+      <button class="rbccm-story-carousel__btn rbccm-story-carousel__btn--next"
+              id="rbccm-story-carousel-next"
+              type="button"
+              aria-label="Next slide">
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+          <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-story-carousel__dots-wrap" id="rbccm-story-carousel-dots"></div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<script>
+/* =========================================================================
+   Story Carousel — accessible-slick implementation
+   Mirrors the leadership / icon-carousel init pattern so all three
+   components share the same loader, arrow wiring, dots container,
+   sr-only announce region, and multi-instance behaviour.
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var BOUND_FLAG = 'data-story-carousel-bound';
+
+  /* Prefer the accessible-slick build hosted on rbccm.com; fall back to
+     vanilla slick from cdnjs if that 404s. */
+  function ensureSlickLoaded(cb) {
+    if (typeof window.jQuery === 'undefined') return;
+    if (typeof window.jQuery.fn.slick !== 'undefined') { cb(); return; }
+    var s = document.createElement('script');
+    s.src = '/assets/rbccm/js/accessible-slick.min.js';
+    s.onload = function () { cb(); };
+    s.onerror = function () {
+      var fallback = document.createElement('script');
+      fallback.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
+      fallback.onload = function () { cb(); };
+      document.head.appendChild(fallback);
+    };
+    document.head.appendChild(s);
+  }
+
+  function intAttr(root, name, fallback) {
+    var n = parseInt(root.getAttribute(name), 10);
+    return (!n || n < 1) ? fallback : n;
+  }
+
+  function init(root) {
+    var $ = window.jQuery;
+    if (root.getAttribute(BOUND_FLAG) === 'true') return;
+
+    var $root     = $(root);
+    var $track    = $root.find('.rbccm-story-carousel__track');
+    var $prev     = $root.find('.rbccm-story-carousel__btn--prev');
+    var $next     = $root.find('.rbccm-story-carousel__btn--next');
+    var $dots     = $root.find('.rbccm-story-carousel__dots-wrap');
+    var $announce = $root.find('.rbccm-story-carousel__announce');
+
+    if (!$track.length || !$track.children().length) return;
+    if ($track.hasClass('slick-initialized')) return;
+    root.setAttribute(BOUND_FLAG, 'true');
+
+    var cfgAutoplay = root.getAttribute('data-autoplay') === 'true';
+    var cfgArrows   = root.getAttribute('data-arrows')   !== 'false';
+    var cfgDots     = root.getAttribute('data-dots')     !== 'false';
+    var cfgSpeed    = intAttr(root, 'data-speed', 350);
+    var cfgAuto     = intAttr(root, 'data-autoplay-speed', 6000);
+
+    var reducedMotion = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    $track.slick({
+      slidesToShow:    1,
+      slidesToScroll:  1,
+      infinite:        true,
+      arrows:          false,
+      dots:            cfgDots,
+      appendDots:      $dots,
+      speed:           reducedMotion ? 0 : cfgSpeed,
+      cssEase:         reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+      autoplay:        cfgAutoplay && !reducedMotion,
+      autoplaySpeed:   cfgAuto,
+      pauseOnHover:    true,
+      pauseOnFocus:    true,
+      adaptiveHeight:  false,
+      accessibility:   false,
+      draggable:       true,
+      swipe:           true,
+      touchMove:       true,
+      regionLabel:     root.getAttribute('aria-label') || 'Story carousel',
+      responsive: [
+        { breakpoint: 768, settings: { adaptiveHeight: true } }
+      ]
+    });
+
+    $prev.on('click', function () {
+      try { $track.slick('slickPrev'); } catch (e) {}
+    });
+    $next.on('click', function () {
+      try { $track.slick('slickNext'); } catch (e) {}
+    });
+
+    if (cfgArrows === false) { $prev.hide(); $next.hide(); }
+
+    function syncArrows() {
+      var slick = $track.slick('getSlick');
+      if (!slick) return;
+      if (slick.options.infinite) return;
+      var atStart = slick.currentSlide <= 0;
+      var atEnd   = slick.currentSlide >= slick.slideCount - 1;
+      $prev.prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false');
+      $next.prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false');
+    }
+
+    function applyA11y() {
+      var slides = root.querySelectorAll('.rbccm-story-carousel__track .slick-slide');
+      for (var i = 0; i < slides.length; i++) {
+        var slide = slides[i];
+        var isActive = slide.classList.contains('slick-active');
+        var focusables = slide.querySelectorAll('a, button, [tabindex]');
+        for (var j = 0; j < focusables.length; j++) {
+          if (isActive) focusables[j].removeAttribute('tabindex');
+          else          focusables[j].setAttribute('tabindex', '-1');
+        }
+        if (isActive) slide.removeAttribute('aria-hidden');
+        else          slide.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function forceDotsTabbable() {
+      var buttons = $dots.length ? $dots[0].querySelectorAll('.slick-dots li button') : [];
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].setAttribute('tabindex', '0');
+        if (!buttons[i].getAttribute('aria-label')) {
+          buttons[i].setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        }
+      }
+    }
+
+    $track.on('init reInit breakpoint afterChange', function (e, slick, currentSlide) {
+      syncArrows();
+      forceDotsTabbable();
+      applyA11y();
+      if (e.type === 'afterChange' && $announce.length && slick) {
+        $announce.text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+      }
+    });
+
+    syncArrows();
+    forceDotsTabbable();
+    applyA11y();
+  }
+
+  function initAll(ctx) {
+    if (!window.jQuery) return;
+    var roots = (ctx || document).querySelectorAll('.rbccm-story-carousel');
+    for (var i = 0; i < roots.length; i++) {
+      (function (root) {
+        ensureSlickLoaded(function () { init(root); });
+      })(roots[i]);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { initAll(); });
+  } else {
+    initAll();
+  }
+
+  window.RBCCMStoryCarousel = { init: initAll };
+})();
+</script>

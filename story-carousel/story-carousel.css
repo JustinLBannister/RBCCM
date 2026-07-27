@@ -1,0 +1,512 @@
+/* =========================================================================
+   Story Carousel · BEM styles
+   -------------------------------------------------------------------------
+   Full-width story tile carousel with alternating image / body layout.
+   Slick handles the horizontal transform; this file styles everything
+   inside the track and the surrounding chrome (heading, arrows, dots).
+
+   Block:      .rbccm-story-carousel
+   Element:    .rbccm-story-carousel__<name>
+   Modifier:   .rbccm-story-carousel__<name>--<variant>
+
+   Slide flip:
+     Default (image LEFT, body RIGHT)  → .rbccm-story-carousel__slide
+     Image RIGHT, body LEFT            → add .rbccm-story-carousel__slide--flipped
+   ========================================================================= */
+
+/* Design tokens (namespaced so consumers can override on a specific page
+   without polluting site-wide vars). Section-padding tokens mirror the
+   icon-carousel naming convention (--rbccm-sc-pt-m/pb-m/pt-d/pb-d/px-m/
+   px-d) so every RBCCM section component uses the same responsive
+   40/64 vertical rhythm and 16/24 horizontal gutter. */
+:root {
+  --rbccm-story-carousel-navy:      #003168;
+  --rbccm-story-carousel-navy-dark: #002144;
+  --rbccm-story-carousel-yellow:    #FBDE00;
+  --rbccm-story-carousel-ink:       #1B1F27;
+  --rbccm-story-carousel-body:      #4A4E55;
+  --rbccm-story-carousel-border:    #D9DBDE;
+  --rbccm-story-carousel-tile-h:    275px;
+
+  /* Section padding — same tokens/defaults as icon-carousel */
+  --rbccm-sc-pt-m: 40px;
+  --rbccm-sc-pb-m: 40px;
+  --rbccm-sc-pt-d: 64px;
+  --rbccm-sc-pb-d: 64px;
+  --rbccm-sc-px-m: 16px;
+  --rbccm-sc-px-d: 24px;
+}
+
+.rbccm-story-carousel {
+  padding: var(--rbccm-sc-pt-m, 40px) var(--rbccm-sc-px-m, 16px) var(--rbccm-sc-pb-m, 40px);
+  background: #fff;
+}
+/* 768px+ : exact port of the icon-carousel section-padding pattern —
+   64px vertical, 24px horizontal, no additional breakpoints. Keeps
+   the two components visually identical at every viewport. */
+@media (min-width: 768px) {
+  .rbccm-story-carousel {
+    padding: var(--rbccm-sc-pt-d, 64px) var(--rbccm-sc-px-d, 24px) var(--rbccm-sc-pb-d, 64px);
+  }
+}
+
+/* Container centers the content at the shared 1180 max-width. Horizontal
+   gutter is now owned by the section (above) so both the H2 and the
+   carousel share the same content edge. */
+.rbccm-story-carousel__container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Section heading. Scroll offset for anchor links kept as inline style
+   or CSS variable so consumers with different sticky nav heights can
+   override without editing this file. */
+/* Main section H2 — RBCDisplay 32/38.4 weight 500, navy #002144,
+   1px letter-spacing. Exact live-site spec. Falls back to Georgia
+   stack when RBCDisplay web font isn't loaded (local test). */
+.rbccm-story-carousel__section-heading {
+  color: #002144;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 38.4px;
+  margin: 0 0 35px;
+  scroll-margin-top: var(--rbccm-story-carousel-scroll-offset, 167px);
+}
+
+/* Screen-reader only helper */
+.rbccm-story-carousel__sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* -------------------------------------------------------------------------
+   Carousel layout — matches the leadership-carousel pattern so the
+   track edges line up with the H2 above (both inside the 1180 container)
+   while the arrows sit in the outer gutter on desktop.
+
+   DOM order: [Prev] → [track] → [Next] → [dots]
+
+   Mobile (<1300)  — flex layout. Track wraps to its own row (flex-basis
+                     100%), then [Prev · Dots · Next] flow into a second
+                     row centered with a uniform 26px gap between every
+                     element. Matches icon-carousel's single-flex-row
+                     dots cluster so the visual rhythm is identical to
+                     that component (arrow gap == dot gap).
+   Desktop (≥1300) — CSS Grid `auto 1132px auto` puts prev on the left
+                     of the track, next on the right, dots centered
+                     below. Wrapper extends beyond the 1180 container
+                     via negative side margins so arrows sit outside
+                     the rail while the track edges line up with the H2.
+   ------------------------------------------------------------------------- */
+.rbccm-story-carousel__carousel {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  /* Row-gap 40px (was 20px) — extra breathing room between the track
+     and the [prev · dots · next] controls row so the dots don't feel
+     glued to the tile edge on mobile / tablet. Column-gap stays 26px
+     so the arrow-to-dots spacing matches the dot-to-dot spacing. */
+  gap: 40px 26px;
+  justify-content: center;
+  margin: 0 auto;
+  /* No max-width — carousel fills whatever the parent container gives
+     it. At the desktop breakpoint below, a width:calc extends it 68px
+     beyond the container on each side so the arrows can sit in the
+     gutter without the track shrinking. */
+  width: 100%;
+}
+.rbccm-story-carousel__track     { flex-basis: 100%; min-width: 0; order: 0; }
+.rbccm-story-carousel__btn--prev { order: 1; }
+.rbccm-story-carousel__dots-wrap { order: 2; }
+.rbccm-story-carousel__btn--next { order: 3; }
+
+@media (min-width: 1300px) {
+  .rbccm-story-carousel__carousel {
+    display: grid;
+    align-items: center;
+    /* Extend carousel 68px beyond the container on each side so the
+       arrows can sit in the gutter WITHOUT the track shrinking:
+         width  = container width + 136
+         margin = 0 -68 (shifts left edge -68, right edge +68)
+       Grid columns then resolve to:
+         auto (44 arrow) + 24 gap + 1fr (= container width) + 24 gap + auto (44)
+       Track = container width, edges pinned to container / H2 edges. */
+    column-gap: 24px;
+    row-gap: 24px;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "prev track next"
+      ".    dots  .";
+    margin: 0 -68px;
+    max-width: none;
+    width: calc(100% + 136px);
+  }
+  .rbccm-story-carousel__btn--prev { grid-area: prev; }
+  .rbccm-story-carousel__btn--next { grid-area: next; }
+  .rbccm-story-carousel__track     { grid-area: track; min-width: 0; flex-basis: auto; }
+  .rbccm-story-carousel__dots-wrap { grid-area: dots; justify-self: center; }
+}
+
+/* Equal-height slides — desktop only. Paired with adaptiveHeight:false
+   at the desktop breakpoint in story-carousel.js so the track locks to
+   the tallest slide and every tile stretches to that height. Mobile
+   uses adaptiveHeight:true (via slick's responsive block) so the track
+   grows/shrinks per slide, which is fine when everything is stacked. */
+@media (min-width: 768px) {
+  .rbccm-story-carousel__track .slick-track { display: flex !important; }
+  .rbccm-story-carousel__track .slick-slide { height: auto !important; }
+  .rbccm-story-carousel__track .slick-slide > * { height: 100%; }
+  .rbccm-story-carousel__tile { height: 100%; }
+}
+
+/* Arrows — matches leadership-carousel exactly so the two components
+   share a visual language:
+     Base    → outlined navy circle with navy chevron
+     Hover   → circle fills navy, chevron flips to white (smooth transition)
+     Focus   → 2px navy outline + 4px border-radius (rounded square ring
+               around the circle, keyboard-only via :focus-visible) */
+.rbccm-story-carousel__btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rbccm-story-carousel-navy);
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.rbccm-story-carousel__btn-icon { display: block; }
+
+/* Mobile / desktop icon swap — same pattern as leadership-carousel.
+   Mobile shows a bare 14x24 chevron (no outer circle), desktop shows
+   the 44x44 outlined circle + chevron. Breakpoint mirrors leadership
+   at 1300px so the two components feel identical at every viewport.
+   Specificity bumped by prefixing .rbccm-story-carousel__btn so these
+   win against the generic ".btn-icon { display: block }" rule above. */
+.rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--mobile  { display: block; }
+.rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--desktop { display: none; }
+@media (min-width: 1300px) {
+  .rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--mobile  { display: none; }
+  .rbccm-story-carousel__btn .rbccm-story-carousel__btn-icon--desktop { display: block; }
+}
+
+/* Fill-on-hover treatment is desktop-only — mobile chevron has no
+   background rect to fill, and flipping its stroke to white would make
+   the arrow disappear on a light background. */
+.rbccm-story-carousel__btn-icon--desktop rect,
+.rbccm-story-carousel__btn-icon--desktop path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.rbccm-story-carousel__btn:hover .rbccm-story-carousel__btn-icon--desktop rect {
+  fill: #003168;
+}
+.rbccm-story-carousel__btn:hover .rbccm-story-carousel__btn-icon--desktop path {
+  stroke: #ffffff;
+}
+.rbccm-story-carousel__btn:focus { outline: none; }
+.rbccm-story-carousel__btn:focus-visible {
+  outline: 2px solid #003168;
+  border-radius: 4px;
+}
+.rbccm-story-carousel__btn[disabled],
+.rbccm-story-carousel__btn[aria-disabled="true"] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Dots — matches the leadership-carousel treatment
+   Inactive: 11px outlined circle
+   Active:   11px filled circle + 4px white gap + 1px navy ring (box-shadow)
+   Hover / focus-visible use the active treatment so keyboard users get
+   the same visual feedback as clicks. */
+.rbccm-story-carousel__dots-wrap {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: inline-flex !important;
+  gap: 26px !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  width: auto !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li button {
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+  width: 11px !important;
+}
+.rbccm-story-carousel__dots-wrap .slick-dots li.slick-active button::before,
+.rbccm-story-carousel__dots-wrap .slick-dots li button:focus-visible::before,
+.rbccm-story-carousel__dots-wrap .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+}
+
+/* -------------------------------------------------------------------------
+   Slide + tile — CSS Grid for the media / body split so we can flip
+   the order with a modifier instead of Bootstrap push/pull classes.
+   ------------------------------------------------------------------------- */
+.rbccm-story-carousel__slide {
+  /* slick sets width inline; keep box-sizing consistent. No horizontal
+     padding — the tile fills the slide edge-to-edge so its own media
+     and body flush against the carousel gutter. */
+  box-sizing: border-box;
+}
+
+.rbccm-story-carousel__tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "media body";
+  background: #fff;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  min-height: var(--rbccm-story-carousel-tile-h);
+}
+/* Focus indicator — same intent as leadership-carousel's card focus:
+     - fires on :focus-within (any descendant has focus)
+     - fires on :focus-visible (keyboard focus on the tile itself)
+     - fires on :has(:focus-visible) (kept in its own rule so a browser
+       that can't parse :has() drops just this rule, not the others)
+     - fires on .is-focused (manual JS hook for future needs)
+   Leadership uses border-color because those cards have a border;
+   this variant has no border, so the same visual intent is delivered
+   via an inset 2px navy outline. No layout shift, sits flush inside
+   the tile edge. Same #003168 as the leadership treatment. */
+.rbccm-story-carousel__tile:focus { outline: none; }
+.rbccm-story-carousel__tile:focus-within,
+.rbccm-story-carousel__tile:focus-visible,
+.rbccm-story-carousel__tile.is-focused {
+  outline: 2px solid #003168;
+  outline-offset: -2px;
+}
+.rbccm-story-carousel__tile:has(:focus-visible) {
+  outline: 2px solid #003168;
+  outline-offset: -2px;
+}
+/* Flipped modifier — swap the grid columns so media renders on the right */
+.rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile {
+  grid-template-areas: "body media";
+}
+
+.rbccm-story-carousel__tile-media {
+  grid-area: media;
+  position: relative;
+  min-height: var(--rbccm-story-carousel-tile-h);
+  overflow: hidden;
+}
+.rbccm-story-carousel__media-image {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.rbccm-story-carousel__media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,33,68,0) 0%, rgba(0,33,68,0.15) 100%);
+  pointer-events: none;
+}
+
+.rbccm-story-carousel__tile-body {
+  grid-area: body;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+/* On flipped slides the body sits on the LEFT of the tile, so its own
+   left padding pushes content away from where the H2 above naturally
+   aligns. Zero it out so title/description align flush with the H2
+   left edge. Desktop-only — mobile stacks vertically so the body
+   inherits the symmetric 20px padding for that layout. */
+@media (min-width: 768px) {
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile-body {
+    padding-left: 0;
+  }
+
+  /* When a flipped tile is focused, the 2px inset outline lands right on
+     the text edge (because we zeroed padding-left above). Restore the
+     32px left padding on focus so the outline breathes clear of the
+     copy and the first character stays readable. Covers keyboard focus
+     (:focus-visible), any-descendant focus (:focus-within / :has), and
+     the manual .is-focused JS hook. */
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:focus-within .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:focus-visible .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile.is-focused .rbccm-story-carousel__tile-body {
+    padding-left: 32px;
+  }
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile:has(:focus-visible) .rbccm-story-carousel__tile-body {
+    padding-left: 32px;
+  }
+
+  /* Mirror treatment for default (non-flipped) slides — body sits on the
+     RIGHT, so its own right padding pushes content in from the tile's
+     right edge. Zero it by default so the copy extends flush to the
+     right, then restore 32px on focus so the inset outline stays clear
+     of the text. Same set of focus variants as the flipped rule above. */
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile-body {
+    padding-right: 0;
+  }
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:focus-within .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:focus-visible .rbccm-story-carousel__tile-body,
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile.is-focused .rbccm-story-carousel__tile-body {
+    padding-right: 32px;
+  }
+  .rbccm-story-carousel__slide:not(.rbccm-story-carousel__slide--flipped) .rbccm-story-carousel__tile:has(:focus-visible) .rbccm-story-carousel__tile-body {
+    padding-right: 32px;
+  }
+}
+/* Title — live-site pattern from Conference Insights hero:
+   RBCDisplay 28/33.6, weight 500, navy. Falls back to Georgia stack
+   for local test where the RBCDisplay web font isn't present.
+   Margin cleared — vertical rhythm comes from the parent's 24px flex gap. */
+.rbccm-story-carousel__tile-title {
+  color: #003168;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 33.6px;
+  letter-spacing: normal;
+  margin: 0;
+}
+
+/* Description — matches Conference Insights tile description:
+   Roboto Light 14/19.6, #555, 0.5px letter-spacing. Capped at 3 lines
+   so tile heights stay predictable across slides. Margin cleared —
+   parent's 24px flex gap handles spacing. */
+.rbccm-story-carousel__tile-description {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: 0.5px;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* CTA ("Learn more") — same anchor treatment as Conference Insights
+   meta (the "14 min listen ›" link). Bright-blue text, inline-flex so
+   the underline only runs the length of the text + arrow, transparent
+   border-bottom that fades to currentColor on the CTA's own hover.
+   Margin cleared — the CTA now sits 24px below the description via the
+   parent's flex gap instead of being auto-pushed to the bottom. */
+.rbccm-story-carousel__tile-cta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+/* CTA underline fires when either the whole tile or the CTA itself is
+   hovered, so the "Learn more" call-to-action lights up whenever any
+   part of the card is being interacted with. Mirrors the conference-
+   insights pattern (whole tile hover → meta link underlines). */
+.rbccm-story-carousel__tile:hover .rbccm-story-carousel__tile-cta,
+.rbccm-story-carousel__tile-cta:hover {
+  border-bottom-color: currentColor;
+}
+/* Arrow — same 4x10 fill-based chevron SVG the Conference Insights
+   meta uses. Explicit navy fill matches that component's treatment
+   (slightly darker than the CTA text blue by design). */
+.rbccm-story-carousel__tile-cta-arrow {
+  fill: var(--Blue-Bright-Blue, #0051A5);
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------------
+   Responsive: stack image on top of body on small screens. Flipped
+   modifier collapses to the same stacked order — no room at this width
+   to differentiate visually. Arrows shrink to 32px so the [prev · dots
+   · next] cluster fits under a narrow viewport.
+   ------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .rbccm-story-carousel__tile,
+  .rbccm-story-carousel__slide--flipped .rbccm-story-carousel__tile {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "body";
+    min-height: 0;
+  }
+  .rbccm-story-carousel__tile-media { min-height: 200px; }
+  /* Vertical only — left/right padding is 0 so text extends to the
+     tile's edges on mobile, matching the desktop asymmetric-zero
+     pattern. */
+  .rbccm-story-carousel__tile-body { padding: 20px 0; }
+  /* Scale the title down on small screens and tighten the line-height
+     proportionally so the desktop 33.6px pixel value doesn't leave
+     awkward gaps between wrapped lines at 20px type. Margin stays
+     zero — the parent flex gap handles spacing. */
+  .rbccm-story-carousel__tile-title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .rbccm-story-carousel__carousel { gap: 16px 20px; }
+  .rbccm-story-carousel__btn-icon { width: 32px; height: 32px; }
+  .rbccm-story-carousel__btn-icon rect,
+  .rbccm-story-carousel__btn-icon path { transform-origin: center; }
+}

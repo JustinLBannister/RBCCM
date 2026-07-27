@@ -1,0 +1,193 @@
+<!--
+  Story Carousel · BEM refactor
+  ------------------------------------------------------------------
+  Full-width story tile carousel with alternating image-left / image-
+  right layout. Section heading sits above the carousel.
+
+  Replaces the legacy pattern:
+    .story-tiles .row.story-tile-row + .slick-slide + Bootstrap grid
+    with flip-col-6-left / flip-col-6-right classes for layout swap
+
+  BEM naming:
+    Block:    .rbccm-story-carousel
+    Element:  .rbccm-story-carousel__<name>
+    Modifier: .rbccm-story-carousel__<name>--<variant>
+
+  Slide flip:
+    Default = image on the left, body on the right
+    .rbccm-story-carousel__slide--flipped = image on the right, body on the left
+    (Editors add the modifier per slide — commonly on every other slide
+    to alternate, but explicit so it's controllable.)
+
+  Load stylesheet + slick init together. The init script is external
+  (story-carousel.js) and reads config from data-* attributes on the
+  root — no per-page JS needed.
+-->
+<link rel="stylesheet" href="/assets/rbccm/css/sub/test/story-carousel.css">
+
+<section class="rbccm-story-carousel"
+         id="rbccm-story-carousel"
+         aria-labelledby="regional-projects"
+         data-autoplay="false"
+         data-arrows="true"
+         data-dots="true">
+
+  <div class="rbccm-story-carousel__container">
+
+    <h2 id="regional-projects" class="rbccm-story-carousel__section-heading">
+      Regional impact projects
+    </h2>
+
+    <!-- Screen reader announcements + keyboard instructions -->
+    <div id="rbccm-story-carousel-announce"
+         class="rbccm-story-carousel__announce rbccm-story-carousel__sr-only"
+         aria-live="polite" aria-atomic="true"></div>
+    <p id="rbccm-story-carousel-instructions" class="rbccm-story-carousel__sr-only">
+      Use left and right arrow keys to navigate between slides.
+    </p>
+
+    <div class="rbccm-story-carousel__carousel">
+
+      <button class="rbccm-story-carousel__btn rbccm-story-carousel__btn--prev"
+              id="rbccm-story-carousel-prev"
+              type="button"
+              aria-label="Previous slide">
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-story-carousel__track"
+           id="rbccm-story-carousel-track"
+           role="region"
+           aria-label="Regional impact projects carousel"
+           aria-describedby="rbccm-story-carousel-instructions">
+
+        <!-- Slide 1 — image LEFT (default) -->
+        <div class="rbccm-story-carousel__slide">
+          <a class="rbccm-story-carousel__tile" href="/en/our-impact/the-theatre-royal-sydney">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image"
+                   style="background-image: url('/assets/rbccm/images/insights/2025/theatre-royal-sydney-th.webp');"
+                   role="img"
+                   aria-label="RBC partners with Theatre Royal Sydney"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">RBC partners with Theatre Royal Sydney to support arts and culture</h2>
+              <p class="rbccm-story-carousel__tile-description">
+                RBC Capital Markets, Theatre Royal Sydney and Youth Off The Streets come together to give youth in crisis a unique theatre experience.
+              </p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 2 — image RIGHT (flipped) -->
+        <div class="rbccm-story-carousel__slide rbccm-story-carousel__slide--flipped">
+          <a class="rbccm-story-carousel__tile" href="/en/insights/2025/03/bear-cottages-big-day-out">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image"
+                   style="background-image: url('/assets/rbccm/images/insights/2025/theatre-royal-sydney-bear-cottage-th.webp');"
+                   role="img"
+                   aria-label="Bear Cottage's big day out"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">Bear Cottage's big day out</h2>
+              <p class="rbccm-story-carousel__tile-description">
+                RBC Capital Markets, Theatre Royal Sydney and Bear Cottage come together to give children in care and their families a unique day out.
+              </p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 3 — image LEFT (default) -->
+        <div class="rbccm-story-carousel__slide">
+          <a class="rbccm-story-carousel__tile" href="/en/insights/2025/10/another-successful-year-for-rbc-race-for-the-kids-at-the-tcs-sydney-marathon">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image"
+                   style="background-image: url('/assets/rbccm/images/insights/2025/20251008-another-successful-year-for-rbc-race-banner.webp');"
+                   role="img"
+                   aria-label="RBC Race for the Kids Sydney"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">RBC Race for the Kids teams up with the TCS Sydney Marathon</h2>
+              <p class="rbccm-story-carousel__tile-description">
+                Team RBC runners joined 50,000+ runners participating in the marathon, 10km and mini marathon race distances.
+              </p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Slide 4 — image RIGHT (flipped) -->
+        <div class="rbccm-story-carousel__slide rbccm-story-carousel__slide--flipped">
+          <a class="rbccm-story-carousel__tile" href="/en/our-impact/change-a-life">
+            <div class="rbccm-story-carousel__tile-media">
+              <div class="rbccm-story-carousel__media-image"
+                   style="background-image: url('/assets/rbccm/images/insights/2025/change-a-life-podcast-th.webp');"
+                   role="img"
+                   aria-label="Change a Life podcast"></div>
+              <div class="rbccm-story-carousel__media-overlay" aria-hidden="true"></div>
+            </div>
+            <div class="rbccm-story-carousel__tile-body">
+              <h2 class="rbccm-story-carousel__tile-title">Change a Life podcast</h2>
+              <p class="rbccm-story-carousel__tile-description">
+                RBC, through its Purpose Framework, is committed to a net-zero economy, future-ready skills, and equitable opportunities. Together with nonprofit partners, RBC turns innovative ideas into lasting impact.
+              </p>
+              <div class="rbccm-story-carousel__tile-cta">
+                <span class="rbccm-story-carousel__tile-cta-label">Learn more</span>
+                <svg class="rbccm-story-carousel__tile-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true">
+                  <path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div><!-- /__track -->
+
+      <button class="rbccm-story-carousel__btn rbccm-story-carousel__btn--next"
+              id="rbccm-story-carousel-next"
+              type="button"
+              aria-label="Next slide">
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--mobile" xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg class="rbccm-story-carousel__btn-icon rbccm-story-carousel__btn-icon--desktop" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true" focusable="false">
+          <rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/>
+          <path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="rbccm-story-carousel__dots-wrap" id="rbccm-story-carousel-dots"></div>
+
+    </div><!-- /__carousel -->
+
+  </div><!-- /__container -->
+
+</section>
+
+<script src="/assets/rbccm/js/sub/test/story-carousel.js"></script>
