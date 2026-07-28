@@ -88,6 +88,22 @@
     return false;
   }
 
+  // Skip elements that live INSIDE a data-json-list container. Once
+  // renderList has run, item scopes have already been recursively
+  // bound with each item's data. If the outer bindScope pass then
+  // re-visits those descendant elements with the WHOLE data object,
+  // the empty-path lookup returns the whole object and textContent
+  // becomes "[object Object]" — which is exactly the MAAS+MATA
+  // headlineLines bug this guard prevents.
+  function insideList(el) {
+    var p = el.parentNode;
+    while (p) {
+      if (p.nodeType === 1 && p.hasAttribute && p.hasAttribute('data-json-list')) return true;
+      p = p.parentNode;
+    }
+    return false;
+  }
+
   // ---- Core binding ---------------------------------------------
   function bindScope(root, data) {
     if (!root || data == null) return;
@@ -100,10 +116,15 @@
     }
 
     // 2) Text bindings
+    //    insideList guard: any descendant of a data-json-list container
+    //    was already bound by renderList's recursive bindScope call with
+    //    its own item data. Re-binding here with the WHOLE data object
+    //    would clobber the string items with String(fullData) =
+    //    "[object Object]".
     var textEls = root.querySelectorAll('[data-json]');
     for (var j = 0; j < textEls.length; j++) {
       var el = textEls[j];
-      if (insideTemplate(el)) continue;
+      if (insideTemplate(el) || insideList(el)) continue;
       var val = getPath(data, el.getAttribute('data-json'));
       if (val != null) el.textContent = String(val);
     }
@@ -112,7 +133,7 @@
     var htmlEls = root.querySelectorAll('[data-json-html]');
     for (var k = 0; k < htmlEls.length; k++) {
       var elH = htmlEls[k];
-      if (insideTemplate(elH)) continue;
+      if (insideTemplate(elH) || insideList(elH)) continue;
       var valH = getPath(data, elH.getAttribute('data-json-html'));
       if (valH != null) elH.innerHTML = String(valH);
     }
@@ -122,7 +143,7 @@
     var allEls = root.querySelectorAll('*');
     for (var m = 0; m < allEls.length; m++) {
       var elA = allEls[m];
-      if (insideTemplate(elA)) continue;
+      if (insideTemplate(elA) || insideList(elA)) continue;
       if (!elA.attributes || !elA.attributes.length) continue;
       // Iterate over a copy — setAttribute during iteration is fine, but
       // we don't want to trip on live NamedNodeMap semantics on old IE
@@ -150,7 +171,7 @@
     var ifEls = root.querySelectorAll('[data-json-if]');
     for (var p = 0; p < ifEls.length; p++) {
       var elI = ifEls[p];
-      if (insideTemplate(elI)) continue;
+      if (insideTemplate(elI) || insideList(elI)) continue;
       var valI = getPath(data, elI.getAttribute('data-json-if'));
       if (!valI) elI.hidden = true;
       else       elI.hidden = false;

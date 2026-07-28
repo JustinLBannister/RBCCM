@@ -374,8 +374,29 @@
 
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* iOS VoiceOver / NVDA feedback: Slick's default dot buttons carry
+       only numeric text ("1", "2", ...) and no aria-label, so screen
+       readers announce them as "clickable 1 button" with no context.
+       This helper stamps a descriptive aria-label + aria-current on
+       each dot so a user hears "Go to slide 3 of 11, current" instead.
+       Runs on init and after every slide change since Slick re-appends
+       the ul on some breakpoint transitions. */
+    function labelDots() {
+      var buttons = document.querySelectorAll('#rbccm-lead-dots .slick-dots li button');
+      var total = buttons.length;
+      for (var i = 0; i < buttons.length; i++) {
+        var li = buttons[i].parentNode;
+        var isActive = li && li.classList.contains('slick-active');
+        var label = 'Go to slide ' + (i + 1) + ' of ' + total;
+        if (isActive) label += ', current';
+        buttons[i].setAttribute('aria-label', label);
+        if (isActive) buttons[i].setAttribute('aria-current', 'true');
+        else          buttons[i].removeAttribute('aria-current');
+      }
+    }
+
     function initCarousel() {
-      $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
+      $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); labelDots(); }, 0); });
       $track.slick({
         slidesToShow:    1,
         slidesToScroll:  1,
@@ -472,6 +493,7 @@
     $track.on('afterChange', function (e, slick, currentSlide) {
       applyA11y();
       syncArrows();
+      labelDots();
       if (typeof currentSlide !== 'undefined' && slick) {
         $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
       }

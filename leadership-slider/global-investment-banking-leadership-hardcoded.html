@@ -316,8 +316,29 @@
 
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* iOS VoiceOver / NVDA feedback: Slick's default dot buttons carry only
+       "1", "2", "3" as visible text and no aria-label, so screen readers
+       announce them as "clickable 1 button" with no context. This helper
+       stamps a descriptive aria-label + aria-current on each dot so a
+       user hears "Go to slide 3 of 5, current" instead. Runs on init and
+       after every slide change (Slick re-appends the ul on some breakpoint
+       transitions so we can't set-and-forget). */
+    function labelDots() {
+      var buttons = document.querySelectorAll('#rbccm-lead-dots .slick-dots li button');
+      var total = buttons.length;
+      for (var i = 0; i < buttons.length; i++) {
+        var li = buttons[i].parentNode;
+        var isActive = li && li.classList.contains('slick-active');
+        var label = 'Go to slide ' + (i + 1) + ' of ' + total;
+        if (isActive) label += ', current';
+        buttons[i].setAttribute('aria-label', label);
+        if (isActive) buttons[i].setAttribute('aria-current', 'true');
+        else          buttons[i].removeAttribute('aria-current');
+      }
+    }
+
     function initCarousel() {
-      $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
+      $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); labelDots(); }, 0); });
       $track.slick({
         slidesToShow:    1,
         slidesToScroll:  1,
@@ -414,6 +435,7 @@
     $track.on('afterChange', function (e, slick, currentSlide) {
       applyA11y();
       syncArrows();
+      labelDots();
       if (typeof currentSlide !== 'undefined' && slick) {
         $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
       }
@@ -516,10 +538,18 @@
     var $modalBody = $modal.find('.rbccm-leadership__modal-body');
     var $modalLi   = $modal.find('.rbccm-leadership__modal-linkedin');
 
+    /* Track the button that opened the modal so we can restore focus to
+       it when the modal closes. iOS QA feedback: without this, focus
+       goes to the top of the page after the modal is dismissed, which
+       breaks the WAI-ARIA dialog pattern (focus should return to the
+       triggering element per WCAG 2.4.3). */
+    var $modalTrigger = null;
+
     $(document).on('click', '.rbccm-leadership__card-bio', function (e) {
       e.preventDefault();
       var $src = $('#' + $(this).attr('data-bio-target'));
       if (!$src.length) return;
+      $modalTrigger = $(this);
       $modalName.text($src.attr('data-name') || '');
       $modalRole.text($src.attr('data-role') || '');
       $modalBody.html($src.html());
@@ -527,6 +557,18 @@
       if (li) { $modalLi.attr('href', li).removeAttr('hidden'); }
       else    { $modalLi.attr('hidden', 'hidden'); }
       $modal.modal('show');
+    });
+
+    /* Restore focus to the trigger button when the modal is fully closed.
+       Bootstrap 3 fires `hidden.bs.modal` after the close animation, so
+       the trigger is scrollable/focusable by then. preventScroll:true so
+       returning focus doesn't yank the viewport back to the button — the
+       browser only needs to move focus, not scroll to it. */
+    $modal.on('hidden.bs.modal', function () {
+      if (!$modalTrigger || !$modalTrigger.length) return;
+      try { $modalTrigger[0].focus({ preventScroll: true }); }
+      catch (e) { $modalTrigger[0].focus(); }
+      $modalTrigger = null;
     });
   });
 </script>
