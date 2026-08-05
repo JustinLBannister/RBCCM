@@ -9,7 +9,7 @@
 
      DCR-DRIVEN with per-slide OVERRIDES, same pattern as
      deal-carousel and how-we-think. Each Case Study Group
-     binds ONE article/story DCR — the XSL reads title /
+     binds ONE rbccm/casestudy DCR — the XSL reads title /
      description / image / read-time from that record, and
      per-slide String/Textarea/Image overrides win when set.
 
@@ -126,16 +126,20 @@
 <Data>
 
   <!-- ═══ CASE STUDY SLIDES ═══════════════════════════════════
-       One Group per slide. Each Group binds ONE article/story
-       DCR — case studies live in the same tree as insights
-       stories, differentiated by subcategory ("Case Study" or
-       "Expertise"). Typical path:
-         templatedata/article/story/data/<year>/<month>/<slug>
+       One Group per slide. Each Group binds ONE rbccm/casestudy
+       DCR. Typical path in this Teamsite install:
+         templatedata/rbccm/casestudy/data/<year>/<month>/<slug>
 
-       If your Teamsite installs case studies under a distinct
-       DCR type (e.g. Category="rbccm" Type="case-study"), change
-       the Category/Type below AND update the XSL's `$dcr`
-       selector root name to match.
+       Public URL (built in the XSL's story-url template):
+         /en/expertise/transactions/case-study/<year>/<month>/<slug>
+
+       The XSL binds $dcr as `DCR/*[1]` (wildcard root) so the
+       template stays working regardless of the casestudy
+       datacapture's actual root element name. Field selectors
+       inside the XSL (title, description, subcategory,
+       thumbnail, time_to_read) assume field names match the
+       article/story tree — adjust in the XSL if the casestudy
+       datacapture uses different names.
 
        MINIMUM 3 slides — enforced by the XSL. Below that the
        carousel has less visual weight than a single hero card
@@ -157,11 +161,12 @@
          Replicatable="true"
          CloneGroupID="case-studies-slide">
 
-    <!-- DCR picker. Scoped to Category="article" Type="story"
-         (same tree how-we-think Insights uses). Author browses
-         the standard story tree and picks a case study. -->
+    <!-- DCR picker. Scoped to Category="rbccm" Type="casestudy"
+         so the author only sees case-study records in the
+         picker. Nested <DCR> element must be present but empty
+         (a default path becomes a phantom publish dependency). -->
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR Category="article" Type="story"></DCR>
+      <DCR Category="rbccm" Type="casestudy"></DCR>
     </Datum>
 
     <!-- ── Per-slide overrides ──

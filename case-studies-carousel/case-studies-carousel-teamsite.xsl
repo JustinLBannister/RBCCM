@@ -16,7 +16,12 @@
   <xsl:template name="story-url">
     <xsl:param name="path" select="''"/>
     <xsl:if test="$path != ''">
-      <xsl:text>/en/story/story.page?dcr=</xsl:text><xsl:value-of select="$path"/>
+      <xsl:variable name="tail" select="substring-after($path, 'templatedata/rbccm/casestudy/data/')"/>
+      <xsl:text>/en/expertise/transactions/case-study/</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$tail != ''"><xsl:value-of select="$tail"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$path"/></xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -214,6 +219,7 @@
     <xsl:variable name="eyebrow">
       <xsl:choose>
         <xsl:when test="$ovEyebrow != ''"><xsl:value-of select="$ovEyebrow"/></xsl:when>
+        <xsl:when test="normalize-space($dcr/eyebrow) != ''"><xsl:value-of select="normalize-space($dcr/eyebrow)"/></xsl:when>
         <xsl:when test="normalize-space($dcr/subcategory) != ''"><xsl:value-of select="normalize-space($dcr/subcategory)"/></xsl:when>
         <xsl:otherwise>Expertise</xsl:otherwise>
       </xsl:choose>
@@ -359,7 +365,7 @@
          CloneGroupID="case-studies-slide">
 
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR Category="article" Type="story"></DCR>
+      <DCR Category="rbccm" Type="casestudy"></DCR>
     </Datum>
 
     

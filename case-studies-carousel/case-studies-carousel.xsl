@@ -83,16 +83,28 @@
   </xsl:template>
 
   <!-- ═══════════════════════════════════════════════════════════════════
-       story-url — resolve a story DCR's public URL from its path.
-       Case studies live at /en/story/story.page?dcr=<full-dcr-path>,
-       same route the insights stories use. Falls back to # if the DCR
-       has no path yet (author dropped a slide but hasn't picked a
-       record).
+       story-url — resolve a case-study DCR's public URL.
+       Case studies live under
+         /en/expertise/transactions/case-study/<year>/<month>/<slug>
+       (example the client confirmed:
+         /en/expertise/transactions/case-study/2025/09/bloomberg_brings_dynamic_multi-asset_index_to_fia_market).
+       DCR paths from the picker come back as
+         templatedata/rbccm/casestudy/data/<year>/<month>/<slug>
+       so we slice off the templatedata/... prefix and prepend the
+       case-study route. If the picker ever returns a path that
+       doesn't carry the standard prefix (author supplied a raw path),
+       we fall back to the value as-is under the same case-study
+       route to avoid emitting a broken href.
        ═══════════════════════════════════════════════════════════════════ -->
   <xsl:template name="story-url">
     <xsl:param name="path" select="''"/>
     <xsl:if test="$path != ''">
-      <xsl:text>/en/story/story.page?dcr=</xsl:text><xsl:value-of select="$path"/>
+      <xsl:variable name="tail" select="substring-after($path, 'templatedata/rbccm/casestudy/data/')"/>
+      <xsl:text>/en/expertise/transactions/case-study/</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$tail != ''"><xsl:value-of select="$tail"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$path"/></xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -324,11 +336,18 @@
        ============================================================= -->
   <xsl:template name="render-slide">
 
-    <!-- Bound record (see the DCR TREE ↔ ROOT ELEMENT MAP comment at
-         the top of this file). If a field access below is silently
-         empty in preview, the root name is the first thing to check —
-         story-tiles-default and the deals datacapture both root at
-         `press_release`, so it's the safe default for article/*. -->
+    <!-- Bound record. Case studies live at templatedata/rbccm/casestudy
+         and — per the datacapture — reuse the SAME `press_release`
+         root element as the article/story tree. Field names on the
+         datacapture we consume:
+           eyebrow       — new; wired into $eyebrow resolution below
+           title         — headline
+           description   — summary paragraph
+           subcategory   — legacy fallback for eyebrow
+           thumbnail     — 1200x628 tile image path
+           time_to_read  — auto-generated for text, manual otherwise
+         Publish date, video, banner, keypoints, region, industry are
+         also on the record but the carousel doesn't surface them. -->
     <xsl:variable name="dcr"     select="Datum[@Name='Case Study Record']/DCR/press_release"/>
     <xsl:variable name="dcrPath" select="Datum[@Name='Case Study Record']/DCR/@path"/>
 
@@ -345,10 +364,15 @@
     <xsl:variable name="ovLink"     select="normalize-space(Datum[@Name='Card Link URL'])"/>
     <xsl:variable name="ovNewTab"   select="Datum[@Name='Open Card Link in New Tab'] = 'true'"/>
 
-    <!-- Resolve: override > record > default -->
+    <!-- Resolve: per-slide override > record eyebrow > record subcategory > default.
+         `eyebrow` is the casestudy datacapture's dedicated Above-Title
+         field; `subcategory` is kept as a fallback for older records
+         where the eyebrow field is empty but subcategory carries the
+         label. Final default is "Expertise" (matches the live site). -->
     <xsl:variable name="eyebrow">
       <xsl:choose>
         <xsl:when test="$ovEyebrow != ''"><xsl:value-of select="$ovEyebrow"/></xsl:when>
+        <xsl:when test="normalize-space($dcr/eyebrow) != ''"><xsl:value-of select="normalize-space($dcr/eyebrow)"/></xsl:when>
         <xsl:when test="normalize-space($dcr/subcategory) != ''"><xsl:value-of select="normalize-space($dcr/subcategory)"/></xsl:when>
         <xsl:otherwise>Expertise</xsl:otherwise>
       </xsl:choose>
