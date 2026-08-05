@@ -58,7 +58,11 @@
   padding: 0;
   /* Fade the real tile row in once the Filter By component has finished
      initializing (see [data-filter-ready] below). Prevents the "all
-     tiles flash → some hide → visible tiles reveal" jump on page load. */
+     tiles flash → some hide → visible tiles reveal" jump on page load.
+     The XSL emits `data-filter-ready="true"` on the section by default
+     for the stand-alone case (no filter-by present); when filter-by
+     IS on the page it starts by removing that attribute and re-adds
+     it once ready. */
   opacity: 0;
   transition: opacity 0.25s ease-out;
 }

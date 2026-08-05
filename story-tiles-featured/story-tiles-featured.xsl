@@ -382,6 +382,14 @@
            falls back to left (default), blank scheme to light. -->
       <xsl:attribute name="class">rbccm-story-tiles<xsl:if test="$CFG_COLOR_SCHEME = 'dark'"> rbccm-story-tiles--on-dark</xsl:if><xsl:if test="$CFG_HEADING_ALIGN = 'center'"> rbccm-story-tiles--headings-centered</xsl:if></xsl:attribute>
       <xsl:attribute name="id">rbccm-story-tiles</xsl:attribute>
+      <!-- Emit data-filter-ready="true" up-front so the tile row
+           renders immediately in the stand-alone case (no filter-by
+           on the page). If filter-by IS present, its init code
+           starts by flipping this to false, then re-adds true when
+           the filter dropdowns are populated. Without this, the
+           CSS keeps the tiles at opacity: 0 and the skeleton
+           shimmering forever. -->
+      <xsl:attribute name="data-filter-ready">true</xsl:attribute>
       <!-- Inline style bundles padding overrides + optional bg
            colour override into one attribute. Any blank Datum
            emits nothing; CSS falls back to its own defaults for
