@@ -111,7 +111,9 @@
   /* Darker base so the shimmer sweep reads clearly on top. */
   background: #e0e0e0;
   border: 1px solid #d5d5d5;
-  border-radius: 8px;
+  /* No border-radius — matches the site standard (flat cards
+     everywhere, no rounded corners on tiles or buttons). */
+  border-radius: 0;
   overflow: hidden;
   position: relative;
   min-height: 400px;
@@ -648,7 +650,9 @@ a.rbccm-story-tiles__insight:active {
   font-weight: 500;
   line-height: normal;
   text-decoration: none;
-  border-radius: 4px;
+  /* No border-radius — matches the site standard (flat cards
+     and flat buttons across the RBCCM component library). */
+  border-radius: 0;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
@@ -679,6 +683,33 @@ a.rbccm-story-tiles__insight:active {
   background: var(--Blue-Dark-Blue, #003168);
   border-color: var(--Blue-Dark-Blue, #003168);
   color: #ffffff;
+  outline: none;
+}
+
+/* ---------- Anchor-specific override chain ----------
+   The site's global `a:link, a:visited { color: #006ac3 }` rules
+   (unified.css, unified2.css, new-components.css) have specificity
+   0,1,1 and would win over our plain-class rule above (0,1,0),
+   repainting the button label blue at rest AND wiping the white
+   colour on hover/focus. Type-prefixing (`a.__view-all:link`) lifts
+   specificity to 0,2,1 which beats every site default. Chain
+   covers every link state so the colour holds through the full
+   interaction. Same defensive pattern used on how-we-think tiles
+   + case-studies cards. */
+a.rbccm-story-tiles__view-all,
+a.rbccm-story-tiles__view-all:link,
+a.rbccm-story-tiles__view-all:visited,
+a.rbccm-story-tiles__view-all:active {
+  color: #ffffff;
+  text-decoration: none;
+}
+a.rbccm-story-tiles__view-all:hover,
+a.rbccm-story-tiles__view-all:focus,
+a.rbccm-story-tiles__view-all:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  text-decoration: none;
   outline: none;
 }
 

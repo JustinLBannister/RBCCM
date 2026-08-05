@@ -48,7 +48,22 @@
        Heading + Subheading render above the tile grid. Blank
        either / both drops the corresponding tag — no empty <h2>
        or empty <p> markup, and no phantom margin. -->
-  <xsl:variable name="CFG_HEADING"      select="normalize-space(/Properties/Datum[@ID='Heading'])" />
+  <!-- Heading — falls back to "Latest insights" if the DCR is
+       blank OR was saved before the Heading Datum existed (in
+       which case there's no <Datum ID='Heading'> node at all).
+       Matches the pattern every other RBCCM component uses
+       (case-studies-carousel, how-we-think, featured-
+       conferences). The properties.xml default only pre-
+       populates the DCR editor for NEW instances — runtime XSL
+       has to supply its own fallback. -->
+  <xsl:variable name="CFG_HEADING">
+    <xsl:choose>
+      <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])" />
+      </xsl:when>
+      <xsl:otherwise>Latest insights</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
   <xsl:variable name="CFG_SUBHEADING"   select="/Properties/Datum[@ID='Subheading']" />
   <xsl:variable name="CFG_HEADING_ID"   select="normalize-space(/Properties/Datum[@ID='HeadingId'])" />
 
@@ -405,23 +420,23 @@
              <p> markup, and no phantom margin. The whole header
              wrapper is skipped when both are blank so the tiles
              sit flush against the top of the container. -->
-        <xsl:if test="$CFG_HEADING != '' or normalize-space($CFG_SUBHEADING) != ''">
-          <div class="rbccm-story-tiles__header">
-            <xsl:if test="$CFG_HEADING != ''">
-              <h2 class="rbccm-story-tiles__heading">
-                <xsl:if test="$CFG_HEADING_ID != ''">
-                  <xsl:attribute name="id"><xsl:value-of select="$CFG_HEADING_ID" /></xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="$CFG_HEADING" />
-              </h2>
+        <!-- Header always renders now that Heading has a baked-in
+             fallback default. Subheading paragraph stays truly
+             optional — dropped from the DOM when the Subheading
+             Datum is blank so we don't leave an empty <p>. -->
+        <div class="rbccm-story-tiles__header">
+          <h2 class="rbccm-story-tiles__heading">
+            <xsl:if test="$CFG_HEADING_ID != ''">
+              <xsl:attribute name="id"><xsl:value-of select="$CFG_HEADING_ID" /></xsl:attribute>
             </xsl:if>
-            <xsl:if test="normalize-space($CFG_SUBHEADING) != ''">
-              <p class="rbccm-story-tiles__subheading">
-                <xsl:value-of select="$CFG_SUBHEADING" disable-output-escaping="yes" />
-              </p>
-            </xsl:if>
-          </div>
-        </xsl:if>
+            <xsl:value-of select="$CFG_HEADING" />
+          </h2>
+          <xsl:if test="normalize-space($CFG_SUBHEADING) != ''">
+            <p class="rbccm-story-tiles__subheading">
+              <xsl:value-of select="$CFG_SUBHEADING" disable-output-escaping="yes" />
+            </p>
+          </xsl:if>
+        </div>
 
         <!-- Skeleton placeholders — shown until the Filter By JS finishes
              initializing (marker attribute `data-filter-ready="true"`).
