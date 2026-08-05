@@ -1,0 +1,554 @@
+/* ============================================================
+   RBC CM — Case Studies Carousel
+   All rules scoped to .rbccm-case-studies
+   Mobile-first; layout switches at min-width: 1300px
+   ============================================================
+   Consumed by case-studies-carousel.xsl. Slick runs at every
+   viewport (1-per-view); arrows always visible; arrows swap
+   from plain-chevron (below track, <1300) to chevron-in-circle
+   (outside track, >=1300). Dot pattern ported from leadership-
+   carousel so both components stay visually aligned.
+
+   Deploy at: /assets/rbccm/css/components/case-studies-carousel.css
+             (path referenced from the skin's <link>).
+   ============================================================ */
+
+/* Design tokens — scoped to the section so the --cs-* names
+   don't leak into the page's global :root. */
+.rbccm-case-studies {
+  --cs-navy:      #002144;
+  --cs-navy-med:  #003168;
+  --cs-blue:      #0051A5;
+  --cs-blue-br:   #006AC3;
+  --cs-yellow:    #FFC72C;
+  --cs-ink:       #082043;
+  --cs-text:      #494949;
+  --cs-muted:     #6B7280;
+  --cs-hairline:  #E5E7EB;
+  --cs-border:    #A8A8A8;
+  --cs-white:     #FFFFFF;
+  --cs-serif:     "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --cs-sans:      Roboto, Arial, sans-serif;
+  /* Padding tokens — XSL writes overrides as inline properties
+     on the section; these var() fallbacks are the defaults. */
+  --cs-pad-top-mobile:     40px;
+  --cs-pad-bottom-mobile:  40px;
+  --cs-pad-top-desktop:    64px;
+  --cs-pad-bottom-desktop: 64px;
+}
+
+/* ---------- Section shell ---------- */
+
+.rbccm-case-studies {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: var(--cs-pad-top-mobile) 16px var(--cs-pad-bottom-mobile);
+  background: #fff;
+  box-sizing: border-box;
+}
+@media (min-width: 992px)  {
+  .rbccm-case-studies {
+    padding: var(--cs-pad-top-desktop) 24px var(--cs-pad-bottom-desktop);
+    gap: 32px;
+  }
+}
+@media (min-width: 1440px) {
+  .rbccm-case-studies { padding: var(--cs-pad-top-desktop) 170px var(--cs-pad-bottom-desktop); }
+}
+.rbccm-case-studies *,
+.rbccm-case-studies *::before,
+.rbccm-case-studies *::after { box-sizing: border-box; }
+
+/* Inner content rail — heading + carousel + view-all all
+   centre on the same 1140 rail. The carousel itself breaks
+   OUT of this rail at ≥1300px via negative side margins so
+   the arrows can sit in the section's outer gutter (same
+   pattern as leadership-carousel). */
+.rbccm-case-studies__container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/* Scroll-margin-top on the heading — kicks in when the H2 has
+   an id set via the HeadingId Datum, so anchor links landing on
+   this section clear the sticky nav. */
+.rbccm-case-studies__heading[id] { scroll-margin-top: 167px; }
+
+/* ---------- Header (H2 + optional intro) ---------- */
+
+.rbccm-case-studies__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 32px;
+}
+.rbccm-case-studies__heading {
+  color: #002144;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+}
+@media (min-width: 992px) {
+  .rbccm-case-studies__heading { font-size: 29px; line-height: 34.8px; letter-spacing: 1px; }
+}
+.rbccm-case-studies__intro {
+  color: #003168;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+  max-width: 780px;
+}
+
+/* ---------- Carousel wrapper ----------
+   Ported from leadership-carousel.__carousel. Two layouts:
+
+   <1300: 5-col grid, arrows sit BELOW the track alongside the
+          dots (`prev · dots · next` centred on row 2). Track
+          spans row 1. Keeps everything inside the 1140 rail.
+
+   >=1300: 3-col grid, track locked at 1140 in the middle,
+           arrows live in `auto` columns OUTSIDE the rail. The
+           wrapper itself extends beyond the __container via
+           negative side margins so the arrows sit in the
+           section's gutter without shrinking the track. */
+.rbccm-case-studies__carousel {
+  align-items: center;
+  box-sizing: border-box;
+  display: grid;
+  gap: 24px 26px;
+  grid-template-columns: 1fr auto auto auto 1fr;
+  grid-template-areas:
+    "track track track track track"
+    ".     prev  dots  next  .";
+  margin: 32px auto 0;
+  max-width: 1140px;
+  width: 100%;
+}
+@media (min-width: 1300px) {
+  .rbccm-case-studies__carousel {
+    column-gap: 24px;
+    grid-template-areas:
+      "prev track next"
+      ".    dots  .";
+    grid-template-columns: auto 1140px auto;
+    margin: 32px -68px 0 -68px;
+    max-width: none;
+  }
+}
+/* Grid-area assignment. Class-based (not ID-based) so multi-
+   instance carousels on the same page don't collide. */
+.rbccm-case-studies__btn--prev  { grid-area: prev; }
+.rbccm-case-studies__track      { grid-area: track; min-width: 0; }
+.rbccm-case-studies__btn--next  { grid-area: next; }
+.rbccm-case-studies__dots-wrap  { grid-area: dots; justify-self: center; }
+
+
+/* ---------- Arrow buttons — leadership pattern ----------
+   Mobile chevron (14x24 plain), desktop chevron in outlined
+   circle (44x44). Both SVGs live in each __btn; CSS swaps
+   which one renders based on the same 1300 breakpoint as the
+   __carousel grid switch. */
+.rbccm-case-studies__btn {
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  height: 44px;
+  justify-content: center;
+  padding: 0;
+  width: 44px;
+}
+.rbccm-case-studies__btn:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.rbccm-case-studies__btn svg { display: block; }
+
+.rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: block; }
+.rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: none; }
+@media (min-width: 1300px) {
+  .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: none; }
+  .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: block; }
+}
+
+/* Desktop arrow hover — fills the circle blue, chevron flips
+   to white. Targets the SVG paths directly. */
+.rbccm-case-studies__btn-icon--desktop rect,
+.rbccm-case-studies__btn-icon--desktop path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop rect { fill: #003168; }
+.rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop path { stroke: #ffffff; }
+
+
+/* ---------- Track / slide ---------- */
+
+.rbccm-case-studies__track {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.rbccm-case-studies__track.slick-initialized {
+  display: block;
+  gap: 0;
+}
+
+/* accessible-slick ships default padding on .slick-list (used
+   for its centerPadding behaviour) and a margin on .slick-track.
+   Both need zeroing for 1-per-view so the active slide fills
+   the full track. Same fix story-carousel needed (tasks 131/142). */
+.rbccm-case-studies__track.slick-initialized .slick-list {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.rbccm-case-studies__track.slick-initialized .slick-track {
+  display: flex;
+  align-items: stretch;
+  margin: 0 !important;
+}
+.rbccm-case-studies__track.slick-initialized .slick-slide { height: auto; }
+.rbccm-case-studies__track.slick-initialized .slick-slide > div { height: 100%; }
+.rbccm-case-studies__track.slick-initialized .rbccm-case-studies__slide {
+  display: flex !important;
+  height: 100%;
+}
+.rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
+
+.rbccm-case-studies__slide { width: 100%; }
+
+
+/* ---------- Card ----------
+   Visuals ported wholesale from how-we-think tiles so the two
+   components share the same border, hover, typography and CTA
+   treatment. Structural difference: how-we-think stacks a tall
+   tile (image on top, body below); case-studies uses a
+   horizontal card (image left, body right) on tablet+ and
+   stacks to 1 column on mobile. */
+.rbccm-case-studies__card {
+  align-items: stretch;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .rbccm-case-studies__card { flex-direction: row; }
+}
+/* Beat Bootstrap 3's `a:focus, a:hover` blue underline default —
+   same specificity trick how-we-think uses. */
+a.rbccm-case-studies__card,
+a.rbccm-case-studies__card:link,
+a.rbccm-case-studies__card:visited,
+a.rbccm-case-studies__card:hover,
+a.rbccm-case-studies__card:focus,
+a.rbccm-case-studies__card:focus-visible,
+a.rbccm-case-studies__card:active {
+  color: #000;
+  text-decoration: none;
+  outline-offset: 0;
+}
+
+/* Media — mobile 16:9 above the body, tablet+ takes half the
+   card width. `overflow: hidden` clips the 1.08 scale on hover
+   so it doesn't shift the card. */
+.rbccm-case-studies__media {
+  align-self: stretch;
+  background: #003168 center/cover no-repeat;
+  flex-shrink: 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+@media (min-width: 768px) {
+  .rbccm-case-studies__media {
+    aspect-ratio: auto;
+    width: 50%;
+    min-height: 320px;
+  }
+}
+.rbccm-case-studies__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+}
+
+/* Body — vertical stack: eyebrow / divider / title / desc /
+   CTA. min-height carves out room so the CTA can `margin-top:
+   auto` and pin to the bottom without collapsing. */
+.rbccm-case-studies__body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 240px;
+  padding: 24px;
+}
+@media (min-width: 992px) {
+  .rbccm-case-studies__body { padding: 32px; min-height: 315px; }
+}
+
+/* Eyebrow — Roboto Light 14/140 wt 400, LS 2, #006AC3 uppercase
+   (matches how-we-think tile eyebrow). */
+.rbccm-case-studies__eyebrow {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+/* Yellow divider — 30.9px baseline, widens to 56 on card hover
+   / focus-within. */
+.rbccm-case-studies__divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+/* Title — Roboto Medium 20/125 wt 400 #000 (matches how-we-think). */
+.rbccm-case-studies__title {
+  color: #000;
+  font-family: "Roboto Medium", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 125%;
+  margin: 10px 0 10px 0;
+}
+@media (min-width: 992px) {
+  .rbccm-case-studies__title { font-size: 22px; }
+}
+/* Description — Roboto Light 14/140 wt 400 #555, LS 0.5. */
+.rbccm-case-studies__desc {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  line-height: 140%;
+  margin: 0 0 20px 0;
+}
+/* CTA (read-time) — inline-flex + fit-content so the hover
+   border-bottom only underlines the label + arrow, not the
+   full card width. */
+.rbccm-case-studies__cta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-case-studies__cta svg { flex-shrink: 0; }
+
+/* Hover / focus — gated by (hover: hover) so touch devices
+   skip the transforms. Same trio as how-we-think:
+     card border → brand blue
+     image → scale 1.08
+     yellow divider → widens to 56
+     CTA gains currentColor underline */
+@media (hover: hover) {
+  .rbccm-case-studies__card:hover {
+    border-color: #0051A5;
+    outline: none;
+  }
+  .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
+  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
+    transform: scale(1.08);
+  }
+  .rbccm-case-studies__card:hover .rbccm-case-studies__divider,
+  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__divider {
+    width: 56px;
+  }
+  .rbccm-case-studies__card:hover .rbccm-case-studies__cta,
+  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__cta {
+    border-bottom-color: currentColor;
+  }
+}
+/* Keyboard focus mirrors hover (blue border, no double ring). */
+.rbccm-case-studies__card:focus { outline: none; }
+.rbccm-case-studies__card:focus-visible { border-color: #0051A5; outline: none; }
+
+/* Reduced-motion — kill all card transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-case-studies__card,
+  .rbccm-case-studies__media img,
+  .rbccm-case-studies__divider,
+  .rbccm-case-studies__cta {
+    transition: none !important;
+  }
+  .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
+  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
+    transform: none !important;
+  }
+}
+
+
+/* =====================================================
+   DOTS — ported verbatim from leadership-carousel.css
+   (SVG data URI outlined-circle default, filled with
+   box-shadow ring on active / hover / focus-visible).
+   Same shape and specificity so this block can lift
+   straight into a shared partial down the line.
+   ===================================================== */
+
+.rbccm-case-studies__dots-wrap {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: flex !important;
+  /* Wrap dots onto a second line when the count outgrows the
+     row. Tighter column-gap on mobile means ~16 dots fit on a
+     375px screen before a second row is needed. Row-gap kicks
+     in only if wrapping happens; single-row cases unaffected. */
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  width: auto !important;
+}
+@media (min-width: 992px) {
+  #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
+    gap: 12px 26px;
+  }
+}
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex !important;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button {
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+}
+/* Inactive dot: outlined circle */
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  width: 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+/* Active dot: filled circle + 4px ring via box-shadow. Same
+   treatment for keyboard focus (:focus-visible) and hover. */
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li.slick-active button::before,
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible::before,
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+  height: 11px !important;
+  width: 11px !important;
+  outline: 0;
+}
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible { outline: none; }
+/* accessible-slick specifics — it injects <span class="slick-dot-icon">
+   inside each button and applies a default ::before border. Both need
+   suppressing so our custom SVG-data-URI dots render cleanly. Same
+   fix story-carousel added (tasks 142 + 143). */
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon,
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon::before {
+  display: none !important;
+}
+#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::after {
+  border: 0 !important;
+  display: none !important;
+}
+
+
+/* ---------- View all CTA ---------- */
+.rbccm-case-studies__viewall-wrap {
+  display: flex;
+  justify-content: center;
+  /* 40px (not 32) because the dots strip is short (~11px) —
+     the row below the track collapses to almost nothing at
+     ≥1300 where the arrows sit outside, so 32px feels tight
+     against the CTA. */
+  margin-top: 40px;
+}
+.rbccm-case-studies__viewall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  padding: 12px 32px;
+  border: 1px solid #003168;
+  background: transparent;
+  color: #003168;
+  font-family: Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.rbccm-case-studies__viewall:hover,
+.rbccm-case-studies__viewall:focus-visible {
+  background: #003168;
+  color: #fff;
+  outline: none;
+  text-decoration: none;
+}

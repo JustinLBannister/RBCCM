@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Case Studies Carousel — local preview</title>
+
+  <!-- accessible-slick (drop-in replacement for slick-carousel with
+       WAI-ARIA support baked in) — same version story-carousel,
+       leadership-carousel, and icon-carousel already load site-wide.
+       Production loads it once site-wide; the local demo pulls it
+       from CDN. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@accessible360/accessible-slick@1.0.1/slick/slick.min.css"/>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@accessible360/accessible-slick@1.0.1/slick/slick.min.js"></script>
+
+  <style>
+    /* ==========================================================
+       Case Studies Carousel — local preview
+       ==========================================================
+       Very simple slider — 1 card per view, one horizontal card
+       (image left, text right). H2 + optional intro up top,
+       "View all" outlined CTA below.
+
+       Arrows + dots use the SAME markup + CSS as the leadership
+       slider (see leadership-carousel.css). Anywhere you see a
+       __btn or __dots-wrap block below, the intent is that this
+       lives in a shared partial (e.g. rbccm-slider-controls.css)
+       once we start extracting it — nothing here is bespoke.
+
+       Stack on mobile: slick `unslick` at <992px; cards fall back
+       to the natural flex-column stack (the mobile-first CSS).
+       ========================================================== */
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: Roboto, Arial, sans-serif;
+      color: #494949;
+      background: #fff;
+      line-height: 1.5;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ---------- Section shell ---------- */
+
+    .rbccm-case-studies {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 40px 16px;
+      background: #fff;
+    }
+    @media (min-width: 992px)  { .rbccm-case-studies { padding: 64px 24px; gap: 32px; } }
+    @media (min-width: 1440px) { .rbccm-case-studies { padding: 64px 170px; } }
+
+    /* Inner content rail — heading + carousel + view-all all
+       centre on the same 1140 rail. The carousel itself breaks
+       OUT of this rail at ≥1300px via negative side margins so
+       the arrows can sit in the section's outer gutter (same
+       pattern as leadership-carousel). */
+    .rbccm-case-studies__container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Header (H2 + optional intro) ---------- */
+
+    .rbccm-case-studies__header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 0 0 32px;
+    }
+    .rbccm-case-studies__heading {
+      color: #002144;
+      font-family: RBCDisplay, Georgia, Times, serif;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.2;
+      margin: 0;
+    }
+    @media (min-width: 992px) {
+      .rbccm-case-studies__heading { font-size: 29px; line-height: 34.8px; letter-spacing: 1px; }
+    }
+    .rbccm-case-studies__intro {
+      color: #003168;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 24px;
+      margin: 0;
+      max-width: 780px;
+    }
+
+    /* ---------- Carousel wrapper ----------
+       Ported from leadership-carousel.__carousel. Two layouts:
+
+       <1300: 5-col grid, arrows sit BELOW the track alongside the
+              dots (`prev · dots · next` centred on row 2). Track
+              spans the full row 1. Keeps everything inside the
+              1140 content rail.
+
+       >=1300: 3-col grid, track locked at 1140 in the middle,
+               arrows live in `auto` columns OUTSIDE the rail.
+               Wrapper itself extends beyond the __container via
+               negative side margins so the arrows sit in the
+               section's gutter without shrinking the track.
+
+       <992: unslick — cards fall back to a flex column stack;
+             the arrows / dots hide via CSS. */
+    .rbccm-case-studies__carousel {
+      align-items: center;
+      box-sizing: border-box;
+      display: grid;
+      gap: 24px 26px;
+      grid-template-columns: 1fr auto auto auto 1fr;
+      grid-template-areas:
+        "track track track track track"
+        ".     prev  dots  next  .";
+      margin: 32px auto 0;
+      max-width: 1140px;
+      width: 100%;
+    }
+    @media (min-width: 1300px) {
+      .rbccm-case-studies__carousel {
+        column-gap: 24px;
+        grid-template-areas:
+          "prev track next"
+          ".    dots  .";
+        grid-template-columns: auto 1140px auto;
+        margin: 32px -68px 0 -68px;
+        max-width: none;
+      }
+    }
+    /* Grid-area assignment. Using class modifiers instead of IDs
+       so multiple instances of the carousel on the same page
+       don't collide on `#rbccm-cs-prev`/`#rbccm-cs-next` — same
+       reason story-carousel and secondary-nav went class-based. */
+    .rbccm-case-studies__btn--prev  { grid-area: prev; }
+    .rbccm-case-studies__track      { grid-area: track; min-width: 0; }
+    .rbccm-case-studies__btn--next  { grid-area: next; }
+    .rbccm-case-studies__dots-wrap  { grid-area: dots; justify-self: center; }
+
+    /* ---------- Arrow buttons — leadership pattern ----------
+       Mobile chevron (SVG 14x24), desktop chevron in outlined
+       circle (SVG 44x44). Same class shape as leadership so a
+       future shared partial can pick this up unchanged.
+       __btn-icon--mobile shows <992, __btn-icon--desktop shows
+       >=992. */
+    .rbccm-case-studies__btn {
+      align-items: center;
+      background: none;
+      border: none;
+      display: flex;                 /* always visible — slick runs at all viewports */
+      height: 44px;
+      justify-content: center;
+      padding: 0;
+      width: 44px;
+    }
+    .rbccm-case-studies__btn:focus-visible {
+      outline: 2px solid #0051A5;
+      outline-offset: 2px;
+      border-radius: 50%;
+    }
+    .rbccm-case-studies__btn svg { display: block; }
+
+    /* Chevron swap is tied to WHERE the arrows sit, not just the
+       viewport size:
+         <1300  arrows sit BELOW the track alongside the dots →
+                plain chevron (no ring), matches mobile treatment
+         >=1300 arrows sit BESIDE the track in the outer gutter →
+                chevron inside outlined circle
+       Same swap-point as the __carousel grid switch above so the
+       two always change together. */
+    .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: block; }
+    .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: none; }
+    @media (min-width: 1300px) {
+      .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: none; }
+      .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: block; }
+    }
+
+    /* Desktop arrow hover — fills the circle blue, chevron flips
+       to white. Same as leadership. */
+    .rbccm-case-studies__btn-icon--desktop rect,
+    .rbccm-case-studies__btn-icon--desktop path {
+      transition: fill 0.2s ease, stroke 0.2s ease;
+    }
+    .rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop rect { fill: #003168; }
+    .rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop path { stroke: #ffffff; }
+
+    /* ---------- Track / slide / card ---------- */
+
+    .rbccm-case-studies__track {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+    .rbccm-case-studies__track.slick-initialized {
+      display: block;
+      gap: 0;
+    }
+
+    /* ---------- Card ---------------------------------------------
+       Visuals ported wholesale from how-we-think tiles so the two
+       components share the same border, hover, typography and CTA
+       treatment. Structural difference: how-we-think stacks a tall
+       tile (image on top, body below); case-studies uses a
+       horizontal card (image left, body right) on tablet+ and
+       stacks to 1 column on mobile. The child styling — border
+       colour flip, image scale, yellow-divider stretch,
+       CTA-border underline — is identical. */
+    .rbccm-case-studies__slide { width: 100%; }
+    .rbccm-case-studies__card {
+      align-items: stretch;
+      background: #FFF;
+      border: 1px solid #A8A8A8;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100%;
+      overflow: hidden;
+      text-decoration: none;
+      transition: border-color 0.15s ease;
+      width: 100%;
+    }
+    @media (min-width: 768px) {
+      .rbccm-case-studies__card { flex-direction: row; }
+    }
+    /* Beat Bootstrap 3's `a:focus, a:hover` blue underline default —
+       same specificity trick how-we-think uses. */
+    a.rbccm-case-studies__card,
+    a.rbccm-case-studies__card:link,
+    a.rbccm-case-studies__card:visited,
+    a.rbccm-case-studies__card:hover,
+    a.rbccm-case-studies__card:focus,
+    a.rbccm-case-studies__card:focus-visible,
+    a.rbccm-case-studies__card:active {
+      color: #000;
+      text-decoration: none;
+      outline-offset: 0;
+    }
+
+    /* Media — mobile 16:9 above the body, tablet+ takes half the
+       card width. `overflow: hidden` clips the 1.08 scale on hover
+       so it doesn't shift the card. */
+    .rbccm-case-studies__media {
+      align-self: stretch;
+      background: #003168 center/cover no-repeat;
+      flex-shrink: 0;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+    }
+    @media (min-width: 768px) {
+      .rbccm-case-studies__media {
+        aspect-ratio: auto;
+        width: 50%;
+        min-height: 320px;
+      }
+    }
+    .rbccm-case-studies__media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.4s ease;
+    }
+
+    /* Body — vertical stack: eyebrow / divider / title / desc /
+       CTA. min-height carves out room so the CTA can `margin-top:
+       auto` and pin to the bottom without collapsing. */
+    .rbccm-case-studies__body {
+      align-items: flex-start;
+      align-self: stretch;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 240px;
+      padding: 24px;
+    }
+    @media (min-width: 992px) {
+      .rbccm-case-studies__body { padding: 32px; min-height: 315px; }
+    }
+
+    /* Eyebrow — Roboto Light 14/140 wt 400, LS 2, #006AC3
+       uppercase (matches how-we-think). */
+    .rbccm-case-studies__eyebrow {
+      color: #006AC3;
+      font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      line-height: 140%;
+      margin: 0 0 5px 0;
+      text-transform: uppercase;
+    }
+    /* Yellow divider — 30.9px baseline, widens to 56 on card
+       hover / focus-within. */
+    .rbccm-case-studies__divider {
+      background: #FFC72C;
+      flex-shrink: 0;
+      height: 2px;
+      margin: 0;
+      transition: width 0.3s ease;
+      width: 30.9px;
+    }
+    /* Title — Roboto Medium 20/125 wt 400 #000 (same as
+       how-we-think). Horizontal card can breathe a touch on desktop. */
+    .rbccm-case-studies__title {
+      color: #000;
+      font-family: "Roboto Medium", Arial, sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: normal;
+      line-height: 125%;
+      margin: 10px 0 10px 0;
+    }
+    @media (min-width: 992px) {
+      .rbccm-case-studies__title { font-size: 22px; }
+    }
+    /* Description — Roboto Light 14/140 wt 400 #555, LS 0.5. */
+    .rbccm-case-studies__desc {
+      color: #555;
+      font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      line-height: 140%;
+      margin: 0 0 20px 0;
+    }
+    /* CTA (read-time) — inline-flex + fit-content so the hover
+       border-bottom only underlines the label + arrow, not the
+       full card width. `margin-top: auto` pins it to the bottom. */
+    .rbccm-case-studies__cta {
+      align-items: center;
+      border-bottom: 1px solid transparent;
+      color: #006AC3;
+      display: inline-flex;
+      font-family: Roboto, Arial, Verdana, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      gap: 7px;
+      letter-spacing: normal;
+      line-height: 20px;
+      margin: auto 0 0 0;
+      padding-bottom: 2px;
+      transition: border-color 0.2s ease;
+      width: fit-content;
+    }
+    .rbccm-case-studies__cta svg { flex-shrink: 0; }
+
+    /* Hover / focus — gated by (hover: hover) so touch devices
+       skip the transforms. Same trio as how-we-think:
+         card border → brand blue
+         image → scale 1.08
+         yellow divider → widens to 56
+         CTA gains currentColor underline */
+    @media (hover: hover) {
+      .rbccm-case-studies__card:hover {
+        border-color: #0051A5;
+        outline: none;
+      }
+      .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
+      .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
+        transform: scale(1.08);
+      }
+      .rbccm-case-studies__card:hover .rbccm-case-studies__divider,
+      .rbccm-case-studies__card:focus-visible .rbccm-case-studies__divider {
+        width: 56px;
+      }
+      .rbccm-case-studies__card:hover .rbccm-case-studies__cta,
+      .rbccm-case-studies__card:focus-visible .rbccm-case-studies__cta {
+        border-bottom-color: currentColor;
+      }
+    }
+    /* Keyboard focus mirrors hover (blue border, no double ring). */
+    .rbccm-case-studies__card:focus { outline: none; }
+    .rbccm-case-studies__card:focus-visible { border-color: #0051A5; outline: none; }
+
+    /* Reduced-motion — kill all card transitions. */
+    @media (prefers-reduced-motion: reduce) {
+      .rbccm-case-studies__card,
+      .rbccm-case-studies__media img,
+      .rbccm-case-studies__divider,
+      .rbccm-case-studies__cta {
+        transition: none !important;
+      }
+      .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
+      .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
+        transform: none !important;
+      }
+    }
+
+    /* ---------- slick equal-height slides ---------- */
+    /* accessible-slick ships default padding on .slick-list (used
+       for its centerPadding behaviour) and a margin on .slick-track
+       — both of which reveal the adjacent slide's edges when we're
+       running plain 1-per-view. Zero them so the active slide fills
+       the full track. Same fix story-carousel needed. */
+    .rbccm-case-studies__track.slick-initialized .slick-list {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .rbccm-case-studies__track.slick-initialized .slick-track {
+      display: flex;
+      align-items: stretch;
+      margin: 0 !important;
+    }
+    .rbccm-case-studies__track.slick-initialized .slick-slide { height: auto; }
+    .rbccm-case-studies__track.slick-initialized .slick-slide > div { height: 100%; }
+    .rbccm-case-studies__track.slick-initialized .rbccm-case-studies__slide {
+      display: flex !important;
+      height: 100%;
+    }
+    .rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
+
+
+    /* =====================================================
+       DOTS — ported verbatim from leadership-carousel.css
+       (SVG data URI outlined-circle default, filled with
+       box-shadow ring on active / hover / focus-visible).
+       Same shape and specificity so this block can lift
+       straight into a shared partial.
+       ===================================================== */
+
+    .rbccm-case-studies__dots-wrap {
+      align-items: center;
+      display: flex;
+      flex: 0 0 auto;
+      justify-content: center;
+    }
+
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
+      align-items: center;
+      bottom: auto !important;
+      display: flex !important;
+      /* Wrap dots onto a second line when the count outgrows the
+         row (mobile at ~10+ slides). Tighter gaps on narrow
+         viewports keep the wrap threshold higher — 16px column
+         gap on mobile means ~16 dots fit on a 375px screen before
+         a second row is needed. Row-gap kicks in only if wrapping
+         happens; single-row cases are unaffected. */
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      justify-content: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: static !important;
+      width: auto !important;
+    }
+    @media (min-width: 992px) {
+      #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
+        gap: 12px 26px;   /* wider column-gap on desktop, same as leadership */
+      }
+    }
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex !important;
+      height: 11px !important;
+      justify-content: center;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 11px !important;
+    }
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button {
+      background: none !important;
+      border: none !important;
+      box-sizing: border-box !important;
+      cursor: pointer;
+      display: block !important;
+      font-size: 0 !important;
+      height: 11px !important;
+      line-height: 0 !important;
+      margin: 0 !important;
+      outline: none;
+      padding: 0 !important;
+      position: static !important;
+      width: 11px !important;
+    }
+    /* Inactive dot: outlined circle */
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-size: 11px 11px !important;
+      content: '' !important;
+      display: block !important;
+      height: 11px !important;
+      opacity: 1 !important;
+      position: static !important;
+      width: 11px !important;
+      transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+    }
+    /* Active dot: filled circle + 4px ring via box-shadow. Same
+       treatment for keyboard focus (:focus-visible) and hover. */
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li.slick-active button::before,
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible::before,
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:hover::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+      background-size: 11px 11px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
+      height: 11px !important;
+      width: 11px !important;
+      outline: 0;
+    }
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible { outline: none; }
+    /* accessible-slick specifics — it injects its own dot glyph
+       <span class="slick-dot-icon"> inside each button and applies
+       a default ::before border/outline. Both need suppressing so
+       our custom SVG-data-URI dot styling above is what renders.
+       Same fix story-carousel added (tasks 142 + 143). */
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon,
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon::before {
+      display: none !important;
+    }
+    #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::after {
+      border: 0 !important;
+      display: none !important;
+    }
+
+
+    /* ---------- View all CTA ---------- */
+    .rbccm-case-studies__viewall-wrap {
+      display: flex;
+      justify-content: center;
+      /* 40px (not 32) because the dots strip is short (~11px) —
+         the row below the track collapses to almost nothing at
+         ≥1300 where the arrows sit outside, so 32px feels tight
+         against the CTA. 40px gives the dots breathing room
+         without breaking the section's overall vertical rhythm. */
+      margin-top: 40px;
+    }
+    .rbccm-case-studies__viewall {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 160px;
+      padding: 12px 32px;
+      border: 1px solid #003168;
+      background: transparent;
+      color: #003168;
+      font-family: Roboto, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 20px;
+      text-align: center;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .rbccm-case-studies__viewall:hover,
+    .rbccm-case-studies__viewall:focus-visible {
+      background: #003168;
+      color: #fff;
+      outline: none;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<section class="rbccm-case-studies" id="rbccm-case-studies" aria-labelledby="rbccm-case-studies-heading">
+  <div class="rbccm-case-studies__container">
+
+    <header class="rbccm-case-studies__header">
+      <h2 class="rbccm-case-studies__heading" id="rbccm-case-studies-heading">Signature case studies</h2>
+      <!-- Optional intro (uncomment when authored):
+      <p class="rbccm-case-studies__intro">Selected recent engagements from across Global Markets.</p>
+      -->
+    </header>
+
+    <!-- Carousel wrapper: [prev arrow] [track] [next arrow].
+         Arrows only render at ≥992 via CSS (unslick on mobile
+         means no arrows needed there anyway). -->
+    <div class="rbccm-case-studies__carousel">
+
+      <!-- PREV — leadership __btn markup verbatim -->
+      <button id="rbccm-cs-prev" class="rbccm-case-studies__btn rbccm-case-studies__btn--prev" tabindex="0" aria-label="Previous case study">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-case-studies__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-case-studies__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- TRACK — slick target. Each direct child = one slide. -->
+      <div class="rbccm-case-studies__track">
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="/en/expertise/transactions/case-study/2025/09/bloomberg_brings_dynamic_multi-asset_index_to_fia_market">
+            <div class="rbccm-case-studies__media">
+              <img loading="lazy" src="https://picsum.photos/seed/bloomberg-versa10/900/500" alt="" />
+            </div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Bloomberg brings dynamic multi-asset index to FIA market</h3>
+              <p class="rbccm-case-studies__desc">Bloomberg&rsquo;s VERSA 10 Index (BVERSA10) &mdash; developed with RBC Capital Markets &mdash; offers &hellip;</p>
+              <span class="rbccm-case-studies__cta">
+                4 min read
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="/en/expertise/transactions/case-study/2025/07/blackstone_and_cpp_investments_acquire_airtrunk_in_a24b_landmark_deal">
+            <div class="rbccm-case-studies__media">
+              <img loading="lazy" src="https://picsum.photos/seed/blackstone-airtrunk/900/500" alt="" />
+            </div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Blackstone and CPP Investments acquire AirTrunk in A$24B landmark deal</h3>
+              <p class="rbccm-case-studies__desc">RBC Capital Markets acts as joint financial advisor and lead structuring bank to Blackstone and &hellip;</p>
+              <span class="rbccm-case-studies__cta">
+                3 min read
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="/en/expertise/transactions/case-study/2025/02/kroger_sells_specialty_pharmacy_business_to_elevance_health_in_464m_deal">
+            <div class="rbccm-case-studies__media">
+              <img loading="lazy" src="https://picsum.photos/seed/kroger-elevance/900/500" alt="" />
+            </div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Kroger sells specialty pharmacy business to Elevance Health in $464M deal</h3>
+              <p class="rbccm-case-studies__desc">In October 2024, The Kroger Co. completed the sale of its specialty pharmacy business to &hellip;</p>
+              <span class="rbccm-case-studies__cta">
+                3 min read
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="/en/expertise/transactions/case-study/2025/04/ibm_acquisition_aims_to_create_comprehensive">
+            <div class="rbccm-case-studies__media">
+              <img loading="lazy" src="https://picsum.photos/seed/ibm-hybrid-cloud/900/500" alt="" />
+            </div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">IBM Acquisition Aims to Create Comprehensive End-to-End Hybrid Cloud Platform</h3>
+              <p class="rbccm-case-studies__desc">IBM has enhanced its capabilities to support clients&rsquo; deployment of cloud and AI technologies &hellip;</p>
+              <span class="rbccm-case-studies__cta">
+                3 min read
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Filler slides 5-14 for dot-wrap stress testing.
+             Remove these before productionising — they're only
+             here so you can see how the dots wrap on mobile at
+             12+ slides. -->
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/fervo-energy/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Fervo Energy raises landmark financing for next-gen geothermal</h3>
+              <p class="rbccm-case-studies__desc">RBC Capital Markets served as joint lead arranger on Fervo&rsquo;s milestone raise to power data-centre load growth &hellip;</p>
+              <span class="rbccm-case-studies__cta">5 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/gfl-environmental/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">GFL Environmental executes strategic separation of Environmental Services</h3>
+              <p class="rbccm-case-studies__desc">RBC advised GFL on the carve-out and sale of its Environmental Services business &hellip;</p>
+              <span class="rbccm-case-studies__cta">6 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/imi-plc/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">IMI plc anchors transformation around three global megatrends</h3>
+              <p class="rbccm-case-studies__desc">RBC European coverage helped IMI refine its investor narrative around energy, automation, and healthcare exposure &hellip;</p>
+              <span class="rbccm-case-studies__cta">7 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/coeur-mining/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Coeur Mining accelerates capital return following SilverCrest acquisition</h3>
+              <p class="rbccm-case-studies__desc">Coeur reaps the benefits of recent investments and is now focused on debt repayment and returning capital &hellip;</p>
+              <span class="rbccm-case-studies__cta">4 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/svante-carbon/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Svante&rsquo;s carbon capture platform scales to 100 plants per year</h3>
+              <p class="rbccm-case-studies__desc">RBC supported Svante&rsquo;s milestone series raise to industrialise solid-sorbent CO&#8322; capture across sectors &hellip;</p>
+              <span class="rbccm-case-studies__cta">5 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/nuveen-fixed-income/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Nuveen pioneers sustainability and impact in the fixed income market</h3>
+              <p class="rbccm-case-studies__desc">Stephen M. Liberatore shares how Nuveen became a leading sustainable debt investor driving impact through fixed income &hellip;</p>
+              <span class="rbccm-case-studies__cta">5 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/natural-gas-data/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Natural gas powers the AI data-centre boom</h3>
+              <p class="rbccm-case-studies__desc">Artificial intelligence is fuelling unprecedented demand for reliable baseload power, reshaping US natural gas markets &hellip;</p>
+              <span class="rbccm-case-studies__cta">8 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/great-recalibration/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">The great recalibration offers a roadmap to the future</h3>
+              <p class="rbccm-case-studies__desc">RBC Imagine explores the disruptive forces reshaping society and how businesses and investors can be ready &hellip;</p>
+              <span class="rbccm-case-studies__cta">17 min listen <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/datacenter-equipment/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Expertise</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Datacentre equipment demand reshapes industrial markets</h3>
+              <p class="rbccm-case-studies__desc">Datacentre power requirements are evolving rapidly, creating both disruption risks and new market opportunities &hellip;</p>
+              <span class="rbccm-case-studies__cta">7 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-case-studies__slide">
+          <a class="rbccm-case-studies__card" href="#">
+            <div class="rbccm-case-studies__media"><img loading="lazy" src="https://picsum.photos/seed/global-comms-infra/900/500" alt=""/></div>
+            <div class="rbccm-case-studies__body">
+              <p class="rbccm-case-studies__eyebrow">Case Study</p>
+              <div class="rbccm-case-studies__divider" aria-hidden="true"></div>
+              <h3 class="rbccm-case-studies__title">Global Communications Infrastructure Conference convenes the sector</h3>
+              <p class="rbccm-case-studies__desc">Grid operators, hyperscalers, datacentre platforms and fibre providers meet in Chicago to examine AI-era infrastructure &hellip;</p>
+              <span class="rbccm-case-studies__cta">6 min read <svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true"><path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+      </div><!-- /.__track -->
+
+      <!-- NEXT — mirror of the prev arrow markup -->
+      <button id="rbccm-cs-next" class="rbccm-case-studies__btn rbccm-case-studies__btn--next" tabindex="0" aria-label="Next case study">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-case-studies__btn-icon--mobile" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-case-studies__btn-icon--desktop" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/>
+          <path d="M19 31L28 21.5L19 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Dots — slick appends its <ul.slick-dots> here via
+           appendDots. Sits inside the grid so it can land in the
+           dots grid-area (row 2 centre <1300, row 2 centre ≥1300). -->
+      <div class="rbccm-case-studies__dots-wrap"></div>
+
+    </div><!-- /.__carousel -->
+
+    <div class="rbccm-case-studies__viewall-wrap">
+      <a class="rbccm-case-studies__viewall" href="/en/expertise/transactions">View all</a>
+    </div>
+
+  </div>
+</section>
+
+
+<script>
+  /* ==========================================================
+     Case Studies Carousel — slick init
+     ==========================================================
+     - Init on `.rbccm-case-studies__track` inside each root.
+     - Desktop (>=992): 1 slide, arrows + dots.
+     - Mobile (<992): responsive setting 'unslick' — slick tears
+       itself down; cards render as the mobile-first flex column.
+     - Arrows wired via prevArrow / nextArrow to the leadership-
+       style __btn markup in the DOM.
+     ========================================================== */
+  (function () {
+    function ready(fn) {
+      if (document.readyState !== 'loading') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    function init($) {
+      $('.rbccm-case-studies').each(function () {
+        var $root = $(this);
+        var $track = $root.find('.rbccm-case-studies__track');
+        if (!$track.length || $track.hasClass('slick-initialized')) return;
+
+        $track.slick({
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          arrows: true,
+          dots: true,
+          adaptiveHeight: false,
+          // Fade instead of horizontal slide. Requires slidesToShow: 1
+          // (which we have). cssEase defaults to 'ease' which is
+          // smooth enough — override to 'linear' if you want the
+          // classic slick fade feel.
+          fade: true,
+          prevArrow: $root.find('#rbccm-cs-prev'),
+          nextArrow: $root.find('#rbccm-cs-next'),
+          appendDots: $root.find('.rbccm-case-studies__dots-wrap')
+        });
+      });
+    }
+    ready(function () {
+      var tries = 0;
+      (function check() {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.slick) init(window.jQuery);
+        else if (tries++ < 50) setTimeout(check, 60);
+      })();
+    });
+  })();
+</script>
+
+</body>
+</html>
