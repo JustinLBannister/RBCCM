@@ -161,14 +161,21 @@
          Replicatable="true"
          CloneGroupID="case-studies-slide">
 
-    <!-- DCR picker. Scoped to Category="rbccm" Type="casestudy".
-         Both attributes are REQUIRED by TeamSite's component data
-         XSD — stripping either one fails validation with
-         "Attribute 'Category'/'Type' must appear on element 'DCR'."
-         Nested element must otherwise be present but empty (a
-         default path becomes a phantom publish dependency). -->
+    <!-- DCR picker. SCOPE TEMPORARILY CHANGED to article/story as
+         a debug step for the "Initializing deployment" hang.
+         Rationale: how-we-think and the deal carousel both use
+         Category="article" Type="story" and publish cleanly, so
+         if this scope also publishes here, we've isolated the
+         hang to the rbccm/casestudy scope specifically (likely an
+         unregistered / mis-registered DCR type in TeamSite).
+         RUNTIME NOTE FOR TESTING: while this scope is in place,
+         picked records will produce a wrong URL — story-url below
+         strips the templatedata/rbccm/casestudy/data/ prefix and
+         won't match article/story paths. That's OK for the deploy
+         test; do not ship in this state. TO RESTORE:
+           <DCR Category="rbccm" Type="casestudy"></DCR> -->
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR Category="rbccm" Type="casestudy"></DCR>
+      <DCR Category="article" Type="story"></DCR>
     </Datum>
 
     <!-- ── Per-slide overrides ──
