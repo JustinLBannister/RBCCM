@@ -365,7 +365,7 @@
          CloneGroupID="case-studies-slide">
 
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR Category="rbccm" Type="casestudy"></DCR>
+      <DCR></DCR>
     </Datum>
 
     

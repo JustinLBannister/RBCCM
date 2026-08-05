@@ -25,10 +25,15 @@
 
   var BOUND_FLAG = 'data-case-studies-carousel-bound';
 
-  /* Prefer the accessible-slick build hosted on rbccm.com so we get the
-     same screen-reader experience as every page that already includes it;
-     fall back to vanilla slick from cdnjs only if that 404s. Straight port
-     of the story-carousel / icon-carousel loader. */
+  /* Load accessible-slick from the local rbccm.com asset. The prior
+     cdnjs cross-origin fallback was stripped as a debug step for the
+     TeamSite "Initializing deployment" hang — some TeamSite installs
+     scan external URLs in deployed asset files, and an unreachable
+     cdnjs from the deploy server can stall the publish queue on any
+     page referencing this JS. If accessible-slick.min.js fails to
+     load, the carousel silently no-ops (jQuery.fn.slick stays
+     undefined and init() bails). Restore a fallback only after
+     confirming the publish path is clean. */
   function ensureSlickLoaded(cb) {
     if (typeof window.jQuery === 'undefined') return;   /* no jQuery, no carousel */
     if (typeof window.jQuery.fn.slick !== 'undefined') { cb(); return; }
@@ -36,12 +41,6 @@
     var s = document.createElement('script');
     s.src = '/assets/rbccm/js/accessible-slick.min.js';
     s.onload = function () { cb(); };
-    s.onerror = function () {
-      var fallback = document.createElement('script');
-      fallback.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
-      fallback.onload = function () { cb(); };
-      document.head.appendChild(fallback);
-    };
     document.head.appendChild(s);
   }
 
