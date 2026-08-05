@@ -1,13 +1,16 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<!-- Declared 1.0 to match Justin's TeamSite install — every other
-     component in this codebase runs in Rendering Mode: XSLT 1.0. Do NOT
-     switch this back to 2.0 without ALSO flipping the component's
-     Rendering Mode dropdown in TeamSite, otherwise any 2.0-only
-     functions (replace(), format-date(), current-date()) fail silently.
-     The `clean` template below has been rewritten to stay inside 1.0.
-     The two month/day formatter helpers rely only on substring() +
-     xsl:choose which work identically in both. -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<!-- Declared 2.0 to test whether TeamSite's stricter 2.0 rendering
+     mode clears the "Initializing deployment" hang seen on pages
+     hosting this component. The `clean` template below still uses
+     only 1.0-safe functions (translate + normalize-space) so the
+     bump is a no-op semantically — the win, if any, comes from
+     TeamSite's stricter 2.0 dep resolution.
+     IMPORTANT: the component's Rendering Mode dropdown in TeamSite
+     Component Center MUST be set to XSLT 2.0 to match this
+     declaration, otherwise the engine sits in a backwards-compat
+     limbo. If the flip doesn't clear the hang, revert both the
+     declaration AND the dropdown to 1.0. -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBC CM Case Studies Carousel
        ===================================================================
        Replaces the legacy Bootstrap 3 carousel at #cs-carousel:
