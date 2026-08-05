@@ -1,4 +1,15 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- ============================================================
+     Case Studies Carousel · Single-file TeamSite skin
+     ============================================================
+     Full XSL stylesheet AND the Properties + Data schema in one
+     file (matches the conference-insights-tiles.html pattern) so
+     the whole component can be pasted into a TeamSite component
+     slot in one paste. CSS and JS remain external references —
+     deploy them separately at:
+       /assets/rbccm/css/components/case-studies-carousel.css
+       /assets/rbccm/js/components/case-studies-carousel.js
+     ============================================================ -->
 <!-- Declared 2.0 to match Teamsite's "Rendering Mode: XSLT 2.0" (the house
      setting per the Conference-Insights BRD). Do NOT set this to 1.0. -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -36,11 +47,9 @@
        update the Category/Type in the properties.xml AND change
        `$dcr` below to match.
 
-       SINGLE-FILE VARIANT: CSS and JS are inlined below. No external
-       /assets/rbccm/css/components/case-studies-carousel.css or
-       /assets/rbccm/js/components/case-studies-carousel.js need to be
-       deployed alongside this skin. Paste this file into the TeamSite
-       component slot and it renders end-to-end on its own.
+       Deploy alongside this skin:
+         /assets/rbccm/css/components/case-studies-carousel.css
+         /assets/rbccm/js/components/case-studies-carousel.js
        =================================================================== -->
 
   <xsl:output method="html" indent="no" encoding="UTF-8"/>
@@ -158,571 +167,7 @@
     <xsl:if test="$slideCount &gt;= 3">
 
       <!-- ═══ EXTERNAL CSS ═══ -->
-      <!-- ═══ INLINE CSS ═══
-           Full stylesheet inlined so this single skin file can be pasted
-           directly into a TeamSite component slot without needing the
-           external /assets/rbccm/css/components/case-studies-carousel.css
-           to also be deployed. The <link> reference in the split-file
-           version at case-studies-carousel.xsl still works if you prefer
-           to keep CSS separate. -->
-      <style type="text/css">
-        <xsl:text disable-output-escaping="yes"><![CDATA[
-/* ============================================================
-   RBC CM — Case Studies Carousel
-   All rules scoped to .rbccm-case-studies
-   Mobile-first; layout switches at min-width: 1300px
-   ============================================================
-   Consumed by case-studies-carousel.xsl. Slick runs at every
-   viewport (1-per-view); arrows always visible; arrows swap
-   from plain-chevron (below track, <1300) to chevron-in-circle
-   (outside track, >=1300). Dot pattern ported from leadership-
-   carousel so both components stay visually aligned.
-
-   Deploy at: /assets/rbccm/css/components/case-studies-carousel.css
-             (path referenced from the skin's <link>).
-   ============================================================ */
-
-/* Design tokens — scoped to the section so the --cs-* names
-   don't leak into the page's global :root. */
-.rbccm-case-studies {
-  --cs-navy:      #002144;
-  --cs-navy-med:  #003168;
-  --cs-blue:      #0051A5;
-  --cs-blue-br:   #006AC3;
-  --cs-yellow:    #FFC72C;
-  --cs-ink:       #082043;
-  --cs-text:      #494949;
-  --cs-muted:     #6B7280;
-  --cs-hairline:  #E5E7EB;
-  --cs-border:    #A8A8A8;
-  --cs-white:     #FFFFFF;
-  --cs-serif:     "RBC Display", RBCDisplay, Georgia, Times, serif;
-  --cs-sans:      Roboto, Arial, sans-serif;
-  /* Padding tokens — XSL writes overrides as inline properties
-     on the section; these var() fallbacks are the defaults. */
-  --cs-pad-top-mobile:     40px;
-  --cs-pad-bottom-mobile:  40px;
-  --cs-pad-top-desktop:    64px;
-  --cs-pad-bottom-desktop: 64px;
-}
-
-/* ---------- Section shell ---------- */
-
-.rbccm-case-studies {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: var(--cs-pad-top-mobile) 16px var(--cs-pad-bottom-mobile);
-  background: #fff;
-  box-sizing: border-box;
-}
-@media (min-width: 992px)  {
-  .rbccm-case-studies {
-    padding: var(--cs-pad-top-desktop) 24px var(--cs-pad-bottom-desktop);
-    gap: 32px;
-  }
-}
-@media (min-width: 1440px) {
-  .rbccm-case-studies { padding: var(--cs-pad-top-desktop) 170px var(--cs-pad-bottom-desktop); }
-}
-.rbccm-case-studies *,
-.rbccm-case-studies *::before,
-.rbccm-case-studies *::after { box-sizing: border-box; }
-
-/* Inner content rail — heading + carousel + view-all all
-   centre on the same 1140 rail. The carousel itself breaks
-   OUT of this rail at ≥1300px via negative side margins so
-   the arrows can sit in the section's outer gutter (same
-   pattern as leadership-carousel). */
-.rbccm-case-studies__container {
-  width: 100%;
-  max-width: 1140px;
-  margin: 0 auto;
-}
-
-/* Scroll-margin-top on the heading — kicks in when the H2 has
-   an id set via the HeadingId Datum, so anchor links landing on
-   this section clear the sticky nav. */
-.rbccm-case-studies__heading[id] { scroll-margin-top: 167px; }
-
-/* ---------- Header (H2 + optional intro) ---------- */
-
-.rbccm-case-studies__header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0 0 32px;
-}
-.rbccm-case-studies__heading {
-  color: #002144;
-  font-family: RBCDisplay, Georgia, Times, serif;
-  font-size: 24px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0;
-}
-@media (min-width: 992px) {
-  .rbccm-case-studies__heading { font-size: 29px; line-height: 34.8px; letter-spacing: 1px; }
-}
-.rbccm-case-studies__intro {
-  color: #003168;
-  font-family: Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  margin: 0;
-  max-width: 780px;
-}
-
-/* ---------- Carousel wrapper ----------
-   Ported from leadership-carousel.__carousel. Two layouts:
-
-   <1300: 5-col grid, arrows sit BELOW the track alongside the
-          dots (`prev · dots · next` centred on row 2). Track
-          spans row 1. Keeps everything inside the 1140 rail.
-
-   >=1300: 3-col grid, track locked at 1140 in the middle,
-           arrows live in `auto` columns OUTSIDE the rail. The
-           wrapper itself extends beyond the __container via
-           negative side margins so the arrows sit in the
-           section's gutter without shrinking the track. */
-.rbccm-case-studies__carousel {
-  align-items: center;
-  box-sizing: border-box;
-  display: grid;
-  gap: 24px 26px;
-  grid-template-columns: 1fr auto auto auto 1fr;
-  grid-template-areas:
-    "track track track track track"
-    ".     prev  dots  next  .";
-  margin: 32px auto 0;
-  max-width: 1140px;
-  width: 100%;
-}
-@media (min-width: 1300px) {
-  .rbccm-case-studies__carousel {
-    column-gap: 24px;
-    grid-template-areas:
-      "prev track next"
-      ".    dots  .";
-    grid-template-columns: auto 1140px auto;
-    margin: 32px -68px 0 -68px;
-    max-width: none;
-  }
-}
-/* Grid-area assignment. Class-based (not ID-based) so multi-
-   instance carousels on the same page don't collide. */
-.rbccm-case-studies__btn--prev  { grid-area: prev; }
-.rbccm-case-studies__track      { grid-area: track; min-width: 0; }
-.rbccm-case-studies__btn--next  { grid-area: next; }
-.rbccm-case-studies__dots-wrap  { grid-area: dots; justify-self: center; }
-
-
-/* ---------- Arrow buttons — leadership pattern ----------
-   Mobile chevron (14x24 plain), desktop chevron in outlined
-   circle (44x44). Both SVGs live in each __btn; CSS swaps
-   which one renders based on the same 1300 breakpoint as the
-   __carousel grid switch. */
-.rbccm-case-studies__btn {
-  align-items: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  height: 44px;
-  justify-content: center;
-  padding: 0;
-  width: 44px;
-}
-.rbccm-case-studies__btn:focus-visible {
-  outline: 2px solid #0051A5;
-  outline-offset: 2px;
-  border-radius: 50%;
-}
-.rbccm-case-studies__btn svg { display: block; }
-
-.rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: block; }
-.rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: none; }
-@media (min-width: 1300px) {
-  .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--mobile   { display: none; }
-  .rbccm-case-studies__btn .rbccm-case-studies__btn-icon--desktop  { display: block; }
-}
-
-/* Desktop arrow hover — fills the circle blue, chevron flips
-   to white. Targets the SVG paths directly. */
-.rbccm-case-studies__btn-icon--desktop rect,
-.rbccm-case-studies__btn-icon--desktop path {
-  transition: fill 0.2s ease, stroke 0.2s ease;
-}
-.rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop rect { fill: #003168; }
-.rbccm-case-studies__btn:hover .rbccm-case-studies__btn-icon--desktop path { stroke: #ffffff; }
-
-
-/* ---------- Track / slide ---------- */
-
-.rbccm-case-studies__track {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 0;
-}
-.rbccm-case-studies__track.slick-initialized {
-  display: block;
-  gap: 0;
-}
-
-/* accessible-slick ships default padding on .slick-list (used
-   for its centerPadding behaviour) and a margin on .slick-track.
-   Both need zeroing for 1-per-view so the active slide fills
-   the full track. Same fix story-carousel needed (tasks 131/142). */
-.rbccm-case-studies__track.slick-initialized .slick-list {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-.rbccm-case-studies__track.slick-initialized .slick-track {
-  display: flex;
-  align-items: stretch;
-  margin: 0 !important;
-}
-.rbccm-case-studies__track.slick-initialized .slick-slide { height: auto; }
-.rbccm-case-studies__track.slick-initialized .slick-slide > div { height: 100%; }
-.rbccm-case-studies__track.slick-initialized .rbccm-case-studies__slide {
-  display: flex !important;
-  height: 100%;
-}
-.rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
-
-.rbccm-case-studies__slide { width: 100%; }
-
-
-/* ---------- Card ----------
-   Visuals ported wholesale from how-we-think tiles so the two
-   components share the same border, hover, typography and CTA
-   treatment. Structural difference: how-we-think stacks a tall
-   tile (image on top, body below); case-studies uses a
-   horizontal card (image left, body right) on tablet+ and
-   stacks to 1 column on mobile. */
-.rbccm-case-studies__card {
-  align-items: stretch;
-  background: #FFF;
-  border: 1px solid #A8A8A8;
-  color: #000;
-  display: flex;
-  flex-direction: column;
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  height: 100%;
-  overflow: hidden;
-  text-decoration: none;
-  transition: border-color 0.15s ease;
-  width: 100%;
-}
-@media (min-width: 768px) {
-  .rbccm-case-studies__card { flex-direction: row; }
-}
-/* Beat Bootstrap 3's `a:focus, a:hover` blue underline default —
-   same specificity trick how-we-think uses. */
-a.rbccm-case-studies__card,
-a.rbccm-case-studies__card:link,
-a.rbccm-case-studies__card:visited,
-a.rbccm-case-studies__card:hover,
-a.rbccm-case-studies__card:focus,
-a.rbccm-case-studies__card:focus-visible,
-a.rbccm-case-studies__card:active {
-  color: #000;
-  text-decoration: none;
-  outline-offset: 0;
-}
-
-/* Media — mobile 16:9 above the body, tablet+ takes half the
-   card width. `overflow: hidden` clips the 1.08 scale on hover
-   so it doesn't shift the card. */
-.rbccm-case-studies__media {
-  align-self: stretch;
-  background: #003168 center/cover no-repeat;
-  flex-shrink: 0;
-  overflow: hidden;
-  aspect-ratio: 16 / 9;
-}
-@media (min-width: 768px) {
-  .rbccm-case-studies__media {
-    aspect-ratio: auto;
-    width: 50%;
-    min-height: 320px;
-  }
-}
-.rbccm-case-studies__media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.4s ease;
-}
-
-/* Body — vertical stack: eyebrow / divider / title / desc /
-   CTA. min-height carves out room so the CTA can `margin-top:
-   auto` and pin to the bottom without collapsing. */
-.rbccm-case-studies__body {
-  align-items: flex-start;
-  align-self: stretch;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-height: 240px;
-  padding: 24px;
-}
-@media (min-width: 992px) {
-  .rbccm-case-studies__body { padding: 32px; min-height: 315px; }
-}
-
-/* Eyebrow — Roboto Light 14/140 wt 400, LS 2, #006AC3 uppercase
-   (matches how-we-think tile eyebrow). */
-.rbccm-case-studies__eyebrow {
-  color: #006AC3;
-  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  line-height: 140%;
-  margin: 0 0 5px 0;
-  text-transform: uppercase;
-}
-/* Yellow divider — 30.9px baseline, widens to 56 on card hover
-   / focus-within. */
-.rbccm-case-studies__divider {
-  background: #FFC72C;
-  flex-shrink: 0;
-  height: 2px;
-  margin: 0;
-  transition: width 0.3s ease;
-  width: 30.9px;
-}
-/* Title — Roboto Medium 20/125 wt 400 #000 (matches how-we-think). */
-.rbccm-case-studies__title {
-  color: #000;
-  font-family: "Roboto Medium", Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: normal;
-  line-height: 125%;
-  margin: 10px 0 10px 0;
-}
-@media (min-width: 992px) {
-  .rbccm-case-studies__title { font-size: 22px; }
-}
-/* Description — Roboto Light 14/140 wt 400 #555, LS 0.5. */
-.rbccm-case-studies__desc {
-  color: #555;
-  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  line-height: 140%;
-  margin: 0 0 20px 0;
-}
-/* CTA (read-time) — inline-flex + fit-content so the hover
-   border-bottom only underlines the label + arrow, not the
-   full card width. */
-.rbccm-case-studies__cta {
-  align-items: center;
-  border-bottom: 1px solid transparent;
-  color: #006AC3;
-  display: inline-flex;
-  font-family: Roboto, Arial, Verdana, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  gap: 7px;
-  letter-spacing: normal;
-  line-height: 20px;
-  margin: auto 0 0 0;
-  padding-bottom: 2px;
-  transition: border-color 0.2s ease;
-  width: fit-content;
-}
-.rbccm-case-studies__cta svg { flex-shrink: 0; }
-
-/* Hover / focus — gated by (hover: hover) so touch devices
-   skip the transforms. Same trio as how-we-think:
-     card border → brand blue
-     image → scale 1.08
-     yellow divider → widens to 56
-     CTA gains currentColor underline */
-@media (hover: hover) {
-  .rbccm-case-studies__card:hover {
-    border-color: #0051A5;
-    outline: none;
-  }
-  .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
-  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
-    transform: scale(1.08);
-  }
-  .rbccm-case-studies__card:hover .rbccm-case-studies__divider,
-  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__divider {
-    width: 56px;
-  }
-  .rbccm-case-studies__card:hover .rbccm-case-studies__cta,
-  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__cta {
-    border-bottom-color: currentColor;
-  }
-}
-/* Keyboard focus mirrors hover (blue border, no double ring). */
-.rbccm-case-studies__card:focus { outline: none; }
-.rbccm-case-studies__card:focus-visible { border-color: #0051A5; outline: none; }
-
-/* Reduced-motion — kill all card transitions. */
-@media (prefers-reduced-motion: reduce) {
-  .rbccm-case-studies__card,
-  .rbccm-case-studies__media img,
-  .rbccm-case-studies__divider,
-  .rbccm-case-studies__cta {
-    transition: none !important;
-  }
-  .rbccm-case-studies__card:hover .rbccm-case-studies__media img,
-  .rbccm-case-studies__card:focus-visible .rbccm-case-studies__media img {
-    transform: none !important;
-  }
-}
-
-
-/* =====================================================
-   DOTS — ported verbatim from leadership-carousel.css
-   (SVG data URI outlined-circle default, filled with
-   box-shadow ring on active / hover / focus-visible).
-   Same shape and specificity so this block can lift
-   straight into a shared partial down the line.
-   ===================================================== */
-
-.rbccm-case-studies__dots-wrap {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  justify-content: center;
-}
-
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
-  align-items: center;
-  bottom: auto !important;
-  display: flex !important;
-  /* Wrap dots onto a second line when the count outgrows the
-     row. Tighter column-gap on mobile means ~16 dots fit on a
-     375px screen before a second row is needed. Row-gap kicks
-     in only if wrapping happens; single-row cases unaffected. */
-  flex-wrap: wrap;
-  gap: 12px 16px;
-  justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: static !important;
-  width: auto !important;
-}
-@media (min-width: 992px) {
-  #rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots {
-    gap: 12px 26px;
-  }
-}
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li {
-  align-items: center;
-  box-sizing: border-box;
-  display: flex !important;
-  height: 11px !important;
-  justify-content: center;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 11px !important;
-}
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button {
-  background: none !important;
-  border: none !important;
-  box-sizing: border-box !important;
-  cursor: pointer;
-  display: block !important;
-  font-size: 0 !important;
-  height: 11px !important;
-  line-height: 0 !important;
-  margin: 0 !important;
-  outline: none;
-  padding: 0 !important;
-  position: static !important;
-  width: 11px !important;
-}
-/* Inactive dot: outlined circle */
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-size: 11px 11px !important;
-  content: '' !important;
-  display: block !important;
-  height: 11px !important;
-  opacity: 1 !important;
-  position: static !important;
-  width: 11px !important;
-  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
-}
-/* Active dot: filled circle + 4px ring via box-shadow. Same
-   treatment for keyboard focus (:focus-visible) and hover. */
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li.slick-active button::before,
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible::before,
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:hover::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
-  background-size: 11px 11px !important;
-  border-radius: 50% !important;
-  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px #003168 !important;
-  height: 11px !important;
-  width: 11px !important;
-  outline: 0;
-}
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button:focus-visible { outline: none; }
-/* accessible-slick specifics — it injects <span class="slick-dot-icon">
-   inside each button and applies a default ::before border. Both need
-   suppressing so our custom SVG-data-URI dots render cleanly. Same
-   fix story-carousel added (tasks 142 + 143). */
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon,
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button .slick-dot-icon::before {
-  display: none !important;
-}
-#rbccm-case-studies .rbccm-case-studies__dots-wrap .slick-dots li button::after {
-  border: 0 !important;
-  display: none !important;
-}
-
-
-/* ---------- View all CTA ---------- */
-.rbccm-case-studies__viewall-wrap {
-  display: flex;
-  justify-content: center;
-  /* 40px (not 32) because the dots strip is short (~11px) —
-     the row below the track collapses to almost nothing at
-     ≥1300 where the arrows sit outside, so 32px feels tight
-     against the CTA. */
-  margin-top: 40px;
-}
-.rbccm-case-studies__viewall {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 160px;
-  padding: 12px 32px;
-  border: 1px solid #003168;
-  background: transparent;
-  color: #003168;
-  font-family: Roboto, sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 20px;
-  text-align: center;
-  text-decoration: none;
-  transition: background 150ms ease, color 150ms ease;
-}
-.rbccm-case-studies__viewall:hover,
-.rbccm-case-studies__viewall:focus-visible {
-  background: #003168;
-  color: #fff;
-  outline: none;
-  text-decoration: none;
-}
-        ]]></xsl:text>
-      </style>
+      <link rel="stylesheet" href="/assets/rbccm/css/components/case-studies-carousel.css"/>
 
       <!-- Inline padding overrides. Written as CSS custom properties on
            the section so the stylesheet's var() fallbacks stay in charge
@@ -851,146 +296,7 @@ a.rbccm-case-studies__card:active {
       </section>
 
       <!-- ═══ EXTERNAL JS (scoped to #rbccm-case-studies) ═══ -->
-      <!-- ═══ INLINE JS ═══
-           Full controller inlined for the same single-file reason. -->
-      <script type="text/javascript">
-        <xsl:text disable-output-escaping="yes"><![CDATA[
-/* =========================================================================
-   Case Studies Carousel — accessible-slick implementation
-   =========================================================================
-   Same carousel stack as the rest of rbccm.com: jQuery + slick, preferring
-   the accessible-slick build. Mirrors the loader, the arrow wiring and the
-   dots container used by story-carousel / leadership-carousel / icon-
-   carousel so all four behave and are maintained the same way.
-
-   ---- Config (data attributes on .rbccm-case-studies) --------------------
-     data-region-label     accessible-slick regionLabel override (aria)
-     data-instructions     accessible-slick instructionsText override (aria)
-     data-speed            ms transition speed (default 350)
-
-   ---- Multi-instance -----------------------------------------------------
-   All queries are scoped to each .rbccm-case-studies root. A BOUND_FLAG on
-   the root prevents double-init if a page injects more markup later —
-   consumers can also call window.RBCCMCaseStudiesCarousel.init(ctx) to
-   bind newly-added roots (feed scripts, TeamSite preview re-render, etc.).
-
-   Deploy at: /assets/rbccm/js/components/case-studies-carousel.js
-             (path referenced from the skin's <script>).
-   ========================================================================= */
-(function () {
-  'use strict';
-
-  var BOUND_FLAG = 'data-case-studies-carousel-bound';
-
-  /* Prefer the accessible-slick build hosted on rbccm.com so we get the
-     same screen-reader experience as every page that already includes it;
-     fall back to vanilla slick from cdnjs only if that 404s. Straight port
-     of the story-carousel / icon-carousel loader. */
-  function ensureSlickLoaded(cb) {
-    if (typeof window.jQuery === 'undefined') return;   /* no jQuery, no carousel */
-    if (typeof window.jQuery.fn.slick !== 'undefined') { cb(); return; }
-
-    var s = document.createElement('script');
-    s.src = '/assets/rbccm/js/accessible-slick.min.js';
-    s.onload = function () { cb(); };
-    s.onerror = function () {
-      var fallback = document.createElement('script');
-      fallback.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js';
-      fallback.onload = function () { cb(); };
-      document.head.appendChild(fallback);
-    };
-    document.head.appendChild(s);
-  }
-
-  function intAttr(root, name, fallback) {
-    var n = parseInt(root.getAttribute(name), 10);
-    return (!n || n < 1) ? fallback : n;
-  }
-
-  function attrOr(root, name, fallback) {
-    var v = root.getAttribute(name);
-    return (v && v.length) ? v : fallback;
-  }
-
-  function init(root) {
-    var $ = window.jQuery;
-    if (root.getAttribute(BOUND_FLAG) === 'true') return;
-
-    var $root  = $(root);
-    var $track = $root.find('.rbccm-case-studies__track');
-    var $prev  = $root.find('.rbccm-case-studies__btn--prev');
-    var $next  = $root.find('.rbccm-case-studies__btn--next');
-    var $dots  = $root.find('.rbccm-case-studies__dots-wrap');
-
-    if (!$track.length || !$track.children().length) return;
-    if ($track.hasClass('slick-initialized')) return;
-    root.setAttribute(BOUND_FLAG, 'true');
-
-    /* Config — pulled from data-attrs on the root (see XSL). Falls back to
-       sensible defaults when the Datum is blank. */
-    var cfgSpeed = intAttr(root, 'data-speed', 350);
-
-    /* Region label — accessible-slick's aria-label on the wrapper region.
-       Blank Datum → derive from the H2 (heading text is a natural label).
-       If the H2 isn't present for some reason, fall back to "carousel". */
-    var $heading = $root.find('.rbccm-case-studies__heading').first();
-    var headingText = $heading.length ? $.trim($heading.text()) : '';
-    var regionLabel = attrOr(root, 'data-region-label', headingText || 'carousel');
-
-    var instructionsText = attrOr(root, 'data-instructions', '');
-
-    /* Transition — 'slide' (default) or 'fade'. The XSL always emits
-       this attribute so we can trust attrOr's fallback for the
-       edge case of markup that predates the attr. */
-    var transition = attrOr(root, 'data-transition', 'slide');
-
-    var opts = {
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      infinite: true,
-      arrows: true,
-      dots: true,
-      speed: cfgSpeed,
-      adaptiveHeight: false,
-      prevArrow: $prev,
-      nextArrow: $next,
-      appendDots: $dots,
-      regionLabel: regionLabel
-    };
-    /* Fade: cross-fade between cards instead of horizontal slide.
-       Requires slidesToShow: 1 (which we have). cssEase defaults
-       to 'ease'; leave alone unless a designer flags the fall-off
-       feels wrong. */
-    if (transition === 'fade') opts.fade = true;
-    /* Only pass instructionsText if the author set one — accessible-slick
-       renders the sr-only block even for an empty string, which adds
-       unwanted markup. */
-    if (instructionsText) opts.instructionsText = instructionsText;
-
-    $track.slick(opts);
-  }
-
-  function initAll(ctx) {
-    var root = (ctx && ctx.querySelectorAll) ? ctx : document;
-    var roots = root.querySelectorAll('.rbccm-case-studies');
-    for (var i = 0; i < roots.length; i++) init(roots[i]);
-  }
-
-  function ready(fn) {
-    if (document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  ready(function () {
-    ensureSlickLoaded(function () { initAll(); });
-  });
-
-  /* Expose init for consumers that inject markup after load (feed scripts,
-     TeamSite preview re-render, etc.). */
-  window.RBCCMCaseStudiesCarousel = { init: initAll };
-})();
-        ]]></xsl:text>
-      </script>
+      <script src="/assets/rbccm/js/components/case-studies-carousel.js"></script>
 
     </xsl:if><!-- /slideCount >= 1 -->
 
@@ -1136,3 +442,211 @@ a.rbccm-case-studies__card:active {
   </xsl:template>
 
 </xsl:stylesheet>
+
+<!-- ============================================================
+     Case Studies Carousel — Properties + Data
+     ============================================================
+     Replaces the legacy Bootstrap 3 carousel at #cs-carousel
+     (case-studies-about story-tiles container). One horizontal
+     card per slide, image left + text right on tablet+, stacked
+     on mobile. Slick at every viewport (1-per-view), arrows +
+     dots always visible.
+
+     DCR-DRIVEN with per-slide OVERRIDES, same pattern as
+     deal-carousel and how-we-think. Each Case Study Group
+     binds ONE article/story DCR — the XSL reads title /
+     description / image / read-time from that record, and
+     per-slide String/Textarea/Image overrides win when set.
+
+     A slide can be:
+       fully DCR-driven   pick a case study, fill in nothing
+       fully MANUAL       leave the picker empty, type all fields
+       MIXED              pick a record and override one or two
+
+     Deploy alongside the skin:
+       /assets/rbccm/css/components/case-studies-carousel.css
+       /assets/rbccm/js/components/case-studies-carousel.js
+
+     Depends on: jQuery + accessible-slick (loaded site-wide;
+     the JS loader falls back to CDN if the site build isn't
+     present).
+
+     Consumed by case-studies-carousel.xsl.
+
+     SCHEMA NOTE: only ID, Name, Type are permitted on a Datum,
+     and only ID, Name, Replicatable, CloneGroupID on a Group.
+     MinReplicates and Required are NOT in Teamsite's schema and
+     will fail validation. Counts and required fields are
+     enforced in the XSL instead.
+
+     IMPORTANT — Datum @Name attributes MUST match the XSL's
+     @Name selectors. Teamsite strips @ID on replicated Datums,
+     so @Name is the only reliable match inside a Replicatable
+     Group. Keep them plain: no apostrophes (they break the
+     single-quoted XPath), no em-dashes.
+     ============================================================ -->
+<Properties ComponentID="case-studies-carousel-v1">
+
+  <!-- ─── Section heading (required) ───
+       RBCDisplay 29/34.8 wt 500, dark navy #002144, left-aligned.
+       Mobile scales to 24/120% wt 500. Blank falls back to
+       "Signature case studies". -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">Signature case studies</Datum>
+
+  <!-- Optional intro paragraph below the H2. Textarea because
+       the copy can run long. Blank drops the paragraph entirely
+       (XSL skips the <p> when empty). -->
+  <Datum ID="Intro" Type="Textarea" Name="Section Intro (optional)"></Datum>
+
+  <!-- Section aria-label on the <section> wrapper. Blank falls
+       back to the Heading. -->
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label (blank = heading)"></Datum>
+
+  <!-- Optional id="…" on the H2 so anchor links (…#case-studies)
+       can jump to the section. When set, the CSS also applies
+       scroll-margin-top so the target sits below the sticky nav. -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional, e.g. case-studies)"></Datum>
+
+
+  <!-- ═══ TRANSITION MODE ════════════════════════════════════
+       Two options:
+         slide  (default) horizontal slide between cards — the
+                classic slick behaviour. Feels like flipping
+                through pages.
+         fade   cross-fade between cards, no horizontal motion.
+                Reads calmer, especially for signature content
+                where the cards are the focus rather than the
+                transition itself.
+       Parsed case-insensitively; anything unrecognised falls
+       back to "slide" so a typo can't break the component. -->
+  <Datum ID="TransitionMode" Type="String" Name="Transition Mode (slide or fade)">slide</Datum>
+
+
+  <!-- ═══ VIEW ALL CTA ═══════════════════════════════════════
+       Outlined pill below the dot pagination. Blank link = NO
+       button; blank label alone would render a button with no
+       text, so we drop it in the XSL if either is blank. -->
+  <Datum ID="CtaLabel" Type="String" Name="View All Button Label (blank = no button)">View all</Datum>
+  <Datum ID="CtaLink"  Type="String" Name="View All Button Link (blank = no button)">/en/expertise/transactions</Datum>
+  <Datum ID="CtaNewTab" Type="Boolean" Name="Open View All in New Tab">false</Datum>
+
+
+  <!-- ═══ ACCESSIBILITY (optional overrides) ═════════════════ -->
+
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+  <!-- Accessible-slick's `regionLabel` — matters when a page
+       carries more than one carousel: without distinct labels a
+       screen reader announces two identical "region"s and the
+       user can't tell them apart. Blank falls back to the
+       Section Heading, then to a generic label. -->
+  <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank = heading)"></Datum>
+
+  <!-- Accessible-slick's `instructionsText`. Optional
+       screen-reader-only text emitted at the START of the
+       carousel. Blank by default and that is the right default
+       here — behaviour is obvious (Prev / Next / numbered dots
+       all reachable by Tab), nothing bespoke to explain. Fill
+       in only for non-obvious behaviour. -->
+  <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions (blank = none)"></Datum>
+
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+  <Datum ID="AriaViewAllLabel"   Type="String" Name="View All Aria Label (override)"></Datum>
+
+
+  <!-- ═══ SECTION PADDING (optional overrides) ═══════════════
+       Blank uses the baked-in defaults: 40/16 mobile, 64/24 at
+       992+, 64/170 at 1440+. Supply any CSS length to override.
+       Written as CSS custom properties on the section so the
+       stylesheet keeps its defaults and an override is a
+       one-Datum change with no CSS edit. -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
+</Properties>
+
+<Data>
+
+  <!-- ═══ CASE STUDY SLIDES ═══════════════════════════════════
+       One Group per slide. Each Group binds ONE article/story
+       DCR — case studies live in the same tree as insights
+       stories, differentiated by subcategory ("Case Study" or
+       "Expertise"). Typical path:
+         templatedata/article/story/data/<year>/<month>/<slug>
+
+       If your Teamsite installs case studies under a distinct
+       DCR type (e.g. Category="rbccm" Type="case-study"), change
+       the Category/Type below AND update the XSL's `$dcr`
+       selector root name to match.
+
+       MINIMUM 3 slides — enforced by the XSL. Below that the
+       carousel has less visual weight than a single hero card
+       (2 dots looks broken, 1 dot is pointless), so the whole
+       component drops from render until the author has bound
+       three case studies. No hard maximum — slick derives the
+       dot count from however many exist — but the dot strip
+       wraps on mobile past ~14 slides, so 4-8 is the intended
+       sweet spot.
+
+       IMPORTANT — the nested <DCR> element must be PRESENT
+       but EMPTY. A default path here becomes a phantom
+       dependency Teamsite tries to resolve at publish, and
+       every cloned row inherits it. Category + Type still scope
+       the picker to the correct DCR type; the path is filled in
+       by Teamsite when the author picks one. -->
+  <Group ID="CaseStudy"
+         Name="Case Study"
+         Replicatable="true"
+         CloneGroupID="case-studies-slide">
+
+    <!-- DCR picker. Scoped to Category="article" Type="story"
+         (same tree how-we-think Insights uses). Author browses
+         the standard story tree and picks a case study. -->
+    <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
+      <DCR Category="article" Type="story"></DCR>
+    </Datum>
+
+    <!-- ── Per-slide overrides ──
+         BLANK = "use the bound record". An override wins for
+         that field. A slide with no record AND no title is
+         dropped by the XSL (a card with no headline is not a
+         card). -->
+
+    <!-- Uppercase eyebrow above the divider. XSL default is
+         "Expertise" (matching the live site); the record's own
+         subcategory wins if set (e.g. "Case Study"), then the
+         override wins over that. -->
+    <Datum ID="EyebrowOverride" Type="String" Name="Eyebrow Label (blank = record subcategory or Expertise)"></Datum>
+
+    <Datum ID="TitleOverride" Type="String" Name="Title"></Datum>
+    <Datum ID="DescriptionOverride" Type="Textarea" Name="Description"></Datum>
+
+    <!-- Card image. The nested <Image> skeleton is REQUIRED and
+         must be left EMPTY. A default path here fails validation
+         with "Datum ID=[Image] Value is not a valid image". -->
+    <Datum ID="ImageOverride" Type="Image" Name="Card Image">
+      <Image>
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+    <Datum ID="ImageAltOverride" Type="String" Name="Card Image Alt Text (blank = title)"></Datum>
+
+    <!-- Read-time / meta line at the bottom. Free text so it can
+         say "4 min read", "13 min listen", "17 min watch". XSL
+         falls back to the record's reading_time when blank. -->
+    <Datum ID="MetaOverride" Type="String" Name="Read Time (e.g. 4 min read)"></Datum>
+
+    <!-- Link. Blank falls back to the bound record's own case-
+         study page URL (built from the DCR path). Manual
+         override for external links or when the record has no
+         page. -->
+    <Datum ID="LinkOverride" Type="String" Name="Card Link URL"></Datum>
+    <Datum ID="LinkNewTab" Type="Boolean" Name="Open Card Link in New Tab">false</Datum>
+
+  </Group>
+
+</Data>
