@@ -161,20 +161,14 @@
          Replicatable="true"
          CloneGroupID="case-studies-slide">
 
-    <!-- DCR picker. Category/Type STRIPPED as a debug step for the
-         "Initializing deployment" hang: the leading hypothesis is
-         TeamSite enumerating the full templatedata/rbccm/casestudy/**
-         pool at deploy time to validate the picker, and stalling on
-         one broken record in the pool. With no Category/Type, the
-         picker is unconstrained — author can browse any DCR type
-         and pick a case study manually. If this clears the hang,
-         we know it's pool-enumeration and we can (a) fix or remove
-         the broken record, or (b) leave the picker unconstrained
-         and rely on authors to pick from the correct tree.
-         To RESTORE the constrained picker after debug:
-           <DCR Category="rbccm" Type="casestudy"></DCR> -->
+    <!-- DCR picker. Scoped to Category="rbccm" Type="casestudy".
+         Both attributes are REQUIRED by TeamSite's component data
+         XSD — stripping either one fails validation with
+         "Attribute 'Category'/'Type' must appear on element 'DCR'."
+         Nested element must otherwise be present but empty (a
+         default path becomes a phantom publish dependency). -->
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR></DCR>
+      <DCR Category="rbccm" Type="casestudy"></DCR>
     </Datum>
 
     <!-- ── Per-slide overrides ──
