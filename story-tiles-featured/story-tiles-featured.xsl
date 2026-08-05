@@ -22,7 +22,13 @@
        /assets/rbccm/css/components/story-tiles-featured.css
        /assets/rbccm/js/components/story-tiles-featured.js
      ============================================================ -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<!-- Declared 1.0 to match Justin's TeamSite install — every other
+     component in this codebase runs in Rendering Mode: XSLT 1.0.
+     This skin doesn't use any 2.0-only functions (no replace(),
+     format-date(), current-date()) so the swap is a safe no-op at
+     runtime; the version number just needs to match the mode the
+     TeamSite engine is set to. -->
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: default -->
 
   <xsl:output method="html" indent="no" />

@@ -1,7 +1,13 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<!-- Declared 2.0 to match Teamsite's "Rendering Mode: XSLT 2.0" (the house
-     setting per the Conference-Insights BRD). Do NOT set this to 1.0. -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<!-- Declared 1.0 to match Justin's TeamSite install — every other
+     component in this codebase runs in Rendering Mode: XSLT 1.0. Do NOT
+     switch this back to 2.0 without ALSO flipping the component's
+     Rendering Mode dropdown in TeamSite, otherwise any 2.0-only
+     functions (replace(), format-date(), current-date()) fail silently.
+     The `clean` template below has been rewritten to stay inside 1.0.
+     The two month/day formatter helpers rely only on substring() +
+     xsl:choose which work identically in both. -->
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBC CM Case Studies Carousel
        ===================================================================
        Replaces the legacy Bootstrap 3 carousel at #cs-carousel:
@@ -49,16 +55,31 @@
 
 
   <!-- ═══════════════════════════════════════════════════════════════════
-       clean — strip TinyMCE bogus <br> + fold non-breaking spaces
-       Same template deal-carousel and how-we-think use; kept in sync
-       by hand.
-       ═══════════════════════════════════════════════════════════════════ -->
+       clean — fold non-breaking spaces + collapse whitespace
+       ═══════════════════════════════════════════════════════════════════
+       XSLT-1.0 compatible: uses only `translate()` and `normalize-space()`.
+       The tag-stripping regex + entity-name folding regex from the 2.0
+       version had to be dropped (both used `replace()` which is 2.0-only).
+
+       Trade-offs of the 1.0 version:
+         - TinyMCE's bogus `<br data-mce-bogus="1">` markup in an
+           otherwise-empty Textarea WILL slip through as literal text
+           when rendered. In practice this is rare — the author would
+           have to open the field in the visual editor and immediately
+           save without typing anything. If it becomes a problem, wrap
+           an offending Datum's guard clause with a longer
+           string-length check (e.g. `string-length(...) &gt; 12`).
+         - Literal HTML entity NAMES like `&amp;nbsp;` (not the char)
+           in the source won't be folded to a space; they'll render as
+           whatever the browser interprets `&nbsp;` as.
+
+       Both trade-offs are acceptable for RBCCM's authoring pattern —
+       the Case Study description Datum is short and typed fresh; it
+       doesn't inherit from pasted rich-text where these edge cases
+       usually show up. -->
   <xsl:template name="clean">
     <xsl:param name="s" select="''"/>
-    <xsl:variable name="stripped" select="replace(string($s), '&lt;[^&gt;]+&gt;', '')"/>
-    <xsl:variable name="nbspFolded" select="translate($stripped, '&#160;', ' ')"/>
-    <xsl:variable name="entityFolded" select="replace($nbspFolded, '&amp;(nbsp|#160|#xA0);', ' ')"/>
-    <xsl:value-of select="normalize-space($entityFolded)"/>
+    <xsl:value-of select="normalize-space(translate(string($s), '&#160;', ' '))"/>
   </xsl:template>
 
   <!-- ═══════════════════════════════════════════════════════════════════
