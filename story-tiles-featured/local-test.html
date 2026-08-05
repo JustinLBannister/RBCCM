@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story Tiles - Featured — Local Test (all variations)</title>
+  <link rel="stylesheet" href="story-tiles-featured.css">
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; color: #222; }
+
+    /* Demo shell — every variation gets a labelled banner so you can
+       see at a glance which Datum combo produced the treatment below.
+       These styles are demo-only and never ship. */
+    .demo-header {
+      padding: 20px 24px;
+      background: #002144;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .demo-header code { background: rgba(255,255,255,0.14); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+    .demo-header a { color: #7fc5ff; }
+    .demo-toc { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; }
+    .demo-toc li::before { content: "→ "; color: #7fc5ff; }
+    .demo-toc a { color: #fff; text-decoration: underline; }
+
+    .demo-label {
+      background: #E5E7EB;
+      border-bottom: 1px solid #C3C3C3;
+      padding: 14px 24px 12px;
+      font-size: 13px;
+      color: #222;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 12px;
+    }
+    .demo-label strong { color: #002144; font-size: 14px; }
+    .demo-label code { background: #fff; border: 1px solid #C3C3C3; padding: 1px 5px; border-radius: 3px; font-size: 11.5px; }
+    .demo-label .demo-label__note { color: #6B7280; }
+  </style>
+</head>
+<body>
+
+<div class="demo-header">
+  <strong>Local test: story-tiles-featured</strong> — every variation of the component on one page so you can eyeball each configuration.
+  Each section is labelled with the Datum combination that produced it. Resize the browser to test mobile-first behaviour: 1 col mobile / 3 col at ≥768, and the featured card becomes horizontal (image left / text right) at ≥768.
+  <ul class="demo-toc">
+    <li><a href="#v1">Default</a></li>
+    <li><a href="#v2">Centered heading</a></li>
+    <li><a href="#v3">Dark scheme</a></li>
+    <li><a href="#v4">Dark + centered</a></li>
+    <li><a href="#v5">Tinted background</a></li>
+    <li><a href="#v6">Heading only</a></li>
+    <li><a href="#v7">No header</a></li>
+    <li><a href="#v8">Load-more state</a></li>
+  </ul>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 1 — Default
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v1">
+  <strong>1. Default</strong>
+  <span>light scheme, left-aligned heading, H2 + subheading, View All</span>
+  <span class="demo-label__note">— <code>ColorScheme=light</code> <code>HeadingAlignment=left</code></span>
+</div>
+<section class="rbccm-story-tiles" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading" id="latest-insights">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets — hand-picked for the moments that matter to your business.</p>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 2 — Centered heading
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v2">
+  <strong>2. Centered heading</strong>
+  <span>light scheme, centered heading + subheading</span>
+  <span class="demo-label__note">— <code>HeadingAlignment=center</code></span>
+</div>
+<section class="rbccm-story-tiles rbccm-story-tiles--headings-centered" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets.</p>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 3 — Dark scheme
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v3">
+  <strong>3. Dark scheme</strong>
+  <span>navy bg, white heading + subheading, cards stay light</span>
+  <span class="demo-label__note">— <code>ColorScheme=dark</code></span>
+</div>
+<section class="rbccm-story-tiles rbccm-story-tiles--on-dark" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets.</p>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 4 — Dark + centered
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v4">
+  <strong>4. Dark + centered</strong>
+  <span>modifiers combine — navy bg AND centered heading</span>
+  <span class="demo-label__note">— <code>ColorScheme=dark</code> <code>HeadingAlignment=center</code></span>
+</div>
+<section class="rbccm-story-tiles rbccm-story-tiles--on-dark rbccm-story-tiles--headings-centered" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets.</p>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 5 — Tinted background
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v5">
+  <strong>5. Tinted background</strong>
+  <span>light scheme with a custom pale-blue bg override</span>
+  <span class="demo-label__note">— <code>BackgroundColor=#EFF6FD</code> (writes <code>style="background-color: …"</code>)</span>
+</div>
+<section class="rbccm-story-tiles" style="background-color: #EFF6FD;" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets.</p>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 6 — Heading only (no subheading)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v6">
+  <strong>6. Heading only</strong>
+  <span>H2 renders, subheading paragraph is dropped from the DOM</span>
+  <span class="demo-label__note">— <code>Subheading</code> blank</span>
+</div>
+<section class="rbccm-story-tiles" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+    </div>
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 7 — No header at all (bare tiles)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v7">
+  <strong>7. No header</strong>
+  <span>both Heading and Subheading blank — entire header wrapper skipped</span>
+  <span class="demo-label__note">— <code>Heading</code> and <code>Subheading</code> both blank</span>
+</div>
+<section class="rbccm-story-tiles" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div data-inject-tiles data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     VARIATION 8 — Load-more state
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="demo-label" id="v8">
+  <strong>8. Load-more state</strong>
+  <span>See More button visible + 3 hidden tiles waiting to be revealed</span>
+  <span class="demo-label__note">— <code>EnableLoadMore=true</code> <code>InitialVisibleCount=4</code> <code>LoadMoreChunkSize=3</code> — click "See more" to reveal hidden tiles</span>
+</div>
+<section class="rbccm-story-tiles" data-filter-ready="true">
+  <div class="rbccm-story-tiles__inner">
+    <div class="rbccm-story-tiles__header">
+      <h2 class="rbccm-story-tiles__heading">Latest insights</h2>
+      <p class="rbccm-story-tiles__subheading">Featured commentary, research, and case studies from RBC Capital Markets.</p>
+    </div>
+    <div data-inject-tiles data-load-more="true" data-view-all="true"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TILE TEMPLATE + INJECTOR
+     ═══════════════════════════════════════════════════════════════════
+     Rather than paste 8 copies of the same 4-tile markup, we template
+     it once and clone into each variation on load. Keeps this file
+     readable at ~200 lines instead of 900+, and any tile change ripples
+     through every variation automatically.
+
+     Attributes on the <div data-inject-tiles>:
+       data-view-all       renders the "View all" button below
+       data-load-more      adds 3 extra tiles hidden via [hidden] +
+                           puts data-load-more="true" on the row so
+                           story-tiles-featured.js reveals them via
+                           the See More button. -->
+<template id="tile-block-base">
+  <ul class="rbccm-story-tiles__row">
+    <!-- Featured card -->
+    <li class="rbccm-story-tiles__item">
+      <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card rbccm-story-tiles__insight--featured" href="#" aria-label="Insights: Data centers become the new battleground in Iran war. 4 min read.">
+        <div class="rbccm-story-tiles__insight-media">
+          <img loading="lazy" alt="" src="https://picsum.photos/seed/data-centers-battleground/1200/700">
+        </div>
+        <div class="rbccm-story-tiles__insight-body">
+          <div class="rbccm-story-tiles__insight-label">Insights</div>
+          <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+          <h3 class="rbccm-story-tiles__insight-title">Data centers become the new battleground in Iran war</h3>
+          <p class="rbccm-story-tiles__insight-desc">Iranian attacks on Gulf tech infrastructure expose vulnerabilities in U.S.-backed AI investments, while Houthi entry compounds security concerns.</p>
+          <p class="rbccm-story-tiles__insight-meta">
+            <span>4 min read</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-story-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+          </p>
+        </div>
+      </a>
+    </li>
+    <!-- Standard card 1 -->
+    <li class="rbccm-story-tiles__item">
+      <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Insights: Energy market risks reignited after Iran ceasefire collapses. 4 min read.">
+        <div class="rbccm-story-tiles__insight-media">
+          <img loading="lazy" alt="" src="https://picsum.photos/seed/energy-market-risks/800/500">
+        </div>
+        <div class="rbccm-story-tiles__insight-body">
+          <div class="rbccm-story-tiles__insight-label">Insights</div>
+          <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+          <h3 class="rbccm-story-tiles__insight-title">Energy market risks reignited after Iran ceasefire collapses</h3>
+          <p class="rbccm-story-tiles__insight-desc">The failure of the Trump-backed Versailles accord reinstates Strait of Hormuz disruption risks as Houthis escalate attacks.</p>
+          <p class="rbccm-story-tiles__insight-meta">
+            <span>4 min read</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-story-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+          </p>
+        </div>
+      </a>
+    </li>
+    <!-- Standard card 2 -->
+    <li class="rbccm-story-tiles__item">
+      <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Insights: OPEC+ navigates production pace amid Iran deal uncertainty. 3 min read.">
+        <div class="rbccm-story-tiles__insight-media">
+          <img loading="lazy" alt="" src="https://picsum.photos/seed/opec-navigates/800/500">
+        </div>
+        <div class="rbccm-story-tiles__insight-body">
+          <div class="rbccm-story-tiles__insight-label">Insights</div>
+          <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+          <h3 class="rbccm-story-tiles__insight-title">OPEC+ navigates production pace amid Iran deal uncertainty</h3>
+          <p class="rbccm-story-tiles__insight-desc">OPEC+ increases production as diplomatic talks toward final deal face timeline pressures amid persistent security concerns.</p>
+          <p class="rbccm-story-tiles__insight-meta">
+            <span>3 min read</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-story-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+          </p>
+        </div>
+      </a>
+    </li>
+    <!-- Standard card 3 -->
+    <li class="rbccm-story-tiles__item">
+      <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Insights: From supply shock to supply opportunity. 25 min watch.">
+        <div class="rbccm-story-tiles__insight-media">
+          <img loading="lazy" alt="" src="https://picsum.photos/seed/supply-opportunity/800/500">
+        </div>
+        <div class="rbccm-story-tiles__insight-body">
+          <div class="rbccm-story-tiles__insight-label">Insights</div>
+          <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+          <h3 class="rbccm-story-tiles__insight-title">From supply shock to supply opportunity</h3>
+          <p class="rbccm-story-tiles__insight-desc">Global Energy Forum insights reveal an industry navigating supply disruption while building a more diversified energy future.</p>
+          <p class="rbccm-story-tiles__insight-meta">
+            <span>25 min watch</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-story-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+          </p>
+        </div>
+      </a>
+    </li>
+  </ul>
+</template>
+
+<!-- Extra hidden tiles used only in the load-more variation. -->
+<template id="tile-block-extra-hidden">
+  <li class="rbccm-story-tiles__item" hidden data-hidden-by-loadmore="true">
+    <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Extra tile 1">
+      <div class="rbccm-story-tiles__insight-media"><img loading="lazy" alt="" src="https://picsum.photos/seed/extra1/800/500"></div>
+      <div class="rbccm-story-tiles__insight-body">
+        <div class="rbccm-story-tiles__insight-label">Insights</div>
+        <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+        <h3 class="rbccm-story-tiles__insight-title">Hidden tile — revealed by See More (1 of 3)</h3>
+        <p class="rbccm-story-tiles__insight-desc">This card stays out of the DOM flow until the See More button reveals it in a chunk.</p>
+        <p class="rbccm-story-tiles__insight-meta"><span>5 min read</span></p>
+      </div>
+    </a>
+  </li>
+  <li class="rbccm-story-tiles__item" hidden data-hidden-by-loadmore="true">
+    <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Extra tile 2">
+      <div class="rbccm-story-tiles__insight-media"><img loading="lazy" alt="" src="https://picsum.photos/seed/extra2/800/500"></div>
+      <div class="rbccm-story-tiles__insight-body">
+        <div class="rbccm-story-tiles__insight-label">Insights</div>
+        <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+        <h3 class="rbccm-story-tiles__insight-title">Hidden tile — revealed by See More (2 of 3)</h3>
+        <p class="rbccm-story-tiles__insight-desc">Same layout as the initial four; just gated by the loader.</p>
+        <p class="rbccm-story-tiles__insight-meta"><span>6 min read</span></p>
+      </div>
+    </a>
+  </li>
+  <li class="rbccm-story-tiles__item" hidden data-hidden-by-loadmore="true">
+    <a class="rbccm-story-tiles__insight rbccm-story-tiles__insight--card" href="#" aria-label="Extra tile 3">
+      <div class="rbccm-story-tiles__insight-media"><img loading="lazy" alt="" src="https://picsum.photos/seed/extra3/800/500"></div>
+      <div class="rbccm-story-tiles__insight-body">
+        <div class="rbccm-story-tiles__insight-label">Insights</div>
+        <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+        <h3 class="rbccm-story-tiles__insight-title">Hidden tile — revealed by See More (3 of 3)</h3>
+        <p class="rbccm-story-tiles__insight-desc">Same layout as the initial four; just gated by the loader.</p>
+        <p class="rbccm-story-tiles__insight-meta"><span>4 min read</span></p>
+      </div>
+    </a>
+  </li>
+</template>
+
+<script>
+  /* Inject the tile block + optional controls into each demo slot. */
+  document.querySelectorAll('[data-inject-tiles]').forEach(function (slot) {
+    var base = document.getElementById('tile-block-base').content.cloneNode(true);
+    slot.appendChild(base);
+
+    /* Load-more variation — append hidden tiles + wire the row's
+       data-load-more attribute so story-tiles-featured.js targets
+       this instance. */
+    if (slot.hasAttribute('data-load-more')) {
+      var row = slot.querySelector('.rbccm-story-tiles__row');
+      row.setAttribute('data-load-more', 'true');
+      row.setAttribute('data-load-more-chunk', '3');
+      var extras = document.getElementById('tile-block-extra-hidden').content.cloneNode(true);
+      row.appendChild(extras);
+    }
+
+    /* View All button. */
+    if (slot.hasAttribute('data-view-all')) {
+      var wrap = document.createElement('div');
+      wrap.className = 'rbccm-story-tiles__controls';
+
+      /* See More button — only on the load-more variation. */
+      if (slot.hasAttribute('data-load-more')) {
+        var seeMore = document.createElement('button');
+        seeMore.type = 'button';
+        seeMore.className = 'rbccm-story-tiles__see-more';
+        seeMore.textContent = 'See more';
+        wrap.appendChild(seeMore);
+      }
+
+      var link = document.createElement('a');
+      link.className = 'rbccm-story-tiles__view-all';
+      link.href = '#';
+      link.textContent = 'View all';
+      wrap.appendChild(link);
+
+      slot.appendChild(wrap);
+    }
+  });
+</script>
+
+<!-- The load-more controller — reads data-load-more + data-load-more-chunk
+     off the row and reveals hidden tiles in chunks. -->
+<script src="story-tiles-featured.js"></script>
+
+</body>
+</html>

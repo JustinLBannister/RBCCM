@@ -1,0 +1,657 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<!-- Story Tiles - Featured
+     ============================================================
+     Stand-alone version of conference-insights-tiles, generic
+     enough to drop on any page. Same layout and functionality
+     minus the conference-flavoured defaults + minus the insights-
+     year-XML feed enhancement (that JS is specific to the
+     Conference Insights landing page).
+
+     Layout: CSS Grid, 1 column mobile, 3 columns at 768px+.
+     A per-tile "Featured" boolean promotes a card to full-width
+     horizontal (image left, text right at desktop) — matches
+     the "1 feature + 3 below + View all" pattern.
+
+     Section-level Datums (new, on top of the conference-insights
+     inheritance): Heading (H2), Subheading (Textarea), Heading
+     Alignment (left / center), Color Scheme (light / dark) and
+     Background Colour override. Reads cleanly on any page
+     without CSS surgery.
+
+     Deploy alongside:
+       /assets/rbccm/css/components/story-tiles-featured.css
+       /assets/rbccm/js/components/story-tiles-featured.js
+     ============================================================ -->
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!-- Skin: default -->
+
+  <xsl:output method="html" indent="no" />
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl" />
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl" />
+
+  <!-- ============================================================
+       PROPERTY VARIABLES
+       ============================================================ -->
+  <xsl:variable name="FLAG_ENABLE_LOAD_MORE"      select="/Properties/Datum[@ID='EnableLoadMore'] = 'true'" />
+  <xsl:variable name="FLAG_SHOW_VIEW_ALL_ALWAYS"  select="/Properties/Datum[@ID='ShowAfterLoadAlways'] = 'true'" />
+  <xsl:variable name="CFG_INITIAL_VISIBLE"        select="number(/Properties/Datum[@ID='InitialVisibleCount'])" />
+  <xsl:variable name="CFG_LOAD_MORE_CHUNK"        select="number(/Properties/Datum[@ID='LoadMoreChunkSize'])" />
+  <xsl:variable name="CFG_SEE_MORE_TEXT"          select="/Properties/Datum[@ID='SeeMoreText']" />
+  <xsl:variable name="CFG_SEE_MORE_CLASS"         select="/Properties/Datum[@ID='SeeMoreClass']" />
+  <xsl:variable name="CFG_VIEW_ALL_TEXT"          select="/Properties/Datum[@ID='ViewAllText']" />
+  <xsl:variable name="CFG_VIEW_ALL_HREF"          select="/Properties/Datum[@ID='ViewAllHref']" />
+  <xsl:variable name="CFG_VIEW_ALL_CLASS"         select="/Properties/Datum[@ID='ViewAllClass']" />
+  <xsl:variable name="CFG_EYEBROW_DEFAULT"        select="/Properties/Datum[@ID='EyebrowDefault']" />
+
+  <!-- ─── Section header (new, stand-alone) ───
+       Heading + Subheading render above the tile grid. Blank
+       either / both drops the corresponding tag — no empty <h2>
+       or empty <p> markup, and no phantom margin. -->
+  <xsl:variable name="CFG_HEADING"      select="normalize-space(/Properties/Datum[@ID='Heading'])" />
+  <xsl:variable name="CFG_SUBHEADING"   select="/Properties/Datum[@ID='Subheading']" />
+  <xsl:variable name="CFG_HEADING_ID"   select="normalize-space(/Properties/Datum[@ID='HeadingId'])" />
+
+  <!-- Heading alignment (SelectSingle) — "left" (default) or "center".
+       Case-insensitive; anything unrecognised (typo, custom value)
+       falls back to "left". Applied as a section-level modifier
+       class so the CSS can align heading + subheading together. -->
+  <xsl:variable name="CFG_HEADING_ALIGN">
+    <xsl:choose>
+      <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='HeadingAlignment']/Option[@Selected='true']/Value), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'center'">center</xsl:when>
+      <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='HeadingAlignment']/Option[@Selected='true']/Value), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'centered'">center</xsl:when>
+      <xsl:otherwise>left</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- Color scheme (SelectSingle) — "light" (default) or "dark".
+       "dark" flips the section bg to dark navy and heading /
+       subheading text to white; tile cards stay light so the
+       tile content remains legible. -->
+  <xsl:variable name="CFG_COLOR_SCHEME">
+    <xsl:choose>
+      <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='ColorScheme']/Option[@Selected='true']/Value), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'">dark</xsl:when>
+      <xsl:otherwise>light</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- Background colour override (String). Any CSS colour value
+       (hex / rgb / named). Blank uses the CSS default for the
+       chosen ColorScheme. When set, wins over the scheme's
+       default bg — useful for a "tinted" section that isn't
+       full dark or full light. -->
+  <xsl:variable name="CFG_BG_COLOR" select="normalize-space(/Properties/Datum[@ID='BackgroundColor'])" />
+
+  <!-- Tile title heading level. Defaults to h2 so the tile grid is a
+       coherent secondary landmark under a page-level h1. Authors can drop
+       to h3/h4/h5/h6 via the TitleHeadingLevel SelectSingle Datum for pages
+       where h2 would break the outline (e.g. embedded under another h2). -->
+  <xsl:variable name="CFG_TITLE_LEVEL">
+    <xsl:choose>
+      <xsl:when test="normalize-space(/Properties/Datum[@ID='TitleHeadingLevel']/Option[@Selected='true']/Value) != ''">
+        <xsl:value-of select="normalize-space(/Properties/Datum[@ID='TitleHeadingLevel']/Option[@Selected='true']/Value)" />
+      </xsl:when>
+      <xsl:otherwise>h2</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- Padding overrides. Blank = use CSS default. Values are strings that
+       should include a unit (e.g. "24px", "0", "2rem"). Emitted as CSS
+       custom properties on the section's inline style so the CSS falls
+       back to its defaults for any variable that isn't set. -->
+  <xsl:variable name="CFG_PAD_TOP_MOBILE"     select="normalize-space(/Properties/Datum[@ID='PadTopMobile'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_MOBILE"  select="normalize-space(/Properties/Datum[@ID='PadBottomMobile'])" />
+  <xsl:variable name="CFG_PAD_TOP_DESKTOP"    select="normalize-space(/Properties/Datum[@ID='PadTopDesktop'])" />
+  <xsl:variable name="CFG_PAD_BOTTOM_DESKTOP" select="normalize-space(/Properties/Datum[@ID='PadBottomDesktop'])" />
+  <xsl:variable name="HAS_PAD_OVERRIDES" select="
+    $CFG_PAD_TOP_MOBILE != ''
+    or $CFG_PAD_BOTTOM_MOBILE != ''
+    or $CFG_PAD_TOP_DESKTOP != ''
+    or $CFG_PAD_BOTTOM_DESKTOP != ''
+  " />
+
+  <xsl:variable name="HAS_HIDDEN_TILES" select="$FLAG_ENABLE_LOAD_MORE and count(/Properties/Data/Group[@Name='Story Tile']) &gt; $CFG_INITIAL_VISIBLE" />
+  <xsl:variable name="RENDER_CONTROLS"  select="$HAS_HIDDEN_TILES or $FLAG_SHOW_VIEW_ALL_ALWAYS" />
+
+
+  <!-- ============================================================
+       CARD TEMPLATE
+       ============================================================ -->
+  <xsl:template name="TILE_CARD">
+    <xsl:param name="is_featured">false</xsl:param>
+    <xsl:param name="hide_for_loadmore">false</xsl:param>
+
+    <xsl:variable name="ARTICLE_DCR"        select="./Datum[@Name='Source DCR']/DCR/press_release" />
+    <xsl:variable name="ARTICLE_TITLE"      select="$ARTICLE_DCR/title" />
+    <xsl:variable name="ARTICLE_DESCRIPTION" select="$ARTICLE_DCR/description" />
+    <xsl:variable name="ARTICLE_THUMBNAIL"  select="$ARTICLE_DCR/thumbnail" />
+    <xsl:variable name="ARTICLE_TYPE"       select="$ARTICLE_DCR/story_type" />
+    <xsl:variable name="ARTICLE_READTIME"   select="$ARTICLE_DCR/time_to_read" />
+    <xsl:variable name="ARTICLE_WATCHTIME"  select="$ARTICLE_DCR/time_to_watch" />
+
+    <xsl:variable name="TITLE_MANUAL"       select="./Datum[@Name='Manual Article Title']" />
+    <xsl:variable name="DESC_MANUAL"        select="./Datum[@Name='Manual Article Description']" />
+    <xsl:variable name="OVERWRITE"          select="./Datum[@Name='Overwrite Title']/Option[@Selected='true']/Value" />
+    <!-- Link resolution: manual Link Datum on the tile row wins (author
+         override for redirects, external URLs, etc.); otherwise fall back
+         to the article DCR's own can_url (canonical URL to the story
+         page). Matches the citizenship-carousel pattern so authors don't
+         have to type the URL for every article they add. -->
+    <xsl:variable name="LINK_MANUAL"        select="./Datum[@Name='Link']" />
+    <xsl:variable name="LINK_CANONICAL"     select="$ARTICLE_DCR/can_url" />
+    <xsl:variable name="LINK">
+      <xsl:choose>
+        <xsl:when test="normalize-space($LINK_MANUAL) != ''"><xsl:value-of select="$LINK_MANUAL" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$LINK_CANONICAL" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="EYEBROW_OVERRIDE"   select="./Datum[@Name='Eyebrow Override']" />
+    <xsl:variable name="OPEN_NEW_TAB"       select="./Datum[@Name='Open in New Tab'] = 'true'" />
+
+    <xsl:variable name="EYEBROW">
+      <xsl:choose>
+        <xsl:when test="normalize-space($EYEBROW_OVERRIDE) != ''"><xsl:value-of select="$EYEBROW_OVERRIDE" /></xsl:when>
+        <xsl:when test="normalize-space($CFG_EYEBROW_DEFAULT) != ''"><xsl:value-of select="$CFG_EYEBROW_DEFAULT" /></xsl:when>
+        <xsl:otherwise>Insights</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="META_TEXT">
+      <xsl:choose>
+        <xsl:when test="$ARTICLE_TYPE = 'video' and normalize-space($ARTICLE_WATCHTIME) != ''"><xsl:value-of select="$ARTICLE_WATCHTIME" /> watch</xsl:when>
+        <xsl:when test="$ARTICLE_TYPE = 'audio' and normalize-space($ARTICLE_WATCHTIME) != ''"><xsl:value-of select="$ARTICLE_WATCHTIME" /> listen</xsl:when>
+        <xsl:when test="normalize-space($ARTICLE_READTIME) != ''"><xsl:value-of select="$ARTICLE_READTIME" /> read</xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Bottom-right date label: "Jul 2026" style. Sourced from the DCR's
+         publish_date, which arrives as ISO YYYY-MM-DD. XSL 1.0 has no
+         datetime type, so we substring the year (chars 1-4) and month
+         (chars 6-7), then map the numeric month to a 3-letter abbrev via
+         xsl:choose. Empty publish_date → empty DATE_LABEL → the bottom-
+         row wrapper collapses to just the meta on the left. -->
+    <xsl:variable name="ARTICLE_PUB" select="normalize-space($ARTICLE_DCR/publish_date)" />
+    <xsl:variable name="DATE_LABEL">
+      <xsl:if test="string-length($ARTICLE_PUB) &gt;= 7">
+        <xsl:variable name="MM" select="substring($ARTICLE_PUB, 6, 2)" />
+        <xsl:variable name="YYYY" select="substring($ARTICLE_PUB, 1, 4)" />
+        <xsl:choose>
+          <xsl:when test="$MM = '01'">Jan </xsl:when>
+          <xsl:when test="$MM = '02'">Feb </xsl:when>
+          <xsl:when test="$MM = '03'">Mar </xsl:when>
+          <xsl:when test="$MM = '04'">Apr </xsl:when>
+          <xsl:when test="$MM = '05'">May </xsl:when>
+          <xsl:when test="$MM = '06'">Jun </xsl:when>
+          <xsl:when test="$MM = '07'">Jul </xsl:when>
+          <xsl:when test="$MM = '08'">Aug </xsl:when>
+          <xsl:when test="$MM = '09'">Sep </xsl:when>
+          <xsl:when test="$MM = '10'">Oct </xsl:when>
+          <xsl:when test="$MM = '11'">Nov </xsl:when>
+          <xsl:when test="$MM = '12'">Dec </xsl:when>
+        </xsl:choose>
+        <xsl:value-of select="$YYYY" />
+      </xsl:if>
+    </xsl:variable>
+
+    <!-- Region label ("US", "Canada", "Global", "Europe", "APAC"). Pulls
+         from the DCR's regional_origination first, then regional_relevancy
+         as fallback. Codes get uppercased or mapped to their long form.
+         Feed emits region as lowercase codes so we map here — XSL 1.0's
+         translate() handles the tolower normalization. -->
+    <xsl:variable name="REGION_RAW">
+      <xsl:variable name="orig" select="normalize-space($ARTICLE_DCR/regional_origination)" />
+      <xsl:variable name="rel"  select="normalize-space($ARTICLE_DCR/regional_relevancy)" />
+      <xsl:choose>
+        <xsl:when test="$orig != ''"><xsl:value-of select="$orig" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$rel" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="REGION_KEY" select="translate($REGION_RAW, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+    <xsl:variable name="REGION_LABEL">
+      <xsl:choose>
+        <xsl:when test="$REGION_KEY = 'us'">US</xsl:when>
+        <xsl:when test="$REGION_KEY = 'ca'">Canada</xsl:when>
+        <xsl:when test="$REGION_KEY = 'canada'">Canada</xsl:when>
+        <xsl:when test="$REGION_KEY = 'global'">Global</xsl:when>
+        <xsl:when test="$REGION_KEY = 'eu'">Europe</xsl:when>
+        <xsl:when test="$REGION_KEY = 'europe'">Europe</xsl:when>
+        <xsl:when test="$REGION_KEY = 'apac'">APAC</xsl:when>
+        <xsl:otherwise><xsl:value-of select="$REGION_RAW" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Topic label. DCR ships this as a checkbox multi-select — we take
+         the first selected Option and pretty-print it. Slugs like
+         "energy-transition" are mapped to display names below. -->
+    <xsl:variable name="TOPIC_RAW" select="normalize-space($ARTICLE_DCR/topic/Option[@Selected='true'][1]/Value)" />
+    <xsl:variable name="TOPIC_KEY" select="translate($TOPIC_RAW, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-')" />
+    <xsl:variable name="TOPIC_LABEL">
+      <xsl:choose>
+        <xsl:when test="$TOPIC_KEY = 'energy'">Energy</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'energy-transition'">Energy Transition</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'financial-institutions'">Financial Institutions</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'healthcare'">Healthcare</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'industrials'">Industrials</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'markets-economics'">Markets &amp; Economics</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'mining-materials'">Mining &amp; Materials</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'power-utilities-infrastructure'">Power, Utilities &amp; Infrastructure</xsl:when>
+        <xsl:when test="$TOPIC_KEY = 'technology-innovation'">Technology &amp; Innovation</xsl:when>
+        <xsl:otherwise><xsl:value-of select="$TOPIC_RAW" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Concatenate region + date with " · " separator, mirroring JS. -->
+    <xsl:variable name="REGION_DATE">
+      <xsl:choose>
+        <xsl:when test="normalize-space($REGION_LABEL) != '' and normalize-space($DATE_LABEL) != ''">
+          <xsl:value-of select="normalize-space($REGION_LABEL)" /><xsl:text> &#183; </xsl:text><xsl:value-of select="normalize-space($DATE_LABEL)" />
+        </xsl:when>
+        <xsl:when test="normalize-space($REGION_LABEL) != ''"><xsl:value-of select="normalize-space($REGION_LABEL)" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space($DATE_LABEL)" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="TITLE_TEXT">
+      <xsl:choose>
+        <xsl:when test="normalize-space($OVERWRITE) = 'Yes' and normalize-space($TITLE_MANUAL) != ''"><xsl:value-of select="$TITLE_MANUAL" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$ARTICLE_TITLE" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Screen-reader-only single announcement for the whole card link, so
+         SR users hear "Insights: The Future of AI in Financial Services. 2
+         min read. Opens in new window." rather than each child element
+         concatenated. Composed of eyebrow + title + meta + new-tab hint. -->
+    <xsl:variable name="ARIA_LABEL">
+      <xsl:value-of select="$EYEBROW" />
+      <xsl:text>: </xsl:text>
+      <xsl:value-of select="$TITLE_TEXT" />
+      <xsl:if test="normalize-space($META_TEXT) != ''">
+        <xsl:text>. </xsl:text>
+        <xsl:value-of select="$META_TEXT" />
+      </xsl:if>
+      <xsl:text>.</xsl:text>
+      <xsl:if test="$OPEN_NEW_TAB"><xsl:text> Opens in new window.</xsl:text></xsl:if>
+    </xsl:variable>
+
+    <a>
+      <xsl:attribute name="class">
+        rbccm-story-tiles__insight rbccm-story-tiles__insight--card<xsl:if test="$is_featured = 'true'"> rbccm-story-tiles__insight--featured</xsl:if>
+      </xsl:attribute>
+      <xsl:attribute name="href"><xsl:value-of select="$LINK" /></xsl:attribute>
+      <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL" /></xsl:attribute>
+      <xsl:if test="$OPEN_NEW_TAB">
+        <xsl:attribute name="target">_blank</xsl:attribute>
+        <xsl:attribute name="rel">noopener noreferrer</xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$hide_for_loadmore = 'true'">
+        <xsl:attribute name="hidden">hidden</xsl:attribute>
+        <xsl:attribute name="data-hidden-by-loadmore">true</xsl:attribute>
+      </xsl:if>
+
+      <div class="rbccm-story-tiles__insight-media">
+        <!-- alt="" because the visible title/description is right next to
+             the image inside the same link. Non-empty alt would cause the
+             title to be announced twice. -->
+        <img loading="lazy" alt="">
+          <xsl:attribute name="src"><xsl:value-of select="$ARTICLE_THUMBNAIL" /></xsl:attribute>
+        </img>
+      </div>
+
+      <div class="rbccm-story-tiles__insight-body">
+        <div class="rbccm-story-tiles__insight-label"><xsl:value-of select="$EYEBROW" /></div>
+        <div class="rbccm-story-tiles__insight-divider" aria-hidden="true"></div>
+
+        <xsl:element name="{$CFG_TITLE_LEVEL}">
+          <xsl:attribute name="class">rbccm-story-tiles__insight-title</xsl:attribute>
+          <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes" />
+        </xsl:element>
+
+        <p class="rbccm-story-tiles__insight-desc">
+          <xsl:choose>
+            <xsl:when test="normalize-space($OVERWRITE) = 'Yes' and normalize-space($DESC_MANUAL) != ''">
+              <xsl:value-of select="$DESC_MANUAL" disable-output-escaping="yes" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$ARTICLE_DESCRIPTION" disable-output-escaping="yes" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </p>
+
+        <!-- Bottom row: meta ("14 min listen ›") on the left, taxonomy
+             stack (topic on top, "region · date" below) on the right.
+             Any side or piece can be absent — we only emit the wrappers
+             we have. If neither side has content, the whole row collapses
+             and the card reads as pre-taxonomy layout. -->
+        <xsl:variable name="HAS_TAXONOMY" select="normalize-space($TOPIC_LABEL) != '' or normalize-space($REGION_DATE) != ''" />
+        <xsl:if test="normalize-space($META_TEXT) != '' or $HAS_TAXONOMY">
+          <div class="rbccm-story-tiles__insight-bottom">
+            <xsl:if test="normalize-space($META_TEXT) != ''">
+              <p class="rbccm-story-tiles__insight-meta">
+                <span><xsl:value-of select="$META_TEXT" /></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-story-tiles__insight-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"></path></svg>
+              </p>
+            </xsl:if>
+            <xsl:if test="$HAS_TAXONOMY">
+              <!-- Topic and region rendered as their own spans even though
+                   CSS currently hides them. Keeping the markup shape lets
+                   the team un-hide via a one-line CSS change once we
+                   confirm the extra taxonomy is welcome. Region carries
+                   its " · " separator inline so hiding it removes the
+                   orphan dot for free. -->
+              <div class="rbccm-story-tiles__insight-taxonomy">
+                <xsl:if test="normalize-space($TOPIC_LABEL) != ''">
+                  <span class="rbccm-story-tiles__insight-topic"><xsl:value-of select="normalize-space($TOPIC_LABEL)" /></span>
+                </xsl:if>
+                <xsl:if test="normalize-space($REGION_LABEL) != ''">
+                  <span class="rbccm-story-tiles__insight-region">
+                    <xsl:value-of select="normalize-space($REGION_LABEL)" />
+                    <xsl:if test="normalize-space($DATE_LABEL) != ''">
+                      <xsl:text> &#183; </xsl:text>
+                    </xsl:if>
+                  </span>
+                </xsl:if>
+                <xsl:if test="normalize-space($DATE_LABEL) != ''">
+                  <span class="rbccm-story-tiles__insight-date"><xsl:value-of select="normalize-space($DATE_LABEL)" /></span>
+                </xsl:if>
+              </div>
+            </xsl:if>
+          </div>
+        </xsl:if>
+      </div>
+    </a>
+  </xsl:template>
+
+
+  <!-- ============================================================
+       MAIN TEMPLATE
+       ============================================================ -->
+  <xsl:template match="/">
+    <xsl:variable name="ARTICLES" select="/Properties/Data/Group[@Name='Story Tile']" />
+
+    <!-- Shared CSS + JS (relative path is /assets/rbccm/... in production).
+         Scoping these to the component keeps authors from having to touch
+         page-level settings — drop the tile component on any page and
+         everything renders correctly on its own. -->
+    <link rel="stylesheet" href="/assets/rbccm/css/components/story-tiles-featured.css" />
+    <script src="/assets/rbccm/js/components/story-tiles-featured.js"></script>
+
+    <section>
+      <!-- Section modifier classes are composed dynamically:
+           base + color-scheme + heading-alignment. Blank alignment
+           falls back to left (default), blank scheme to light. -->
+      <xsl:attribute name="class">rbccm-story-tiles<xsl:if test="$CFG_COLOR_SCHEME = 'dark'"> rbccm-story-tiles--on-dark</xsl:if><xsl:if test="$CFG_HEADING_ALIGN = 'center'"> rbccm-story-tiles--headings-centered</xsl:if></xsl:attribute>
+      <xsl:attribute name="id">rbccm-story-tiles</xsl:attribute>
+      <!-- Inline style bundles padding overrides + optional bg
+           colour override into one attribute. Any blank Datum
+           emits nothing; CSS falls back to its own defaults for
+           each unset custom property. -->
+      <xsl:if test="$HAS_PAD_OVERRIDES or $CFG_BG_COLOR != ''">
+        <xsl:attribute name="style"><xsl:if test="$CFG_PAD_TOP_MOBILE != ''">--rbccm-stf-pt-m: <xsl:value-of select="$CFG_PAD_TOP_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_MOBILE != ''">--rbccm-stf-pb-m: <xsl:value-of select="$CFG_PAD_BOTTOM_MOBILE" />;</xsl:if><xsl:if test="$CFG_PAD_TOP_DESKTOP != ''">--rbccm-stf-pt-d: <xsl:value-of select="$CFG_PAD_TOP_DESKTOP" />;</xsl:if><xsl:if test="$CFG_PAD_BOTTOM_DESKTOP != ''">--rbccm-stf-pb-d: <xsl:value-of select="$CFG_PAD_BOTTOM_DESKTOP" />;</xsl:if><xsl:if test="$CFG_BG_COLOR != ''">background-color: <xsl:value-of select="$CFG_BG_COLOR" />;</xsl:if></xsl:attribute>
+      </xsl:if>
+      <div class="rbccm-story-tiles__inner">
+
+        <!-- ─── Header (Heading + Subheading) ───
+             Rendered above the tile grid. Blank either / both
+             drops the corresponding tag — no empty <h2> or empty
+             <p> markup, and no phantom margin. The whole header
+             wrapper is skipped when both are blank so the tiles
+             sit flush against the top of the container. -->
+        <xsl:if test="$CFG_HEADING != '' or normalize-space($CFG_SUBHEADING) != ''">
+          <div class="rbccm-story-tiles__header">
+            <xsl:if test="$CFG_HEADING != ''">
+              <h2 class="rbccm-story-tiles__heading">
+                <xsl:if test="$CFG_HEADING_ID != ''">
+                  <xsl:attribute name="id"><xsl:value-of select="$CFG_HEADING_ID" /></xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="$CFG_HEADING" />
+              </h2>
+            </xsl:if>
+            <xsl:if test="normalize-space($CFG_SUBHEADING) != ''">
+              <p class="rbccm-story-tiles__subheading">
+                <xsl:value-of select="$CFG_SUBHEADING" disable-output-escaping="yes" />
+              </p>
+            </xsl:if>
+          </div>
+        </xsl:if>
+
+        <!-- Skeleton placeholders — shown until the Filter By JS finishes
+             initializing (marker attribute `data-filter-ready="true"`).
+             Same layout as the real row (1 featured card on top + 3-up
+             row below) so nothing shifts when real tiles cross-fade in.
+             aria-hidden so screen readers ignore the shimmer state. -->
+        <div class="rbccm-story-tiles__skeleton" aria-hidden="true">
+          <div class="rbccm-story-tiles__skeleton-card rbccm-story-tiles__skeleton-card--featured">
+            <div class="rbccm-story-tiles__skeleton-image"></div>
+            <div class="rbccm-story-tiles__skeleton-body">
+              <div class="rbccm-story-tiles__skeleton-title"></div>
+              <div class="rbccm-story-tiles__skeleton-desc"></div>
+              <div class="rbccm-story-tiles__skeleton-desc rbccm-story-tiles__skeleton-desc--short"></div>
+              <div class="rbccm-story-tiles__skeleton-meta"></div>
+            </div>
+          </div>
+          <div class="rbccm-story-tiles__skeleton-row">
+            <div class="rbccm-story-tiles__skeleton-card">
+              <div class="rbccm-story-tiles__skeleton-image"></div>
+              <div class="rbccm-story-tiles__skeleton-body">
+                <div class="rbccm-story-tiles__skeleton-title"></div>
+                <div class="rbccm-story-tiles__skeleton-desc"></div>
+                <div class="rbccm-story-tiles__skeleton-desc rbccm-story-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-story-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-story-tiles__skeleton-card">
+              <div class="rbccm-story-tiles__skeleton-image"></div>
+              <div class="rbccm-story-tiles__skeleton-body">
+                <div class="rbccm-story-tiles__skeleton-title"></div>
+                <div class="rbccm-story-tiles__skeleton-desc"></div>
+                <div class="rbccm-story-tiles__skeleton-desc rbccm-story-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-story-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-story-tiles__skeleton-card">
+              <div class="rbccm-story-tiles__skeleton-image"></div>
+              <div class="rbccm-story-tiles__skeleton-body">
+                <div class="rbccm-story-tiles__skeleton-title"></div>
+                <div class="rbccm-story-tiles__skeleton-desc"></div>
+                <div class="rbccm-story-tiles__skeleton-desc rbccm-story-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-story-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row is a semantic <ul> so screen readers announce "list of N".
+             Each card sits inside a <li> with display: contents (see CSS)
+             so the <a> remains the direct CSS Grid child — the li box
+             collapses out of the layout but its semantics are preserved. -->
+        <ul class="rbccm-story-tiles__row">
+          <xsl:if test="$HAS_HIDDEN_TILES">
+            <xsl:attribute name="data-load-more">true</xsl:attribute>
+            <xsl:attribute name="data-load-more-chunk"><xsl:value-of select="$CFG_LOAD_MORE_CHUNK" /></xsl:attribute>
+          </xsl:if>
+
+          <xsl:for-each select="$ARTICLES">
+            <xsl:variable name="IS_FEATURED"  select="./Datum[@Name='Featured'] = 'true'" />
+            <xsl:variable name="HIDE_FOR_LM"  select="$HAS_HIDDEN_TILES and position() &gt; $CFG_INITIAL_VISIBLE" />
+
+            <!-- ============================================================
+                 FILTER DATA ATTRIBUTES (July 2 taxonomy)
+                 The shared Filter By component (filter-by.html) reads
+                 these attributes off each tile to drive Year/Region/
+                 Topic dropdowns + full-text search. Each field is
+                 optional — the corresponding filter dropdown auto-hides
+                 if no tile carries it. See article DCR for source fields:
+                   publish_date         → data-year   (YYYY prefix)
+                   regional_relevancy   → data-region
+                   topic (checkbox)     → data-topic  (space-separated)
+                   title + description  → data-search-text (lowercased)
+                 ============================================================ -->
+            <xsl:variable name="LI_DCR"        select="./Datum[@Name='Source DCR']/DCR/press_release" />
+            <xsl:variable name="LI_PUB"        select="normalize-space($LI_DCR/publish_date)" />
+            <!-- Combine both regional fields into data-region so the
+                 filter matches on either dimension. Article tagged
+                 Origination=US + Relevancy=Global gets data-region="us global"
+                 and matches both US and Global filter selections.
+                 REGION_BUCKETS in filter-by.js tokenizes on whitespace so
+                 the space-separated emission works out of the box. -->
+            <xsl:variable name="LI_REGION_ORIG" select="normalize-space($LI_DCR/regional_origination)" />
+            <xsl:variable name="LI_REGION_REL"  select="normalize-space($LI_DCR/regional_relevancy)" />
+            <xsl:variable name="LI_REGION">
+              <xsl:choose>
+                <xsl:when test="$LI_REGION_ORIG != '' and $LI_REGION_REL != '' and $LI_REGION_ORIG != $LI_REGION_REL">
+                  <xsl:value-of select="$LI_REGION_ORIG" /><xsl:text> </xsl:text><xsl:value-of select="$LI_REGION_REL" />
+                </xsl:when>
+                <xsl:when test="$LI_REGION_ORIG != ''"><xsl:value-of select="$LI_REGION_ORIG" /></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$LI_REGION_REL" /></xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+            <li class="rbccm-story-tiles__item">
+              <xsl:if test="$LI_PUB != '' and string-length($LI_PUB) &gt;= 4">
+                <xsl:attribute name="data-year"><xsl:value-of select="substring($LI_PUB, 1, 4)" /></xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$LI_REGION != ''">
+                <xsl:attribute name="data-region"><xsl:value-of select="$LI_REGION" /></xsl:attribute>
+              </xsl:if>
+              <!-- Topic is a multi-checkbox in the DCR. Teamsite serializes
+                   selected values as text content on the <topic> element
+                   (space or comma separated for multi-select), not as
+                   child elements. Read the whole string value and pass
+                   through with whitespace normalized — the filter JS
+                   already tokenizes on space/comma/slash. -->
+              <xsl:if test="normalize-space($LI_DCR/topic) != ''">
+                <xsl:attribute name="data-topic"><xsl:value-of select="normalize-space($LI_DCR/topic)" /></xsl:attribute>
+              </xsl:if>
+              <xsl:attribute name="data-search-text">
+                <xsl:value-of select="translate(normalize-space($LI_DCR/title), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="translate(normalize-space($LI_DCR/description), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" />
+              </xsl:attribute>
+            <xsl:call-template name="TILE_CARD">
+              <xsl:with-param name="is_featured">
+                <xsl:choose>
+                  <xsl:when test="$IS_FEATURED">true</xsl:when>
+                  <xsl:otherwise>false</xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="hide_for_loadmore">
+                <xsl:choose>
+                  <xsl:when test="$HIDE_FOR_LM">true</xsl:when>
+                  <xsl:otherwise>false</xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+            </xsl:call-template>
+            </li>
+          </xsl:for-each>
+        </ul>
+
+        <!-- Controls row: See More + View All. -->
+        <xsl:if test="$RENDER_CONTROLS">
+          <div class="rbccm-story-tiles__controls">
+
+            <xsl:if test="$HAS_HIDDEN_TILES">
+              <button type="button">
+                <xsl:attribute name="class">
+                  rbccm-story-tiles__see-more<xsl:if test="normalize-space($CFG_SEE_MORE_CLASS) != ''"><xsl:text> </xsl:text><xsl:value-of select="$CFG_SEE_MORE_CLASS" /></xsl:if>
+                </xsl:attribute>
+                <xsl:choose>
+                  <xsl:when test="normalize-space($CFG_SEE_MORE_TEXT) != ''">
+                    <xsl:value-of select="$CFG_SEE_MORE_TEXT" disable-output-escaping="yes" />
+                  </xsl:when>
+                  <xsl:otherwise>See more</xsl:otherwise>
+                </xsl:choose>
+              </button>
+            </xsl:if>
+
+            <a>
+              <xsl:attribute name="class">
+                rbccm-story-tiles__view-all<xsl:if test="normalize-space($CFG_VIEW_ALL_CLASS) != ''"><xsl:text> </xsl:text><xsl:value-of select="$CFG_VIEW_ALL_CLASS" /></xsl:if>
+              </xsl:attribute>
+              <xsl:attribute name="href">
+                <xsl:choose>
+                  <xsl:when test="normalize-space($CFG_VIEW_ALL_HREF) != ''"><xsl:value-of select="$CFG_VIEW_ALL_HREF" /></xsl:when>
+                  <xsl:otherwise>/en/insights</xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:if test="$HAS_HIDDEN_TILES and not($FLAG_SHOW_VIEW_ALL_ALWAYS)">
+                <xsl:attribute name="hidden">hidden</xsl:attribute>
+                <xsl:attribute name="data-view-all-gated">true</xsl:attribute>
+              </xsl:if>
+              <xsl:choose>
+                <xsl:when test="normalize-space($CFG_VIEW_ALL_TEXT) != ''">
+                  <xsl:value-of select="$CFG_VIEW_ALL_TEXT" disable-output-escaping="yes" />
+                </xsl:when>
+                <xsl:otherwise>View all</xsl:otherwise>
+              </xsl:choose>
+            </a>
+
+          </div>
+        </xsl:if>
+
+      </div>
+    </section>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+<Properties ComponentID="1782500001003">
+  <!-- Padding overrides. Leave blank to use component defaults
+       (mobile 40 / 40, desktop 64 / 64). Include a unit, e.g. "24px" or "2rem". -->
+  <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
+  <!-- Load-more behavior -->
+  <Datum ID="EnableLoadMore"        Type="Boolean" Name="Enable See More / Load More button">false</Datum>
+  <Datum ID="ShowAfterLoadAlways"   Type="Boolean" Name="Always show View All button (independent of load-more)">true</Datum>
+  <Datum ID="InitialVisibleCount"   Type="Number"  Name="Number of tiles visible before See More click">4</Datum>
+  <Datum ID="LoadMoreChunkSize"     Type="Number"  Name="How many tiles to reveal per See More click">3</Datum>
+
+  <!-- Button labels -->
+  <Datum ID="SeeMoreText"           Type="String"  Name="See More button label">See more</Datum>
+  <Datum ID="SeeMoreClass"          Type="String"  Name="See More button extra CSS class (optional)"/>
+  <Datum ID="ViewAllText"           Type="String"  Name="View All button label">View all</Datum>
+  <Datum ID="ViewAllHref"           Type="String"  Name="View All button URL">/en/insights</Datum>
+  <Datum ID="ViewAllClass"          Type="String"  Name="View All button extra CSS class (optional)"/>
+
+  <!-- Eyebrow default (per-tile override available via Eyebrow Override Datum) -->
+  <Datum ID="EyebrowDefault"        Type="String"  Name="Default eyebrow label">Insights</Datum>
+
+  <!-- Tile title heading level. Default h2. Drop to h3/h4/h5/h6 when
+       embedding under another h2 so the page outline stays coherent. -->
+  <Datum ID="TitleHeadingLevel"     Type="SelectSingle" Name="Tile title heading level">
+    <Option Selected="true"><Display>H2 (default)</Display><Value>h2</Value></Option>
+    <Option><Display>H3</Display><Value>h3</Value></Option>
+    <Option><Display>H4</Display><Value>h4</Value></Option>
+    <Option><Display>H5</Display><Value>h5</Value></Option>
+    <Option><Display>H6</Display><Value>h6</Value></Option>
+  </Datum>
+</Properties>
+
+<Data>
+  <Group ID="T01-0" Name="Story Tile" Replicatable="true">
+    <Datum ID="SourceDCR"         Name="Source DCR"                 Type="DCR">
+      <!-- Restrict the browser to conference-insights article DCRs so
+           authors don't accidentally pick unrelated DCR types (events,
+           podcasts, etc.). The RBCCM articles live at
+           templatedata/article/story/data/{year}/*.xml so the canonical
+           Category/Type is `article/story`. -->
+      <DCR Category="article" Type="story"/>
+      <DCR-Category Name="article">
+        <DCR-Type Name="story"/>
+      </DCR-Category>
+    </Datum>
+    <Datum ID="ManualTitle"       Name="Manual Article Title"       Type="String"/>
+    <Datum ID="ManualDescription" Name="Manual Article Description" Type="String"/>
+    <Datum ID="OverwriteTitle"    Name="Overwrite Title"            Type="SelectSingle">
+      <Option Selected="true"><Display>No</Display><Value>No</Value></Option>
+      <Option><Display>Yes</Display><Value>Yes</Value></Option>
+    </Datum>
+    <Datum ID="Link"              Name="Link"                       Type="String"/>
+    <Datum ID="Featured"          Name="Featured"                   Type="Boolean">false</Datum>
+    <Datum ID="OpenInNewTab"      Name="Open in New Tab"            Type="Boolean">false</Datum>
+    <Datum ID="EyebrowOverride"   Name="Eyebrow Override"           Type="String"/>
+  </Group>
+</Data>

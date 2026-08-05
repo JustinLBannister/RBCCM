@@ -1,0 +1,199 @@
+<!-- ============================================================
+     Story Tiles - Featured — Properties + Data
+     ============================================================
+     Stand-alone version of conference-insights-tiles. Same
+     "1 featured card + 3-up row + View all" layout, minus the
+     conference-flavoured defaults and minus the insights-year
+     XML feed enhancement.
+
+     What's new on top of conference-insights-tiles:
+       Heading           section H2 (was implicit before)
+       Subheading        paragraph under H2
+       HeadingId         optional anchor id + scroll-margin-top
+       HeadingAlignment  left / center
+       ColorScheme       light / dark
+       BackgroundColor   optional CSS colour override
+
+     Deploy alongside the skin:
+       /assets/rbccm/css/components/story-tiles-featured.css
+       /assets/rbccm/js/components/story-tiles-featured.js
+
+     Consumed by story-tiles-featured.xsl.
+
+     SCHEMA NOTE: only ID, Name, Type are permitted on a Datum,
+     and only ID, Name, Replicatable, CloneGroupID on a Group.
+     MinReplicates and Required are NOT in Teamsite's schema.
+     Enforce counts + required in the XSL, not here.
+     ============================================================ -->
+<Properties ComponentID="story-tiles-featured-v1">
+
+  <!-- ═══ SECTION HEADER ═════════════════════════════════════
+       Both Heading and Subheading are OPTIONAL. Leave one or
+       both blank and the XSL drops the corresponding tag — no
+       empty <h2>, no empty <p>, no phantom margin. Leave both
+       blank and the whole header wrapper is skipped, so the
+       tiles sit flush against the top of the container. -->
+  <Datum ID="Heading" Type="String" Name="Section Heading (optional)">Latest insights</Datum>
+
+  <!-- Textarea: intro copy can run long and may need inline
+       markup (a link, an em). TinyMCE wraps content in <p>
+       under the hood; the XSL emits it as-is inside our own
+       <p class="__subheading"> so paragraph styling is
+       controlled from CSS. -->
+  <Datum ID="Subheading" Type="Textarea" Name="Section Subheading / Intro (optional)"></Datum>
+
+  <!-- Optional id on the H2 so anchor links (…#latest-insights)
+       jump to the section. When set, the CSS also applies a
+       scroll-margin-top so the H2 sits below any sticky nav.
+       Use a slug: lowercase, dashes. -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional, e.g. latest-insights)"></Datum>
+
+
+  <!-- ═══ APPEARANCE ═════════════════════════════════════════
+       Same option system as icon-carousel and deal-carousel:
+         ColorScheme = dark        adds the "on-dark" modifier
+         HeadingAlignment = center adds the "headings-centered" modifier
+       The two are INDEPENDENT — centre the heading on a light
+       section, or left-align it on a dark one. Anything valid.
+       Parsed case-insensitively; anything unrecognised falls
+       back to the default so a typo can't break the layout. -->
+  <Datum ID="ColorScheme" Type="SelectSingle" Name="Color Scheme">
+    <Option Selected="true">
+      <Display>Light (default)</Display>
+      <Value>light</Value>
+    </Option>
+    <Option>
+      <Display>Dark (navy background, white heading)</Display>
+      <Value>dark</Value>
+    </Option>
+  </Datum>
+
+  <Datum ID="HeadingAlignment" Type="SelectSingle" Name="Heading Alignment">
+    <Option Selected="true">
+      <Display>Left (default)</Display>
+      <Value>left</Value>
+    </Option>
+    <Option>
+      <Display>Center</Display>
+      <Value>center</Value>
+    </Option>
+  </Datum>
+
+  <!-- Optional custom background colour, layered over whichever
+       ColorScheme is picked. Accepts any CSS colour value: hex
+       (#EFF6FD), rgb(), hsl(), or named. Blank uses the CSS
+       default for the chosen scheme (white for light, navy for
+       dark). Useful for a "tinted" section (pale blue wash, off-
+       white, brand accent) that isn't one of the two schemes. -->
+  <Datum ID="BackgroundColor" Type="String" Name="Background Color (blank uses scheme default, e.g. #EFF6FD)"></Datum>
+
+
+  <!-- ═══ SECTION PADDING (optional overrides) ═══════════════
+       Blank uses component defaults (mobile 40 / 40, desktop
+       64 / 64). Include a unit — "24px", "2rem", "0". Emitted
+       as CSS custom properties on the section's inline style
+       so the CSS falls back to defaults for any variable that
+       isn't set. -->
+  <Datum ID="PadTopMobile" Type="String" Name="Mobile padding-top (blank = 40px)"/>
+  <Datum ID="PadBottomMobile" Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
+  <Datum ID="PadTopDesktop" Type="String" Name="Desktop padding-top (blank = 64px)"/>
+  <Datum ID="PadBottomDesktop" Type="String" Name="Desktop padding-bottom (blank = 64px)"/>
+
+
+  <!-- ═══ LOAD-MORE BEHAVIOUR ════════════════════════════════
+       Off by default — most instances show all tiles at once.
+       Turn on to render a "See more" button that reveals
+       hidden tiles in chunks. The View All button below is
+       independent (see ShowAfterLoadAlways). -->
+  <Datum ID="EnableLoadMore" Type="Boolean" Name="Enable See More / Load More button">false</Datum>
+  <Datum ID="ShowAfterLoadAlways" Type="Boolean" Name="Always show View All button (independent of load-more)">true</Datum>
+  <Datum ID="InitialVisibleCount" Type="Number" Name="Number of tiles visible before See More click">4</Datum>
+  <Datum ID="LoadMoreChunkSize" Type="Number" Name="How many tiles to reveal per See More click">3</Datum>
+
+  <!-- ═══ BUTTON LABELS + URLS ═══════════════════════════════ -->
+  <Datum ID="SeeMoreText" Type="String" Name="See More button label">See more</Datum>
+  <Datum ID="SeeMoreClass" Type="String" Name="See More button extra CSS class (optional)"/>
+  <Datum ID="ViewAllText" Type="String" Name="View All button label">View all</Datum>
+  <!-- URL is intentionally blank by default (was /en/insights in
+       conference-insights-tiles). Author supplies the correct
+       destination per instance. -->
+  <Datum ID="ViewAllHref" Type="String" Name="View All button URL (blank hides the button)"></Datum>
+  <Datum ID="ViewAllClass" Type="String" Name="View All button extra CSS class (optional)"/>
+
+
+  <!-- ═══ EYEBROW + TITLE HEADING LEVEL ══════════════════════ -->
+  <!-- Per-tile Eyebrow Override is available on the Story Tile
+       Group below; this is the fallback used when a tile
+       doesn't override. -->
+  <Datum ID="EyebrowDefault" Type="String" Name="Default eyebrow label">Insights</Datum>
+
+  <!-- Tile title heading level. Default h2 keeps the tile grid a
+       coherent secondary landmark under a page-level h1. Drop to
+       h3-h6 when embedding under another h2 so the page outline
+       stays coherent. -->
+  <Datum ID="TitleHeadingLevel" Type="SelectSingle" Name="Tile title heading level">
+    <Option Selected="true">
+      <Display>H2 (default)</Display>
+      <Value>h2</Value>
+    </Option>
+    <Option>
+      <Display>H3</Display>
+      <Value>h3</Value>
+    </Option>
+    <Option>
+      <Display>H4</Display>
+      <Value>h4</Value>
+    </Option>
+    <Option>
+      <Display>H5</Display>
+      <Value>h5</Value>
+    </Option>
+    <Option>
+      <Display>H6</Display>
+      <Value>h6</Value>
+    </Option>
+  </Datum>
+
+</Properties>
+
+<Data>
+  <!-- ═══ STORY TILES ═════════════════════════════════════════
+       One Group per tile. Each Group binds ONE article/story
+       DCR (Category="article" Type="story"), typically at
+       templatedata/article/story/data/<year>/<month>/<slug>.
+
+       The Featured Boolean per tile promotes that card to the
+       full-width horizontal layout (image left, text right on
+       desktop). Combine one Featured=true with three or more
+       Featured=false to hit the "1 featured + 3-up" layout the
+       component is named for.
+
+       IMPORTANT — the nested <DCR> element must be PRESENT and
+       EMPTY; a default path becomes a phantom dependency
+       Teamsite tries to resolve at publish. Category + Type
+       still scope the picker. -->
+  <Group ID="T01-0" Name="Story Tile" Replicatable="true">
+    <Datum ID="SourceDCR" Name="Source DCR" Type="DCR">
+      <DCR Category="article" Type="story"/>
+      <DCR-Category Name="article">
+        <DCR-Type Name="story"/>
+      </DCR-Category>
+    </Datum>
+    <Datum ID="ManualTitle" Name="Manual Article Title" Type="String"/>
+    <Datum ID="ManualDescription" Name="Manual Article Description" Type="String"/>
+    <Datum ID="OverwriteTitle" Name="Overwrite Title" Type="SelectSingle">
+      <Option Selected="true">
+        <Display>No</Display>
+        <Value>No</Value>
+      </Option>
+      <Option>
+        <Display>Yes</Display>
+        <Value>Yes</Value>
+      </Option>
+    </Datum>
+    <Datum ID="Link" Name="Link" Type="String"/>
+    <Datum ID="Featured" Name="Featured" Type="Boolean">false</Datum>
+    <Datum ID="OpenInNewTab" Name="Open in New Tab" Type="Boolean">false</Datum>
+    <Datum ID="EyebrowOverride" Name="Eyebrow Override" Type="String"/>
+  </Group>
+</Data>
