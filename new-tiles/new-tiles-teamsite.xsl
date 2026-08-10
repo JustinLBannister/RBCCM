@@ -1492,7 +1492,7 @@
 
 <Data>
 
-  <Datum ID="ArticleRecord">
+  <Datum ID="ArticleRecord" Type="DCR" Name="Article picker (optional)">
     <DCR Category="article" Type="story"></DCR>
   </Datum>
 
