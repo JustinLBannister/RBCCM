@@ -368,6 +368,25 @@
       <DCR Category="rbccm" Type="casestudy"></DCR>
     </Datum>
 
+    
+    <Datum ID="EyebrowOverride" Type="String" Name="Eyebrow Label (blank = record subcategory or Expertise)"></Datum>
+
+    <Datum ID="TitleOverride" Type="String" Name="Title"></Datum>
+    <Datum ID="DescriptionOverride" Type="Textarea" Name="Description"></Datum>
+
+    <Datum ID="ImageOverride" Type="Image" Name="Card Image">
+      <Image>
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+    <Datum ID="ImageAltOverride" Type="String" Name="Card Image Alt Text (blank = title)"></Datum>
+
+    <Datum ID="MetaOverride" Type="String" Name="Read Time (e.g. 4 min read)"></Datum>
+
+    <Datum ID="LinkOverride" Type="String" Name="Card Link URL"></Datum>
+    <Datum ID="LinkNewTab" Type="Boolean" Name="Open Card Link in New Tab">false</Datum>
+
   </Group>
 
 </Data>

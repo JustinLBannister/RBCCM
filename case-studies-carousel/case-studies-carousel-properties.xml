@@ -133,48 +133,62 @@
        Public URL (built in the XSL's story-url template):
          /en/expertise/transactions/case-study/<year>/<month>/<slug>
 
-       The XSL binds $dcr as `DCR/*[1]` (wildcard root) so the
-       template stays working regardless of the casestudy
-       datacapture's actual root element name. Field selectors
-       inside the XSL (title, description, subcategory,
-       thumbnail, time_to_read) assume field names match the
-       article/story tree — adjust in the XSL if the casestudy
-       datacapture uses different names.
-
-       MINIMUM 3 slides — enforced by the XSL. Below that the
-       carousel has less visual weight than a single hero card
-       (2 dots looks broken, 1 dot is pointless), so the whole
-       component drops from render until the author has bound
-       three case studies. No hard maximum — slick derives the
-       dot count from however many exist — but the dot strip
-       wraps on mobile past ~14 slides, so 4-8 is the intended
-       sweet spot.
-
-       IMPORTANT — the nested <DCR> element must be PRESENT
-       but EMPTY. A default path here becomes a phantom
-       dependency Teamsite tries to resolve at publish, and
-       every cloned row inherits it. Category + Type still scope
-       the picker to the correct DCR type; the path is filled in
-       by Teamsite when the author picks one. -->
+       DEPLOY HANG INVESTIGATION (open): TeamSite hangs at
+       "Initializing deployment" whenever a case study is picked
+       on the test page. The picker resolves records fine at
+       edit-time (fields populate) so the DCR type registration
+       is valid. The hang is specifically the deploy-time
+       packaging of the reference — probably the record's own
+       sub-deps (images, referenced pages) failing to walk. The
+       leadership carousel (rbccm/authors picker) has the SAME
+       pattern: works on some pages, hangs on others. -->
   <Group ID="CaseStudy"
          Name="Case Study"
          Replicatable="true"
          CloneGroupID="case-studies-slide">
 
-    <!-- DCR picker. Scope restored to rbccm/casestudy (the actual
-         target). TEST D — every Override Datum below has been
-         STRIPPED. If the component publishes cleanly with only
-         this DCR Datum in the Group, the hang is triggered by
-         the DCR + Override Datums combination inside the same
-         Group; we'd restructure by moving the Overrides to
-         separate top-level Datums or a sibling Group. If publish
-         still hangs, the picker is fundamentally broken here and
-         we ship manual-only.
-         The nested <DCR> element must be present but empty (a
-         default path becomes a phantom publish dependency). -->
+    <!-- DCR picker. Scoped to Category="rbccm" Type="casestudy". -->
     <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
       <DCR Category="rbccm" Type="casestudy"></DCR>
     </Datum>
+
+    <!-- ── Per-slide overrides ──
+         BLANK = "use the bound record". An override wins for
+         that field. A slide with no record AND no title is
+         dropped by the XSL (a card with no headline is not a
+         card). -->
+
+    <!-- Uppercase eyebrow above the divider. XSL default is
+         "Expertise" (matching the live site); the record's own
+         subcategory wins if set (e.g. "Case Study"), then the
+         override wins over that. -->
+    <Datum ID="EyebrowOverride" Type="String" Name="Eyebrow Label (blank = record subcategory or Expertise)"></Datum>
+
+    <Datum ID="TitleOverride" Type="String" Name="Title"></Datum>
+    <Datum ID="DescriptionOverride" Type="Textarea" Name="Description"></Datum>
+
+    <!-- Card image. The nested <Image> skeleton is REQUIRED and
+         must be left EMPTY. A default path here fails validation
+         with "Datum ID=[Image] Value is not a valid image". -->
+    <Datum ID="ImageOverride" Type="Image" Name="Card Image">
+      <Image>
+        <Path/>
+        <Description/>
+      </Image>
+    </Datum>
+    <Datum ID="ImageAltOverride" Type="String" Name="Card Image Alt Text (blank = title)"></Datum>
+
+    <!-- Read-time / meta line at the bottom. Free text so it can
+         say "4 min read", "13 min listen", "17 min watch". XSL
+         falls back to the record's reading_time when blank. -->
+    <Datum ID="MetaOverride" Type="String" Name="Read Time (e.g. 4 min read)"></Datum>
+
+    <!-- Link. Blank falls back to the bound record's own case-
+         study page URL (built from the DCR path). Manual
+         override for external links or when the record has no
+         page. -->
+    <Datum ID="LinkOverride" Type="String" Name="Card Link URL"></Datum>
+    <Datum ID="LinkNewTab" Type="Boolean" Name="Open Card Link in New Tab">false</Datum>
 
   </Group>
 
