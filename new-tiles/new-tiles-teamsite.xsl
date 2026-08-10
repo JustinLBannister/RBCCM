@@ -5,7 +5,7 @@
     <xsl:text disable-output-escaping="yes"><![CDATA[
 <style>
 
-    /* SCOPED RESETS — component-only, do not leak to host page */
+    /* SCOPED RESETS - component-only, do not leak to host page */
     .rbccm-new-tiles-section, .rbccm-new-tiles-section *, .rbccm-new-tiles__player, .rbccm-new-tiles__player * { box-sizing: border-box; }
     .rbccm-new-tiles-section, .rbccm-new-tiles__player { font-family: var(--nt-sans); color: var(--nt-text); line-height: 1.5; }
     .rbccm-new-tiles-section img, .rbccm-new-tiles__player img { display: block; max-width: 100%; }
@@ -13,7 +13,7 @@
     .rbccm-new-tiles-section a { color: inherit; text-decoration: none; }
 
     /* ==========================================================
-       New Tiles — local preview shell
+       New Tiles - local preview shell
        ==========================================================
        Working name / classes: .rbccm-new-tiles__*
        Rename before productionising.
@@ -43,7 +43,7 @@
     @media (min-width: 768px) {
       .rbccm-new-tiles__rationale-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
     }
-    /* Toolbar row — one horizontal row of controls, wraps to a new
+    /* Toolbar row - one horizontal row of controls, wraps to a new
        line when the viewport is too narrow. Rows stack via the
        toolbar's flex-column parent. Groups holding a text input or
        select grow to fill available space (flex: 1) so the row is
@@ -53,8 +53,8 @@
        Standard RBCCM section header pattern shared with the other
        shipping components (leadership-carousel, story-tiles-featured,
        icon-carousel, etc.):
-         H2  — RBCDisplay 29px, weight 500, dark navy #003168
-         P   — Roboto 16px, weight 400, dark navy, line-height 24px
+         H2  - RBCDisplay 29px, weight 500, dark navy #003168
+         P   - Roboto 16px, weight 400, dark navy, line-height 24px
        Mobile scales H2 down to 24px per site standard.
        Both sit above the card grid with a shared 1140px content
        rail so they line up with the cards at the desktop max width. */
@@ -97,7 +97,7 @@
 
     .rbccm-new-tiles__section-header {
       /* Aligns to the LEFT edge of the parent (the demo shell / the
-         cards container) — no max-width, no auto margins. This lets
+         cards container) - no max-width, no auto margins. This lets
          the heading + subheading line up with the cards' left edge
          at every viewport, matching how the rest of the site handles
          section headers over card grids (see: story-tiles, etc.).
@@ -106,7 +106,7 @@
       margin: 0 0 35px 0;
       text-align: left;
     }
-    /* Centered modifier — both H2 and subheading center-align. */
+    /* Centered modifier - both H2 and subheading center-align. */
     .rbccm-new-tiles__section-header--centered {
       text-align: center;
     }
@@ -114,7 +114,7 @@
     .rbccm-new-tiles__section-header--centered .rbccm-new-tiles__subheading {
       text-align: center;
     }
-    /* On-dark modifier — flips heading + subheading to white against
+    /* On-dark modifier - flips heading + subheading to white against
        dark backgrounds so they stay legible. */
     .rbccm-new-tiles-section--on-dark .rbccm-new-tiles__heading,
     .rbccm-new-tiles-section--on-dark .rbccm-new-tiles__subheading {
@@ -240,7 +240,7 @@
        above card content but under the popover. Uses :has() to
        key off `[data-open="true"]` on any descendant popover,
        so the same rule covers Listen / Share / More.
-       `pointer-events: auto` only when visible — the scrim
+       `pointer-events: auto` only when visible - the scrim
        catches ambient clicks so tapping the dimmed area closes
        the popover via the JS click-outside logic instead of
        accidentally triggering an underlying button. */
@@ -272,7 +272,7 @@
       height: 100%;
       object-fit: cover;
     }
-    /* Play button — bottom-left corner (roughly 20/20 offset).
+    /* Play button - bottom-left corner (roughly 20/20 offset).
        Round, 1.5px white outline, transparent fill on rest;
        fills white with blue icon on hover / focus. Positioned
        absolute so it floats over the image. */
@@ -301,11 +301,11 @@
       transform: scale(1.04);
     }
     .rbccm-new-tiles__play svg {
-      /* Optical centre for a play triangle — nudge right 1px. */
+      /* Optical centre for a play triangle - nudge right 1px. */
       margin-left: 2px;
     }
 
-    /* Duration chip — bottom-right, dark translucent pill with
+    /* Duration chip - bottom-right, dark translucent pill with
        headphone icon + "7 min". Small caps-ish look. */
     .rbccm-new-tiles__duration {
       position: absolute;
@@ -328,7 +328,7 @@
 
     .rbccm-new-tiles__
 
-    /* Eyebrow — bright blue, uppercase, letter-spaced. Sits
+    /* Eyebrow - bright blue, uppercase, letter-spaced. Sits
        above the meta row on a line of its own. */
     .rbccm-new-tiles__eyebrow {
       color: var(--nt-blue-br);
@@ -341,7 +341,7 @@
       margin: 0;
     }
 
-    /* Meta row — icon + label groups separated by thin `|`.
+    /* Meta row - icon + label groups separated by thin `|`.
        Each pair uses inline-flex so the icon and label track
        together and wrap as a unit. The `|` is a real character
        (light muted), not a border, so it drops naturally on
@@ -370,7 +370,7 @@
       user-select: none;
     }
 
-    /* Title — RBCDisplay, bold. Line-height a touch tighter than
+    /* Title - RBCDisplay, bold. Line-height a touch tighter than
        the description below to keep the visual weight. */
     .rbccm-new-tiles__title {
       font-family: var(--nt-serif);
@@ -384,7 +384,7 @@
     /* ---------- Stretched link ("card is clickable") ----------
        The anchor wrapping the title text also stretches
        invisibly over the entire card via a ::before pseudo, so
-       tapping anywhere on the card navigates to the article —
+       tapping anywhere on the card navigates to the article -
        BUT the H3's <a> stays the only real link in the DOM. So
        screen readers announce a single, clearly-labelled link;
        right-click "open in new tab" works from anywhere on the
@@ -392,7 +392,7 @@
        nesting).
 
        Interactive children (play, tags, action row, popovers,
-       scrim) MUST sit above the stretched pseudo — otherwise
+       scrim) MUST sit above the stretched pseudo - otherwise
        tapping any of them would just fire the article link.
        Each gets its own `position: relative; z-index: 2+`
        below. */
@@ -414,7 +414,7 @@
          adds text over the pseudo. */
       cursor: pointer;
     }
-    /* Keyboard focus — outline the WHOLE card box, not just
+    /* Keyboard focus - outline the WHOLE card box, not just
        the title. Users hitting Tab land on the card as a unit,
        which matches the click affordance. */
     .rbccm-new-tiles__title-link:focus-visible::before {
@@ -422,7 +422,7 @@
       outline-offset: -2px;
       border-radius: inherit;
     }
-    /* Hover — title text goes brand blue when the mouse is
+    /* Hover - title text goes brand blue when the mouse is
        anywhere on the card, so the link affordance travels
        with the pointer. */
     @media (hover: hover) {
@@ -431,7 +431,7 @@
       }
     }
 
-    /* Interactive children — raised above the stretched pseudo
+    /* Interactive children - raised above the stretched pseudo
        (z-index: 1) so their own click behaviour wins. Any new
        interactive element inside the card needs this same
        promotion or it will silently become a navigate-to-
@@ -439,7 +439,7 @@
 
        .__play and .__duration are ALREADY position: absolute
        (they anchor to corners of the media block), so they
-       only need z-index — adding `position: relative` here
+       only need z-index - adding `position: relative` here
        would clobber that anchoring and let them re-flow.
        The other two are static by default, so they need
        both. */
@@ -455,7 +455,7 @@
        so the popover (which is a child of .__actions and inherits its
        stacking context) sits ABOVE the scrim when the popover opens.
        Prior value of z-index: 2 was fine for stretched-link layering
-       but trapped the popover below the scrim — scrim tinted the
+       but trapped the popover below the scrim - scrim tinted the
        popover chrome grey when open. z-index: 20 keeps the popover
        and its anchor row bright while the rest of the card dims. */
     .rbccm-new-tiles__actions {
@@ -463,13 +463,13 @@
       z-index: 20;
     }
 
-    /* Description — muted, capped to a comfortable 3-line block. */
+    /* Description - muted, capped to a comfortable 3-line block. */
     .rbccm-new-tiles__desc {
       color: var(--nt-muted);
       font-size: 14px;
       line-height: 1.5;
       margin: 0;
-      /* Optional line clamp — keeps card heights close on desktop. */
+      /* Optional line clamp - keeps card heights close on desktop. */
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
@@ -536,7 +536,7 @@
       flex-shrink: 0;
     }
 
-    /* Secondary actions — Save / Share / More. Icon-only
+    /* Secondary actions - Save / Share / More. Icon-only
        square buttons. */
     .rbccm-new-tiles__action {
       width: 36px;
@@ -557,7 +557,7 @@
       color: var(--nt-blue);
       outline: none;
     }
-    /* Save toggle — the Save button carries two SVG paths
+    /* Save toggle - the Save button carries two SVG paths
        (outline + fill). CSS swaps which one shows based on
        aria-pressed, and the button colour goes brand blue
        once saved so it reads as "on". */
@@ -565,14 +565,14 @@
     .rbccm-new-tiles__action[aria-pressed="true"] { color: var(--nt-blue); }
     .rbccm-new-tiles__action[aria-pressed="true"] .rbccm-new-tiles__save-outline { display: none; }
     .rbccm-new-tiles__action[aria-pressed="true"] .rbccm-new-tiles__save-fill { display: block; }
-    /* Open popover state — action button gets the same tinted
+    /* Open popover state - action button gets the same tinted
        fill Listen does when its popover is open, so the source
        of the popover is visually obvious. */
     .rbccm-new-tiles__action[aria-expanded="true"] {
       background: var(--nt-blue-tint);
       color: var(--nt-blue);
     }
-    /* Tiny copied-link confirmation — a text bubble that
+    /* Tiny copied-link confirmation - a text bubble that
        floats in for a beat after a successful clipboard write,
        then fades. `data-flash="true"` is set by the JS. */
     .rbccm-new-tiles__flash {
@@ -618,7 +618,7 @@
       /* Anchor to BOTH sides of the actions row (which has
          padding: 14px 20px), so the popover width matches the
          card's content width and never overflows the card box.
-         No min-width / max-width — the platform list wraps
+         No min-width / max-width - the platform list wraps
          when needed, and the extras row just grows height. */
       left: 20px;
       right: 20px;
@@ -669,7 +669,7 @@
     }
     /* 4-column grid so the four primary platforms line up on
        row 1 and the 5th (More) drops to row 2 spanning the
-       full width — cleaner than a lonely square in the corner.
+       full width - cleaner than a lonely square in the corner.
        Uniform 8px gap. */
     .rbccm-new-tiles__popover-list {
       display: grid;
@@ -716,7 +716,7 @@
       background: var(--nt-blue-tint);
       outline: none;
     }
-    /* Platform icon — placeholder coloured squares stand in for
+    /* Platform icon - placeholder coloured squares stand in for
        the real brand SVGs (Apple Podcasts purple, Spotify green,
        etc). Swap for the actual asset files when ready. */
     .rbccm-new-tiles__platform-icon {
@@ -829,7 +829,7 @@
        Clicking the "More" icon button inside the popover
        reveals additional items (Pocket Casts, RSS Feed,
        Download MP3, View Transcript) below the initial 5-icon
-       row — same popover, just taller. Uses the CSS Grid
+       row - same popover, just taller. Uses the CSS Grid
        template-rows 0fr → 1fr trick for a smooth height
        transition without hardcoding a max-height. */
     .rbccm-new-tiles__popover-extra {
@@ -966,7 +966,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
         </button>
 
-        <!-- Listen popover — opens on click of Listen; the More
+        <!-- Listen popover - opens on click of Listen; the More
              button inside toggles data-expanded on this same
              element to reveal the extras row below. -->
         <div class="rbccm-new-tiles__popover" id="pop-1" role="dialog" aria-label="Listen on">
@@ -998,7 +998,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__popover-more-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
           </div>
-          <!-- Extras row — hidden by default; expands into view
+          <!-- Extras row - hidden by default; expands into view
                when More is toggled. Grid animates via the
                template-rows 0fr → 1fr trick. -->
           <div class="rbccm-new-tiles__popover-extra" id="pop-1-extra">
@@ -1029,7 +1029,7 @@
         </div>
 
         <!-- Options popover (card 1). Overflow menu with a few
-             standard actions. Small on purpose — heavy actions
+             standard actions. Small on purpose - heavy actions
              (Save, Share) live in the action row as their own
              buttons. -->
         <div class="rbccm-new-tiles__popover" id="options-1" role="dialog" aria-label="More options">
@@ -1265,7 +1265,7 @@
 
 <script>
   /* ==========================================================
-     Card action controller — Listen / Save / Share / More
+     Card action controller - Listen / Save / Share / More
      ==========================================================
      All three action-row popovers (Listen, Share, More) reuse
      the same __popover shell + open/close mechanics. Any
@@ -1345,7 +1345,7 @@
       btn.setAttribute('aria-pressed', nowSaved ? 'true' : 'false');
       btn.setAttribute('aria-label', nowSaved ? 'Remove from saved' : 'Save');
     }
-    /* Restore save state on load — buttons carrying
+    /* Restore save state on load - buttons carrying
        data-tile-id are set to aria-pressed="true" when that id
        is in localStorage. Runs once at DOMContentLoaded. */
     function restoreSaved() {
@@ -1501,7 +1501,7 @@
         return;
       }
 
-      /* Report — demo-only alert. Wire this to a real form or
+      /* Report - demo-only alert. Wire this to a real form or
          mailto once product decides where reports should go. */
       var reportBtn = e.target.closest('[data-action="report"]');
       if (reportBtn) {
@@ -1537,7 +1537,7 @@
 
 <script>
   /* ==========================================================
-     Podcast player — bottom-pinned iframe embed
+     Podcast player - bottom-pinned iframe embed
      ==========================================================
      - Click a card's Play button → iframe src = that button's
        data-episode-url, player slides in from the bottom.
@@ -1545,7 +1545,7 @@
        and slides the player back out.
      - Focus returns to the play button that triggered it, so
        keyboard users don't lose their place.
-     - Only one player instance for the whole page — reusing
+     - Only one player instance for the whole page - reusing
        the DOM keeps the CSS anchoring simple and prevents
        two audio tracks playing over each other.
      ========================================================== */
@@ -1558,7 +1558,7 @@
 
     function openPlayer(url, trigger) {
       if (!url) return;
-      /* Only swap src if it's changed — avoids restarting a
+      /* Only swap src if it's changed - avoids restarting a
          track when the same episode's play button is hit twice. */
       if (iframe.getAttribute('src') !== url) iframe.src = url;
       player.setAttribute('data-open', 'true');
@@ -1573,7 +1573,7 @@
     function closePlayer() {
       player.setAttribute('data-open', 'false');
       /* Clear src to stop playback. Setting to blank both
-         mutes the audio and unloads the iframe — Captivate's
+         mutes the audio and unloads the iframe - Captivate's
          player doesn't expose a JS pause API, so this is the
          only reliable way to silence it on close. */
       iframe.src = '';
@@ -1608,7 +1608,7 @@
 (function () {
   'use strict';
 
-  // Relative URL — resolves against the current page's origin, so it's
+  // Relative URL - resolves against the current page's origin, so it's
   // guaranteed same-origin when hosted on rbccm.com (no CORS check).
   // For local file:// preview the absolute URL is spliced back in by
   // the branch below so the proxy chain has something to fetch.
@@ -1620,7 +1620,7 @@
   var CARD_SEL   = '.rbccm-new-tiles__card';
   var TYPE_FILTER = 'audio';   // only podcasts for this component
 
-  // Proxy chain lifted from insights-json-builder — first hit wins.
+  // Proxy chain lifted from insights-json-builder - first hit wins.
   function proxyUrls(target) {
     return [
       'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target),
@@ -1631,7 +1631,7 @@
   }
 
   // Fetch strategy: try direct same-origin first (works when the page
-  // is served from rbccm.com — no proxy needed, and the public CORS
+  // is served from rbccm.com - no proxy needed, and the public CORS
   // proxies actively reject requests from an origin that already has
   // direct access). Fall back to the proxy chain only if the direct
   // fetch fails, so localhost / file:// preview still works.
@@ -1681,7 +1681,7 @@
   }
 
   // "July 15, 2026" → "Jul 2026". Falls back to the raw string if the
-  // month name doesn't match (unusual dates still render — just not
+  // month name doesn't match (unusual dates still render - just not
   // abbreviated).
   var MONTH_ABBR = {
     january: 'Jan', february: 'Feb', march: 'Mar', april: 'Apr',
@@ -1710,7 +1710,7 @@
   }
 
   // Populate a single card in place. Selectors mirror the DOM in the
-  // hand-built demo cards above — if the markup diverges, update here.
+  // hand-built demo cards above - if the markup diverges, update here.
   function paintCard(cardEl, item, index) {
     // Media image
     var img = cardEl.querySelector('.rbccm-new-tiles__media img');
@@ -1728,17 +1728,17 @@
       if (kept) durationChip.insertBefore(kept, durationChip.firstChild);
     }
 
-    // Play button — the feed doesn't carry the Captivate episode UUID
+    // Play button - the feed doesn't carry the Captivate episode UUID
     // and rbccm.com refuses to be iframed (X-Frame-Options), so we
     // leave the original hardcoded FPO Captivate URL in place. When
     // the real component ships each card's Captivate URL will come
     // from an EpisodeUrl Datum authored per-tile.
 
-    // Eyebrow (category) — usually "Insights" from this feed.
+    // Eyebrow (category) - usually "Insights" from this feed.
     var eyebrow = cardEl.querySelector('.rbccm-new-tiles__eyebrow');
     if (eyebrow && item.category) eyebrow.textContent = item.category;
 
-    // Meta row — [date, type, region, watchtime]. Keep each item's SVG
+    // Meta row - [date, type, region, watchtime]. Keep each item's SVG
     // icon and only replace the label text.
     var metaItems = cardEl.querySelectorAll('.rbccm-new-tiles__meta-item');
     var metaValues = [shortDate(item.date), 'Podcast', item.region || '', item.watchtime || ''];
@@ -1761,7 +1761,7 @@
     var desc = cardEl.querySelector('.rbccm-new-tiles__desc');
     if (desc) desc.textContent = item.description;
 
-    // Tags — feed sends a comma-separated string; keep the first three
+    // Tags - feed sends a comma-separated string; keep the first three
     // to avoid overflowing the card.
     var tagContainer = cardEl.querySelector('.rbccm-new-tiles__tags');
     if (tagContainer && item.tags) {
