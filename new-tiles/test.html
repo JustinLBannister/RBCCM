@@ -2049,7 +2049,14 @@
 (function () {
   'use strict';
 
-  var FEED_URL   = 'https://www.rbccm.com/en/insights/data/2026-insights';
+  // Relative URL — resolves against the current page's origin, so it's
+  // guaranteed same-origin when hosted on rbccm.com (no CORS check).
+  // For local file:// preview the absolute URL is spliced back in by
+  // the branch below so the proxy chain has something to fetch.
+  var FEED_PATH  = '/en/insights/data/2026-insights';
+  var FEED_URL   = (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                     ? 'https://www.rbccm.com' + FEED_PATH
+                     : FEED_PATH;
   var MAX_CARDS  = 3;
   var CARD_SEL   = '.rbccm-new-tiles__card';
   var TYPE_FILTER = 'audio';   // only podcasts for this component
@@ -2064,22 +2071,29 @@
     ];
   }
 
-  // Sequential proxy fetch — resolves with the raw XML text of whichever
-  // proxy responds first, rejects if all four fail.
+  // Fetch strategy: try direct same-origin first (works when the page
+  // is served from rbccm.com — no proxy needed, and the public CORS
+  // proxies actively reject requests from an origin that already has
+  // direct access). Fall back to the proxy chain only if the direct
+  // fetch fails, so localhost / file:// preview still works.
   function fetchViaProxy(target) {
-    var urls = proxyUrls(target);
-    return urls.reduce(function (chain, url, idx) {
-      return chain.catch(function () {
-        return fetch(url).then(function (r) {
-          if (!r.ok) throw new Error('proxy ' + (idx + 1) + ' HTTP ' + r.status);
-          // allorigins.win/get wraps the payload in JSON.
-          if (url.indexOf('allorigins.win/get') !== -1) {
-            return r.json().then(function (j) { return j.contents; });
-          }
-          return r.text();
+    return fetch(target).then(function (r) {
+      if (!r.ok) throw new Error('direct HTTP ' + r.status);
+      return r.text();
+    }).catch(function () {
+      var urls = proxyUrls(target);
+      return urls.reduce(function (chain, url, idx) {
+        return chain.catch(function () {
+          return fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('proxy ' + (idx + 1) + ' HTTP ' + r.status);
+            if (url.indexOf('allorigins.win/get') !== -1) {
+              return r.json().then(function (j) { return j.contents; });
+            }
+            return r.text();
+          });
         });
-      });
-    }, Promise.reject(new Error('start')));
+      }, Promise.reject(new Error('start')));
+    });
   }
 
   // Parse the feed XML into an ordered array of plain-object news items.

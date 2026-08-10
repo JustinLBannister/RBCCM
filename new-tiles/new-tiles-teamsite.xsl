@@ -1,31 +1,15 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" indent="no" encoding="UTF-8"/>
-
-  <!-- new-tiles component — HTML/CSS/JS block dumped verbatim via
-       CDATA + disable-output-escaping. Section/article tags rewritten
-       to <div> for TeamSite's HTML5 sanitizer. Feed enhancer tries
-       direct same-origin fetch first (works when served from
-       rbccm.com), falls back to CORS proxies for local preview. -->
   <xsl:template match="/">
     <xsl:text disable-output-escaping="yes"><![CDATA[
 <style>
 
     /* SCOPED RESETS — component-only, do not leak to host page */
-    .rbccm-new-tiles-section,
-    .rbccm-new-tiles-section *,
-    .rbccm-new-tiles__player,
-    .rbccm-new-tiles__player * { box-sizing: border-box; }
-    .rbccm-new-tiles-section,
-    .rbccm-new-tiles__player {
-      font-family: var(--nt-sans);
-      color: var(--nt-text);
-      line-height: 1.5;
-    }
-    .rbccm-new-tiles-section img,
-    .rbccm-new-tiles__player img { display: block; max-width: 100%; }
-    .rbccm-new-tiles-section button,
-    .rbccm-new-tiles__player button { font-family: inherit; }
+    .rbccm-new-tiles-section, .rbccm-new-tiles-section *, .rbccm-new-tiles__player, .rbccm-new-tiles__player * { box-sizing: border-box; }
+    .rbccm-new-tiles-section, .rbccm-new-tiles__player { font-family: var(--nt-sans); color: var(--nt-text); line-height: 1.5; }
+    .rbccm-new-tiles-section img, .rbccm-new-tiles__player img { display: block; max-width: 100%; }
+    .rbccm-new-tiles-section button, .rbccm-new-tiles__player button { font-family: inherit; }
     .rbccm-new-tiles-section a { color: inherit; text-decoration: none; }
 
     /* ==========================================================
@@ -1624,7 +1608,14 @@
 (function () {
   'use strict';
 
-  var FEED_URL   = 'https://www.rbccm.com/en/insights/data/2026-insights';
+  // Relative URL — resolves against the current page's origin, so it's
+  // guaranteed same-origin when hosted on rbccm.com (no CORS check).
+  // For local file:// preview the absolute URL is spliced back in by
+  // the branch below so the proxy chain has something to fetch.
+  var FEED_PATH  = '/en/insights/data/2026-insights';
+  var FEED_URL   = (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                     ? 'https://www.rbccm.com' + FEED_PATH
+                     : FEED_PATH;
   var MAX_CARDS  = 3;
   var CARD_SEL   = '.rbccm-new-tiles__card';
   var TYPE_FILTER = 'audio';   // only podcasts for this component
@@ -1640,10 +1631,10 @@
   }
 
   // Fetch strategy: try direct same-origin first (works when the page
-  // is served from rbccm.com — no proxy needed and none of the public
-  // CORS proxies work from a domain that already has direct access).
-  // If direct fails (e.g. running from localhost / file:// for preview),
-  // walk the proxy chain as a fallback.
+  // is served from rbccm.com — no proxy needed, and the public CORS
+  // proxies actively reject requests from an origin that already has
+  // direct access). Fall back to the proxy chain only if the direct
+  // fetch fails, so localhost / file:// preview still works.
   function fetchViaProxy(target) {
     return fetch(target).then(function (r) {
       if (!r.ok) throw new Error('direct HTTP ' + r.status);
@@ -1831,21 +1822,16 @@
 
 ]]></xsl:text>
   </xsl:template>
-
 </xsl:stylesheet>
 
 <Properties ComponentID="new-tiles-v1">
-
   <Datum ID="ArticleRecord" Type="DCR" Name="Article picker (optional)">
     <DCR Category="article" Type="story"></DCR>
   </Datum>
-
 </Properties>
 
 <Data>
-
   <Datum ID="ArticleRecord" Type="DCR" Name="Article picker (optional)">
     <DCR Category="article" Type="story"></DCR>
   </Datum>
-
 </Data>
