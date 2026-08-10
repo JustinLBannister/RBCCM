@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Tiles — Podcast Card Grid</title>
+  <meta name="description" content="Podcast card grid component with progressive-disclosure Listen popover, bookmarking, share, and bottom-pinned Captivate player.">
+  <meta name="robots" content="noindex">
+</head>
+<body style="margin:0; padding:0; background:#FAFBFC;">
+
+<style>
+
+    /* SCOPED RESETS — component-only, do not leak to host page */
+    .rbccm-new-tiles-section,
+    .rbccm-new-tiles-section *,
+    .rbccm-new-tiles__player,
+    .rbccm-new-tiles__player * { box-sizing: border-box; }
+    .rbccm-new-tiles-section,
+    .rbccm-new-tiles__player {
+      font-family: var(--nt-sans);
+      color: var(--nt-text);
+      line-height: 1.5;
+    }
+    .rbccm-new-tiles-section img,
+    .rbccm-new-tiles__player img { display: block; max-width: 100%; }
+    .rbccm-new-tiles-section button,
+    .rbccm-new-tiles__player button { font-family: inherit; }
+    .rbccm-new-tiles-section a { color: inherit; text-decoration: none; }
+
+    /* ==========================================================
+       New Tiles — local preview shell
+       ==========================================================
+       Working name / classes: .rbccm-new-tiles__*
+       Rename before productionising.
+       Iterating on the richer card pattern: corner play + duration
+       on media, icon-based meta row, tag chips, and a Listen button
+       with progressive-disclosure platform picker.
+       ========================================================== */
+
+    :root {
+      --nt-navy:      #002144;
+      --nt-navy-med:  #003168;
+      --nt-blue:      #0051A5;
+      --nt-blue-br:   #006AC3;
+      --nt-blue-tint: #EEF3FA;   /* tag chip fill */
+      --nt-yellow:    #FFC72C;
+      --nt-ink:       #082043;
+      --nt-text:      #494949;
+      --nt-muted:     #6B7280;
+      --nt-hairline:  #E5E7EB;
+      --nt-border:    #A8A8A8;
+      --nt-white:     #FFFFFF;
+      --nt-black-a70: rgba(0,0,0,0.7);
+      --nt-serif:     "RBC Display", RBCDisplay, Georgia, Times, serif;
+      --nt-sans:      Roboto, Arial, sans-serif;
+    }
+
+    @media (min-width: 768px) {
+      .rbccm-new-tiles__rationale-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    }
+    /* Toolbar row — one horizontal row of controls, wraps to a new
+       line when the viewport is too narrow. Rows stack via the
+       toolbar's flex-column parent. Groups holding a text input or
+       select grow to fill available space (flex: 1) so the row is
+       packed with no visible gaps;
+
+    /* ---------- Section header ----------
+       Standard RBCCM section header pattern shared with the other
+       shipping components (leadership-carousel, story-tiles-featured,
+       icon-carousel, etc.):
+         H2  — RBCDisplay 29px, weight 500, dark navy #003168
+         P   — Roboto 16px, weight 400, dark navy, line-height 24px
+       Mobile scales H2 down to 24px per site standard.
+       Both sit above the card grid with a shared 1140px content
+       rail so they line up with the cards at the desktop max width. */
+    /* ---------- Section wrapper ----------
+       Optional outer section that gives the whole component a
+       background colour + top/bottom padding. In the shipping
+       component this becomes the <section> the author drops on
+       the page; background colour is a Datum.
+
+       Full-bleed background: a ::before pseudo-element extends
+       past the parent container out to viewport edges via
+       `inset: 0 calc(50% - 50vw)`, while the section's own box
+       stays inside the parent's rail so inner content (header +
+       cards) doesn't move. `isolation: isolate` confines the
+       -1 z-index so the pseudo can't sink behind ancestor
+       backgrounds. Set --nt-section-bg to change colour. */
+    .rbccm-new-tiles-section {
+      position: relative;
+      isolation: isolate;
+      /* Section padding matches the site-wide standard used by
+         leadership-carousel, story-tiles-featured, case-studies-carousel,
+         and icon-carousel: 40px top/bottom on mobile, 64px on desktop.
+         Horizontal padding stays 0 because the parent container / rail
+         already handles horizontal alignment; the bg extends full-bleed
+         via the ::before pseudo below. */
+      padding: 40px 0;
+      background: transparent;
+    }
+    @media (min-width: 992px) {
+      .rbccm-new-tiles-section { padding: 64px 0; }
+    }
+    .rbccm-new-tiles-section::before {
+      content: '';
+      position: absolute;
+      inset: 0 calc(50% - 50vw);
+      background: var(--nt-section-bg, #ffffff);
+      z-index: -1;
+      transition: background 0.2s ease;
+    }
+
+    .rbccm-new-tiles__section-header {
+      /* Aligns to the LEFT edge of the parent (the demo shell / the
+         cards container) — no max-width, no auto margins. This lets
+         the heading + subheading line up with the cards' left edge
+         at every viewport, matching how the rest of the site handles
+         section headers over card grids (see: story-tiles, etc.).
+         35px bottom margin matches the standard header-to-content
+         gap used across leadership / story-tiles / icon-carousel. */
+      margin: 0 0 35px 0;
+      text-align: left;
+    }
+    /* Centered modifier — both H2 and subheading center-align. */
+    .rbccm-new-tiles__section-header--centered {
+      text-align: center;
+    }
+    .rbccm-new-tiles__section-header--centered .rbccm-new-tiles__heading,
+    .rbccm-new-tiles__section-header--centered .rbccm-new-tiles__subheading {
+      text-align: center;
+    }
+    /* On-dark modifier — flips heading + subheading to white against
+       dark backgrounds so they stay legible. */
+    .rbccm-new-tiles-section--on-dark .rbccm-new-tiles__heading,
+    .rbccm-new-tiles-section--on-dark .rbccm-new-tiles__subheading {
+      color: #ffffff;
+    }
+    .rbccm-new-tiles__heading {
+      color: #003168;
+      font-family: var(--nt-serif, RBCDisplay, Georgia, Times, serif);
+      font-size: 29px;
+      font-weight: 500;
+      line-height: normal;
+      margin: 0;
+      text-align: left;
+    }
+    /* Tighten the H2 → subheading gap when a subheading follows so
+       they read as a paired header block. */
+    .rbccm-new-tiles__heading--with-subhead {
+      margin-bottom: 12px;
+    }
+    .rbccm-new-tiles__subheading {
+      color: #003168;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      margin: 0;
+      text-align: left;
+    }
+    @media (max-width: 767px) {
+      .rbccm-new-tiles__heading { font-size: 24px; line-height: 1.2; }
+    }
+
+    /* ---------- Card grid ---------- */
+
+    .rbccm-new-tiles {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 768px) {
+      .rbccm-new-tiles { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 992px) {
+      .rbccm-new-tiles { grid-template-columns: repeat(3, 1fr); gap: 30px; }
+    }
+
+    /* ---------- Individual card ---------- */
+
+    .rbccm-new-tiles__card {
+      background: var(--nt-white);
+      border: 1px solid var(--nt-hairline);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      /* Positioned so the ::after scrim can inset:0 the card box. */
+      position: relative;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    @media (hover: hover) {
+      .rbccm-new-tiles__card:hover {
+        border-color: var(--nt-blue);
+        box-shadow: 0 8px 24px rgba(0, 33, 68, 0.08);
+      }
+    }
+
+    /* ---------- Podcast player (bottom-pinned) ----------
+       Single fixed player docked at the bottom of the viewport.
+       Hidden by default (translateY 100%), slides up when a
+       card's Play button is clicked. iframe src is set from
+       the play button's data-episode-url and cleared on close
+       so playback stops when the player is dismissed. */
+    .rbccm-new-tiles__player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #f9f9f9;
+      z-index: 9999;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.14);
+    }
+    .rbccm-new-tiles__player[data-open="true"] {
+      transform: translateY(0);
+    }
+    .rbccm-new-tiles__player-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--nt-ink);
+      border-radius: 50%;
+      z-index: 1;
+      transition: background 0.15s ease;
+    }
+    .rbccm-new-tiles__player-close:hover,
+    .rbccm-new-tiles__player-close:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+      outline: none;
+    }
+    .rbccm-new-tiles__player-iframe {
+      display: block;
+      width: 100%;
+      height: 200px;
+      border: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rbccm-new-tiles__player { transition: none; }
+    }
+
+    /* ---------- Popover-open scrim ----------
+       When any popover inside a card is open, an ::after
+       overlay fades in to darken the rest of the card. Popover
+       itself sits at z:20; the scrim at z:15 so it lands
+       above card content but under the popover. Uses :has() to
+       key off `[data-open="true"]` on any descendant popover,
+       so the same rule covers Listen / Share / More.
+       `pointer-events: auto` only when visible — the scrim
+       catches ambient clicks so tapping the dimmed area closes
+       the popover via the JS click-outside logic instead of
+       accidentally triggering an underlying button. */
+    .rbccm-new-tiles__card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      border-radius: inherit;
+      z-index: 15;
+      pointer-events: none;
+      transition: background 0.2s ease;
+    }
+    .rbccm-new-tiles__card:has(.rbccm-new-tiles__popover[data-open="true"])::after {
+      background: rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+    }
+
+    /* ---------- Media block ---------- */
+
+    .rbccm-new-tiles__media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: var(--nt-navy) center/cover no-repeat;
+      overflow: hidden;
+    }
+    .rbccm-new-tiles__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Play button — bottom-left corner (roughly 20/20 offset).
+       Round, 1.5px white outline, transparent fill on rest;
+       fills white with blue icon on hover / focus. Positioned
+       absolute so it floats over the image. */
+    .rbccm-new-tiles__play {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid var(--nt-white);
+      background: transparent;
+      color: var(--nt-white);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+    .rbccm-new-tiles__play:hover,
+    .rbccm-new-tiles__play:focus-visible {
+      background: var(--nt-white);
+      color: var(--nt-blue);
+      outline: none;
+      transform: scale(1.04);
+    }
+    .rbccm-new-tiles__play svg {
+      /* Optical centre for a play triangle — nudge right 1px. */
+      margin-left: 2px;
+    }
+
+    /* Duration chip — bottom-right, dark translucent pill with
+       headphone icon + "7 min". Small caps-ish look. */
+    .rbccm-new-tiles__duration {
+      position: absolute;
+      right: 16px;
+      bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--nt-black-a70);
+      color: var(--nt-white);
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+    .rbccm-new-tiles__duration svg { flex-shrink: 0; }
+
+    /* ---------- Body ---------- */
+
+    .rbccm-new-tiles__
+
+    /* Eyebrow — bright blue, uppercase, letter-spaced. Sits
+       above the meta row on a line of its own. */
+    .rbccm-new-tiles__eyebrow {
+      color: var(--nt-blue-br);
+      font-family: "Roboto Light", var(--nt-sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      line-height: 1.4;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    /* Meta row — icon + label groups separated by thin `|`.
+       Each pair uses inline-flex so the icon and label track
+       together and wrap as a unit. The `|` is a real character
+       (light muted), not a border, so it drops naturally on
+       narrow widths when a group wraps to the next line. */
+    .rbccm-new-tiles__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+      font-size: 13px;
+      color: var(--nt-text);
+      line-height: 1.3;
+    }
+    .rbccm-new-tiles__meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rbccm-new-tiles__meta-item svg {
+      flex-shrink: 0;
+      color: var(--nt-muted);
+    }
+    .rbccm-new-tiles__meta-sep {
+      color: var(--nt-hairline);
+      font-weight: 300;
+      user-select: none;
+    }
+
+    /* Title — RBCDisplay, bold. Line-height a touch tighter than
+       the description below to keep the visual weight. */
+    .rbccm-new-tiles__title {
+      font-family: var(--nt-serif);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--nt-ink);
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    /* ---------- Stretched link ("card is clickable") ----------
+       The anchor wrapping the title text also stretches
+       invisibly over the entire card via a ::before pseudo, so
+       tapping anywhere on the card navigates to the article —
+       BUT the H3's <a> stays the only real link in the DOM. So
+       screen readers announce a single, clearly-labelled link;
+       right-click "open in new tab" works from anywhere on the
+       card; buttons inside the card stay valid HTML (no anchor
+       nesting).
+
+       Interactive children (play, tags, action row, popovers,
+       scrim) MUST sit above the stretched pseudo — otherwise
+       tapping any of them would just fire the article link.
+       Each gets its own `position: relative; z-index: 2+`
+       below. */
+    .rbccm-new-tiles__title-link {
+      color: inherit;
+      text-decoration: none;
+      /* Suppress the native focus ring on the text itself; we
+         paint the ring on the ::before instead so it outlines
+         the whole card box for keyboard users. */
+      outline: none;
+    }
+    .rbccm-new-tiles__title-link::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      /* Not strictly needed (::before inherits nothing here),
+         but keeps the cursor consistent if a future change
+         adds text over the pseudo. */
+      cursor: pointer;
+    }
+    /* Keyboard focus — outline the WHOLE card box, not just
+       the title. Users hitting Tab land on the card as a unit,
+       which matches the click affordance. */
+    .rbccm-new-tiles__title-link:focus-visible::before {
+      outline: 2px solid var(--nt-blue);
+      outline-offset: -2px;
+      border-radius: inherit;
+    }
+    /* Hover — title text goes brand blue when the mouse is
+       anywhere on the card, so the link affordance travels
+       with the pointer. */
+    @media (hover: hover) {
+      .rbccm-new-tiles__card:hover .rbccm-new-tiles__title-link {
+        color: var(--nt-blue);
+      }
+    }
+
+    /* Interactive children — raised above the stretched pseudo
+       (z-index: 1) so their own click behaviour wins. Any new
+       interactive element inside the card needs this same
+       promotion or it will silently become a navigate-to-
+       article target instead.
+
+       .__play and .__duration are ALREADY position: absolute
+       (they anchor to corners of the media block), so they
+       only need z-index — adding `position: relative` here
+       would clobber that anchoring and let them re-flow.
+       The other two are static by default, so they need
+       both. */
+    .rbccm-new-tiles__play,
+    .rbccm-new-tiles__duration {
+      z-index: 2;
+    }
+    .rbccm-new-tiles__tag {
+      position: relative;
+      z-index: 2;
+    }
+    /* Actions row bumped above the .__card::after scrim (z-index: 15)
+       so the popover (which is a child of .__actions and inherits its
+       stacking context) sits ABOVE the scrim when the popover opens.
+       Prior value of z-index: 2 was fine for stretched-link layering
+       but trapped the popover below the scrim — scrim tinted the
+       popover chrome grey when open. z-index: 20 keeps the popover
+       and its anchor row bright while the rest of the card dims. */
+    .rbccm-new-tiles__actions {
+      position: relative;
+      z-index: 20;
+    }
+
+    /* Description — muted, capped to a comfortable 3-line block. */
+    .rbccm-new-tiles__desc {
+      color: var(--nt-muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+      /* Optional line clamp — keeps card heights close on desktop. */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ---------- Tag chips ---------- */
+
+    .rbccm-new-tiles__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .rbccm-new-tiles__tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--nt-blue-tint);
+      color: var(--nt-navy-med);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* ---------- Action row (Listen / Save / Share / More) ---------- */
+
+    .rbccm-new-tiles__actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 14px 20px 16px;
+      border-top: 1px solid var(--nt-hairline);
+      margin-top: auto;
+    }
+    /* Primary action = Listen. Blue, left-aligned, with play
+       icon. Grows to push the secondary actions to the right. */
+    .rbccm-new-tiles__action--primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px 8px 12px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--nt-blue);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: auto;
+      transition: background 0.15s ease;
+    }
+    .rbccm-new-tiles__action--primary:hover,
+    .rbccm-new-tiles__action--primary:focus-visible {
+      background: var(--nt-blue-tint);
+      outline: none;
+    }
+    .rbccm-new-tiles__action--primary[aria-expanded="true"] {
+      background: var(--nt-blue-tint);
+    }
+    .rbccm-new-tiles__action--primary svg {
+      color: var(--nt-blue);
+      flex-shrink: 0;
+    }
+
+    /* Secondary actions — Save / Share / More. Icon-only
+       square buttons. */
+    .rbccm-new-tiles__action {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--nt-muted);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .rbccm-new-tiles__action:hover,
+    .rbccm-new-tiles__action:focus-visible {
+      background: var(--nt-blue-tint);
+      color: var(--nt-blue);
+      outline: none;
+    }
+    /* Save toggle — the Save button carries two SVG paths
+       (outline + fill). CSS swaps which one shows based on
+       aria-pressed, and the button colour goes brand blue
+       once saved so it reads as "on". */
+    .rbccm-new-tiles__save-fill { display: none; }
+    .rbccm-new-tiles__action[aria-pressed="true"] { color: var(--nt-blue); }
+    .rbccm-new-tiles__action[aria-pressed="true"] .rbccm-new-tiles__save-outline { display: none; }
+    .rbccm-new-tiles__action[aria-pressed="true"] .rbccm-new-tiles__save-fill { display: block; }
+    /* Open popover state — action button gets the same tinted
+       fill Listen does when its popover is open, so the source
+       of the popover is visually obvious. */
+    .rbccm-new-tiles__action[aria-expanded="true"] {
+      background: var(--nt-blue-tint);
+      color: var(--nt-blue);
+    }
+    /* Tiny copied-link confirmation — a text bubble that
+       floats in for a beat after a successful clipboard write,
+       then fades. `data-flash="true"` is set by the JS. */
+    .rbccm-new-tiles__flash {
+      position: absolute;
+      top: -34px;
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      padding: 6px 10px;
+      background: var(--nt-ink);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      z-index: 30;
+    }
+    .rbccm-new-tiles__flash[data-flash="true"] {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .rbccm-new-tiles__flash::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--nt-ink);
+    }
+
+    /* ---------- Listen popover (state 2) ---------- */
+
+    /* The action row is `position: relative` so the popover can
+       anchor to the Listen button's box. */
+    .rbccm-new-tiles__actions { position: relative; }
+
+    .rbccm-new-tiles__popover {
+      position: absolute;
+      bottom: calc(100% - 8px);
+      /* Anchor to BOTH sides of the actions row (which has
+         padding: 14px 20px), so the popover width matches the
+         card's content width and never overflows the card box.
+         No min-width / max-width — the platform list wraps
+         when needed, and the extras row just grows height. */
+      left: 20px;
+      right: 20px;
+      z-index: 20;
+      background: var(--nt-white);
+      border: 1px solid var(--nt-hairline);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0, 33, 68, 0.14);
+      padding: 14px 16px;
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .rbccm-new-tiles__popover[data-open="true"] {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .rbccm-new-tiles__popover-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .rbccm-new-tiles__popover-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--nt-ink);
+    }
+    .rbccm-new-tiles__popover-close {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--nt-muted);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .rbccm-new-tiles__popover-close:hover,
+    .rbccm-new-tiles__popover-close:focus-visible {
+      background: var(--nt-blue-tint);
+      color: var(--nt-blue);
+      outline: none;
+    }
+    /* 4-column grid so the four primary platforms line up on
+       row 1 and the 5th (More) drops to row 2 spanning the
+       full width — cleaner than a lonely square in the corner.
+       Uniform 8px gap. */
+    .rbccm-new-tiles__popover-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+    /* Full-width More button on row 2. Swaps to a horizontal
+       icon + label layout since the vertical stack looks
+       awkward stretched across the popover. Subtle tint so it
+       reads as its own tier below the platform icons. */
+    .rbccm-new-tiles__platform:last-child {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      justify-content: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(0, 33, 68, 0.03);
+      max-width: none;
+    }
+    .rbccm-new-tiles__platform:last-child .rbccm-new-tiles__platform-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+    }
+    .rbccm-new-tiles__platform {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      color: var(--nt-ink);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.2;
+      min-width: 54px;
+    }
+    .rbccm-new-tiles__platform:hover,
+    .rbccm-new-tiles__platform:focus-visible {
+      background: var(--nt-blue-tint);
+      outline: none;
+    }
+    /* Platform icon — placeholder coloured squares stand in for
+       the real brand SVGs (Apple Podcasts purple, Spotify green,
+       etc). Swap for the actual asset files when ready. */
+    .rbccm-new-tiles__platform-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+    }
+    .rbccm-new-tiles__platform-icon--apple    { background: #9E4CD0; }
+    .rbccm-new-tiles__platform-icon--spotify  { background: #1DB954; }
+    .rbccm-new-tiles__platform-icon--youtube  { background: #FF3B3B; }
+    .rbccm-new-tiles__platform-icon--amazon   { background: #6C5DD3; }
+    .rbccm-new-tiles__platform-icon--pocket   { background: #E22F4C; }
+    .rbccm-new-tiles__platform-icon--rss      { background: #F19232; }
+    .rbccm-new-tiles__platform-icon--more     {
+      background: #F1F3F6;
+      color: var(--nt-ink);
+    }
+
+    /* ---------- Expanded panel (state 3) ---------- */
+
+    .rbccm-new-tiles__panel {
+      background: var(--nt-white);
+      border: 1px solid var(--nt-hairline);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0, 33, 68, 0.14);
+      padding: 16px 18px;
+      max-width: 420px;
+    }
+    .rbccm-new-tiles__panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .rbccm-new-tiles__panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--nt-ink);
+    }
+    .rbccm-new-tiles__panel-
+    .rbccm-new-tiles__panel-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--nt-ink);
+      font-size: 14px;
+      font-weight: 500;
+      text-align: left;
+      border-radius: 4px;
+    }
+    .rbccm-new-tiles__panel-item:hover,
+    .rbccm-new-tiles__panel-item:focus-visible {
+      background: var(--nt-blue-tint);
+      outline: none;
+    }
+    .rbccm-new-tiles__panel-item-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .rbccm-new-tiles__panel-item-icon--apple   { background: #9E4CD0; }
+    .rbccm-new-tiles__panel-item-icon--spotify { background: #1DB954; }
+    .rbccm-new-tiles__panel-item-icon--youtube { background: #FF3B3B; }
+    .rbccm-new-tiles__panel-item-icon--amazon  { background: #6C5DD3; }
+    .rbccm-new-tiles__panel-item-icon--pocket  { background: #E22F4C; }
+    .rbccm-new-tiles__panel-item-icon--rss     { background: #F19232; }
+    .rbccm-new-tiles__panel-item-icon--dl {
+      background: transparent;
+      color: var(--nt-ink);
+      width: auto;
+    }
+    .rbccm-new-tiles__panel-item-icon--tx {
+      background: transparent;
+      color: var(--nt-ink);
+      width: auto;
+    }
+
+    /* ---------- Share + Options popover row layout ----------
+       Share and More popovers reuse the same __popover shell
+       as Listen but their content is a vertical stack of icon +
+       label rows (not the Listen icon grid). Each row uses the
+       same __panel-item classes as the "expanded" section of
+       the Listen popover so styling stays in one place. */
+    .rbccm-new-tiles__popover-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .rbccm-new-tiles__popover-stack .rbccm-new-tiles__panel-item {
+      width: 100%;
+      padding: 10px 8px;
+    }
+
+    /* ---------- Popover "More" expansion ----------
+       Clicking the "More" icon button inside the popover
+       reveals additional items (Pocket Casts, RSS Feed,
+       Download MP3, View Transcript) below the initial 5-icon
+       row — same popover, just taller. Uses the CSS Grid
+       template-rows 0fr → 1fr trick for a smooth height
+       transition without hardcoding a max-height. */
+    .rbccm-new-tiles__popover-extra {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.28s ease, margin-top 0.28s ease, opacity 0.15s ease;
+      margin-top: 0;
+      opacity: 0;
+    }
+    .rbccm-new-tiles__popover-extra > * {
+      overflow: hidden;
+    }
+    .rbccm-new-tiles__popover[data-expanded="true"] .rbccm-new-tiles__popover-extra {
+      grid-template-rows: 1fr;
+      margin-top: 12px;
+      opacity: 1;
+    }
+    /* Divider between the initial row and the extra items,
+       only visible in the expanded state. */
+    .rbccm-new-tiles__popover-extra-inner {
+      padding-top: 12px;
+      border-top: 1px solid var(--nt-hairline);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 20px;
+    }
+    /* More button uses a chevron-down icon so it reads as a
+       "reveal more below" affordance (different from the card
+       row's overflow "…" button, which looks identical when
+       both use an ellipsis). Chevron rotates 180° when the
+       popover is expanded, so it flips to point up and signals
+       "collapse". */
+    .rbccm-new-tiles__popover-more-chevron {
+      display: block;
+      width: 14px;
+      height: 14px;
+      color: var(--nt-ink);
+      transition: transform 0.25s ease;
+    }
+    .rbccm-new-tiles__popover[data-expanded="true"] .rbccm-new-tiles__popover-more-chevron {
+      transform: rotate(180deg);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rbccm-new-tiles__popover-more-chevron { transition: none; }
+    }
+    @media (min-width: 992px) {
+      .rbccm-new-tiles__demo-row { grid-template-columns: repeat(3, 1fr); }
+    }
+  
+</style>
+
+<div class="rbccm-new-tiles-section">
+
+  <!-- Standard section header (H2 + optional subheading) shown above
+       the grid. In the shipping component these will be Datums so the
+       author can override the copy per page instance. -->
+  <div class="rbccm-new-tiles__section-header">
+    <h2 class="rbccm-new-tiles__heading rbccm-new-tiles__heading--with-subhead">Latest insights</h2>
+    <p class="rbccm-new-tiles__subheading">Podcast conversations and analysis from RBC Capital Markets on the trends shaping global markets.</p>
+  </div>
+
+  <div class="rbccm-new-tiles">
+
+    <!-- Card 1 -->
+    <div class="rbccm-new-tiles__card">
+      <div class="rbccm-new-tiles__media">
+        <img loading="lazy" src="https://picsum.photos/seed/imi-megatrends/800/450" alt="" />
+        <button type="button" class="rbccm-new-tiles__play"
+                data-action="play"
+                data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
+                aria-label="Play podcast">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+        <span class="rbccm-new-tiles__duration">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 14v-2a9 9 0 0 1 18 0v2"/>
+            <rect x="3" y="14" width="4" height="6" rx="1"/>
+            <rect x="17" y="14" width="4" height="6" rx="1"/>
+          </svg>
+          7 min
+        </span>
+      </div>
+
+      <div class="rbccm-new-tiles__body">
+        <p class="rbccm-new-tiles__eyebrow">Insights</p>
+
+        <div class="rbccm-new-tiles__meta">
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Feb 2026
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
+            Podcast
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Healthcare
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            7 min
+          </span>
+        </div>
+
+        <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-imi-megatrends">How linking itself to 3 global megatrends paid off for IMI</a></h3>
+        <p class="rbccm-new-tiles__desc">As energy demand rises, automation accelerates and healthcare advances, engineering group IMI is well placed to&hellip;</p>
+
+        <div class="rbccm-new-tiles__tags">
+          <span class="rbccm-new-tiles__tag">Healthcare</span>
+          <span class="rbccm-new-tiles__tag">Automation</span>
+          <span class="rbccm-new-tiles__tag">Energy</span>
+        </div>
+      </div>
+
+      <div class="rbccm-new-tiles__actions">
+        <button type="button" class="rbccm-new-tiles__action--primary" aria-haspopup="true" aria-expanded="false" data-popover="pop-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          Listen on
+        </button>
+        <button type="button" class="rbccm-new-tiles__action" data-action="save" data-tile-id="tile-1" aria-pressed="false" aria-label="Save">
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__save-outline" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__save-fill" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="share-1" aria-haspopup="dialog" aria-expanded="false" aria-label="Share">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="options-1" aria-haspopup="menu" aria-expanded="false" aria-label="More options">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+
+        <!-- Listen popover — opens on click of Listen; the More
+             button inside toggles data-expanded on this same
+             element to reveal the extras row below. -->
+        <div class="rbccm-new-tiles__popover" id="pop-1" role="dialog" aria-label="Listen on">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Listen on</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="rbccm-new-tiles__popover-list">
+            <button type="button" class="rbccm-new-tiles__platform">
+              <span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--apple">&#127925;</span>
+              Apple Podcasts
+            </button>
+            <button type="button" class="rbccm-new-tiles__platform">
+              <span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--spotify">&#9835;</span>
+              Spotify
+            </button>
+            <button type="button" class="rbccm-new-tiles__platform">
+              <span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--youtube">&#9654;</span>
+              YouTube
+            </button>
+            <button type="button" class="rbccm-new-tiles__platform">
+              <span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--amazon">&#9835;</span>
+              Amazon<br>Music
+            </button>
+            <button type="button" class="rbccm-new-tiles__platform rbccm-new-tiles__popover-more" aria-expanded="false" aria-controls="pop-1-extra">
+              More
+              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__popover-more-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <!-- Extras row — hidden by default; expands into view
+               when More is toggled. Grid animates via the
+               template-rows 0fr → 1fr trick. -->
+          <div class="rbccm-new-tiles__popover-extra" id="pop-1-extra">
+            <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>View Transcript</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share popover (card 1). Uses the same .__popover
+             shell + open/close mechanics as Listen; content is
+             a vertical stack of icon + label rows. -->
+        <div class="rbccm-new-tiles__popover" id="share-1" role="dialog" aria-label="Share">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Share</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="twitter"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X (Twitter)</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="linkedin"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 1 1 8.3 6.5a1.78 1.78 0 0 1-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0 0 13 14.19a.66.66 0 0 0 0 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 0 1 2.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg>LinkedIn</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="email"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="native-share"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>More apps&hellip;</button>
+          </div>
+        </div>
+
+        <!-- Options popover (card 1). Overflow menu with a few
+             standard actions. Small on purpose — heavy actions
+             (Save, Share) live in the action row as their own
+             buttons. -->
+        <div class="rbccm-new-tiles__popover" id="options-1" role="dialog" aria-label="More options">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">More</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="print"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="report"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Report</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="rbccm-new-tiles__card">
+      <div class="rbccm-new-tiles__media">
+        <img loading="lazy" src="https://picsum.photos/seed/us-equity-thanksgiving/800/450" alt="" />
+        <button type="button" class="rbccm-new-tiles__play"
+                data-action="play"
+                data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
+                aria-label="Play podcast">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <span class="rbccm-new-tiles__duration">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
+          7 min
+        </span>
+      </div>
+
+      <div class="rbccm-new-tiles__body">
+        <p class="rbccm-new-tiles__eyebrow">Insights</p>
+        <div class="rbccm-new-tiles__meta">
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Dec 2025
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
+            Podcast
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="3 6 8 6 12 12 8 18 3 18"/><polyline points="21 6 16 6 12 12 16 18 21 18"/></svg>
+            Markets
+          </span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            7 min
+          </span>
+        </div>
+        <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-us-equity-thanksgiving">What the US equity market has been thankful for</a></h3>
+        <p class="rbccm-new-tiles__desc">Explore what drove the S&amp;P 500&rsquo;s strong post-Thanksgiving rally and the tactical signals reshaping market expectations.</p>
+        <div class="rbccm-new-tiles__tags">
+          <span class="rbccm-new-tiles__tag">Equities</span>
+          <span class="rbccm-new-tiles__tag">Markets</span>
+          <span class="rbccm-new-tiles__tag">Outlook</span>
+        </div>
+      </div>
+
+      <div class="rbccm-new-tiles__actions">
+        <button type="button" class="rbccm-new-tiles__action--primary" aria-haspopup="true" aria-expanded="false" data-popover="pop-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          Listen on
+        </button>
+        <button type="button" class="rbccm-new-tiles__action" data-action="save" data-tile-id="tile-2" aria-pressed="false" aria-label="Save"><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__save-outline" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__save-fill" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="share-2" aria-haspopup="dialog" aria-expanded="false" aria-label="Share"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="options-2" aria-haspopup="menu" aria-expanded="false" aria-label="More options"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+
+        <div class="rbccm-new-tiles__popover" id="pop-2" role="dialog" aria-label="Listen on">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Listen on</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-list">
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--apple">&#127925;</span>Apple<br>Podcasts</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--spotify">&#9835;</span>Spotify</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--youtube">&#9654;</span>YouTube</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--amazon">&#9835;</span>Amazon<br>Music</button>
+            <button type="button" class="rbccm-new-tiles__platform rbccm-new-tiles__popover-more" aria-expanded="false" aria-controls="pop-2-extra">More<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__popover-more-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-extra" id="pop-2-extra">
+            <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>View Transcript</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share popover (card 2) -->
+        <div class="rbccm-new-tiles__popover" id="share-2" role="dialog" aria-label="Share">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Share</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="twitter"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X (Twitter)</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="linkedin"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 1 1 8.3 6.5a1.78 1.78 0 0 1-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0 0 13 14.19a.66.66 0 0 0 0 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 0 1 2.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg>LinkedIn</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="email"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="native-share"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>More apps&hellip;</button>
+          </div>
+        </div>
+
+        <!-- Options popover (card 2) -->
+        <div class="rbccm-new-tiles__popover" id="options-2" role="dialog" aria-label="More options">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">More</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="print"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="report"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Report</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="rbccm-new-tiles__card">
+      <div class="rbccm-new-tiles__media">
+        <img loading="lazy" src="https://picsum.photos/seed/fiber-optic-network/800/450" alt="" />
+        <button type="button" class="rbccm-new-tiles__play"
+                data-action="play"
+                data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
+                aria-label="Play podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+        <span class="rbccm-new-tiles__duration"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>7 min</span>
+      </div>
+
+      <div class="rbccm-new-tiles__body">
+        <p class="rbccm-new-tiles__eyebrow">Insights</p>
+        <div class="rbccm-new-tiles__meta">
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Aug 2025</span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>Podcast</span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Technology</span>
+          <span class="rbccm-new-tiles__meta-sep">|</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>7 min</span>
+        </div>
+        <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-winding-down">Winding down with no regrets</a></h3>
+        <p class="rbccm-new-tiles__desc">With reporting season starting to wind down, Health Care and Tech stand out positively on a few of our earnings-related&hellip;</p>
+        <div class="rbccm-new-tiles__tags">
+          <span class="rbccm-new-tiles__tag">Health Care</span>
+          <span class="rbccm-new-tiles__tag">Technology</span>
+          <span class="rbccm-new-tiles__tag">Earnings</span>
+        </div>
+      </div>
+
+      <div class="rbccm-new-tiles__actions">
+        <button type="button" class="rbccm-new-tiles__action--primary" aria-haspopup="true" aria-expanded="false" data-popover="pop-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          Listen on
+        </button>
+        <button type="button" class="rbccm-new-tiles__action" aria-label="Save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        <button type="button" class="rbccm-new-tiles__action" aria-label="Share"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="options-3" aria-haspopup="menu" aria-expanded="false" aria-label="More options"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+
+        <div class="rbccm-new-tiles__popover" id="pop-3" role="dialog" aria-label="Listen on">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Listen on</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-list">
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--apple">&#127925;</span>Apple<br>Podcasts</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--spotify">&#9835;</span>Spotify</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--youtube">&#9654;</span>YouTube</button>
+            <button type="button" class="rbccm-new-tiles__platform"><span class="rbccm-new-tiles__platform-icon rbccm-new-tiles__platform-icon--amazon">&#9835;</span>Amazon<br>Music</button>
+            <button type="button" class="rbccm-new-tiles__platform rbccm-new-tiles__popover-more" aria-expanded="false" aria-controls="pop-3-extra">More<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-new-tiles__popover-more-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-extra" id="pop-3-extra">
+            <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>View Transcript</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share popover (card 3) -->
+        <div class="rbccm-new-tiles__popover" id="share-3" role="dialog" aria-label="Share">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">Share</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="twitter"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X (Twitter)</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="linkedin"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 1 1 8.3 6.5a1.78 1.78 0 0 1-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0 0 13 14.19a.66.66 0 0 0 0 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 0 1 2.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg>LinkedIn</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-share="email"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="native-share"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>More apps&hellip;</button>
+          </div>
+        </div>
+
+        <!-- Options popover (card 3) -->
+        <div class="rbccm-new-tiles__popover" id="options-3" role="dialog" aria-label="More options">
+          <div class="rbccm-new-tiles__popover-head">
+            <span class="rbccm-new-tiles__popover-title">More</span>
+            <button type="button" class="rbccm-new-tiles__popover-close" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+          </div>
+          <div class="rbccm-new-tiles__popover-stack">
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="copy-link"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy link</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="print"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
+            <button type="button" class="rbccm-new-tiles__panel-item" data-action="report"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Report</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /.rbccm-new-tiles -->
+
+  </div><!-- /.rbccm-new-tiles-section -->
+
+<div class="rbccm-new-tiles__player" data-open="false" role="region" aria-label="Podcast player">
+  <button type="button" class="rbccm-new-tiles__player-close" aria-label="Close player">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+  <iframe class="rbccm-new-tiles__player-iframe" title="Podcast player" scrolling="no" frameborder="0" allow="autoplay" src=""></iframe>
+</div>
+
+
+
+<script>
+  /* ==========================================================
+     Card action controller — Listen / Save / Share / More
+     ==========================================================
+     All three action-row popovers (Listen, Share, More) reuse
+     the same __popover shell + open/close mechanics. Any
+     element carrying data-popover="<id>" opens the overlay
+     with that id.
+
+     - Only one popover open at a time; opening a new one closes
+       the current.
+     - Click outside, press ESC, or hit × → closes.
+     - "More" INSIDE the Listen popover toggles data-expanded on
+       the same popover (reveals extra platforms).
+
+     Save (aria-pressed toggle):
+       Persists per data-tile-id in localStorage under the key
+       "rbccm-new-tiles__saved". State restored on load, so a
+       reload keeps saved cards saved.
+
+     Share:
+       data-action="copy-link"   uses navigator.clipboard.writeText
+       data-share="twitter"      opens X share URL in a new tab
+       data-share="linkedin"     opens LinkedIn share URL
+       data-share="email"        mailto: with title as subject
+       data-action="native-share" uses navigator.share() (mobile)
+                                 button hides on browsers that
+                                 don't support the API.
+
+     More:
+       data-action="print"       window.print()
+       data-action="report"      demo alert
+       data-action="copy-link"   same as in Share
+     ========================================================== */
+  (function () {
+    var openTrigger = null;
+    var openPopover = null;
+    var SAVED_KEY   = 'rbccm-new-tiles__saved';
+
+    /* ── Popover open / close ── */
+    function closeAll() {
+      if (openPopover) {
+        openPopover.setAttribute('data-open', 'false');
+        openPopover.setAttribute('data-expanded', 'false');
+        var moreBtn = openPopover.querySelector('.rbccm-new-tiles__popover-more');
+        if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+      }
+      if (openTrigger) openTrigger.setAttribute('aria-expanded', 'false');
+      openPopover = null;
+      openTrigger = null;
+    }
+
+    function openById(id, trigger) {
+      var pop = document.getElementById(id);
+      if (!pop) return;
+      if (openPopover === pop) { closeAll(); return; }
+      closeAll();
+      pop.setAttribute('data-open', 'true');
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+      openPopover = pop;
+      openTrigger = trigger || null;
+    }
+
+    /* ── Saved state (localStorage) ── */
+    function getSaved() {
+      try { return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+    function setSaved(list) {
+      try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    function toggleSaved(tileId, btn) {
+      if (!tileId) return;
+      var saved = getSaved();
+      var idx = saved.indexOf(tileId);
+      var nowSaved;
+      if (idx >= 0) { saved.splice(idx, 1); nowSaved = false; }
+      else          { saved.push(tileId);    nowSaved = true;  }
+      setSaved(saved);
+      btn.setAttribute('aria-pressed', nowSaved ? 'true' : 'false');
+      btn.setAttribute('aria-label', nowSaved ? 'Remove from saved' : 'Save');
+    }
+    /* Restore save state on load — buttons carrying
+       data-tile-id are set to aria-pressed="true" when that id
+       is in localStorage. Runs once at DOMContentLoaded. */
+    function restoreSaved() {
+      var saved = getSaved();
+      document.querySelectorAll('[data-action="save"][data-tile-id]').forEach(function (btn) {
+        var id = btn.getAttribute('data-tile-id');
+        if (saved.indexOf(id) >= 0) {
+          btn.setAttribute('aria-pressed', 'true');
+          btn.setAttribute('aria-label', 'Remove from saved');
+        }
+      });
+    }
+    if (document.readyState !== 'loading') restoreSaved();
+    else document.addEventListener('DOMContentLoaded', restoreSaved);
+
+    /* ── Share / copy / print helpers ── */
+    function findCard(el) {
+      return el.closest('.rbccm-new-tiles__card');
+    }
+    function tileMeta(card) {
+      if (!card) return { url: window.location.href, title: document.title };
+      var titleEl = card.querySelector('.rbccm-new-tiles__title');
+      /* Cards in this demo are <article>s; production markup
+         will likely wrap each card in an <a>. Fall back to the
+         page URL when no href is available. */
+      var linkEl = card.querySelector('a[href]');
+      var href = linkEl ? new URL(linkEl.getAttribute('href'), window.location.href).href
+                        : window.location.href;
+      var title = titleEl ? titleEl.textContent.trim() : document.title;
+      return { url: href, title: title };
+    }
+
+    function flashConfirm(anchor, msg) {
+      /* Position a tiny "Copied!" bubble above the anchor
+         button. Reuses one element per popover so repeated
+         clicks reset the timer cleanly. */
+      var pop = anchor.closest('.rbccm-new-tiles__popover');
+      if (!pop) return;
+      var flash = pop.querySelector('.rbccm-new-tiles__flash');
+      if (!flash) {
+        flash = document.createElement('span');
+        flash.className = 'rbccm-new-tiles__flash';
+        pop.appendChild(flash);
+      }
+      flash.textContent = msg;
+      flash.setAttribute('data-flash', 'true');
+      clearTimeout(flash._t);
+      flash._t = setTimeout(function () { flash.setAttribute('data-flash', 'false'); }, 1400);
+    }
+
+    function copyLink(anchor) {
+      var meta = tileMeta(findCard(anchor));
+      var done = function (ok) { flashConfirm(anchor, ok ? 'Link copied' : 'Copy failed'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(meta.url).then(function () { done(true); }, function () { done(false); });
+      } else {
+        /* Legacy fallback for browsers without the clipboard
+           API. document.execCommand is deprecated but still
+           the only universally-available fallback. */
+        var ta = document.createElement('textarea');
+        ta.value = meta.url; document.body.appendChild(ta); ta.select();
+        try { done(document.execCommand('copy')); } catch (e) { done(false); }
+        document.body.removeChild(ta);
+      }
+    }
+
+    function shareTo(anchor, target) {
+      var meta = tileMeta(findCard(anchor));
+      var u = encodeURIComponent(meta.url);
+      var t = encodeURIComponent(meta.title);
+      var link;
+      if (target === 'twitter')       link = 'https://twitter.com/intent/tweet?url=' + u + '&text=' + t;
+      else if (target === 'linkedin') link = 'https://www.linkedin.com/sharing/share-offsite/?url=' + u;
+      else if (target === 'email')    link = 'mailto:?subject=' + t + '&body=' + u;
+      if (link) window.open(link, target === 'email' ? '_self' : '_blank', 'noopener');
+    }
+
+    function nativeShare(anchor) {
+      var meta = tileMeta(findCard(anchor));
+      if (navigator.share) {
+        navigator.share({ title: meta.title, url: meta.url }).catch(function () {});
+      }
+    }
+    /* Hide native-share buttons on browsers without the API
+       (desktop Chromium, Firefox, older Safari) so we don't
+       show a dead button. Ran on load. */
+    function hideNativeShareIfUnsupported() {
+      if (navigator.share) return;
+      document.querySelectorAll('[data-action="native-share"]').forEach(function (btn) {
+        btn.hidden = true;
+      });
+    }
+    if (document.readyState !== 'loading') hideNativeShareIfUnsupported();
+    else document.addEventListener('DOMContentLoaded', hideNativeShareIfUnsupported);
+
+    /* ── Delegated click router ── */
+    document.addEventListener('click', function (e) {
+      /* Popover trigger (Listen / Share / More). */
+      var trigger = e.target.closest('[data-popover]');
+      if (trigger) {
+        e.preventDefault();
+        openById(trigger.getAttribute('data-popover'), trigger);
+        return;
+      }
+
+      /* "More" toggle INSIDE the Listen popover. */
+      var moreBtn = e.target.closest('.rbccm-new-tiles__popover-more');
+      if (moreBtn) {
+        e.preventDefault();
+        var pop = moreBtn.closest('.rbccm-new-tiles__popover');
+        if (!pop) return;
+        var expanded = pop.getAttribute('data-expanded') === 'true';
+        pop.setAttribute('data-expanded', expanded ? 'false' : 'true');
+        moreBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        return;
+      }
+
+      /* × close inside a popover. */
+      if (e.target.closest('.rbccm-new-tiles__popover-close')) {
+        closeAll();
+        return;
+      }
+
+      /* Save toggle. */
+      var saveBtn = e.target.closest('[data-action="save"]');
+      if (saveBtn) {
+        e.preventDefault();
+        toggleSaved(saveBtn.getAttribute('data-tile-id'), saveBtn);
+        return;
+      }
+
+      /* Copy link. */
+      var copyBtn = e.target.closest('[data-action="copy-link"]');
+      if (copyBtn) {
+        e.preventDefault();
+        copyLink(copyBtn);
+        return;
+      }
+
+      /* Native share (mobile only; button hidden otherwise). */
+      var nativeBtn = e.target.closest('[data-action="native-share"]');
+      if (nativeBtn) {
+        e.preventDefault();
+        nativeShare(nativeBtn);
+        return;
+      }
+
+      /* Print. */
+      var printBtn = e.target.closest('[data-action="print"]');
+      if (printBtn) {
+        e.preventDefault();
+        window.print();
+        return;
+      }
+
+      /* Report — demo-only alert. Wire this to a real form or
+         mailto once product decides where reports should go. */
+      var reportBtn = e.target.closest('[data-action="report"]');
+      if (reportBtn) {
+        e.preventDefault();
+        var meta = tileMeta(findCard(reportBtn));
+        alert('Report submitted for:\n\n' + meta.title);
+        closeAll();
+        return;
+      }
+
+      /* Share URL (twitter / linkedin / email). */
+      var shareBtn = e.target.closest('[data-share]');
+      if (shareBtn) {
+        e.preventDefault();
+        shareTo(shareBtn, shareBtn.getAttribute('data-share'));
+        return;
+      }
+
+      /* Click outside any open popover → close. */
+      if (openPopover && !e.target.closest('.rbccm-new-tiles__popover')) {
+        closeAll();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && openPopover) {
+        closeAll();
+        if (openTrigger) openTrigger.focus();
+      }
+    });
+  })();
+</script>
+
+<script>
+  /* ==========================================================
+     Podcast player — bottom-pinned iframe embed
+     ==========================================================
+     - Click a card's Play button → iframe src = that button's
+       data-episode-url, player slides in from the bottom.
+     - Close button (or ESC) → clears iframe src (stops audio)
+       and slides the player back out.
+     - Focus returns to the play button that triggered it, so
+       keyboard users don't lose their place.
+     - Only one player instance for the whole page — reusing
+       the DOM keeps the CSS anchoring simple and prevents
+       two audio tracks playing over each other.
+     ========================================================== */
+  (function () {
+    var player  = document.querySelector('.rbccm-new-tiles__player');
+    if (!player) return;
+    var iframe  = player.querySelector('.rbccm-new-tiles__player-iframe');
+    var closeBtn = player.querySelector('.rbccm-new-tiles__player-close');
+    var lastTrigger = null;
+
+    function openPlayer(url, trigger) {
+      if (!url) return;
+      /* Only swap src if it's changed — avoids restarting a
+         track when the same episode's play button is hit twice. */
+      if (iframe.getAttribute('src') !== url) iframe.src = url;
+      player.setAttribute('data-open', 'true');
+      lastTrigger = trigger || null;
+      /* Focus the close button so the next keystroke can
+         dismiss the player. Delay past the slide-in
+         transition so screen readers announce the region
+         change first. */
+      setTimeout(function () { closeBtn.focus(); }, 320);
+    }
+
+    function closePlayer() {
+      player.setAttribute('data-open', 'false');
+      /* Clear src to stop playback. Setting to blank both
+         mutes the audio and unloads the iframe — Captivate's
+         player doesn't expose a JS pause API, so this is the
+         only reliable way to silence it on close. */
+      iframe.src = '';
+      if (lastTrigger) {
+        lastTrigger.focus();
+        lastTrigger = null;
+      }
+    }
+
+    document.addEventListener('click', function (e) {
+      var playBtn = e.target.closest('[data-action="play"]');
+      if (playBtn) {
+        e.preventDefault();
+        openPlayer(playBtn.getAttribute('data-episode-url'), playBtn);
+        return;
+      }
+      if (e.target.closest('.rbccm-new-tiles__player-close')) {
+        e.preventDefault();
+        closePlayer();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && player.getAttribute('data-open') === 'true') {
+        closePlayer();
+      }
+    });
+  })();
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var FEED_URL   = 'https://www.rbccm.com/en/insights/data/2026-insights';
+  var MAX_CARDS  = 3;
+  var CARD_SEL   = '.rbccm-new-tiles__card';
+  var TYPE_FILTER = 'audio';   // only podcasts for this component
+
+  // Proxy chain lifted from insights-json-builder — first hit wins.
+  function proxyUrls(target) {
+    return [
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(target),
+      'https://corsproxy.io/?url=' + encodeURIComponent(target),
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(target)
+    ];
+  }
+
+  // Fetch strategy: try direct same-origin first (works when the page
+  // is served from rbccm.com — no proxy needed and none of the public
+  // CORS proxies work from a domain that already has direct access).
+  // If direct fails (e.g. running from localhost / file:// for preview),
+  // walk the proxy chain as a fallback.
+  function fetchViaProxy(target) {
+    return fetch(target).then(function (r) {
+      if (!r.ok) throw new Error('direct HTTP ' + r.status);
+      return r.text();
+    }).catch(function () {
+      var urls = proxyUrls(target);
+      return urls.reduce(function (chain, url, idx) {
+        return chain.catch(function () {
+          return fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('proxy ' + (idx + 1) + ' HTTP ' + r.status);
+            if (url.indexOf('allorigins.win/get') !== -1) {
+              return r.json().then(function (j) { return j.contents; });
+            }
+            return r.text();
+          });
+        });
+      }, Promise.reject(new Error('start')));
+    });
+  }
+
+  // Parse the feed XML into an ordered array of plain-object news items.
+  function parseFeed(xmlText) {
+    var doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    var items = Array.prototype.slice.call(doc.getElementsByTagName('news'));
+    return items.map(function (n) {
+      function txt(tag) {
+        var el = n.getElementsByTagName(tag)[0];
+        return el ? (el.textContent || '').trim() : '';
+      }
+      return {
+        date:        txt('date'),
+        link:        txt('link'),
+        thumbnail:   txt('thumbnail'),
+        title:       txt('title'),
+        description: txt('description'),
+        category:    txt('category'),
+        region:      txt('region'),
+        tags:        txt('tags'),
+        readtime:    txt('readtime'),
+        watchtime:   txt('watchtime'),
+        type:        txt('type')
+      };
+    });
+  }
+
+  // "July 15, 2026" → "Jul 2026". Falls back to the raw string if the
+  // month name doesn't match (unusual dates still render — just not
+  // abbreviated).
+  var MONTH_ABBR = {
+    january: 'Jan', february: 'Feb', march: 'Mar', april: 'Apr',
+    may: 'May', june: 'Jun', july: 'Jul', august: 'Aug',
+    september: 'Sep', october: 'Oct', november: 'Nov', december: 'Dec'
+  };
+  function shortDate(raw) {
+    var m = raw.match(/^([A-Za-z]+)\s+\d+,\s*(\d{4})/);
+    if (!m) return raw;
+    var mo = MONTH_ABBR[m[1].toLowerCase()];
+    return mo ? (mo + ' ' + m[2]) : raw;
+  }
+
+  // Feed thumbnails come back as site-relative paths (/assets/rbccm/...).
+  // Prepend the rbccm.com origin so they resolve when the test page is
+  // served from a different host.
+  function absoluteImage(path) {
+    if (!path) return '';
+    if (/^https?:/.test(path)) return path;
+    return 'https://www.rbccm.com' + path;
+  }
+  function absoluteLink(path) {
+    if (!path) return '#';
+    if (/^https?:/.test(path)) return path;
+    return 'https://www.rbccm.com' + path;
+  }
+
+  // Populate a single card in place. Selectors mirror the DOM in the
+  // hand-built demo cards above — if the markup diverges, update here.
+  function paintCard(cardEl, item, index) {
+    // Media image
+    var img = cardEl.querySelector('.rbccm-new-tiles__media img');
+    if (img) {
+      img.src = absoluteImage(item.thumbnail);
+      img.alt = item.title;
+    }
+
+    // Duration chip in the media overlay (audio icon + minutes)
+    var durationChip = cardEl.querySelector('.rbccm-new-tiles__duration');
+    if (durationChip && item.watchtime) {
+      // Preserve the leading SVG icon, replace only the text node.
+      var kept = durationChip.querySelector('svg');
+      durationChip.textContent = ' ' + item.watchtime;
+      if (kept) durationChip.insertBefore(kept, durationChip.firstChild);
+    }
+
+    // Play button — the feed doesn't carry the Captivate episode UUID
+    // and rbccm.com refuses to be iframed (X-Frame-Options), so we
+    // leave the original hardcoded FPO Captivate URL in place. When
+    // the real component ships each card's Captivate URL will come
+    // from an EpisodeUrl Datum authored per-tile.
+
+    // Eyebrow (category) — usually "Insights" from this feed.
+    var eyebrow = cardEl.querySelector('.rbccm-new-tiles__eyebrow');
+    if (eyebrow && item.category) eyebrow.textContent = item.category;
+
+    // Meta row — [date, type, region, watchtime]. Keep each item's SVG
+    // icon and only replace the label text.
+    var metaItems = cardEl.querySelectorAll('.rbccm-new-tiles__meta-item');
+    var metaValues = [shortDate(item.date), 'Podcast', item.region || '', item.watchtime || ''];
+    metaItems.forEach(function (el, i) {
+      var v = metaValues[i];
+      if (v == null) return;
+      var svg = el.querySelector('svg');
+      el.textContent = ' ' + v;
+      if (svg) el.insertBefore(svg, el.firstChild);
+    });
+
+    // Title (anchor text + href)
+    var title = cardEl.querySelector('.rbccm-new-tiles__title-link');
+    if (title) {
+      title.textContent = item.title;
+      title.setAttribute('href', absoluteLink(item.link));
+    }
+
+    // Description (first ~3 lines get clamped by CSS)
+    var desc = cardEl.querySelector('.rbccm-new-tiles__desc');
+    if (desc) desc.textContent = item.description;
+
+    // Tags — feed sends a comma-separated string; keep the first three
+    // to avoid overflowing the card.
+    var tagContainer = cardEl.querySelector('.rbccm-new-tiles__tags');
+    if (tagContainer && item.tags) {
+      var tags = item.tags.split(',').map(function (t) { return t.trim(); })
+                          .filter(Boolean).slice(0, 3);
+      tagContainer.innerHTML = '';
+      tags.forEach(function (t) {
+        var span = document.createElement('span');
+        span.className = 'rbccm-new-tiles__tag';
+        span.textContent = t;
+        tagContainer.appendChild(span);
+      });
+    }
+  }
+
+  // Expose paintCard + feed items on a namespace so the demo toolbar
+  // (and any other test-page control panel) can re-swap card content
+  // without re-fetching the feed.
+  window.RBCCMNewTiles = window.RBCCMNewTiles || {};
+  window.RBCCMNewTiles.paintCard = paintCard;
+  window.RBCCMNewTiles.CARD_SEL  = CARD_SEL;
+
+  function run() {
+    var cards = document.querySelectorAll(CARD_SEL);
+    if (!cards.length) return;
+
+    fetchViaProxy(FEED_URL)
+      .then(parseFeed)
+      .then(function (items) {
+        var podcasts = items.filter(function (i) { return i.type === TYPE_FILTER; });
+        if (!podcasts.length) {
+          console.warn('[new-tiles feed] no <type>audio</type> items in 2026 feed');
+          return;
+        }
+        var take = podcasts.slice(0, MAX_CARDS);
+        for (var i = 0; i < take.length && i < cards.length; i++) {
+          paintCard(cards[i], take[i], i);
+        }
+        // Cache the full audio list on the namespace + fire an event so
+        // the demo toolbar can populate its <select>s with all options
+        // and know which 3 are currently in play.
+        window.RBCCMNewTiles.items = podcasts;
+        window.RBCCMNewTiles.currentSlots = take.slice(0);
+        document.dispatchEvent(new CustomEvent('rbccm-new-tiles:feed-ready', {
+          detail: { items: podcasts, initial: take }
+        }));
+        console.log('[new-tiles feed] painted', take.length, 'podcast cards');
+      })
+      .catch(function (err) {
+        console.error('[new-tiles feed] fetch failed:', err && err.message);
+      });
+  }
+
+  if (document.readyState !== 'loading') run();
+  else document.addEventListener('DOMContentLoaded', run);
+})();
+</script>
+
+</body>
+</html>
