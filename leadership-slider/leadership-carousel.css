@@ -98,7 +98,14 @@
     @media (min-width: 1300px) {
       .rbccm-leadership__card { margin: 0 20px 0 0; width: 270px !important; }
     }
-    #rbccm-leadership .slick-center .rbccm-leadership__card {
+    /* Active-card border. `.slick-center` was the marker while the
+       carousel ran in centerMode; that class isn't applied under the
+       left-align layout, so we also match `.slick-current` (slick's
+       class for the leftmost visible slide when centerMode is off).
+       Keeping both selectors means either mode still lights up the
+       anchor card in dark blue. */
+    #rbccm-leadership .slick-center .rbccm-leadership__card,
+    #rbccm-leadership .slick-current .rbccm-leadership__card {
       border-color: #003168;
     }
 
@@ -604,7 +611,8 @@
     /* Active card border — light-theme uses #003168 (dark blue) which
        vanishes against the dark bg. Swap to white so the centered card
        still reads as focused. */
-    #rbccm-leadership.rbccm-leadership--on-dark .slick-center .rbccm-leadership__card {
+    #rbccm-leadership.rbccm-leadership--on-dark .slick-center .rbccm-leadership__card,
+    #rbccm-leadership.rbccm-leadership--on-dark .slick-current .rbccm-leadership__card {
       border-color: #ffffff;
     }
 

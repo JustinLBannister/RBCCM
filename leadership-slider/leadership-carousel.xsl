@@ -226,7 +226,13 @@
             useCSS:          true,
             useTransform:    true,
             fade:            false,
-            centerMode:      true,
+            /* Left-aligned track — first card flush to the container's
+               left edge at every viewport (mobile → desktop). Was
+               centerMode:true which placed the active card in the
+               middle with peek cards either side; client asked for a
+               packed left-align layout instead. `variableWidth` still
+               true so cards keep their individual widths. */
+            centerMode:      false,
             centerPadding:   '0px',
             adaptiveHeight:  false,
             rows:            1,
@@ -265,7 +271,7 @@
               {
                 breakpoint: 1245,
                 settings: {
-                  centerMode:     true,
+                  centerMode:     false,
                   centerPadding:  '0px',
                   draggable:      true,
                   infinite:       true,
@@ -278,7 +284,7 @@
               {
                 breakpoint: 1025,
                 settings: {
-                  centerMode:     true,
+                  centerMode:     false,
                   centerPadding:  '0px',
                   draggable:      true,
                   infinite:       true,
@@ -291,7 +297,7 @@
               {
                 breakpoint: 640,
                 settings: {
-                  centerMode:     true,
+                  centerMode:     false,
                   centerPadding:  '0px',
                   draggable:      true,
                   infinite:       true,
