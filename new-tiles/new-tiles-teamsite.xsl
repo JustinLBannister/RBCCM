@@ -2,11 +2,11 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" indent="no" encoding="UTF-8"/>
 
-  <!-- new-tiles component — the HTML/CSS/JS block is dumped verbatim
-       via CDATA + disable-output-escaping. Section/article tags
-       already rewritten to <div> so TeamSite's HTML sanitizer keeps
-       them. Properties/Data blocks at the bottom give TeamSite an
-       instance to persist. -->
+  <!-- new-tiles component — HTML/CSS/JS block dumped verbatim via
+       CDATA + disable-output-escaping. Section/article tags rewritten
+       to <div> for TeamSite's HTML5 sanitizer. Feed enhancer tries
+       direct same-origin fetch first (works when served from
+       rbccm.com), falls back to CORS proxies for local preview. -->
   <xsl:template match="/">
     <xsl:text disable-output-escaping="yes"><![CDATA[
 <style>
@@ -1639,22 +1639,29 @@
     ];
   }
 
-  // Sequential proxy fetch — resolves with the raw XML text of whichever
-  // proxy responds first, rejects if all four fail.
+  // Fetch strategy: try direct same-origin first (works when the page
+  // is served from rbccm.com — no proxy needed and none of the public
+  // CORS proxies work from a domain that already has direct access).
+  // If direct fails (e.g. running from localhost / file:// for preview),
+  // walk the proxy chain as a fallback.
   function fetchViaProxy(target) {
-    var urls = proxyUrls(target);
-    return urls.reduce(function (chain, url, idx) {
-      return chain.catch(function () {
-        return fetch(url).then(function (r) {
-          if (!r.ok) throw new Error('proxy ' + (idx + 1) + ' HTTP ' + r.status);
-          // allorigins.win/get wraps the payload in JSON.
-          if (url.indexOf('allorigins.win/get') !== -1) {
-            return r.json().then(function (j) { return j.contents; });
-          }
-          return r.text();
+    return fetch(target).then(function (r) {
+      if (!r.ok) throw new Error('direct HTTP ' + r.status);
+      return r.text();
+    }).catch(function () {
+      var urls = proxyUrls(target);
+      return urls.reduce(function (chain, url, idx) {
+        return chain.catch(function () {
+          return fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('proxy ' + (idx + 1) + ' HTTP ' + r.status);
+            if (url.indexOf('allorigins.win/get') !== -1) {
+              return r.json().then(function (j) { return j.contents; });
+            }
+            return r.text();
+          });
         });
-      });
-    }, Promise.reject(new Error('start')));
+      }, Promise.reject(new Error('start')));
+    });
   }
 
   // Parse the feed XML into an ordered array of plain-object news items.
