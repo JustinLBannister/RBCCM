@@ -4,6 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>New Tiles - local preview</title>
+  <!-- Font Awesome — for platform brand icons (Spotify, YouTube, Amazon)
+       and the fa-podcast glyph used as Apple Podcasts. Matches the
+       icon set already loaded by the live RBC CM site so the popovers
+       render identically inside TeamSite. -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
     /* ==========================================================
        New Tiles - local preview shell
@@ -187,6 +192,11 @@
       min-width: 180px;
     }
     .rbccm-new-tiles__demo-toolbar-input--wide { min-width: 260px; }
+    /* Full-row variant — the group grows to fill its row and the
+       select inside stretches with it, so a long featured-article
+       title stays readable at a glance. */
+    .rbccm-new-tiles__demo-toolbar-group--full { flex: 1 1 100%; }
+    .rbccm-new-tiles__demo-toolbar-select--full { flex: 1 1 auto; min-width: 0; }
     .rbccm-new-tiles__demo-toolbar-checkbox {
       accent-color: #0051A5;
     }
@@ -324,7 +334,7 @@
     .rbccm-new-tiles__card {
       background: var(--nt-white);
       border: 1px solid var(--nt-hairline);
-      border-radius: 8px;
+      border-radius: 0;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -441,9 +451,12 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
+      /* Solid white default (was transparent) — meets WCAG contrast on
+         any image background. Blue icon rides on white so the play
+         glyph is always readable regardless of the photo underneath. */
       border: 1.5px solid var(--nt-white);
-      background: transparent;
-      color: var(--nt-white);
+      background: var(--nt-white);
+      color: var(--nt-blue);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -453,8 +466,8 @@
     }
     .rbccm-new-tiles__play:hover,
     .rbccm-new-tiles__play:focus-visible {
-      background: var(--nt-white);
-      color: var(--nt-blue);
+      background: var(--nt-blue);
+      color: var(--nt-white);
       outline: none;
       transform: scale(1.04);
     }
@@ -597,9 +610,13 @@
         left: auto;
         bottom: 20px;
         width: min(340px, calc(100% - 300px));
+        min-width: 346px;
         transform: translateX(4px);
       }
-      .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__popover[id^="pop-"]     { right: 269px; }
+      /* Save button is hidden via CSS, so the button cluster is now:
+         [Listen ~113] [Share 36] [More 36] — Listen popover offset
+         drops by 40 (36 button + 4 gap) versus the with-Save layout. */
+      .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__popover[id^="pop-"]     { right: 229px; }
       .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__popover[id^="share-"]   { right: 112px; }
       .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__popover[id^="options-"] { right:  72px; }
       .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__popover[data-open="true"] {
@@ -659,6 +676,44 @@
       color: var(--nt-hairline);
       font-weight: 300;
       user-select: none;
+    }
+
+    /* ---------- Temporary visibility toggles ----------
+       Hidden by default per client review. The demo toolbar's
+       "Show extras" checkbox flips body[data-show-extras="true"],
+       which every rule below gates on — one attribute toggle
+       reveals region meta, tag chips, save button, and Report row
+       all at once. Markup + a11y semantics stay intact either way. */
+
+    /* Region meta chip (3rd meta item, e.g. "global") + its leading
+       separator. Meta row: 1 date | 2 sep | 3 podcast | 4 sep |
+       5 REGION | 6 sep | 7 duration — hiding 5 + 6 leaves the
+       other three. */
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__meta > *:nth-child(5),
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__meta > *:nth-child(6) {
+      display: none !important;
+    }
+
+    /* Topic tag chips — hides both the body copy AND the horizontal
+       footer copy. Explicit --footer selector included so the
+       higher-specificity horizontal @media rule can't reintroduce
+       the row when extras are off. */
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__tags,
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__tags--footer,
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__card--horizontal .rbccm-new-tiles__body .rbccm-new-tiles__tags {
+      display: none !important;
+    }
+
+    /* Save / bookmark button — hidden until auth wire-up.
+       Card 3 is missing data-action="save" so aria-label picks it up. */
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__action[data-action="save"],
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__action[aria-label="Save"] {
+      display: none !important;
+    }
+
+    /* Report item inside the More popover. */
+    body:not([data-show-extras="true"]) .rbccm-new-tiles__panel-item[data-action="report"] {
+      display: none !important;
     }
 
     /* Title - RBCDisplay, bold. Line-height a touch tighter than
@@ -958,77 +1013,119 @@
       color: var(--nt-blue);
       outline: none;
     }
-    /* 4-column grid so the four primary platforms line up on
-       row 1 and the 5th (More) drops to row 2 spanning the
-       full width - cleaner than a lonely square in the corner.
-       Uniform 8px gap. */
+    /* 2-column grid — primary row shows just Apple + Spotify; More
+       drops to the next row full-width. YouTube and Amazon Music
+       moved into the "More" extras panel so the primary popover
+       stays focused on the two dominant platforms.
+       (nth-child(3)/(4) targets YouTube/Amazon — kept in DOM so
+       the extras-panel copies stay easy to re-promote later.) */
     .rbccm-new-tiles__popover-list {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       align-items: start;
     }
-    /* Full-width More button on row 2. Swaps to a horizontal
-       icon + label layout since the vertical stack looks
-       awkward stretched across the popover. Subtle tint so it
-       reads as its own tier below the platform icons. */
+    .rbccm-new-tiles__popover-list > .rbccm-new-tiles__platform:nth-child(3),
+    .rbccm-new-tiles__popover-list > .rbccm-new-tiles__platform:nth-child(4) {
+      display: none;
+    }
+    /* Secondary "More" pill — full-width, outlined variant so it
+       reads as a tier below the primary blue platform buttons. */
     .rbccm-new-tiles__platform:last-child {
       grid-column: 1 / -1;
-      flex-direction: row;
-      justify-content: center;
-      gap: 10px;
+      background: transparent;
+      color: var(--nt-blue);
+      border: 1px solid var(--nt-hairline);
       padding: 8px 12px;
-      background: rgba(0, 33, 68, 0.03);
-      max-width: none;
     }
-    .rbccm-new-tiles__platform:last-child .rbccm-new-tiles__platform-icon {
-      width: 28px;
-      height: 28px;
-      font-size: 14px;
+    .rbccm-new-tiles__platform:last-child:hover,
+    .rbccm-new-tiles__platform:last-child:focus-visible {
+      background: var(--nt-blue-tint);
     }
+    /* Platform pill — RBC blue button, white FA icon + label sitting
+       side-by-side. Icon glyph is drawn by ::before on the modifier
+       class (see below), so no HTML changes are required — the
+       existing emoji text inside the icon span is hidden via
+       font-size: 0. */
     .rbccm-new-tiles__platform {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      gap: 6px;
-      background: transparent;
+      justify-content: center;
+      gap: 10px;
+      background: var(--nt-blue);
       border: none;
       cursor: pointer;
-      padding: 4px;
+      padding: 10px 14px;
       border-radius: 6px;
-      color: var(--nt-ink);
-      font-size: 11px;
-      font-weight: 500;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
       line-height: 1.2;
-      min-width: 54px;
+      min-width: 0;
+      text-align: left;
     }
     .rbccm-new-tiles__platform:hover,
     .rbccm-new-tiles__platform:focus-visible {
-      background: var(--nt-blue-tint);
+      background: var(--nt-navy-med);
       outline: none;
     }
-    /* Platform icon - placeholder coloured squares stand in for
-       the real brand SVGs (Apple Podcasts purple, Spotify green,
-       etc). Swap for the actual asset files when ready. */
+    /* Kill <br> line breaks inside platform labels so
+       "Apple<br>Podcasts" renders on a single line in the pill. */
+    .rbccm-new-tiles__platform br { display: none; }
+
+    /* Icon slot — the old coloured square is gone. Font-size:0 hides
+       the emoji/text content that used to be in the span; ::before
+       paints the Font Awesome glyph in white at 16px. */
     .rbccm-new-tiles__platform-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
+      width: auto;
+      height: auto;
+      background: none !important;
+      color: inherit;
+      font-size: 0;
+      line-height: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 18px;
+      border-radius: 0;
     }
-    .rbccm-new-tiles__platform-icon--apple    { background: #9E4CD0; }
-    .rbccm-new-tiles__platform-icon--spotify  { background: #1DB954; }
-    .rbccm-new-tiles__platform-icon--youtube  { background: #FF3B3B; }
-    .rbccm-new-tiles__platform-icon--amazon   { background: #6C5DD3; }
-    .rbccm-new-tiles__platform-icon--pocket   { background: #E22F4C; }
-    .rbccm-new-tiles__platform-icon--rss      { background: #F19232; }
-    .rbccm-new-tiles__platform-icon--more     {
-      background: #F1F3F6;
-      color: var(--nt-ink);
+    .rbccm-new-tiles__platform-icon::before {
+      font-size: 16px;
+      line-height: 1;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+    }
+    .rbccm-new-tiles__platform-icon--apple::before {
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      content: "\f2ce";        /* fa-podcast (used as Apple Podcasts) */
+    }
+    .rbccm-new-tiles__platform-icon--spotify::before {
+      font-family: "Font Awesome 6 Brands";
+      content: "\f1bc";        /* fa-spotify */
+    }
+    .rbccm-new-tiles__platform-icon--youtube::before {
+      font-family: "Font Awesome 6 Brands";
+      content: "\f167";        /* fa-youtube */
+    }
+    .rbccm-new-tiles__platform-icon--amazon::before {
+      font-family: "Font Awesome 6 Brands";
+      content: "\f270";        /* fa-amazon */
+    }
+    .rbccm-new-tiles__platform-icon--pocket::before {
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      content: "\f2ce";        /* podcast glyph as a stand-in */
+    }
+    .rbccm-new-tiles__platform-icon--rss::before {
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      content: "\f09e";        /* fa-rss */
+    }
+    .rbccm-new-tiles__platform-icon--more::before {
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      content: "\f142";        /* fa-ellipsis-v */
     }
 
     /* ---------- Expanded panel (state 3) ---------- */
@@ -1316,6 +1413,10 @@
         <input type="checkbox" class="rbccm-new-tiles__demo-toolbar-checkbox" id="nt-toggle-center">
         <span class="rbccm-new-tiles__demo-toolbar-label">Center heading</span>
       </label>
+      <label class="rbccm-new-tiles__demo-toolbar-group">
+        <input type="checkbox" class="rbccm-new-tiles__demo-toolbar-checkbox" id="nt-toggle-extras">
+        <span class="rbccm-new-tiles__demo-toolbar-label">Show extras</span>
+      </label>
       <div class="rbccm-new-tiles__demo-toolbar-group">
         <span class="rbccm-new-tiles__demo-toolbar-label">Background:</span>
         <button type="button" class="rbccm-new-tiles__demo-toolbar-swatch" data-bg="#ffffff" data-on-dark="false" aria-label="White" aria-pressed="true" style="background:#ffffff;"></button>
@@ -1325,18 +1426,28 @@
       </div>
     </div>
 
+    <!-- Featured (full-width horizontal card) selector — sits on its
+         own row and stretches so long titles remain legible. Maps to
+         DOM slot 0 (the .rbccm-new-tiles__card--horizontal card). -->
+    <div class="rbccm-new-tiles__demo-toolbar-row">
+      <div class="rbccm-new-tiles__demo-toolbar-group rbccm-new-tiles__demo-toolbar-group--full">
+        <span class="rbccm-new-tiles__demo-toolbar-label">Featured:</span>
+        <select class="rbccm-new-tiles__demo-toolbar-select rbccm-new-tiles__demo-toolbar-select--full" data-slot="0" aria-label="Article for featured card"><option>Loading feed…</option></select>
+      </div>
+    </div>
+
     <div class="rbccm-new-tiles__demo-toolbar-row">
       <div class="rbccm-new-tiles__demo-toolbar-group">
         <span class="rbccm-new-tiles__demo-toolbar-label">Card 1:</span>
-        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="0" aria-label="Article for card 1"><option>Loading feed…</option></select>
+        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="1" aria-label="Article for card 1"><option>Loading feed…</option></select>
       </div>
       <div class="rbccm-new-tiles__demo-toolbar-group">
         <span class="rbccm-new-tiles__demo-toolbar-label">Card 2:</span>
-        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="1" aria-label="Article for card 2"><option>Loading feed…</option></select>
+        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="2" aria-label="Article for card 2"><option>Loading feed…</option></select>
       </div>
       <div class="rbccm-new-tiles__demo-toolbar-group">
         <span class="rbccm-new-tiles__demo-toolbar-label">Card 3:</span>
-        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="2" aria-label="Article for card 3"><option>Loading feed…</option></select>
+        <select class="rbccm-new-tiles__demo-toolbar-select" data-slot="3" aria-label="Article for card 3"><option>Loading feed…</option></select>
       </div>
     </div>
 
@@ -1479,6 +1590,8 @@
                template-rows 0fr → 1fr trick. -->
           <div class="rbccm-new-tiles__popover-extra" id="pop-1-extra">
             <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--youtube">&#9654;</span>YouTube</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--amazon">&#9835;</span>Amazon Music</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
@@ -1594,6 +1707,8 @@
           </div>
           <div class="rbccm-new-tiles__popover-extra" id="pop-2-extra">
             <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--youtube">&#9654;</span>YouTube</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--amazon">&#9835;</span>Amazon Music</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
@@ -1687,6 +1802,8 @@
           </div>
           <div class="rbccm-new-tiles__popover-extra" id="pop-4-extra">
             <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--youtube">&#9654;</span>YouTube</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--amazon">&#9835;</span>Amazon Music</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
@@ -1761,7 +1878,7 @@
           Listen on
         </button>
         <button type="button" class="rbccm-new-tiles__action" aria-label="Save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
-        <button type="button" class="rbccm-new-tiles__action" aria-label="Share"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        <button type="button" class="rbccm-new-tiles__action" data-popover="share-3" aria-haspopup="dialog" aria-expanded="false" aria-label="Share"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
         <button type="button" class="rbccm-new-tiles__action" data-popover="options-3" aria-haspopup="menu" aria-expanded="false" aria-label="More options"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
 
         <div class="rbccm-new-tiles__popover" id="pop-3" role="dialog" aria-label="Listen on">
@@ -1778,6 +1895,8 @@
           </div>
           <div class="rbccm-new-tiles__popover-extra" id="pop-3-extra">
             <div class="rbccm-new-tiles__popover-extra-inner">
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--youtube">&#9654;</span>YouTube</button>
+              <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--amazon">&#9835;</span>Amazon Music</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--pocket">&#128266;</span>Pocket Casts</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><span class="rbccm-new-tiles__panel-item-icon rbccm-new-tiles__panel-item-icon--rss">&#128225;</span>RSS Feed</button>
               <button type="button" class="rbccm-new-tiles__panel-item"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download MP3</button>
@@ -2511,6 +2630,20 @@
   var section       = document.getElementById('nt-section');
   var sectionHeader = document.getElementById('nt-section-header');
   var centerToggle  = document.getElementById('nt-toggle-center');
+  var extrasToggle  = document.getElementById('nt-toggle-extras');
+
+  // "Show extras" — toggles body[data-show-extras] which every hide
+  // rule in the CSS gates on. Off by default (region meta, tag chips,
+  // save button, and Report row all hidden).
+  if (extrasToggle) {
+    extrasToggle.addEventListener('change', function () {
+      if (extrasToggle.checked) {
+        document.body.setAttribute('data-show-extras', 'true');
+      } else {
+        document.body.removeAttribute('data-show-extras');
+      }
+    });
+  }
   var swatches      = toolbar.querySelectorAll('.rbccm-new-tiles__demo-toolbar-swatch');
   var selects       = toolbar.querySelectorAll('.rbccm-new-tiles__demo-toolbar-select');
   var headingInput  = document.getElementById('nt-input-heading');
