@@ -137,6 +137,10 @@
         grid-template-columns: auto 1140px auto;
         margin: 32px -68px 0 -68px;
         max-width: none;
+        /* Centre the grid tracks - otherwise the ~48px of leftover
+           space (carousel 1276 - grid 1228) pools on the right and
+           the track sits left of the heading on the 1140 rail. */
+        justify-content: center;
       }
     }
     /* Grid-area assignment. Using class modifiers instead of IDs
@@ -202,6 +206,12 @@
       flex-direction: column;
       gap: 20px;
       min-width: 0;
+      /* Cap the track at the 1140 rail so slick can't measure a
+         wider parent and blow the slide width past the heading rail. */
+      max-width: 1140px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
     .rbccm-case-studies__track.slick-initialized {
       display: block;
@@ -417,6 +427,8 @@
     .rbccm-case-studies__track.slick-initialized .slick-list {
       padding: 0 !important;
       margin: 0 !important;
+      max-width: 1140px;
+      width: 100%;
     }
     .rbccm-case-studies__track.slick-initialized .slick-track {
       display: flex;

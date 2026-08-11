@@ -143,6 +143,13 @@
     grid-template-columns: auto 1140px auto;
     margin: 32px -68px 0 -68px;
     max-width: none;
+    /* Auto arrow columns collapse to the 44px button width, so the
+       grid (44 + 1140 + 44 = 1228) is narrower than the carousel
+       (1140 + 136 negative-margin = 1276). Without justify-content
+       the leftover 48px pools on the right and the track sits
+       ~24px left of the heading. Centering the grid puts the
+       track back on the 1140 rail with the heading. */
+    justify-content: center;
   }
 }
 /* Grid-area assignment. Class-based (not ID-based) so multi-
@@ -200,6 +207,14 @@
   flex-direction: column;
   gap: 20px;
   min-width: 0;
+  /* Explicit cap so the track never grows past the 1140 grid rail
+     even if slick measures at an odd moment or a parent grid column
+     doesn't resolve as expected. Prevents the slide-width calc from
+     overshooting and spilling the card past the heading rail. */
+  max-width: 1140px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .rbccm-case-studies__track.slick-initialized {
   display: block;
@@ -209,10 +224,14 @@
 /* accessible-slick ships default padding on .slick-list (used
    for its centerPadding behaviour) and a margin on .slick-track.
    Both need zeroing for 1-per-view so the active slide fills
-   the full track. Same fix story-carousel needed (tasks 131/142). */
+   the full track. Same fix story-carousel needed (tasks 131/142).
+   width:100% + max-width match the outer track cap so slick can't
+   compute a slide width larger than 1140. */
 .rbccm-case-studies__track.slick-initialized .slick-list {
   padding: 0 !important;
   margin: 0 !important;
+  max-width: 1140px;
+  width: 100%;
 }
 .rbccm-case-studies__track.slick-initialized .slick-track {
   display: flex;
