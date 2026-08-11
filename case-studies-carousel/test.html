@@ -55,7 +55,10 @@
       background: #fff;
     }
     @media (min-width: 992px)  { .rbccm-case-studies { padding: 64px 24px; gap: 32px; } }
-    @media (min-width: 1440px) { .rbccm-case-studies { padding: 64px 170px; } }
+    /* NOTE: removed 1440+ 170px side padding - it made this rail sit
+       inward of leadership-carousel at wide viewports. Section now
+       relies on __container's max-width:1140 to centre, matching the
+       rest of the RBC CM 1140-rail components. */
 
     /* Inner content rail — heading + carousel + view-all all
        centre on the same 1140 rail. The carousel itself breaks

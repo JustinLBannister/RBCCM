@@ -54,9 +54,13 @@
     gap: 32px;
   }
 }
-@media (min-width: 1440px) {
-  .rbccm-case-studies { padding: var(--cs-pad-top-desktop) 170px var(--cs-pad-bottom-desktop); }
-}
+/* NOTE: the 1440+ media query used to add 170px side padding here.
+   Removed so this component aligns with leadership-carousel and the
+   rest of the RBC CM 1140-rail components at wide viewports.
+   Leadership uses zero side padding on its section wrapper and lets
+   the inner __container's max-width:1140px centre the content on its
+   own; adding 170px here made the case-studies rail sit inward of
+   leadership's rail at 1440-1480ish viewports. */
 .rbccm-case-studies *,
 .rbccm-case-studies *::before,
 .rbccm-case-studies *::after { box-sizing: border-box; }
