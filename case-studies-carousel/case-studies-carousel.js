@@ -1,60 +1,243 @@
 /* =========================================================================
-   Case Studies Carousel — accessible-slick implementation
+   Case Studies Carousel - feed loader + accessible-slick init (v2)
    =========================================================================
-   Same carousel stack as the rest of rbccm.com: jQuery + slick, preferring
-   the accessible-slick build. Mirrors the loader, the arrow wiring and the
-   dots container used by story-carousel / leadership-carousel / icon-
-   carousel so all four behave and are maintained the same way.
+   Two-phase startup:
+     1. Feed loader: on DOMContentLoaded, for every .rbccm-case-studies
+        root that contains URL shells, fetch its data-feed-url once,
+        parse it, and hydrate each shell with the tile markup for the
+        matching case-study record (matched by slug).
+     2. Slick init: after hydration completes (or a 3s safety timeout),
+        bind accessible-slick to each track. Shells with no matching
+        feed record are removed first so slick never sees an empty
+        slide - carousel silently self-heals when a case study is
+        unpublished or renamed.
 
    ---- Config (data attributes on .rbccm-case-studies) --------------------
-     data-region-label     accessible-slick regionLabel override (aria)
-     data-instructions     accessible-slick instructionsText override (aria)
-     data-speed            ms transition speed (default 350)
+     data-feed-url         Feed URL to fetch (required for hydration).
+                           Set by the XSL from the FeedUrl Datum.
+     data-region-label     accessible-slick regionLabel override.
+     data-instructions     accessible-slick instructionsText override.
+     data-transition       'slide' (default) or 'fade'.
+     data-speed            ms transition speed (default 350).
 
    ---- Multi-instance -----------------------------------------------------
-   All queries are scoped to each .rbccm-case-studies root. A BOUND_FLAG on
-   the root prevents double-init if a page injects more markup later —
-   consumers can also call window.RBCCMCaseStudiesCarousel.init(ctx) to
-   bind newly-added roots (feed scripts, TeamSite preview re-render, etc.).
+   All queries are scoped to each .rbccm-case-studies root. A BOUND_FLAG
+   on each root prevents double-init. Consumers can call
+   window.RBCCMCaseStudiesCarousel.init(ctx) to rebind newly-added roots
+   (feed scripts, TeamSite preview re-render, etc.).
 
    Deploy at: /assets/rbccm/js/components/case-studies-carousel.js
-             (path referenced from the skin's <script>).
    ========================================================================= */
 (function () {
   'use strict';
 
   var BOUND_FLAG = 'data-case-studies-carousel-bound';
+  var HYDRATED_EVENT = 'rbccm-case-studies:hydrated';
 
-  /* Load accessible-slick from the local rbccm.com asset. The prior
-     cdnjs cross-origin fallback was stripped as a debug step for the
-     TeamSite "Initializing deployment" hang — some TeamSite installs
-     scan external URLs in deployed asset files, and an unreachable
-     cdnjs from the deploy server can stall the publish queue on any
-     page referencing this JS. If accessible-slick.min.js fails to
-     load, the carousel silently no-ops (jQuery.fn.slick stays
-     undefined and init() bails). Restore a fallback only after
-     confirming the publish path is clean. */
+  /* ---------- accessible-slick loader --------------------------------- */
+  /* Load accessible-slick from the local rbccm.com asset. If it fails
+     to load, the carousel silently no-ops (jQuery.fn.slick stays
+     undefined and initSlick bails). */
   function ensureSlickLoaded(cb) {
-    if (typeof window.jQuery === 'undefined') return;   /* no jQuery, no carousel */
+    if (typeof window.jQuery === 'undefined') return;
     if (typeof window.jQuery.fn.slick !== 'undefined') { cb(); return; }
-
     var s = document.createElement('script');
     s.src = '/assets/rbccm/js/accessible-slick.min.js';
     s.onload = function () { cb(); };
     document.head.appendChild(s);
   }
 
-  function intAttr(root, name, fallback) {
-    var n = parseInt(root.getAttribute(name), 10);
-    return (!n || n < 1) ? fallback : n;
-  }
-
+  /* ---------- Small helpers ------------------------------------------- */
   function attrOr(root, name, fallback) {
     var v = root.getAttribute(name);
     return (v && v.length) ? v : fallback;
   }
+  function intAttr(root, name, fallback) {
+    var n = parseInt(root.getAttribute(name), 10);
+    return (!n || n < 1) ? fallback : n;
+  }
+  function extractSlug(url) {
+    var m = String(url || '').match(/\/case-study\/(.+?)(?:[?#]|$)/);
+    return m ? m[1] : null;
+  }
+  function childText(parent, tag) {
+    if (!parent) return '';
+    var el = parent.getElementsByTagName(tag)[0];
+    return el ? (el.textContent || '').trim() : '';
+  }
+  /* Decode HTML entities via a throwaway textarea (native decoder). */
+  var _decodeEl = document.createElement('textarea');
+  function decodeEntities(text) {
+    _decodeEl.innerHTML = text || '';
+    return _decodeEl.value;
+  }
+  function escapeAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function fireHydrated() {
+    try {
+      document.dispatchEvent(new CustomEvent(HYDRATED_EVENT));
+    } catch (e) {
+      var ev = document.createEvent('Event');
+      ev.initEvent(HYDRATED_EVENT, true, true);
+      document.dispatchEvent(ev);
+    }
+  }
 
-  function init(root) {
+  /* ---------- Feed parsing -------------------------------------------- */
+  /* Build a slug -> record lookup from the parsed feed XML.
+     First record for a given slug wins (feed is sorted newest-first
+     so the most recent version of any accidentally duplicated case
+     study is what gets shown). */
+  function buildLookup(xmlDoc) {
+    var map = {};
+    var records = xmlDoc.getElementsByTagName('caseStudy');
+    for (var i = 0; i < records.length; i++) {
+      var rec = records[i];
+      var slug = childText(rec, 'slug');
+      if (!slug || map[slug]) continue;
+      map[slug] = {
+        slug:        slug,
+        title:       decodeEntities(childText(rec, 'title')),
+        /* Kept raw - feed descriptions may include real HTML
+           (embedded <a>, <br>, <strong>) that we WANT to render. */
+        description: childText(rec, 'description'),
+        thumbnail:   childText(rec, 'thumbnail'),
+        eyebrow:     childText(rec, 'eyebrow') || 'Case Study',
+        link:        childText(rec, 'link'),
+        readtime:    childText(rec, 'readtime')
+      };
+    }
+    return map;
+  }
+
+  /* ---------- Slide HTML builder -------------------------------------- */
+  var CTA_CHEVRON =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true">' +
+      '<path d="M2 0L1 1l3 4-3 4 1 1 4-5z"/>' +
+    '</svg>';
+
+  function buildSlideHTML(record, overrides) {
+    var eyebrow  = overrides.eyebrow  || record.eyebrow;
+    var readtime = overrides.readtime || record.readtime;
+    /* Some feed records already include the word "read" (e.g. "3 min read"),
+       others don't ("3 min"). Only append " read" when it's missing. */
+    var ctaText  = readtime
+      ? (readtime.toLowerCase().indexOf('read') !== -1 ? readtime : readtime + ' read')
+      : '';
+    var cta = ctaText
+      ? '<span class="rbccm-case-studies__cta">' + escapeAttr(ctaText) + ' ' + CTA_CHEVRON + '</span>'
+      : '';
+
+    return (
+      '<a class="rbccm-case-studies__card" href="' + escapeAttr(record.link) + '">' +
+        '<div class="rbccm-case-studies__media">' +
+          '<img loading="lazy" src="' + escapeAttr(record.thumbnail) + '" alt="" />' +
+        '</div>' +
+        '<div class="rbccm-case-studies__body">' +
+          '<p class="rbccm-case-studies__eyebrow">' + escapeAttr(eyebrow) + '</p>' +
+          '<div class="rbccm-case-studies__divider" aria-hidden="true"></div>' +
+          '<h3 class="rbccm-case-studies__title">' + escapeAttr(record.title) + '</h3>' +
+          '<p class="rbccm-case-studies__desc">' + record.description + '</p>' +
+          cta +
+        '</div>' +
+      '</a>'
+    );
+  }
+
+  /* ---------- Hydrate a single root's shells -------------------------- */
+  function hydrateRoot(root, lookup) {
+    var track = root.querySelector('.rbccm-case-studies__track');
+    if (!track) return;
+    var shells = track.querySelectorAll('.rbccm-case-studies__slide[data-cs-url]');
+    for (var i = 0; i < shells.length; i++) {
+      var shell = shells[i];
+      var url  = shell.getAttribute('data-cs-url');
+      var slug = extractSlug(url);
+      var rec  = slug && lookup[slug];
+      if (!rec) {
+        /* Missing / renamed / unpublished - drop the shell so slick
+           doesn't see an empty slide. Self-healing carousel. */
+        shell.parentNode.removeChild(shell);
+        continue;
+      }
+      shell.innerHTML = buildSlideHTML(rec, {
+        eyebrow:  shell.getAttribute('data-cs-eyebrow')  || '',
+        readtime: shell.getAttribute('data-cs-readtime') || ''
+      });
+    }
+  }
+
+  /* Drop unhydrated shells (called when feed fetch fails). */
+  function dropEmpties(root) {
+    var track = root.querySelector('.rbccm-case-studies__track');
+    if (!track) return;
+    var empties = track.querySelectorAll('.rbccm-case-studies__slide[data-cs-url]:empty');
+    for (var i = 0; i < empties.length; i++) empties[i].parentNode.removeChild(empties[i]);
+  }
+
+  /* ---------- Feed cache (multiple carousels share fetches) ---------- */
+  var _feedCache = {};
+  function loadFeed(url) {
+    if (_feedCache[url]) return _feedCache[url];
+    _feedCache[url] = fetch(url)
+      .then(function (r) {
+        if (!r.ok) throw new Error('Feed HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function (xml) {
+        var doc = new DOMParser().parseFromString(xml, 'text/xml');
+        var err = doc.querySelector('parsererror');
+        if (err) throw new Error('Feed XML parse error');
+        return buildLookup(doc);
+      });
+    return _feedCache[url];
+  }
+
+  /* ---------- Hydration entry point ----------------------------------- */
+  function hydrateAll(cb) {
+    var roots = document.querySelectorAll('.rbccm-case-studies');
+    if (!roots.length) { cb(); return; }
+
+    /* Group roots by feed URL so we only fetch each feed once even
+       when multiple carousels on the same page share a feed. */
+    var byFeed = {};
+    var noFeed = [];
+    for (var i = 0; i < roots.length; i++) {
+      var root = roots[i];
+      var hasShells = root.querySelector('.rbccm-case-studies__slide[data-cs-url]');
+      if (!hasShells) { noFeed.push(root); continue; }
+      var feedUrl = attrOr(root, 'data-feed-url', '/en/expertise/transactions/data/case-studies.page');
+      (byFeed[feedUrl] = byFeed[feedUrl] || []).push(root);
+    }
+
+    var pending = Object.keys(byFeed).length;
+    if (!pending) { cb(); return; }
+
+    Object.keys(byFeed).forEach(function (feedUrl) {
+      loadFeed(feedUrl)
+        .then(function (lookup) {
+          byFeed[feedUrl].forEach(function (root) { hydrateRoot(root, lookup); });
+        })
+        .catch(function (e) {
+          /* eslint-disable no-console */
+          if (window.console && console.error) {
+            console.error('[case-studies-carousel] Feed load failed:', feedUrl, e);
+          }
+          byFeed[feedUrl].forEach(dropEmpties);
+        })
+        .then(function () {
+          if (--pending === 0) cb();
+        });
+    });
+  }
+
+  /* ---------- Slick init ---------------------------------------------- */
+  function initSlick(root) {
     var $ = window.jQuery;
     if (root.getAttribute(BOUND_FLAG) === 'true') return;
 
@@ -68,22 +251,11 @@
     if ($track.hasClass('slick-initialized')) return;
     root.setAttribute(BOUND_FLAG, 'true');
 
-    /* Config — pulled from data-attrs on the root (see XSL). Falls back to
-       sensible defaults when the Datum is blank. */
     var cfgSpeed = intAttr(root, 'data-speed', 350);
-
-    /* Region label — accessible-slick's aria-label on the wrapper region.
-       Blank Datum → derive from the H2 (heading text is a natural label).
-       If the H2 isn't present for some reason, fall back to "carousel". */
     var $heading = $root.find('.rbccm-case-studies__heading').first();
     var headingText = $heading.length ? $.trim($heading.text()) : '';
     var regionLabel = attrOr(root, 'data-region-label', headingText || 'carousel');
-
     var instructionsText = attrOr(root, 'data-instructions', '');
-
-    /* Transition — 'slide' (default) or 'fade'. The XSL always emits
-       this attribute so we can trust attrOr's fallback for the
-       edge case of markup that predates the attr. */
     var transition = attrOr(root, 'data-transition', 'slide');
 
     var opts = {
@@ -99,35 +271,35 @@
       appendDots: $dots,
       regionLabel: regionLabel
     };
-    /* Fade: cross-fade between cards instead of horizontal slide.
-       Requires slidesToShow: 1 (which we have). cssEase defaults
-       to 'ease'; leave alone unless a designer flags the fall-off
-       feels wrong. */
     if (transition === 'fade') opts.fade = true;
-    /* Only pass instructionsText if the author set one — accessible-slick
-       renders the sr-only block even for an empty string, which adds
-       unwanted markup. */
     if (instructionsText) opts.instructionsText = instructionsText;
 
     $track.slick(opts);
   }
 
-  function initAll(ctx) {
-    var root = (ctx && ctx.querySelectorAll) ? ctx : document;
-    var roots = root.querySelectorAll('.rbccm-case-studies');
-    for (var i = 0; i < roots.length; i++) init(roots[i]);
+  function initAllSlick(ctx) {
+    var scope = (ctx && ctx.querySelectorAll) ? ctx : document;
+    var roots = scope.querySelectorAll('.rbccm-case-studies');
+    for (var i = 0; i < roots.length; i++) initSlick(roots[i]);
   }
 
+  /* ---------- Bootstrap ------------------------------------------------ */
   function ready(fn) {
     if (document.readyState !== 'loading') fn();
     else document.addEventListener('DOMContentLoaded', fn);
   }
 
   ready(function () {
-    ensureSlickLoaded(function () { initAll(); });
+    hydrateAll(function () {
+      fireHydrated();
+      ensureSlickLoaded(function () { initAllSlick(); });
+    });
   });
 
-  /* Expose init for consumers that inject markup after load (feed scripts,
-     TeamSite preview re-render, etc.). */
-  window.RBCCMCaseStudiesCarousel = { init: initAll };
+  /* Public API - lets consumers rebind newly-injected markup, or
+     re-run hydration after a feed refresh (e.g. TeamSite preview). */
+  window.RBCCMCaseStudiesCarousel = {
+    init: initAllSlick,
+    hydrate: function (cb) { hydrateAll(cb || function () {}); }
+  };
 })();

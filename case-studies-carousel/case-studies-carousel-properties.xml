@@ -1,108 +1,94 @@
 <!-- ============================================================
-     Case Studies Carousel — Properties + Data
+     Case Studies Carousel - Properties + Data
      ============================================================
-     Replaces the legacy Bootstrap 3 carousel at #cs-carousel
-     (case-studies-about story-tiles container). One horizontal
-     card per slide, image left + text right on tablet+, stacked
-     on mobile. Slick at every viewport (1-per-view), arrows +
-     dots always visible.
+     URL-driven schema (v2). Replaces the earlier DCR-picker
+     approach that hung TeamSite's publish walk. Authors paste
+     the public URL of a case study - the runtime JS fetches the
+     shared case-studies feed
+       /en/expertise/transactions/data/case-studies.page
+     matches each slide's URL to a feed record by slug, and
+     hydrates the tile markup (title / description / thumbnail /
+     eyebrow / read-time) from the feed.
 
-     DCR-DRIVEN with per-slide OVERRIDES, same pattern as
-     deal-carousel and how-we-think. Each Case Study Group
-     binds ONE rbccm/casestudy DCR — the XSL reads title /
-     description / image / read-time from that record, and
-     per-slide String/Textarea/Image overrides win when set.
+     Publish is instant: TeamSite only serializes text Datums.
+     No DCR references, no external calls, no dep-walk hang risk.
 
-     A slide can be:
-       fully DCR-driven   pick a case study, fill in nothing
-       fully MANUAL       leave the picker empty, type all fields
-       MIXED              pick a record and override one or two
+     Optional per-slide overrides let authors tweak eyebrow or
+     read-time without touching the case-study DCR itself.
 
      Deploy alongside the skin:
        /assets/rbccm/css/components/case-studies-carousel.css
        /assets/rbccm/js/components/case-studies-carousel.js
 
-     Depends on: jQuery + accessible-slick (loaded site-wide;
-     the JS loader falls back to CDN if the site build isn't
-     present).
+     Depends on: jQuery + accessible-slick (loaded site-wide).
 
      Consumed by case-studies-carousel.xsl.
 
      SCHEMA NOTE: only ID, Name, Type are permitted on a Datum,
      and only ID, Name, Replicatable, CloneGroupID on a Group.
-     MinReplicates and Required are NOT in Teamsite's schema and
+     MinReplicates and Required are NOT in TeamSite's schema and
      will fail validation. Counts and required fields are
      enforced in the XSL instead.
-
-     IMPORTANT — Datum @Name attributes MUST match the XSL's
-     @Name selectors. Teamsite strips @ID on replicated Datums,
-     so @Name is the only reliable match inside a Replicatable
-     Group. Keep them plain: no apostrophes (they break the
-     single-quoted XPath), no em-dashes.
      ============================================================ -->
-<Properties ComponentID="case-studies-carousel-v1">
+<Properties ComponentID="case-studies-carousel-v2">
 
-  <!-- ─── Section heading (required) ───
-       RBCDisplay 29/34.8 wt 500, dark navy #002144, left-aligned.
-       Mobile scales to 24/120% wt 500. Blank falls back to
+  <!-- Section heading (required). RBCDisplay 29/34.8 wt 500 on
+       desktop, 24/120% on mobile. Blank falls back to
        "Signature case studies". -->
   <Datum ID="Heading" Type="String" Name="Section Heading">Signature case studies</Datum>
 
   <!-- Optional intro paragraph below the H2. Textarea because
-       the copy can run long. Blank drops the paragraph entirely
-       (XSL skips the <p> when empty). -->
+       copy can run long. Blank drops the paragraph. -->
   <Datum ID="Intro" Type="Textarea" Name="Section Intro (optional)"></Datum>
 
   <!-- Section aria-label on the <section> wrapper. Blank falls
        back to the Heading. -->
   <Datum ID="AriaLabel" Type="String" Name="Section Aria Label (blank = heading)"></Datum>
 
-  <!-- Optional id="…" on the H2 so anchor links (…#case-studies)
-       can jump to the section. When set, the CSS also applies
-       scroll-margin-top so the target sits below the sticky nav. -->
-  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional, e.g. case-studies)"></Datum>
+  <!-- Optional id="..." on the H2 so anchor links (...#case-studies)
+       can jump to the section. When set, CSS applies scroll-margin-top
+       to clear the sticky nav. -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional)"></Datum>
 
 
-  <!-- ═══ TRANSITION MODE ════════════════════════════════════
-       Two options:
-         slide  (default) horizontal slide between cards — the
-                classic slick behaviour. Feels like flipping
-                through pages.
-         fade   cross-fade between cards, no horizontal motion.
-                Reads calmer, especially for signature content
-                where the cards are the focus rather than the
-                transition itself.
-       Parsed case-insensitively; anything unrecognised falls
-       back to "slide" so a typo can't break the component. -->
+  <!-- ═══ TRANSITION MODE ══════════════════════════════════════
+       "slide" (default) horizontal slide between cards.
+       "fade" cross-fade between cards, no horizontal motion.
+       Parsed case-insensitively; unknown values fall back to
+       "slide". -->
   <Datum ID="TransitionMode" Type="String" Name="Transition Mode (slide or fade)">slide</Datum>
 
 
-  <!-- ═══ VIEW ALL CTA ═══════════════════════════════════════
-       Outlined pill below the dot pagination. Blank link = NO
-       button; blank label alone would render a button with no
-       text, so we drop it in the XSL if either is blank. -->
+  <!-- ═══ VIEW ALL CTA ═════════════════════════════════════════
+       Outlined pill below the dots. Blank link OR blank label
+       drops the whole button. -->
   <Datum ID="CtaLabel" Type="String" Name="View All Button Label (blank = no button)">View all</Datum>
   <Datum ID="CtaLink"  Type="String" Name="View All Button Link (blank = no button)">/en/expertise/transactions</Datum>
   <Datum ID="CtaNewTab" Type="Boolean" Name="Open View All in New Tab">false</Datum>
 
 
-  <!-- ═══ ACCESSIBILITY (optional overrides) ═════════════════ -->
+  <!-- ═══ FEED URL ═════════════════════════════════════════════
+       Where the JS fetches case-study metadata from. Default
+       points at the shared TeamSite feed component. Override
+       per instance only if a different feed is needed (e.g. a
+       regional split). -->
+  <Datum ID="FeedUrl" Type="String" Name="Feed URL (blank = default case-studies feed)">/en/expertise/transactions/data/case-studies.page</Datum>
+
+
+  <!-- ═══ ACCESSIBILITY (optional overrides) ══════════════════ -->
 
   <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
 
-  <!-- Accessible-slick's `regionLabel` — matters when a page
-       carries more than one carousel: without distinct labels a
-       screen reader announces two identical "region"s and the
-       user can't tell them apart. Blank falls back to the
-       Section Heading, then to a generic label. -->
+  <!-- accessible-slick regionLabel. Matters when a page carries
+       more than one carousel: without distinct labels a screen
+       reader announces two identical "region"s. Blank falls
+       back to the Section Heading. -->
   <Datum ID="RegionLabel" Type="String" Name="Carousel Region Aria Label (blank = heading)"></Datum>
 
-  <!-- Accessible-slick's `instructionsText`. Optional
-       screen-reader-only text emitted at the START of the
-       carousel. Blank by default and that is the right default
-       here — behaviour is obvious (Prev / Next / numbered dots
-       all reachable by Tab), nothing bespoke to explain. Fill
-       in only for non-obvious behaviour. -->
+  <!-- accessible-slick instructionsText. Optional screen-reader
+       hint at the START of the carousel. Blank by default and
+       usually stays blank - behaviour is obvious. Fill in only
+       for non-obvious behaviour. -->
   <Datum ID="InstructionsText" Type="String" Name="Screen Reader Instructions (blank = none)"></Datum>
 
   <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
@@ -110,12 +96,11 @@
   <Datum ID="AriaViewAllLabel"   Type="String" Name="View All Aria Label (override)"></Datum>
 
 
-  <!-- ═══ SECTION PADDING (optional overrides) ═══════════════
-       Blank uses the baked-in defaults: 40/16 mobile, 64/24 at
-       992+, 64/170 at 1440+. Supply any CSS length to override.
-       Written as CSS custom properties on the section so the
-       stylesheet keeps its defaults and an override is a
-       one-Datum change with no CSS edit. -->
+  <!-- ═══ SECTION PADDING (optional overrides) ════════════════
+       Blank = baked-in defaults (40/16 mobile, 64/24 992+,
+       64/170 1440+). Supply any CSS length to override. Written
+       as CSS custom properties on the section so the stylesheet
+       keeps its defaults and an override is a one-Datum change. -->
   <Datum ID="PadTopMobile"     Type="String" Name="Mobile padding-top (blank = 40px)"/>
   <Datum ID="PadBottomMobile"  Type="String" Name="Mobile padding-bottom (blank = 40px)"/>
   <Datum ID="PadTopDesktop"    Type="String" Name="Desktop padding-top (blank = 64px)"/>
@@ -126,69 +111,39 @@
 <Data>
 
   <!-- ═══ CASE STUDY SLIDES ═══════════════════════════════════
-       One Group per slide. Each Group binds ONE rbccm/casestudy
-       DCR. Typical path in this Teamsite install:
-         templatedata/rbccm/casestudy/data/<year>/<month>/<slug>
+       One Group per slide. Author's only required input is the
+       case-study URL. Everything else - title, description,
+       image, eyebrow, read-time - is read from the shared
+       case-studies feed at render time by the JS runtime.
 
-       Public URL (built in the XSL's story-url template):
-         /en/expertise/transactions/case-study/<year>/<month>/<slug>
+       WORKFLOW
+         1. Browse to the case study on the site.
+         2. Copy the URL from the address bar.
+         3. Paste into the Case Study URL Datum below.
+         4. Save + publish. Done.
 
-       DEPLOY HANG INVESTIGATION (open): TeamSite hangs at
-       "Initializing deployment" whenever a case study is picked
-       on the test page. The picker resolves records fine at
-       edit-time (fields populate) so the DCR type registration
-       is valid. The hang is specifically the deploy-time
-       packaging of the reference — probably the record's own
-       sub-deps (images, referenced pages) failing to walk. The
-       leadership carousel (rbccm/authors picker) has the SAME
-       pattern: works on some pages, hangs on others. -->
-  <Group ID="CaseStudy"
-         Name="Case Study"
+       PER-SLIDE OVERRIDES (both optional)
+         Eyebrow Override    - replaces the eyebrow the feed
+                               would show for this record. Use
+                               to say "Featured deal" on one
+                               specific tile without editing
+                               the underlying DCR record.
+         Read Time Override  - replaces the "X min" value.
+
+       BEHAVIOUR
+         Missing/renamed URLs are silently dropped at render
+         time. If every URL fails to match, the carousel shows
+         nothing (no broken shells). The gate is intentionally
+         soft - lets you queue a not-yet-published case study
+         and it'll pop in when the feed refreshes. -->
+  <Group ID="Slide"
+         Name="Case Study Slide"
          Replicatable="true"
-         CloneGroupID="case-studies-slide">
+         CloneGroupID="cs-slide">
 
-    <!-- DCR picker. Scoped to Category="rbccm" Type="casestudy". -->
-    <Datum ID="CaseStudyRecord" Type="DCR" Name="Case Study Record">
-      <DCR Category="rbccm" Type="casestudy"></DCR>
-    </Datum>
-
-    <!-- ── Per-slide overrides ──
-         BLANK = "use the bound record". An override wins for
-         that field. A slide with no record AND no title is
-         dropped by the XSL (a card with no headline is not a
-         card). -->
-
-    <!-- Uppercase eyebrow above the divider. XSL default is
-         "Expertise" (matching the live site); the record's own
-         subcategory wins if set (e.g. "Case Study"), then the
-         override wins over that. -->
-    <Datum ID="EyebrowOverride" Type="String" Name="Eyebrow Label (blank = record subcategory or Expertise)"></Datum>
-
-    <Datum ID="TitleOverride" Type="String" Name="Title"></Datum>
-    <Datum ID="DescriptionOverride" Type="Textarea" Name="Description"></Datum>
-
-    <!-- Card image. The nested <Image> skeleton is REQUIRED and
-         must be left EMPTY. A default path here fails validation
-         with "Datum ID=[Image] Value is not a valid image". -->
-    <Datum ID="ImageOverride" Type="Image" Name="Card Image">
-      <Image>
-        <Path/>
-        <Description/>
-      </Image>
-    </Datum>
-    <Datum ID="ImageAltOverride" Type="String" Name="Card Image Alt Text (blank = title)"></Datum>
-
-    <!-- Read-time / meta line at the bottom. Free text so it can
-         say "4 min read", "13 min listen", "17 min watch". XSL
-         falls back to the record's reading_time when blank. -->
-    <Datum ID="MetaOverride" Type="String" Name="Read Time (e.g. 4 min read)"></Datum>
-
-    <!-- Link. Blank falls back to the bound record's own case-
-         study page URL (built from the DCR path). Manual
-         override for external links or when the record has no
-         page. -->
-    <Datum ID="LinkOverride" Type="String" Name="Card Link URL"></Datum>
-    <Datum ID="LinkNewTab" Type="Boolean" Name="Open Card Link in New Tab">false</Datum>
+    <Datum ID="Url"      Type="String" Name="Case Study URL"></Datum>
+    <Datum ID="Eyebrow"  Type="String" Name="Eyebrow Override (blank = use feed)"></Datum>
+    <Datum ID="ReadTime" Type="String" Name="Read Time Override (blank = use feed)"></Datum>
 
   </Group>
 
