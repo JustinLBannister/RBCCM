@@ -130,11 +130,11 @@
     }
     @media (min-width: 1300px) {
       .rbccm-case-studies__carousel {
-        column-gap: 24px;
+        column-gap: 28px;
         grid-template-areas:
           "prev track next"
           ".    dots  .";
-        grid-template-columns: auto 1140px auto;
+        grid-template-columns: auto 1110px auto;
         margin: 32px -68px 0 -68px;
         max-width: none;
       }
@@ -911,6 +911,22 @@
         .trim();
     }
 
+    // Truncate description to ~100 chars at a word boundary + ellipsis
+    // (matches the legacy Bootstrap carousel behaviour). Strips all
+    // remaining HTML before counting so the cap is on visible text.
+    var DESC_MAX_CHARS = 100;
+    function truncateDescription(html, maxChars) {
+      if (!html) return '';
+      var probe = document.createElement('div');
+      probe.innerHTML = html;
+      var text = (probe.textContent || probe.innerText || '').trim();
+      if (text.length <= maxChars) return text;
+      var cut = text.substr(0, maxChars);
+      var lastSpace = cut.lastIndexOf(' ');
+      if (lastSpace > maxChars * 0.6) cut = cut.substr(0, lastSpace);
+      return cut.replace(/[\s.,;:—-]+$/, '') + '…';
+    }
+
     function buildLookup(xmlDoc) {
       var map = {};
       var records = xmlDoc.getElementsByTagName('caseStudy');
@@ -921,7 +937,10 @@
         map[slug] = {
           slug:        slug,
           title:       decodeEntities(childText(rec, 'title')),
-          description: sanitizeDescription(childText(rec, 'description')),
+          description: truncateDescription(
+            sanitizeDescription(childText(rec, 'description')),
+            DESC_MAX_CHARS
+          ),
           thumbnail:   childText(rec, 'thumbnail'),
           eyebrow:     childText(rec, 'eyebrow') || 'Case Study',
           link:        childText(rec, 'link'),

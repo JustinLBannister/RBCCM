@@ -91,12 +91,11 @@
   /* ---------- Feed parsing -------------------------------------------- */
   /* Description sanitizer.
      Descriptions in the feed may carry authored HTML - <br>, <strong>,
-     <sup>, <em>, etc. - which we WANT to render. But two patterns
-     break the card:
+     <sup>, <em>, etc. But three patterns break the card:
        1. Nested <a> tags. The whole card is wrapped in <a class="__card">.
           Browsers don't allow <a> inside <a> and will close the outer
           one prematurely, splitting the card into fragments (Kroger
-          tile shows this - CTA link at the end fragments the layout).
+          tile hits this - CTA link at the end fragments the layout).
        2. Literal "\n" sequences (backslash-n as text, not real
           newlines). Some records were authored with escape sequences
           rather than actual newlines; they render as visible junk.
@@ -105,16 +104,33 @@
   function sanitizeDescription(html) {
     if (!html) return '';
     return String(html)
-      /* Unwrap nested anchors: keep the inner text/HTML, drop the <a>. */
       .replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, '$1')
-      /* Drop TinyMCE bogus BRs. */
       .replace(/<br[^>]*data-mce-bogus[^>]*>/gi, '')
-      /* Collapse literal "\n" escape sequences to a space. */
       .replace(/\\n/g, ' ')
-      /* Squash the whitespace runs that the previous replacement
-         can leave behind. */
       .replace(/\s{2,}/g, ' ')
       .trim();
+  }
+
+  /* Truncate description to roughly the same length the legacy
+     Bootstrap 3 carousel used (~100 chars, word-boundary rounded,
+     ellipsis appended). Strips ALL remaining HTML tags before
+     counting so we're capping visible text length, not markup
+     length - authored <br>/<strong> in the middle of a long
+     paragraph won't skew the cut. Trailing punctuation before
+     the ellipsis is trimmed (avoid "…." / ",…"). */
+  var DESC_MAX_CHARS = 100;
+  function truncateDescription(html, maxChars) {
+    if (!html) return '';
+    var probe = document.createElement('div');
+    probe.innerHTML = html;
+    var text = (probe.textContent || probe.innerText || '').trim();
+    if (text.length <= maxChars) return text;
+    var cut = text.substr(0, maxChars);
+    var lastSpace = cut.lastIndexOf(' ');
+    /* Only back up to a space if the space isn't miles behind the
+       target (avoids an aggressive cut on very long single words). */
+    if (lastSpace > maxChars * 0.6) cut = cut.substr(0, lastSpace);
+    return cut.replace(/[\s.,;:—-]+$/, '') + '…';
   }
 
   /* Build a slug -> record lookup from the parsed feed XML.
@@ -131,10 +147,15 @@
       map[slug] = {
         slug:        slug,
         title:       decodeEntities(childText(rec, 'title')),
-        /* Description kept as HTML (br / strong / sup preserved) but
-           run through sanitizeDescription to strip patterns that
-           break the card layout - see sanitizeDescription above. */
-        description: sanitizeDescription(childText(rec, 'description')),
+        /* Description: sanitize first (strip <a>, bogus BRs, literal \n),
+           then truncate to ~100 chars word-boundary + ellipsis (matches
+           legacy Bootstrap carousel behaviour). truncateDescription
+           strips all remaining HTML before counting, so the output is
+           plain text - safe to inject via innerHTML. */
+        description: truncateDescription(
+          sanitizeDescription(childText(rec, 'description')),
+          DESC_MAX_CHARS
+        ),
         thumbnail:   childText(rec, 'thumbnail'),
         eyebrow:     childText(rec, 'eyebrow') || 'Case Study',
         link:        childText(rec, 'link'),
