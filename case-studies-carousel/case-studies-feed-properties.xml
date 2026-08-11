@@ -1,0 +1,50 @@
+<!-- ============================================================
+     Case Studies Feed - Properties + Data
+     ============================================================
+     Pairs with case-studies-feed.xsl. Deploy as a new skin
+     alongside the existing article feed - does NOT modify the
+     article feed's Properties/Data block.
+
+     Differences from the article feed:
+       - New ComponentID (any unique value works; the string
+         below is a placeholder - TeamSite will assign one when
+         you save the component)
+       - qQuery scoped to rbccm/casestudy (not article/news)
+       - qPagesize bumped to 50 so a single feed URL can serve
+         multiple carousel instances that each pick their own
+         subset via the component's Slugs Datum
+       - ViewPage/ArchivePage kept for parity with the article
+         feed but effectively unused - the feed XSL builds each
+         link directly from the DCR @path
+     ============================================================ -->
+<Properties ComponentID="case-studies-feed-v1">
+  <Datum ID="Container" Type="Boolean" Name="Wrap in Container">false</Datum>
+</Properties>
+<Data>
+  <!-- Kept for structural parity with the article feed. The
+       case-studies feed XSL doesn't consume these - links are
+       built from the DCR path via substring-after. Safe to leave
+       as-is (or point at any published page). -->
+  <Datum ID="ViewPage"    Type="PageLink" Name="View Case Study Page"><![CDATA[$PAGE_LINK[transactions]]]></Datum>
+  <Datum ID="ArchivePage" Type="PageLink" Name="Archive Page"><![CDATA[$PAGE_LINK[transactions]]]></Datum>
+
+  <External>
+    <Parameters>
+      <!-- Query the DCR store for every rbccm/casestudy record
+           published since 2015. Newest first (see qSort below).
+           The 2015 floor mirrors the article feed's convention
+           - keeps the result set bounded but wide enough that
+           no real case study is excluded. -->
+      <Datum ID="qQuery"    Name="qQuery"    Type="String" Label="Query">TeamSite/Templating/DCR/Type:rbccm/casestudy AND TeamSite/Metadata/publishdate:&gt;2015-00-00</Datum>
+      <Datum ID="qSort"     Name="qSort"     Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
+      <!-- 50 keeps the feed small enough to fetch quickly on a
+           page load, generous enough that one feed URL serves
+           every carousel instance across the site (each instance
+           filters down to the slugs it wants via its Slugs Datum). -->
+      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">50</Datum>
+      <Datum ID="qOffset"   Name="qOffset"   Type="String" Label="Offset">0</Datum>
+    </Parameters>
+    <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>
+    <Method>findByQuery</Method>
+  </External>
+</Data>

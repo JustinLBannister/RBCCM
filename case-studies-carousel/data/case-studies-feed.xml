@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================
+     Case Studies Feed - test fixture
+     ============================================================
+     Static mock of what TeamSite would emit at runtime when the
+     case-studies-feed.xsl skin renders against a case-study
+     MetaQueryExternal component.
+
+     Shape mirrors the live article feed exactly - same <root>
+     + LiveSite comment wrappers, same per-item structure with
+     date/link/thumbnail/title/description/eyebrow/etc.
+
+     Differences from the article feed shape:
+       archive        -> caseStudies       (root wrapper)
+       news           -> caseStudy         (per-item)
+       category       -> eyebrow           (semantic rename per
+                                            client note - eyebrow
+                                            is the series/label,
+                                            not the content type)
+       author/watchtime/video/story-type: DROPPED (case studies
+                                            don't carry these
+                                            metadata keys)
+       slug           -> NEW               (derived from DCR
+                                            path tail; carousel
+                                            JS can filter/order
+                                            by it)
+
+     Data below is real: four case studies pulled from the
+     existing legacy carousel on rbccm.com. Once the real feed
+     is deployed, this file becomes the offline fixture that
+     test.html loads for local preview.
+     ============================================================ -->
+<root>
+<!-- ls:begin[component-case-studies-feed-v1] -->
+<caseStudies>
+
+  <caseStudy>
+    <slug>2025/09/bloomberg_brings_dynamic_multi-asset_index_to_fia_market</slug>
+    <date>September 25, 2025</date>
+    <link>/en/expertise/transactions/case-study/2025/09/bloomberg_brings_dynamic_multi-asset_index_to_fia_market</link>
+    <thumbnail>/assets/rbccm/images/insights/2025/20250925-bloomberg_brings_dynamic_multi-asset_index_to_fia_market_th.webp</thumbnail>
+    <title>Bloomberg brings dynamic multi-asset index to FIA market</title>
+    <description>Bloomberg's VERSA 10 Index (BVERSA10) - developed with RBC Capital Markets - offers a new benchmark for fixed indexed annuity products.</description>
+    <eyebrow>Expertise</eyebrow>
+    <region>global</region>
+    <tags>Indices, Structured Products, FIA, Insurance, Bloomberg</tags>
+    <readtime>4 min</readtime>
+  </caseStudy>
+
+  <caseStudy>
+    <slug>2025/07/blackstone_and_cpp_investments_acquire_airtrunk_in_a24b_landmark_deal</slug>
+    <date>July 30, 2025</date>
+    <link>/en/expertise/transactions/case-study/2025/07/blackstone_and_cpp_investments_acquire_airtrunk_in_a24b_landmark_deal</link>
+    <thumbnail>/assets/rbccm/images/insights/2025/20250716-blackstone_and_cpp_investments_acquire_airtrunk-th.jpg</thumbnail>
+    <title>Blackstone and CPP Investments acquire AirTrunk in A$24B landmark deal</title>
+    <description>RBC Capital Markets acts as joint financial advisor and lead structuring bank to Blackstone and CPP Investments on their ~A$24 billion acquisition of AirTrunk.</description>
+    <eyebrow>Case Study</eyebrow>
+    <region>asia-pacific</region>
+    <tags>Blackstone, CPP Investments, Data Centers, Digital Infrastructure, M&amp;A</tags>
+    <readtime>5 min</readtime>
+  </caseStudy>
+
+  <caseStudy>
+    <slug>2025/04/ibm_acquisition_aims_to_create_comprehensive</slug>
+    <date>April 15, 2025</date>
+    <link>/en/expertise/transactions/case-study/2025/04/ibm_acquisition_aims_to_create_comprehensive</link>
+    <thumbnail>/assets/rbccm/images/insights/2025/ibm_acquisition_aims_to_create-th.jpg</thumbnail>
+    <title>IBM Acquisition Aims to Create Comprehensive End-to-End Hybrid Cloud Platform</title>
+    <description>IBM has enhanced its capabilities to support clients' deployment of cloud and AI technologies with the acquisition of HashiCorp - creating a comprehensive end-to-end hybrid cloud platform.</description>
+    <eyebrow>Case Study</eyebrow>
+    <region>north-america</region>
+    <tags>IBM, HashiCorp, Cloud, AI, Technology, M&amp;A</tags>
+    <readtime>3 min</readtime>
+  </caseStudy>
+
+  <caseStudy>
+    <slug>2025/02/kroger_sells_specialty_pharmacy_business_to_elevance_health_in_464m_deal</slug>
+    <date>February 10, 2025</date>
+    <link>/en/expertise/transactions/case-study/2025/02/kroger_sells_specialty_pharmacy_business_to_elevance_health_in_464m_deal</link>
+    <thumbnail>/assets/rbccm/images/insights/2025/kroger-sells-specialty-pharmacy-business-th.jpg</thumbnail>
+    <title>Kroger sells specialty pharmacy business to Elevance Health in $464M deal</title>
+    <description>In October 2024, The Kroger Co. completed the sale of its specialty pharmacy business to Elevance Health for $464M - RBC Capital Markets served as exclusive financial advisor.</description>
+    <eyebrow>Case Study</eyebrow>
+    <region>north-america</region>
+    <tags>Kroger, Elevance Health, Healthcare, Pharmacy, M&amp;A</tags>
+    <readtime>3 min</readtime>
+  </caseStudy>
+
+</caseStudies>
+<!-- ls:end[component-case-studies-feed-v1] -->
+</root>

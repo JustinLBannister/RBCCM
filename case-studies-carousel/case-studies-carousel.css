@@ -291,14 +291,19 @@ a.rbccm-case-studies__card:active {
 }
 
 /* Body — vertical stack: eyebrow / divider / title / desc /
-   CTA. min-height carves out room so the CTA can `margin-top:
-   auto` and pin to the bottom without collapsing. */
+   CTA. `justify-content: center` clusters the block vertically
+   inside whatever height the image dictates, matching the
+   conference-insights featured tile spacing (no big whitespace
+   between description and CTA). min-height is kept so short
+   cards still hold shape, but content is centered — not
+   top-aligned with a bottom-pinned CTA. */
 .rbccm-case-studies__body {
   align-items: flex-start;
   align-self: stretch;
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center;
   min-height: 240px;
   padding: 24px;
 }
@@ -328,7 +333,9 @@ a.rbccm-case-studies__card:active {
   transition: width 0.3s ease;
   width: 30.9px;
 }
-/* Title — Roboto Medium 20/125 wt 400 #000 (matches how-we-think). */
+/* Title — Roboto Medium 20/125 wt 400 #000 (matches how-we-think).
+   Vertical spacing matches conference-insights featured tile:
+   26px above (divider → title), 12px below (title → desc). */
 .rbccm-case-studies__title {
   color: #000;
   font-family: "Roboto Medium", Arial, sans-serif;
@@ -336,12 +343,13 @@ a.rbccm-case-studies__card:active {
   font-weight: 400;
   letter-spacing: normal;
   line-height: 125%;
-  margin: 10px 0 10px 0;
+  margin: 26px 0 12px 0;
 }
 @media (min-width: 992px) {
   .rbccm-case-studies__title { font-size: 22px; }
 }
-/* Description — Roboto Light 14/140 wt 400 #555, LS 0.5. */
+/* Description — Roboto Light 14/140 wt 400 #555, LS 0.5.
+   26px bottom to match conference-insights featured spacing. */
 .rbccm-case-studies__desc {
   color: #555;
   font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
@@ -349,7 +357,7 @@ a.rbccm-case-studies__card:active {
   font-weight: 400;
   letter-spacing: 0.5px;
   line-height: 140%;
-  margin: 0 0 20px 0;
+  margin: 0 0 26px 0;
 }
 /* CTA (read-time) — inline-flex + fit-content so the hover
    border-bottom only underlines the label + arrow, not the
@@ -365,7 +373,11 @@ a.rbccm-case-studies__card:active {
   gap: 7px;
   letter-spacing: normal;
   line-height: 20px;
-  margin: auto 0 0 0;
+  /* Was `auto 0 0 0` — pinned CTA to card bottom, leaving a big
+     gap under the description. Zeroed so it flows right after the
+     description and the body's `justify-content: center` can
+     actually cluster the whole block vertically. */
+  margin: 0;
   padding-bottom: 2px;
   transition: border-color 0.2s ease;
   width: fit-content;
