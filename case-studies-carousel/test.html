@@ -895,6 +895,19 @@
     // Dedup: first record for a given slug wins (feed is sorted
     // newest-first so this keeps the most recent version of any
     // accidentally duplicated case study).
+    // Sanitize description before injection - keep authored HTML
+    // (br/strong/sup) but drop nested <a> tags (break outer card
+    // link), TinyMCE bogus BRs, and literal "\n" escape sequences.
+    function sanitizeDescription(html) {
+      if (!html) return '';
+      return String(html)
+        .replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, '$1')
+        .replace(/<br[^>]*data-mce-bogus[^>]*>/gi, '')
+        .replace(/\\n/g, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+
     function buildLookup(xmlDoc) {
       var map = {};
       var records = xmlDoc.getElementsByTagName('caseStudy');
@@ -905,9 +918,7 @@
         map[slug] = {
           slug:        slug,
           title:       decodeEntities(childText(rec, 'title')),
-          // Description kept raw - feed values may include real HTML
-          // (embedded <a>, <br>, <strong>) that we WANT to render.
-          description: childText(rec, 'description'),
+          description: sanitizeDescription(childText(rec, 'description')),
           thumbnail:   childText(rec, 'thumbnail'),
           eyebrow:     childText(rec, 'eyebrow') || 'Case Study',
           link:        childText(rec, 'link'),

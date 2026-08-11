@@ -165,7 +165,13 @@
               </xsl:if>
               <xsl:value-of select="$heading"/>
             </h2>
-            <xsl:if test="$intro != ''">
+            <!-- Suppress the intro when it's just a TinyMCE bogus BR
+                 (author opened the visual editor and saved without
+                 typing - the placeholder <br data-mce-bogus="1">
+                 leaks through as literal content). Same guard we
+                 use across other components that have a Textarea
+                 Datum bound to TinyMCE. -->
+            <xsl:if test="$intro != '' and not(contains($intro, 'data-mce-bogus'))">
               <p class="rbccm-case-studies__intro"><xsl:value-of select="$intro"/></p>
             </xsl:if>
           </header>

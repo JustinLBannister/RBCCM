@@ -89,6 +89,34 @@
   }
 
   /* ---------- Feed parsing -------------------------------------------- */
+  /* Description sanitizer.
+     Descriptions in the feed may carry authored HTML - <br>, <strong>,
+     <sup>, <em>, etc. - which we WANT to render. But two patterns
+     break the card:
+       1. Nested <a> tags. The whole card is wrapped in <a class="__card">.
+          Browsers don't allow <a> inside <a> and will close the outer
+          one prematurely, splitting the card into fragments (Kroger
+          tile shows this - CTA link at the end fragments the layout).
+       2. Literal "\n" sequences (backslash-n as text, not real
+          newlines). Some records were authored with escape sequences
+          rather than actual newlines; they render as visible junk.
+       3. TinyMCE bogus BR (<br data-mce-bogus="1">). Placeholder
+          markup that should never make it to output. */
+  function sanitizeDescription(html) {
+    if (!html) return '';
+    return String(html)
+      /* Unwrap nested anchors: keep the inner text/HTML, drop the <a>. */
+      .replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, '$1')
+      /* Drop TinyMCE bogus BRs. */
+      .replace(/<br[^>]*data-mce-bogus[^>]*>/gi, '')
+      /* Collapse literal "\n" escape sequences to a space. */
+      .replace(/\\n/g, ' ')
+      /* Squash the whitespace runs that the previous replacement
+         can leave behind. */
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
   /* Build a slug -> record lookup from the parsed feed XML.
      First record for a given slug wins (feed is sorted newest-first
      so the most recent version of any accidentally duplicated case
@@ -103,9 +131,10 @@
       map[slug] = {
         slug:        slug,
         title:       decodeEntities(childText(rec, 'title')),
-        /* Kept raw - feed descriptions may include real HTML
-           (embedded <a>, <br>, <strong>) that we WANT to render. */
-        description: childText(rec, 'description'),
+        /* Description kept as HTML (br / strong / sup preserved) but
+           run through sanitizeDescription to strip patterns that
+           break the card layout - see sanitizeDescription above. */
+        description: sanitizeDescription(childText(rec, 'description')),
         thumbnail:   childText(rec, 'thumbnail'),
         eyebrow:     childText(rec, 'eyebrow') || 'Case Study',
         link:        childText(rec, 'link'),
