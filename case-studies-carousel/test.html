@@ -130,12 +130,15 @@
     }
     @media (min-width: 1300px) {
       .rbccm-case-studies__carousel {
-        column-gap: 28px;
+        column-gap: 40px;
         grid-template-areas:
           "prev track next"
           ".    dots  .";
-        grid-template-columns: auto 1110px auto;
-        margin: 32px -68px 0 -68px;
+        grid-template-columns: auto 1100px auto;
+        /* Left -84 = -(arrow 44 + gap 40): track left = container-left.
+           Right -44 = -(1100 + 40 + 44 - 1140): right arrow starts at
+           container-right and bleeds its own width past. */
+        margin: 32px -44px 0 -84px;
         max-width: none;
       }
     }
