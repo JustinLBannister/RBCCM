@@ -130,15 +130,15 @@
     }
     @media (min-width: 1300px) {
       .rbccm-case-studies__carousel {
-        column-gap: 40px;
+        column-gap: 25px;
         grid-template-areas:
           "prev track next"
           ".    dots  .";
         grid-template-columns: auto 1100px auto;
-        /* Left -84 = -(arrow 44 + gap 40): track left = container-left.
-           Right -44 = -(1100 + 40 + 44 - 1140): right arrow starts at
-           container-right and bleeds its own width past. */
-        margin: 32px -44px 0 -84px;
+        /* Left -69 = -(arrow 44 + gap 25). Right -29 balances the
+           grid overshoot. Slides carry 15px internal padding so the
+           card breathes without changing outer slide dimensions. */
+        margin: 32px -29px 0 -69px;
         max-width: none;
       }
     }
@@ -220,7 +220,9 @@
        stacks to 1 column on mobile. The child styling — border
        colour flip, image scale, yellow-divider stretch,
        CTA-border underline — is identical. */
-    .rbccm-case-studies__slide { width: 100%; }
+    /* 15px horizontal padding gives the card visual breathing room
+       inside the slide without changing the slide's outer width. */
+    .rbccm-case-studies__slide { width: 100%; padding: 0 15px; }
     .rbccm-case-studies__card {
       align-items: stretch;
       background: #FFF;

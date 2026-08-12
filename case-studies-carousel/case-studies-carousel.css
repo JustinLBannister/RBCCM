@@ -136,17 +136,15 @@
 }
 @media (min-width: 1300px) {
   .rbccm-case-studies__carousel {
-    column-gap: 40px;
+    column-gap: 25px;
     grid-template-areas:
       "prev track next"
       ".    dots  .";
     grid-template-columns: auto 1100px auto;
-    /* Left margin = -(arrow width 44 + column-gap 40) = -84 so the
-       track column starts exactly at container-left, aligning with
-       the heading. Right margin = -(1100 track + 40 gap + 44 arrow)
-       + 1140 container = -44, so right arrow starts right at the
-       container's right edge and bleeds only its own width past. */
-    margin: 32px -44px 0 -84px;
+    /* Left -69  = -(arrow 44 + gap 25): track left = container-left.
+       Right -29 = -(1100 + 25 + 44 - 1140): balances the grid
+       overshoot so nothing wraps. */
+    margin: 32px -29px 0 -69px;
     max-width: none;
   }
 }
@@ -232,7 +230,15 @@
 }
 .rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
 
-.rbccm-case-studies__slide { width: 100%; }
+/* 15px horizontal padding gives the card visual breathing room
+   inside the slide, so the card doesn't touch the slide edges.
+   Combined with box-sizing: border-box (set on all children of
+   .rbccm-case-studies), the card renders at (slide width - 30)
+   without changing the outer slide/track dimensions. */
+.rbccm-case-studies__slide {
+  width: 100%;
+  padding: 0 15px;
+}
 
 
 /* ---------- Card ----------
