@@ -125,7 +125,10 @@
   align-items: center;
   box-sizing: border-box;
   display: grid;
-  gap: 24px 26px;
+  /* row-gap 8 pulls the dot pagination in tight under the slide;
+     column-gap 26 spaces the arrow / dots / arrow row (below-track
+     layout at <1300, overridden at 1300+). */
+  gap: 8px 26px;
   grid-template-columns: 1fr auto auto auto 1fr;
   grid-template-areas:
     "track track track track track"
@@ -230,14 +233,12 @@
 }
 .rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
 
-/* 15px horizontal padding gives the card visual breathing room
-   inside the slide, so the card doesn't touch the slide edges.
-   Combined with box-sizing: border-box (set on all children of
-   .rbccm-case-studies), the card renders at (slide width - 30)
-   without changing the outer slide/track dimensions. */
+/* Slide padding zeroed - the 15px inner padding wasn't needed
+   once the grid math (arrow columns + column-gap + track) was
+   dialed in. Card now fills the full slide width. */
 .rbccm-case-studies__slide {
   width: 100%;
-  padding: 0 15px;
+  padding: 0;
 }
 
 
@@ -563,7 +564,10 @@ a.rbccm-case-studies__card:active {
   padding: 12px 32px;
   border: 1px solid #003168;
   background: transparent;
-  color: #003168;
+  /* !important because RBC's site-wide `a` styles override
+     component-scoped colors on links. Same fix pattern used on
+     other button-styled anchors in the RBC CM component library. */
+  color: #003168 !important;
   font-family: Roboto, sans-serif;
   font-size: 15px;
   font-weight: 500;
