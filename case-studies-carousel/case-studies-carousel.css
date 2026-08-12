@@ -233,12 +233,18 @@
 }
 .rbccm-case-studies__track.slick-initialized .rbccm-case-studies__card { width: 100%; }
 
-/* Slide padding zeroed - the 15px inner padding wasn't needed
-   once the grid math (arrow columns + column-gap + track) was
-   dialed in. Card now fills the full slide width. */
+/* Card fills the slide by default. Toggle on via the SlidePadding
+   Datum (author flips it per instance) - XSL emits
+   `data-slide-padding="true"` on the section root, which the
+   attribute selector below picks up and applies 15px each side
+   inside the slide. Same slick track / carousel dimensions
+   either way - only the card's inset changes. */
 .rbccm-case-studies__slide {
   width: 100%;
   padding: 0;
+}
+.rbccm-case-studies[data-slide-padding="true"] .rbccm-case-studies__slide {
+  padding: 0 15px;
 }
 
 
@@ -579,7 +585,9 @@ a.rbccm-case-studies__card:active {
 .rbccm-case-studies__viewall:hover,
 .rbccm-case-studies__viewall:focus-visible {
   background: #003168;
-  color: #fff;
+  /* !important - matches the default-state color rule so RBC's
+     site-wide a:hover styles can't win on the flip. */
+  color: #fff !important;
   outline: none;
   text-decoration: none;
 }

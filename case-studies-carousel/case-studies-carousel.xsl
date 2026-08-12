@@ -67,11 +67,20 @@
       <xsl:call-template name="clean"><xsl:with-param name="s" select="$introRaw"/></xsl:call-template>
     </xsl:variable>
 
-    <!-- View all CTA -->
+    <!-- View all CTA. `showCta` is a hard gate - author flips it
+         off to hide the button while KEEPING their label/link
+         values. The label/link fallback still applies too: blank
+         either one and the button drops even when showCta is true. -->
+    <xsl:variable name="showCta"         select="not(/Properties/Datum[@ID='ShowCta'] = 'false')"/>
     <xsl:variable name="ctaLabel"        select="normalize-space(/Properties/Datum[@ID='CtaLabel'])"/>
     <xsl:variable name="ctaLink"         select="normalize-space(/Properties/Datum[@ID='CtaLink'])"/>
     <xsl:variable name="ctaNewTab"       select="/Properties/Datum[@ID='CtaNewTab'] = 'true'"/>
     <xsl:variable name="ariaViewAllLabel" select="normalize-space(/Properties/Datum[@ID='AriaViewAllLabel'])"/>
+
+    <!-- Slide padding toggle - when true, section root carries
+         data-slide-padding="true" which the CSS uses to add 15px
+         internal padding to each slide. Default off. -->
+    <xsl:variable name="slidePadding" select="/Properties/Datum[@ID='SlidePadding'] = 'true'"/>
 
     <!-- Feed URL - blank falls back to the shared feed page. -->
     <xsl:variable name="feedUrl">
@@ -152,6 +161,7 @@
         <xsl:if test="$regionLabel      != ''"><xsl:attribute name="data-region-label"><xsl:value-of select="$regionLabel"/></xsl:attribute></xsl:if>
         <xsl:if test="$instructionsText != ''"><xsl:attribute name="data-instructions"><xsl:value-of select="$instructionsText"/></xsl:attribute></xsl:if>
         <xsl:attribute name="data-transition"><xsl:value-of select="$transitionMode"/></xsl:attribute>
+        <xsl:if test="$slidePadding"><xsl:attribute name="data-slide-padding">true</xsl:attribute></xsl:if>
 
         <div class="rbccm-case-studies__container">
 
@@ -238,8 +248,10 @@
 
           </div><!-- /.__carousel -->
 
-          <!-- View all CTA - only rendered when BOTH label and link are set. -->
-          <xsl:if test="$ctaLabel != '' and $ctaLink != ''">
+          <!-- View all CTA - rendered when showCta is true AND both
+               label and link are populated. Author can flip showCta
+               off to hide without clearing their label/link values. -->
+          <xsl:if test="$showCta and $ctaLabel != '' and $ctaLink != ''">
             <div class="rbccm-case-studies__viewall-wrap">
               <a class="rbccm-case-studies__viewall">
                 <xsl:attribute name="href"><xsl:value-of select="$ctaLink"/></xsl:attribute>

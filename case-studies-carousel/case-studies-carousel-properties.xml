@@ -60,11 +60,26 @@
 
 
   <!-- ═══ VIEW ALL CTA ═════════════════════════════════════════
-       Outlined pill below the dots. Blank link OR blank label
-       drops the whole button. -->
+       Outlined pill below the dots. Author has two ways to hide it:
+         - Flip ShowCta to false (keeps label/link values in place
+           for easy re-enable later).
+         - Blank the label OR the link (drops the button too).
+       An explicit ShowCta toggle exists because some pages want the
+       carousel without a "View all" CTA (self-contained hero) while
+       preserving the default label/link for future re-enable. -->
+  <Datum ID="ShowCta"  Type="Boolean" Name="Show View All Button">true</Datum>
   <Datum ID="CtaLabel" Type="String" Name="View All Button Label (blank = no button)">View all</Datum>
   <Datum ID="CtaLink"  Type="String" Name="View All Button Link (blank = no button)">/en/expertise/transactions</Datum>
   <Datum ID="CtaNewTab" Type="Boolean" Name="Open View All in New Tab">false</Datum>
+
+
+  <!-- ═══ SLIDE PADDING ════════════════════════════════════════
+       Adds 15px horizontal padding inside each slide so the card
+       doesn't touch the slide edges. Some page layouts want the
+       card visually inset from the arrows; others want the card
+       flush to the carousel bounds. Boolean toggle rather than
+       CSS override so authors don't need to edit stylesheet. -->
+  <Datum ID="SlidePadding" Type="Boolean" Name="Slide Padding (15px each side)">false</Datum>
 
 
   <!-- ═══ FEED URL ═════════════════════════════════════════════
