@@ -1,5 +1,5 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: RBC CM How We Think
        ===================================================================
        Three-tab component: Insights / Newsroom / Conferences.
@@ -175,11 +175,25 @@
     <xsl:variable name="allEvents"
                   select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
 
-    <!-- Homepage-flagged events. contains() on the stringified
-         sitelocation handles every TeamSite checkbox serialization
-         (delimited string, repeated value, whatever). -->
-    <xsl:variable name="homepageEvents"
-                  select="$allEvents[contains(string(sitelocation), 'rbccm-homepage')]"/>
+    <!-- Today as YYYYMMDD (XSL 2.0). Used to drop past events even
+         when authors forget to unflag them - matches the main
+         homepage behaviour exactly. -->
+    <xsl:variable name="CURRENT_DATE"
+                  select="format-date(current-date(), '[Y0001][M01][D01]')"/>
+
+    <!-- Homepage-flagged, future-dated events. The compact date
+         comparison collapses event_date (YYYY-MM-DD) into YYYYMMDD
+         via substring maths - matches the main homepage's exact
+         idiom. contains() on stringified sitelocation handles every
+         TeamSite checkbox serialization. -->
+    <xsl:variable name="homepageEvents" select="$allEvents[
+        contains(string(sitelocation), 'rbccm-homepage')
+        and (concat(
+              substring-before(event_date, '-'),
+              substring-before(substring-after(event_date, '-'), '-'),
+              substring-after(substring-after(event_date, '-'), '-')
+            ) &gt;= $CURRENT_DATE)
+      ]"/>
     <xsl:variable name="homepageCount" select="count($homepageEvents)"/>
 
     <xsl:variable name="minConferences">
