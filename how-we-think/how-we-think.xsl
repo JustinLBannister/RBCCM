@@ -167,12 +167,13 @@
 
 
     <!-- ═══ CONFERENCES: filter + sort + cap ══════════════════
-         Same DCR access pattern featured-conferences uses. The
-         DCR pick's Type is "conferences" (Category "rbccm"), so
-         its serialized shape is DCR/conferences/data/... with
-         each event as a child of /conferences. -->
+         Path per the live homepage featured-conferences component:
+         DCR Category="about-us" Type="conferences" with the pick
+         resolving to /DCR/events/event nodes. Each <event> has
+         event_date, event_name, location, sitelocation etc. as
+         children. -->
     <xsl:variable name="allEvents"
-                  select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/conferences/data"/>
+                  select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
 
     <!-- Homepage-flagged events. contains() on the stringified
          sitelocation handles every TeamSite checkbox serialization
