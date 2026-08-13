@@ -71,15 +71,10 @@
   <Datum ID="ConferencesTabLabel" Type="String" Name="Conferences Tab Label">Conferences</Datum>
   <Datum ID="ConferencesLede"     Type="Textarea" Name="Conferences Tab Lede (optional)">Where our teams are meeting clients, industry leaders, and policymakers next.</Datum>
 
-  <!-- Centralized Events List feed - IDENTICAL binding to the
-       featured-conferences homepage strip. The text node inside
-       <DCR> is a default path that pre-populates the picker, so
-       authors don't need to touch it - the component "just works"
-       and pulls whichever events have sitelocation contains
-       "rbccm-homepage". -->
-  <Datum ID="EventsList" Type="DCR" Name="Events List">
-    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data/conferences</DCR>
-  </Datum>
+  <!-- EventsList DCR pick lives in the <Data> block below, mirroring
+       the working homepage featured-conferences component. Moving it
+       to Data (not Properties) fixes the "cannot select feed" issue
+       in the Appearance editor. -->
 
   <!-- Minimum flagged events required to render the Conferences tab.
        Default 1 (render whatever is flagged). Bump to 3 to require a
@@ -102,6 +97,17 @@
 </Properties>
 
 <Data>
+
+  <!-- ═══ CONFERENCES TAB - EVENTS LIST DCR PICK ═══════════════
+       Centralized Events List feed - identical binding to the live
+       homepage featured-conferences component. The text node inside
+       <DCR> is the default path so authors don't need to touch the
+       picker. XSL iterates /DCR/events/event children and filters
+       by sitelocation contains "rbccm-homepage". -->
+  <Datum ID="EventsList" Type="DCR" Name="Events List">
+    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data/conferences</DCR>
+  </Datum>
+
 
   <!-- ═══ INSIGHTS TAB - URL SLOTS ═══════════════════════════
        One Group per tile (3 tiles). Author's only required input
