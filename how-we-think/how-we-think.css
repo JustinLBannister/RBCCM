@@ -43,6 +43,17 @@
   background: #fff;
   box-sizing: border-box;
 }
+
+/* Insights tiles are hydrated by JS. Hide unhydrated shells so
+   authors never see the placeholder eyebrow + empty heading flash
+   before the feed lookup resolves. is-hydrated is applied by
+   how-we-think-feeds.js once the tile's real content is injected;
+   tiles with no feed match are removed entirely and never appear.
+   Tiles without data-hwt-url (e.g. static demo shells in test.html)
+   are unaffected by this rule. */
+.rbccm-how-we-think__tile[data-hwt-url]:not(.is-hydrated) {
+  visibility: hidden;
+}
 @media (min-width: 992px)  { .rbccm-how-we-think { padding: 64px 24px; } }
 @media (min-width: 1440px) { .rbccm-how-we-think { padding: 64px 170px; } }
 .rbccm-how-we-think *,

@@ -59,8 +59,8 @@
 
   <Datum ID="NewsroomTabLabel" Type="String" Name="Newsroom Tab Label">Newsroom</Datum>
   <Datum ID="NewsroomLede"     Type="Textarea" Name="Newsroom Tab Lede (optional)">In the media. RBC Capital Markets experts share insights with global outlets.</Datum>
-  <Datum ID="NewsroomFeedUrl"  Type="String" Name="Newsroom Feed URL">/en/insights/data/all</Datum>
-  <Datum ID="NewsroomMaxItems" Type="String" Name="Newsroom Max Items">3</Datum>
+  <!-- Newsroom items are now server-fetched via MetaQueryExternal
+       in the Data block below. No FeedUrl / MaxItems Datums needed. -->
   <Datum ID="NewsroomCtaLabel" Type="String" Name="Newsroom CTA Label">Show more media hits</Datum>
   <Datum ID="NewsroomCtaLink"  Type="String" Name="Newsroom CTA Link">/en/about-us/in-the-media</Datum>
   <Datum ID="NewsroomCtaNewTab" Type="Boolean" Name="Newsroom CTA New Tab">false</Datum>
@@ -126,5 +126,26 @@
     <Datum ID="ReadTimeOverride"  Type="String" Name="Read/Watch/Listen Time Override (blank = use feed)"></Datum>
 
   </Group>
+
+
+  <!-- ═══ NEWSROOM TAB - SERVER-SIDE FEED ══════════════════════
+       Auto-query pattern lifted straight from the Newsroom DCR's
+       Default XSL. TeamSite runs this at page-serve time and
+       injects results at /Properties/Data/Result/records/metaResult,
+       which the XSL iterates to render the top 3 most recent
+       news items. Zero author input.
+
+       qQuery filters to article/news DCRs published after 2015.
+       qSort takes newest first. qPagesize caps at 3. -->
+  <External>
+    <Parameters>
+      <Datum ID="qQuery" Name="qQuery" Type="String" Label="Query">TeamSite/Templating/DCR/Type:article/news AND TeamSite/Metadata/publishdate:&gt;2015-00-00</Datum>
+      <Datum ID="qSort" Name="qSort" Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
+      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">3</Datum>
+      <Datum ID="qOffset" Name="qOffset" Type="String" Label="Offset">0</Datum>
+    </Parameters>
+    <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>
+    <Method>findByQuery</Method>
+  </External>
 
 </Data>

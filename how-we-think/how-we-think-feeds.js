@@ -107,6 +107,9 @@
         '<p class="rbccm-how-we-think__tile-copy">' + escapeAttr(rec.description) + '</p>' +
         (cta ? '<span class="rbccm-how-we-think__tile-cta">' + escapeAttr(cta) + '</span>' : '') +
       '</div>';
+    /* Reveal the tile — CSS keeps [data-hwt-url]:not(.is-hydrated)
+       hidden so the placeholder shell never flashes on load. */
+    tile.classList.add('is-hydrated');
   }
 
   var INSIGHTS_FEEDS = [
@@ -139,56 +142,18 @@
   }
 
 
-  /* ---------- Newsroom hydration ----------------------------- */
-  function newsDateSort(a, b) {
-    return (new Date(b.date).getTime() || 0) - (new Date(a.date).getTime() || 0);
-  }
-
-  function loadNewsroom() {
-    var container = section.querySelector('[data-hwt-newsroom]');
-    if (!container) return;
-    var feedUrl = attrOr(section, 'data-newsroom-feed', '/en/insights/data/all');
-    var maxItems = parseInt(attrOr(section, 'data-newsroom-max', '3'), 10) || 3;
-
-    fetch(feedUrl)
-      .then(function (r) { return r.ok ? r.text() : ''; })
-      .then(function (xml) {
-        if (!xml) throw new Error('empty');
-        var doc = new DOMParser().parseFromString(xml, 'text/xml');
-        var items = Array.prototype.slice.call(doc.getElementsByTagName('news'));
-        var parsed = items.map(function (it) {
-          return {
-            date:        childText(it, 'date'),
-            link:        childText(it, 'link'),
-            title:       decodeEntities(childText(it, 'title')),
-            description: decodeEntities(childText(it, 'description'))
-          };
-        }).filter(function (n) { return n.title && n.link; })
-          .sort(newsDateSort)
-          .slice(0, maxItems);
-        if (!parsed.length) throw new Error('no items');
-        container.innerHTML = parsed.map(function (n) {
-          return '<div class="rbccm-how-we-think__news-item">' +
-              '<span class="rbccm-how-we-think__news-date">' + escapeAttr(n.date) + '</span>' +
-              '<a class="rbccm-how-we-think__news-link" href="' + escapeAttr(n.link) + '" target="_blank" rel="noopener">' + escapeAttr(n.title) + '</a>' +
-              '<p class="rbccm-how-we-think__news-summary">' + escapeAttr(n.description) + '</p>' +
-            '</div>';
-        }).join('');
-      })
-      .catch(function () {
-        container.innerHTML = '';
-      });
-  }
+  /* Newsroom used to hydrate client-side here; it's now
+     server-rendered via MetaQueryExternal.findByQuery in the
+     properties.xml <Data><External> block. Nothing to do at
+     runtime. */
 
 
   /* ---------- Bootstrap -------------------------------------- */
   if (document.readyState !== 'loading') {
     loadInsights();
-    loadNewsroom();
   } else {
     document.addEventListener('DOMContentLoaded', function () {
       loadInsights();
-      loadNewsroom();
     });
   }
 })();

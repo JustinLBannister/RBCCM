@@ -61,6 +61,34 @@
 
 
   <!-- ═══════════════════════════════════════════════════════════════════
+       PUBLISH_DATE - "Month D, YYYY" from a YYYY-MM-DD publishdate.
+       Copied verbatim from the Newsroom DCR's Default XSL so the
+       server-rendered output matches the rest of the site exactly. -->
+  <xsl:template name="PUBLISH_DATE">
+    <xsl:param name="publish_date"/>
+    <xsl:variable name="vYear" select="substring-before($publish_date, '-')"/>
+    <xsl:variable name="vnumMonth" select="number(substring-before(substring-after($publish_date, '-'), '-'))"/>
+    <xsl:variable name="vDay" select="number(substring-after(substring-after($publish_date, '-'), '-'))"/>
+    <xsl:choose>
+      <xsl:when test="$vnumMonth = 1">January</xsl:when>
+      <xsl:when test="$vnumMonth = 2">February</xsl:when>
+      <xsl:when test="$vnumMonth = 3">March</xsl:when>
+      <xsl:when test="$vnumMonth = 4">April</xsl:when>
+      <xsl:when test="$vnumMonth = 5">May</xsl:when>
+      <xsl:when test="$vnumMonth = 6">June</xsl:when>
+      <xsl:when test="$vnumMonth = 7">July</xsl:when>
+      <xsl:when test="$vnumMonth = 8">August</xsl:when>
+      <xsl:when test="$vnumMonth = 9">September</xsl:when>
+      <xsl:when test="$vnumMonth = 10">October</xsl:when>
+      <xsl:when test="$vnumMonth = 11">November</xsl:when>
+      <xsl:when test="$vnumMonth = 12">December</xsl:when>
+    </xsl:choose>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="$vDay"/>, <xsl:value-of select="$vYear"/>
+  </xsl:template>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════
        Main
        =================================================================== -->
   <xsl:template match="/">
@@ -121,22 +149,12 @@
     <xsl:variable name="newsroomCtaLabel" select="normalize-space(/Properties/Datum[@ID='NewsroomCtaLabel'])"/>
     <xsl:variable name="newsroomCtaLink"  select="normalize-space(/Properties/Datum[@ID='NewsroomCtaLink'])"/>
     <xsl:variable name="newsroomCtaNewTab" select="/Properties/Datum[@ID='NewsroomCtaNewTab'] = 'true'"/>
-    <xsl:variable name="newsroomFeedUrl">
-      <xsl:choose>
-        <xsl:when test="normalize-space(/Properties/Datum[@ID='NewsroomFeedUrl']) != ''">
-          <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NewsroomFeedUrl'])"/>
-        </xsl:when>
-        <xsl:otherwise>/en/insights/data/all</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="newsroomMaxItems">
-      <xsl:choose>
-        <xsl:when test="normalize-space(/Properties/Datum[@ID='NewsroomMaxItems']) != ''">
-          <xsl:value-of select="normalize-space(/Properties/Datum[@ID='NewsroomMaxItems'])"/>
-        </xsl:when>
-        <xsl:otherwise>3</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+
+    <!-- Newsroom is server-rendered from MetaQueryExternal.findByQuery
+         defined in the properties file's <Data><External> block. The
+         result set lands at /Properties/Data/Result/records/metaResult
+         and is iterated further down. -->
+    <xsl:variable name="newsroomArticles" select="/Properties/Data/Result/records/metaResult"/>
 
     <xsl:variable name="conferencesCtaLabel" select="normalize-space(/Properties/Datum[@ID='ConferencesCtaLabel'])"/>
     <xsl:variable name="conferencesCtaLink"  select="normalize-space(/Properties/Datum[@ID='ConferencesCtaLink'])"/>
@@ -185,8 +203,6 @@
 
     <section class="rbccm-how-we-think" id="rbccm-how-we-think">
       <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
-      <xsl:attribute name="data-newsroom-feed"><xsl:value-of select="$newsroomFeedUrl"/></xsl:attribute>
-      <xsl:attribute name="data-newsroom-max"><xsl:value-of select="$newsroomMaxItems"/></xsl:attribute>
 
       <div class="rbccm-how-we-think__container">
 
@@ -291,8 +307,45 @@
               <p class="rbccm-how-we-think__panel-lede"><xsl:value-of select="$newsroomLede"/></p>
             </xsl:if>
 
-            <!-- Empty container; JS populates from the newsroom feed. -->
-            <div class="rbccm-how-we-think__news" data-hwt-newsroom=""></div>
+            <!-- Server-rendered from the External MetaQueryExternal
+                 block in properties.xml. Iterates the top 3 news
+                 records, sorted newest first. Each record's fields
+                 come from TeamSite/Metadata/* keys. -->
+            <div class="rbccm-how-we-think__news">
+              <xsl:for-each select="$newsroomArticles">
+                <xsl:sort select="./attr[@key='TeamSite/Metadata/publishdate']" order="descending"/>
+                <xsl:variable name="artTitle" select="./attr[@key='TeamSite/Metadata/Title']"/>
+                <xsl:variable name="artDesc"  select="./attr[@key='TeamSite/Metadata/Description']"/>
+                <xsl:variable name="artDate"  select="./attr[@key='TeamSite/Metadata/publishdate']"/>
+                <xsl:variable name="artExtLink" select="./attr[@key='TeamSite/Metadata/link']"/>
+                <xsl:variable name="artPath" select="./@path"/>
+                <xsl:variable name="artLink">
+                  <xsl:choose>
+                    <xsl:when test="$artExtLink != ''"><xsl:value-of select="$artExtLink"/></xsl:when>
+                    <xsl:otherwise><xsl:value-of select="concat('/en/insights/story.page?dcr=', $artPath)"/></xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <div class="rbccm-how-we-think__news-item">
+                  <span class="rbccm-how-we-think__news-date">
+                    <xsl:call-template name="PUBLISH_DATE">
+                      <xsl:with-param name="publish_date" select="$artDate"/>
+                    </xsl:call-template>
+                  </span>
+                  <a class="rbccm-how-we-think__news-link">
+                    <xsl:attribute name="href"><xsl:value-of select="$artLink"/></xsl:attribute>
+                    <xsl:if test="$artExtLink != ''">
+                      <xsl:attribute name="target">_blank</xsl:attribute>
+                      <xsl:attribute name="rel">noopener</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$artTitle" disable-output-escaping="yes"/>
+                  </a>
+                  <p class="rbccm-how-we-think__news-summary">
+                    <xsl:value-of select="$artDesc" disable-output-escaping="yes"/>
+                  </p>
+                </div>
+              </xsl:for-each>
+            </div>
 
             <xsl:if test="$newsroomCtaLabel != '' and $newsroomCtaLink != ''">
               <div class="rbccm-how-we-think__cta-wrap">
