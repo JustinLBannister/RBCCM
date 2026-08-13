@@ -396,11 +396,24 @@
                     <xsl:variable name="pos" select="position()"/>
                     <xsl:if test="$maxConferencesRaw = '' or $pos &lt;= number($maxConferencesRaw)">
                       <xsl:variable name="eventDate" select="normalize-space(event_date)"/>
+                      <xsl:variable name="eventDateEnd" select="normalize-space(event_date_end)"/>
                       <xsl:variable name="eventYear" select="substring($eventDate, 1, 4)"/>
                       <xsl:variable name="eventMonth" select="substring($eventDate, 6, 2)"/>
                       <xsl:variable name="eventDay" select="substring($eventDate, 9, 2)"/>
+                      <xsl:variable name="eventDayEnd" select="substring($eventDateEnd, 9, 2)"/>
                       <xsl:variable name="monthLabel">
                         <xsl:call-template name="monthName"><xsl:with-param name="m" select="$eventMonth"/></xsl:call-template>
+                      </xsl:variable>
+                      <!-- Day label: "21" for single-day events, "21-22"
+                           when an end date exists and differs from the
+                           start. Strips leading zero on the end day
+                           (via number() cast) to match "SEP 21-22"
+                           display, not "SEP 21-02". -->
+                      <xsl:variable name="dayLabel">
+                        <xsl:value-of select="number($eventDay)"/>
+                        <xsl:if test="$eventDateEnd != '' and $eventDayEnd != '' and $eventDayEnd != $eventDay">
+                          <xsl:text>-</xsl:text><xsl:value-of select="number($eventDayEnd)"/>
+                        </xsl:if>
                       </xsl:variable>
                       <xsl:variable name="displayTitle">
                         <xsl:choose>
@@ -424,7 +437,7 @@
                             </xsl:if>
                             <div class="rbccm-how-we-think__conference-date">
                               <span class="rbccm-how-we-think__conference-month"><xsl:value-of select="$monthLabel"/></span>
-                              <span class="rbccm-how-we-think__conference-day"><xsl:value-of select="$eventDay"/></span>
+                              <span class="rbccm-how-we-think__conference-day"><xsl:value-of select="$dayLabel"/></span>
                             </div>
                             <div>
                               <p class="rbccm-how-we-think__conference-location"><xsl:value-of select="normalize-space(location)"/></p>
@@ -437,7 +450,7 @@
                           <div class="rbccm-how-we-think__conference">
                             <div class="rbccm-how-we-think__conference-date">
                               <span class="rbccm-how-we-think__conference-month"><xsl:value-of select="$monthLabel"/></span>
-                              <span class="rbccm-how-we-think__conference-day"><xsl:value-of select="$eventDay"/></span>
+                              <span class="rbccm-how-we-think__conference-day"><xsl:value-of select="$dayLabel"/></span>
                             </div>
                             <div>
                               <p class="rbccm-how-we-think__conference-location"><xsl:value-of select="normalize-space(location)"/></p>
