@@ -1,0 +1,598 @@
+/* ============================================================
+   RBC CM — How We Think
+   All rules scoped to .rbccm-how-we-think
+   Mobile-first; desktop overrides at min-width: 992px
+   ============================================================
+   Consumed by how-we-think.xsl (or the .html skin) — the XSL
+   emits BEM markup under .rbccm-how-we-think__* and this file
+   owns every visual rule for it.
+
+   Deploy at: /assets/rbccm/css/sub/test/how-we-think.css
+             (path referenced from the skin's <link>).
+   ============================================================ */
+
+/* Design tokens — scoped to the section so the --hwt-* names
+   don't leak into the page's global :root. Any component that
+   dereferences colours or fonts here reads them from this
+   ancestor, so the values are safe to iterate without touching
+   the rest of the site. */
+.rbccm-how-we-think {
+  --hwt-navy:        #003168;
+  --hwt-navy-dark:   #002144;
+  --hwt-blue:        #0051A5;
+  --hwt-ink:         #082043;
+  --hwt-text:        #494949;
+  --hwt-muted:       #6B7280;
+  --hwt-hairline:    #D8D8D8;
+  --hwt-hairline-2:  #E5E7EB;
+  --hwt-yellow:      #FFC72C;
+  --hwt-conf-bg:     #EFF6FD;
+  --hwt-white:       #FFFFFF;
+  --hwt-serif:       "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --hwt-sans:        Roboto, Arial, sans-serif;
+}
+
+/* ---------- Section shell ---------- */
+
+.rbccm-how-we-think {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 40px 16px;
+  background: #fff;
+  box-sizing: border-box;
+}
+@media (min-width: 992px)  { .rbccm-how-we-think { padding: 64px 24px; } }
+@media (min-width: 1440px) { .rbccm-how-we-think { padding: 64px 170px; } }
+.rbccm-how-we-think *,
+.rbccm-how-we-think *::before,
+.rbccm-how-we-think *::after { box-sizing: border-box; }
+.rbccm-how-we-think__container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Section H2 — desktop matches the live site's computed styles:
+     RBCDisplay 29/34.8 wt 500, letter-spacing 1px, #002144.
+   Mobile (<992): RBC Display 24/28.8 wt 500 (Figma spec). */
+.rbccm-how-we-think__heading {
+  color: #002144;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 34.8px;
+  letter-spacing: 1px;
+  text-align: center;
+  margin: 0 auto;
+  max-width: 1140px;
+  width: 100%;
+}
+@media (max-width: 991px) {
+  .rbccm-how-we-think__heading {
+    font-size: 24px;
+    line-height: 120%;
+    letter-spacing: 0;
+  }
+}
+
+/* ---------- Tabs + panels wrapper ----------
+   XSL emits tabs and panels as siblings under `.__tablist`:
+       tab1, tab2, tab3, panel1, panel2, panel3
+   The JS `reorderForViewport()` runtime-moves the active panel
+   to be the next sibling of the active tab on mobile, so Tab
+   flow matches the visual accordion order. On desktop it
+   parks panels back at the end of the wrapper, so Tab flow
+   is tab → tab → tab → active-panel content. See
+   how-we-think.js for the full sequence. */
+
+/* Mobile-first: flex column. `order` on children still gives
+   the correct visual accordion even if JS fails to load
+   (progressive-enhancement fallback). */
+.rbccm-how-we-think__tablist {
+  display: flex;
+  flex-direction: column;
+}
+/* Progressive-enhancement fallback: if JS never runs, `order`
+   interleaves the panels between the tabs so the mobile
+   accordion visual still holds. When JS runs, DOM order is
+   updated to match, so `order` becomes a no-op. */
+.rbccm-how-we-think__tab[data-panel="insights"]     { order: 1; }
+.rbccm-how-we-think__panel[data-panel="insights"]   { order: 2; }
+.rbccm-how-we-think__tab[data-panel="newsroom"]     { order: 3; }
+.rbccm-how-we-think__panel[data-panel="newsroom"]   { order: 4; }
+.rbccm-how-we-think__tab[data-panel="conferences"]  { order: 5; }
+.rbccm-how-we-think__panel[data-panel="conferences"]{ order: 6; }
+
+/* ---------- Tab (mobile-first accordion header) ----------
+   Row: [label — chevron] with `justify-content: space-between`.
+   Each tab carries its own 1px bottom hairline (matches the
+   featured-conferences__inner-tab pattern). Wrapper's `border-top`
+   closes the box above the first tab. */
+.rbccm-how-we-think__tab {
+  position: relative;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hwt-hairline);
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-family: "Roboto Medium", Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  gap: 12px;
+  justify-content: space-between;
+  line-height: 120%;
+  margin: 0;
+  padding: 18px 4px;
+  text-align: left;
+  transition: color 150ms ease;
+  width: 100%;
+}
+/* Wrapper's top border closes the top of the first tab. */
+.rbccm-how-we-think__tablist { border-top: 1px solid var(--hwt-hairline); }
+.rbccm-how-we-think__tab:hover { color: var(--hwt-ink); }
+.rbccm-how-we-think__tab.is-active { color: #000; }
+.rbccm-how-we-think__tab:focus-visible { outline: 2px solid var(--hwt-blue); outline-offset: -2px; }
+
+/* Chevron — visible on mobile, hidden on desktop.
+   SVG points UP natively → rotate 180° for the closed
+   (inactive) state, drop the rotation on .is-active so the
+   chevron points up ("this section is open"). Same pattern as
+   .rbccm-featured-conferences__inner-chevron. */
+.rbccm-how-we-think__tab-chevron {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  flex-shrink: 0;
+  transform: rotate(180deg);
+  transition: transform 0.25s ease;
+}
+.rbccm-how-we-think__tab.is-active .rbccm-how-we-think__tab-chevron {
+  transform: rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-how-we-think__tab-chevron { transition: none; }
+}
+
+/* ---------- Panels ----------
+   Base hidden; JS toggles `.is-active` on the panel that
+   matches the active tab. */
+.rbccm-how-we-think__panel {
+  display: none;
+  padding: 32px 0;
+}
+.rbccm-how-we-think__panel.is-active {
+  display: block;
+}
+/* Close the bottom of the open accordion section on mobile so
+   it reads as a bordered box (top hairline from wrapper →
+   tab hairline → panel content → this bottom hairline). */
+@media (max-width: 991px) {
+  .rbccm-how-we-think__panel.is-active {
+    border-bottom: 1px solid var(--hwt-hairline);
+  }
+}
+
+/* ---------- Desktop overrides (min-width: 992) ---------- */
+@media (min-width: 992px) {
+  /* Grid: tabs auto-flow into row 1 columns 1-3; panels are
+     pinned to row 2 spanning all columns. */
+  .rbccm-how-we-think__tablist {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    border-top: none;
+  }
+  /* Tabs: reset the mobile accordion layout back to the desktop
+     tab-strip treatment (centred, no top border, black bottom
+     hairline, Roboto 18/32). Explicit `grid-row: 1` pins the tabs
+     to row 1 so they can't get pushed elsewhere by auto-flow. */
+  .rbccm-how-we-think__tab {
+    grid-row: 1;
+    border-top: none;
+    border-bottom: 1px solid #000;
+    flex-direction: column;
+    font-family: Roboto, Arial, sans-serif;
+    font-weight: 500;
+    gap: 0;
+    justify-content: center;
+    line-height: 32px;
+    padding: 16px;
+    text-align: center;
+  }
+  /* Active tab: 3px black underline centred on the row-1
+     hairline. `bottom: -2px + height: 3` puts the stripe's
+     centre on the same y as the hairline's centre so switching
+     state doesn't shift the box. */
+  .rbccm-how-we-think__tab.is-active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 3px;
+    background: #000;
+    pointer-events: none;
+  }
+  /* Chevron hidden on desktop. */
+  .rbccm-how-we-think__tab-chevron { display: none; }
+  /* Panels: pinned to row 2, all columns. Only .is-active is
+     visible. */
+  .rbccm-how-we-think__panel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 32px 0 0 0;
+  }
+}
+
+/* Panel lede — desktop: Roboto 18/26 wt 400 #000.
+   Mobile (<992): Roboto 16/120% wt 400 #000. */
+.rbccm-how-we-think__panel-lede {
+  text-align: center;
+  color: #000;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 32px;
+}
+@media (max-width: 991px) {
+  .rbccm-how-we-think__panel-lede {
+    font-size: 16px;
+    line-height: 120%;
+  }
+}
+
+/* ---------- CTA button ---------- */
+.rbccm-how-we-think__cta-wrap { text-align: center; margin-top: 32px; }
+/* Figma: flex 200 × 50, padding 10, gap 10, centre aligned.
+   White Roboto 16 wt 500 label. */
+.rbccm-how-we-think__cta {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  min-width: 200px;
+  height: 50px;
+  padding: 10px 24px;
+  box-sizing: border-box;
+  background: var(--hwt-blue);
+  color: #FFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-align: center;
+  text-decoration: none;
+  transition: background 150ms ease;
+}
+.rbccm-how-we-think__cta:hover,
+.rbccm-how-we-think__cta:focus-visible { background: var(--hwt-navy); color: #fff; text-decoration: none; }
+.rbccm-how-we-think__cta::after {
+  content: "";
+  width: 8px; height: 8px;
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -1px;
+}
+
+/* ---------- Insights tiles ----------
+   Ported wholesale from .rbccm-conference-insights-tiles__insight
+   so the two components render identically. Flat cards (no radius,
+   no shadow), 1px #A8A8A8 border that flips to #0051A5 on hover,
+   image scales 1.08 + yellow divider stretches 30.9→56 + meta
+   gains a currentColor underline. Hover gated by (hover: hover).
+   Reduced-motion respected. */
+
+.rbccm-how-we-think__tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-how-we-think__tiles { grid-template-columns: repeat(2, 1fr); gap: 32px 30px; }
+}
+@media (min-width: 992px) {
+  .rbccm-how-we-think__tiles { grid-template-columns: repeat(3, 1fr); }
+}
+
+.rbccm-how-we-think__tile {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  min-height: 555px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+/* Beat Bootstrap 3's `a:focus, a:hover` default (blue underline
+   inherits into the title/desc otherwise). Type-prefix bumps
+   specificity to 0,2,1 which wins over 0,1,1. */
+a.rbccm-how-we-think__tile,
+a.rbccm-how-we-think__tile:link,
+a.rbccm-how-we-think__tile:visited,
+a.rbccm-how-we-think__tile:hover,
+a.rbccm-how-we-think__tile:focus,
+a.rbccm-how-we-think__tile:focus-visible,
+a.rbccm-how-we-think__tile:active {
+  color: #000;
+  text-decoration: none;
+  outline-offset: 0;
+}
+
+/* Media — 240 tall, hidden overflow so the 1.08 scale on hover
+   doesn't shift the layout. */
+.rbccm-how-we-think__tile-img {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 240px;
+  overflow: hidden;
+  background: #0b1830 center/cover no-repeat;
+}
+.rbccm-how-we-think__tile-img img {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+/* Body — holds eyebrow / divider / title / desc / meta.
+   min-height gives the meta's `margin-top: auto` real space to
+   push into. */
+.rbccm-how-we-think__tile-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 315px;
+  padding: 20px;
+}
+
+/* Eyebrow — Roboto Light 14/140 wt 400, letter-spacing 2,
+   #006AC3 uppercase. */
+.rbccm-how-we-think__tile-eyebrow {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+/* Yellow divider — 30.9px wide baseline, widens to 56 on hover. */
+.rbccm-how-we-think__tile-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+
+/* Title — Roboto Medium 20/125 wt 400 #000. */
+.rbccm-how-we-think__tile-title {
+  color: #000;
+  font-family: "Roboto Medium", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 125%;
+  letter-spacing: normal;
+  margin: 10px 0 10px 0;
+}
+
+/* Description — Roboto Light 14/140 wt 400 #555, LS 0.5. */
+.rbccm-how-we-think__tile-copy {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+}
+
+/* Meta (read time) — inline-flex + fit-content so the hover
+   border-bottom only underlines the label + arrow, not the full
+   card width. */
+.rbccm-how-we-think__tile-cta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-how-we-think__tile-cta::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* Hover / focus effects — gated by (hover: hover) so touch-only
+   devices skip the transforms. focus-visible mirrors hover. */
+@media (hover: hover) {
+  .rbccm-how-we-think__tile:hover {
+    border-color: #0051A5;
+    outline: none;
+  }
+  .rbccm-how-we-think__tile:hover .rbccm-how-we-think__tile-img img,
+  .rbccm-how-we-think__tile:focus-visible .rbccm-how-we-think__tile-img img {
+    transform: scale(1.08);
+  }
+  .rbccm-how-we-think__tile:hover .rbccm-how-we-think__tile-divider,
+  .rbccm-how-we-think__tile:focus-visible .rbccm-how-we-think__tile-divider {
+    width: 56px;
+  }
+  .rbccm-how-we-think__tile:hover .rbccm-how-we-think__tile-cta,
+  .rbccm-how-we-think__tile:focus-visible .rbccm-how-we-think__tile-cta {
+    border-bottom-color: currentColor;
+  }
+}
+
+/* Keyboard focus — flip the card border to brand blue for
+   :focus-visible so it matches the hover treatment. */
+.rbccm-how-we-think__tile:focus { outline: none; }
+.rbccm-how-we-think__tile:focus-visible { border-color: #0051A5; outline: none; }
+
+/* Reduced-motion — kill the scale/width/border transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-how-we-think__tile,
+  .rbccm-how-we-think__tile-img img,
+  .rbccm-how-we-think__tile-divider,
+  .rbccm-how-we-think__tile-cta {
+    transition: none !important;
+  }
+  .rbccm-how-we-think__tile:hover .rbccm-how-we-think__tile-img img,
+  .rbccm-how-we-think__tile:focus-visible .rbccm-how-we-think__tile-img img {
+    transform: none !important;
+  }
+}
+
+/* ---------- Newsroom ---------- */
+
+.rbccm-how-we-think__news { display: flex; flex-direction: column; gap: 32px; }
+/* News item — 3px bright-blue (#006AC3) left rail that fills
+   with warm-yellow (#FFC72C) from bottom → top ONLY when the
+   anchor itself is hovered/focused (not the whole item region).
+   Uses :has() to lift the anchor-hover up to the item so the
+   pseudo element on .news-item picks it up. Reduced-motion
+   skips the animation. */
+.rbccm-how-we-think__news-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 16px;
+  border-left: 3px solid #006AC3;
+}
+.rbccm-how-we-think__news-item::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  bottom: 0;
+  width: 3px;
+  height: 0;
+  background: var(--hwt-yellow);
+  transition: height 0.4s ease;
+  pointer-events: none;
+}
+.rbccm-how-we-think__news-item:has(.rbccm-how-we-think__news-link:hover)::before,
+.rbccm-how-we-think__news-item:has(.rbccm-how-we-think__news-link:focus-visible)::before {
+  height: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-how-we-think__news-item::before { transition: none; }
+}
+.rbccm-how-we-think__news-date {
+  color: var(--hwt-muted);
+  font-family: var(--hwt-sans);
+  font-size: 14px;
+}
+.rbccm-how-we-think__news-link {
+  color: #006AC3;
+  font-family: var(--hwt-sans);
+  font-size: 18px;
+  font-weight: 500;
+}
+.rbccm-how-we-think__news-link:hover,
+.rbccm-how-we-think__news-link:focus-visible { text-decoration: underline; color: #003168; }
+.rbccm-how-we-think__news-summary {
+  color: var(--hwt-text);
+  font-family: var(--hwt-sans);
+  font-size: 15px;
+  margin: 4px 0 0;
+}
+
+/* ---------- Conferences ---------- */
+
+.rbccm-how-we-think__conferences {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 32px 24px;
+  background: var(--hwt-conf-bg);
+}
+@media (max-width: 720px) { .rbccm-how-we-think__conferences { grid-template-columns: 1fr; } }
+.rbccm-how-we-think__conference {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.rbccm-how-we-think__conference-date {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rbccm-how-we-think__conference-month {
+  color: var(--hwt-ink);
+  font-family: var(--hwt-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.rbccm-how-we-think__conference-day {
+  color: var(--hwt-ink);
+  font-family: var(--hwt-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: 4px;
+}
+.rbccm-how-we-think__conference-location {
+  color: var(--hwt-ink);
+  font-family: var(--hwt-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.rbccm-how-we-think__conference-name {
+  color: var(--hwt-text);
+  font-family: var(--hwt-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 240px;
+}

@@ -1,0 +1,163 @@
+<!--
+  ============================================================================
+  Reference: current (outdated, non-functioning) "How we think" markup.
+  Full 3-tab version pulled from an archived rbccm.com snapshot so we can
+  preserve tab structure, DOM shape, JS init, and content copy while
+  rebuilding.
+
+  Observations that inform the rebuild:
+    - The TeamSite "Tabbed Content - Same Page" component wraps everything;
+      its Component Properties expose: Locked, ID (tab-wrapper), Title
+      ("How we think"), and Content DCR
+      (`templatedata/rbccm/tabcontent/data/about-us-tabs`).
+    - Bootstrap 3 tab pattern: `nav-tabs` + `data-toggle="tab"` + role
+      "tabpanel". jQuery/Bootstrap 3 dependency.
+    - 3 tabs total: Insights (tab1), Newsroom (tab2), Conferences (tab3).
+    - Insights pane hardcodes a `.story-tiles` block; a skin script later
+      detaches and reparents it into `#insights-listing`.
+    - Newsroom pane hardcodes `.news-item` rows; a skin script reparents
+      them into `#media-listing` via the same detach/appendTo pattern.
+    - Conferences pane hardcodes the `.featured-conference-wrapper` and
+      relies on a skin script to strip its `.container` class and hide
+      the h2 + show-more button. Brittle.
+    - Tile pattern is the shared story-tiles-default styles
+      (.story-card, .white-box, .tile--news, .yellow-line-sm, etc.).
+
+  Rebuild targets (see README.md):
+    - Full BEM markup under .rbccm-how-we-think__*
+    - Datum-picker driven content per tile (icon-carousel/secondary-nav
+      pattern), no shared skin/reparent JS
+    - Vanilla-JS tab logic — no jQuery / Bootstrap 3
+    - Own the tile/newsroom/conference CSS entirely
+    - Same rail + section padding conventions as icon-carousel / story-
+      carousel / featured-conferences
+  ============================================================================
+-->
+
+<div class="container">
+      <h2 class="tabs-title">How we think</h2>
+      <div class="tabs">
+         <div class="">
+            <ul role="tablist" class="nav nav-tabs nav-justified" style="display: flex; width: 100%;">
+               <li role="presentation" style="flex: 1; list-style: none; text-align: center;" class="active"><a role="tab" data-toggle="tab" href="#tab1" aria-controls="tab1" aria-expanded="true">Insights</a></li>
+               <li role="presentation" style="flex: 1; list-style: none; text-align: center;" class=""><a role="tab" data-toggle="tab" href="#tab2" aria-controls="tab2" aria-expanded="false">Newsroom</a></li>
+               <li role="presentation" style="flex: 1; list-style: none; text-align: center;" class=""><a role="tab" data-toggle="tab" href="#tab3" aria-controls="tab3" aria-expanded="false">Conferences</a></li>
+            </ul>
+         </div>
+         <div class="tab-content white-box content--wrapper">
+            <div role="tabpanel" id="tab1" name="Insights" class="tab-pane active">
+               <div class="white-box-text"><div class="text-center" style="padding-bottom: 20px;">Our global expertise and data-driven perspectives help clients make informed, strategic decisions across all major sectors.</div>
+<div id="insights-listing"><div id="mainContent" class="story-tiles " style="">
+      <div class="row">
+         <div class=" col-xs-12 col-md-4 "><a class=" white-box tile--news tile--gib tile tile--white" href="/en/insights/2025/08/how-svante-plans-to-deploy-100-carbon-capture-plants-per-year" target="_blank" style="height: 575px;">
+               <div class="img-stretch inline" style="width: auto; background-image: url('/assets/rbccm/images/insights/2025/20250820-how-svante-plans-to-deploy-100-carbon-capture-plants-per-year-th.jpg'); background-position: center;">
+                  <div class="tile-overlay"></div>
+               </div>
+               <div class="white-box-text">
+                  <p class="uppercase wide-text" style="margin-bottom: 5px; font-size: 14px;">Insights</p>
+                  <div class="yellow-line-sm">&nbsp;</div>
+                  <h2>How Svante plans to deploy 100 carbon capture plants per year</h2>
+                  <p class="description">Svante's solid sorbent technology promises to make carbon capture truly scalable across industrial sectors – but success depends on cracking the code of CO2 ... </p>
+                  <div class="learn-more" style="position:absolute; bottom:25px; display:flex"><span>4 min read </span></div>
+               </div></a></div>
+         <div class=" col-xs-12 col-md-4 "><a class=" white-box tile--news tile--gib tile tile--white" href="/en/insights/2025/07/coeur-reaps-the-benefits-of-recent-investments-and-from-major" target="_blank" style="height: 575px;">
+               <div class="img-stretch inline" style="width: auto; background-image: url('/assets/rbccm/images/insights/2025/20250707-coeur-reaps-the-benefits-of-recent-th.jpg'); background-position: center;">
+                  <div class="tile-overlay"></div>
+               </div>
+               <div class="white-box-text">
+                  <p class="uppercase wide-text" style="margin-bottom: 5px; font-size: 14px;">Insights</p>
+                  <div class="yellow-line-sm">&nbsp;</div>
+                  <h2>Coeur reaps the benefits of recent investments and from major M&amp;A;</h2>
+                  <p class="description">Coeur Mining, after major investments and acquiring SilverCrest Metals, is now focused on debt repayment and returning capital to shareholders.</p>
+                  <div class="learn-more" style="position:absolute; bottom:25px; display:flex"><span>13 min listen </span></div>
+               </div></a></div>
+         <div class=" col-xs-12 col-md-4 "><a class=" white-box tile--news tile--gib tile tile--white" href="/en/insights/2025/07/pioneering-sustainability-and-impact-in-the-fixed-income-market" target="_blank" style="height: 575px;">
+               <div class="img-stretch inline" style="width: auto; background-image: url('/assets/rbccm/images/insights/2025/20250717-pioneering-sustainability-and-impact-in-the-fixed-income-market-th.jpg'); background-position: center;">
+                  <div class="tile-overlay"></div>
+               </div>
+               <div class="white-box-text">
+                  <p class="uppercase wide-text" style="margin-bottom: 5px; font-size: 14px;">Insights</p>
+                  <div class="yellow-line-sm">&nbsp;</div>
+                  <h2>Pioneering sustainability and impact in the fixed income market</h2>
+                  <p class="description">Stephen M. Liberatore, CFA shares how Nuveen became a leading sustainable debt investor and is driving impact through the fixed income market.</p>
+                  <div class="learn-more" style="position:absolute; bottom:25px; display:flex"><span>5 min read </span></div>
+               </div></a></div>
+      </div>
+   </div></div>
+<div class="text-center" style="margin-bottom: 30px;"><a class="btn btn-lead" style="background-color: #0051a5 !important;" title="Link to Insights page" href="/en/insights"><span class="read-time">More insights</span></a></div>
+<p>
+<script>// <![CDATA[
+$(document).ready(function () {
+	$(".news-listing").detach().appendTo("#media-listing");
+	$("#mainContent").detach().appendTo("#insights-listing");
+	$(".featured-conference-wrapper").detach().appendTo("#featured-conferences");
+	$(".conferences-container .container").removeClass('container');
+	$(".conferences h2").hide();
+	$("#show-more").hide();
+});
+// ]]></script>
+</p></div>
+            </div>
+            <div role="tabpanel" id="tab2" name="Newsroom" class="tab-pane">
+               <div class="white-box-text"><div id="media-listing"><div class="news-listing">
+            <div class="news-item">
+               <div class="row">
+                  <div class="col-xs-12"><span class="news-date">January 15, 2026</span><div><a href="https://finance.yahoo.com/video/why-investors-turning-options-trading-110053656.html" target="_blank">RBC Radio: Amy Wu Silverman on Yahoo! Finance</a></div>
+                     <p>Hedging options for investors, investing trends amid market uncertainty and more.</p>
+                  </div>
+               </div>
+            </div>
+            <div class="news-item">
+               <div class="row">
+                  <div class="col-xs-12"><span class="news-date">January 15, 2026</span><div><a href="https://www.cnbc.com/video/2026/01/15/new-iran-sanctions-an-off-ramp-for-pres-trump-says-rbcs-helima-croft.html?&amp;qsearchterm=helima%20croft" target="_blank">RBC TV: Helima Croft on CNBC</a></div>
+                     <p>New Iran sanctions, intervention in Venezuela, President Trump’s meeting with Greenland and more.</p>
+                  </div>
+               </div>
+            </div>
+            <div class="news-item">
+               <div class="row">
+                  <div class="col-xs-12"><span class="news-date">January 15, 2026</span><div><a href="https://www.cnbc.com/video/2026/01/15/rbcs-lori-calvasina-breaks-down-her-2026-sp-500-year-end-target-of-7750.html" target="_blank">RBC TV: Lori Calvasina on CNBC</a></div>
+                     <p>The latest market trends, Lori’s 2026 S&amp;P; 500 year-end target of 7,750, earnings season and more.</p>
+                  </div>
+               </div>
+            </div>
+            <div class="text-center" style="margin: 40px 0 20px 0"><a href="#" id="show-more" class="btn btn-inverse" style="display: none;">Show More Articles</a></div>
+         </div></div>
+<div class="text-center" style="margin: 40px 0 20px 0;"><a class="btn btn-lead" title="Go to all media articles" href="/en/about-us/in-the-media"><span class="read-time">Show more media hits</span></a></div></div>
+            </div>
+            <div role="tabpanel" id="tab3" name="Conferences" class="tab-pane">
+               <div class="white-box-text"><div id="featured-conferences"><div style="background-color:#EFF6FD; margin-bottom: 50px;" class="featured-conference-wrapper">
+   <div class="container">
+      <div class="conferences conferences-home text-center">
+         <h2 style="display: none;"><img style="display:inline;margin-top: -8px;width: 39px;" src="/assets/rbccm/homepage/calendar.svg" alt="calendar icon">&nbsp;&nbsp;Featured conferences</h2>
+         <div class="row">
+            <div class="col-xs-12 col-sm-4 tile" style="height: auto;">
+               <div class="lblue-circle event-date" style="background-color: #ffffff;">
+                  <p><span class="month">Mar</span><span class="day">10-11</span></p>
+               </div>
+               <p class="location">New York</p>
+               <p class="event-name">Global Financial Institutions Conference </p>
+            </div>
+            <div class="col-xs-12 col-sm-4 tile" style="height: auto;">
+               <div class="lblue-circle event-date" style="background-color: #ffffff;">
+                  <p><span class="month">May</span><span class="day">19-21</span></p>
+               </div>
+               <p class="location">Toronto</p>
+               <p class="event-name">Canadian Industrials Conference</p>
+            </div>
+            <div class="col-xs-12 col-sm-4 tile" style="height: auto;">
+               <div class="lblue-circle event-date" style="background-color: #ffffff;">
+                  <p><span class="month">Jun</span><span class="day">2-3</span></p>
+               </div>
+               <p class="location">New York</p>
+               <p class="event-name">Global Energy, Power &amp; Infrastructure Conference </p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div></div>
+<div class="text-center" style="margin-bottom: 30px;"><a class="btn btn-lead" style="background-color: #0051a5 !important;" title="See all upcoming conferences" href="/en/about-us/conferences"><span class="read-time">Review upcoming events</span></a></div></div>
+            </div>
+         </div>
+      </div>
+   </div>

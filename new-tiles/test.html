@@ -401,6 +401,79 @@
       .rbccm-new-tiles__player { transition: none; }
     }
 
+
+    /* ---------- Video modal (centered popup) ----------
+       For video tiles specifically, the play button opens a
+       centered modal with a 16:9 embed instead of the bottom-
+       pinned podcast player. Fills more of the viewport (video
+       needs the space; audio does not), and the dark backdrop
+       cues that it's a modal overlay rather than a companion
+       widget. One shared instance for the whole page - JS swaps
+       the iframe src per play button clicked. */
+    .rbccm-new-tiles__video-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.85);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .rbccm-new-tiles__video-modal[data-open="true"] {
+      opacity: 1;
+      visibility: visible;
+    }
+    /* Content shell - fixed max width, 16:9 aspect ratio so
+       the iframe never letterboxes. `position: relative` so the
+       close button can absolute-position to the top-right. */
+    .rbccm-new-tiles__video-modal-content {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+    .rbccm-new-tiles__video-modal-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    /* Close button sits just outside the content top-right so
+       it doesn't overlap the video controls. Filled white circle
+       on the dark backdrop = high contrast, easy to hit. */
+    .rbccm-new-tiles__video-modal-close {
+      position: absolute;
+      top: -48px;
+      right: 0;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .rbccm-new-tiles__video-modal-close:hover,
+    .rbccm-new-tiles__video-modal-close:focus-visible {
+      background: #f0f0f0;
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rbccm-new-tiles__video-modal { transition: none; }
+    }
+
+
     /* ---------- Popover-open scrim ----------
        When any popover inside a card is open, an ::after
        overlay fades in to darken the rest of the card. Popover
@@ -1486,11 +1559,12 @@
         </button>
         <span class="rbccm-new-tiles__duration">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 14v-2a9 9 0 0 1 18 0v2"/>
-            <rect x="3" y="14" width="4" height="6" rx="1"/>
-            <rect x="17" y="14" width="4" height="6" rx="1"/>
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
           </svg>
-          7 min
+          7 min listen
         </span>
       </div>
 
@@ -1504,7 +1578,7 @@
           </span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             Podcast
           </span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
@@ -1515,7 +1589,7 @@
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            7 min
+            7 min listen
           </span>
         </div>
 
@@ -1642,13 +1716,14 @@
         <img loading="lazy" src="https://picsum.photos/seed/us-equity-thanksgiving/800/450" alt="" />
         <button type="button" class="rbccm-new-tiles__play"
                 data-action="play"
-                data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
-                aria-label="Play podcast">
+                data-media-type="video"
+                data-media-url="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                aria-label="Play video">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
         </button>
         <span class="rbccm-new-tiles__duration">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
-          7 min
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          5 min watch
         </span>
       </div>
 
@@ -1661,8 +1736,8 @@
           </span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>
-            Podcast
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            Video
           </span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item">
@@ -1672,7 +1747,7 @@
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            7 min
+            5 min watch
           </span>
         </div>
         <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-us-equity-thanksgiving">What the US equity market has been thankful for</a></h3>
@@ -1753,11 +1828,9 @@
     <article class="rbccm-new-tiles__card">
       <div class="rbccm-new-tiles__media">
         <img loading="lazy" src="https://picsum.photos/seed/nt-card-4/800/450" alt="" />
-        <button type="button" class="rbccm-new-tiles__play"
-                data-action="play"
-                data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
-                aria-label="Play podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
-        <span class="rbccm-new-tiles__duration"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>7 min</span>
+        <!-- Article card: no play button or duration badge on the
+             image (no media to play). Read-time still surfaces
+             below in the meta chip. -->
       </div>
 
       <div class="rbccm-new-tiles__body">
@@ -1765,11 +1838,11 @@
         <div class="rbccm-new-tiles__meta">
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Jul 2025</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
-          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>Podcast</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Article</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Markets</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
-          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>7 min</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>4 min read</span>
         </div>
         <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-nt-card-4">Latest market insight - populated from feed</a></h3>
         <p class="rbccm-new-tiles__desc">This card fills the third grid slot in the supporting row beneath the featured horizontal card. The feed enhancer paints its title, meta, and image from the next available feed item.</p>
@@ -1848,8 +1921,8 @@
         <button type="button" class="rbccm-new-tiles__play"
                 data-action="play"
                 data-episode-url="https://player.captivate.fm/episode/81a80424-883b-45bd-bcf1-3df9286348b5/"
-                aria-label="Play podcast"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
-        <span class="rbccm-new-tiles__duration"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>7 min</span>
+                aria-label="Play audio"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+        <span class="rbccm-new-tiles__duration"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>6 min listen</span>
       </div>
 
       <div class="rbccm-new-tiles__body">
@@ -1857,11 +1930,11 @@
         <div class="rbccm-new-tiles__meta">
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Aug 2025</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
-          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>Podcast</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>Audio</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Technology</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
-          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>7 min</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>6 min listen</span>
         </div>
         <h3 class="rbccm-new-tiles__title"><a class="rbccm-new-tiles__title-link" href="#article-winding-down">Winding down with no regrets</a></h3>
         <p class="rbccm-new-tiles__desc">With reporting season starting to wind down, Health Care and Tech stand out positively on a few of our earnings-related&hellip;</p>
@@ -1954,7 +2027,7 @@
         <div class="rbccm-new-tiles__meta">
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Feb 2026</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
-          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>Podcast</span>
+          <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Podcast</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
           <span class="rbccm-new-tiles__meta-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/></svg>Healthcare</span>
           <span class="rbccm-new-tiles__meta-sep">|</span>
@@ -2076,6 +2149,15 @@
       openTrigger = null;
     }
 
+    /* Selector matching every focusable element inside a popover.
+       Used by openById to send focus into the popover on open,
+       and by the Tab keydown handler below to wrap focus at the
+       edges (roving focus never escapes the popover while open). */
+    var FOCUSABLE_SEL =
+      'button:not([disabled]), [href], input:not([disabled]), ' +
+      'select:not([disabled]), textarea:not([disabled]), ' +
+      '[tabindex]:not([tabindex="-1"])';
+
     function openById(id, trigger) {
       var pop = document.getElementById(id);
       if (!pop) return;
@@ -2085,6 +2167,17 @@
       if (trigger) trigger.setAttribute('aria-expanded', 'true');
       openPopover = pop;
       openTrigger = trigger || null;
+      /* Move focus into the popover so screen-reader / keyboard
+         users land inside on open. First focusable is usually the
+         close X button - that's fine; from there Tab walks the
+         platform / share / options list, Shift+Tab reaches the
+         close, and the Tab handler below wraps at both ends. */
+      var focusables = pop.querySelectorAll(FOCUSABLE_SEL);
+      if (focusables.length) {
+        // Defer one tick so the browser sees the popover as visible
+        // (data-open just flipped) before .focus() runs.
+        setTimeout(function () { focusables[0].focus(); }, 0);
+      }
     }
 
     /* ── Saved state (localStorage) ── */
@@ -2226,7 +2319,12 @@
 
       /* × close inside a popover. */
       if (e.target.closest('.rbccm-new-tiles__popover-close')) {
+        /* Preserve the trigger reference across closeAll (which
+           nulls it out) so we can return focus - keeps the tab
+           chain intact for keyboard users clicking the × close. */
+        var triggerToFocus = openTrigger;
         closeAll();
+        if (triggerToFocus) triggerToFocus.focus();
         return;
       }
 
@@ -2288,9 +2386,30 @@
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && openPopover) {
+      if (!openPopover) return;
+
+      if (e.key === 'Escape') {
+        var toFocus = openTrigger;
         closeAll();
-        if (openTrigger) openTrigger.focus();
+        if (toFocus) toFocus.focus();
+        return;
+      }
+
+      /* Focus trap: Tab / Shift+Tab wraps within the open
+         popover so keyboard users can't step out of it into the
+         page behind. Same pattern used by native <dialog>. */
+      if (e.key === 'Tab') {
+        var focusables = openPopover.querySelectorAll(FOCUSABLE_SEL);
+        if (!focusables.length) return;
+        var first = focusables[0];
+        var last  = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
   })();
@@ -2311,6 +2430,33 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
   </button>
   <iframe class="rbccm-new-tiles__player-iframe" title="Podcast player" scrolling="no" frameborder="0" allow="autoplay" src=""></iframe>
+</div>
+
+
+<!-- ============================================================
+     Video modal (centered popup)
+     ============================================================
+     Companion to the bottom-pinned podcast player above. Same
+     one-instance-per-page pattern - the JS below sets the iframe
+     src from a clicked play button's data-media-url when
+     data-media-type="video". Close button, Escape, and backdrop
+     click all dismiss (and clear the iframe src to stop playback).
+     ============================================================ -->
+<div class="rbccm-new-tiles__video-modal"
+     data-open="false"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Video player">
+  <div class="rbccm-new-tiles__video-modal-content">
+    <button type="button" class="rbccm-new-tiles__video-modal-close" aria-label="Close video">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <iframe class="rbccm-new-tiles__video-modal-iframe"
+            title="Video player"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+            src=""></iframe>
+  </div>
 </div>
 
 <script>
@@ -2361,22 +2507,85 @@
       }
     }
 
+    /* ------------------------------------------------------------
+       Video modal - shares the play button surface with the audio
+       player above but opens a centered modal instead of the
+       bottom-pinned iframe. Chosen when the clicked play button
+       carries data-media-type="video" - falls back to the audio
+       player for podcast / audio types (or the legacy
+       data-episode-url attribute for backwards compatibility). */
+    var videoModal    = document.querySelector('.rbccm-new-tiles__video-modal');
+    var videoIframe   = videoModal && videoModal.querySelector('.rbccm-new-tiles__video-modal-iframe');
+    var videoCloseBtn = videoModal && videoModal.querySelector('.rbccm-new-tiles__video-modal-close');
+    var videoLastTrigger = null;
+
+    function openVideoModal(url, trigger) {
+      if (!videoModal || !url) return;
+      if (videoIframe.getAttribute('src') !== url) videoIframe.src = url;
+      videoModal.setAttribute('data-open', 'true');
+      videoLastTrigger = trigger || null;
+      /* Lock body scroll while modal is open so the page behind
+         doesn't scroll when the user scrolls over the backdrop. */
+      document.body.style.overflow = 'hidden';
+      setTimeout(function () { videoCloseBtn.focus(); }, 220);
+    }
+
+    function closeVideoModal() {
+      if (!videoModal) return;
+      videoModal.setAttribute('data-open', 'false');
+      /* Clear src to stop playback (autoplay iframes keep playing
+         even when the wrapper is hidden). */
+      videoIframe.src = '';
+      document.body.style.overflow = '';
+      if (videoLastTrigger) {
+        videoLastTrigger.focus();
+        videoLastTrigger = null;
+      }
+    }
+
     document.addEventListener('click', function (e) {
       var playBtn = e.target.closest('[data-action="play"]');
       if (playBtn) {
         e.preventDefault();
-        openPlayer(playBtn.getAttribute('data-episode-url'), playBtn);
+        /* Route by media type. Video → centered modal. Anything
+           else (audio / podcast / unset) → bottom-pinned player.
+           data-media-url is the modern attribute; fall back to
+           the legacy data-episode-url for cards that haven't
+           been migrated yet. */
+        var mediaType = (playBtn.getAttribute('data-media-type') || '').toLowerCase();
+        var mediaUrl  = playBtn.getAttribute('data-media-url') ||
+                        playBtn.getAttribute('data-episode-url');
+        if (mediaType === 'video') {
+          openVideoModal(mediaUrl, playBtn);
+        } else {
+          openPlayer(mediaUrl, playBtn);
+        }
         return;
       }
       if (e.target.closest('.rbccm-new-tiles__player-close')) {
         e.preventDefault();
         closePlayer();
+        return;
+      }
+      /* Video modal: × close button OR backdrop click (target is
+         the modal wrapper itself, not the content shell). Both
+         dismiss. */
+      if (e.target.closest('.rbccm-new-tiles__video-modal-close')) {
+        e.preventDefault();
+        closeVideoModal();
+        return;
+      }
+      if (videoModal && videoModal.getAttribute('data-open') === 'true' && e.target === videoModal) {
+        closeVideoModal();
       }
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && player.getAttribute('data-open') === 'true') {
+      if (e.key !== 'Escape') return;
+      if (player.getAttribute('data-open') === 'true') {
         closePlayer();
+      } else if (videoModal && videoModal.getAttribute('data-open') === 'true') {
+        closeVideoModal();
       }
     });
   })();

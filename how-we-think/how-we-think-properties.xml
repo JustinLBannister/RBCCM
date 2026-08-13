@@ -1,0 +1,125 @@
+<!-- ============================================================
+     How We Think - Properties + Data
+     ============================================================
+     Three-tab component: Insights / Newsroom / Conferences.
+
+     Tab data sources (deliberately different per tab):
+
+       Insights    - Author input: URL Datums per tile (3 tiles).
+                     JS matches each URL to a record in the 2024 /
+                     2025 / 2026 insights feeds by slug and hydrates
+                     the tile server-side markup with image, title,
+                     description, read-time. Same pattern as
+                     case-studies-carousel; no DCR pickers.
+
+       Newsroom    - NO author input. JS fetches
+                     /en/insights/data/all on load, takes the 3 most
+                     recent news items, renders date + title link +
+                     description.
+
+       Conferences - NO author input beyond the EventsList DCR
+                     pick (the same single aggregate DCR that
+                     featured-conferences uses). XSL filters events
+                     where sitelocation checkbox contains
+                     "rbccm-homepage" and renders month/day badge +
+                     location + name for each. Server-rendered.
+
+     SCHEMA NOTE: only ID, Name, Type are permitted on a Datum;
+     only ID, Name, Replicatable, CloneGroupID on a Group.
+     MinReplicates and Required are NOT in TeamSite's schema and
+     will fail validation. Counts and required fields are enforced
+     in the XSL.
+     ============================================================ -->
+<Properties ComponentID="how-we-think-v1">
+
+  <!-- Section H2 heading. Default matches the live site. -->
+  <Datum ID="Heading" Type="String" Name="Section Heading">How we think</Datum>
+
+  <!-- Aria label on the wrapper section. Blank falls back to Heading. -->
+  <Datum ID="AriaLabel" Type="String" Name="Section Aria Label (blank = heading)"></Datum>
+
+  <!-- Optional id attribute on the H2 so anchor links can jump to
+       this section. Blank = no id emitted. -->
+  <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional)"></Datum>
+
+
+  <!-- ═══ INSIGHTS TAB ═══════════════════════════════════════ -->
+
+  <Datum ID="InsightsTabLabel" Type="String" Name="Insights Tab Label">Insights</Datum>
+  <Datum ID="InsightsLede"     Type="Textarea" Name="Insights Tab Lede (optional)">Our global expertise and data-driven perspectives help clients make informed, strategic decisions across all major sectors.</Datum>
+  <Datum ID="InsightsCtaLabel" Type="String" Name="Insights CTA Label">More insights</Datum>
+  <Datum ID="InsightsCtaLink"  Type="String" Name="Insights CTA Link">/en/insights</Datum>
+  <Datum ID="InsightsCtaNewTab" Type="Boolean" Name="Insights CTA New Tab">false</Datum>
+
+
+  <!-- ═══ NEWSROOM TAB ═══════════════════════════════════════ -->
+
+  <Datum ID="NewsroomTabLabel" Type="String" Name="Newsroom Tab Label">Newsroom</Datum>
+  <Datum ID="NewsroomLede"     Type="Textarea" Name="Newsroom Tab Lede (optional)">In the media. RBC Capital Markets experts share insights with global outlets.</Datum>
+  <Datum ID="NewsroomFeedUrl"  Type="String" Name="Newsroom Feed URL">/en/insights/data/all</Datum>
+  <Datum ID="NewsroomMaxItems" Type="String" Name="Newsroom Max Items">3</Datum>
+  <Datum ID="NewsroomCtaLabel" Type="String" Name="Newsroom CTA Label">Show more media hits</Datum>
+  <Datum ID="NewsroomCtaLink"  Type="String" Name="Newsroom CTA Link">/en/about-us/in-the-media</Datum>
+  <Datum ID="NewsroomCtaNewTab" Type="Boolean" Name="Newsroom CTA New Tab">false</Datum>
+
+
+  <!-- ═══ CONFERENCES TAB ════════════════════════════════════ -->
+
+  <Datum ID="ConferencesTabLabel" Type="String" Name="Conferences Tab Label">Conferences</Datum>
+  <Datum ID="ConferencesLede"     Type="Textarea" Name="Conferences Tab Lede (optional)">Where our teams are meeting clients, industry leaders, and policymakers next.</Datum>
+
+  <!-- Single aggregate DCR pick. Same DCR that featured-conferences
+       uses. Author picks the events root DCR once; the XSL walks its
+       <event> children and filters to those with sitelocation
+       containing "rbccm-homepage". -->
+  <Datum ID="EventsList" Type="DCR" Name="Events List">
+    <DCR Category="rbccm" Type="conferences"></DCR>
+  </Datum>
+
+  <!-- Minimum flagged events required to render the Conferences tab.
+       Default 1 (render whatever is flagged). Bump to 3 to require a
+       full row before the tab appears. -->
+  <Datum ID="ConferencesMinCount" Type="String" Name="Conferences Min Flagged (blank = 1)"></Datum>
+
+  <!-- Maximum events to render. Default: unlimited (show all flagged).
+       Set to a specific number if the tab should cap. -->
+  <Datum ID="ConferencesMaxCount" Type="String" Name="Conferences Max Items (blank = all)"></Datum>
+
+  <Datum ID="ConferencesCtaLabel" Type="String" Name="Conferences CTA Label">Review upcoming events</Datum>
+  <Datum ID="ConferencesCtaLink"  Type="String" Name="Conferences CTA Link">/en/about-us/conferences</Datum>
+  <Datum ID="ConferencesCtaNewTab" Type="Boolean" Name="Conferences CTA New Tab">false</Datum>
+
+
+  <!-- ═══ ACCESSIBILITY (optional overrides) ═════════════════ -->
+
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ═══ INSIGHTS TAB - URL SLOTS ═══════════════════════════
+       One Group per tile (3 tiles). Author's only required input
+       is the article URL. JS matches it against the insights year
+       feeds and hydrates the tile at page load.
+
+       Blank URL slot = tile is dropped by the XSL. Renders nothing
+       if the tab ends up with zero tiles (rest of the section
+       still shows). Non-blank URL that doesn't match a feed
+       record is silently removed by JS at hydration time. -->
+  <Group ID="InsightSlide"
+         Name="Insights Tile"
+         Replicatable="true"
+         CloneGroupID="hwt-insight-slide">
+
+    <Datum ID="Url" Type="String" Name="Insight URL"></Datum>
+
+    <!-- Optional overrides. Blank = use whatever the matched feed
+         record returns. Populate to override without editing the
+         underlying article DCR. -->
+    <Datum ID="EyebrowOverride"   Type="String" Name="Eyebrow Override (blank = use feed)"></Datum>
+    <Datum ID="ReadTimeOverride"  Type="String" Name="Read/Watch/Listen Time Override (blank = use feed)"></Datum>
+
+  </Group>
+
+</Data>

@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How We Think - local preview</title>
+  <link rel="stylesheet" href="./how-we-think.css" />
+</head>
+<body>
+
+<section class="rbccm-how-we-think" id="rbccm-how-we-think" aria-labelledby="rbccm-how-we-think-heading">
+  <div class="rbccm-how-we-think__container">
+
+    <!-- Section heading. In the XSL this text comes from the Heading Datum
+         (default "How we think"). -->
+    <h2 class="rbccm-how-we-think__heading" id="rbccm-how-we-think-heading">How we think</h2>
+
+    <!-- Tab wrapper: holds all three tab buttons + all three panels.
+         JS toggles .is-active on the active tab/panel pair. Panel DOM
+         order is reordered on mobile so the accordion Tab-flow is
+         tab -> its panel -> next tab (see how-we-think.js). -->
+    <div class="rbccm-how-we-think__tablist" role="group" aria-label="How we think content sections">
+
+      <!-- =============== TABS =============== -->
+      <button type="button"
+              class="rbccm-how-we-think__tab is-active"
+              data-panel="insights"
+              aria-expanded="true"
+              aria-controls="hwt-panel-insights">
+        Insights
+        <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <button type="button"
+              class="rbccm-how-we-think__tab"
+              data-panel="newsroom"
+              aria-expanded="false"
+              aria-controls="hwt-panel-newsroom">
+        Newsroom
+        <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <button type="button"
+              class="rbccm-how-we-think__tab"
+              data-panel="conferences"
+              aria-expanded="false"
+              aria-controls="hwt-panel-conferences">
+        Conferences
+        <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+
+      <!-- =============== INSIGHTS PANEL =============== -->
+      <!-- URL shells - author pastes an article URL per tile, JS below
+           matches it against the insights year feeds and injects the
+           tile HTML (image, eyebrow, title, description, read-time). -->
+      <div class="rbccm-how-we-think__panel is-active"
+           id="hwt-panel-insights"
+           data-panel="insights"
+           role="region"
+           aria-labelledby=""
+           tabindex="0">
+
+        <p class="rbccm-how-we-think__panel-lede">Our global expertise and data-driven perspectives help clients make informed, strategic decisions across all major sectors.</p>
+
+        <div class="rbccm-how-we-think__tiles">
+          <a class="rbccm-how-we-think__tile"
+             data-hwt-url="/en/insights/story/how-svante-plans-to-deploy-100-carbon-capture-plants"
+             href="#">
+            <!-- Placeholder markup - JS overwrites innerHTML on match.
+                 If no match, JS removes the tile (self-healing). -->
+            <div class="rbccm-how-we-think__tile-img"></div>
+            <div class="rbccm-how-we-think__tile-body">
+              <p class="rbccm-how-we-think__tile-eyebrow">INSIGHTS</p>
+              <div class="rbccm-how-we-think__tile-divider" aria-hidden="true"></div>
+              <h3 class="rbccm-how-we-think__tile-title">Loading…</h3>
+              <p class="rbccm-how-we-think__tile-copy">Fetching article details from the insights feed.</p>
+              <span class="rbccm-how-we-think__tile-cta">Read more</span>
+            </div>
+          </a>
+
+          <a class="rbccm-how-we-think__tile"
+             data-hwt-url="/en/insights/story/coeur-reaps-the-benefits-of-recent-investments"
+             href="#">
+            <div class="rbccm-how-we-think__tile-img"></div>
+            <div class="rbccm-how-we-think__tile-body">
+              <p class="rbccm-how-we-think__tile-eyebrow">INSIGHTS</p>
+              <div class="rbccm-how-we-think__tile-divider" aria-hidden="true"></div>
+              <h3 class="rbccm-how-we-think__tile-title">Loading…</h3>
+              <p class="rbccm-how-we-think__tile-copy">Fetching article details from the insights feed.</p>
+              <span class="rbccm-how-we-think__tile-cta">Read more</span>
+            </div>
+          </a>
+
+          <a class="rbccm-how-we-think__tile"
+             data-hwt-url="/en/insights/story/pioneering-sustainability-and-impact-fixed-income-market"
+             href="#">
+            <div class="rbccm-how-we-think__tile-img"></div>
+            <div class="rbccm-how-we-think__tile-body">
+              <p class="rbccm-how-we-think__tile-eyebrow">INSIGHTS</p>
+              <div class="rbccm-how-we-think__tile-divider" aria-hidden="true"></div>
+              <h3 class="rbccm-how-we-think__tile-title">Loading…</h3>
+              <p class="rbccm-how-we-think__tile-copy">Fetching article details from the insights feed.</p>
+              <span class="rbccm-how-we-think__tile-cta">Read more</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="rbccm-how-we-think__cta-wrap">
+          <a class="rbccm-how-we-think__cta" href="/en/insights">More insights</a>
+        </div>
+      </div>
+
+
+      <!-- =============== NEWSROOM PANEL =============== -->
+      <!-- No author input. JS fetches /en/insights/data/all on load
+           and injects the top 3 news items into __news. -->
+      <div class="rbccm-how-we-think__panel"
+           id="hwt-panel-newsroom"
+           data-panel="newsroom"
+           role="region"
+           aria-labelledby=""
+           tabindex="0">
+
+        <p class="rbccm-how-we-think__panel-lede">In the media. RBC Capital Markets experts share insights with global outlets.</p>
+
+        <div class="rbccm-how-we-think__news" data-hwt-newsroom>
+          <!-- Placeholder rows - JS replaces the whole container's
+               innerHTML with real feed items. If fetch fails, the
+               placeholders are removed so the section stays empty
+               rather than showing "Loading..." forever. -->
+          <div class="rbccm-how-we-think__news-item">
+            <span class="rbccm-how-we-think__news-date">Loading…</span>
+            <a class="rbccm-how-we-think__news-link" href="#">Fetching latest media hits</a>
+            <p class="rbccm-how-we-think__news-summary">The newsroom feed populates this list on page load.</p>
+          </div>
+          <div class="rbccm-how-we-think__news-item">
+            <span class="rbccm-how-we-think__news-date">Loading…</span>
+            <a class="rbccm-how-we-think__news-link" href="#">Fetching latest media hits</a>
+            <p class="rbccm-how-we-think__news-summary">The newsroom feed populates this list on page load.</p>
+          </div>
+          <div class="rbccm-how-we-think__news-item">
+            <span class="rbccm-how-we-think__news-date">Loading…</span>
+            <a class="rbccm-how-we-think__news-link" href="#">Fetching latest media hits</a>
+            <p class="rbccm-how-we-think__news-summary">The newsroom feed populates this list on page load.</p>
+          </div>
+        </div>
+
+        <div class="rbccm-how-we-think__cta-wrap">
+          <a class="rbccm-how-we-think__cta" href="/en/about-us/in-the-media">Show more media hits</a>
+        </div>
+      </div>
+
+
+      <!-- =============== CONFERENCES PANEL =============== -->
+      <!-- Server-rendered in the shipping XSL by filtering the
+           EventsList DCR to events where sitelocation contains
+           "rbccm-homepage". Here in test.html the cards are static
+           mocks so the visual can be reviewed without TeamSite. -->
+      <div class="rbccm-how-we-think__panel"
+           id="hwt-panel-conferences"
+           data-panel="conferences"
+           role="region"
+           aria-labelledby=""
+           tabindex="0">
+
+        <p class="rbccm-how-we-think__panel-lede">Where our teams are meeting clients, industry leaders, and policymakers next.</p>
+
+        <div class="rbccm-how-we-think__conferences">
+
+          <a class="rbccm-how-we-think__conference" href="/en/about-us/conferences/global-industrials-2026">
+            <div class="rbccm-how-we-think__conference-date">
+              <span class="rbccm-how-we-think__conference-month">Oct</span>
+              <span class="rbccm-how-we-think__conference-day">15</span>
+            </div>
+            <div>
+              <p class="rbccm-how-we-think__conference-location">New York, NY</p>
+              <p class="rbccm-how-we-think__conference-name">Global Industrials Conference 2026</p>
+            </div>
+          </a>
+
+          <a class="rbccm-how-we-think__conference" href="/en/about-us/conferences/energy-transition-2026">
+            <div class="rbccm-how-we-think__conference-date">
+              <span class="rbccm-how-we-think__conference-month">Nov</span>
+              <span class="rbccm-how-we-think__conference-day">04</span>
+            </div>
+            <div>
+              <p class="rbccm-how-we-think__conference-location">Toronto, ON</p>
+              <p class="rbccm-how-we-think__conference-name">Energy Transition Summit</p>
+            </div>
+          </a>
+
+          <a class="rbccm-how-we-think__conference" href="/en/about-us/conferences/tech-2026">
+            <div class="rbccm-how-we-think__conference-date">
+              <span class="rbccm-how-we-think__conference-month">Dec</span>
+              <span class="rbccm-how-we-think__conference-day">02</span>
+            </div>
+            <div>
+              <p class="rbccm-how-we-think__conference-location">London, UK</p>
+              <p class="rbccm-how-we-think__conference-name">Global Technology, Internet, Media &amp; Telecommunications Conference</p>
+            </div>
+          </a>
+
+        </div>
+
+        <div class="rbccm-how-we-think__cta-wrap">
+          <a class="rbccm-how-we-think__cta" href="/en/about-us/conferences">Review upcoming events</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- Tab controller (desktop tab strip + mobile accordion). -->
+<script src="./how-we-think.js"></script>
+
+
+<!-- ============================================================
+     Feed hydration - Insights (URL matching) + Newsroom (top N)
+     ============================================================
+     Runs after the tab controller. Both fetches happen on load so
+     the panels are populated even if the user never clicks their
+     tab. Same-origin fetches when served from rbccm.com; on
+     file:// preview the fetches fail silently and the placeholder
+     copy is removed so the UI stays clean.
+     ============================================================ */
+<script>
+(function () {
+  var section = document.getElementById('rbccm-how-we-think');
+  if (!section) return;
+
+  /* ---------- Small helpers ------------------------------------ */
+  function decodeEntities(s) {
+    var t = document.createElement('textarea');
+    t.innerHTML = s || '';
+    return t.value;
+  }
+  function escapeAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function childText(node, tag) {
+    if (!node) return '';
+    var el = node.getElementsByTagName(tag)[0];
+    return el ? (el.textContent || '').trim() : '';
+  }
+
+
+  /* ---------- Insights: URL → feed match ---------------------- */
+  /* Author pastes an insight URL per tile shell (data-hwt-url).
+     JS extracts the slug (`.../story/<slug>` OR the last path
+     segment) and matches against records in the 2024/2025/2026
+     insights feeds. Same pattern as case-studies-carousel. */
+  var INSIGHTS_FEEDS = [
+    '/en/insights/data/2024-insights',
+    '/en/insights/data/2025-insights',
+    '/en/insights/data/2026-insights'
+  ];
+
+  function extractInsightSlug(url) {
+    if (!url) return null;
+    var m = String(url).match(/\/([^/?#]+)(?:[/?#]|$)(?![^?#]*\/[^/?#]+)/);
+    return m ? m[1] : null;
+  }
+
+  function buildInsightLookup(xmlDocs) {
+    var map = {};
+    xmlDocs.forEach(function (doc) {
+      if (!doc) return;
+      var items = doc.getElementsByTagName('news');
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        var link = childText(it, 'link');
+        var slug = extractInsightSlug(link);
+        if (!slug || map[slug]) continue;
+        map[slug] = {
+          link:        link,
+          title:       decodeEntities(childText(it, 'title')),
+          description: decodeEntities(childText(it, 'description')),
+          thumbnail:   childText(it, 'thumbnail'),
+          category:    childText(it, 'category') || 'Insights',
+          type:        childText(it, 'type'),
+          readtime:    childText(it, 'readtime'),
+          watchtime:   childText(it, 'watchtime')
+        };
+      }
+    });
+    return map;
+  }
+
+  function insightCtaText(rec) {
+    var t = (rec.type || '').toLowerCase();
+    if (t === 'audio')  return (rec.watchtime || rec.readtime || '') + (rec.watchtime ? ' listen' : ' read');
+    if (t === 'video')  return (rec.watchtime || rec.readtime || '') + ' watch';
+    return (rec.readtime || '') + ' read';
+  }
+
+  function hydrateInsightTile(tile, rec) {
+    tile.setAttribute('href', rec.link || '#');
+    var cta = insightCtaText(rec).trim();
+    tile.innerHTML =
+      '<div class="rbccm-how-we-think__tile-img">' +
+        (rec.thumbnail
+          ? '<img loading="lazy" src="' + escapeAttr(rec.thumbnail) + '" alt="" />'
+          : '') +
+      '</div>' +
+      '<div class="rbccm-how-we-think__tile-body">' +
+        '<p class="rbccm-how-we-think__tile-eyebrow">' + escapeAttr((rec.category || 'INSIGHTS').toUpperCase()) + '</p>' +
+        '<div class="rbccm-how-we-think__tile-divider" aria-hidden="true"></div>' +
+        '<h3 class="rbccm-how-we-think__tile-title">' + escapeAttr(rec.title) + '</h3>' +
+        '<p class="rbccm-how-we-think__tile-copy">' + escapeAttr(rec.description) + '</p>' +
+        (cta && cta !== 'read' && cta !== 'watch' && cta !== 'listen'
+          ? '<span class="rbccm-how-we-think__tile-cta">' + escapeAttr(cta) + '</span>'
+          : '') +
+      '</div>';
+  }
+
+  function loadInsights() {
+    var tiles = section.querySelectorAll('.rbccm-how-we-think__tile[data-hwt-url]');
+    if (!tiles.length) return;
+    Promise.all(INSIGHTS_FEEDS.map(function (url) {
+      return fetch(url)
+        .then(function (r) { return r.ok ? r.text() : ''; })
+        .then(function (xml) {
+          if (!xml) return null;
+          return new DOMParser().parseFromString(xml, 'text/xml');
+        })
+        .catch(function () { return null; });
+    })).then(function (docs) {
+      var lookup = buildInsightLookup(docs);
+      Array.prototype.forEach.call(tiles, function (tile) {
+        var slug = extractInsightSlug(tile.getAttribute('data-hwt-url'));
+        var rec  = slug && lookup[slug];
+        if (rec) {
+          hydrateInsightTile(tile, rec);
+        } else {
+          /* No match - drop the tile rather than leave a "Loading..."
+             card sitting there forever. */
+          tile.parentNode.removeChild(tile);
+        }
+      });
+    });
+  }
+
+
+  /* ---------- Newsroom: /en/insights/data/all → top 3 --------- */
+  function newsDateSort(a, b) {
+    var da = new Date(a.date).getTime() || 0;
+    var db = new Date(b.date).getTime() || 0;
+    return db - da;
+  }
+
+  function loadNewsroom() {
+    var container = section.querySelector('[data-hwt-newsroom]');
+    if (!container) return;
+    fetch('/en/insights/data/all')
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (xml) {
+        if (!xml) throw new Error('empty response');
+        var doc = new DOMParser().parseFromString(xml, 'text/xml');
+        var items = Array.prototype.slice.call(doc.getElementsByTagName('news'));
+        var parsed = items.map(function (it) {
+          return {
+            date:        childText(it, 'date'),
+            link:        childText(it, 'link'),
+            title:       decodeEntities(childText(it, 'title')),
+            description: decodeEntities(childText(it, 'description'))
+          };
+        }).filter(function (n) { return n.title && n.link; })
+          .sort(newsDateSort)
+          .slice(0, 3);
+        if (!parsed.length) throw new Error('no items');
+        container.innerHTML = parsed.map(function (n) {
+          return '<div class="rbccm-how-we-think__news-item">' +
+            '<span class="rbccm-how-we-think__news-date">' + escapeAttr(n.date) + '</span>' +
+            '<a class="rbccm-how-we-think__news-link" href="' + escapeAttr(n.link) + '" target="_blank" rel="noopener">' + escapeAttr(n.title) + '</a>' +
+            '<p class="rbccm-how-we-think__news-summary">' + escapeAttr(n.description) + '</p>' +
+          '</div>';
+        }).join('');
+      })
+      .catch(function () {
+        /* Feed unreachable (file:// preview, or transient failure).
+           Clear the loading placeholders so the panel doesn't look
+           broken. Author-facing empty state is fine here - real
+           newsroom always has items in production. */
+        container.innerHTML = '';
+      });
+  }
+
+
+  /* ---------- Bootstrap ---------------------------------------- */
+  if (document.readyState !== 'loading') {
+    loadInsights();
+    loadNewsroom();
+  } else {
+    document.addEventListener('DOMContentLoaded', function () {
+      loadInsights();
+      loadNewsroom();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
