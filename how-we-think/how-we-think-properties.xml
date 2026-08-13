@@ -17,12 +17,15 @@
                      recent news items, renders date + title link +
                      description.
 
-       Conferences - NO author input beyond the EventsList DCR
-                     pick (the same single aggregate DCR that
-                     featured-conferences uses). XSL filters events
-                     where sitelocation checkbox contains
-                     "rbccm-homepage" and renders month/day badge +
-                     location + name for each. Server-rendered.
+       Conferences - NO author input at all. The EventsList Datum
+                     has a pre-populated default DCR path pointing
+                     at the centralized conferences feed (same
+                     binding featured-conferences uses). XSL filters
+                     events where sitelocation checkbox contains
+                     "rbccm-homepage", sorts by event_date, renders
+                     month/day badge + location + name. Fully
+                     server-rendered; author drops the component
+                     and it populates.
 
      SCHEMA NOTE: only ID, Name, Type are permitted on a Datum;
      only ID, Name, Replicatable, CloneGroupID on a Group.
@@ -68,12 +71,14 @@
   <Datum ID="ConferencesTabLabel" Type="String" Name="Conferences Tab Label">Conferences</Datum>
   <Datum ID="ConferencesLede"     Type="Textarea" Name="Conferences Tab Lede (optional)">Where our teams are meeting clients, industry leaders, and policymakers next.</Datum>
 
-  <!-- Single aggregate DCR pick. Same DCR that featured-conferences
-       uses. Author picks the events root DCR once; the XSL walks its
-       <event> children and filters to those with sitelocation
-       containing "rbccm-homepage". -->
+  <!-- Centralized Events List feed - IDENTICAL binding to the
+       featured-conferences homepage strip. The text node inside
+       <DCR> is a default path that pre-populates the picker, so
+       authors don't need to touch it - the component "just works"
+       and pulls whichever events have sitelocation contains
+       "rbccm-homepage". -->
   <Datum ID="EventsList" Type="DCR" Name="Events List">
-    <DCR Category="rbccm" Type="conferences"></DCR>
+    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data</DCR>
   </Datum>
 
   <!-- Minimum flagged events required to render the Conferences tab.
