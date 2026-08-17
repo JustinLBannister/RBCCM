@@ -243,7 +243,7 @@
                   aria-expanded="true"
                   aria-controls="hwt-panel-insights">
             <xsl:value-of select="$insightsTabLabel"/>
-            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
           </button>
 
           <button type="button"
@@ -252,7 +252,7 @@
                   aria-expanded="false"
                   aria-controls="hwt-panel-newsroom">
             <xsl:value-of select="$newsroomTabLabel"/>
-            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
           </button>
 
           <button type="button"
@@ -261,7 +261,7 @@
                   aria-expanded="false"
                   aria-controls="hwt-panel-conferences">
             <xsl:value-of select="$conferencesTabLabel"/>
-            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="rbccm-how-we-think__tab-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
           </button>
 
 
