@@ -191,6 +191,133 @@
 </head>
 <body>
 
+<style>
+  /* Password gate — shown until sessionStorage says we're authed. */
+  #pw-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #082043;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #fff;
+  }
+  #pw-gate.is-hidden { display: none; }
+  #pw-gate-card {
+    background: #fff;
+    color: #082043;
+    padding: 40px 32px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    text-align: left;
+  }
+  #pw-gate-card h2 { margin: 0 0 6px; font-size: 20px; }
+  #pw-gate-card p { margin: 0 0 20px; font-size: 13px; color: #4b5563; line-height: 1.5; }
+  #pw-gate-card label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  #pw-gate-card input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #c8ccd1;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  #pw-gate-card button {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: #082043;
+    color: #fff;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+  }
+  #pw-gate-card button:hover { background: #0f2f5c; }
+  #pw-gate-error { margin-top: 12px; font-size: 12px; color: #c62828; min-height: 16px; }
+  /* Hide app body until authed to avoid flash-of-content. */
+  body.pw-locked > *:not(#pw-gate) { visibility: hidden; }
+</style>
+
+<!-- Password gate: SHA-256 hash of the shared password is embedded
+     below. On correct match, gate hides and success is remembered
+     in sessionStorage so it doesn't re-prompt on refresh within
+     the same tab. Not military-grade — someone with dev tools can
+     see the hash and try to brute-force. Fine for stopping casual
+     URL-shares on an authenticated corp network. To rotate: compute
+     new SHA-256 via `echo -n "newpass" | shasum -a 256` and replace
+     the PW_HASH const. -->
+<div id="pw-gate" role="dialog" aria-labelledby="pw-gate-title" aria-modal="true">
+  <form id="pw-gate-card" autocomplete="off">
+    <h2 id="pw-gate-title">Access required</h2>
+    <p>Enter the shared password to open the preview generator.</p>
+    <label for="pw-gate-input">Password</label>
+    <input type="password" id="pw-gate-input" autofocus>
+    <button type="submit">Unlock</button>
+    <div id="pw-gate-error" role="status" aria-live="polite"></div>
+  </form>
+</div>
+<script>
+(function () {
+  var PW_HASH = 'ef7cf60555874c2944342015cf65178fd49116cd6ce7a9d9aea804a583158bd0';
+  var STORAGE_KEY = 'preview-generator__authed';
+  var gate = document.getElementById('pw-gate');
+  var form = document.getElementById('pw-gate-card');
+  var input = document.getElementById('pw-gate-input');
+  var errEl = document.getElementById('pw-gate-error');
+
+  // Lock body until auth check completes. Adding via JS (not CSS
+  // default) means users without JS see the app instead of a
+  // permanent block — reasonable fallback since gating is best-effort.
+  document.body.classList.add('pw-locked');
+
+  function unlock() {
+    gate.classList.add('is-hidden');
+    document.body.classList.remove('pw-locked');
+  }
+
+  // Already authed this session? Skip the gate.
+  try {
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') { unlock(); return; }
+  } catch (e) { /* private mode / disabled storage — show gate */ }
+
+  async function sha256Hex(msg) {
+    var buf = new TextEncoder().encode(msg);
+    var digest = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(digest))
+      .map(function (b) { return b.toString(16).padStart(2, '0'); })
+      .join('');
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    errEl.textContent = '';
+    var pw = (input.value || '').trim();
+    if (!pw) return;
+    try {
+      var hash = await sha256Hex(pw);
+      if (hash === PW_HASH) {
+        try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (err) { /* ignore */ }
+        unlock();
+      } else {
+        errEl.textContent = 'Wrong password.';
+        input.select();
+      }
+    } catch (err) {
+      errEl.textContent = 'Browser doesn\'t support the crypto API.';
+    }
+  });
+})();
+</script>
+
+
+
 <header>
   <h1>MAAS+MATA CMS · Prototype</h1>
   <div class="actions">
@@ -288,19 +415,19 @@
 (function () {
   'use strict';
 
-  // v3 was the previous key; v4 forces a reset for editors upgrading
-  // to the new design so they see the v4 SAMPLE seed on next load
-  // instead of their stale v3 draft.
-  // Storage key bumped v4 → v4b to force a reset for editors on a
-  // stale draft — v4b adds newStandard, chartCard.video, and the
-  // 3-item thoughtLeadership.items array. Legacy sections (whyRbc,
-  // assetCoverage) are hidden from the nav.
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4c';
+  // Storage key rev forces a reset for editors upgrading
+  // so they see the latest SAMPLE seed on next load
+  // instead of their stale draft.
+  // Storage key: bump this value whenever the schema/seed shape
+  // changes so any editor with a stale draft is reset to the new
+  // SAMPLE on next load. Latest bumps have added newStandard,
+  // chartCard.video, marketInsights.items[], platform bullets.
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4d';
 
   // ==============================================================
-  // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
+  // SAMPLE / SEED DATA (from current MAAS-MATA design PDF)
   // ==============================================================
-  // Real v4 copy across every section. Two sections that v4
+  // Real current-design copy across every section. Two sections that were
   // removed entirely (whyRbc, assetCoverage) are kept in the seed
   // so their editor panels still open with sample content, but the
   // production page no longer renders them (they're marked --legacy
@@ -317,11 +444,11 @@
       secondaryCta: { label: "", href: "" }
     },
     chartCard: {
-      // v4: the interactive chart is now a static screenshot with a
+      // the chart is now a static screenshot with a
       // Brightcove video modal overlay. The chart data fields below
       // (labels/quotes/quality) still exist for the v3 legacy block
       // that's kept hidden in markup, but editors don't need to
-      // touch them anymore. Only the video sub-object matters for v4.
+      // touch them anymore. Only the video sub-object matters now.
       leftLabel: "MAAS · Execution Console",
       rightLabel: "MATA · Analytics",
       leftHeadline: "Portfolio · Cross-Asset",
@@ -339,7 +466,7 @@
         videoId: "6371076976112"
       }
     },
-    // v4 NEW section: "A new standard for multi-asset trading" —
+    // NEW section: "A new standard for multi-asset trading" —
     // sits inside the dark-strip between the chart image and the
     // awards row. 2-line stacked heading (grey lead + white/yellow
     // highlight), 3 body paragraphs, single yellow CTA.
@@ -398,9 +525,9 @@
         }
       ]
     },
-    // v4: this section slot is now "Innovation for the next
-    // execution era" but reuses the closeTheLoop schema/structure.
-    closeTheLoop: {
+    // This section slot is now "Innovation for the next
+    // execution era" but reuses the innovationEra schema/structure.
+    innovationEra: {
       heading: "Innovation for the next execution era",
       body: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.",
       features: [
@@ -409,7 +536,7 @@
         { number: "03", title: "Optimize with experts", body: "Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions." }
       ]
     },
-    // v4: REMOVED. Kept in seed so the CMS panel opens with
+    // REMOVED. Kept in seed so the CMS panel opens with
     // context, but the live page marks its section --legacy and
     // won't ship it. Safe to leave as-is.
     whyRbc: {
@@ -423,7 +550,7 @@
         { value: "1:1",       label: "Client partnership",     body: "Trusted relationships built on stability and expertise." }
       ]
     },
-    // v4: REMOVED. Same legacy note as whyRbc above.
+    // REMOVED. Same legacy note as whyRbc above.
     assetCoverage: {
       eyebrow: "Asset coverage",
       heading: "Connected across the desk",
@@ -434,7 +561,7 @@
         { icon: "index",    title: "Index strategies", subtitle: "Index strategies subtitle", body: "Integrated analytics for event driven execution.", cta: { label: "Learn more", href: "#" } }
       ]
     },
-    // v4: "MATA Capabilities / Sharper insight. Smarter trades."
+    // e.g. "MATA Capabilities / Sharper insight. Smarter trades."
     // Three regular asset cards + one wide "Index events" card.
     // (Schema may not surface all fields yet - safe to add here
     // so JSON round-trips cleanly.)
@@ -454,10 +581,10 @@
         body: "Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates."
       }
     },
-    // v4: "Market insights" is now a 3-card Slick-style carousel.
-    // items[] replaces the old single `featured` object. PDF v4
+    // e.g. "Market insights" is now a 3-card Slick-style carousel.
+    // items[] replaces the old single `featured` object. PDF
     // shows lorem ipsum across all 3 - real copy lands separately.
-    thoughtLeadership: {
+    marketInsights: {
       eyebrow: "Trends Shaping Institutional Trading",
       heading: "Market insights",
       items: [
@@ -505,15 +632,15 @@
     hero: {
       label: 'Hero',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero (v4: "Multi-Asset Agency Solutions")' },
-        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline (v4: "Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
-        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline (v4: "RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero (example: "Multi-Asset Agency Solutions")' },
+        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline (example: "Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
+        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline (example: "RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
         primaryCta: { type: 'cta', label: 'Primary CTA', figmaRef: 'The blue "Request demo" button' },
-        secondaryCta: { type: 'cta', label: 'Secondary CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 used this for the "Watch the video" text link but v4 has a single Request demo CTA only.' }
+        secondaryCta: { type: 'cta', label: 'Secondary CTA (unused)', figmaRef: 'REMOVED — leave blank. v3 used this for the "Watch the video" text link but currently a single Request demo CTA.' }
       }
     },
     chartCard: {
-      // v4: chart card is now a static screenshot with a Brightcove
+      // the chart card is a static screenshot with a Brightcove
       // video modal. The old chart data fields (labels/quotes/quality)
       // still exist for the v3 legacy block (hidden in markup) but
       // editors only need to fill in the video sub-object.
@@ -529,13 +656,13 @@
             videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The video ID from Brightcove Studio (long numeric string, e.g. "6371076976112").' }
           }
         },
-        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
+        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.' },
+        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.' },
+        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.' },
+        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.' },
         quotes: {
           type: 'array', label: 'Legacy: Quotes (right column)',
-          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
+          figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.',
           itemLabelKey: 'label',
           defaultItem: { label: '', value: '', delta: '', positive: true },
           itemFields: {
@@ -547,7 +674,7 @@
         },
         quality: {
           type: 'object', label: 'Legacy: Execution quality box',
-          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
+          figmaRef: 'the static screenshot ignores this. Kept for legacy chart block.',
           fields: {
             label: { type: 'text', label: 'Label', figmaRef: 'Legacy label field.' },
             score: { type: 'text', label: 'Score', figmaRef: 'Legacy score field.' },
@@ -559,12 +686,12 @@
     newStandard: {
       label: 'A New Standard',
       fields: {
-        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey (v4: "A new standard for").' },
-        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent (v4: "multi-asset ").' },
-        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup (v4: "trading").' },
+        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey (example: "A new standard for").' },
+        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent (example: "multi-asset ").' },
+        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup (example: "trading").' },
         body: {
           type: 'stringArray', label: 'Body paragraphs',
-          figmaRef: 'Each row is a separate paragraph under the heading. v4 uses 3 paragraphs; add or remove rows as needed.'
+          figmaRef: 'Each row is a separate paragraph under the heading. currently uses 3 paragraphs; add or remove rows as needed.'
         },
         cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "See MAAS in action" button below the body copy.' }
       }
@@ -572,16 +699,16 @@
     awards: {
       label: 'Awards',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges (v4: "See why the world\'s top institutions choose MAAS")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges (example: "See why the world\'s top institutions choose MAAS")' },
         items: {
           type: 'array', label: 'Award badges',
-          figmaRef: 'v4: 3 award cards (was 4 in v3). Each has a year pill, a title, and an issuer.',
+          figmaRef: 'currently 3 award cards. Each has a year pill, a title, and an issuer.',
           itemLabelKey: 'title',
           defaultItem: { year: '', title: '', issuer: '' },
           itemFields: {
-            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card (v4 examples: "2026" / "2025")' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text (v4 examples: "Best Trading Analytics Platform", "Overall Best Provider, Algorithmic Trading", "Best Provider, Multi-User Clients")' },
-            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title (v4: "TradingTech Insights Awards USA" / "The Trade")' }
+            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card (examples: "2026" / "2025")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text (examples: "Best Trading Analytics Platform", "Overall Best Provider, Algorithmic Trading", "Best Provider, Multi-User Clients")' },
+            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title (example: "TradingTech Insights Awards USA" / "The Trade")' }
           }
         }
       }
@@ -589,42 +716,42 @@
     platforms: {
       label: 'Platforms (MAAS / MATA cards)',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading (v4: "Two platforms, one unified ecosystem.")' },
-        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline (v4: "Better insight for stronger execution")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading (example: "Two platforms, one unified ecosystem.")' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline (example: "Better insight for stronger execution")' },
         cards: {
           type: 'array', label: 'Cards',
-          figmaRef: 'The two large side-by-side platform cards. v4 order: MATA (navy/dark) on the left, MAAS (white/light) on the right. Each has 5-6 bullets.',
+          figmaRef: 'The two large side-by-side platform cards. order: MATA (navy/dark) on the left, MAAS (white/light) on the right. Each has 5-6 bullets.',
           itemLabelKey: 'title',
           defaultItem: { theme: 'dark', eyebrow: '', title: '', acronym: '', body: '', bullets: [], cta: { label: '', href: '' } },
           itemFields: {
             theme: {
               type: 'select', label: 'Theme',
-              figmaRef: 'v4: Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
+              figmaRef: 'Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
               options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ]
             },
-            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase label at the top of the card (v4: "MATA – Analytics" / "MAAS - Execution")' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Card headline (v4: "Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
-            acronym: { type: 'text', label: 'Acronym (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 showed spaced "MAAS"/"MATA" under the title but v4 dropped it in favour of the new title/body treatment.' },
-            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card (v4: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
-            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: 'v4: 5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. v4 examples: MATA — "Quantify expected execution costs before commitment", "Compare strategies side by side to evaluate potential outcomes", etc. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
-            cta: { type: 'cta', label: 'CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 had "Explore MAAS/MATA →" links but v4 platform cards have no CTA.' }
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase label at the top of the card (example: "MATA – Analytics" / "MAAS - Execution")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card headline (example: "Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
+            acronym: { type: 'text', label: 'Acronym (unused)', figmaRef: 'REMOVED — leave blank. v3 showed spaced "MAAS"/"MATA" under the title but dropped in favour of the new title/body treatment.' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card (example: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
+            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: '5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. examples: MATA — "Quantify expected execution costs before commitment", "Compare strategies side by side to evaluate potential outcomes", etc. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
+            cta: { type: 'cta', label: 'CTA (unused)', figmaRef: 'REMOVED — leave blank. v3 had "Explore MAAS/MATA →" links but platform cards currently have no CTA.' }
           }
         }
       }
     },
-    closeTheLoop: {
-      label: 'Innovation Era (was: Close the Loop)',
+    innovationEra: {
+      label: 'Innovation Era',
       fields: {
-        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band (v4: "Innovation for the next execution era")' },
-        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading (v4: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band (example: "Innovation for the next execution era")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading (example: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
         features: {
           type: 'array', label: 'Features',
-          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03). v4 titles: "Model with depth", "Connect with ease", "Optimize with experts".',
+          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03). example titles: "Model with depth", "Connect with ease", "Optimize with experts".',
           itemLabelKey: 'title',
           defaultItem: { number: '', title: '', body: '' },
           itemFields: {
             number: { type: 'text', label: 'Number', figmaRef: 'The "/01", "/02", "/03" number label in yellow' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Feature title (v4 examples: "Model with depth" / "Connect with ease" / "Optimize with experts")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Feature title (examples: "Model with depth" / "Connect with ease" / "Optimize with experts")' },
             body: { type: 'textarea', label: 'Body', figmaRef: 'Short description under the title' }
           }
         }
@@ -632,7 +759,7 @@
     },
     whyRbc: {
       hidden: true,
-      label: 'Why RBC (v4 REMOVED - legacy)',
+      label: 'Why RBC (removed — legacy)',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("OUR NUMBERS")' },
         heading: { type: 'text', label: 'Heading', figmaRef: 'The big serif heading ("Why RBC Capital Markets")' },
@@ -652,7 +779,7 @@
     },
     assetCoverage: {
       hidden: true,
-      label: 'Asset Coverage (v4 REMOVED - replaced by MATA Capabilities)',
+      label: 'Asset Coverage (removed — replaced by MATA Capabilities)',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("ASSET COVERAGE")' },
         heading: { type: 'text', label: 'Heading', figmaRef: 'Big white section heading ("Connected across the desk")' },
@@ -680,21 +807,21 @@
         }
       }
     },
-    thoughtLeadership: {
-      label: 'Market Insights (was: Thought Leadership)',
+    marketInsights: {
+      label: 'Market Insights',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading (v4: "Trends Shaping Institutional Trading").' },
-        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading (v4: "Market insights"). v3 called this section "Thought leadership".' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading (example: "Trends Shaping Institutional Trading").' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading (example: "Market insights"). previously called "Thought leadership".' },
         items: {
           type: 'array', label: 'Insight cards',
-          figmaRef: 'v4: 3-card Slick-style carousel (was a single featured card in v3). Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
+          figmaRef: 'currently a 3-card Slick-style carousel. Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
           itemLabelKey: 'title',
           defaultItem: { eyebrow: 'Insights', title: '', body: '', cta: { label: '', href: '' }, image: './insights-featured-story.jpg' },
           itemFields: {
-            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card (v4: "Insights"). v3 said "Insights · Featured story" — v4 simplified.' },
-            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card (v4 lorem placeholder: "Lorem ipsum dolor sit amet consectetur adipiscing elit")' },
-            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph (v4 lorem placeholder)' },
-            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom (v4: "2 min read"). Label is what shows; href goes to the article.' },
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card (example: "Insights"). previously "Insights · Featured story" — simplified.' },
+            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card (lorem placeholder: "Lorem ipsum dolor sit amet consectetur adipiscing elit")' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph (lorem placeholder)' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom (example: "2 min read"). Label is what shows; href goes to the article.' },
             image: { type: 'text', label: 'Illustration image URL', figmaRef: 'Path to the right-side illustration image. Default: ./insights-featured-story.jpg' }
           }
         }
@@ -703,10 +830,10 @@
     demoCta: {
       label: 'Demo CTA',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption (v4: "See the platform")' },
-        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline (v4: "Talk with an " — note trailing space)' },
-        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline (v4: "expert" — period is added by markup)' },
-        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline (v4: "Connect with our product teams to arrange a custom demo.")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption (example: "See the platform")' },
+        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline (example: "Talk with an " — note trailing space)' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline (example: "expert" — period is added by markup)' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline (example: "Connect with our product teams to arrange a custom demo.")' },
         cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "Request a demo →" button' }
       }
     },
@@ -786,7 +913,7 @@
     // - lets us leave the schema/data in place (so nothing breaks
     // when a stale draft re-saves) while just not surfacing the
     // field in the editor UI.
-    if (def.hidden || (typeof def.label === 'string' && /^\s*Legacy:/i.test(def.label))) return '';
+    if (def.hidden || (typeof def.label === 'string' && (/^\s*Legacy:/i.test(def.label) || /\(unused\)/i.test(def.label)))) return '';
 
     if (def.type === 'text' || def.type === 'url') {
       return fieldWrap(def.label, def.figmaRef,
