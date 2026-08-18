@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview Generator</title>
+<style>
+  :root { --ink: #082043; --grey-100: #f5f6f8; --grey-200: #eaecef; --grey-400: #c8ccd1; --grey-600: #6b7280; --yellow: #FFC72C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--grey-100); color: var(--ink); }
+  main { max-width: 720px; margin: 60px auto; padding: 32px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  h1 { margin: 0 0 8px; font-size: 24px; }
+  p.lead { margin: 0 0 32px; color: var(--grey-600); font-size: 14px; line-height: 1.5; }
+  ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  a.card { display: block; padding: 16px 20px; border: 1px solid var(--grey-400); border-radius: 6px; text-decoration: none; color: var(--ink); transition: border-color 150ms ease, box-shadow 150ms ease; }
+  a.card:hover { border-color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  a.card strong { display: block; font-size: 15px; margin-bottom: 2px; }
+  a.card span { display: block; font-size: 12px; color: var(--grey-600); }
+  footer { max-width: 720px; margin: 24px auto 60px; padding: 0 32px; font-size: 12px; color: var(--grey-600); }
+  code { background: var(--grey-200); padding: 1px 5px; border-radius: 3px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<main>
+  <h1>Preview Generator</h1>
+  <p class="lead">Pick a component to edit. Each editor produces a JSON draft you can attach to an Asana task; the receiving developer uploads it to TeamSite and previews with <code>?preview=draft</code>.</p>
+  <ul>
+    <li>
+      <a class="card" href="./maas-mata/index.html">
+        <strong>MAAS + MATA landing page</strong>
+        <span>Hero, chart card, awards, platforms, MATA capabilities, market insights, demo CTA, newsletter.</span>
+      </a>
+    </li>
+  </ul>
+</main>
+
+<footer>
+  Add more components by creating a new folder alongside <code>maas-mata/</code> with its own <code>index.html</code>.
+</footer>
+
+</body>
+</html>
