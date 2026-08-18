@@ -420,7 +420,7 @@
     color: #082043;
     text-align: center;
     max-width: 342px;
-    margin: 0 auto 32px;
+    margin: 0 auto 12px;
   }
   /* iPad and up: drop the phone-width cap so the title can spread
      across the wider viewport before desktop's own overrides kick
@@ -680,13 +680,16 @@
     align-items: center;
     justify-content: center;
     width: 44px;
-    height: 44px;
+    height: 32px;
     padding: 0;
     background: transparent;
     border: 0;
     color: #fff;
     cursor: pointer;
     transition: opacity 150ms ease;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__awards-arrow { height: 44px; }
   }
   .rbccm-maas-mata__awards-arrow svg { display: block; width: 14px; height: 24px; }
   .rbccm-maas-mata__awards-arrow:disabled { opacity: 0.35; cursor: default; }
@@ -1890,6 +1893,7 @@
     align-items: center;
     gap: 10px;
     width: auto;
+    min-width: 232px;
     padding: 8px 25px;
     box-sizing: border-box;
     border: 1px solid #D8D8D8;
