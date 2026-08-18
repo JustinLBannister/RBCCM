@@ -4330,7 +4330,18 @@
   // forces opacity:1 and disables the animation property).
   (function () {
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ?noanim=1 in the URL forces every data-animate element to
+    // opacity:1 immediately so full-page screenshot tools capture
+    // everything without needing to scroll (IntersectionObserver
+    // otherwise leaves below-fold sections hidden).
+    var noanim = /[?&]noanim=1/.test(window.location.search);
     document.body.classList.add('rbccm-anim-ready');
+    if (noanim) {
+      document.querySelectorAll('[data-animate], [data-animate-hero], [data-stagger-parent] > *').forEach(function (el) {
+        el.style.opacity = '1';
+      });
+      return;
+    }
     if (reduced) return;
 
     function play(el, name, delay, duration) {
