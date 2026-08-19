@@ -399,6 +399,18 @@
                       <xsl:if test="$artExtLink != ''">
                         <xsl:attribute name="target">_blank</xsl:attribute>
                         <xsl:attribute name="rel">noopener</xsl:attribute>
+                        <!-- WCAG 3.2.5 — warn AT users that this link
+                             opens in a new tab. Suffix appended to the
+                             visible title so the accessible name reads
+                             "Title (opens in new tab)". FR pages get
+                             the French phrasing via the $locale check. -->
+                        <xsl:attribute name="aria-label">
+                          <xsl:value-of select="normalize-space($artTitle)"/>
+                          <xsl:choose>
+                            <xsl:when test="$locale = 'fr'"> (s'ouvre dans un nouvel onglet)</xsl:when>
+                            <xsl:otherwise> (opens in new tab)</xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:attribute>
                       </xsl:if>
                       <xsl:value-of select="$artTitle" disable-output-escaping="yes"/>
                     </a>
