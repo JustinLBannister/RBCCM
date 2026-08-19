@@ -53,6 +53,13 @@
   <Datum ID="InsightsCtaLabel" Type="String" Name="Insights CTA Label">More insights</Datum>
   <Datum ID="InsightsCtaLink"  Type="String" Name="Insights CTA Link">/en/insights</Datum>
   <Datum ID="InsightsCtaNewTab" Type="Boolean" Name="Insights CTA New Tab">false</Datum>
+  <!-- Accessibility: optional title + aria-label overrides for the
+       CTA anchor. Blank = neither attribute emitted; anchor text is
+       already the accessible name. Fill either to enrich screen-
+       reader context and native tooltip on hover. Localise per
+       Locale setting. -->
+  <Datum ID="InsightsCtaTitle"     Type="String" Name="Insights CTA Link Title (accessibility, optional)"></Datum>
+  <Datum ID="InsightsCtaAriaLabel" Type="String" Name="Insights CTA Aria Label (accessibility, optional)"></Datum>
 
 
   <!-- ═══ NEWSROOM TAB ═══════════════════════════════════════ -->
@@ -64,6 +71,8 @@
   <Datum ID="NewsroomCtaLabel" Type="String" Name="Newsroom CTA Label">Show more media hits</Datum>
   <Datum ID="NewsroomCtaLink"  Type="String" Name="Newsroom CTA Link">/en/about-us/in-the-media</Datum>
   <Datum ID="NewsroomCtaNewTab" Type="Boolean" Name="Newsroom CTA New Tab">false</Datum>
+  <Datum ID="NewsroomCtaTitle"     Type="String" Name="Newsroom CTA Link Title (accessibility, optional)"></Datum>
+  <Datum ID="NewsroomCtaAriaLabel" Type="String" Name="Newsroom CTA Aria Label (accessibility, optional)"></Datum>
 
 
   <!-- ═══ CONFERENCES TAB ════════════════════════════════════ -->
@@ -88,6 +97,8 @@
   <Datum ID="ConferencesCtaLabel" Type="String" Name="Conferences CTA Label">Review upcoming events</Datum>
   <Datum ID="ConferencesCtaLink"  Type="String" Name="Conferences CTA Link">/en/about-us/conferences</Datum>
   <Datum ID="ConferencesCtaNewTab" Type="Boolean" Name="Conferences CTA New Tab">false</Datum>
+  <Datum ID="ConferencesCtaTitle"     Type="String" Name="Conferences CTA Link Title (accessibility, optional)"></Datum>
+  <Datum ID="ConferencesCtaAriaLabel" Type="String" Name="Conferences CTA Aria Label (accessibility, optional)"></Datum>
 
 
   <!-- ═══ ACCESSIBILITY (optional overrides) ═════════════════ -->
@@ -147,7 +158,10 @@
     <Parameters>
       <Datum ID="qQuery" Name="qQuery" Type="String" Label="Query">TeamSite/Templating/DCR/Type:article/news AND TeamSite/Metadata/publishdate:&gt;2015-00-00</Datum>
       <Datum ID="qSort" Name="qSort" Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
-      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">3</Datum>
+      <!-- Pull a larger candidate set (20) so the XSL can filter
+           by language and still emit 3 matching items. The XSL
+           itself caps output at 3 (position() &lt;= 3). -->
+      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">20</Datum>
       <Datum ID="qOffset" Name="qOffset" Type="String" Label="Offset">0</Datum>
     </Parameters>
     <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>

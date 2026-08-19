@@ -145,10 +145,14 @@
     <xsl:variable name="insightsCtaLabel" select="normalize-space(/Properties/Datum[@ID='InsightsCtaLabel'])"/>
     <xsl:variable name="insightsCtaLink"  select="normalize-space(/Properties/Datum[@ID='InsightsCtaLink'])"/>
     <xsl:variable name="insightsCtaNewTab" select="/Properties/Datum[@ID='InsightsCtaNewTab'] = 'true'"/>
+    <xsl:variable name="insightsCtaTitle"     select="normalize-space(/Properties/Datum[@ID='InsightsCtaTitle'])"/>
+    <xsl:variable name="insightsCtaAriaLabel" select="normalize-space(/Properties/Datum[@ID='InsightsCtaAriaLabel'])"/>
 
     <xsl:variable name="newsroomCtaLabel" select="normalize-space(/Properties/Datum[@ID='NewsroomCtaLabel'])"/>
     <xsl:variable name="newsroomCtaLink"  select="normalize-space(/Properties/Datum[@ID='NewsroomCtaLink'])"/>
     <xsl:variable name="newsroomCtaNewTab" select="/Properties/Datum[@ID='NewsroomCtaNewTab'] = 'true'"/>
+    <xsl:variable name="newsroomCtaTitle"     select="normalize-space(/Properties/Datum[@ID='NewsroomCtaTitle'])"/>
+    <xsl:variable name="newsroomCtaAriaLabel" select="normalize-space(/Properties/Datum[@ID='NewsroomCtaAriaLabel'])"/>
 
     <!-- Newsroom is server-rendered from MetaQueryExternal.findByQuery
          defined in the properties file's <Data><External> block. The
@@ -156,9 +160,38 @@
          and is iterated further down. -->
     <xsl:variable name="newsroomArticles" select="/Properties/Data/Result/records/metaResult"/>
 
+    <!-- Component locale (lower-cased, 'en' fallback). Compared
+         against TeamSite/Metadata/language on each record to keep
+         only news items authored in the same language as the
+         page. Missing language attr on legacy records is treated
+         as 'en' so pre-migration articles remain visible on EN
+         pages. -->
+    <xsl:variable name="locale">
+      <xsl:choose>
+        <xsl:when test="translate(normalize-space(/Properties/Datum[@ID='Locale']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'fr'">fr</xsl:when>
+        <xsl:otherwise>en</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- Language-filtered newsroom set. Match rules:
+           1. Article has language attr → must equal $locale
+              (case-insensitive)
+           2. Article has no language attr (legacy) → include
+              only when $locale is 'en' (back-compat)
+         Everything else is dropped before the sort/cap pass. -->
+    <xsl:variable name="newsroomArticlesLocalized" select="$newsroomArticles[
+      translate(attr[@key='TeamSite/Metadata/language'], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = $locale
+      or (not(attr[@key='TeamSite/Metadata/language'])
+          and $locale = 'en')
+      or (normalize-space(attr[@key='TeamSite/Metadata/language']) = ''
+          and $locale = 'en')
+    ]"/>
+
     <xsl:variable name="conferencesCtaLabel" select="normalize-space(/Properties/Datum[@ID='ConferencesCtaLabel'])"/>
     <xsl:variable name="conferencesCtaLink"  select="normalize-space(/Properties/Datum[@ID='ConferencesCtaLink'])"/>
     <xsl:variable name="conferencesCtaNewTab" select="/Properties/Datum[@ID='ConferencesCtaNewTab'] = 'true'"/>
+    <xsl:variable name="conferencesCtaTitle"     select="normalize-space(/Properties/Datum[@ID='ConferencesCtaTitle'])"/>
+    <xsl:variable name="conferencesCtaAriaLabel" select="normalize-space(/Properties/Datum[@ID='ConferencesCtaAriaLabel'])"/>
 
 
     <!-- Insights tiles: URL shells from replicated Slide groups. -->
@@ -305,6 +338,12 @@
                     <xsl:attribute name="target">_blank</xsl:attribute>
                     <xsl:attribute name="rel">noopener</xsl:attribute>
                   </xsl:if>
+                  <xsl:if test="$insightsCtaTitle != ''">
+                    <xsl:attribute name="title"><xsl:value-of select="$insightsCtaTitle"/></xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test="$insightsCtaAriaLabel != ''">
+                    <xsl:attribute name="aria-label"><xsl:value-of select="$insightsCtaAriaLabel"/></xsl:attribute>
+                  </xsl:if>
                   <xsl:value-of select="$insightsCtaLabel"/>
                 </a>
               </div>
@@ -327,38 +366,47 @@
                  records, sorted newest first. Each record's fields
                  come from TeamSite/Metadata/* keys. -->
             <div class="rbccm-how-we-think__news">
-              <xsl:for-each select="$newsroomArticles">
+              <!-- Iterate the language-filtered set. sorted-position() <= 3
+                   caps the output at 3 items even though the External query
+                   returns up to 20 candidates. Title/Description use the
+                   metadata written by the article DCR — if authors provide
+                   FR-localised versions on the article, those come through
+                   automatically because the External query returns metadata
+                   verbatim per record. -->
+              <xsl:for-each select="$newsroomArticlesLocalized">
                 <xsl:sort select="./attr[@key='TeamSite/Metadata/publishdate']" order="descending"/>
-                <xsl:variable name="artTitle" select="./attr[@key='TeamSite/Metadata/Title']"/>
-                <xsl:variable name="artDesc"  select="./attr[@key='TeamSite/Metadata/Description']"/>
-                <xsl:variable name="artDate"  select="./attr[@key='TeamSite/Metadata/publishdate']"/>
-                <xsl:variable name="artExtLink" select="./attr[@key='TeamSite/Metadata/link']"/>
-                <xsl:variable name="artPath" select="./@path"/>
-                <xsl:variable name="artLink">
-                  <xsl:choose>
-                    <xsl:when test="$artExtLink != ''"><xsl:value-of select="$artExtLink"/></xsl:when>
-                    <xsl:otherwise><xsl:value-of select="concat('/en/insights/story.page?dcr=', $artPath)"/></xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
+                <xsl:if test="position() &lt;= 3">
+                  <xsl:variable name="artTitle" select="./attr[@key='TeamSite/Metadata/Title']"/>
+                  <xsl:variable name="artDesc"  select="./attr[@key='TeamSite/Metadata/Description']"/>
+                  <xsl:variable name="artDate"  select="./attr[@key='TeamSite/Metadata/publishdate']"/>
+                  <xsl:variable name="artExtLink" select="./attr[@key='TeamSite/Metadata/link']"/>
+                  <xsl:variable name="artPath" select="./@path"/>
+                  <xsl:variable name="artLink">
+                    <xsl:choose>
+                      <xsl:when test="$artExtLink != ''"><xsl:value-of select="$artExtLink"/></xsl:when>
+                      <xsl:otherwise><xsl:value-of select="concat('/', $locale, '/insights/story.page?dcr=', $artPath)"/></xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
 
-                <div class="rbccm-how-we-think__news-item">
-                  <span class="rbccm-how-we-think__news-date">
-                    <xsl:call-template name="PUBLISH_DATE">
-                      <xsl:with-param name="publish_date" select="$artDate"/>
-                    </xsl:call-template>
-                  </span>
-                  <a class="rbccm-how-we-think__news-link">
-                    <xsl:attribute name="href"><xsl:value-of select="$artLink"/></xsl:attribute>
-                    <xsl:if test="$artExtLink != ''">
-                      <xsl:attribute name="target">_blank</xsl:attribute>
-                      <xsl:attribute name="rel">noopener</xsl:attribute>
-                    </xsl:if>
-                    <xsl:value-of select="$artTitle" disable-output-escaping="yes"/>
-                  </a>
-                  <p class="rbccm-how-we-think__news-summary">
-                    <xsl:value-of select="$artDesc" disable-output-escaping="yes"/>
-                  </p>
-                </div>
+                  <div class="rbccm-how-we-think__news-item">
+                    <span class="rbccm-how-we-think__news-date">
+                      <xsl:call-template name="PUBLISH_DATE">
+                        <xsl:with-param name="publish_date" select="$artDate"/>
+                      </xsl:call-template>
+                    </span>
+                    <a class="rbccm-how-we-think__news-link">
+                      <xsl:attribute name="href"><xsl:value-of select="$artLink"/></xsl:attribute>
+                      <xsl:if test="$artExtLink != ''">
+                        <xsl:attribute name="target">_blank</xsl:attribute>
+                        <xsl:attribute name="rel">noopener</xsl:attribute>
+                      </xsl:if>
+                      <xsl:value-of select="$artTitle" disable-output-escaping="yes"/>
+                    </a>
+                    <p class="rbccm-how-we-think__news-summary">
+                      <xsl:value-of select="$artDesc" disable-output-escaping="yes"/>
+                    </p>
+                  </div>
+                </xsl:if>
               </xsl:for-each>
             </div>
 
@@ -368,6 +416,12 @@
                   <xsl:if test="$newsroomCtaNewTab">
                     <xsl:attribute name="target">_blank</xsl:attribute>
                     <xsl:attribute name="rel">noopener</xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test="$newsroomCtaTitle != ''">
+                    <xsl:attribute name="title"><xsl:value-of select="$newsroomCtaTitle"/></xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test="$newsroomCtaAriaLabel != ''">
+                    <xsl:attribute name="aria-label"><xsl:value-of select="$newsroomCtaAriaLabel"/></xsl:attribute>
                   </xsl:if>
                   <xsl:value-of select="$newsroomCtaLabel"/>
                 </a>
@@ -469,6 +523,12 @@
                       <xsl:if test="$conferencesCtaNewTab">
                         <xsl:attribute name="target">_blank</xsl:attribute>
                         <xsl:attribute name="rel">noopener</xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test="$conferencesCtaTitle != ''">
+                        <xsl:attribute name="title"><xsl:value-of select="$conferencesCtaTitle"/></xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test="$conferencesCtaAriaLabel != ''">
+                        <xsl:attribute name="aria-label"><xsl:value-of select="$conferencesCtaAriaLabel"/></xsl:attribute>
                       </xsl:if>
                       <xsl:value-of select="$conferencesCtaLabel"/>
                     </a>
