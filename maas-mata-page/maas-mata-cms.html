@@ -1,24 +1,21 @@
 <!doctype html>
 <!--
-  MAAS+MATA CMS — prototype
+  MAAS+MATA CMS — v2
   ------------------------------------------------------------------
-  Same pattern as leadership-cms-prototype.html, but for the full
-  MAAS+MATA page schema.
+  Editor form for maas-mata.json.
 
-  How to use:
-    1. Open this file locally, fill in / edit content
-    2. Click "Download JSON" (or "Copy JSON") in the top bar
-    3. Send maas-mata.json to the dev
-    4. Dev drops it into /js/data/maas-mata.json on the RBCCM server
-    5. Page picks it up on next load via rbccm-json-bind.js
+  What's new in v2:
+    - Every field now shows a "Figma:" reference label so editors
+      know exactly which visual element they're editing on the design
+    - Newsletter section simplified — only heading, body, and
+      Marketo form ID. Marketo owns the form inputs; editors can't
+      change them here.
 
-  Structure:
-    - Left sidebar: section navigation
-    - Middle: form for the selected section
-    - Right: live JSON preview
-    - Top bar: Copy JSON, Download, Load JSON, Load sample
-
-  Auto-saves drafts to localStorage between refreshes.
+  Round-trip:
+    1. Edit content, click Download → maas-mata.json downloads
+    2. Send file to dev
+    3. Dev drops into /js/data/maas-mata.json on RBCCM server
+    4. Page picks it up on next load
 -->
 <html lang="en">
 <head>
@@ -27,7 +24,7 @@
 <title>MAAS+MATA CMS — Prototype</title>
 <style>
   :root {
-    --navy: #003168; --navy-dark: #002144; --yellow: #FBDE00;
+    --navy: #003168; --navy-dark: #002144; --yellow: #FBDE00; --yellow-soft: #FFF8CC;
     --blue: #0051A5; --grey-100: #f5f5f5; --grey-200: #e6e6e6;
     --grey-300: #d0d3d7; --grey-400: #b0b0b0; --grey-600: #595959;
     --grey-800: #333; --red: #c62828; --green: #2e7d32;
@@ -36,17 +33,14 @@
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--grey-100);
-    color: var(--grey-800);
-    line-height: 1.4;
+    background: var(--grey-100); color: var(--grey-800); line-height: 1.4;
     height: 100vh; overflow: hidden;
   }
   header {
     background: var(--navy); color: #fff;
     padding: 10px 20px;
     border-top: 6px solid var(--yellow);
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
   }
   header h1 { margin: 0; font-size: 16px; font-weight: 500; }
   header .actions { display: flex; gap: 8px; }
@@ -72,153 +66,90 @@
     height: calc(100vh - 50px);
   }
   .pane { overflow-y: auto; }
-  .pane--nav {
-    background: #fff;
-    border-right: 1px solid var(--grey-200);
-    padding: 16px 0;
-  }
-  .pane--form {
-    background: #fff;
-    border-right: 1px solid var(--grey-200);
-    padding: 20px 28px;
-  }
-  .pane--json {
-    background: #fafafa;
-    padding: 16px;
-  }
-  .section-nav {
-    list-style: none;
-    margin: 0; padding: 0;
-  }
+  .pane--nav { background: #fff; border-right: 1px solid var(--grey-200); padding: 16px 0; }
+  .pane--form { background: #fff; border-right: 1px solid var(--grey-200); padding: 20px 28px; }
+  .pane--json { background: #fafafa; padding: 16px; }
+  .section-nav { list-style: none; margin: 0; padding: 0; }
   .section-nav li {
-    padding: 9px 20px;
-    font-size: 13px;
-    color: var(--grey-800);
-    cursor: pointer;
-    border-left: 3px solid transparent;
+    padding: 9px 20px; font-size: 13px; color: var(--grey-800);
+    cursor: pointer; border-left: 3px solid transparent;
   }
   .section-nav li:hover { background: var(--grey-100); }
   .section-nav li.active { background: var(--grey-100); border-left-color: var(--navy); color: var(--navy-dark); font-weight: 600; }
   .section-nav-header {
-    padding: 4px 20px 8px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--grey-600);
-    font-weight: 700;
-    margin-top: 8px;
+    padding: 4px 20px 8px; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--grey-600); font-weight: 700; margin-top: 8px;
   }
 
-  h2.section-title {
-    font-size: 18px;
-    color: var(--navy-dark);
-    margin: 0 0 4px 0;
-  }
-  .section-path {
-    font-size: 11px;
-    color: var(--grey-600);
-    font-family: monospace;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--grey-200);
-  }
+  h2.section-title { font-size: 18px; color: var(--navy-dark); margin: 0 0 4px 0; }
+  .section-path { font-size: 11px; color: var(--grey-600); font-family: monospace; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--grey-200); }
 
   .field { margin-bottom: 14px; }
   .field-label {
     display: block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    color: var(--grey-600);
-    margin-bottom: 4px;
-    font-weight: 600;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--grey-600); margin-bottom: 4px; font-weight: 600;
   }
   .field-hint { font-size: 11px; color: var(--grey-600); margin-top: 3px; }
+
+  /* Figma reference chip — shows WHERE on the design this maps to */
+  .figma-ref {
+    display: block;
+    font-size: 11px;
+    color: var(--grey-800);
+    margin: 0 0 6px;
+    padding: 4px 8px;
+    background: var(--yellow-soft);
+    border-left: 3px solid var(--yellow);
+    border-radius: 0 3px 3px 0;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .figma-ref::before {
+    content: "Figma: ";
+    font-weight: 700;
+    font-style: normal;
+    color: var(--navy-dark);
+    letter-spacing: 0.3px;
+  }
+
   input[type="text"], input[type="email"], input[type="url"], textarea, select {
-    width: 100%;
-    padding: 7px 9px;
-    border: 1px solid var(--grey-300);
-    border-radius: 3px;
-    font: inherit;
-    font-size: 13px;
-    background: #fff;
+    width: 100%; padding: 7px 9px;
+    border: 1px solid var(--grey-300); border-radius: 3px;
+    font: inherit; font-size: 13px; background: #fff;
   }
   input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--navy);
+    outline: none; border-color: var(--navy);
     box-shadow: 0 0 0 2px rgba(0,49,104,0.12);
   }
   textarea { min-height: 60px; resize: vertical; font-family: inherit; }
-  label.check {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    cursor: pointer;
-  }
+  label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
 
-  .group {
-    border: 1px solid var(--grey-200);
-    border-radius: 4px;
-    padding: 12px;
-    margin-bottom: 12px;
-    background: #fdfdfd;
-  }
-  .group-title {
-    font-size: 12px; font-weight: 600;
-    color: var(--grey-800);
-    margin-bottom: 8px;
-  }
+  .group { border: 1px solid var(--grey-200); border-radius: 4px; padding: 12px; margin-bottom: 12px; background: #fdfdfd; }
+  .group-title { font-size: 12px; font-weight: 600; color: var(--grey-800); margin-bottom: 8px; }
 
-  .array {
-    margin-bottom: 12px;
-  }
+  .array { margin-bottom: 12px; }
   .array-item {
-    border: 1px solid var(--grey-200);
-    border-radius: 4px;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: #fdfdfd;
-    position: relative;
+    border: 1px solid var(--grey-200); border-radius: 4px;
+    padding: 12px; margin-bottom: 8px; background: #fdfdfd; position: relative;
   }
   .array-item-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--grey-200);
+    margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--grey-200);
   }
-  .array-item-title {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
-    color: var(--grey-600); font-weight: 600;
-  }
+  .array-item-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--grey-600); font-weight: 600; }
   .array-item-actions { display: flex; gap: 4px; }
-  .array-add {
-    margin-top: 4px;
-  }
+  .array-add { margin-top: 4px; }
 
-  .cta-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+  .cta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-  .json-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px;
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-    color: var(--grey-600); font-weight: 600;
-  }
+  .json-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-600); font-weight: 600; }
   .json-preview {
     font-family: "SF Mono", Monaco, Consolas, monospace;
-    font-size: 11px;
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 12px;
-    border-radius: 4px;
-    overflow: auto;
-    white-space: pre;
-    height: calc(100vh - 130px);
-    line-height: 1.5;
+    font-size: 11px; background: #1e1e1e; color: #d4d4d4;
+    padding: 12px; border-radius: 4px; overflow: auto;
+    white-space: pre; height: calc(100vh - 130px); line-height: 1.5;
   }
   .json-preview .json-key { color: #9cdcfe; }
   .json-preview .json-str { color: #ce9178; }
@@ -227,18 +158,13 @@
   .json-preview .json-null { color: #569cd6; }
 
   .modal-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 100;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: center; justify-content: center; z-index: 100;
   }
   .modal-backdrop.open { display: flex; }
   .modal {
-    background: #fff;
-    border-radius: 4px;
-    width: 700px; max-width: 90vw;
-    max-height: 90vh;
+    background: #fff; border-radius: 4px;
+    width: 700px; max-width: 90vw; max-height: 90vh;
     display: flex; flex-direction: column;
     border-top: 6px solid var(--yellow);
   }
@@ -249,26 +175,17 @@
 
   .toast {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--green); color: #fff;
-    padding: 8px 14px; border-radius: 3px;
-    font-size: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    opacity: 0; transition: all 0.2s;
-    pointer-events: none;
-    z-index: 200;
+    background: var(--green); color: #fff; padding: 8px 14px; border-radius: 3px;
+    font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 200;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.error { background: var(--red); }
 
   .badge {
-    display: inline-block;
-    background: var(--yellow);
-    color: var(--navy-dark);
-    padding: 1px 6px;
-    font-size: 10px;
-    font-weight: 600;
-    border-radius: 8px;
-    margin-left: 6px;
+    display: inline-block; background: var(--yellow); color: var(--navy-dark);
+    padding: 1px 6px; font-size: 10px; font-weight: 600;
+    border-radius: 8px; margin-left: 6px;
   }
 </style>
 </head>
@@ -280,13 +197,12 @@
     <button class="ghost" id="btn-load-json">Load JSON</button>
     <button class="ghost" id="btn-reset">Load sample</button>
     <button id="btn-copy">Copy JSON</button>
-    <button class="yellow" id="btn-download">Download .json</button>
+    <button class="yellow" id="btn-export">Export draft &rarr; download</button>
   </div>
 </header>
 
 <div class="layout">
 
-  <!-- LEFT: section nav -->
   <nav class="pane pane--nav">
     <div class="section-nav-header">Sections</div>
     <ul class="section-nav" id="section-nav"></ul>
@@ -296,10 +212,8 @@
     </ul>
   </nav>
 
-  <!-- MIDDLE: form -->
   <div class="pane pane--form" id="form-pane"></div>
 
-  <!-- RIGHT: JSON preview -->
   <div class="pane pane--json">
     <div class="json-header">
       <span>Live JSON <span class="badge">saved locally</span></span>
@@ -308,7 +222,6 @@
   </div>
 </div>
 
-<!-- Load JSON modal -->
 <div class="modal-backdrop" id="modal-load">
   <div class="modal">
     <div class="modal-header">
@@ -326,7 +239,6 @@
   </div>
 </div>
 
-<!-- Schema modal -->
 <div class="modal-backdrop" id="modal-schema">
   <div class="modal">
     <div class="modal-header">
@@ -340,64 +252,166 @@
   </div>
 </div>
 
+<!-- Export draft modal - collects an editor name + optional note,
+     then downloads the current state as JSON with a `_meta` block
+     that names the editor, timestamp, and which sections changed
+     since the seed. The consuming page ignores `_meta` since no
+     data-json binding path points at it. -->
+<div class="modal-backdrop" id="modal-export">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Export draft</h3>
+      <button class="close" id="modal-export-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600); margin: 0 0 16px;">Fills in author + timestamp + a change summary, then downloads a JSON file you can attach to Asana (or hand off however).</p>
+      <div class="field">
+        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Your name (remembered for next time)</label>
+        <input type="text" id="export-editor" placeholder="e.g. Joon" autocomplete="name" style="width: 100%; padding: 8px 10px; border: 1px solid var(--grey-400); border-radius: 4px; font-size: 14px;">
+      </div>
+      <div class="field" style="margin-top: 12px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Note (optional)</label>
+        <textarea id="export-note" rows="3" placeholder="e.g. Q4 hero copy pass" style="width: 100%; padding: 8px 10px; border: 1px solid var(--grey-400); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+      </div>
+      <div id="export-summary" style="margin-top: 16px; padding: 12px; background: var(--grey-100); border-radius: 4px; font-size: 12px; color: var(--grey-700); max-height: 200px; overflow-y: auto;"></div>
+      <div style="display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end;">
+        <button class="ghost" id="modal-export-cancel">Cancel</button>
+        <button class="yellow" id="modal-export-download">Download JSON</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v1';
+  // v3 was the previous key; v4 forces a reset for editors upgrading
+  // to the new design so they see the v4 SAMPLE seed on next load
+  // instead of their stale v3 draft.
+  // Storage key bumped v4 → v4b to force a reset for editors on a
+  // stale draft — v4b adds newStandard, chartCard.video, and the
+  // 3-item thoughtLeadership.items array. Legacy sections (whyRbc,
+  // assetCoverage) are hidden from the nav.
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4c';
 
   // ==============================================================
-  // SAMPLE / SEED DATA — full MAAS+MATA content
+  // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
   // ==============================================================
+  // Real v4 copy across every section. Two sections that v4
+  // removed entirely (whyRbc, assetCoverage) are kept in the seed
+  // so their editor panels still open with sample content, but the
+  // production page no longer renders them (they're marked --legacy
+  // in maas-mata.html). Editors can leave those alone.
   var SAMPLE = {
-    meta: { title: "MAAS + MATA · RBC Capital Markets" },
+    meta: {
+      title: "MAAS + MATA · RBC Capital Markets"
+    },
     hero: {
-      eyebrow: "Introducing MAAS + MATA",
-      headlineLines: ["Fewer blind spots.", "Faster decisions.", "One desk."],
-      subtitle: "One institutional trading ecosystem: MAAS executes across asset classes; MATA explains every outcome with greater consistency, visibility and control.",
-      primaryCta: { label: "See the platform", href: "#platform" },
-      secondaryCta: { label: "Watch the video", href: "#video" }
+      eyebrow: "Multi-Asset Agency Solutions",
+      headlineLines: ["Trade with Clarity.", "Execute with Control."],
+      subtitle: "RBC Capital Markets' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.",
+      primaryCta: { label: "Request demo", href: "#demo" },
+      secondaryCta: { label: "", href: "" }
     },
     chartCard: {
-      leftLabel: "MAAS · Execution Engine",
+      // v4: the interactive chart is now a static screenshot with a
+      // Brightcove video modal overlay. The chart data fields below
+      // (labels/quotes/quality) still exist for the v3 legacy block
+      // that's kept hidden in markup, but editors don't need to
+      // touch them anymore. Only the video sub-object matters for v4.
+      leftLabel: "MAAS · Execution Console",
       rightLabel: "MATA · Analytics",
-      leftHeadline: "Consistent trades",
-      leftValue: "+13,200 M",
+      leftHeadline: "Portfolio · Cross-Asset",
+      leftValue: "+13,300 M",
       quotes: [
         { label: "Notify Inc.",   value: "$921.87", delta: "+2.14%", positive: true },
-        { label: "GLD / USD",     value: "0.7372",  delta: "-0.16%", positive: false },
+        { label: "CAD / USD",     value: "0.7372",  delta: "-0.16%", positive: false },
         { label: "Notify Dec 26", value: "$245.80", delta: "+0.62%", positive: true }
       ],
-      quality: { label: "Execution quality", score: "98.2", trend: "+ 1.4% vs 30-day avg" }
+      quality: { label: "Execution quality", score: "98.2", trend: "+ 1.4% vs Benchmark" },
+      video: {
+        title: "Platform demo",
+        accountId: "6415665624001",
+        playerId: "default",
+        videoId: "6371076976112"
+      }
+    },
+    // v4 NEW section: "A new standard for multi-asset trading" —
+    // sits inside the dark-strip between the chart image and the
+    // awards row. 2-line stacked heading (grey lead + white/yellow
+    // highlight), 3 body paragraphs, single yellow CTA.
+    newStandard: {
+      headingLead: "A new standard for",
+      headingHighlight: "multi-asset ",
+      headingHighlightAccent: "trading",
+      body: [
+        "Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.",
+        "Many platforms help you analyze the trade. MAAS, RBC's Multi-Asset Agency Solutions platform, goes further, bringing trading intelligence, and execution technology into one unified experience. Across all major asset classes and index events, MAAS helps you analyze opportunities, execute strategies and manage risk with greater visibility and control.",
+        "Because in complex markets, the traders who win aren't just faster — they're better informed, better connected, and better positioned to execute."
+      ],
+      cta: { label: "See MAAS in action", href: "#platform" }
     },
     awards: {
-      eyebrow: "Platform recognition",
+      eyebrow: "See why the world's top institutions choose MAAS",
       items: [
-        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
-        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
-        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" },
-        { year: "2025", title: "Best Cross-Asset Trading Platform", issuer: "Institutional Trading 2025" }
+        { year: "2026", title: "Best Trading Analytics Platform",           issuer: "TradingTech Insights Awards USA" },
+        { year: "2025", title: "Overall Best Provider, Algorithmic Trading", issuer: "The Trade" },
+        { year: "2025", title: "Best Provider, Multi-User Clients",          issuer: "The Trade" }
       ]
     },
     platforms: {
-      eyebrow: "One ecosystem · Two engines",
-      heading: "Where execution meets analytics",
+      eyebrow: "Two platforms, one unified ecosystem.",
+      heading: "Better insight for stronger execution",
       cards: [
-        { theme: "light", eyebrow: "Execution platform", title: "Multi-Asset Agency Solutions", acronym: "MAAS", body: "MAAS brings multi asset trading into one connected execution platform, helping institutional trading desks streamline workflows, improve consistency, and execute with greater confidence.", cta: { label: "Explore MAAS", href: "/maas" } },
-        { theme: "dark",  eyebrow: "Analytics platform", title: "Multi-Asset Trade Analytics",   acronym: "MATA", body: "MATA delivers cross asset trade analytics that provide deeper execution insights, portfolio wide visibility, and the intelligence needed to optimize future trading decisions.", cta: { label: "Explore MATA", href: "/mata" } }
+        {
+          theme: "dark",
+          eyebrow: "MATA – Analytics",
+          title: "Transform data into trading intelligence",
+          acronym: "",
+          body: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.",
+          bullets: [
+            "Quantify expected execution costs before commitment",
+            "Compare strategies side by side to evaluate potential outcomes",
+            "Explore interactive outlier views to focus on higher-risk or harder-to-trade orders",
+            "Monitor market conditions and portfolio exposures",
+            "Model scenarios across asset classes"
+          ],
+          cta: { label: "", href: "" }
+        },
+        {
+          theme: "light",
+          eyebrow: "MAAS - Execution",
+          title: "Drive stronger performance outcomes",
+          acronym: "",
+          body: "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.",
+          bullets: [
+            "Access adaptive algorithms built for live market conditions",
+            "Select AI-powered strategies tailored to execution objectives",
+            "Route orders intelligently to help minimize market impact",
+            "Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls",
+            "Benchmark performance against pre-trade expectations"
+          ],
+          cta: { label: "", href: "" }
+        }
       ]
     },
+    // v4: this section slot is now "Innovation for the next
+    // execution era" but reuses the closeTheLoop schema/structure.
     closeTheLoop: {
-      heading: "Built to close the loop between trade and insight",
-      body: "MAAS and MATA work together to bridge the gap between execution and analytics so every trade makes the next one smarter.",
+      heading: "Innovation for the next execution era",
+      body: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.",
       features: [
-        { number: "01", title: "Connected Execution",   body: "Execute across multiple asset classes through a consistent trading experience." },
-        { number: "02", title: "Cross-Asset Analytics", body: "Understand execution quality and uncover insights across your entire portfolio." },
-        { number: "03", title: "Data-Driven Decisions", body: "Leverage actionable analytics that help optimize future execution strategies." }
+        { number: "01", title: "Model with depth",      body: "Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team." },
+        { number: "02", title: "Connect with ease",     body: "Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team." },
+        { number: "03", title: "Optimize with experts", body: "Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions." }
       ]
     },
+    // v4: REMOVED. Kept in seed so the CMS panel opens with
+    // context, but the live page marks its section --legacy and
+    // won't ship it. Safe to leave as-is.
     whyRbc: {
       eyebrow: "Our Numbers",
       heading: "Why RBC Capital Markets",
@@ -409,212 +423,279 @@
         { value: "1:1",       label: "Client partnership",     body: "Trusted relationships built on stability and expertise." }
       ]
     },
+    // v4: REMOVED. Same legacy note as whyRbc above.
     assetCoverage: {
       eyebrow: "Asset coverage",
       heading: "Connected across the desk",
       assets: [
-        { icon: "equities", title: "Equities",         body: "Connected execution and performance insights." },
-        { icon: "futures",  title: "Futures",          body: "Streamlined workflows across complex strategies." },
-        { icon: "fx",       title: "FX",               body: "Unified trading with cross asset visibility." },
-        { icon: "index",    title: "Index strategies", body: "Integrated analytics for event driven execution." }
+        { icon: "equities", title: "Equities",         subtitle: "Equities subtitle",         body: "Connected execution and performance insights.",    cta: { label: "Learn more", href: "#" } },
+        { icon: "futures",  title: "Futures",          subtitle: "Futures subtitle",          body: "Streamlined workflows across complex strategies.", cta: { label: "Learn more", href: "#" } },
+        { icon: "fx",       title: "FX",               subtitle: "FX subtitle",               body: "Unified trading with cross asset visibility.",     cta: { label: "Learn more", href: "#" } },
+        { icon: "index",    title: "Index strategies", subtitle: "Index strategies subtitle", body: "Integrated analytics for event driven execution.", cta: { label: "Learn more", href: "#" } }
       ]
     },
-    thoughtLeadership: {
-      heading: "Thought leadership",
-      featured: {
-        eyebrow: "Insights · Featured story",
-        title: "Connected execution for an increasingly fragmented market",
-        body: "Institutional markets continue to evolve as liquidity becomes more distributed across venues, asset classes, and geographies. Managing this complexity requires more than access — it requires connectivity.",
-        cta: { label: "Read the story", href: "/insights/connected-execution", readTime: "3 min" }
+    // v4: "MATA Capabilities / Sharper insight. Smarter trades."
+    // Three regular asset cards + one wide "Index events" card.
+    // (Schema may not surface all fields yet - safe to add here
+    // so JSON round-trips cleanly.)
+    mataCapabilities: {
+      eyebrow: "MATA Capabilities",
+      heading: "Sharper insight. Smarter trades.",
+      subheading: "Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.",
+      cards: [
+        { icon: "equities", title: "Equities",         subtitle: "Cash Equities, ETFs & ADRs",  body: "Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views." },
+        { icon: "fx",       title: "Foreign Exchange", subtitle: "G10 & EM Currency Pairs",     body: "Analyse real-time market liquidity conditions, assess expected execution costs across currency pairs, and monitor live order performance and benchmarks during execution." },
+        { icon: "futures",  title: "Futures",          subtitle: "Index, Commodity & Rate Futures", body: "Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures." }
+      ],
+      indexEvents: {
+        icon: "index",
+        title: "Index events",
+        subtitle: "120+ Global Indices",
+        body: "Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates."
       }
+    },
+    // v4: "Market insights" is now a 3-card Slick-style carousel.
+    // items[] replaces the old single `featured` object. PDF v4
+    // shows lorem ipsum across all 3 - real copy lands separately.
+    thoughtLeadership: {
+      eyebrow: "Trends Shaping Institutional Trading",
+      heading: "Market insights",
+      items: [
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "2 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        },
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "3 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        },
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "4 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        }
+      ]
     },
     demoCta: {
       eyebrow: "See the platform",
-      headlinePrefix: "Trade with total",
-      headlineHighlight: "clarity.",
-      body: "Discover how MAAS and MATA help institutional trading desks simplify multi asset workflows, uncover deeper execution insights, and make more informed trading decisions.",
-      cta: { label: "Request a demo", href: "/request-demo" }
+      headlinePrefix: "Talk with an ",
+      headlineHighlight: "expert",
+      body: "Connect with our product teams to arrange a custom demo.",
+      cta: { label: "Request a demo", href: "#demo" }
     },
     newsletter: {
       heading: "Stay informed",
       body: "Get the latest updates and insights from RBC Capital Markets delivered to your inbox.",
-      fields: [
-        { id: "first",   type: "text",  label: "First Name",     required: true  },
-        { id: "last",    type: "text",  label: "Last Name",      required: true  },
-        { id: "title",   type: "text",  label: "Title",          required: false },
-        { id: "company", type: "text",  label: "Company",        required: true  },
-        { id: "email",   type: "email", label: "Business Email", required: true  }
-      ],
-      linkedinAutofillLabel: "Autofill with LinkedIn",
-      consent: "Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets.",
-      privacyLabel: "View Privacy Policy",
-      privacyHref: "/privacy",
-      submitLabel: "Sign up"
+      marketoFormId: ""
     }
   };
 
   // ==============================================================
-  // SCHEMA — describes each section's form
+  // SCHEMA — with figmaRef on every field
   // ==============================================================
-  // Field types:
-  //   text, textarea, url, checkbox
-  //   select { options: [...] }
-  //   cta   → composite (label + href) — writes to {label, href}
-  //   ctaWithRead → cta + readTime
-  //   stringArray → array of strings (chips)
-  //   object → nested { fields: {...} }
-  //   array  → array of objects { itemFields: {...}, itemLabelKey, defaultItem }
   var SCHEMA = {
     hero: {
       label: 'Hero',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
-        headlineLines: { type: 'stringArray', label: 'Headline lines', hint: 'Each line is a separate row in the H1' },
-        subtitle: { type: 'textarea', label: 'Subtitle' },
-        primaryCta: { type: 'cta', label: 'Primary CTA' },
-        secondaryCta: { type: 'cta', label: 'Secondary CTA' }
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero (v4: "Multi-Asset Agency Solutions")' },
+        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline (v4: "Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
+        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline (v4: "RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
+        primaryCta: { type: 'cta', label: 'Primary CTA', figmaRef: 'The blue "Request demo" button' },
+        secondaryCta: { type: 'cta', label: 'Secondary CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 used this for the "Watch the video" text link but v4 has a single Request demo CTA only.' }
       }
     },
     chartCard: {
-      label: 'Chart Card',
+      // v4: chart card is now a static screenshot with a Brightcove
+      // video modal. The old chart data fields (labels/quotes/quality)
+      // still exist for the v3 legacy block (hidden in markup) but
+      // editors only need to fill in the video sub-object.
+      label: 'Chart / Video',
       fields: {
-        leftLabel: { type: 'text', label: 'Top left label' },
-        rightLabel: { type: 'text', label: 'Top right label' },
-        leftHeadline: { type: 'text', label: 'Headline label' },
-        leftValue: { type: 'text', label: 'Headline value' },
+        video: {
+          type: 'object', label: 'Video (Brightcove)',
+          figmaRef: 'The video that plays when the user clicks the play button on the chart screenshot. Brightcove Account ID + Video ID are the two you MUST fill in — Player ID defaults to "default".',
+          fields: {
+            title: { type: 'text', label: 'Video title', figmaRef: 'Screen-reader label for the modal (not visible on the page). e.g. "Platform demo".' },
+            accountId: { type: 'text', label: 'Brightcove Account ID', figmaRef: 'The numeric Brightcove Account ID (e.g. "6415665624001"). Find it in the Brightcove Studio URL or ask RBC digital.' },
+            playerId: { type: 'text', label: 'Brightcove Player ID', figmaRef: 'Player ID. Leave as "default" unless a specific player was created for this video.' },
+            videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The video ID from Brightcove Studio (long numeric string, e.g. "6371076976112").' }
+          }
+        },
+        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
+        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
+        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
+        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
         quotes: {
-          type: 'array',
-          label: 'Quotes (right column)',
+          type: 'array', label: 'Legacy: Quotes (right column)',
+          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
           itemLabelKey: 'label',
           defaultItem: { label: '', value: '', delta: '', positive: true },
           itemFields: {
-            label: { type: 'text', label: 'Instrument' },
-            value: { type: 'text', label: 'Value' },
-            delta: { type: 'text', label: 'Delta' },
-            positive: { type: 'checkbox', label: 'Positive (green delta)' }
+            label: { type: 'text', label: 'Instrument', figmaRef: 'The instrument name.' },
+            value: { type: 'text', label: 'Value', figmaRef: 'The price value.' },
+            delta: { type: 'text', label: 'Delta', figmaRef: 'The change with sign.' },
+            positive: { type: 'checkbox', label: 'Positive (green delta)', figmaRef: 'Check for green (gain), leave blank for red (loss).' }
           }
         },
         quality: {
-          type: 'object',
-          label: 'Execution quality box',
+          type: 'object', label: 'Legacy: Execution quality box',
+          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
           fields: {
-            label: { type: 'text', label: 'Label' },
-            score: { type: 'text', label: 'Score' },
-            trend: { type: 'text', label: 'Trend text' }
+            label: { type: 'text', label: 'Label', figmaRef: 'Legacy label field.' },
+            score: { type: 'text', label: 'Score', figmaRef: 'Legacy score field.' },
+            trend: { type: 'text', label: 'Trend text', figmaRef: 'Legacy trend field.' }
           }
         }
+      }
+    },
+    newStandard: {
+      label: 'A New Standard',
+      fields: {
+        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey (v4: "A new standard for").' },
+        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent (v4: "multi-asset ").' },
+        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup (v4: "trading").' },
+        body: {
+          type: 'stringArray', label: 'Body paragraphs',
+          figmaRef: 'Each row is a separate paragraph under the heading. v4 uses 3 paragraphs; add or remove rows as needed.'
+        },
+        cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "See MAAS in action" button below the body copy.' }
       }
     },
     awards: {
       label: 'Awards',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges (v4: "See why the world\'s top institutions choose MAAS")' },
         items: {
-          type: 'array',
-          label: 'Award badges',
+          type: 'array', label: 'Award badges',
+          figmaRef: 'v4: 3 award cards (was 4 in v3). Each has a year pill, a title, and an issuer.',
           itemLabelKey: 'title',
           defaultItem: { year: '', title: '', issuer: '' },
           itemFields: {
-            year: { type: 'text', label: 'Year' },
-            title: { type: 'text', label: 'Title' },
-            issuer: { type: 'text', label: 'Issuer' }
+            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card (v4 examples: "2026" / "2025")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text (v4 examples: "Best Trading Analytics Platform", "Overall Best Provider, Algorithmic Trading", "Best Provider, Multi-User Clients")' },
+            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title (v4: "TradingTech Insights Awards USA" / "The Trade")' }
           }
         }
       }
     },
     platforms: {
-      label: 'Platforms (MAAS/MATA cards)',
+      label: 'Platforms (MAAS / MATA cards)',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
-        heading: { type: 'text', label: 'Section heading' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading (v4: "Two platforms, one unified ecosystem.")' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline (v4: "Better insight for stronger execution")' },
         cards: {
-          type: 'array',
-          label: 'Cards',
+          type: 'array', label: 'Cards',
+          figmaRef: 'The two large side-by-side platform cards. v4 order: MATA (navy/dark) on the left, MAAS (white/light) on the right. Each has 5-6 bullets.',
           itemLabelKey: 'title',
-          defaultItem: { theme: 'light', eyebrow: '', title: '', acronym: '', body: '', cta: { label: '', href: '' } },
+          defaultItem: { theme: 'dark', eyebrow: '', title: '', acronym: '', body: '', bullets: [], cta: { label: '', href: '' } },
           itemFields: {
-            theme: { type: 'select', label: 'Theme', options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ] },
-            eyebrow: { type: 'text', label: 'Eyebrow' },
-            title: { type: 'text', label: 'Title' },
-            acronym: { type: 'text', label: 'Acronym' },
-            body: { type: 'textarea', label: 'Body' },
-            cta: { type: 'cta', label: 'CTA' }
+            theme: {
+              type: 'select', label: 'Theme',
+              figmaRef: 'v4: Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
+              options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ]
+            },
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase label at the top of the card (v4: "MATA – Analytics" / "MAAS - Execution")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card headline (v4: "Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
+            acronym: { type: 'text', label: 'Acronym (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 showed spaced "MAAS"/"MATA" under the title but v4 dropped it in favour of the new title/body treatment.' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card (v4: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
+            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: 'v4: 5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. v4 examples: MATA — "Quantify expected execution costs before commitment", "Compare strategies side by side to evaluate potential outcomes", etc. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
+            cta: { type: 'cta', label: 'CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 had "Explore MAAS/MATA →" links but v4 platform cards have no CTA.' }
           }
         }
       }
     },
     closeTheLoop: {
-      label: 'Close the Loop',
+      label: 'Innovation Era (was: Close the Loop)',
       fields: {
-        heading: { type: 'text', label: 'Heading' },
-        body: { type: 'textarea', label: 'Body' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band (v4: "Innovation for the next execution era")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading (v4: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
         features: {
-          type: 'array',
-          label: 'Features',
+          type: 'array', label: 'Features',
+          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03). v4 titles: "Model with depth", "Connect with ease", "Optimize with experts".',
           itemLabelKey: 'title',
           defaultItem: { number: '', title: '', body: '' },
           itemFields: {
-            number: { type: 'text', label: 'Number (e.g. "01")' },
-            title: { type: 'text', label: 'Title' },
-            body: { type: 'textarea', label: 'Body' }
+            number: { type: 'text', label: 'Number', figmaRef: 'The "/01", "/02", "/03" number label in yellow' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Feature title (v4 examples: "Model with depth" / "Connect with ease" / "Optimize with experts")' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Short description under the title' }
           }
         }
       }
     },
     whyRbc: {
-      label: 'Why RBC',
+      hidden: true,
+      label: 'Why RBC (v4 REMOVED - legacy)',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
-        heading: { type: 'text', label: 'Heading' },
-        body: { type: 'textarea', label: 'Body' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("OUR NUMBERS")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'The big serif heading ("Why RBC Capital Markets")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading' },
         stats: {
-          type: 'array',
-          label: 'Stats',
+          type: 'array', label: 'Stats',
+          figmaRef: 'The 4 big-number stat blocks with yellow-underlined values (700+, $1T+, AI-driven, 1:1)',
           itemLabelKey: 'label',
           defaultItem: { value: '', label: '', body: '' },
           itemFields: {
-            value: { type: 'text', label: 'Value (e.g. "700+", "$1T+")' },
-            label: { type: 'text', label: 'Label' },
-            body: { type: 'textarea', label: 'Body' }
+            value: { type: 'text', label: 'Value', figmaRef: 'The big serif number with yellow underline (e.g. "700+")' },
+            label: { type: 'text', label: 'Label', figmaRef: 'Small uppercase label under the number (e.g. "ASSET COVERAGE")' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'One-line description at the bottom of the stat block' }
           }
         }
       }
     },
     assetCoverage: {
-      label: 'Asset Coverage',
+      hidden: true,
+      label: 'Asset Coverage (v4 REMOVED - replaced by MATA Capabilities)',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
-        heading: { type: 'text', label: 'Heading' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("ASSET COVERAGE")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big white section heading ("Connected across the desk")' },
         assets: {
-          type: 'array',
-          label: 'Assets',
+          type: 'array', label: 'Assets',
+          figmaRef: 'The 4 dark cards with yellow icons at the bottom of the dark strip',
           itemLabelKey: 'title',
-          defaultItem: { icon: 'equities', title: '', body: '' },
+          defaultItem: { icon: 'equities', title: '', subtitle: '', body: '', cta: { label: 'Learn more', href: '#' } },
           itemFields: {
-            icon: { type: 'select', label: 'Icon', options: [
-              { value: 'equities', label: 'Equities (line chart)' },
-              { value: 'futures', label: 'Futures (bars)' },
-              { value: 'fx', label: 'FX (arrows)' },
-              { value: 'index', label: 'Index (crosshair)' }
-            ] },
-            title: { type: 'text', label: 'Title' },
-            body: { type: 'textarea', label: 'Body' }
+            icon: {
+              type: 'select', label: 'Icon',
+              figmaRef: 'Yellow icon at the top of the card',
+              options: [
+                { value: 'equities', label: 'Equities (line chart)' },
+                { value: 'futures', label: 'Futures (bars)' },
+                { value: 'fx', label: 'FX (arrows)' },
+                { value: 'index', label: 'Index (crosshair)' }
+              ]
+            },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card title (e.g. "Equities")' },
+            subtitle: { type: 'text', label: 'Subtitle', figmaRef: 'Italic white subtitle under the title' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Small grey description under the title' },
+            cta: { type: 'cta', label: 'Learn more CTA', figmaRef: 'Yellow "Learn more →" anchor at the bottom of the card' }
           }
         }
       }
     },
     thoughtLeadership: {
-      label: 'Thought Leadership',
+      label: 'Market Insights (was: Thought Leadership)',
       fields: {
-        heading: { type: 'text', label: 'Section heading' },
-        featured: {
-          type: 'object',
-          label: 'Featured story',
-          fields: {
-            eyebrow: { type: 'text', label: 'Eyebrow' },
-            title: { type: 'text', label: 'Title' },
-            body: { type: 'textarea', label: 'Body' },
-            cta: { type: 'ctaWithRead', label: 'CTA' }
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading (v4: "Trends Shaping Institutional Trading").' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading (v4: "Market insights"). v3 called this section "Thought leadership".' },
+        items: {
+          type: 'array', label: 'Insight cards',
+          figmaRef: 'v4: 3-card Slick-style carousel (was a single featured card in v3). Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
+          itemLabelKey: 'title',
+          defaultItem: { eyebrow: 'Insights', title: '', body: '', cta: { label: '', href: '' }, image: './insights-featured-story.jpg' },
+          itemFields: {
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card (v4: "Insights"). v3 said "Insights · Featured story" — v4 simplified.' },
+            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card (v4 lorem placeholder: "Lorem ipsum dolor sit amet consectetur adipiscing elit")' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph (v4 lorem placeholder)' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom (v4: "2 min read"). Label is what shows; href goes to the article.' },
+            image: { type: 'text', label: 'Illustration image URL', figmaRef: 'Path to the right-side illustration image. Default: ./insights-featured-story.jpg' }
           }
         }
       }
@@ -622,35 +703,22 @@
     demoCta: {
       label: 'Demo CTA',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow' },
-        headlinePrefix: { type: 'text', label: 'Headline prefix (regular text)' },
-        headlineHighlight: { type: 'text', label: 'Highlighted word (yellow italic)' },
-        body: { type: 'textarea', label: 'Body' },
-        cta: { type: 'cta', label: 'CTA' }
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption (v4: "See the platform")' },
+        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline (v4: "Talk with an " — note trailing space)' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline (v4: "expert" — period is added by markup)' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline (v4: "Connect with our product teams to arrange a custom demo.")' },
+        cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "Request a demo →" button' }
       }
     },
     newsletter: {
       label: 'Newsletter',
       fields: {
-        heading: { type: 'text', label: 'Heading' },
-        body: { type: 'textarea', label: 'Body' },
-        fields: {
-          type: 'array',
-          label: 'Form fields',
-          itemLabelKey: 'label',
-          defaultItem: { id: '', type: 'text', label: '', required: false },
-          itemFields: {
-            id: { type: 'text', label: 'Field id' },
-            type: { type: 'select', label: 'Input type', options: [ { value: 'text', label: 'text' }, { value: 'email', label: 'email' }, { value: 'url', label: 'url' } ] },
-            label: { type: 'text', label: 'Label / placeholder' },
-            required: { type: 'checkbox', label: 'Required' }
-          }
-        },
-        linkedinAutofillLabel: { type: 'text', label: 'LinkedIn button text' },
-        consent: { type: 'textarea', label: 'Consent copy' },
-        privacyLabel: { type: 'text', label: 'Privacy link label' },
-        privacyHref: { type: 'text', label: 'Privacy link URL' },
-        submitLabel: { type: 'text', label: 'Submit button label' }
+        heading: { type: 'text', label: 'Heading', figmaRef: 'The section heading ("Stay informed")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The one-line paragraph under Stay informed' },
+        marketoFormId: {
+          type: 'text', label: 'Marketo form ID',
+          figmaRef: 'The Marketo form ID that gets embedded. Form fields (first name, email, consent, etc.) come from Marketo — they are NOT editable here.'
+        }
       }
     }
   };
@@ -692,13 +760,19 @@
   }
 
   // ==============================================================
-  // FORM RENDERING (schema-driven)
+  // FORM RENDERING
   // ==============================================================
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
 
-  function fieldWrap(labelText, innerHtml, hint) {
+  // Render Figma reference chip (yellow band under label)
+  function figmaChip(ref) {
+    return ref ? '<div class="figma-ref">' + esc(ref) + '</div>' : '';
+  }
+
+  function fieldWrap(labelText, figmaRef, innerHtml, hint) {
     return '<div class="field">'
       + '<label class="field-label">' + esc(labelText) + '</label>'
+      + figmaChip(figmaRef)
       + innerHtml
       + (hint ? '<div class="field-hint">' + esc(hint) + '</div>' : '')
       + '</div>';
@@ -708,33 +782,41 @@
     var path = basePath + (basePath ? '.' : '') + key;
     var val = getPath(state, path);
 
+    // Skip any field explicitly marked hidden OR labelled "Legacy:"
+    // - lets us leave the schema/data in place (so nothing breaks
+    // when a stale draft re-saves) while just not surfacing the
+    // field in the editor UI.
+    if (def.hidden || (typeof def.label === 'string' && /^\s*Legacy:/i.test(def.label))) return '';
+
     if (def.type === 'text' || def.type === 'url') {
-      return fieldWrap(def.label,
+      return fieldWrap(def.label, def.figmaRef,
         '<input type="text" data-path="' + esc(path) + '" value="' + esc(val || '') + '">',
         def.hint);
     }
     if (def.type === 'textarea') {
-      return fieldWrap(def.label,
+      return fieldWrap(def.label, def.figmaRef,
         '<textarea data-path="' + esc(path) + '">' + esc(val || '') + '</textarea>',
         def.hint);
     }
     if (def.type === 'checkbox') {
-      return '<div class="field"><label class="check">'
-        + '<input type="checkbox" data-path="' + esc(path) + '" ' + (val ? 'checked' : '') + '>'
-        + esc(def.label)
+      return '<div class="field">'
+        + figmaChip(def.figmaRef)
+        + '<label class="check">'
+        +   '<input type="checkbox" data-path="' + esc(path) + '" ' + (val ? 'checked' : '') + '>'
+        +   esc(def.label)
         + '</label></div>';
     }
     if (def.type === 'select') {
       var opts = def.options.map(function (o) {
         return '<option value="' + esc(o.value) + '"' + (o.value === val ? ' selected' : '') + '>' + esc(o.label) + '</option>';
       }).join('');
-      return fieldWrap(def.label,
+      return fieldWrap(def.label, def.figmaRef,
         '<select data-path="' + esc(path) + '">' + opts + '</select>',
         def.hint);
     }
     if (def.type === 'cta') {
       var cta = val || { label: '', href: '' };
-      return fieldWrap(def.label,
+      return fieldWrap(def.label, def.figmaRef,
         '<div class="cta-row">'
         + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta.label || '') + '">'
         + '<input type="text" placeholder="URL / #anchor" data-path="' + esc(path) + '.href" value="' + esc(cta.href || '') + '">'
@@ -743,7 +825,7 @@
     }
     if (def.type === 'ctaWithRead') {
       var cta2 = val || { label: '', href: '', readTime: '' };
-      return fieldWrap(def.label,
+      return fieldWrap(def.label, def.figmaRef,
         '<div class="cta-row" style="grid-template-columns: 2fr 2fr 1fr;">'
         + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta2.label || '') + '">'
         + '<input type="text" placeholder="URL" data-path="' + esc(path) + '.href" value="' + esc(cta2.href || '') + '">'
@@ -756,7 +838,11 @@
       Object.keys(def.fields).forEach(function (k) {
         inner += renderField(k, def.fields[k], path);
       });
-      return '<div class="group"><div class="group-title">' + esc(def.label) + '</div>' + inner + '</div>';
+      return '<div class="group">'
+        + '<div class="group-title">' + esc(def.label) + '</div>'
+        + figmaChip(def.figmaRef)
+        + inner
+        + '</div>';
     }
     if (def.type === 'stringArray') {
       var arr = Array.isArray(val) ? val : [];
@@ -775,7 +861,7 @@
       }).join('');
       return '<div class="field">'
         + '<label class="field-label">' + esc(def.label) + '</label>'
-        + (def.hint ? '<div class="field-hint" style="margin-top:0;margin-bottom:8px;">' + esc(def.hint) + '</div>' : '')
+        + figmaChip(def.figmaRef)
         + '<div class="array">' + itemsHtml + '</div>'
         + '<button class="ghost small array-add" data-array-action="add-string" data-array-path="' + esc(path) + '">+ Add item</button>'
         + '</div>';
@@ -804,7 +890,7 @@
       var defaultJson = JSON.stringify(def.defaultItem).replace(/'/g, "&#39;");
       return '<div class="field">'
         + '<label class="field-label">' + esc(def.label) + '</label>'
-        + (def.hint ? '<div class="field-hint" style="margin-top:0;margin-bottom:8px;">' + esc(def.hint) + '</div>' : '')
+        + figmaChip(def.figmaRef)
         + '<div class="array">' + itemsHtml2 + '</div>'
         + '<button class="ghost small array-add" data-array-action="add-obj" data-array-path="' + esc(path) + '" data-default=\'' + defaultJson + '\'>+ Add item</button>'
         + '</div>';
@@ -824,8 +910,6 @@
     });
     container.innerHTML = html;
     container.scrollTop = 0;
-
-    // highlight in nav
     var lis = document.querySelectorAll('#section-nav li');
     for (var i = 0; i < lis.length; i++) {
       lis[i].classList.toggle('active', lis[i].getAttribute('data-section') === sectionId);
@@ -835,6 +919,11 @@
   function renderNav() {
     var html = '';
     Object.keys(SCHEMA).forEach(function (id) {
+      // Skip legacy sections (whyRbc, assetCoverage etc.) from the
+      // sidebar — SCHEMA + SAMPLE still carry them so the underlying
+      // data is preserved for anyone who wants to re-enable the
+      // panel, but editors shouldn't see them in day-to-day use.
+      if (SCHEMA[id].hidden) return;
       html += '<li data-section="' + esc(id) + '">' + esc(SCHEMA[id].label) + '</li>';
     });
     document.getElementById('section-nav').innerHTML = html;
@@ -870,28 +959,21 @@
   }
 
   // ==============================================================
-  // EVENT WIRING
+  // EVENTS
   // ==============================================================
-
-  // Nav clicks
   document.getElementById('section-nav').addEventListener('click', function (e) {
     var li = e.target.closest('li[data-section]');
     if (!li) return;
     renderSection(li.getAttribute('data-section'));
   });
 
-  // Form input changes (delegated)
   document.getElementById('form-pane').addEventListener('input', function (e) {
     var el = e.target;
     var path = el.getAttribute('data-path');
     if (!path) return;
-    var val;
-    if (el.type === 'checkbox') val = el.checked;
-    else val = el.value;
+    var val = el.type === 'checkbox' ? el.checked : el.value;
     setPath(state, path, val);
     save();
-    // Note: NOT re-rendering here — that would blow away focus. Only
-    // re-render when array structure changes (add/remove/move).
   });
   document.getElementById('form-pane').addEventListener('change', function (e) {
     var el = e.target;
@@ -903,7 +985,6 @@
     save();
   });
 
-  // Array actions (add/remove/move)
   document.getElementById('form-pane').addEventListener('click', function (e) {
     var btn = e.target.closest('button[data-array-action]');
     if (!btn) return;
@@ -932,7 +1013,6 @@
     renderSection(currentSection);
   });
 
-  // Top-bar actions
   document.getElementById('btn-copy').addEventListener('click', function () {
     var json = JSON.stringify(state, null, 2);
     navigator.clipboard.writeText(json).then(
@@ -941,19 +1021,159 @@
     );
   });
 
-  document.getElementById('btn-download').addEventListener('click', function () {
-    var json = JSON.stringify(state, null, 2);
+  // ==============================================================
+  // EXPORT DRAFT (v2 flow — replaces the plain "Download .json")
+  //
+  // Opens a small modal that captures the editor's name + an
+  // optional note, computes a summary of which sections changed vs
+  // SAMPLE, then bundles all of that into a `_meta` block at the
+  // top of the JSON download. Filename encodes the ISO timestamp
+  // and editor name so uploads to Asana are self-documenting.
+  //
+  // The consuming page (maas-mata.html) doesn't need to change:
+  // no data-json path targets `_meta`, so it's silently ignored.
+  // ==============================================================
+
+  // Remember the editor across sessions so Joon types it once.
+  var EDITOR_KEY = 'preview-generator__editor-name';
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function timestampParts() {
+    var d = new Date();
+    var iso = d.toISOString();
+    var stamp = d.getUTCFullYear()
+      + pad2(d.getUTCMonth() + 1)
+      + pad2(d.getUTCDate())
+      + 'T'
+      + pad2(d.getUTCHours())
+      + pad2(d.getUTCMinutes())
+      + 'Z';
+    return { iso: iso, stamp: stamp };
+  }
+
+  // Deep-compare state vs SAMPLE. Returns a flat list of paths
+  // where leaves differ. Arrays report length changes + per-index.
+  function diffAgainstSample(current, sample, path) {
+    path = path || '';
+    var out = [];
+    if (typeof current !== typeof sample || (current === null) !== (sample === null)) {
+      out.push(path || '(root)');
+      return out;
+    }
+    if (current === null || typeof current !== 'object') {
+      if (current !== sample) out.push(path);
+      return out;
+    }
+    if (Array.isArray(current) || Array.isArray(sample)) {
+      if (current.length !== sample.length) {
+        out.push(path + ' (length ' + sample.length + ' -> ' + current.length + ')');
+      }
+      var max = Math.max(current.length, sample.length);
+      for (var i = 0; i < max; i++) {
+        out = out.concat(diffAgainstSample(current[i], sample[i], path + '[' + i + ']'));
+      }
+      return out;
+    }
+    var keys = {};
+    Object.keys(current).forEach(function (k) { keys[k] = true; });
+    Object.keys(sample).forEach(function (k) { keys[k] = true; });
+    Object.keys(keys).forEach(function (k) {
+      out = out.concat(diffAgainstSample(current[k], sample[k], path ? path + '.' + k : k));
+    });
+    return out;
+  }
+
+  function summariseSections(diffs) {
+    var buckets = {};
+    diffs.forEach(function (d) {
+      var section = d.split(/[.\[]/)[0];
+      buckets[section] = (buckets[section] || 0) + 1;
+    });
+    var allSections = Object.keys(SAMPLE);
+    var changed = [];
+    var unchanged = [];
+    allSections.forEach(function (s) {
+      if (buckets[s]) changed.push(s + ' (' + buckets[s] + ' field' + (buckets[s] === 1 ? '' : 's') + ')');
+      else unchanged.push(s);
+    });
+    return { changed: changed, unchanged: unchanged };
+  }
+
+  function renderExportSummary() {
+    var diffs = diffAgainstSample(state, SAMPLE);
+    var summary = summariseSections(diffs);
+    var box = document.getElementById('export-summary');
+    var html = '';
+    if (summary.changed.length) {
+      html += '<div><strong>Changed sections</strong><br>' + summary.changed.map(esc).join('<br>') + '</div>';
+    } else {
+      html += '<div><em>No changes vs sample content yet.</em></div>';
+    }
+    if (summary.unchanged.length) {
+      html += '<div style="margin-top: 10px; color: var(--grey-500);"><strong>Untouched</strong><br>' + summary.unchanged.map(esc).join(', ') + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function openExportModal() {
+    try {
+      var saved = window.localStorage.getItem(EDITOR_KEY);
+      if (saved) document.getElementById('export-editor').value = saved;
+    } catch (e) { /* ignore */ }
+    renderExportSummary();
+    document.getElementById('modal-export').classList.add('open');
+    setTimeout(function () { document.getElementById('export-editor').focus(); }, 0);
+  }
+
+  function closeExportModal() {
+    document.getElementById('modal-export').classList.remove('open');
+  }
+
+  function doExport() {
+    var editor = document.getElementById('export-editor').value.trim();
+    var note = document.getElementById('export-note').value.trim();
+    if (editor) {
+      try { window.localStorage.setItem(EDITOR_KEY, editor); } catch (e) { /* ignore */ }
+    }
+    var diffs = diffAgainstSample(state, SAMPLE);
+    var summary = summariseSections(diffs);
+    var ts = timestampParts();
+
+    var payload = { _meta: {
+      generatedAt: ts.iso,
+      editor: editor || null,
+      note: note || null,
+      sectionsChanged: summary.changed,
+      sectionsUnchanged: summary.unchanged,
+      changedPaths: diffs,
+      previewInstructions:
+        'Upload this JSON to TeamSite at /assets/maas-mata/maas-mata-draft.json, ' +
+        'then visit the page URL with ?preview=draft appended. ' +
+        'When approved, rename to maas-mata.json (or overwrite the production file).'
+    }};
+    Object.keys(state).forEach(function (k) { payload[k] = state[k]; });
+
+    var safeEditor = editor
+      ? '_' + editor.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      : '';
+    var filename = 'maas-mata-draft_' + ts.stamp + safeEditor + '.json';
+
+    var json = JSON.stringify(payload, null, 2);
     var blob = new Blob([json], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url;
-    a.download = 'maas-mata.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Downloaded maas-mata.json');
-  });
+
+    closeExportModal();
+    toast('Downloaded ' + filename);
+  }
+
+  document.getElementById('btn-export').addEventListener('click', openExportModal);
+  document.getElementById('modal-export-close').addEventListener('click', closeExportModal);
+  document.getElementById('modal-export-cancel').addEventListener('click', closeExportModal);
+  document.getElementById('modal-export-download').addEventListener('click', doExport);
 
   document.getElementById('btn-reset').addEventListener('click', function () {
     if (!confirm('Replace all content with the sample data?')) return;
@@ -967,18 +1187,13 @@
     document.getElementById('load-json-input').value = '';
     document.getElementById('modal-load').classList.add('open');
   });
-  document.getElementById('modal-load-close').addEventListener('click', function () {
-    document.getElementById('modal-load').classList.remove('open');
-  });
-  document.getElementById('modal-load-cancel').addEventListener('click', function () {
-    document.getElementById('modal-load').classList.remove('open');
-  });
+  document.getElementById('modal-load-close').addEventListener('click', function () { document.getElementById('modal-load').classList.remove('open'); });
+  document.getElementById('modal-load-cancel').addEventListener('click', function () { document.getElementById('modal-load').classList.remove('open'); });
   document.getElementById('modal-load-apply').addEventListener('click', function () {
     var raw = document.getElementById('load-json-input').value.trim();
     if (!raw) { toast('Paste JSON first', true); return; }
     try {
-      var parsed = JSON.parse(raw);
-      state = parsed;
+      state = JSON.parse(raw);
       save();
       renderSection(currentSection);
       document.getElementById('modal-load').classList.remove('open');
@@ -989,7 +1204,6 @@
   });
 
   document.getElementById('btn-show-schema').addEventListener('click', function () {
-    // Show a friendly, human-readable schema derived from the SCHEMA
     var out = {};
     Object.keys(SCHEMA).forEach(function (sid) {
       out[sid] = describeSection(SCHEMA[sid]);
@@ -1003,9 +1217,7 @@
 
   function describeSection(def) {
     var out = {};
-    Object.keys(def.fields).forEach(function (k) {
-      out[k] = describeField(def.fields[k]);
-    });
+    Object.keys(def.fields).forEach(function (k) { out[k] = describeField(def.fields[k]); });
     return out;
   }
   function describeField(f) {
@@ -1020,7 +1232,6 @@
     return f.type;
   }
 
-  // Modal backdrop click
   document.querySelectorAll('.modal-backdrop').forEach(function (m) {
     m.addEventListener('click', function (e) { if (e.target === m) m.classList.remove('open'); });
   });
@@ -1033,7 +1244,7 @@
   // ==============================================================
   // INIT
   // ==============================================================
-  load(); // hydrate from localStorage if present
+  load();
   renderNav();
   renderSection('hero');
   renderJson();

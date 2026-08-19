@@ -1,0 +1,273 @@
+<!-- ============================================================
+     MAAS + MATA Landing Page — Properties + Data
+     ============================================================
+     One-component skin for the MAAS + MATA landing page. Every
+     author-editable string / image / repeater is exposed here.
+     Rendered by maas-mata.xsl (single .xsl file, inline CSS + JS).
+
+     Sections (mirrors maas-mata.html):
+       1  Hero              eyebrow, two-tone title, subtitle, CTA
+       2  Chart Card        static image + Brightcove video modal
+       3  New Standard      3-colour headline + body + yellow CTA
+       4  Awards            eyebrow + repeater (year/title/issuer)
+       5  Platforms         two cards (MATA analytics, MAAS execution)
+       6  Innovation Era    3 numbered features (repeater)
+       7  MATA Capabilities eyebrow + heading + 3-card repeater +
+                            fixed "Index events" wide card
+       8  Market Insights   eyebrow + heading + featured insight card
+       9  Demo CTA          eyebrow + "Talk with an <highlight>."
+      10  Newsletter        heading + body + form-fields repeater +
+                            Marketo IDs + consent + submit label
+
+     Appearance (section-level):
+       ColorScheme, background overrides, per-section padding
+
+     SCHEMA NOTE (per story-tiles-featured convention):
+       Only ID, Name, Type are permitted on a Datum.
+       Only ID, Name, Replicatable, CloneGroupID on a Group.
+       MinReplicates / Required are enforced in the XSL, not here.
+
+     Deploy alongside the skin:
+       /assets/rbccm/css/components/maas-mata.css   (or inline in XSL)
+       /assets/rbccm/js/components/maas-mata.js     (or inline in XSL)
+       /assets/rbccm/js/rbccm-json-bind.js          (shared runtime,
+                                                     optional — this
+                                                     skin renders
+                                                     from Datums, not
+                                                     JSON)
+     ============================================================ -->
+<Properties ComponentID="maas-mata-v1">
+
+  <!-- ═══ 1. HERO ════════════════════════════════════════════
+       Eyebrow renders above a yellow 45x2 underline. Title is
+       a two-line H1 with per-line colour (line 1 dark navy,
+       line 2 bright blue). Subtitle wraps to 3 lines on mobile
+       and full width on desktop. -->
+  <Datum ID="HeroEyebrow" Type="String" Name="Hero eyebrow">Multi-Asset Agency Solutions</Datum>
+  <Datum ID="HeroTitleLine1" Type="String" Name="Hero title — line 1 (dark navy)">Trade with Clarity.</Datum>
+  <Datum ID="HeroTitleLine2" Type="String" Name="Hero title — line 2 (bright blue)">Execute with Control.</Datum>
+  <Datum ID="HeroSubtitle" Type="Textarea" Name="Hero subtitle">RBC Capital Markets' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.</Datum>
+  <Datum ID="HeroCtaLabel" Type="String" Name="Hero CTA label">Request demo</Datum>
+  <Datum ID="HeroCtaHref" Type="String" Name="Hero CTA URL">#demo</Datum>
+
+
+  <!-- ═══ 2. CHART CARD (image + Brightcove modal) ═══════════
+       The chart is a baked screenshot per client direction.
+       Two variants: one for mobile (narrower crop), one for
+       desktop. Blank Brightcove Video Id hides the play
+       button. -->
+  <Datum ID="ChartImageDesktop" Type="String" Name="Chart image URL — desktop">./maas-execution-console-reveal.png</Datum>
+  <Datum ID="ChartImageMobile" Type="String" Name="Chart image URL — mobile">./maas-execution-console-mobile.png</Datum>
+  <Datum ID="ChartImageAlt" Type="String" Name="Chart image alt text">MAAS Execution Console — cross-asset portfolio chart with +$15,500.90 delta and live quote strip.</Datum>
+  <Datum ID="ChartBrightcoveAccount" Type="String" Name="Brightcove account ID"/>
+  <Datum ID="ChartBrightcovePlayer" Type="String" Name="Brightcove player ID">default</Datum>
+  <Datum ID="ChartBrightcoveVideoId" Type="String" Name="Brightcove video ID (blank hides play button)"/>
+
+
+  <!-- ═══ 3. NEW STANDARD ═════════════════════════════════════
+       Headline is split into 3 colour stops:
+         Lead     grey    "A new standard for"
+         Highlight white   "multi-asset"
+         Accent   yellow  "trading"
+       Body is a repeater — one Group per paragraph. -->
+  <Datum ID="NewStandardHeadingLead" Type="String" Name="New-standard headline — lead (grey)">A new standard for</Datum>
+  <Datum ID="NewStandardHeadingHighlight" Type="String" Name="New-standard headline — highlight (white)">multi-asset </Datum>
+  <Datum ID="NewStandardHeadingAccent" Type="String" Name="New-standard headline — accent (yellow)">trading</Datum>
+  <Datum ID="NewStandardCtaLabel" Type="String" Name="New-standard CTA label">See MAAS in action</Datum>
+  <Datum ID="NewStandardCtaHref" Type="String" Name="New-standard CTA URL">#platform</Datum>
+
+
+  <!-- ═══ 5. PLATFORMS ═══════════════════════════════════════
+       Section-level eyebrow + heading precede the two cards
+       (defined in the Data block below as a Platform Card
+       repeater). -->
+  <Datum ID="PlatformsEyebrow" Type="String" Name="Platforms eyebrow">Two platforms, one unified ecosystem.</Datum>
+  <Datum ID="PlatformsHeading" Type="String" Name="Platforms heading">Better insight for stronger execution</Datum>
+
+
+  <!-- ═══ 6. INNOVATION ERA ══════════════════════════════════
+       Light-cream section. Heading + intro copy precede a
+       numbered features repeater (defined below). -->
+  <Datum ID="InnovationEraHeading" Type="String" Name="Innovation-era heading">Innovation for the next execution era</Datum>
+  <Datum ID="InnovationEraBody" Type="Textarea" Name="Innovation-era intro copy">Technology, scale and multi-asset expertise — engineered to help you execute with confidence.</Datum>
+
+
+  <!-- ═══ 7. MATA CAPABILITIES ═══════════════════════════════
+       Yellow eyebrow + white heading + subtitle above a
+       3-card grid + one wider "Index events" info card. The
+       3 grid cards live in the Data block below. Index Events
+       is authored here as a fixed card. -->
+  <Datum ID="MataCapEyebrow" Type="String" Name="MATA capabilities eyebrow">MATA Capabilities</Datum>
+  <Datum ID="MataCapHeading" Type="String" Name="MATA capabilities heading">Sharper insight. Smarter trades.</Datum>
+  <Datum ID="MataCapSubheading" Type="Textarea" Name="MATA capabilities subheading">Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.</Datum>
+
+  <!-- Index Events fixed card (renders full width below the
+       3-card grid). Icon is a SelectSingle so authors can swap
+       between the pre-built SVG symbols in the sprite. -->
+  <Datum ID="IndexEventsIcon" Type="SelectSingle" Name="Index Events icon">
+    <Option><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option Selected="true"><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="IndexEventsTitle" Type="String" Name="Index Events title">Index events</Datum>
+  <Datum ID="IndexEventsSubtitle" Type="String" Name="Index Events subtitle">120+ Global Indices</Datum>
+  <Datum ID="IndexEventsBody" Type="Textarea" Name="Index Events body">Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates.</Datum>
+
+
+  <!-- ═══ 8. MARKET INSIGHTS ═════════════════════════════════
+       Featured insight card lives on top of a starfield
+       background. Repeater below supports multiple insight
+       tiles in a swipeable carousel; the first item is the
+       "featured" one shown on load. -->
+  <Datum ID="MarketInsightsEyebrow" Type="String" Name="Market Insights eyebrow">Trends Shaping Institutional Trading</Datum>
+  <Datum ID="MarketInsightsHeading" Type="String" Name="Market Insights heading">Market insights</Datum>
+
+
+  <!-- ═══ 9. DEMO CTA ════════════════════════════════════════
+       Headline is split — prefix in white, highlight word in
+       yellow. Yellow pill CTA below. -->
+  <Datum ID="DemoEyebrow" Type="String" Name="Demo eyebrow">See the platform</Datum>
+  <Datum ID="DemoHeadlinePrefix" Type="String" Name="Demo headline — prefix (white)">Talk with an </Datum>
+  <Datum ID="DemoHeadlineHighlight" Type="String" Name="Demo headline — highlight (yellow)">expert</Datum>
+  <Datum ID="DemoBody" Type="Textarea" Name="Demo body">Connect with our product teams to arrange a custom demo.</Datum>
+  <Datum ID="DemoCtaLabel" Type="String" Name="Demo CTA label">Request a demo</Datum>
+  <Datum ID="DemoCtaHref" Type="String" Name="Demo CTA URL">#demo</Datum>
+
+
+  <!-- ═══ 10. NEWSLETTER (Marketo form) ══════════════════════
+       Heading + body + form fields (repeater) + Marketo IDs.
+       Field labels + names are author-editable so the form
+       can be re-scoped without markup surgery. Marketo IDs
+       are required — the form submits nowhere if blank. -->
+  <Datum ID="NewsletterHeading" Type="String" Name="Newsletter heading">Stay informed</Datum>
+  <Datum ID="NewsletterBody" Type="Textarea" Name="Newsletter body">Get the latest updates and insights from RBC Capital Markets delivered to your inbox.</Datum>
+  <Datum ID="NewsletterMarketoBaseUrl" Type="String" Name="Marketo base URL (e.g. //app-xxx.marketo.com)"/>
+  <Datum ID="NewsletterMarketoMunchkinId" Type="String" Name="Marketo Munchkin ID (e.g. 123-ABC-456)"/>
+  <Datum ID="NewsletterMarketoFormId" Type="String" Name="Marketo form ID (numeric)"/>
+  <Datum ID="NewsletterLinkedinLabel" Type="String" Name="LinkedIn autofill button label">Autofill with LinkedIn</Datum>
+  <Datum ID="NewsletterLinkedinHref" Type="String" Name="LinkedIn OAuth URL">#linkedin</Datum>
+  <Datum ID="NewsletterConsent" Type="Textarea" Name="Consent copy">Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets.</Datum>
+  <Datum ID="NewsletterPrivacyLabel" Type="String" Name="Privacy Policy link label">View Privacy Policy</Datum>
+  <Datum ID="NewsletterPrivacyHref" Type="String" Name="Privacy Policy URL">/privacy-policy</Datum>
+  <Datum ID="NewsletterSubmitLabel" Type="String" Name="Submit button label">Sign up</Datum>
+
+
+  <!-- ═══ APPEARANCE (section-level, optional) ═══════════════
+       ColorScheme flips the whole page tone. BackgroundColor
+       is a full-page override (rare — the deep-band gradient
+       usually reads correctly on any background). -->
+  <Datum ID="ColorScheme" Type="SelectSingle" Name="Color Scheme">
+    <Option Selected="true">
+      <Display>Default (mixed light + dark bands)</Display>
+      <Value>default</Value>
+    </Option>
+    <Option>
+      <Display>Dark (all bands dark navy)</Display>
+      <Value>dark</Value>
+    </Option>
+  </Datum>
+
+
+  <!-- Page <title> + meta description live on the parent page
+       skin, not on this component. Author them there. -->
+
+</Properties>
+
+<Data>
+
+  <!-- ═══ 3b. NEW STANDARD — body paragraphs (repeater) ══════ -->
+  <Group ID="NSB-0" Name="New Standard Paragraph" Replicatable="true">
+    <Datum ID="Paragraph" Name="Paragraph body" Type="Textarea">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
+  </Group>
+
+  <!-- ═══ 4. AWARDS (repeater) ═══════════════════════════════
+       Section-level eyebrow lives at the top of the Data
+       block for authoring convenience even though schema-wise
+       it's a Property. TeamSite doesn't care — this comment
+       is just a reader nudge; the Datum stays here so the
+       related content is grouped in the DCR editor UI. -->
+  <Group ID="AWD-META" Name="Awards Section Header" Replicatable="false">
+    <Datum ID="AwardsEyebrow" Name="Awards eyebrow" Type="String">See why the world's top institutions choose MAAS</Datum>
+  </Group>
+
+  <Group ID="AWD-0" Name="Award" Replicatable="true">
+    <Datum ID="Year" Name="Year" Type="String">2026</Datum>
+    <Datum ID="Title" Name="Award title" Type="String">Best Trading Analytics Platform</Datum>
+    <Datum ID="Issuer" Name="Award issuer" Type="String">TradingTech Insights Awards USA</Datum>
+  </Group>
+
+  <!-- ═══ 5b. PLATFORM CARDS (repeater, expects exactly 2) ═══
+       Theme "dark" = dark card with yellow eyebrow.
+       Theme "light" = white card with blue eyebrow.
+       Bullets is a separate nested repeater so authors don't
+       have to hand-format lists. -->
+  <Group ID="PLT-0" Name="Platform Card" Replicatable="true">
+    <Datum ID="Theme" Name="Theme" Type="SelectSingle">
+      <Option Selected="true"><Display>Dark (navy card)</Display><Value>dark</Value></Option>
+      <Option><Display>Light (white card)</Display><Value>light</Value></Option>
+    </Datum>
+    <Datum ID="Eyebrow" Name="Card eyebrow" Type="String">MATA – Analytics</Datum>
+    <Datum ID="Title" Name="Card title" Type="String">Transform data into trading intelligence</Datum>
+    <Datum ID="Body" Name="Card body" Type="Textarea">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
+    <Datum ID="Bullet1" Name="Bullet 1" Type="String">Quantify expected execution costs before commitment</Datum>
+    <Datum ID="Bullet2" Name="Bullet 2" Type="String">Compare strategies side by side to evaluate potential outcomes</Datum>
+    <Datum ID="Bullet3" Name="Bullet 3" Type="String">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
+    <Datum ID="Bullet4" Name="Bullet 4" Type="String">Monitor market conditions and portfolio exposures</Datum>
+    <Datum ID="Bullet5" Name="Bullet 5" Type="String">Model scenarios across asset classes</Datum>
+  </Group>
+
+  <!-- ═══ 6b. INNOVATION ERA — feature list (repeater) ═══════
+       Numbered features. Number can be "/01" (matches Figma)
+       or "01" — the XSL wraps in / marks so authors don't have
+       to remember. -->
+  <Group ID="INV-0" Name="Innovation Feature" Replicatable="true">
+    <Datum ID="Number" Name="Number (e.g. 01)" Type="String">01</Datum>
+    <Datum ID="Title" Name="Feature title" Type="String">Model with depth</Datum>
+    <Datum ID="Body" Name="Feature body" Type="Textarea">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
+  </Group>
+
+  <!-- ═══ 7b. MATA CAPABILITY CARDS (repeater, 3 expected) ═══
+       One card per asset class. Icon picks a pre-built SVG
+       symbol from the inline sprite (equities / fx / futures
+       / info). -->
+  <Group ID="MTC-0" Name="MATA Capability Card" Replicatable="true">
+    <Datum ID="Icon" Name="Icon" Type="SelectSingle">
+      <Option Selected="true"><Display>Equities (chart)</Display><Value>equities</Value></Option>
+      <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
+      <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+      <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+    </Datum>
+    <Datum ID="Title" Name="Card title" Type="String">Equities</Datum>
+    <Datum ID="Subtitle" Name="Card subtitle" Type="String">Cash Equities, ETFs &amp; ADRs</Datum>
+    <Datum ID="Body" Name="Card body" Type="Textarea">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
+  </Group>
+
+  <!-- ═══ 8b. MARKET INSIGHTS (repeater) ═════════════════════
+       Featured insight card (white on starfield). First Group
+       renders as the featured card. Subsequent Groups render
+       as swipeable carousel slides on mobile / narrower cards
+       on desktop. -->
+  <Group ID="MKT-0" Name="Market Insight" Replicatable="true">
+    <Datum ID="Eyebrow" Name="Card eyebrow" Type="String">Insights</Datum>
+    <Datum ID="Title" Name="Card title" Type="String">Lorem ipsum dolor sit amet consectetur adipiscing elit</Datum>
+    <Datum ID="Body" Name="Card body" Type="Textarea">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</Datum>
+    <Datum ID="CtaLabel" Name="CTA label (e.g. '2 min read')" Type="String">2 min read</Datum>
+    <Datum ID="CtaHref" Name="CTA URL" Type="String">#</Datum>
+  </Group>
+
+  <!-- ═══ 10b. NEWSLETTER FORM FIELDS (repeater) ═════════════
+       One Group per Marketo form field. Type = "text" or
+       "email"; the XSL maps to the correct <input type>.
+       Name is the Marketo field name (must match Marketo
+       exactly), Label is the visible field label. -->
+  <Group ID="NLF-0" Name="Newsletter Field" Replicatable="true">
+    <Datum ID="Label" Name="Field label" Type="String">First Name</Datum>
+    <Datum ID="Name" Name="Marketo field name" Type="String">firstName</Datum>
+    <Datum ID="Type" Name="Input type" Type="SelectSingle">
+      <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
+      <Option><Display>Email</Display><Value>email</Value></Option>
+    </Datum>
+  </Group>
+
+</Data>
