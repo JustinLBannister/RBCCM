@@ -348,8 +348,11 @@
                   </xsl:choose></xsl:attribute>
                 <h6 class="rbccm-maas-mata__platform-eyebrow" data-json="eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title" data-json="title"><xsl:value-of select="$PLT1_TITLE" /></h3>
                 <p class="rbccm-maas-mata__platform-body" data-json-html="body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
-                <ul class="rbccm-maas-mata__platform-list">
-                  <xsl:if test="normalize-space($PLT1_B1) != ''"><li><xsl:value-of select="$PLT1_B1" /></li></xsl:if>
+                <!-- Nested list: first <li> becomes the implicit template
+                     when JSON provides bullets[]. data-json="" binds the
+                     item's own value (each bullet is a string). -->
+                <ul class="rbccm-maas-mata__platform-list" data-json-list="bullets">
+                  <xsl:if test="normalize-space($PLT1_B1) != ''"><li data-json=""><xsl:value-of select="$PLT1_B1" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B2) != ''"><li><xsl:value-of select="$PLT1_B2" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B3) != ''"><li><xsl:value-of select="$PLT1_B3" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B4) != ''"><li><xsl:value-of select="$PLT1_B4" /></li></xsl:if>
@@ -456,13 +459,14 @@
               </article>
             </div>
 
-            <!-- Fixed Index Events card (full width below the 3-card grid) -->
+            <!-- Fixed Index Events card (full width below the 3-card grid).
+                 Not inside a data-json-list, so paths are absolute. -->
             <article class="rbccm-maas-mata__mata-cap-wide">
               <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$MC_INDEX_ICON" /></xsl:attribute></use></svg>
               <div class="rbccm-maas-mata__mata-cap-wide-body">
-                <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$MC_INDEX_TITLE" /></h3>
-                <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$MC_INDEX_SUBTITLE" /></p>
-                <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$MC_INDEX_BODY" disable-output-escaping="yes" /></p>
+                <h3 class="rbccm-maas-mata__mata-cap-title" data-json="mataCapabilities.indexEvents.title"><xsl:value-of select="$MC_INDEX_TITLE" /></h3>
+                <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="mataCapabilities.indexEvents.subtitle"><xsl:value-of select="$MC_INDEX_SUBTITLE" /></p>
+                <p class="rbccm-maas-mata__mata-cap-body" data-json-html="mataCapabilities.indexEvents.body"><xsl:value-of select="$MC_INDEX_BODY" disable-output-escaping="yes" /></p>
               </div>
             </article>
           </div>
