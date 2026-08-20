@@ -3025,6 +3025,47 @@
     display: inline !important;
   }
 
+  /* Button hover animations — arrow flyby + yellow shine sweep.
+     Global .btn:hover rules were suppressing the animation
+     property; !important restores it. */
+  .rbccm-maas-mata .rbccm-maas-mata__btn-icon {
+    transition: transform 200ms ease, opacity 200ms ease !important;
+    will-change: transform, opacity;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary:hover .rbccm-maas-mata__btn-icon,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary:focus-visible .rbccm-maas-mata__btn-icon,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:hover .rbccm-maas-mata__btn-icon,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:focus-visible .rbccm-maas-mata__btn-icon {
+    animation: rbccm-mm-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: -60% !important;
+    width: 40% !important;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%) !important;
+    transform: skewX(-18deg) !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    z-index: 0 !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:hover::before,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:focus-visible::before {
+    animation: rbccm-mm-shine-sweep 700ms cubic-bezier(0.4, 0, 0.2, 1) both !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow { position: relative !important; overflow: hidden !important; }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary { position: relative !important; overflow: hidden !important; }
+
+  /* Featured CTA arrow flyby — same animation, scoped to the
+     Market Insights read-more chip so global .btn styles don't
+     eat the transition. */
+  .rbccm-maas-mata .rbccm-maas-mata__featured-cta:hover .rbccm-maas-mata__featured-cta-arrow,
+  .rbccm-maas-mata .rbccm-maas-mata__featured-cta:focus-visible .rbccm-maas-mata__featured-cta-arrow {
+    animation: rbccm-mm-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+  }
+
   /* Platforms heading: tighten the gap under it — global rules
      were adding ~30px extra margin-bottom. Section owns its own
      gap already. */
