@@ -184,20 +184,39 @@
     var arr = getPath(data, listPath);
     if (!Array.isArray(arr)) { warn('data-json-list "' + listPath + '" is not an array (got ' + typeof arr + ')'); return; }
 
-    // Template supplies the row markup. Support both <template> and a
-    // <script type="text/template"> for older browsers, but <template>
-    // is preferred.
+    // Template supplies the row markup. Prefer an explicit <template>
+    // child; if none exists, promote the first element child (an
+    // XSL-rendered fallback card) to serve as the implicit template.
+    // That lets list-bound sections work without every fallback needing
+    // its own <template> block hand-written.
     var tpl = null;
     var childNodes = container.childNodes;
     for (var i = 0; i < childNodes.length; i++) {
       if (childNodes[i].nodeName === 'TEMPLATE') { tpl = childNodes[i]; break; }
     }
-    if (!tpl) { warn('data-json-list "' + listPath + '" has no <template> child'); return; }
+    if (!tpl) {
+      var firstEl = null;
+      for (var j = 0; j < childNodes.length; j++) {
+        if (childNodes[j].nodeType === 1 && childNodes[j].nodeName !== 'TEMPLATE') { firstEl = childNodes[j]; break; }
+      }
+      if (!firstEl) { warn('data-json-list "' + listPath + '" has no <template> or fallback child'); return; }
+      tpl = document.createElement('template');
+      tpl.innerHTML = firstEl.outerHTML;
+      container.insertBefore(tpl, container.firstChild);
+    }
 
-    // Clear any previously rendered clones (marked with data-json-list-item)
-    // and any explicit fallback children (marked with data-json-list-fallback)
-    var toRemove = container.querySelectorAll('[data-json-list-item], [data-json-list-fallback]');
-    for (var r = 0; r < toRemove.length; r++) toRemove[r].parentNode.removeChild(toRemove[r]);
+    // Clear ALL non-template element children before rendering — this
+    // catches previous clones (data-json-list-item), explicit fallback
+    // markers (data-json-list-fallback), AND unattributed XSL fallback
+    // children (e.g. award cards written straight in the skin). Without
+    // this the JSON items append after the fallbacks and the list
+    // renders twice.
+    var kids = container.childNodes;
+    var stripped = [];
+    for (var k = 0; k < kids.length; k++) {
+      if (kids[k].nodeType === 1 && kids[k].nodeName !== 'TEMPLATE') stripped.push(kids[k]);
+    }
+    for (var r = 0; r < stripped.length; r++) stripped[r].parentNode.removeChild(stripped[r]);
 
     // Clone template once per item
     for (var idx = 0; idx < arr.length; idx++) {
