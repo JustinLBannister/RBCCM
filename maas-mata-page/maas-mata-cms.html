@@ -1150,9 +1150,10 @@
       sectionsUnchanged: summary.unchanged,
       changedPaths: diffs,
       previewInstructions:
-        'Production path: /assets/rbccm/js/pages/data/maas-mata.json — dev uploads ' +
-        'this file there (or as maas-mata-draft.json alongside for a preview pass ' +
-        'first). Page reads it on next load; hard-refresh to bust cache.'
+        'Upload this file to /assets/rbccm/js/pages/data/maas-mata.json. ' +
+        'Preview it at the live page URL with ?preview=draft appended — that ' +
+        'flag is what triggers the page to fetch the JSON and rebind live copy. ' +
+        'Without the flag, the page renders the XSL/Datum defaults untouched.'
     }};
     Object.keys(state).forEach(function (k) { payload[k] = state[k]; });
 

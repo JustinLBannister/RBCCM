@@ -614,6 +614,12 @@
       </div>
     </xsl:if>
 
+    <!-- rbccm-json-bind must load BEFORE maas-mata.js so the
+         bootstrap block at the bottom of maas-mata.js finds the
+         RBCCMBind global. If this file is ever removed, the page
+         gracefully falls back to XSL-baked Datums (bootstrap
+         checks for RBCCMBind and no-ops when missing). -->
+    <script src="/assets/rbccm/js/pages/rbccm-json-bind.js"></script>
     <script src="/assets/rbccm/js/pages/maas-mata.js"></script>
 
   </xsl:template>

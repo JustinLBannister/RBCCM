@@ -515,11 +515,16 @@
   })();
 
 
-/* Preview override — guarded by RBCCMBind presence, so prod is
-   a no-op. Precedence: ?preview=slug > localStorage draft > JSON
-   file > XSL fallback. */
+/* JSON bind bootstrap. Guarded by RBCCMBind presence AND by the
+   ?preview=draft URL flag. Default (no preview flag) = do nothing;
+   XSL-baked Datums render as-is. Only when an editor visits with
+   ?preview=draft do we fetch the JSON file and rebind live text.
+   That JSON lives at /assets/rbccm/js/pages/data/maas-mata.json
+   (editor uploads their exported CMS draft to that path). */
 (function () {
   if (typeof window.RBCCMBind !== 'object' || typeof RBCCMBind.load !== 'function') return;
+  var isPreview = /[?&]preview=draft(?:&|$)/.test(window.location.search);
+  if (!isPreview) return;
   RBCCMBind.load({
     url: '/assets/rbccm/js/pages/data/maas-mata.json',
     fallbackSelector: '#fallback-data',
