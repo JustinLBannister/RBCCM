@@ -251,14 +251,16 @@
           <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>
-        <xsl:if test="$CHART_HAS_VIDEO">
-          <button type="button" class="rbccm-maas-mata__chart-image-play" data-video-play="" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="rbccm-mm-video-modal">
-            <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
-            <xsl:attribute name="data-bc-player"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:attribute>
-            <xsl:attribute name="data-bc-video"><xsl:value-of select="$CHART_BC_VIDEO" /></xsl:attribute>
-            <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
-          </button>
-        </xsl:if>
+        <!-- Play button always renders so editors can see the UI in
+             preview. The Brightcove attrs are set from Datums when
+             filled; when empty, the modal opens with an empty iframe
+             (useful for design review, not for a live launch). -->
+        <button type="button" class="rbccm-maas-mata__chart-image-play" data-video-play="" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="rbccm-mm-video-modal">
+          <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
+          <xsl:attribute name="data-bc-player"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:attribute>
+          <xsl:attribute name="data-bc-video"><xsl:value-of select="$CHART_BC_VIDEO" /></xsl:attribute>
+          <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
+        </button>
       </div>
 
 
@@ -334,13 +336,18 @@
             <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading"><xsl:value-of select="$PLATFORMS_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__platforms-grid" data-stagger-parent="fadeInUp" data-stagger-step="150" data-json-list="platforms.cards">
+              <!-- First card carries data-json hooks — the runtime
+                   promotes it as the implicit template on JSON bind.
+                   NOTE: theme class stays dark (Figma default); JSON
+                   theme swap needs a data-json-class hook wired
+                   separately if editors want to flip per-card. -->
               <article>
                 <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
                     <xsl:when test="translate($PLT1_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
                   </xsl:choose></xsl:attribute>
-                <h6 class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT1_TITLE" /></h3>
-                <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
+                <h6 class="rbccm-maas-mata__platform-eyebrow" data-json="eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title" data-json="title"><xsl:value-of select="$PLT1_TITLE" /></h3>
+                <p class="rbccm-maas-mata__platform-body" data-json-html="body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
                 <ul class="rbccm-maas-mata__platform-list">
                   <xsl:if test="normalize-space($PLT1_B1) != ''"><li><xsl:value-of select="$PLT1_B1" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B2) != ''"><li><xsl:value-of select="$PLT1_B2" /></li></xsl:if>
@@ -380,11 +387,13 @@
           </div>
 
           <div class="rbccm-maas-mata__features-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="innovationEra.features">
+            <!-- First feature carries the data-json hooks — rbccm-json-bind
+                 promotes it to the implicit template when the JSON binds. -->
             <article class="rbccm-maas-mata__feature">
               <div class="rbccm-maas-mata__feature-content">
-                <div class="rbccm-maas-mata__feature-number">/<xsl:value-of select="$F1_NUM" /></div>
-                <h3 class="rbccm-maas-mata__feature-title"><xsl:value-of select="$F1_TITLE" /></h3>
-                <p class="rbccm-maas-mata__feature-body"><xsl:value-of select="$F1_BODY" disable-output-escaping="yes" /></p>
+                <div class="rbccm-maas-mata__feature-number" data-json="number">/<xsl:value-of select="$F1_NUM" /></div>
+                <h3 class="rbccm-maas-mata__feature-title" data-json="title"><xsl:value-of select="$F1_TITLE" /></h3>
+                <p class="rbccm-maas-mata__feature-body" data-json-html="body"><xsl:value-of select="$F1_BODY" disable-output-escaping="yes" /></p>
               </div>
             </article>
             <article class="rbccm-maas-mata__feature">
@@ -419,12 +428,14 @@
 
           <div class="rbccm-maas-mata__mata-cap-cards">
             <div class="rbccm-maas-mata__mata-cap-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="mataCapabilities.cards">
+              <!-- First card carries data-json hooks — rbccm-json-bind
+                   promotes it to the implicit template when JSON binds. -->
               <article class="rbccm-maas-mata__mata-cap-card">
                 <div class="rbccm-maas-mata__mata-cap-content">
                   <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use></svg>
-                  <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C1_TITLE" /></h3>
-                  <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C1_SUBTITLE" /></p>
-                  <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>
+                  <h3 class="rbccm-maas-mata__mata-cap-title" data-json="title"><xsl:value-of select="$C1_TITLE" /></h3>
+                  <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="subtitle"><xsl:value-of select="$C1_SUBTITLE" /></p>
+                  <p class="rbccm-maas-mata__mata-cap-body" data-json-html="body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>
                 </div>
               </article>
               <article class="rbccm-maas-mata__mata-cap-card">
@@ -465,9 +476,11 @@
             <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading"><xsl:value-of select="$MK_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__featured-track" data-animate="fadeInUp" data-animate-delay="200" data-insights-track="" data-json-list="marketInsights.items">
-              <article class="rbccm-maas-mata__featured-card"><div class="rbccm-maas-mata__featured-body"><h4 class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS1_EYEBROW" /></h4><div class="rbccm-maas-mata__featured-content"><h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS1_TITLE" /></h3><p class="rbccm-maas-mata__featured-copy"><xsl:value-of select="$INS1_BODY" disable-output-escaping="yes" /></p></div><a class="rbccm-maas-mata__featured-cta">
+              <!-- First card carries data-json hooks — the runtime
+                   promotes it as the implicit template on JSON bind. -->
+              <article class="rbccm-maas-mata__featured-card"><div class="rbccm-maas-mata__featured-body"><h4 class="rbccm-maas-mata__featured-eyebrow" data-json="eyebrow"><xsl:value-of select="$INS1_EYEBROW" /></h4><div class="rbccm-maas-mata__featured-content"><h3 class="rbccm-maas-mata__featured-title" data-json="title"><xsl:value-of select="$INS1_TITLE" /></h3><p class="rbccm-maas-mata__featured-copy" data-json-html="body"><xsl:value-of select="$INS1_BODY" disable-output-escaping="yes" /></p></div><a class="rbccm-maas-mata__featured-cta" data-json-attr-href="cta.href">
                   <xsl:attribute name="href"><xsl:value-of select="$INS1_CTA_HREF" /></xsl:attribute>
-                  <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="$INS1_CTA_LABEL" /></span>
+                  <span class="rbccm-maas-mata__featured-cta-read" data-json="cta.label"><xsl:value-of select="$INS1_CTA_LABEL" /></span>
                   <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a></div><div class="rbccm-maas-mata__featured-illustration"></div></article>
             </div>
@@ -598,9 +611,9 @@
 
     </div><!-- /.rbccm-maas-mata -->
 
-    <!-- Video modal: only emitted when the chart card has a Brightcove
-         video attached, otherwise there's no play button to trigger it. -->
-    <xsl:if test="$CHART_HAS_VIDEO">
+    <!-- Video modal always emitted so the play button has something to
+         trigger in preview. Iframe stays empty when no Brightcove video
+         is configured — modal will still open/close cleanly. -->
       <div class="rbccm-maas-mata__video-modal" id="rbccm-mm-video-modal" hidden="hidden" role="dialog" aria-modal="true" aria-label="Video player">
         <div class="rbccm-maas-mata__video-modal-backdrop" data-video-close=""></div>
         <div class="rbccm-maas-mata__video-modal-dialog">
@@ -612,7 +625,6 @@
           </div>
         </div>
       </div>
-    </xsl:if>
 
     <!-- rbccm-json-bind must load BEFORE maas-mata.js so the
          bootstrap block at the bottom of maas-mata.js finds the
