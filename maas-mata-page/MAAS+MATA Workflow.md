@@ -87,6 +87,16 @@ When the layout, CSS, or JS needs to change (i.e. anything not editable via JSON
 - Edit `maas-mata.js` (video modal, animate.css triggers, carousels, chart ticker, JSON-bind bootstrap) and upload to `/assets/rbccm/js/pages/maas-mata.js`.
 - The bind runtime itself lives in `rbccm-json-bind.js` and is generic — do not edit it for page-specific tweaks. Page-specific post-bind touch-ups go in the `onRendered` callback in `maas-mata.js`.
 
+### Animations
+
+The page uses [animate.css](https://animate.style/) for entrance fades. The CDN link is in the XSL, and the four keyframes we actually use (`fadeIn`, `fadeInUp`, `fadeInDown`, `zoomIn`) are also copied into `maas-mata.css` so animations still work if the CDN is ever blocked.
+
+Elements opt in with `data-animate="fadeInUp"` (fires on scroll into view) or `data-animate-hero="fadeInUp"` (fires on load). Containers with `data-stagger-parent="fadeInUp"` stagger their children.
+
+Two ways to turn animations off: the OS-level `prefers-reduced-motion` setting is respected, and appending `?noanim=1` to any URL skips them for that visit.
+
+One quirk to know about: animations sometimes don't fire on RBC corporate laptops / VDI. Cause isn't fully pinned down — likely the corp browser policy or GPU restrictions. Content itself is never hidden by default, so worst case is "no fade in," not "nothing shows up." If someone reports it, have them try `?noanim=1` first to confirm they see the page content, then check DevTools for `animation-name` on any `[data-animate]` element to see if the corp browser is stripping it.
+
 ### Cache-busting
 
 Handled automatically by an `AssetVersion` Datum in the Properties block. The XSL reads that value and appends `?v={value}` to every `<link>` and `<script>` URL for `maas-mata.css`, `maas-mata.js`, and `rbccm-json-bind.js`.
