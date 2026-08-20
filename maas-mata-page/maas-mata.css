@@ -2931,3 +2931,123 @@
   /* Debug pill */
   .rbccm-debug-bar { position: fixed; bottom: 12px; right: 12px; background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-family: monospace; opacity: 0.7; z-index: 999; }
   .rbccm-debug-bar--err { background: #c62828; opacity: 1; }
+
+  /* =========================================================
+     TeamSite defence block. unified.css / unified2.css apply
+     global `p`, `li`, `a`, and `.btn` rules that override our
+     scoped BEM CSS on live pages (margin-bottom, letter-spacing,
+     colour, line-height, padding). !important here is the
+     minimal-hammer fix so authored typography lands as designed.
+     ========================================================= */
+
+  /* Buttons — pin size + colour so global .btn / .btn-yellow
+     rules don't reshape them. */
+  .rbccm-maas-mata .rbccm-maas-mata__btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 50px !important;
+    padding: 12px 35px !important;
+    border-radius: 100px !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    text-decoration: none !important;
+    letter-spacing: 0 !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary {
+    background: #0051A5 !important;
+    color: #fff !important;
+    border: 1px solid #0051A5 !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 29.26px !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow {
+    background: #FFC72C !important;
+    color: #061730 !important;
+    border: 1px solid transparent !important;
+    font-size: 19.507px !important;
+    font-weight: 500 !important;
+    line-height: 29.26px !important;
+  }
+  /* Ghost variant scoped to new-standard — transparent + light border */
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow {
+    background: transparent !important;
+    color: #D8D8D8 !important;
+    border: 1px solid #D8D8D8 !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+  }
+
+  /* New Standard: force each heading span onto its own line
+     (some environments strip display:block from spans). */
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-lead,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-highlight,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-accent {
+    display: block !important;
+  }
+
+  /* New Standard body paragraphs — beat unified2.css line-height +
+     letter-spacing + margin overrides. */
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-body p {
+    color: #D8D8D8 !important;
+    text-align: center !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 150% !important;
+    letter-spacing: 0 !important;
+    margin: 0 0 21px !important;
+    font-feature-settings: 'liga' off, 'clig' off !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-body p:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Award cards — equalize height across the row so the tallest
+     card doesn't stretch its neighbours' hairline. */
+  .rbccm-maas-mata .rbccm-maas-mata__awards-grid {
+    align-items: stretch !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__award-card {
+    height: 100% !important;
+    align-self: stretch !important;
+  }
+
+  /* Platforms grid — same story: equalize the two cards. */
+  .rbccm-maas-mata .rbccm-maas-mata__platforms-grid {
+    align-items: stretch !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__platform-card {
+    align-self: stretch !important;
+    height: 100% !important;
+  }
+
+  /* Platform card body copy — Roboto 14 / 150% / #ECECEC on dark
+     variant, matches design spec. Global .btn / p styles were
+     eating letter-spacing + line-height. */
+  .rbccm-maas-mata .rbccm-maas-mata__platform-body,
+  .rbccm-maas-mata .rbccm-maas-mata__platform-list li {
+    color: #ECECEC !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 150% !important;
+    letter-spacing: 0 !important;
+    font-feature-settings: 'liga' off, 'clig' off !important;
+  }
+  /* Light variant card — swap the copy colour back to grey */
+  .rbccm-maas-mata .rbccm-maas-mata__platform-card--light .rbccm-maas-mata__platform-body,
+  .rbccm-maas-mata .rbccm-maas-mata__platform-card--light .rbccm-maas-mata__platform-list li {
+    color: #494949 !important;
+  }
+
+  /* Platforms eyebrow — tighten space beneath since the global rule
+     was adding extra margin. */
+  .rbccm-maas-mata .rbccm-maas-mata__platforms-eyebrow {
+    margin: 0 auto !important;
+    letter-spacing: 3px !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__platforms-heading {
+    margin: 0 !important;
+    letter-spacing: 0 !important;
+  }
