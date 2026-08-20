@@ -3108,14 +3108,25 @@
     margin-bottom: 0 !important;
   }
 
-  /* Award cards — equalize height across the row so the tallest
-     card doesn't stretch its neighbours' hairline. */
-  .rbccm-maas-mata .rbccm-maas-mata__awards-grid {
-    align-items: stretch !important;
-  }
-  .rbccm-maas-mata .rbccm-maas-mata__award-card {
-    height: 100% !important;
-    align-self: stretch !important;
+  /* Award cards — equalize height across the row. Base grid was
+     display:flex which was letting shorter cards stay short. Force
+     grid on the --3 modifier so all three tracks share the same
+     row height, then stretch each card to fill its cell. */
+  @media (min-width: 872px) {
+    .rbccm-maas-mata .rbccm-maas-mata__awards-grid--3 {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      grid-auto-rows: 1fr !important;
+      align-items: stretch !important;
+      gap: 16px !important;
+    }
+    .rbccm-maas-mata .rbccm-maas-mata__awards-grid--3 > .rbccm-maas-mata__award-card {
+      flex: initial !important;
+      width: auto !important;
+      max-width: none !important;
+      height: 100% !important;
+      align-self: stretch !important;
+    }
   }
 
   /* Platforms grid — same story: equalize the two cards. */
