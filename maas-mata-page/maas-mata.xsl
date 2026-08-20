@@ -231,7 +231,7 @@
             <xsl:value-of select="$HERO_SUBTITLE" disable-output-escaping="yes" />
           </p>
           <div class="rbccm-maas-mata__hero-actions" data-animate-hero="fadeInUp" data-animate-delay="450">
-            <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--blue" data-json-attr-href="hero.primaryCta.href">
+            <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--primary" data-json-attr-href="hero.primaryCta.href">
               <xsl:attribute name="href"><xsl:value-of select="$HERO_CTA_HREF" /></xsl:attribute>
               <span data-json="hero.primaryCta.label"><xsl:value-of select="$HERO_CTA_LABEL" /></span>
               <svg class="rbccm-maas-mata__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
@@ -289,7 +289,7 @@
             <xsl:value-of select="$AWD_EYEBROW" />
           </h5>
 
-          <div class="rbccm-maas-mata__awards-track" data-awards-track="" data-json-list="awards.items">
+          <div class="rbccm-maas-mata__awards-grid rbccm-maas-mata__awards-grid--3" data-awards-track="" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="awards.items">
             <template>
               <article class="rbccm-maas-mata__award-card">
                 <div class="rbccm-maas-mata__award-year" data-json="year"></div>
@@ -298,19 +298,19 @@
               </article>
             </template>
             <article class="rbccm-maas-mata__award-card">
-              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD1_YEAR" /></div>
-              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD1_TITLE" /></h6>
-              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD1_ISSUER" /></div>
+              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD1_YEAR" /></span>
+              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD1_TITLE" /></h3>
+              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD1_ISSUER" /></p>
             </article>
             <article class="rbccm-maas-mata__award-card">
-              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD2_YEAR" /></div>
-              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD2_TITLE" /></h6>
-              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD2_ISSUER" /></div>
+              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD2_YEAR" /></span>
+              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD2_TITLE" /></h3>
+              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD2_ISSUER" /></p>
             </article>
             <article class="rbccm-maas-mata__award-card">
-              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD3_YEAR" /></div>
-              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD3_TITLE" /></h6>
-              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD3_ISSUER" /></div>
+              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD3_YEAR" /></span>
+              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD3_TITLE" /></h3>
+              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD3_ISSUER" /></p>
             </article>
           </div>
 
@@ -331,38 +331,36 @@
             <h5 class="rbccm-maas-mata__platforms-eyebrow" data-animate="fadeInUp" data-json="platforms.eyebrow"><xsl:value-of select="$PLATFORMS_EYEBROW" /></h5>
             <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading"><xsl:value-of select="$PLATFORMS_HEADING" /></h2>
 
-            <div class="rbccm-maas-mata__platforms-grid" data-json-list="platforms.cards">
+            <div class="rbccm-maas-mata__platforms-grid" data-stagger-parent="fadeInUp" data-stagger-step="150" data-json-list="platforms.cards">
               <article>
                 <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
                     <xsl:when test="translate($PLT1_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
                   </xsl:choose></xsl:attribute>
-                <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></div>
-                <h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT1_TITLE" /></h3>
+                <h6 class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT1_TITLE" /></h3>
                 <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
-                <ul class="rbccm-maas-mata__platform-bullets">
+                <ul class="rbccm-maas-mata__platform-list">
                   <xsl:if test="normalize-space($PLT1_B1) != ''"><li><xsl:value-of select="$PLT1_B1" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B2) != ''"><li><xsl:value-of select="$PLT1_B2" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B3) != ''"><li><xsl:value-of select="$PLT1_B3" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B4) != ''"><li><xsl:value-of select="$PLT1_B4" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B5) != ''"><li><xsl:value-of select="$PLT1_B5" /></li></xsl:if>
-                </ul>
+                </ul></div>
               </article>
               <article>
                 <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
                     <xsl:when test="translate($PLT2_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
                   </xsl:choose></xsl:attribute>
-                <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT2_EYEBROW" /></div>
-                <h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT2_TITLE" /></h3>
+                <h6 class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT2_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT2_TITLE" /></h3>
                 <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT2_BODY" disable-output-escaping="yes" /></p>
-                <ul class="rbccm-maas-mata__platform-bullets">
+                <ul class="rbccm-maas-mata__platform-list">
                   <xsl:if test="normalize-space($PLT2_B1) != ''"><li><xsl:value-of select="$PLT2_B1" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B2) != ''"><li><xsl:value-of select="$PLT2_B2" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B3) != ''"><li><xsl:value-of select="$PLT2_B3" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B4) != ''"><li><xsl:value-of select="$PLT2_B4" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B5) != ''"><li><xsl:value-of select="$PLT2_B5" /></li></xsl:if>
-                </ul>
+                </ul></div>
               </article>
             </div>
           </div>
@@ -379,23 +377,29 @@
             <p class="rbccm-maas-mata__innovation-era-body" data-json-html="innovationEra.body"><xsl:value-of select="$INV_BODY" disable-output-escaping="yes" /></p>
           </div>
 
-          <ol class="rbccm-maas-mata__innovation-era-list" data-json-list="innovationEra.features">
-            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="150">
-              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F1_NUM" /></div>
-              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F1_TITLE" /></h3>
-              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F1_BODY" disable-output-escaping="yes" /></p>
-            </li>
-            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="300">
-              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F2_NUM" /></div>
-              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F2_TITLE" /></h3>
-              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F2_BODY" disable-output-escaping="yes" /></p>
-            </li>
-            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="450">
-              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F3_NUM" /></div>
-              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F3_TITLE" /></h3>
-              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F3_BODY" disable-output-escaping="yes" /></p>
-            </li>
-          </ol>
+          <div class="rbccm-maas-mata__features-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="innovationEra.features">
+            <article class="rbccm-maas-mata__feature">
+              <div class="rbccm-maas-mata__feature-content">
+                <div class="rbccm-maas-mata__feature-number">/<xsl:value-of select="$F1_NUM" /></div>
+                <h3 class="rbccm-maas-mata__feature-title"><xsl:value-of select="$F1_TITLE" /></h3>
+                <p class="rbccm-maas-mata__feature-body"><xsl:value-of select="$F1_BODY" disable-output-escaping="yes" /></p>
+              </div>
+            </article>
+            <article class="rbccm-maas-mata__feature">
+              <div class="rbccm-maas-mata__feature-content">
+                <div class="rbccm-maas-mata__feature-number">/<xsl:value-of select="$F2_NUM" /></div>
+                <h3 class="rbccm-maas-mata__feature-title"><xsl:value-of select="$F2_TITLE" /></h3>
+                <p class="rbccm-maas-mata__feature-body"><xsl:value-of select="$F2_BODY" disable-output-escaping="yes" /></p>
+              </div>
+            </article>
+            <article class="rbccm-maas-mata__feature">
+              <div class="rbccm-maas-mata__feature-content">
+                <div class="rbccm-maas-mata__feature-number">/<xsl:value-of select="$F3_NUM" /></div>
+                <h3 class="rbccm-maas-mata__feature-title"><xsl:value-of select="$F3_TITLE" /></h3>
+                <p class="rbccm-maas-mata__feature-body"><xsl:value-of select="$F3_BODY" disable-output-escaping="yes" /></p>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -411,50 +415,42 @@
             <p class="rbccm-maas-mata__mata-cap-sub" data-json-html="mataCapabilities.subheading"><xsl:value-of select="$MC_SUBHEADING" disable-output-escaping="yes" /></p>
           </div>
 
-          <div class="rbccm-maas-mata__mata-cap-grid" data-json-list="mataCapabilities.cards">
-            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="150">
-              <div class="rbccm-maas-mata__mata-cap-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use>
-                </svg>
-              </div>
-              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C1_TITLE" /></h3>
-              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C1_SUBTITLE" /></div>
-              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>
-            </article>
-            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="300">
-              <div class="rbccm-maas-mata__mata-cap-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C2_ICON" /></xsl:attribute></use>
-                </svg>
-              </div>
-              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C2_TITLE" /></h3>
-              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C2_SUBTITLE" /></div>
-              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C2_BODY" disable-output-escaping="yes" /></p>
-            </article>
-            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="450">
-              <div class="rbccm-maas-mata__mata-cap-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C3_ICON" /></xsl:attribute></use>
-                </svg>
-              </div>
-              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C3_TITLE" /></h3>
-              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C3_SUBTITLE" /></div>
-              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C3_BODY" disable-output-escaping="yes" /></p>
-            </article>
+          <div class="rbccm-maas-mata__mata-cap-cards">
+            <div class="rbccm-maas-mata__mata-cap-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="mataCapabilities.cards">
+              <article class="rbccm-maas-mata__mata-cap-card">
+                <div class="rbccm-maas-mata__mata-cap-content">
+                  <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use></svg>
+                  <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C1_TITLE" /></h3>
+                  <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C1_SUBTITLE" /></p>
+                  <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>
+                </div>
+              </article>
+              <article class="rbccm-maas-mata__mata-cap-card">
+                <div class="rbccm-maas-mata__mata-cap-content">
+                  <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C2_ICON" /></xsl:attribute></use></svg>
+                  <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C2_TITLE" /></h3>
+                  <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C2_SUBTITLE" /></p>
+                  <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C2_BODY" disable-output-escaping="yes" /></p>
+                </div>
+              </article>
+              <article class="rbccm-maas-mata__mata-cap-card">
+                <div class="rbccm-maas-mata__mata-cap-content">
+                  <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C3_ICON" /></xsl:attribute></use></svg>
+                  <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C3_TITLE" /></h3>
+                  <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C3_SUBTITLE" /></p>
+                  <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C3_BODY" disable-output-escaping="yes" /></p>
+                </div>
+              </article>
+            </div>
 
             <!-- Fixed Index Events card (full width below the 3-card grid) -->
-            <article class="rbccm-maas-mata__mata-cap-wide" data-animate="fadeInUp">
-              <div class="rbccm-maas-mata__mata-cap-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-                  <use>
-                    <xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$MC_INDEX_ICON" /></xsl:attribute>
-                  </use>
-                </svg>
+            <article class="rbccm-maas-mata__mata-cap-wide">
+              <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$MC_INDEX_ICON" /></xsl:attribute></use></svg>
+              <div class="rbccm-maas-mata__mata-cap-wide-body">
+                <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$MC_INDEX_TITLE" /></h3>
+                <p class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$MC_INDEX_SUBTITLE" /></p>
+                <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$MC_INDEX_BODY" disable-output-escaping="yes" /></p>
               </div>
-              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$MC_INDEX_TITLE" /></h3>
-              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$MC_INDEX_SUBTITLE" /></div>
-              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$MC_INDEX_BODY" disable-output-escaping="yes" /></p>
             </article>
           </div>
         </section>
@@ -467,16 +463,11 @@
             <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading"><xsl:value-of select="$MK_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__featured-track" data-animate="fadeInUp" data-animate-delay="200" data-insights-track="" data-json-list="marketInsights.items">
-              <article class="rbccm-maas-mata__featured-card">
-                <div class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS1_EYEBROW" /></div>
-                <h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS1_TITLE" /></h3>
-                <p class="rbccm-maas-mata__featured-body"><xsl:value-of select="$INS1_BODY" disable-output-escaping="yes" /></p>
-                <a class="rbccm-maas-mata__featured-cta">
+              <article class="rbccm-maas-mata__featured-card"><div class="rbccm-maas-mata__featured-body"><h4 class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS1_EYEBROW" /></h4><div class="rbccm-maas-mata__featured-content"><h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS1_TITLE" /></h3><p class="rbccm-maas-mata__featured-copy"><xsl:value-of select="$INS1_BODY" disable-output-escaping="yes" /></p></div><a class="rbccm-maas-mata__featured-cta">
                   <xsl:attribute name="href"><xsl:value-of select="$INS1_CTA_HREF" /></xsl:attribute>
                   <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="$INS1_CTA_LABEL" /></span>
                   <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
-              </article>
+                </a></div><div class="rbccm-maas-mata__featured-illustration"></div></article>
             </div>
 
             <div class="rbccm-maas-mata__insights-controls" data-animate="zoomIn" data-animate-delay="350" data-insights-controls="">
