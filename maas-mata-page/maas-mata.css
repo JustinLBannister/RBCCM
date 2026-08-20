@@ -99,6 +99,25 @@
     isolation: isolate;
     transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
   }
+  /* "See MAAS in action" ghost pill — 1px #D8D8D8 border + text on
+     the dark strip. Scoped to the section so the demo CTA yellow
+     button elsewhere stays as-is. */
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow {
+    background: transparent;
+    color: #D8D8D8;
+    border: 1px solid #D8D8D8;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 29.26px;
+    padding: 12px 35px;
+    gap: 10px;
+  }
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow:hover,
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+
   /* Mobile size override for the demo CTA. Figma spec: 40px tall,
      14/29.26 Roboto, tighter side padding, 10px icon gap. */
   .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
@@ -428,11 +447,7 @@
   /* Mobile hero layout defaults are now on the base rules above
      (eyebrow 80, title 32, subtitle 32 bottom margins; title 50px,
      subtitle 16px). Desktop overrides sit in min-width: 992 blocks
-     alongside each element's base rule.
-     This @media block used to hold the mobile flip; kept as a
-     placeholder for any future mobile-specific tweaks that
-     shouldn't be inherited by desktop. */
-  }
+     alongside each element's base rule. */
 
   /* Chart card */
   /* Chart wrapper — Figma "Stats-UI" bar: display flex, center card,
@@ -2808,7 +2823,7 @@
     background: #061730;
     border-radius: 20px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-    padding: 48px 24px 24px;
+    padding: 0;
     transform: scale(0.96);
     transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -2824,26 +2839,36 @@
     padding: 0; margin: -1px; overflow: hidden;
     clip: rect(0,0,0,0); white-space: nowrap; border: 0;
   }
+  /* Close button: thin white X inside a 32px circle. Positioned
+     outside the top-right of the video frame so it doesn't obscure
+     content. Ring + backdrop keep it readable against any video. */
   .rbccm-maas-mata__video-modal-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
+    top: -60px;
+    right: 0;
+    width: 48px;
+    height: 48px;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 0;
+    border: 3px solid #fff;
     color: #fff;
     cursor: pointer;
     border-radius: 50%;
-    transition: background 150ms ease;
+    transition: background 150ms ease, transform 150ms ease;
+    z-index: 2;
+  }
+  .rbccm-maas-mata__video-modal-close svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 3;
   }
   .rbccm-maas-mata__video-modal-close:hover,
   .rbccm-maas-mata__video-modal-close:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(6, 23, 48, 1);
+    transform: scale(1.08);
   }
   .rbccm-maas-mata__video-modal-close:focus-visible {
     outline: 2px solid #FFC72C;

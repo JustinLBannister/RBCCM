@@ -362,17 +362,27 @@
         goTo(parseInt(t.getAttribute('data-idx'), 10) || 0);
       });
 
-      if (typeof IntersectionObserver !== 'undefined') {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-              var idx = slides.indexOf(entry.target);
-              if (idx > -1) setActive(idx);
-            }
+      // Scroll-based active tracker (rAF-throttled). More reliable than
+      // IntersectionObserver on a snap track — IO can race with the
+      // snap animation and miss transitions. Finds the slide whose left
+      // edge is closest to the track's current scrollLeft.
+      var scrollTimer = null;
+      function onScroll() {
+        if (scrollTimer) return;
+        scrollTimer = requestAnimationFrame(function () {
+          scrollTimer = null;
+          var slides = getSlides();
+          if (!slides.length) return;
+          var offset = track.scrollLeft + parseFloat(getComputedStyle(track).paddingLeft || '0');
+          var closest = 0, minDist = Infinity;
+          slides.forEach(function (s, i) {
+            var d = Math.abs(s.offsetLeft - track.offsetLeft - offset);
+            if (d < minDist) { minDist = d; closest = i; }
           });
-        }, { root: track, threshold: [0.6, 0.9] });
-        slides.forEach(function (s) { io.observe(s); });
+          if (closest !== activeIndex) setActive(closest);
+        });
       }
+      track.addEventListener('scroll', onScroll, { passive: true });
     }
 
     // Data binding may inflate the list from 0 fallback cards to
