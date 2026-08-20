@@ -2939,25 +2939,16 @@
     to   { transform: scale3d(1, 1, 1); }
   }
 
-  /* Fail-safe: only hide animate targets once JS has confirmed it
-     ran (body.rbccm-anim-ready). If the JS chain fails silently on
-     any environment, elements stay visible instead of stuck at
-     opacity:0. */
-  .rbccm-anim-ready [data-animate]:not(.animate__animated),
-  .rbccm-anim-ready [data-animate-hero]:not(.animate__animated),
-  .rbccm-anim-ready [data-stagger-parent] > *:not(.animate__animated) {
-    opacity: 0;
-  }
-  .rbccm-anim-ready [data-animate].animate__animated,
-  .rbccm-anim-ready [data-animate-hero].animate__animated,
-  .rbccm-anim-ready [data-stagger-parent] > .animate__animated {
-    opacity: 1;
-  }
+  /* No "hidden until animate" pattern — content is visible by
+     default. Animate.css keyframes we inlined above start from
+     opacity:0 and end at opacity:1 with animation-fill-mode: both,
+     so the entrance still plays when JS adds the classes. If JS
+     doesn't fire on some browsers, content just appears (no
+     animation) — always better than "stuck at opacity 0". */
   @media (prefers-reduced-motion: reduce) {
     [data-animate],
     [data-animate-hero],
     [data-stagger-parent] > * {
-      opacity: 1 !important;
       animation: none !important;
     }
   }
@@ -3162,6 +3153,6 @@
     letter-spacing: 3px !important;
   }
   .rbccm-maas-mata .rbccm-maas-mata__platforms-heading {
-    margin: 0 !important;
+    margin: 50px 0 60px !important;
     letter-spacing: 0 !important;
   }

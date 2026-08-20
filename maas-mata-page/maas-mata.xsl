@@ -181,8 +181,11 @@
        ============================================================ -->
   <xsl:template match="/">
 
-    <!-- Component stylesheet (includes the 4 animate.css keyframes
-         we use — no external CDN dependency). -->
+    <!-- animate.css from CDN (drives fade + zoom entrances) + our
+         own component stylesheet. Local keyframes are duplicated
+         inside maas-mata.css as a fallback so the animations still
+         run if the CDN is ever blocked. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="/assets/rbccm/css/pages/maas-mata.css"/>
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
@@ -267,7 +270,7 @@
           <div class="rbccm-maas-mata__container">
             <h2 class="rbccm-maas-mata__new-standard-heading" data-animate="fadeInUp">
               <span class="rbccm-maas-mata__new-standard-heading-lead" data-json="newStandard.headingLead"><xsl:value-of select="$NS_LEAD" /></span>
-              <span class="rbccm-maas-mata__new-standard-heading-highlight"><span data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span> <span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span>.</span>
+              <span class="rbccm-maas-mata__new-standard-heading-highlight"><span data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span><xsl:text> </xsl:text><span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span>.</span>
             </h2>
             <div class="rbccm-maas-mata__new-standard-body" data-animate="fadeInUp" data-animate-delay="150" data-json-list="newStandard.body">
               <template><p data-json=""></p></template>
