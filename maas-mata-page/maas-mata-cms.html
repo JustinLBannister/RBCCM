@@ -14,7 +14,7 @@
   Round-trip:
     1. Edit content, click Download → maas-mata.json downloads
     2. Send file to dev
-    3. Dev drops into /js/data/maas-mata.json on RBCCM server
+    3. Dev drops into /assets/rbccm/js/pages/data/maas-mata.json on RBCCM server
     4. Page picks it up on next load
 -->
 <html lang="en">
@@ -246,7 +246,7 @@
       <button class="close" id="modal-schema-close" aria-label="Close">×</button>
     </div>
     <div class="modal-body">
-      <p style="font-size: 12px; color: var(--grey-600);">The MAAS+MATA page reads this shape from <code>/js/data/maas-mata.json</code>. Every editable text on the page maps to a path here.</p>
+      <p style="font-size: 12px; color: var(--grey-600);">The MAAS+MATA page reads this shape from <code>/assets/rbccm/js/pages/data/maas-mata.json</code>. Every editable text on the page maps to a path here.</p>
       <pre class="json-preview" id="schema-preview" style="height: 500px;"></pre>
     </div>
   </div>
@@ -295,7 +295,10 @@
   // stale draft — v4b adds newStandard, chartCard.video, and the
   // 3-item thoughtLeadership.items array. Legacy sections (whyRbc,
   // assetCoverage) are hidden from the nav.
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4c';
+  // v4c → v4d: bumped ahead of team demo — SAMPLE seed matches the
+  // final rendered copy (post XSL/properties sync), so opening the
+  // CMS fresh now pre-fills with production-accurate placeholders.
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4d';
 
   // ==============================================================
   // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
@@ -1147,9 +1150,9 @@
       sectionsUnchanged: summary.unchanged,
       changedPaths: diffs,
       previewInstructions:
-        'Upload this JSON to TeamSite at /assets/maas-mata/maas-mata-draft.json, ' +
-        'then visit the page URL with ?preview=draft appended. ' +
-        'When approved, rename to maas-mata.json (or overwrite the production file).'
+        'Production path: /assets/rbccm/js/pages/data/maas-mata.json — dev uploads ' +
+        'this file there (or as maas-mata-draft.json alongside for a preview pass ' +
+        'first). Page reads it on next load; hard-refresh to bust cache.'
     }};
     Object.keys(state).forEach(function (k) { payload[k] = state[k]; });
 
