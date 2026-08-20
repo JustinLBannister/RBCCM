@@ -298,7 +298,11 @@
   // v4c → v4d: bumped ahead of team demo — SAMPLE seed matches the
   // final rendered copy (post XSL/properties sync), so opening the
   // CMS fresh now pre-fills with production-accurate placeholders.
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4d';
+  // v4d → v4e: renamed closeTheLoop → innovationEra and
+  // thoughtLeadership → marketInsights so exported JSON keys match
+  // the data-json paths the XSL emits. Bump forces reset for any
+  // drafts saved under the old key names.
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4e';
 
   // ==============================================================
   // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
@@ -402,8 +406,9 @@
       ]
     },
     // v4: this section slot is now "Innovation for the next
-    // execution era" but reuses the closeTheLoop schema/structure.
-    closeTheLoop: {
+    // execution era". Renamed key from closeTheLoop → innovationEra
+    // to match the data-json paths the XSL emits.
+    innovationEra: {
       heading: "Innovation for the next execution era",
       body: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.",
       features: [
@@ -460,7 +465,9 @@
     // v4: "Market insights" is now a 3-card Slick-style carousel.
     // items[] replaces the old single `featured` object. PDF v4
     // shows lorem ipsum across all 3 - real copy lands separately.
-    thoughtLeadership: {
+    // Renamed key from thoughtLeadership → marketInsights to match
+    // the data-json paths the XSL emits.
+    marketInsights: {
       eyebrow: "Trends Shaping Institutional Trading",
       heading: "Market insights",
       items: [
@@ -615,8 +622,8 @@
         }
       }
     },
-    closeTheLoop: {
-      label: 'Innovation Era (was: Close the Loop)',
+    innovationEra: {
+      label: 'Innovation Era',
       fields: {
         heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band (v4: "Innovation for the next execution era")' },
         body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading (v4: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
@@ -683,8 +690,8 @@
         }
       }
     },
-    thoughtLeadership: {
-      label: 'Market Insights (was: Thought Leadership)',
+    marketInsights: {
+      label: 'Market Insights',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading (v4: "Trends Shaping Institutional Trading").' },
         heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading (v4: "Market insights"). v3 called this section "Thought leadership".' },

@@ -247,7 +247,7 @@
 
       <!-- ═══ 2. CHART CARD ═══════════════════════════════════ -->
       <div class="rbccm-maas-mata__chart rbccm-maas-mata__chart-image" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600">
-        <img>
+        <img class="rbccm-maas-mata__chart-image-poster">
           <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>
