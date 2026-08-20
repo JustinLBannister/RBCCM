@@ -1,0 +1,2922 @@
+/* maas-mata.css
+   Mobile-first. Desktop overrides live under @media (min-width: 992px).
+   Tokens on :root below. Pair with maas-mata.js + maas-mata.xsl.
+   animate.css@4.1.1 loaded from the page shell. */
+
+  :root {
+    --navy-900: #001E3C; --navy-800: #002144; --navy-700: #003168; --navy-600: #0051A5;
+    --yellow:   #FBDE00; --yellow-dk: #F4C020;
+    --cream:    #F6F1E7; --off-white: #FAFAF7;
+    --grey-100: #F3F4F5; --grey-300: #D9DBDE; --grey-500: #8A8F97; --grey-700: #4A4E55;
+    --ink:      #1B1F27; --white: #FFFFFF;
+    --serif:    Georgia, "Times New Roman", serif;
+    --sans:     "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--sans); color: var(--ink); background: var(--white); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ==============================================================
+     Site chrome (not part of the component)
+     ============================================================== */
+  .rbccm-site-topbar { background: #fff; border-bottom: 1px solid var(--grey-300); font-size: 12px; color: var(--grey-700); }
+  .rbccm-site-topbar__inner { display: flex; justify-content: flex-end; gap: 20px; padding: 8px 23px; }
+  /* Site chrome hidden for now — restore by removing this rule. */
+  .rbccm-site-topbar, .rbccm-site-topbar__inner, .rbccm-site-header, .rbccm-site-footer { display: none !important; }
+  .rbccm-site-header { background: #fff; padding: 14px 0; border-bottom: 1px solid var(--grey-300); }
+  .rbccm-site-header__inner { max-width: 1180px; margin: 0 auto; padding: 0 23px; display: flex; align-items: center; justify-content: space-between; }
+  .rbccm-site-logo { font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 8px; }
+  .rbccm-site-logo::before { content: ""; display: inline-block; width: 22px; height: 22px; background: var(--yellow); border-radius: 4px; }
+  .rbccm-site-nav__list { list-style: none; padding: 0; margin: 0; display: flex; gap: 28px; font-size: 14px; color: var(--navy-800); }
+  .rbccm-site-nav__link { padding: 8px 0; }
+  .rbccm-site-nav__link:hover { color: var(--navy-600); }
+  .rbccm-site-footer { background: var(--navy-900); color: var(--grey-500); padding: 32px 0; font-size: 12px; }
+  .rbccm-site-footer__inner { max-width: 1180px; margin: 0 auto; padding: 0 23px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .rbccm-site-footer__links { display: flex; gap: 20px; }
+  .rbccm-site-footer__socials { display: flex; gap: 10px; }
+  .rbccm-site-footer__social { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; }
+
+  /* ==============================================================
+     Component: rbccm-maas-mata
+     ============================================================== */
+  .rbccm-maas-mata__container { max-width: 1180px; margin: 0 auto; padding: 0 23px; }
+
+  /* Shared button pattern */
+  /* Hero button base — exact Figma spec: 50px tall, 12/35 padding, 10px gap,
+     pill radius, Roboto 18/29.26 middle weight. Two variants below layer
+     colour + border on top. */
+  .rbccm-maas-mata__btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 50px; padding: 12px 35px; border-radius: 100px; border: 1px solid transparent; cursor: pointer; font-family: Roboto, Arial, sans-serif; font-size: 18px; line-height: 29.26px; text-decoration: none; }
+  .rbccm-maas-mata__btn--primary { background: #0051A5; color: #fff; font-weight: 500; position: relative; overflow: hidden; }
+  .rbccm-maas-mata__btn--primary:hover { background: #003168; }
+  /* Mobile spec (Figma): 14/29.26 Roboto wt 500, white text,
+     bright-blue #0051A5 fill, 50 tall x 12/35 pad, 100px pill.
+     Layout values match the base; only the type-size shrinks. */
+  @media (max-width: 991px) {
+    .rbccm-maas-mata__btn--primary {
+      font-size: 14px;
+      line-height: 29.26px;
+    }
+  }
+  .rbccm-maas-mata__btn--primary .rbccm-maas-mata__btn-icon {
+    fill: #fff; width: 23px; height: 23px; flex-shrink: 0;
+    /* Base transition so the arrow settles smoothly out of any
+       transform state (keeps focus/blur transitions clean). */
+    transition: transform 200ms ease, opacity 200ms ease;
+    will-change: transform, opacity;
+  }
+  /* Arrow fly-through on hover: slides out to the right, fades,
+     reappears from the left, snaps back to rest. Fires once per
+     hover-enter. overflow:hidden on the button clips the flight
+     path so the arrow doesn't visibly escape the pill. */
+  .rbccm-maas-mata__btn--primary:hover .rbccm-maas-mata__btn-icon,
+  .rbccm-maas-mata__btn--primary:focus-visible .rbccm-maas-mata__btn-icon {
+    animation: rbccm-mm-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+  }
+  @keyframes rbccm-mm-arrow-flyby {
+    0%   { transform: translateX(0);     opacity: 1; }
+    45%  { transform: translateX(32px);  opacity: 0; }
+    46%  { transform: translateX(-32px); opacity: 0; }
+    100% { transform: translateX(0);     opacity: 1; }
+  }
+  /* Respect reduced-motion: no fly-through, arrow stays put. */
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-maas-mata__btn--primary:hover .rbccm-maas-mata__btn-icon,
+    .rbccm-maas-mata__btn--primary:focus-visible .rbccm-maas-mata__btn-icon {
+      animation: none;
+    }
+  }
+  /* Secondary — outlined button per Figma (was previously a text-link
+     style). Border-only, grey text, matching icon fill. */
+  .rbccm-maas-mata__btn--secondary { background: transparent; color: #494949; border-color: #D8D8D8; font-weight: 400; }
+  .rbccm-maas-mata__btn--secondary:hover { border-color: #494949; }
+  .rbccm-maas-mata__btn--secondary .rbccm-maas-mata__btn-icon { fill: #494949; width: 12px; height: 13px; flex-shrink: 0; }
+  /* Yellow pill CTA — Figma "Request a demo": warm-yellow fill, deep
+     navy text (#061730), Roboto 19.507/29.26 wt 500. 23×23 dark-navy
+     arrow SVG via .rbccm-maas-mata__btn-icon (fill inherits currentColor
+     which is #061730 on this variant). */
+  .rbccm-maas-mata__btn--yellow {
+    background: #FFC72C;
+    color: #061730;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 19.507px;
+    font-weight: 500;
+    line-height: 29.26px;
+    height: 50px;
+    padding: 12px 35px;
+    border-radius: 100px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    /* Position + clip for the shine-sweep pseudo-element and the
+       arrow flyby below. */
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  }
+  /* Mobile size override for the demo CTA. Figma spec: 40px tall,
+     14/29.26 Roboto, tighter side padding, 10px icon gap. */
+  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
+    height: 40px;
+    padding: 20px 35px;
+    font-size: 14px;
+    line-height: 29.26px;
+    gap: 10px;
+  }
+  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
+    width: 18px;
+    height: 18px;
+    aspect-ratio: 1 / 1;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
+      height: 50px;
+      padding: 12px 35px;
+      font-size: 19.507px;
+    }
+    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
+      width: 23px;
+      height: 23px;
+    }
+  }
+  /* Shine-sweep: a soft white diagonal band travels across the
+     button on hover. Zero-width at rest so it doesn't tint the
+     button. Sits above the yellow fill but below text/icon via
+     z-index. */
+  .rbccm-maas-mata__btn--yellow::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 0;
+  }
+  .rbccm-maas-mata__btn--yellow > * { position: relative; z-index: 1; }
+  .rbccm-maas-mata__btn--yellow:hover,
+  .rbccm-maas-mata__btn--yellow:focus-visible {
+    background: var(--yellow-dk);
+    /* No vertical lift - the shine sweep + arrow flyby carry
+       the hover; button stays anchored in place. */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  }
+  .rbccm-maas-mata__btn--yellow:hover::before,
+  .rbccm-maas-mata__btn--yellow:focus-visible::before {
+    animation: rbccm-mm-shine-sweep 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  @keyframes rbccm-mm-shine-sweep {
+    0%   { left: -60%; opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+  .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
+    fill: #061730; width: 23px; height: 23px; flex-shrink: 0;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+  /* Arrow flyby on yellow buttons that have an icon (Request a
+     demo). No-op on yellow buttons without an icon (See MAAS in
+     action) — the shine-sweep + lift carry the hover there. */
+  .rbccm-maas-mata__btn--yellow:hover .rbccm-maas-mata__btn-icon,
+  .rbccm-maas-mata__btn--yellow:focus-visible .rbccm-maas-mata__btn-icon {
+    animation: rbccm-mm-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-maas-mata__btn--yellow:hover::before,
+    .rbccm-maas-mata__btn--yellow:focus-visible::before,
+    .rbccm-maas-mata__btn--yellow:hover .rbccm-maas-mata__btn-icon,
+    .rbccm-maas-mata__btn--yellow:focus-visible .rbccm-maas-mata__btn-icon {
+      animation: none;
+    }
+  }
+  .rbccm-maas-mata__arrow { display: inline-block; transform: translateY(-1px); }
+
+  /* Hero */
+  /* Faint graph-paper grid — vertical + horizontal rules + a small
+     "cross" accent at every intersection. Lives on the root so it
+     covers the hero AND the white space around the chart card below.
+     Sections that should NOT show the grid (why-rbc, market-insights)
+     get an explicit background: #fff to mask it; the dark / coloured
+     bands (dark-strip, innovation-era, assets, demo, newsletter) already
+     have their own backgrounds and paint over it.
+
+     From Figma Pattern > Layer_2 — same 5-line rhythm in both axes:
+       • line thickness   ~1.2px
+       • line spacing     ~23.35px  (5 × spacing = 116.75px pattern unit)
+       • dark line alpha  0.025 (Figma: rgba(0,49,104,0.05) × 50% opacity)
+       • light line alpha 0.01  (Figma: rgba(0,49,104,0.05) × 20% opacity)
+       • cross accent     rgba(0,49,104,0.05), 1.194 × 8.355 stubs
+
+     Three layers stacked in background-image:
+       1. Vertical rules (90deg gradient)
+       2. Horizontal rules (0deg gradient)
+       3. SVG cross tile — 23.35 × 23.35, one cross centered at the
+          grid intersection; background-position pulls the cross so it
+          sits ON the intersecting rule pair (0.6, 0.6) inside each
+          23.35 cell. */
+  .rbccm-maas-mata {
+    background-color: #fff;
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 49, 104, 0.025) 0,
+        rgba(0, 49, 104, 0.025) 1.2px,
+        transparent 1.2px,
+        transparent 23.35px,
+        rgba(0, 49, 104, 0.01) 23.35px,
+        rgba(0, 49, 104, 0.01) 24.55px,
+        transparent 24.55px,
+        transparent 46.70px,
+        rgba(0, 49, 104, 0.01) 46.70px,
+        rgba(0, 49, 104, 0.01) 47.90px,
+        transparent 47.90px,
+        transparent 70.05px,
+        rgba(0, 49, 104, 0.01) 70.05px,
+        rgba(0, 49, 104, 0.01) 71.25px,
+        transparent 71.25px,
+        transparent 93.40px,
+        rgba(0, 49, 104, 0.01) 93.40px,
+        rgba(0, 49, 104, 0.01) 94.60px,
+        transparent 94.60px,
+        transparent 116.75px
+      ),
+      repeating-linear-gradient(
+        180deg,
+        rgba(0, 49, 104, 0.025) 0,
+        rgba(0, 49, 104, 0.025) 1.2px,
+        transparent 1.2px,
+        transparent 23.35px,
+        rgba(0, 49, 104, 0.01) 23.35px,
+        rgba(0, 49, 104, 0.01) 24.55px,
+        transparent 24.55px,
+        transparent 46.70px,
+        rgba(0, 49, 104, 0.01) 46.70px,
+        rgba(0, 49, 104, 0.01) 47.90px,
+        transparent 47.90px,
+        transparent 70.05px,
+        rgba(0, 49, 104, 0.01) 70.05px,
+        rgba(0, 49, 104, 0.01) 71.25px,
+        transparent 71.25px,
+        transparent 93.40px,
+        rgba(0, 49, 104, 0.01) 93.40px,
+        rgba(0, 49, 104, 0.01) 94.60px,
+        transparent 94.60px,
+        transparent 116.75px
+      ),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='116.75' height='116.75' viewBox='0 0 116.75 116.75'><rect x='54.1975' y='57.778' width='8.355' height='1.194' fill='%23003168' fill-opacity='0.05'/><rect x='57.778' y='54.1975' width='1.194' height='8.355' fill='%23003168' fill-opacity='0.05'/></svg>");
+    background-size: auto, auto, 116.75px 116.75px;
+    background-position: 0 0, 0 0, -57.775px -57.775px;
+    background-repeat: repeat, repeat, repeat;
+  }
+
+  /* Hero — exact Figma spec (desktop). Eyebrow / H1 / paragraph / buttons
+     use the pixel values pulled from the design panel; letter-spacing on
+     the eyebrow is 3px (creates the wide-caps feel without needing
+     text-transform, so the JSON content is emitted as authored).
+
+     Soft blue glow (Figma "Ellipse", 702×702 circle, #0051A5 @ 4%,
+     100px blur, positioned top:-369 / left:centered) renders behind
+     the hero copy via ::before. overflow: hidden clips the top half
+     of the circle so the glow sits like a soft halo at the top-centre
+     of the hero without bleeding into the site header above or the
+     chart section below. */
+  .rbccm-maas-mata__hero {
+    padding: 75px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .rbccm-maas-mata__hero::before {
+    content: "";
+    position: absolute;
+    top: -369px;
+    left: 50%;
+    width: 702px;
+    height: 702px;
+    margin-left: -351px;
+    border-radius: 50%;
+    background: rgba(0, 81, 165, 0.04);
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .rbccm-maas-mata__hero > * { position: relative; z-index: 1; }
+
+  /* Section eyebrows are semantic <h5>s for outline purposes -
+     reset the browser's default h5 margins, padding, and bold
+     weight in one shot so each section's own eyebrow rule owns
+     100% of the visual treatment. */
+  .rbccm-maas-mata__hero-eyebrow,
+  .rbccm-maas-mata__awards-eyebrow,
+  .rbccm-maas-mata__platforms-eyebrow,
+  .rbccm-maas-mata__mata-cap-eyebrow,
+  .rbccm-maas-mata__market-insights-eyebrow,
+  .rbccm-maas-mata__demo-eyebrow {
+    margin: 0;
+    padding: 0;
+    font-weight: 400;
+  }
+
+  /* Card headings + copy became semantic h3/h4/h6/p as of this
+     pass. Every card-level class rule already sets its own
+     font-size/weight/margin, but we defend against TeamSite/CMS
+     global tag styles (which sometimes apply !important margins)
+     by re-zeroing margin + padding on the tag+class pair. */
+  /* Card headings + copy became semantic h3/h4/h6/p. Every class
+     rule already sets its own font-size/weight/margin, but we
+     defend against TeamSite/CMS global tag styles by resetting
+     padding on the tag+class pair. Margin left to the class rule
+     because hero-title / hero-eyebrow specifically want a bottom
+     margin — resetting it here would clobber the section rhythm. */
+  h3.rbccm-maas-mata__award-title,
+  h3.rbccm-maas-mata__feature-title,
+  h3.rbccm-maas-mata__featured-title,
+  h3.rbccm-maas-mata__platform-title,
+  h3.rbccm-maas-mata__mata-cap-title,
+  h6.rbccm-maas-mata__platform-eyebrow,
+  p.rbccm-maas-mata__award-issuer,
+  p.rbccm-maas-mata__feature-body,
+  p.rbccm-maas-mata__platform-body,
+  p.rbccm-maas-mata__mata-cap-subtitle,
+  p.rbccm-maas-mata__mata-cap-body,
+  p.rbccm-maas-mata__featured-copy {
+    margin: 0;
+    padding: 0;
+  }
+  /* Hero eyebrow + title carry their own margin/padding via the
+     class rules (55px + 48px bottom respectively). Only zero the
+     padding to defend against tag-level global rules; leave the
+     margin alone. */
+  h1.rbccm-maas-mata__hero-eyebrow,
+  p.rbccm-maas-mata__hero-title {
+    padding: 0;
+  }
+
+  .rbccm-maas-mata__hero-eyebrow {
+    color: #0051A5;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 120%;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    /* 80px below the yellow underline to the top of the H1 per Figma.
+       The ::after (yellow line) sits INSIDE the eyebrow box, so this
+       margin-bottom is measured from the line's bottom edge. */
+    margin: 0 0 80px;
+  }
+  /* 45x2 RBC yellow underline sitting beneath the eyebrow. Decorative,
+     so ::after keeps it out of the DOM / accessibility tree. Centred by
+     margin auto since the hero is text-align:center. */
+  .rbccm-maas-mata__hero-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+    margin: 15px auto 0;
+  }
+  /* Hero title — mobile-first defaults (50/100% wt 500, 32 bottom,
+     capped at 560 so "Trade with Clarity." fits on one line at
+     tablet widths). Desktop bumps type up and drops the cap. */
+  .rbccm-maas-mata__hero-title {
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 50px;
+    font-weight: 500;
+    line-height: 100%;
+    color: #082043;
+    text-align: center;
+    max-width: 342px;
+    margin: 0 auto 12px;
+  }
+  /* iPad and up: drop the phone-width cap so the title can spread
+     across the wider viewport before desktop's own overrides kick
+     in at 992. */
+  @media (min-width: 768px) {
+    .rbccm-maas-mata__hero-title {
+      max-width: 100%;
+    }
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__hero-title {
+      font-size: 75px;
+      max-width: none;
+      margin: 0 0 20px;
+    }
+  }
+  .rbccm-maas-mata__hero-title-line { display: block; }
+  /* Last line of the H1 flips to bright-blue per Figma. */
+  .rbccm-maas-mata__hero-title-line:last-child { color: #0051A5; }
+  /* Hero subtitle — mobile-first defaults (16/120% wt 400, 32 bottom,
+     capped at 480 for readability). Desktop bumps type + width. */
+  .rbccm-maas-mata__hero-subtitle {
+    color: #082043;
+    text-align: center;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 120%;
+    max-width: 343px;
+    margin: 0 auto 32px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__hero-subtitle {
+      font-size: 21.945px;
+      max-width: 776px;
+      margin: 0 auto 40px;
+    }
+  }
+  .rbccm-maas-mata__hero-subtitle strong { font-weight: 700; }
+  /* 12px gap between the two CTAs per Figma. */
+  .rbccm-maas-mata__hero-actions { display: inline-flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+  /* Mobile hero layout (Figma): the hero content is a 343px flex
+     column, centred, gap 32 between H1/subtitle/button rows.
+     Eyebrow keeps a 48 margin-bottom which stacks with the 32
+     flex-gap to land at the 80px eyebrow→H1 measurement Figma
+     calls out. The image below the hero (chart-image) uses an
+     80 margin-top for the button→image gap - handled in the
+     chart-image mobile block. */
+  /* Mobile hero layout defaults are now on the base rules above
+     (eyebrow 80, title 32, subtitle 32 bottom margins; title 50px,
+     subtitle 16px). Desktop overrides sit in min-width: 992 blocks
+     alongside each element's base rule.
+     This @media block used to hold the mobile flip; kept as a
+     placeholder for any future mobile-specific tweaks that
+     shouldn't be inherited by desktop. */
+  }
+
+  /* Chart card */
+  /* Chart wrapper — Figma "Stats-UI" bar: display flex, center card,
+     padding 0 170 47 170. max-width 1440 caps at spec; below 1440 the
+     170 side padding scales down to 24 to keep the card breathing. */
+  .rbccm-maas-mata__chart {
+    max-width: 1440px;
+    margin: 40px auto -200px;
+    padding: 0 23px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__chart { padding: 0 170px; } }
+  /* Chart card — Figma spec: 1100 × 366 fixed on wide viewports,
+     30px radius, 1px inner border @ 13% white, 16/53.4 spread shadow.
+     width 100% + max-width 1100 lets it collapse gracefully under 1100
+     viewports without dropping the Figma ceiling. */
+  .rbccm-maas-mata__chart-card {
+    width: 100%;
+    max-width: 1100px;
+    height: 366px;
+    background: #09254A;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 30px;
+    padding: 20px 23px;
+    box-shadow: 0 16px 53.4px 16px rgba(0, 0, 0, 0.09);
+    overflow: hidden;
+  }
+  @media (max-width: 991px) { .rbccm-maas-mata__chart-card { height: auto; } }
+  .rbccm-maas-mata__chart-topbar { display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-500); padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .rbccm-maas-mata__chart-topbar-dots { display: flex; gap: 4px; }
+  .rbccm-maas-mata__chart-topbar-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .rbccm-maas-mata__chart-body { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; padding-top: 16px; }
+  @media (max-width: 991px) { .rbccm-maas-mata__chart-body { grid-template-columns: 1fr; } }
+  .rbccm-maas-mata__chart-headline-label { font-size: 12px; color: var(--grey-500); text-transform: uppercase; letter-spacing: 1px; }
+  .rbccm-maas-mata__chart-headline-value { font-family: var(--serif); font-size: 26px; color: var(--yellow); margin: 4px 0 12px; }
+  .rbccm-maas-mata__chart-svg { width: 100%; height: 140px; margin-top: 8px; }
+  .rbccm-maas-mata__chart-right { border-left: 1px solid rgba(255,255,255,0.08); padding-left: 23px; }
+  @media (max-width: 991px) { .rbccm-maas-mata__chart-right { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; } }
+  .rbccm-maas-mata__chart-quote { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dotted rgba(255,255,255,0.08); font-size: 13px; }
+  .rbccm-maas-mata__chart-quote:last-of-type { border-bottom: none; }
+  .rbccm-maas-mata__chart-quote-label { color: #fff; font-weight: 500; }
+  .rbccm-maas-mata__chart-quote-value { color: #fff; font-variant-numeric: tabular-nums; }
+  .rbccm-maas-mata__chart-quote-delta { font-size: 11px; margin-left: 6px; color: #F87171; }
+  .rbccm-maas-mata__chart-quote-delta--positive { color: #4ADE80; }
+  .rbccm-maas-mata__chart-quality { margin-top: 14px; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 6px; display: flex; justify-content: space-between; align-items: baseline; }
+  .rbccm-maas-mata__chart-quality-label { font-size: 11px; color: var(--grey-500); text-transform: uppercase; letter-spacing: 1px; }
+  .rbccm-maas-mata__chart-quality-trend { font-size: 11px; color: var(--grey-500); display: block; margin-top: 2px; }
+  .rbccm-maas-mata__chart-quality-score { font-family: var(--serif); font-size: 22px; color: var(--yellow); }
+
+  /* Dark strip wrapper — Figma bg #09254A, no vertical padding of its own;
+     the chart bar (via chart-card + 47 bottom-slot) and the awards bar
+     (40px top/bottom) supply their own vertical rhythm. */
+  /* Dark strip owns the top overlap for the chart card + the awards
+     rhythm; zero bottom padding — the platforms band below has its own
+     80px top/bottom and its gradient blends seamlessly out of the flat
+     #09254A of this strip. */
+  .rbccm-maas-mata__dark-strip { background: #09254A; color: #fff; padding: 222px 0 0; }
+
+  /* Awards — Figma: 40px top/bottom, 170px sides, flex-column, gap 32,
+     center-aligned. On desktop the 1440px container ⇒ 1100 inner. Kept
+     max-width 1080px + auto side padding so it holds up responsively. */
+  .rbccm-maas-mata__awards {
+    max-width: 1440px;
+    margin: 0 auto 0;
+    /* 30 bottom pulls the "Two platforms, one unified ecosystem"
+       band close to the award cards above without letting the seam
+       feel cramped. */
+    padding: 40px 23px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    text-align: center;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__awards { padding: 40px 170px 30px; } }
+  /* Mobile: drop the section's 24 side padding so the carousel
+     track can run edge-to-edge (the peek off the right needs the
+     viewport itself as its right edge). Eyebrow + controls get
+     their own inset via their child rules below so they stay
+     centred inside the visible width. */
+  @media (max-width: 871px) {
+    .rbccm-maas-mata__awards { padding-left: 0; padding-right: 0; }
+    .rbccm-maas-mata__awards-eyebrow,
+    .rbccm-maas-mata__awards-controls {
+      padding-left: 23px;
+      padding-right: 23px;
+      box-sizing: border-box;
+    }
+  }
+  /* Awards eyebrow "SEE WHY THE WORLD'S TOP INSTITUTIONS CHOOSE
+     MAAS" - Figma: Roboto 16/19.2 weight 500, letter-spacing
+     1.92, colour #C3C3C3, uppercase, centered. Mobile stretches
+     full-width per spec. */
+  .rbccm-maas-mata__awards-eyebrow {
+    color: #C3C3C3;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;      /* 19.2px */
+    letter-spacing: 1.92px;
+    text-transform: uppercase;
+    margin: 0 auto;
+    max-width: 329px;
+    align-self: center;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__awards-eyebrow { max-width: none; }
+  }
+  /* Cards row — Figma: flex, width 1100, justify/align center, gap 16.
+     max-width caps at 1100 per spec, width 100% lets it shrink cleanly
+     under 1100 viewports. */
+  /* Cards row - flex row, 16px gap between cards at ALL
+     breakpoints (mobile and desktop). Do not override this
+     gap in a media query - the spacing between award cards is
+     16 everywhere per Figma. */
+  .rbccm-maas-mata__awards-grid {
+    display: flex;
+    width: 100%;
+    max-width: 1024px;
+    justify-content: center;
+    align-items: stretch;
+    gap: 16px;
+  }
+  /* Mobile awards carousel: cards run in a horizontal scroll-snap
+     track (one card per snap stop, next card peeks off canvas to
+     the right). JS wires the arrows + dots but the scroll itself
+     is native, so touch swipe works out of the box. Above 720 the
+     track reverts to the standard flex layout below. */
+  @media (max-width: 871px) {
+    .rbccm-maas-mata__awards-grid {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* Peek the next card by adding right padding equal to the
+         off-canvas slice we want (~24px). Left padding centres
+         the current card in the viewport. */
+      padding: 0 23px;
+      scroll-padding-left: 23px;
+      justify-content: flex-start;
+      width: 100%;
+      max-width: 100%;
+    }
+    .rbccm-maas-mata__awards-grid::-webkit-scrollbar { display: none; }
+    .rbccm-maas-mata__awards-grid > .rbccm-maas-mata__award-card {
+      /* Figma mobile spec: card is Hug 264 x 127 - fixed width,
+         not viewport-fluid. Keeping the same 264 as desktop means
+         the swipe still peeks the next card on any phone wider
+         than ~310, and the card content stays the intended shape.
+         min-height 127 equalises heights so 2-line vs 3-line
+         titles don't cause vertical jitter mid-swipe. */
+      flex: 0 0 264px;
+      width: 264px;
+      max-width: 264px;
+      min-height: 127px;
+      scroll-snap-align: start;
+      align-self: stretch;
+    }
+    .rbccm-maas-mata__awards-grid { align-items: stretch; }
+  }
+  /* Carousel controls row (mobile only). Arrows flank the dot
+     pagination. Hidden at tablet+ where all three cards fit in the
+     row. */
+  /* Controls row (Figma mobile): visually 26 between every glyph
+     (arrow-dot-dot-dot-arrow), 32 top / 40 bottom vs neighbouring
+     bands. The arrows carry a 44 hit-target that visually inflates
+     the edge gap, so we use gap 12 on the row (arrow visual edge
+     sits ~26 from the first dot after subtracting the arrow
+     button's built-in padding). Dots row below carries its own
+     gap for the tighter dot-to-dot rhythm. */
+  .rbccm-maas-mata__awards-controls {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    /* Margins zeroed — the parent .awards flex-column already
+       carries a 32 gap between children, which handles the
+       cards→controls spacing. Bottom margin is owned by whatever
+       band follows this section. */
+    margin: 0;
+  }
+  @media (max-width: 871px) {
+    .rbccm-maas-mata__awards-controls { display: inline-flex; }
+  }
+  /* Chevron arrows - Figma glyph is 14x24 stroked white. Button
+     itself is a transparent hit-target so tap area stays generous
+     without visual chrome around the glyph. */
+  .rbccm-maas-mata__awards-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__awards-arrow { height: 44px; }
+  }
+  .rbccm-maas-mata__awards-arrow svg { display: block; width: 14px; height: 24px; }
+  .rbccm-maas-mata__awards-arrow:disabled { opacity: 0.35; cursor: default; }
+  .rbccm-maas-mata__awards-arrow:focus-visible { outline: 2px solid #FFC72C; outline-offset: 2px; border-radius: 4px; }
+  /* Dots row - Figma spec: hug 19x19 pill, 1px transparent border
+     at rest / yellow when active, 4px padding, filled white glyph
+     inside. Dot buttons already carry 4px padding each side, so
+     gap 18 lands dot-glyph-to-dot-glyph at ~26 visually. */
+  .rbccm-maas-mata__awards-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .rbccm-maas-mata__awards-dot {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .rbccm-maas-mata__awards-dot svg { display: block; width: 11px; height: 11px; }
+  /* Default state: fill glyph hidden, ring glyph shown. Selector
+     is scoped through .awards-dot so it out-specificities the
+     ".awards-dot svg" size rule above (both use class+tag, so
+     specificity ties; but "descendant with class" wins on order).
+     Written BEFORE the .--active overrides so the cascade lets
+     active flip both displays. */
+  .rbccm-maas-mata__awards-dot .rbccm-maas-mata__awards-dot-fill { display: none; }
+  .rbccm-maas-mata__awards-dot .rbccm-maas-mata__awards-dot-ring { display: block; }
+  /* Active: yellow ring around a filled white disc. */
+  .rbccm-maas-mata__awards-dot--active { border-color: #FFC72C; }
+  .rbccm-maas-mata__awards-dot--active .rbccm-maas-mata__awards-dot-fill { display: block; }
+  .rbccm-maas-mata__awards-dot--active .rbccm-maas-mata__awards-dot-ring { display: none; }
+  /* Award card - Figma: flex-column, padding 15 20, align
+     flex-start, gap 10, 10px radius, 5% white fill. Border-top
+     is a subtle 0.5px hairline (was a bold yellow accent in an
+     earlier iteration - dropped in favour of the whisper
+     divider). */
+  /* Card - Figma desktop spec: 264px wide, hugs content vertically
+     (min ~127px). Padding 15/20, gap 10, radius 10, 0.5px inner
+     top border, 5% white fill. On mobile the card flexes fluidly
+     (flex: 1 1 0) instead of holding 264 - we override the fixed
+     width below in the mobile breakpoint. */
+  .rbccm-maas-mata__award-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px 20px;
+    flex: 0 0 264px;      /* Figma: Hug 264 - fixed slide width on desktop */
+    width: 264px;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 10px;
+    position: relative;
+    /* height: 100% so when the card is dropped into a Slick /
+       accessible-slick slide track, the card fills the slide's
+       full height. Combined with the parent's align-items:
+       stretch this equalises card heights across the row. */
+    height: 100%;
+    box-sizing: border-box;
+  }
+  /* Fading yellow rule across the top of each award card. Pseudo-
+     element sits at the top edge inside the rounded corners; radius
+     matches the card so nothing spills. Gradient: transparent at
+     the edges → #FFC72C in the middle. */
+  .rbccm-maas-mata__award-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, rgba(255,199,44,0) 0%, #FFC72C 50%, rgba(255,199,44,0) 100%);
+    border-radius: 10px 10px 0 0;
+    pointer-events: none;
+  }
+  /* Mobile: card spec is identical to desktop per Figma - same
+     264px width, same padding/gap/radius/border. Cards will
+     scroll horizontally in the slider treatment rather than
+     wrapping / stretching to viewport width. */
+  /* Year — Figma subtitle: yellow #FFC72C, Roboto 12/13.8 weight 500,
+     no pill background (previous pill treatment removed). */
+  .rbccm-maas-mata__award-year {
+    display: block;
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 115%;
+    background: none;
+    padding: 0;
+    margin: 0;
+    letter-spacing: 0;
+    border-radius: 0;
+  }
+  /* Award title — Figma number: white, Roboto 18/20.7 weight 500. */
+  .rbccm-maas-mata__award-title {
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 115%;
+    margin: 0;
+  }
+  /* Issuer - Figma paragraph/small: #D1D1D1, Inter 14/21 weight
+     400 (falls back to Roboto if Inter unavailable).
+     margin-top: auto pins the issuer to the bottom of the card
+     regardless of how long the title above wraps - so all three
+     cards line up their referral-company text at the same
+     baseline. Works because the card is flex-column. When we
+     swap the awards row for a slider, the slider track must
+     keep align-items: stretch so cards stay equal-height. */
+  .rbccm-maas-mata__award-issuer {
+    color: #D1D1D1;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Inter, Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;      /* 21px */
+    margin-top: auto;
+  }
+
+  /* Platforms */
+  /* Platforms band — Figma: flex-column, gap 60, padding 80 170, top-to-
+     bottom navy gradient. Rendered full-width inside the dark-strip so
+     the gradient reaches the viewport edges; the gradient's top stop
+     (#09254A) matches the dark-strip fill above so there's no seam. */
+  /* Platforms section container - Figma spec:
+       Mobile: padding 60/23, gap 32
+       Desktop: padding 80/170, gap 60
+     Both share display flex column, centered, stretch. Background
+     gradient is our own addition (Figma just shows the dark navy;
+     the subtle gradient reads better on tall viewports). */
+  .rbccm-maas-mata__platforms {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    gap: 32px;
+    padding: 80px 16px;
+    background: linear-gradient(180deg, #09254A 0%, #05152A 100%);
+    text-align: center;
+  }
+  /* Padding swap aligned to the card-row breakpoint (988) so we
+     never get "desktop padding with stacked cards" between 721-987
+     - both changes happen together at 988. */
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__platforms {
+      gap: 60px;
+      padding: 80px 170px;
+    }
+  }
+  /* Below 988: every child of the platforms section fills the
+     available width (100%) so eyebrow, heading, and cards row all
+     span from gutter to gutter. Desktop restores natural widths. */
+  @media (max-width: 991px) {
+    .rbccm-maas-mata__platforms > * {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  /* Eyebrow "ONE ECOSYSTEM · TWO ENGINES" — Figma: Roboto 14/16.8 wt 400,
+     letter-spacing 3px, uppercase, warm yellow. 45×2 yellow underline
+     via ::after with a 15px gap sits inside a 360 × 40 eyebrow "box"
+     (per Figma), which the paragraph flex-centres by margin: 0 auto. */
+  /* Platforms eyebrow "TWO PLATFORMS, ONE UNIFIED ECOSYSTEM."
+     Figma spec differs by breakpoint on width/height:
+       Mobile:  align-self: stretch (fills parent), height 49
+       Desktop: fixed 858w, height 40
+     Everything else identical: yellow, Roboto 14/400/120%, LS 3,
+     uppercase, centered. ::after generates the 45x2 yellow rule
+     underneath - matches spec's "line below" without adding markup. */
+  .rbccm-maas-mata__platforms-eyebrow {
+    color: #FFC72C;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;      /* 16.8px */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 auto;
+    padding: 15px 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    /* Mobile default: stretch full-width. Figma frame height is
+       49 but that reflects the text row alone - the wrapper needs
+       to grow to fit text + 15px gap + 2px rule, so we use
+       min-height. */
+    align-self: stretch;
+    min-height: 49px;
+    box-sizing: border-box;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__platforms-eyebrow {
+      /* Desktop: fixed 858 wide. Figma frame height 40 doesn't
+         include the ::after rule, so min-height only - lets the
+         wrapper grow to accommodate the yellow bar. Bottom padding
+         trimmed 5px vs mobile so the eyebrow sits tighter to the
+         heading beneath it on desktop. */
+      width: 858px;
+      max-width: 100%;
+      min-height: 40px;
+      height: auto;
+      align-self: auto;
+      padding-bottom: 10px;
+    }
+  }
+  .rbccm-maas-mata__platforms-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+  }
+  /* Section H2 "Better insight for stronger execution"
+     Mobile  (title-small-mobile): RBC Display 36/43.2 weight 500,
+     stretch full-width. Desktop (title-desktop): 42/52.5 weight 500,
+     natural width. White, centered at both breakpoints. */
+  .rbccm-maas-mata__platforms-heading {
+    color: #FFFFFF;
+    text-align: center;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;     /* 43.2px */
+    align-self: stretch;
+    margin: 0;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__platforms-heading {
+      font-size: 42px;
+      line-height: 125%;   /* 52.5px */
+      align-self: auto;
+    }
+  }
+  /* Cards row - Figma spec:
+       Mobile: flex column, align-items center, gap 16, stretch
+       Desktop: flex row, justify center, align-items flex-start,
+                gap 16, stretch
+     Note gap is 16 (not 32). Max-width sized to fit two
+     470-wide cards + 16 gap = 956. */
+  .rbccm-maas-mata__platforms-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    align-self: stretch;
+    width: 100%;
+    max-width: 956px;
+    text-align: left;
+    margin: 0 auto;
+  }
+  /* Swap from stacked to side-by-side at 988px, the minimum room
+     for two 470-wide cards + 16 gap + 16 side gutters
+     (470*2 + 16 + 16*2 = 988). Below that they'd overlap or
+     force horizontal scroll, so mobile layout continues past
+     720 into tablet territory. */
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__platforms-grid {
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+    }
+  }
+  /* Platform card — Figma: 425 fixed, flex-column, padding 40 30,
+     align-items flex-start, gap 32, radius 20, subtle 1/4 shadow. width
+     let flex-grid own it so it collapses gracefully below 1100. */
+  /* Card: three logical rows — eyebrow, content group, CTA. The content
+     wrapper grows (flex: 1) so the CTA hugs the bottom of the card even
+     if the two cards end up at slightly different content heights.
+     Card-level gap is removed — each block controls its own spacing:
+       • eyebrow → content: 20px (eyebrow margin-bottom)
+       • content items:     15px (content wrapper gap)
+       • content → CTA:     32px min (CTA margin-top) */
+  /* Platform card - Figma spec: 470 wide on desktop, stretches
+     full-width on mobile. padding 40/30, flex column align-start,
+     gap 32 between content blocks, radius 20, subtle 1/4 shadow.
+     Dark variant adds a 1px white-13% border; white variant is
+     borderless. */
+  .rbccm-maas-mata__platform-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Mobile: 20 gap between eyebrow-block and content-wrapper.
+       Desktop bumps to 32 (see @media block further down).
+       Content-wrapper's own gap owns title→body→bullets (15). */
+    gap: 20px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+    align-self: stretch;   /* mobile: fills row width */
+    /* Card is an <a> - whole tile is clickable. Inner "Explore MAAS/
+       MATA" is a visual cue only (a <span>, not a nested link).
+       Hover: 2px lift + softer/deeper shadow + arrow slides right,
+       so the tile feels tactile without needing colour changes on
+       either variant. */
+    color: inherit;
+    text-decoration: none;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  /* Card fixed-width kicks in at 988 - the same breakpoint where
+     the row swaps to horizontal and there's room for two 470-wide
+     cards. Below 988 the card stays align-self: stretch and fills
+     100% of its (column-stacked) parent. */
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__platform-card {
+      width: 470px;
+      max-width: 470px;
+      flex: 0 0 470px;
+      align-self: auto;
+      /* Card gap stays at 20 across breakpoints (matches mobile). */
+      gap: 20px;
+    }
+  }
+  .rbccm-maas-mata__platform-card:hover,
+  .rbccm-maas-mata__platform-card:focus-visible {
+    box-shadow: 0 12px 32px 0 rgba(25, 33, 61, 0.15);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+  }
+  .rbccm-maas-mata__platform-card:focus-visible { outline: 2px solid #0051A5; outline-offset: 2px; }
+  /* Arrow slide inside the CTA on card hover. Transition here (not on
+     the arrow rule itself) so the ease matches the card animation. */
+  .rbccm-maas-mata__platform-card .rbccm-maas-mata__platform-cta-arrow { transition: transform 200ms ease; }
+  .rbccm-maas-mata__platform-card:hover .rbccm-maas-mata__platform-cta-arrow,
+  .rbccm-maas-mata__platform-card:focus-visible .rbccm-maas-mata__platform-cta-arrow {
+    transform: translateX(4px);
+  }
+  .rbccm-maas-mata__platform-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    flex: 1;
+    align-self: stretch;
+  }
+  .rbccm-maas-mata__platform-card--light { background: #FFF; color: #494949; }
+  /* Dark card — Figma: 5% white fill on the platforms band's navy
+     gradient, 1px 13% white hairline. */
+  .rbccm-maas-mata__platform-card--dark {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+  }
+  /* Eyebrow "MAAS - EXECUTION" — Figma: 12/100% Roboto wt 400,
+     uppercase, letter-spacing 0.96, text centred, colour-matched
+     rule beneath the text (137px light / 135px dark, 0.5px tall,
+     10px gap). Whole block sits at flex-start of the card (left);
+     the text-align inside centres above the line. Rule + gap are
+     drawn via a ::after pseudo so we don't need extra markup. */
+  /* Eyebrow "MAAS - EXECUTION" — inline-flex row with
+     the text on the left and a 0.5px rule that fills the remaining
+     card content width. The rule grows via flex: 1 so it always
+     stops at the card's inner edge regardless of card width. */
+  .rbccm-maas-mata__platform-eyebrow {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #0051A5;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 100%;
+    letter-spacing: 0.96px;
+    text-transform: uppercase;
+    font-feature-settings: 'liga' off, 'clig' off;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    /* Stretch to full card width so the ::after has remaining
+       horizontal space to fill. */
+    align-self: stretch;
+  }
+  .rbccm-maas-mata__platform-eyebrow::after {
+    content: '';
+    display: block;
+    /* Grow to consume all leftover width after the text. */
+    flex: 1;
+    height: 0.5px;
+    background: #0051A5;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-eyebrow {
+    color: #FFC72C;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-eyebrow::after {
+    background: #FFC72C;
+  }
+  /* Title — Figma: #111928, Roboto 30/36 weight 600. Dark variant → #fff. */
+  .rbccm-maas-mata__platform-title {
+    color: #111928;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 120%;
+    margin: 0;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-title { color: #fff; }
+  /* Acronym "MAAS" — Figma: same spec as eyebrow (bright blue small caps). */
+  .rbccm-maas-mata__platform-acronym {
+    color: #0051A5;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 100%;
+    letter-spacing: 0.96px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-acronym { color: #FFC72C; }
+  /* Body copy — Figma "description desktop": #494949, Roboto
+     16/150% wt 400, ligatures off. Dark variant flips to #ECECEC. */
+  .rbccm-maas-mata__platform-body {
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 150%;
+    font-feature-settings: 'liga' off, 'clig' off;
+    margin: 0;
+    flex: 1;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-body { color: #ECECEC; }
+  /* Bullet list inside a platform card — Figma: Roboto 14/150%
+     wt 400, ligatures off. Light card #494949 / dark card #ECECEC. */
+  .rbccm-maas-mata__platform-list {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    font-feature-settings: 'liga' off, 'clig' off;
+    color: #494949;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-list { color: #ECECEC; }
+  /* CTA "Explore MAAS →" — Figma anchor: flex, gap 10, centre-aligned,
+     Roboto 12/29.26 weight 400, bright-blue text (yellow on dark). Arrow
+     SVG inherits colour via currentColor so the same markup works on
+     both variants. */
+  .rbccm-maas-mata__platform-cta {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #0051A5;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 29.26px;
+    text-align: center;
+    text-decoration: none;
+    margin: 32px 0 0;
+  }
+  .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-cta { color: #FFC72C; }
+  .rbccm-maas-mata__platform-cta-arrow { width: 16px; height: 16px; flex-shrink: 0; fill: currentColor; }
+
+  /* Innovation era */
+  /* Close-the-loop band — Figma: flex-column, padding 80 170, gap 10,
+     align-items flex-start, bg #F1F5FB. Same responsive 170→24 side
+     pattern as the other 1440-anchored bands. */
+  /* "Innovation for the next execution era" section (reuses the
+     innovation-era shell).
+       Mobile:  padding 60/23, gap 10
+       Desktop: padding 80/170, gap 10
+     Swap at 988 to align with the rest of the page's tablet
+     breakpoint (platforms section, feature cards, etc.). */
+  .rbccm-maas-mata__innovation-era {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 10px;
+    padding: 60px 23px;
+    background: #F1F5FB;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__innovation-era {
+      padding: 80px 170px;
+    }
+  }
+  /* Container caps content at the 1140 rail and centres it inside
+     the section so on wide viewports the heading + feature row
+     don't run off toward the left edge. Section keeps its own
+     padding for narrower viewports; when the viewport exceeds
+     1140+padding, the auto margins take over. */
+  .rbccm-maas-mata__innovation-era > .rbccm-maas-mata__container {
+    padding: 0;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  /* Header row — Figma: flex, space-between, align-items flex-end so
+     the body copy pins to the baseline of the heading (bottom-right). */
+  /* Header row — Figma: horizontal, Width Fill (1100), Height Hug (99),
+     space-between. Anchors heading left, body right, aligns at baseline.
+     margin auto sides so the 1100 rail centres inside the section even
+     when the section's own padding scales down under 1440. */
+  /* Header stacks heading over subtitle. Gap 12 mobile, 16
+     desktop. align-items:flex-start so both left-align even when
+     the subtitle wraps to two lines. */
+  .rbccm-maas-mata__innovation-era-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 12px;
+    margin: 0 0 60px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__innovation-era-header { gap: 16px; }
+  }
+  /* Heading "Innovation for the next execution era"
+     Mobile  (title-small-mobile): RBC Display 36/43.2 wt 500
+     Desktop (title-desktop):       RBC Display 42/52.5 wt 500
+     Black at both breakpoints. Full width at both - the wrapper's
+     padding controls horizontal inset. */
+  .rbccm-maas-mata__innovation-era-heading {
+    color: #000;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;      /* 43.2px */
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__innovation-era-heading {
+      font-size: 42px;
+      line-height: 125%;    /* 52.5px */
+    }
+  }
+  /* Subtitle - Figma description desktop: Roboto 16/24 wt 400,
+     #494949. Same at both breakpoints. Full width. */
+  .rbccm-maas-mata__innovation-era-body {
+    color: #494949;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;      /* 24px */
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  /* Features row — Figma: horizontal flow, Width Fill (1100), Height
+     Hug (208). Row fills the 1100 rail; cards flex-share the width so
+     three 367s can settle into 1100 without a 1px overflow. */
+  /* Row - Figma:
+       Mobile:  flex column (cards stack full-width)
+       Desktop: flex row, align-items flex-start, stretch
+     Swap at 988 - matches the page's tablet breakpoint. */
+  .rbccm-maas-mata__features-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    width: 100%;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__features-grid {
+      flex-direction: row;
+    }
+  }
+  /* Feature card - Figma has two treatments per breakpoint:
+       Mobile  (stacked column):
+         full width, padding 30 0, gap 30, align-items center,
+         top hairline. Last card also gets a bottom hairline so
+         the divider stack closes off.
+       Desktop (3-up row):
+         367 wide, padding 30 20, borders top+right+bottom to
+         form a connected 3-cell divider grid. Last card drops
+         its right border so the row doesn't have an outer right
+         frame. */
+  .rbccm-maas-mata__feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: stretch;
+    gap: 30px;
+    padding: 30px 0;
+    border-top: 1px solid #A8A8A8;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .rbccm-maas-mata__feature:last-of-type {
+    border-bottom: 1px solid #A8A8A8;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__feature {
+      width: 367px;
+      max-width: 367px;
+      padding: 30px 20px;
+      border-right: 1px solid #A8A8A8;
+      border-bottom: 1px solid #A8A8A8;
+      /* Bottom border already comes from mobile :last-of-type
+         rule; here we add it to every card so the row shares
+         a continuous bottom rail. */
+    }
+    .rbccm-maas-mata__feature:last-of-type {
+      border-right: none;   /* no outer right frame */
+    }
+  }
+  /* Inner content wrapper — Figma: flex-column, align-items flex-start,
+     gap 14, align-self stretch. Number/title/body stack left-aligned. */
+  .rbccm-maas-mata__feature-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    align-self: stretch;
+  }
+  /* Number "/01" — Figma: RBC Display 16/24 wt 400, letter-spacing 4,
+     bright blue. */
+  .rbccm-maas-mata__feature-number {
+    color: #0051A5;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 4px;
+    margin: 0;
+  }
+  /* Title — Figma: RBC Display 24/30 wt 500, black. */
+  .rbccm-maas-mata__feature-title {
+    color: #000;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 30px;
+    margin: 0;
+  }
+  /* Body — Figma: Roboto 14/24 wt 400, #494949. */
+  .rbccm-maas-mata__feature-body {
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    margin: 0;
+  }
+
+  /* Why RBC */
+  /* Why RBC — Figma: vertical flow, Width Fill (1440), Height Hug,
+     padding 80 170 (24 sides below 1440), gap 60, align-items flex-start,
+     white background (masks the root graph-paper grid). */
+  .rbccm-maas-mata__why-rbc {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 80px 23px;
+    background: #fff;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__why-rbc { padding: 80px 170px; } }
+  /* Inner container zeroed — section owns the 1440/170 rail directly.
+     Container itself becomes a flex-column so the 60px rhythm from the
+     Figma section-gap applies between the header row and the stats row
+     (they're both children of the container, not of the section). */
+  .rbccm-maas-mata__why-rbc > .rbccm-maas-mata__container {
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 60px;
+  }
+  /* Header row — Figma: flex, align-items flex-end, gap 30, align-self
+     stretch. Left column (eyebrow + heading) sizes to content on the
+     left; right column (body copy) sizes to content on the right and
+     pins to the baseline of the heading. space-between keeps the gap
+     between them elastic on wider viewports; the columns don't stretch,
+     so each keeps its Figma-authored width (heading 310, body 460). */
+  .rbccm-maas-mata__why-rbc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    align-self: stretch;
+    width: 100%;
+    max-width: 1100px;
+    gap: 30px;
+    margin: 0 auto;
+  }
+  .rbccm-maas-mata__why-rbc-header > * { flex: 0 1 auto; min-width: 0; }
+  @media (max-width: 991px) { .rbccm-maas-mata__why-rbc-header { flex-direction: column; align-items: flex-start; } }
+  /* Eyebrow "OUR NUMBERS" — Figma: Roboto 16/19.2 wt 500, LS 1.92,
+     uppercase, bright blue. 38 × 2 yellow lead-line via ::before with
+     10 gap. Whole eyebrow is a flex row so line + text baseline together. */
+  .rbccm-maas-mata__why-rbc-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0051A5;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    letter-spacing: 1.92px;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+  }
+  .rbccm-maas-mata__why-rbc-eyebrow::before {
+    content: '';
+    display: block;
+    width: 38px;
+    height: 2px;
+    background: #FFC72C;
+    flex-shrink: 0;
+  }
+  /* Heading — Figma title/desktop: RBC Display 42/52.5 wt 500, black.
+     310 fixed width per Figma so it wraps to the intended two lines. */
+  .rbccm-maas-mata__why-rbc-heading {
+    color: #000;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 125%;
+    margin: 0;
+    width: 310px;
+    max-width: 100%;
+  }
+  .rbccm-maas-mata__why-rbc-body {
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 150%;
+    margin: 0;
+    max-width: 360px;
+    padding-bottom: 10px;
+  }
+  /* Stats row — Figma: flex, align-items flex-start, gap 10, align-self
+     stretch. Same 1100 rail as the section header above. */
+  .rbccm-maas-mata__stats-grid {
+    display: flex;
+    align-items: stretch;
+    align-self: stretch;
+    gap: 10px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) { .rbccm-maas-mata__stats-grid { flex-wrap: wrap; } }
+  /* Stat card — Figma: flex-column, padding 30, gap 34, align-items
+     flex-start, flex 1 0 0 (equal share). 15 radius, hairline navy
+     border, faint grey fill, subtle 1/4 shadow.
+     justify-content: space-between pins the number block to the top and
+     the text block to the bottom — combined with align-items: stretch
+     on the row, every card matches the tallest card's height and every
+     body copy bottom lines up across the row. */
+  .rbccm-maas-mata__stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 34px;
+    padding: 30px;
+    flex: 1 0 0;
+    min-width: 0;
+    border-radius: 15px;
+    border: 1px solid rgba(0, 49, 104, 0.05);
+    background: rgba(209, 209, 209, 0.05);
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+  }
+  /* Number block — flex row, bottom-aligned so the smaller yellow
+     suffix sits on the same baseline as the big navy number. Spans are
+     direct children (no intermediate div). */
+  .rbccm-maas-mata__stat-value-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 4px;
+    margin: 0;
+  }
+  .rbccm-maas-mata__stat-value {
+    color: #003168;
+    font-family: "RBC Display", RBCDisplay, Georgia, serif;
+    font-size: 50px;
+    font-weight: 500;
+    line-height: 100%;
+  }
+  .rbccm-maas-mata__stat-value-suffix {
+    color: #FFC72C;
+    font-family: "RBC Display", RBCDisplay, Georgia, serif;
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 100%;
+    margin-left: 0;
+  }
+  /* Text block (label + body) — Figma: flex-column, align-items flex-start,
+     gap 12, align-self stretch. */
+  .rbccm-maas-mata__stat-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+  }
+  /* Label "ASSET COVERAGE" — Figma: Roboto 14/16.1 wt 400, LS 0.56,
+     uppercase, black. */
+  .rbccm-maas-mata__stat-label {
+    color: #000;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 115%;
+    letter-spacing: 0.56px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  /* Body — Figma paragraph/small: Inter 14/21 wt 400 (falls back to
+     Roboto) #494949. */
+  .rbccm-maas-mata__stat-body {
+    color: #494949;
+    font-family: Inter, Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    margin: 0;
+  }
+
+  /* Asset coverage */
+  /* Deep-navy band that wraps Asset coverage + Thought leadership +
+     Demo CTA. Single 180deg gradient runs unbroken from #082043 at the
+     top down to #061730 at the bottom, so the three sections read as
+     one continuous surface with no seams between them. Each of the
+     three sections goes transparent so the wrapper's gradient shows. */
+  .rbccm-maas-mata__deep-band {
+    background: linear-gradient(180deg, #082043 0%, #061730 100%);
+    color: #fff;
+  }
+
+  /* Asset coverage — Figma: flex-column, gap 40, padding 80 170 (24
+     sides below 1440), justify/align center. Transparent bg (deep-band
+     wrapper paints the gradient). */
+  .rbccm-maas-mata__assets {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 80px 23px 0;
+    background: transparent;
+    color: #fff;
+    text-align: center;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__assets { padding: 80px 170px 0; } }
+  .rbccm-maas-mata__assets > .rbccm-maas-mata__container { padding: 0; max-width: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; }
+  /* Eyebrow "ASSET COVERAGE" — mirrors the platforms eyebrow: Roboto
+     14/16.8 wt 400, letter-spacing 3, uppercase, warm-yellow, with the
+     45×2 yellow underline via ::after. */
+  .rbccm-maas-mata__assets-eyebrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 0;
+    margin: 0;
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 120%;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .rbccm-maas-mata__assets-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+  }
+  /* Section H2 — mirrors platforms heading: RBC Display 42/52.5 wt 500,
+     centred, white. */
+  .rbccm-maas-mata__assets-heading {
+    color: #fff;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 125%;
+    text-align: center;
+    margin: 0;
+  }
+  /* Cards row — Figma: flex, width 1100, space-between, align-items
+     flex-start. 4 × 263 = 1052 + 3 × ~16 gaps = 1100. */
+  .rbccm-maas-mata__assets-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  @media (max-width: 900px) { .rbccm-maas-mata__assets-grid { flex-wrap: wrap; gap: 16px; justify-content: center; } }
+  /* Tile — Figma: 263 × 257, padding 30, flex-column, space-between,
+     align-items flex-start. 20 radius, hairline 13% white border, 5%
+     white fill, subtle 1/4 shadow. flex-shrink 0 keeps the 263 fixed
+     under the row's space-between distribution.
+     Card is an <a> so the whole tile is clickable; the inner
+     "Learn more" is a visual cue only (a <span>, not a nested link). */
+  .rbccm-maas-mata__asset-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 263px;
+    height: 257px;
+    padding: 30px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .rbccm-maas-mata__asset-card:hover,
+  .rbccm-maas-mata__asset-card:focus-visible {
+    border-color: rgba(255, 199, 44, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    color: inherit;
+  }
+  .rbccm-maas-mata__asset-card:focus-visible { outline: 2px solid #FFC72C; outline-offset: 2px; }
+  /* Content stack (icon + title + subtitle + body) — Figma: flex-column,
+     align-items flex-start, gap 16, align-self stretch. */
+  .rbccm-maas-mata__asset-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+  }
+  /* Icon — Figma: 30 × 30, warm-yellow. */
+  .rbccm-maas-mata__asset-icon { width: 30px; height: 30px; color: #FFC72C; fill: #FFC72C; flex-shrink: 0; }
+  .rbccm-maas-mata__asset-icon g { display: none; }
+  .rbccm-maas-mata__asset-icon[data-icon="equities"] g.equities { display: block; }
+  .rbccm-maas-mata__asset-icon[data-icon="futures"]  g.futures  { display: block; }
+  .rbccm-maas-mata__asset-icon[data-icon="fx"]       g.fx       { display: block; }
+  .rbccm-maas-mata__asset-icon[data-icon="index"]    g.index    { display: block; }
+  /* Title — Figma: Roboto 20 wt 400, warm-yellow. */
+  .rbccm-maas-mata__asset-title {
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+  }
+  /* Subtitle — Figma: Roboto 18 italic wt 500, white. */
+  .rbccm-maas-mata__asset-subtitle {
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: normal;
+    margin: 0;
+  }
+  /* Body — Figma: Roboto 16/19.2 wt 400, #D7D7D7. */
+  .rbccm-maas-mata__asset-body {
+    color: #D7D7D7;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 120%;
+    margin: 0;
+  }
+  /* CTA "Learn more" — Figma anchor: flex, gap 10, Roboto 12/29.26 wt
+     400, warm-yellow text + arrow (arrow inherits via currentColor). */
+  .rbccm-maas-mata__asset-cta {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 29.26px;
+    text-align: center;
+    text-decoration: none;
+    margin: 0;
+  }
+  .rbccm-maas-mata__asset-cta-arrow { width: 16px; height: 16px; flex-shrink: 0; fill: currentColor; }
+
+  /* Market insights */
+  /* Market insights section — Figma: flex-column, padding 80 170
+     (24 sides below 1440), justify/align center, gap 40. Transparent
+     bg — the parent deep-band wrapper paints the shared gradient. */
+  .rbccm-maas-mata__market-insights {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 23px;
+    /* Transparent bg so the .deep-band parent's gradient
+       (#082043 → #061730) reads continuously through this
+       section into demo below. */
+    background: transparent;
+    color: #fff;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__market-insights { padding: 80px 170px; } }
+  .rbccm-maas-mata__market-insights > .rbccm-maas-mata__container { padding: 0; max-width: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; }
+  /* Section H2 "Market insights" — mirrors the assets/platforms
+     heading: RBC Display 42/52.5 wt 500, centred, white. No margin —
+     parent section gap (40px) owns spacing. */
+  /* Eyebrow "TRENDS SHAPING INSTITUTIONAL TRADING" - mirrors the
+     platforms + mata-cap eyebrow treatment: yellow uppercase text
+     with a 45x2 yellow rule beneath. Mobile stretches full-width,
+     desktop pins to 858. */
+  .rbccm-maas-mata__market-insights-eyebrow {
+    color: #FFC72C;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;      /* 16.8px */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 auto;
+    padding: 15px 35px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    align-self: stretch;
+    min-height: 49px;
+    box-sizing: border-box;
+    max-width: 300px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__market-insights-eyebrow {
+      width: 858px;
+      max-width: 100%;
+      min-height: 40px;
+      height: auto;
+      align-self: auto;
+      /* Trim 5 off the bottom on desktop so the eyebrow sits tighter
+         to the "Market insights" heading. */
+      padding-bottom: 10px;
+    }
+  }
+  .rbccm-maas-mata__market-insights-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+  }
+
+  .rbccm-maas-mata__market-insights-heading {
+    color: #fff;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 125%;
+    text-align: center;
+    margin: 0;
+  }
+  /* Featured card — Figma: flex row, 1100 × 408, align-items center.
+     Left column (text) is 540 fixed; right column (illustration)
+     fills the remaining ~560. */
+  /* Slick-style carousel track: real 3-card markup laid out in a
+     scroll-snap row. Each card takes 100% of the track width so
+     only one is fully visible at a time; arrows + dots below
+     scroll between them. Track itself caps at the 1100 rail. */
+  .rbccm-maas-mata__featured-track {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  .rbccm-maas-mata__featured-track::-webkit-scrollbar { display: none; }
+  .rbccm-maas-mata__featured-card {
+    display: flex;
+    align-items: center;
+    /* Each card = one full slide of the 1100 track. flex-shrink:0
+       keeps them from squishing when they line up next to each
+       other in the flex row. */
+    flex: 0 0 100%;
+    width: 100%;
+    height: 408px;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    scroll-snap-align: start;
+  }
+  @media (max-width: 991px) { .rbccm-maas-mata__featured-card { flex-direction: column; height: auto; } }
+  /* Left body — Figma: 540 fixed, padding 0 40, flex-column gap 32,
+     align-items flex-start, align-self stretch. */
+  .rbccm-maas-mata__featured-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    width: 540px;
+    padding: 0 40px;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+  @media (max-width: 991px) { .rbccm-maas-mata__featured-body { width: 100%; padding: 32px; } }
+  /* Eyebrow "INSIGHTS · FEATURED STORY" — Figma: Roboto 16/19.2 wt 500,
+     letter-spacing 1.92, uppercase, #494949 (grey). 38×2 yellow lead
+     line via ::before with gap 10. */
+  .rbccm-maas-mata__featured-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 120%;
+    letter-spacing: 1.92px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .rbccm-maas-mata__featured-eyebrow::before {
+    content: '';
+    display: block;
+    width: 38px;
+    height: 2px;
+    background: #FFC72C;
+    flex-shrink: 0;
+  }
+  /* Content wrapper (title + description) — Figma: flex-column,
+     align-items flex-start, gap 16, align-self stretch. */
+  .rbccm-maas-mata__featured-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+  }
+  /* Title — Figma: Roboto 32 wt 600, black, line-height normal. */
+  .rbccm-maas-mata__featured-title {
+    color: #000;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+  }
+  /* Description — Figma: Roboto 16 wt 400, #424242, line-height normal. */
+  .rbccm-maas-mata__featured-copy {
+    color: #424242;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+  }
+  /* CTA "Read the story" — Figma: pill button, 232 wide, 15/35
+     padding, 1px #D8D8D8 border, gap 10 between text and arrow.
+     Roboto 16/29.26 wt 400, #494949. Arrow inherits colour via
+     currentColor but Figma authors specify #0051A5 for the arrow —
+     wire that explicitly on the arrow class. */
+  .rbccm-maas-mata__featured-cta {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+    min-width: 232px;
+    padding: 8px 25px;
+    box-sizing: border-box;
+    border: 1px solid #D8D8D8;
+    border-radius: 100px;
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 29.26px;
+    text-align: center;
+    text-decoration: none;
+    /* Position + clip so the arrow flyby stays inside the pill. */
+    position: relative;
+    overflow: hidden;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .rbccm-maas-mata__featured-cta:hover,
+  .rbccm-maas-mata__featured-cta:focus-visible {
+    border-color: #494949;
+    text-decoration: none;
+    color: #494949;
+  }
+  .rbccm-maas-mata__featured-cta-read { color: var(--grey-500); }
+  .rbccm-maas-mata__featured-cta-arrow {
+    width: 16px; height: 16px; flex-shrink: 0; fill: #0051A5;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+  /* Same arrow flyby treatment as the primary/yellow CTAs so the
+     "2 min read" chip in Market Insights feels consistent with
+     the other CTAs on the page. */
+  .rbccm-maas-mata__featured-cta:hover .rbccm-maas-mata__featured-cta-arrow,
+  .rbccm-maas-mata__featured-cta:focus-visible .rbccm-maas-mata__featured-cta-arrow {
+    animation: rbccm-mm-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-maas-mata__featured-cta:hover .rbccm-maas-mata__featured-cta-arrow,
+    .rbccm-maas-mata__featured-cta:focus-visible .rbccm-maas-mata__featured-cta-arrow {
+      animation: none;
+    }
+  }
+  /* Right illustration — fills remaining ~560 of the 1100 card.
+     overflow: hidden clips any oversized image to the card's rounded
+     right edge; images inside cover the full pane centred. */
+  .rbccm-maas-mata__featured-illustration {
+    flex: 1;
+    align-self: stretch;
+    /* lightgray fallback per Figma spec — shows while the image loads
+       or if the src fails. The <img> child paints over it once loaded. */
+    background: lightgray 50% / cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .rbccm-maas-mata__featured-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+  .rbccm-maas-mata__featured-illustration svg { width: 90%; max-width: 380px; opacity: 0.7; }
+  /* Dots container — Figma: flex, width 375, centred, gap 26. */
+  .rbccm-maas-mata__featured-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 26px;
+    width: 375px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  /* Each dot is a flex wrapper (padding 4, 50px radius, transparent
+     border) holding an 11×11 circle SVG inside. Active variant flips
+     the wrapper's border to warm-yellow, giving the "outlined ring"
+     effect around the solid dot. Non-active dots show a hollow white
+     ring via the SVG's stroke. */
+  .rbccm-maas-mata__featured-dot {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 50px;
+    border: 1px solid transparent;
+    background: none;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+  }
+  .rbccm-maas-mata__featured-dot--active { border-color: #FFC72C; }
+  .rbccm-maas-mata__featured-dot svg { display: block; width: 11px; height: 11px; }
+  /* Insights carousel controls: same arrow+dot pattern as the
+     awards carousel, always visible (not just mobile). Reuses the
+     .awards-arrow + .awards-dot styling for visual consistency;
+     only the wrapper is scoped to insights. */
+  .rbccm-maas-mata__insights-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    /* No top margin - the parent .market-insights already
+       carries a 40 flex gap between its children (heading /
+       track / controls). Adding a top margin here would stack
+       with that gap and push the controls too far from the card. */
+    margin: 0 auto;
+  }
+
+  /* Demo CTA */
+  /* Demo section — Figma: flex-column, padding 100 0, justify/align
+     center, gap 10. Transparent bg (deep-band gradient shows through). */
+  .rbccm-maas-mata__demo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 50px 0;
+    /* Transparent bg so the .deep-band parent's gradient
+       (#082043 → #061730) reads continuously up from
+       market-insights above. */
+    background: transparent;
+    color: #fff;
+    text-align: center;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__demo { padding: 90px 0 100px; }
+  }
+  /* Inner content stack — Figma: 686 fixed wide, flex-column, gap 41,
+     centre-aligned. Holds eyebrow + heading + body. */
+  .rbccm-maas-mata__demo > .rbccm-maas-mata__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 41px;
+    width: 100%;
+    max-width: 690px;
+    padding: 0 23px;
+    box-sizing: border-box;
+  }
+  /* Eyebrow "SEE THE PLATFORM" — mirrors the platforms eyebrow
+     (Roboto 14/16.8 wt 400, letter-spacing 3, uppercase, warm-yellow,
+     45×2 yellow underline via ::after with 15px gap). */
+  .rbccm-maas-mata__demo-eyebrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 0 35px;
+    margin: 0;
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 120%;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  @media (min-width: 992px) {
+    /* Desktop: 5 more on bottom so the eyebrow's yellow rule sits
+       a touch further from the heading beneath it. */
+    .rbccm-maas-mata__demo-eyebrow { margin-bottom: 5px; }
+  }
+  .rbccm-maas-mata__demo-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+  }
+  /* Heading "Trade with total clarity." — Figma: RBC Display 75/82.5
+     wt 500, centred. "Trade with total" white, "clarity." warm-yellow. */
+  /* Demo heading "Talk with an expert." - same responsive type
+     ramp as .new-standard-heading: mobile 50/100%, desktop 75/110%.
+     "Talk with an" prefix is white (not the newStandard 40%-white);
+     "expert" span is yellow #FFC72C. 100% width - no max-width cap. */
+  .rbccm-maas-mata__demo-heading {
+    color: #FFFFFF;
+    text-align: center;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 50px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    /* Mobile: allow the highlight span to wrap to its own line
+       so 50px "expert." doesn't push past the viewport (it was
+       causing horizontal overflow on the whole page). Tablet+
+       has room to keep both parts on one line. */
+    white-space: normal;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__demo-heading {
+      font-size: 75px;
+      line-height: 110%;   /* 82.5px */
+      white-space: nowrap;
+    }
+  }
+  .rbccm-maas-mata__demo-heading-highlight { color: #FFC72C; font-style: normal; }
+  /* Body — Figma description/desktop: Roboto 16/24 wt 400, white,
+     centred. */
+  .rbccm-maas-mata__demo-body {
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 150%;
+    text-align: center;
+    /* Negative top margin pulls the body up toward the heading so
+       the pair sits tighter than the 41 gap the parent flex owns
+       (parent gap governs eyebrow → heading → body → CTA otherwise). */
+    margin: -27px 0 0;
+    width: 100%;
+    align-self: stretch;
+  }
+
+  /* Newsletter (simplified — Marketo owns the form fields) */
+  .rbccm-maas-mata__newsletter { background: #E7EEF1; padding: 51px 0; }
+  .rbccm-maas-mata__newsletter-heading {
+    font-family: 'RBC Display', var(--sans);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: -0.789px;
+    color: #003168;
+    margin: 0 0 16px;
+  }
+  .rbccm-maas-mata__newsletter-body {
+    font-family: 'Roboto', var(--sans);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 120%;
+    color: #003168;
+    margin: 0 0 24px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__newsletter { padding: 55px 0; }
+    .rbccm-maas-mata__newsletter > .rbccm-maas-mata__container { max-width: 1140px; }
+    .rbccm-maas-mata__newsletter-heading {
+      font-size: 32px;
+      line-height: normal;
+      color: #002750;
+    }
+    .rbccm-maas-mata__newsletter-body {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 23px;
+      color: #002144;
+    }
+  }
+  .rbccm-maas-mata__newsletter-form { min-height: 60px; }
+  .rbccm-maas-mata__newsletter-form-placeholder {
+    padding: 20px; border: 1px dashed var(--grey-300); border-radius: 4px;
+    text-align: center; font-size: 12px; color: var(--grey-600); background: rgba(255,255,255,0.5);
+  }
+
+  /* ==========================================================
+     STYLES - current + legacy marker
+     ==========================================================
+     Grouped at the bottom of the sheet so they're easy to diff
+     against legacy. When the legacy sections are eventually deleted,
+     drop the .rbccm-maas-mata--legacy block too. */
+
+  /* --legacy-hidden: fully hides the block (display: none). Used
+     for markup we want to preserve in the file but not render at
+     all (e.g. the interactive chart-card while a screenshot is in
+     use instead). To re-enable the hidden markup: remove this
+     class from the element and add it to whatever replaced it. */
+  .rbccm-maas-mata--legacy-hidden { display: none !important; }
+
+  /* Chart image wrapper - takes the same slot the interactive
+     chart-card used to occupy, sits centered on the dark strip.
+     Same container width as .rbccm-maas-mata__chart so surrounding
+     spacing is unchanged. */
+  .rbccm-maas-mata__chart-image {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 23px;
+    /* Negative margin pulls the image up so it overlaps the
+       hero/dark-strip boundary the same way the original card
+       did. Tune this if the visual seam needs to shift. */
+    margin-top: -140px;
+    position: relative;
+    z-index: 2;
+  }
+  /* Single-image reveal: one poster image (2200x732 source,
+     displayed at 1100x366). Container starts narrow (max-width
+     331 - shows only the middle chart chunk via object-position
+     center) and animates its max-width out to 1100 when
+     .is-revealed fires. The poster image inside stays fixed at
+     1100x366 so the same image is progressively revealed from
+     center outward - "curtain opens" without any image swap.
+
+     Container owns the border-radius + overflow:hidden so the
+     visible rectangle stays clipped through the animation. */
+  .rbccm-maas-mata__chart-image {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .rbccm-maas-mata__chart-image-poster {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1100px;
+    height: 366px;
+    max-width: none;
+    object-fit: cover;
+    object-position: center;
+    /* Radius also on the image so the corners round even when
+       overflow:hidden on the parent doesn't clip the absolutely
+       positioned poster (some browsers, notably Safari, don't
+       apply border-radius clipping to abs-positioned descendants
+       reliably). Matches parent radius per breakpoint below. */
+    border-radius: 20px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__chart-image-poster { border-radius: 30px; }
+  }
+
+  /* Play button overlay - Figma spec: 55.993 circle, 2px white
+     border, 20% white fill, 5px backdrop blur. Centered on top
+     of the image stack. Hover state fills to 60% white for a
+     "filling in" effect, keeping the 2px border. Icon flips to
+     navy on hover so it stays legible against the fill. */
+  .rbccm-maas-mata__chart-image-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55.993px;
+    height: 55.993px;
+    border-radius: 55.993px;
+    border: 2px solid #FFF;
+    background: rgba(255, 255, 255, 0.20);
+    -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+    color: #FFFFFF;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+  }
+  .rbccm-maas-mata__chart-image-play:hover,
+  .rbccm-maas-mata__chart-image-play:focus-visible {
+    background: rgba(255, 255, 255, 0.90);
+    color: #061730;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  .rbccm-maas-mata__chart-image-play:focus-visible {
+    outline: 2px solid #FFC72C;
+    outline-offset: 3px;
+  }
+  .rbccm-maas-mata__chart-image-play-icon {
+    /* Triangle is positioned in a 56x56 viewBox from Figma and
+       sits optically centered by design - no translateX nudge
+       needed. Sized to fill the button so the path's own
+       coordinates land as intended. */
+    width: 56px;
+    height: 56px;
+    pointer-events: none;
+  }
+  /* Desktop chart-image sits at full width from the start.
+     Entrance animation is handled by animate.css (flipInX on
+     scroll-in) via the data-animate attribute in the markup —
+     no more custom .is-revealed max-width transition. */
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__chart-image {
+      width: calc(100% - 46px);
+      max-width: 1140px;
+      height: 366px;
+      /* 75px below the hero CTA above; -200 bleed into the
+         "A new standard" section below. */
+      margin: 75px auto -200px;
+      padding: 0;
+      box-sizing: border-box;
+      border-radius: 30px;
+    }
+  }
+
+  /* --- Mobile layout (<=720px) --------------------------------
+     Fixed 331 x 366 box, no reveal animation. The poster image
+     sits inside at 1100x366 with object-position: center - the
+     visible chunk is the middle of the chart (matches the mobile
+     crop we used to swap in as a separate file). */
+  @media (max-width: 991px) {
+    .rbccm-maas-mata__chart-image {
+      /* Fills viewport width minus 46 gutter on each side so the
+         reveal grows with the window instead of locking to a fixed
+         width. Cap removed so tablet widths reveal more of the
+         chart than a phone would. */
+      width: calc(100vw - 46px);
+      max-width: none;
+      height: 366px;
+      margin: 0 auto -200px;
+      border-radius: 20px;
+    }
+  }
+
+  /* .--legacy: red dashed outline + "LEGACY - REMOVED" ribbon.
+     Keeps old section markup in the tree for reference/comparison.
+     Currently forced display:none for stakeholder review — comment
+     out the display rule below to see them again. */
+  .rbccm-maas-mata--legacy {
+    display: none !important;
+    position: relative;
+    outline: 2px dashed #d33;
+    outline-offset: -12px;
+    opacity: 0.55;
+  }
+  .rbccm-maas-mata--legacy::before {
+    content: "LEGACY - REMOVED";
+    position: absolute;
+    top: 0; left: 0;
+    background: #d33;
+    color: #fff;
+    font: 700 11px/1 Roboto, Arial, sans-serif;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    border-radius: 0 0 6px 0;
+    z-index: 5;
+  }
+
+  /* ---------- "A new standard for multi-asset trading" ----------
+     Sits inside the dark-strip above the awards. Centered heading
+     with yellow-accented last word, three body paragraphs, yellow
+     CTA underneath. */
+  .rbccm-maas-mata__new-standard {
+    /* Mobile bottom pulled tighter (55) since the awards row is
+       flush against this section on small screens. Desktop below
+       restores the 85 needed for the wider 125 visual gap. */
+    padding: 60px 0 55px;
+    text-align: center;
+    color: #fff;
+  }
+  @media (min-width: 992px) { .rbccm-maas-mata__new-standard { padding: 80px 0 85px; } }
+  /* Heading typography per Figma "title-mobile" / desktop specs.
+     All three parts share family/size/weight/line-height at each
+     breakpoint - only color differs. Mobile: 50px / 100% LH,
+     block width auto. Desktop: 75px / 110% LH, max-width 872. */
+  .rbccm-maas-mata__new-standard-heading {
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 50px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
+    text-align: center;
+    margin: 0 auto 20px;
+    width: auto;
+    max-width: 331px;
+    /* Lead colour applies to the whole heading; the two spans below
+       override for "multi-asset" (white) and "trading" (yellow). */
+    color: rgba(255, 255, 255, 0.40);
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__new-standard-heading {
+      font-size: 75px;
+      line-height: 110%;   /* 82.5px */
+      max-width: 872px;
+    }
+  }
+  .rbccm-maas-mata__new-standard-heading-lead { display: block; }
+  /* Second line block: sets colour to white so both "multi-asset "
+     AND the trailing "." (which is a plain text node after the
+     accent span) render in white. .accent below overrides just
+     the "trading" span to yellow. */
+  .rbccm-maas-mata__new-standard-heading-highlight { display: block; color: #FFFFFF; }
+  .rbccm-maas-mata__new-standard-heading-accent { color: #FFC72C; }                                    /* "trading" - Yellow Warm Yellow */
+  /* Mobile: lock every span in the heading to the same 50/100%
+     ramp as the parent so nothing inherits a stray size and the
+     block wraps naturally into 4 lines
+     ("A new" / "standard for" / "multi-asset" / "trading.")
+     inside the 343px hero content column. */
+  @media (max-width: 991px) {
+    .rbccm-maas-mata__new-standard-heading,
+    .rbccm-maas-mata__new-standard-heading-lead,
+    .rbccm-maas-mata__new-standard-heading-highlight,
+    .rbccm-maas-mata__new-standard-heading-accent {
+      font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+      font-size: 50px;
+      font-weight: 500;
+      line-height: 100%;
+    }
+  }
+  /* Body paragraphs per Figma "description desktop" spec. Mobile
+     and desktop share identical typography (Roboto 16 / 400 /
+     150% / #D8D8D8) - only the wrapper width matters: 100% wide
+     capped at 1100px, centered under the heading. */
+  .rbccm-maas-mata__new-standard-body {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto 30px;
+    color: #D8D8D8;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;  /* 24px */
+  }
+  .rbccm-maas-mata__new-standard-body p { margin: 0 0 21px; }
+  .rbccm-maas-mata__new-standard-body p:last-child { margin-bottom: 0; }
+
+  /* "See MAAS in action" yellow CTA - per Figma spec. Scoped to
+     the new-standard section so the base .rbccm-maas-mata__btn--
+     yellow (used at the bottom demo CTA) isn't affected. Mobile:
+     40h / 14px. Desktop: 50h / 19.507px. */
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow {
+    display: inline-flex;
+    height: 40px;
+    padding: 20px 35px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 100px;
+    background: #FFC72C;
+    color: #061730;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 29.26px;   /* 209.002% */
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow {
+      height: 50px;
+      font-size: 19.507px;
+      line-height: 29.26px;  /* 150% at desktop size */
+    }
+  }
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow:hover {
+    background: #f0b81e;  /* subtle warmer-yellow hover */
+  }
+
+  /* Extend the awards eyebrow to 3-up grid (has 3 items). */
+  .rbccm-maas-mata__awards-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  @media (max-width: 991px) { .rbccm-maas-mata__awards-grid--3 { grid-template-columns: 1fr !important; } }
+
+  /* ---------- MATA Capabilities (DARK bg) ----------
+     Three top cards + one wide bottom card. Own dark section
+     (separate from dark-strip). */
+  /* MATA Capabilities section - Figma.
+       Mobile: padding 60/23, gap 40, flex column centered stretch.
+     Eyebrow + heading reuse the styling patterns from the
+     platforms section (yellow uppercase eyebrow with a 45x2
+     rule below, RBC Display H2). */
+  .rbccm-maas-mata__mata-cap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    gap: 40px;
+    /* Transparent bg so the .deep-band parent's continuous
+       #082043 → #061730 gradient bleeds through this section
+       and reads as one surface with the market-insights and
+       demo sections below. */
+    background: transparent;
+    color: #fff;
+    padding: 60px 23px;
+    text-align: center;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap {
+      padding: 80px 170px;
+    }
+  }
+
+  /* Eyebrow "MATA CAPABILITIES" - same treatment as the platforms
+     eyebrow, with a 45x2 yellow rule underneath via ::after. */
+  .rbccm-maas-mata__mata-cap-eyebrow {
+    color: #FFC72C;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;      /* 16.8px */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 auto;
+    padding: 15px 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    align-self: stretch;
+    min-height: 49px;
+    box-sizing: border-box;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-eyebrow {
+      width: 858px;
+      max-width: 100%;
+      min-height: 40px;
+      height: auto;
+      align-self: auto;
+      /* Trim 10 off the bottom so the eyebrow sits closer to the
+         heading pair on desktop. */
+      padding-bottom: 5px;
+    }
+  }
+  .rbccm-maas-mata__mata-cap-eyebrow::after {
+    content: '';
+    display: block;
+    width: 45px;
+    height: 2px;
+    background: #FFC72C;
+  }
+
+  /* Header + subtitle wrapper — flex column, gap 16, stretch. */
+  .rbccm-maas-mata__mata-cap-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 8px;
+  }
+
+  /* Heading "Sharper insight. Smarter trades." - same responsive
+     type ramp as .platforms-heading. */
+  .rbccm-maas-mata__mata-cap-heading {
+    color: #FFFFFF;
+    text-align: center;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 120%;      /* 43.2px */
+    align-self: stretch;
+    margin: 0;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-heading {
+      font-size: 42px;
+      line-height: 125%;    /* 52.5px */
+    }
+  }
+
+  /* Sub-heading - #D7D7D7 Roboto 16/150%, centered, full width. */
+  .rbccm-maas-mata__mata-cap-sub {
+    color: #D7D7D7;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;      /* 24px */
+    align-self: center;
+    margin: 0 auto;
+    width: 490px;
+    max-width: 100%;
+  }
+
+  /* Cards block - flex column with gap 16, wraps the 3-up grid
+     and the full-width Index events card so they don't inherit
+     the section's 40px gap. Full width mobile; capped at 1100
+     desktop so grid + wide share the same rail. */
+  .rbccm-maas-mata__mata-cap-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: stretch;
+    width: 100%;
+    gap: 16px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-cards {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+  }
+
+  /* Cards grid - Figma:
+       Mobile: flex column, gap 16, GRID 100% width, cards 100% (stack).
+       Desktop (>=988): flex row, cards fixed 329, side-by-side. */
+  .rbccm-maas-mata__mata-cap-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    width: 100%;
+    gap: 16px;
+    text-align: left;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-grid {
+      flex-direction: row;
+      align-items: flex-start;
+      width: 1100px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+  /* Card - Figma: padding 40/30, radius 20, border rgba
+     white 13%, bg white 5%, subtle drop shadow. Height hugs
+     content (no fixed 316). Card is a simple flex-column
+     wrapper around the .mata-cap-content group; the content
+     group owns the 16px rhythm between icon and text so the
+     card itself doesn't need its own gap or justify-content. */
+  .rbccm-maas-mata__mata-cap-card {
+    display: flex;
+    width: 100%;
+    height: auto;
+    padding: 40px 30px;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+    box-sizing: border-box;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-card {
+      /* desktop: cards flex-grow equally to fill the 1100
+         row (was fixed 329). flex: 1 0 0 means grow, don't
+         shrink, basis 0 - three cards share the row evenly. */
+      width: auto;
+      flex: 1 0 0;
+      align-self: stretch;
+    }
+  }
+  /* Content wrapper inside the card - flex column, stretch,
+     holds icon + title/subtitle/body. Mobile gap 16, desktop
+     gap 21 per Figma. */
+  .rbccm-maas-mata__mata-cap-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 16px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-content { gap: 21px; }
+  }
+
+  /* Icon: 30x30, yellow Warm-Yellow. */
+  .rbccm-maas-mata__mata-cap-icon {
+    width: 30px;
+    height: 30px;
+    color: #FFC72C;
+    display: block;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  /* "Equities" - yellow, Roboto 20/400. */
+  .rbccm-maas-mata__mata-cap-title {
+    color: #FFC72C;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin: 0;
+  }
+  /* "Cash Equities, ETFs & ADRs" - white italic Roboto 18/500. */
+  .rbccm-maas-mata__mata-cap-subtitle {
+    color: #FFFFFF;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: normal;
+    margin: 0;
+  }
+  /* Body paragraph - #D7D7D7 Roboto 16/120%. */
+  .rbccm-maas-mata__mata-cap-body {
+    color: #D7D7D7;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;      /* 19.2px */
+    margin: 0;
+  }
+  /* Wide "Index events" card - Figma: same treatment as the
+     3-up cards above (flex column, padding 40/30, gap 21, radius
+     20, border white 13%, bg white 5%, subtle drop shadow), but
+     stretches full row width. On desktop it caps at 1100 to match
+     the grid width. Icon stacks on top like the other cards. */
+  .rbccm-maas-mata__mata-cap-wide {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 21px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+    box-sizing: border-box;
+    width: 100%;
+    text-align: left;
+    color: #fff;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-wide {
+      width: 1100px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+  }
+  /* Icon inside the wide card: no side layout anymore, just
+     stacks on top like the other cards. */
+  .rbccm-maas-mata__mata-cap-wide .rbccm-maas-mata__mata-cap-icon {
+    flex-shrink: 0;
+  }
+  /* Wide body no longer needs flex-grow since it's stacked. */
+  .rbccm-maas-mata__mata-cap-wide-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__mata-cap-wide-body { gap: 21px; }
+  }
+
+  /* ---------- Newsletter form fields ----------
+     Marketo owns submit; we only ship the visual chrome. */
+  /* --- 
+     5-column responsive grid (First / Last / Title on row 1,
+     Company / Business Email on row 2), then LinkedIn button,
+     consent line with inline Privacy link, and Sign up submit. */
+  .rbccm-maas-mata__newsletter-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px) { .rbccm-maas-mata__newsletter-fields { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .rbccm-maas-mata__newsletter-fields { grid-template-columns: 1fr; } }
+  .rbccm-maas-mata__newsletter-field { display: flex; flex-direction: column; gap: 6px; }
+  .rbccm-maas-mata__newsletter-label {
+    font-size: 12px;
+    color: #494949;
+    font-weight: 500;
+  }
+  .rbccm-maas-mata__newsletter-input {
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #D8D8D8;
+    border-radius: 4px;
+    background: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    color: #082043;
+  }
+  .rbccm-maas-mata__newsletter-input:focus {
+    outline: none;
+    border-color: #0051A5;
+    box-shadow: 0 0 0 2px rgba(0,81,165,0.2);
+  }
+  .rbccm-maas-mata__newsletter-linkedin {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #0A66C2;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .rbccm-maas-mata__newsletter-linkedin:hover { background: #084d94; }
+  .rbccm-maas-mata__newsletter-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: #494949;
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+  .rbccm-maas-mata__newsletter-consent-check { margin-top: 3px; }
+  .rbccm-maas-mata__newsletter-privacy { color: #0051A5; text-decoration: underline; }
+  .rbccm-maas-mata__newsletter-submit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 169px;
+    height: 50px;
+    padding: 15px;
+    background: #0051A5;
+    color: #FFF;
+    border: 0.5px solid #FFF;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    cursor: pointer;
+  }
+  .rbccm-maas-mata__newsletter-submit:hover { background: #003168; }
+  .rbccm-maas-mata__newsletter-submit-label {
+    display: inline-block;
+  }
+  .rbccm-maas-mata__newsletter-submit-icon {
+    width: 5px;
+    height: 10px;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  /* Video modal - fixed overlay with backdrop + centered dialog
+     containing a 16:9 iframe frame. Hidden by default via [hidden];
+     JS toggles the .is-open class to fade + scale in. */
+  .rbccm-maas-mata__video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .rbccm-maas-mata__video-modal[hidden] { display: none; }
+  .rbccm-maas-mata__video-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .rbccm-maas-mata__video-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 23, 48, 0.85);
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+    cursor: pointer;
+  }
+  .rbccm-maas-mata__video-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1100px;
+    background: #061730;
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    padding: 48px 24px 24px;
+    transform: scale(0.96);
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .rbccm-maas-mata__video-modal.is-open .rbccm-maas-mata__video-modal-dialog {
+    transform: scale(1);
+  }
+  .rbccm-maas-mata__video-modal-title {
+    /* Visually hidden by default (Figma comp has no visible title;
+       label lives in the button's aria-label). Kept in the DOM for
+       screen-reader context via aria-labelledby on the dialog. */
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .rbccm-maas-mata__video-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 150ms ease;
+  }
+  .rbccm-maas-mata__video-modal-close:hover,
+  .rbccm-maas-mata__video-modal-close:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .rbccm-maas-mata__video-modal-close:focus-visible {
+    outline: 2px solid #FFC72C;
+    outline-offset: 2px;
+  }
+  .rbccm-maas-mata__video-modal-frame {
+    /* 16:9 aspect ratio via padding-bottom hack for older browser
+       support; the iframe fills absolutely. */
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .rbccm-maas-mata__video-modal-iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  /* Lock body scroll while modal is open. Applied via JS. */
+  body.rbccm-maas-mata--modal-open { overflow: hidden; }
+
+  /* -------------------------------------------------------------
+     Animate.css hooks. Elements marked with data-animate (scroll
+     triggered) or data-animate-hero (fires on load) start hidden
+     via opacity:0, then animate.css keyframes take over when JS
+     adds the .animate__animated + .animate__<name> classes.
+     animation-fill-mode: both (baked into animate.css) means the
+     element retains its ending opacity after the animation, so
+     the initial opacity:0 doesn't reappear.
+     Reduced-motion users skip everything — JS forces opacity:1
+     and never adds the animation classes. ------------------------ */
+  [data-animate],
+  [data-animate-hero],
+  [data-stagger-parent] > * {
+    opacity: 0;
+  }
+  .rbccm-anim-ready [data-animate].animate__animated,
+  .rbccm-anim-ready [data-animate-hero].animate__animated,
+  .rbccm-anim-ready [data-stagger-parent] > .animate__animated {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate],
+    [data-animate-hero],
+    [data-stagger-parent] > * {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+
+  /* Debug pill */
+  .rbccm-debug-bar { position: fixed; bottom: 12px; right: 12px; background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-family: monospace; opacity: 0.7; z-index: 999; }
+  .rbccm-debug-bar--err { background: #c62828; opacity: 1; }
