@@ -52,11 +52,10 @@
 
 
   <!-- ═══ 2. CHART CARD (image + optional Brightcove modal) ═══
-       Static screenshot per client direction. Two variants:
-       one narrower crop for mobile, full width for desktop.
-       Blank Brightcove Video Id hides the play button. -->
-  <Datum ID="ChartImageDesktop" Type="String" Name="Chart image URL — desktop">./maas-execution-console-reveal.png</Datum>
-  <Datum ID="ChartImageMobile" Type="String" Name="Chart image URL — mobile">./maas-execution-console-mobile.png</Datum>
+       Static screenshot per client direction. Single image
+       scales down for mobile via CSS. Blank Brightcove Video
+       Id hides the play button. -->
+  <Datum ID="ChartImage" Type="String" Name="Chart image URL (upload to /assets/rbccm/images/... then paste the path here)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
   <Datum ID="ChartImageAlt" Type="String" Name="Chart image alt text">MAAS Execution Console — cross-asset portfolio chart with +$15,500.90 delta and live quote strip.</Datum>
   <Datum ID="ChartBrightcoveAccount" Type="String" Name="Brightcove account ID"/>
   <Datum ID="ChartBrightcovePlayer" Type="String" Name="Brightcove player ID">default</Datum>
@@ -171,102 +170,137 @@
   <!-- Page <title> + meta description live on the parent page
        skin, not on this component. Author them there. -->
 
+
+  <!-- ═══ 3b. NEW STANDARD BODY (3 fixed paragraphs) ═════════ -->
+  <Datum ID="NewStandardParagraph1" Type="Textarea" Name="New-standard paragraph 1">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
+  <Datum ID="NewStandardParagraph2" Type="Textarea" Name="New-standard paragraph 2">Many platforms help you analyze the trade. MAAS, RBC's Multi-Asset Agency Solutions platform, goes further, bringing trading intelligence, and execution technology into one unified experience. Across all major asset classes and index events, MAAS helps you analyze opportunities, execute strategies and manage risk with greater visibility and control.</Datum>
+  <Datum ID="NewStandardParagraph3" Type="Textarea" Name="New-standard paragraph 3">Because in complex markets, the traders who win aren't just faster — they're better informed, better connected, and better positioned to execute.</Datum>
+
+
+  <!-- ═══ 4. AWARDS (3 fixed slots) ══════════════════════════ -->
+  <Datum ID="AwardsEyebrow" Type="String" Name="Awards eyebrow">See why the world's top institutions choose MAAS</Datum>
+  <Datum ID="Award1Year" Type="String" Name="Award 1 — year">2026</Datum>
+  <Datum ID="Award1Title" Type="String" Name="Award 1 — title">Best Trading Analytics Platform</Datum>
+  <Datum ID="Award1Issuer" Type="String" Name="Award 1 — issuer">TradingTech Insights Awards USA</Datum>
+  <Datum ID="Award2Year" Type="String" Name="Award 2 — year">2025</Datum>
+  <Datum ID="Award2Title" Type="String" Name="Award 2 — title">Overall Best Provider, Algorithmic Trading</Datum>
+  <Datum ID="Award2Issuer" Type="String" Name="Award 2 — issuer">The Trade</Datum>
+  <Datum ID="Award3Year" Type="String" Name="Award 3 — year">2025</Datum>
+  <Datum ID="Award3Title" Type="String" Name="Award 3 — title">Best Provider, Multi-User Clients</Datum>
+  <Datum ID="Award3Issuer" Type="String" Name="Award 3 — issuer">The Trade</Datum>
+
+
+  <!-- ═══ 5b. PLATFORM CARDS (2 fixed slots) ═════════════════ -->
+  <Datum ID="Platform1Theme" Type="SelectSingle" Name="Platform 1 — theme">
+    <Option Selected="true"><Display>Dark (navy card)</Display><Value>dark</Value></Option>
+    <Option><Display>Light (white card)</Display><Value>light</Value></Option>
+  </Datum>
+  <Datum ID="Platform1Eyebrow" Type="String" Name="Platform 1 — eyebrow">MATA – Analytics</Datum>
+  <Datum ID="Platform1Title" Type="String" Name="Platform 1 — title">Transform data into trading intelligence</Datum>
+  <Datum ID="Platform1Body" Type="Textarea" Name="Platform 1 — body">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
+  <Datum ID="Platform1Bullet1" Type="String" Name="Platform 1 — bullet 1">Quantify expected execution costs before commitment</Datum>
+  <Datum ID="Platform1Bullet2" Type="String" Name="Platform 1 — bullet 2">Compare strategies side by side to evaluate potential outcomes</Datum>
+  <Datum ID="Platform1Bullet3" Type="String" Name="Platform 1 — bullet 3">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
+  <Datum ID="Platform1Bullet4" Type="String" Name="Platform 1 — bullet 4">Monitor market conditions and portfolio exposures</Datum>
+  <Datum ID="Platform1Bullet5" Type="String" Name="Platform 1 — bullet 5">Model scenarios across asset classes</Datum>
+
+  <Datum ID="Platform2Theme" Type="SelectSingle" Name="Platform 2 — theme">
+    <Option><Display>Dark (navy card)</Display><Value>dark</Value></Option>
+    <Option Selected="true"><Display>Light (white card)</Display><Value>light</Value></Option>
+  </Datum>
+  <Datum ID="Platform2Eyebrow" Type="String" Name="Platform 2 — eyebrow">MAAS - Execution</Datum>
+  <Datum ID="Platform2Title" Type="String" Name="Platform 2 — title">Drive stronger performance outcomes</Datum>
+  <Datum ID="Platform2Body" Type="Textarea" Name="Platform 2 — body">Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.</Datum>
+  <Datum ID="Platform2Bullet1" Type="String" Name="Platform 2 — bullet 1">Access adaptive algorithms built for live market conditions</Datum>
+  <Datum ID="Platform2Bullet2" Type="String" Name="Platform 2 — bullet 2">Select AI-powered strategies tailored to execution objectives</Datum>
+  <Datum ID="Platform2Bullet3" Type="String" Name="Platform 2 — bullet 3">Route orders intelligently to help minimize market impact</Datum>
+  <Datum ID="Platform2Bullet4" Type="String" Name="Platform 2 — bullet 4">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</Datum>
+  <Datum ID="Platform2Bullet5" Type="String" Name="Platform 2 — bullet 5">Benchmark performance against pre-trade expectations</Datum>
+
+
+  <!-- ═══ 6b. INNOVATION FEATURES (3 fixed slots) ════════════ -->
+  <Datum ID="Feature1Number" Type="String" Name="Feature 1 — number">01</Datum>
+  <Datum ID="Feature1Title" Type="String" Name="Feature 1 — title">Model with depth</Datum>
+  <Datum ID="Feature1Body" Type="Textarea" Name="Feature 1 — body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
+  <Datum ID="Feature2Number" Type="String" Name="Feature 2 — number">02</Datum>
+  <Datum ID="Feature2Title" Type="String" Name="Feature 2 — title">Connect with ease</Datum>
+  <Datum ID="Feature2Body" Type="Textarea" Name="Feature 2 — body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team.</Datum>
+  <Datum ID="Feature3Number" Type="String" Name="Feature 3 — number">03</Datum>
+  <Datum ID="Feature3Title" Type="String" Name="Feature 3 — title">Optimize with experts</Datum>
+  <Datum ID="Feature3Body" Type="Textarea" Name="Feature 3 — body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</Datum>
+
+
+  <!-- ═══ 7b. MATA CAPABILITY CARDS (3 fixed slots) ══════════ -->
+  <Datum ID="Card1Icon" Type="SelectSingle" Name="Card 1 — icon">
+    <Option Selected="true"><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card1Title" Type="String" Name="Card 1 — title">Equities</Datum>
+  <Datum ID="Card1Subtitle" Type="String" Name="Card 1 — subtitle">Cash Equities, ETFs &amp; ADRs</Datum>
+  <Datum ID="Card1Body" Type="Textarea" Name="Card 1 — body">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
+
+  <Datum ID="Card2Icon" Type="SelectSingle" Name="Card 2 — icon">
+    <Option><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option Selected="true"><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card2Title" Type="String" Name="Card 2 — title">FX</Datum>
+  <Datum ID="Card2Subtitle" Type="String" Name="Card 2 — subtitle">G10 &amp; EM Currency Pairs</Datum>
+  <Datum ID="Card2Body" Type="Textarea" Name="Card 2 — body">Assess expected execution costs across currency pairs, model scenarios before the trade and monitor live order performance, arrival cost and market conditions during execution.</Datum>
+
+  <Datum ID="Card3Icon" Type="SelectSingle" Name="Card 3 — icon">
+    <Option><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option Selected="true"><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card3Title" Type="String" Name="Card 3 — title">Futures</Datum>
+  <Datum ID="Card3Subtitle" Type="String" Name="Card 3 — subtitle">Index, Commodity &amp; Rate Futures</Datum>
+  <Datum ID="Card3Body" Type="Textarea" Name="Card 3 — body">Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures.</Datum>
+
+
+  <!-- ═══ 8b. MARKET INSIGHT (1 fixed featured card) ═════════ -->
+  <Datum ID="Insight1Eyebrow" Type="String" Name="Insight 1 — eyebrow">Insights</Datum>
+  <Datum ID="Insight1Title" Type="String" Name="Insight 1 — title">Lorem ipsum dolor sit amet consectetur adipiscing elit</Datum>
+  <Datum ID="Insight1Body" Type="Textarea" Name="Insight 1 — body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</Datum>
+  <Datum ID="Insight1CtaLabel" Type="String" Name="Insight 1 — CTA label">2 min read</Datum>
+  <Datum ID="Insight1CtaHref" Type="String" Name="Insight 1 — CTA URL">#</Datum>
+
+
+  <!-- ═══ 10b. NEWSLETTER FORM FIELDS (5 fixed slots) ════════ -->
+  <Datum ID="Field1Label" Type="String" Name="Field 1 — label">First Name</Datum>
+  <Datum ID="Field1Name" Type="String" Name="Field 1 — Marketo name">firstName</Datum>
+  <Datum ID="Field1Type" Type="SelectSingle" Name="Field 1 — input type">
+    <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
+    <Option><Display>Email</Display><Value>email</Value></Option>
+  </Datum>
+  <Datum ID="Field2Label" Type="String" Name="Field 2 — label">Last Name</Datum>
+  <Datum ID="Field2Name" Type="String" Name="Field 2 — Marketo name">lastName</Datum>
+  <Datum ID="Field2Type" Type="SelectSingle" Name="Field 2 — input type">
+    <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
+    <Option><Display>Email</Display><Value>email</Value></Option>
+  </Datum>
+  <Datum ID="Field3Label" Type="String" Name="Field 3 — label">Title</Datum>
+  <Datum ID="Field3Name" Type="String" Name="Field 3 — Marketo name">title</Datum>
+  <Datum ID="Field3Type" Type="SelectSingle" Name="Field 3 — input type">
+    <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
+    <Option><Display>Email</Display><Value>email</Value></Option>
+  </Datum>
+  <Datum ID="Field4Label" Type="String" Name="Field 4 — label">Company</Datum>
+  <Datum ID="Field4Name" Type="String" Name="Field 4 — Marketo name">company</Datum>
+  <Datum ID="Field4Type" Type="SelectSingle" Name="Field 4 — input type">
+    <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
+    <Option><Display>Email</Display><Value>email</Value></Option>
+  </Datum>
+  <Datum ID="Field5Label" Type="String" Name="Field 5 — label">Business Email</Datum>
+  <Datum ID="Field5Name" Type="String" Name="Field 5 — Marketo name">businessEmail</Datum>
+  <Datum ID="Field5Type" Type="SelectSingle" Name="Field 5 — input type">
+    <Option><Display>Text</Display><Value>text</Value></Option>
+    <Option Selected="true"><Display>Email</Display><Value>email</Value></Option>
+  </Datum>
+
 </Properties>
 
-<Data>
-
-  <!-- ═══ 3b. NEW STANDARD — body paragraphs (repeater) ══════ -->
-  <Group ID="NSB-0" Name="New Standard Paragraph" Replicatable="true">
-    <Datum ID="NsParagraph" Name="Paragraph body" Type="Textarea">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
-  </Group>
-
-  <!-- ═══ 4. AWARDS (repeater) ═══════════════════════════════
-       Section-level eyebrow lives at the top of the Data
-       block for authoring convenience even though schema-wise
-       it's a Property. TeamSite doesn't care — this comment
-       is just a reader nudge; the Datum stays here so the
-       related content is grouped in the DCR editor UI. -->
-  <Group ID="AWD-META" Name="Awards Section Header" Replicatable="false">
-    <Datum ID="AwardsEyebrow" Name="Awards eyebrow" Type="String">See why the world's top institutions choose MAAS</Datum>
-  </Group>
-
-  <Group ID="AWD-0" Name="Award" Replicatable="true">
-    <Datum ID="AwardYear" Name="Year" Type="String">2026</Datum>
-    <Datum ID="AwardTitle" Name="Award title" Type="String">Best Trading Analytics Platform</Datum>
-    <Datum ID="AwardIssuer" Name="Award issuer" Type="String">TradingTech Insights Awards USA</Datum>
-  </Group>
-
-  <!-- ═══ 5b. PLATFORM CARDS (repeater, expects exactly 2) ═══
-       Theme "dark" = dark card with yellow eyebrow.
-       Theme "light" = white card with blue eyebrow.
-       Bullets is a separate nested repeater so authors don't
-       have to hand-format lists. -->
-  <Group ID="PLT-0" Name="Platform Card" Replicatable="true">
-    <Datum ID="PlatformTheme" Name="Theme" Type="SelectSingle">
-      <Option Selected="true"><Display>Dark (navy card)</Display><Value>dark</Value></Option>
-      <Option><Display>Light (white card)</Display><Value>light</Value></Option>
-    </Datum>
-    <Datum ID="PlatformEyebrow" Name="Card eyebrow" Type="String">MATA – Analytics</Datum>
-    <Datum ID="PlatformTitle" Name="Card title" Type="String">Transform data into trading intelligence</Datum>
-    <Datum ID="PlatformBody" Name="Card body" Type="Textarea">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
-    <Datum ID="PlatformBullet1" Name="Bullet 1" Type="String">Quantify expected execution costs before commitment</Datum>
-    <Datum ID="PlatformBullet2" Name="Bullet 2" Type="String">Compare strategies side by side to evaluate potential outcomes</Datum>
-    <Datum ID="PlatformBullet3" Name="Bullet 3" Type="String">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
-    <Datum ID="PlatformBullet4" Name="Bullet 4" Type="String">Monitor market conditions and portfolio exposures</Datum>
-    <Datum ID="PlatformBullet5" Name="Bullet 5" Type="String">Model scenarios across asset classes</Datum>
-  </Group>
-
-  <!-- ═══ 6b. INNOVATION ERA — feature list (repeater) ═══════
-       Numbered features. Number can be "/01" (matches Figma)
-       or "01" — the XSL wraps in / marks so authors don't have
-       to remember. -->
-  <Group ID="INV-0" Name="Innovation Feature" Replicatable="true">
-    <Datum ID="FeatureNumber" Name="Number (e.g. 01)" Type="String">01</Datum>
-    <Datum ID="FeatureTitle" Name="Feature title" Type="String">Model with depth</Datum>
-    <Datum ID="FeatureBody" Name="Feature body" Type="Textarea">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
-  </Group>
-
-  <!-- ═══ 7b. MATA CAPABILITY CARDS (repeater, 3 expected) ═══
-       One card per asset class. Icon picks a pre-built SVG
-       symbol from the inline sprite (equities / fx / futures
-       / info). -->
-  <Group ID="MTC-0" Name="MATA Capability Card" Replicatable="true">
-    <Datum ID="CardIcon" Name="Icon" Type="SelectSingle">
-      <Option Selected="true"><Display>Equities (chart)</Display><Value>equities</Value></Option>
-      <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
-      <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
-      <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
-    </Datum>
-    <Datum ID="CardTitle" Name="Card title" Type="String">Equities</Datum>
-    <Datum ID="CardSubtitle" Name="Card subtitle" Type="String">Cash Equities, ETFs &amp; ADRs</Datum>
-    <Datum ID="CardBody" Name="Card body" Type="Textarea">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
-  </Group>
-
-  <!-- ═══ 8b. MARKET INSIGHTS (repeater) ═════════════════════
-       Featured insight card (white on starfield). First Group
-       renders as the featured card. Subsequent Groups render
-       as swipeable carousel slides on mobile / narrower cards
-       on desktop. -->
-  <Group ID="MKT-0" Name="Market Insight" Replicatable="true">
-    <Datum ID="InsightEyebrow" Name="Card eyebrow" Type="String">Insights</Datum>
-    <Datum ID="InsightTitle" Name="Card title" Type="String">Lorem ipsum dolor sit amet consectetur adipiscing elit</Datum>
-    <Datum ID="InsightBody" Name="Card body" Type="Textarea">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</Datum>
-    <Datum ID="InsightCtaLabel" Name="CTA label (e.g. '2 min read')" Type="String">2 min read</Datum>
-    <Datum ID="InsightCtaHref" Name="CTA URL" Type="String">#</Datum>
-  </Group>
-
-  <!-- ═══ 10b. NEWSLETTER FORM FIELDS (repeater) ═════════════
-       One Group per Marketo form field. Type = "text" or
-       "email"; the XSL maps to the correct <input type>.
-       Name is the Marketo field name (must match Marketo
-       exactly), Label is the visible field label. -->
-  <Group ID="NLF-0" Name="Newsletter Field" Replicatable="true">
-    <Datum ID="FieldLabel" Name="Field label" Type="String">First Name</Datum>
-    <Datum ID="FieldName" Name="Marketo field name" Type="String">firstName</Datum>
-    <Datum ID="FieldType" Name="Input type" Type="SelectSingle">
-      <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
-      <Option><Display>Email</Display><Value>email</Value></Option>
-    </Datum>
-  </Group>
-
-</Data>

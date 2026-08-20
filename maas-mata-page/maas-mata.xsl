@@ -22,8 +22,7 @@
   <xsl:variable name="HERO_CTA_HREF"       select="/Properties/Datum[@ID='HeroCtaHref']" />
 
   <!-- Chart Card -->
-  <xsl:variable name="CHART_IMG_DESKTOP"   select="/Properties/Datum[@ID='ChartImageDesktop']" />
-  <xsl:variable name="CHART_IMG_MOBILE"    select="/Properties/Datum[@ID='ChartImageMobile']" />
+  <xsl:variable name="CHART_IMG"   select="/Properties/Datum[@ID='ChartImage']" />
   <xsl:variable name="CHART_IMG_ALT"       select="/Properties/Datum[@ID='ChartImageAlt']" />
   <xsl:variable name="CHART_BC_ACCOUNT"    select="normalize-space(/Properties/Datum[@ID='ChartBrightcoveAccount'])" />
   <xsl:variable name="CHART_BC_PLAYER"     select="normalize-space(/Properties/Datum[@ID='ChartBrightcovePlayer'])" />
@@ -87,10 +86,94 @@
     </xsl:choose>
   </xsl:variable>
 
-  <!-- Awards eyebrow (housed in the Awards Section Header group
-       for authoring convenience — see properties file). -->
-  <xsl:variable name="AWD_EYEBROW"
-    select="/Properties/Data/Group[@Name='Awards Section Header']/Datum[@ID='AwardsEyebrow']" />
+  <!-- Awards eyebrow (top-level Datum). -->
+  <xsl:variable name="AWD_EYEBROW" select="/Properties/Datum[@ID='AwardsEyebrow']" />
+
+  <!-- New Standard body paragraphs (3 fixed slots) -->
+  <xsl:variable name="NS_P1" select="/Properties/Datum[@ID='NewStandardParagraph1']" />
+  <xsl:variable name="NS_P2" select="/Properties/Datum[@ID='NewStandardParagraph2']" />
+  <xsl:variable name="NS_P3" select="/Properties/Datum[@ID='NewStandardParagraph3']" />
+
+  <!-- Awards (3 fixed slots) -->
+  <xsl:variable name="AWD1_YEAR"   select="/Properties/Datum[@ID='Award1Year']"   />
+  <xsl:variable name="AWD1_TITLE"  select="/Properties/Datum[@ID='Award1Title']"  />
+  <xsl:variable name="AWD1_ISSUER" select="/Properties/Datum[@ID='Award1Issuer']" />
+  <xsl:variable name="AWD2_YEAR"   select="/Properties/Datum[@ID='Award2Year']"   />
+  <xsl:variable name="AWD2_TITLE"  select="/Properties/Datum[@ID='Award2Title']"  />
+  <xsl:variable name="AWD2_ISSUER" select="/Properties/Datum[@ID='Award2Issuer']" />
+  <xsl:variable name="AWD3_YEAR"   select="/Properties/Datum[@ID='Award3Year']"   />
+  <xsl:variable name="AWD3_TITLE"  select="/Properties/Datum[@ID='Award3Title']"  />
+  <xsl:variable name="AWD3_ISSUER" select="/Properties/Datum[@ID='Award3Issuer']" />
+
+  <!-- Platform cards (2 fixed slots) -->
+  <xsl:variable name="PLT1_THEME"   select="/Properties/Datum[@ID='Platform1Theme']/Option[@Selected='true']/Value" />
+  <xsl:variable name="PLT1_EYEBROW" select="/Properties/Datum[@ID='Platform1Eyebrow']" />
+  <xsl:variable name="PLT1_TITLE"   select="/Properties/Datum[@ID='Platform1Title']" />
+  <xsl:variable name="PLT1_BODY"    select="/Properties/Datum[@ID='Platform1Body']" />
+  <xsl:variable name="PLT1_B1"      select="/Properties/Datum[@ID='Platform1Bullet1']" />
+  <xsl:variable name="PLT1_B2"      select="/Properties/Datum[@ID='Platform1Bullet2']" />
+  <xsl:variable name="PLT1_B3"      select="/Properties/Datum[@ID='Platform1Bullet3']" />
+  <xsl:variable name="PLT1_B4"      select="/Properties/Datum[@ID='Platform1Bullet4']" />
+  <xsl:variable name="PLT1_B5"      select="/Properties/Datum[@ID='Platform1Bullet5']" />
+  <xsl:variable name="PLT2_THEME"   select="/Properties/Datum[@ID='Platform2Theme']/Option[@Selected='true']/Value" />
+  <xsl:variable name="PLT2_EYEBROW" select="/Properties/Datum[@ID='Platform2Eyebrow']" />
+  <xsl:variable name="PLT2_TITLE"   select="/Properties/Datum[@ID='Platform2Title']" />
+  <xsl:variable name="PLT2_BODY"    select="/Properties/Datum[@ID='Platform2Body']" />
+  <xsl:variable name="PLT2_B1"      select="/Properties/Datum[@ID='Platform2Bullet1']" />
+  <xsl:variable name="PLT2_B2"      select="/Properties/Datum[@ID='Platform2Bullet2']" />
+  <xsl:variable name="PLT2_B3"      select="/Properties/Datum[@ID='Platform2Bullet3']" />
+  <xsl:variable name="PLT2_B4"      select="/Properties/Datum[@ID='Platform2Bullet4']" />
+  <xsl:variable name="PLT2_B5"      select="/Properties/Datum[@ID='Platform2Bullet5']" />
+
+  <!-- Innovation features (3 fixed slots) -->
+  <xsl:variable name="F1_NUM"   select="/Properties/Datum[@ID='Feature1Number']" />
+  <xsl:variable name="F1_TITLE" select="/Properties/Datum[@ID='Feature1Title']"  />
+  <xsl:variable name="F1_BODY"  select="/Properties/Datum[@ID='Feature1Body']"   />
+  <xsl:variable name="F2_NUM"   select="/Properties/Datum[@ID='Feature2Number']" />
+  <xsl:variable name="F2_TITLE" select="/Properties/Datum[@ID='Feature2Title']"  />
+  <xsl:variable name="F2_BODY"  select="/Properties/Datum[@ID='Feature2Body']"   />
+  <xsl:variable name="F3_NUM"   select="/Properties/Datum[@ID='Feature3Number']" />
+  <xsl:variable name="F3_TITLE" select="/Properties/Datum[@ID='Feature3Title']"  />
+  <xsl:variable name="F3_BODY"  select="/Properties/Datum[@ID='Feature3Body']"   />
+
+  <!-- MATA capability cards (3 fixed slots) -->
+  <xsl:variable name="C1_ICON"     select="/Properties/Datum[@ID='Card1Icon']/Option[@Selected='true']/Value" />
+  <xsl:variable name="C1_TITLE"    select="/Properties/Datum[@ID='Card1Title']"    />
+  <xsl:variable name="C1_SUBTITLE" select="/Properties/Datum[@ID='Card1Subtitle']" />
+  <xsl:variable name="C1_BODY"     select="/Properties/Datum[@ID='Card1Body']"     />
+  <xsl:variable name="C2_ICON"     select="/Properties/Datum[@ID='Card2Icon']/Option[@Selected='true']/Value" />
+  <xsl:variable name="C2_TITLE"    select="/Properties/Datum[@ID='Card2Title']"    />
+  <xsl:variable name="C2_SUBTITLE" select="/Properties/Datum[@ID='Card2Subtitle']" />
+  <xsl:variable name="C2_BODY"     select="/Properties/Datum[@ID='Card2Body']"     />
+  <xsl:variable name="C3_ICON"     select="/Properties/Datum[@ID='Card3Icon']/Option[@Selected='true']/Value" />
+  <xsl:variable name="C3_TITLE"    select="/Properties/Datum[@ID='Card3Title']"    />
+  <xsl:variable name="C3_SUBTITLE" select="/Properties/Datum[@ID='Card3Subtitle']" />
+  <xsl:variable name="C3_BODY"     select="/Properties/Datum[@ID='Card3Body']"     />
+
+  <!-- Market insight (1 fixed slot) -->
+  <xsl:variable name="INS1_EYEBROW"   select="/Properties/Datum[@ID='Insight1Eyebrow']" />
+  <xsl:variable name="INS1_TITLE"     select="/Properties/Datum[@ID='Insight1Title']" />
+  <xsl:variable name="INS1_BODY"      select="/Properties/Datum[@ID='Insight1Body']" />
+  <xsl:variable name="INS1_CTA_LABEL" select="/Properties/Datum[@ID='Insight1CtaLabel']" />
+  <xsl:variable name="INS1_CTA_HREF"  select="/Properties/Datum[@ID='Insight1CtaHref']" />
+
+  <!-- Newsletter form fields (5 fixed slots) -->
+  <xsl:variable name="FLD1_LABEL" select="/Properties/Datum[@ID='Field1Label']" />
+  <xsl:variable name="FLD1_NAME"  select="/Properties/Datum[@ID='Field1Name']"  />
+  <xsl:variable name="FLD1_TYPE"  select="/Properties/Datum[@ID='Field1Type']/Option[@Selected='true']/Value" />
+  <xsl:variable name="FLD2_LABEL" select="/Properties/Datum[@ID='Field2Label']" />
+  <xsl:variable name="FLD2_NAME"  select="/Properties/Datum[@ID='Field2Name']"  />
+  <xsl:variable name="FLD2_TYPE"  select="/Properties/Datum[@ID='Field2Type']/Option[@Selected='true']/Value" />
+  <xsl:variable name="FLD3_LABEL" select="/Properties/Datum[@ID='Field3Label']" />
+  <xsl:variable name="FLD3_NAME"  select="/Properties/Datum[@ID='Field3Name']"  />
+  <xsl:variable name="FLD3_TYPE"  select="/Properties/Datum[@ID='Field3Type']/Option[@Selected='true']/Value" />
+  <xsl:variable name="FLD4_LABEL" select="/Properties/Datum[@ID='Field4Label']" />
+  <xsl:variable name="FLD4_NAME"  select="/Properties/Datum[@ID='Field4Name']"  />
+  <xsl:variable name="FLD4_TYPE"  select="/Properties/Datum[@ID='Field4Type']/Option[@Selected='true']/Value" />
+  <xsl:variable name="FLD5_LABEL" select="/Properties/Datum[@ID='Field5Label']" />
+  <xsl:variable name="FLD5_NAME"  select="/Properties/Datum[@ID='Field5Name']"  />
+  <xsl:variable name="FLD5_TYPE"  select="/Properties/Datum[@ID='Field5Type']/Option[@Selected='true']/Value" />
+
 
 
   <!-- ============================================================
@@ -162,15 +245,10 @@
 
       <!-- ═══ 2. CHART CARD ═══════════════════════════════════ -->
       <div class="rbccm-maas-mata__chart rbccm-maas-mata__chart-image" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600">
-        <picture>
-          <source media="(min-width: 992px)">
-            <xsl:attribute name="srcset"><xsl:value-of select="$CHART_IMG_DESKTOP" /></xsl:attribute>
-          </source>
-          <img>
-            <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG_MOBILE" /></xsl:attribute>
-            <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
-          </img>
-        </picture>
+        <img>
+          <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
+          <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
+        </img>
         <xsl:if test="$CHART_HAS_VIDEO">
           <button type="button" class="rbccm-maas-mata__chart-play" data-video-play="" aria-label="Play video">
             <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
@@ -194,9 +272,9 @@
             </h2>
             <div class="rbccm-maas-mata__new-standard-body" data-animate="fadeInUp" data-animate-delay="150" data-json-list="newStandard.body">
               <template><p data-json=""></p></template>
-              <xsl:for-each select="/Properties/Data/Group[@Name='New Standard Paragraph']">
-                <p><xsl:value-of select="Datum[@ID='NsParagraph']" disable-output-escaping="yes" /></p>
-              </xsl:for-each>
+              <p><xsl:value-of select="$NS_P1" disable-output-escaping="yes" /></p>
+              <p><xsl:value-of select="$NS_P2" disable-output-escaping="yes" /></p>
+              <p><xsl:value-of select="$NS_P3" disable-output-escaping="yes" /></p>
             </div>
             <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--yellow" data-animate="fadeInUp" data-animate-delay="300" data-json-attr-href="newStandard.cta.href">
               <xsl:attribute name="href"><xsl:value-of select="$NS_CTA_HREF" /></xsl:attribute>
@@ -212,20 +290,28 @@
           </h5>
 
           <div class="rbccm-maas-mata__awards-track" data-awards-track="" data-json-list="awards.items">
-              <template>
-                <article class="rbccm-maas-mata__award-card">
-                  <div class="rbccm-maas-mata__award-year" data-json="year"></div>
-                  <h6 class="rbccm-maas-mata__award-title" data-json="title"></h6>
-                  <div class="rbccm-maas-mata__award-issuer" data-json="issuer"></div>
-                </article>
-              </template>
-            <xsl:for-each select="/Properties/Data/Group[@Name='Award']">
+            <template>
               <article class="rbccm-maas-mata__award-card">
-                <div class="rbccm-maas-mata__award-year"><xsl:value-of select="Datum[@ID='AwardYear']" /></div>
-                <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="Datum[@ID='AwardTitle']" /></h6>
-                <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="Datum[@ID='AwardIssuer']" /></div>
+                <div class="rbccm-maas-mata__award-year" data-json="year"></div>
+                <h6 class="rbccm-maas-mata__award-title" data-json="title"></h6>
+                <div class="rbccm-maas-mata__award-issuer" data-json="issuer"></div>
               </article>
-            </xsl:for-each>
+            </template>
+            <article class="rbccm-maas-mata__award-card">
+              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD1_YEAR" /></div>
+              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD1_TITLE" /></h6>
+              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD1_ISSUER" /></div>
+            </article>
+            <article class="rbccm-maas-mata__award-card">
+              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD2_YEAR" /></div>
+              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD2_TITLE" /></h6>
+              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD2_ISSUER" /></div>
+            </article>
+            <article class="rbccm-maas-mata__award-card">
+              <div class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD3_YEAR" /></div>
+              <h6 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD3_TITLE" /></h6>
+              <div class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD3_ISSUER" /></div>
+            </article>
           </div>
 
           <div class="rbccm-maas-mata__awards-controls" data-animate="zoomIn" data-animate-delay="350" data-awards-controls="" hidden="hidden">
@@ -246,24 +332,38 @@
             <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading"><xsl:value-of select="$PLATFORMS_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__platforms-grid" data-json-list="platforms.cards">
-              <xsl:for-each select="/Properties/Data/Group[@Name='Platform Card']">
-                <article>
-                  <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
-                      <xsl:when test="translate(normalize-space(Datum[@ID='PlatformTheme']/Option[@Selected='true']/Value), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
-                      <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
-                    </xsl:choose></xsl:attribute>
-                  <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="Datum[@ID='PlatformEyebrow']" /></div>
-                  <h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="Datum[@ID='PlatformTitle']" /></h3>
-                  <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="Datum[@ID='PlatformBody']" disable-output-escaping="yes" /></p>
-                  <ul class="rbccm-maas-mata__platform-bullets">
-                    <xsl:for-each select="Datum[starts-with(@ID, 'PlatformBullet')]">
-                      <xsl:if test="normalize-space(.) != ''">
-                        <li><xsl:value-of select="." /></li>
-                      </xsl:if>
-                    </xsl:for-each>
-                  </ul>
-                </article>
-              </xsl:for-each>
+              <article>
+                <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
+                    <xsl:when test="translate($PLT1_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
+                    <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
+                  </xsl:choose></xsl:attribute>
+                <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></div>
+                <h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT1_TITLE" /></h3>
+                <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
+                <ul class="rbccm-maas-mata__platform-bullets">
+                  <xsl:if test="normalize-space($PLT1_B1) != ''"><li><xsl:value-of select="$PLT1_B1" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT1_B2) != ''"><li><xsl:value-of select="$PLT1_B2" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT1_B3) != ''"><li><xsl:value-of select="$PLT1_B3" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT1_B4) != ''"><li><xsl:value-of select="$PLT1_B4" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT1_B5) != ''"><li><xsl:value-of select="$PLT1_B5" /></li></xsl:if>
+                </ul>
+              </article>
+              <article>
+                <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
+                    <xsl:when test="translate($PLT2_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
+                    <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
+                  </xsl:choose></xsl:attribute>
+                <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT2_EYEBROW" /></div>
+                <h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT2_TITLE" /></h3>
+                <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT2_BODY" disable-output-escaping="yes" /></p>
+                <ul class="rbccm-maas-mata__platform-bullets">
+                  <xsl:if test="normalize-space($PLT2_B1) != ''"><li><xsl:value-of select="$PLT2_B1" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT2_B2) != ''"><li><xsl:value-of select="$PLT2_B2" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT2_B3) != ''"><li><xsl:value-of select="$PLT2_B3" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT2_B4) != ''"><li><xsl:value-of select="$PLT2_B4" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT2_B5) != ''"><li><xsl:value-of select="$PLT2_B5" /></li></xsl:if>
+                </ul>
+              </article>
             </div>
           </div>
         </section>
@@ -280,14 +380,21 @@
           </div>
 
           <ol class="rbccm-maas-mata__innovation-era-list" data-json-list="innovationEra.features">
-            <xsl:for-each select="/Properties/Data/Group[@Name='Innovation Feature']">
-              <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp">
-                <xsl:attribute name="data-animate-delay"><xsl:value-of select="150 * position()" /></xsl:attribute>
-                <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="Datum[@ID='FeatureNumber']" /></div>
-                <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="Datum[@ID='FeatureTitle']" /></h3>
-                <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="Datum[@ID='FeatureBody']" disable-output-escaping="yes" /></p>
-              </li>
-            </xsl:for-each>
+            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="150">
+              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F1_NUM" /></div>
+              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F1_TITLE" /></h3>
+              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F1_BODY" disable-output-escaping="yes" /></p>
+            </li>
+            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="300">
+              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F2_NUM" /></div>
+              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F2_TITLE" /></h3>
+              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F2_BODY" disable-output-escaping="yes" /></p>
+            </li>
+            <li class="rbccm-maas-mata__innovation-era-item" data-animate="fadeInUp" data-animate-delay="450">
+              <div class="rbccm-maas-mata__innovation-era-number">/<xsl:value-of select="$F3_NUM" /></div>
+              <h3 class="rbccm-maas-mata__innovation-era-title"><xsl:value-of select="$F3_TITLE" /></h3>
+              <p class="rbccm-maas-mata__innovation-era-body-item"><xsl:value-of select="$F3_BODY" disable-output-escaping="yes" /></p>
+            </li>
           </ol>
         </div>
       </section>
@@ -305,21 +412,36 @@
           </div>
 
           <div class="rbccm-maas-mata__mata-cap-grid" data-json-list="mataCapabilities.cards">
-            <xsl:for-each select="/Properties/Data/Group[@Name='MATA Capability Card']">
-              <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp">
-                <xsl:attribute name="data-animate-delay"><xsl:value-of select="150 * position()" /></xsl:attribute>
-                <div class="rbccm-maas-mata__mata-cap-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-                    <use>
-                      <xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="Datum[@ID='CardIcon']/Option[@Selected='true']/Value" /></xsl:attribute>
-                    </use>
-                  </svg>
-                </div>
-                <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="Datum[@ID='CardTitle']" /></h3>
-                <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="Datum[@ID='CardSubtitle']" /></div>
-                <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="Datum[@ID='CardBody']" disable-output-escaping="yes" /></p>
-              </article>
-            </xsl:for-each>
+            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="150">
+              <div class="rbccm-maas-mata__mata-cap-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use>
+                </svg>
+              </div>
+              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C1_TITLE" /></h3>
+              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C1_SUBTITLE" /></div>
+              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>
+            </article>
+            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="300">
+              <div class="rbccm-maas-mata__mata-cap-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C2_ICON" /></xsl:attribute></use>
+                </svg>
+              </div>
+              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C2_TITLE" /></h3>
+              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C2_SUBTITLE" /></div>
+              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C2_BODY" disable-output-escaping="yes" /></p>
+            </article>
+            <article class="rbccm-maas-mata__mata-cap-card" data-animate="fadeInUp" data-animate-delay="450">
+              <div class="rbccm-maas-mata__mata-cap-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                  <use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C3_ICON" /></xsl:attribute></use>
+                </svg>
+              </div>
+              <h3 class="rbccm-maas-mata__mata-cap-title"><xsl:value-of select="$C3_TITLE" /></h3>
+              <div class="rbccm-maas-mata__mata-cap-subtitle"><xsl:value-of select="$C3_SUBTITLE" /></div>
+              <p class="rbccm-maas-mata__mata-cap-body"><xsl:value-of select="$C3_BODY" disable-output-escaping="yes" /></p>
+            </article>
 
             <!-- Fixed Index Events card (full width below the 3-card grid) -->
             <article class="rbccm-maas-mata__mata-cap-wide" data-animate="fadeInUp">
@@ -345,18 +467,16 @@
             <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading"><xsl:value-of select="$MK_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__featured-track" data-animate="fadeInUp" data-animate-delay="200" data-insights-track="" data-json-list="marketInsights.items">
-              <xsl:for-each select="/Properties/Data/Group[@Name='Market Insight']">
-                <article class="rbccm-maas-mata__featured-card">
-                  <div class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="Datum[@ID='InsightEyebrow']" /></div>
-                  <h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="Datum[@ID='InsightTitle']" /></h3>
-                  <p class="rbccm-maas-mata__featured-body"><xsl:value-of select="Datum[@ID='InsightBody']" disable-output-escaping="yes" /></p>
-                  <a class="rbccm-maas-mata__featured-cta">
-                    <xsl:attribute name="href"><xsl:value-of select="Datum[@ID='InsightCtaHref']" /></xsl:attribute>
-                    <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="Datum[@ID='InsightCtaLabel']" /></span>
-                    <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </a>
-                </article>
-              </xsl:for-each>
+              <article class="rbccm-maas-mata__featured-card">
+                <div class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS1_EYEBROW" /></div>
+                <h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS1_TITLE" /></h3>
+                <p class="rbccm-maas-mata__featured-body"><xsl:value-of select="$INS1_BODY" disable-output-escaping="yes" /></p>
+                <a class="rbccm-maas-mata__featured-cta">
+                  <xsl:attribute name="href"><xsl:value-of select="$INS1_CTA_HREF" /></xsl:attribute>
+                  <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="$INS1_CTA_LABEL" /></span>
+                  <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+              </article>
             </div>
 
             <div class="rbccm-maas-mata__insights-controls" data-animate="zoomIn" data-animate-delay="350" data-insights-controls="">
@@ -417,15 +537,41 @@
             </xsl:if>
 
             <div class="rbccm-maas-mata__newsletter-fields" data-json-list="newsletter.fields">
-              <xsl:for-each select="/Properties/Data/Group[@Name='Newsletter Field']">
-                <label class="rbccm-maas-mata__newsletter-field">
-                  <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="Datum[@ID='FieldLabel']" /></span>
-                  <input class="rbccm-maas-mata__newsletter-input">
-                    <xsl:attribute name="name"><xsl:value-of select="Datum[@ID='FieldName']" /></xsl:attribute>
-                    <xsl:attribute name="type"><xsl:value-of select="Datum[@ID='FieldType']/Option[@Selected='true']/Value" /></xsl:attribute>
-                  </input>
-                </label>
-              </xsl:for-each>
+              <label class="rbccm-maas-mata__newsletter-field">
+                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD1_LABEL" /></span>
+                <input class="rbccm-maas-mata__newsletter-input">
+                  <xsl:attribute name="name"><xsl:value-of select="$FLD1_NAME" /></xsl:attribute>
+                  <xsl:attribute name="type"><xsl:value-of select="$FLD1_TYPE" /></xsl:attribute>
+                </input>
+              </label>
+              <label class="rbccm-maas-mata__newsletter-field">
+                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD2_LABEL" /></span>
+                <input class="rbccm-maas-mata__newsletter-input">
+                  <xsl:attribute name="name"><xsl:value-of select="$FLD2_NAME" /></xsl:attribute>
+                  <xsl:attribute name="type"><xsl:value-of select="$FLD2_TYPE" /></xsl:attribute>
+                </input>
+              </label>
+              <label class="rbccm-maas-mata__newsletter-field">
+                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD3_LABEL" /></span>
+                <input class="rbccm-maas-mata__newsletter-input">
+                  <xsl:attribute name="name"><xsl:value-of select="$FLD3_NAME" /></xsl:attribute>
+                  <xsl:attribute name="type"><xsl:value-of select="$FLD3_TYPE" /></xsl:attribute>
+                </input>
+              </label>
+              <label class="rbccm-maas-mata__newsletter-field">
+                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD4_LABEL" /></span>
+                <input class="rbccm-maas-mata__newsletter-input">
+                  <xsl:attribute name="name"><xsl:value-of select="$FLD4_NAME" /></xsl:attribute>
+                  <xsl:attribute name="type"><xsl:value-of select="$FLD4_TYPE" /></xsl:attribute>
+                </input>
+              </label>
+              <label class="rbccm-maas-mata__newsletter-field">
+                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD5_LABEL" /></span>
+                <input class="rbccm-maas-mata__newsletter-input">
+                  <xsl:attribute name="name"><xsl:value-of select="$FLD5_NAME" /></xsl:attribute>
+                  <xsl:attribute name="type"><xsl:value-of select="$FLD5_TYPE" /></xsl:attribute>
+                </input>
+              </label>
             </div>
 
             <xsl:if test="normalize-space($NL_LINKEDIN_HREF) != ''">

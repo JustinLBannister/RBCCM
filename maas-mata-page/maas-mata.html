@@ -313,10 +313,15 @@
      of the hero without bleeding into the site header above or the
      chart section below. */
   .rbccm-maas-mata__hero {
-    padding: 75px 0;
+    /* +20 mobile / +55 desktop on top padding compensates for the
+       fixed site navbar sitting over the top of the hero. */
+    padding: 95px 0 75px;
     text-align: center;
     position: relative;
     overflow: hidden;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata__hero { padding-top: 130px; }
   }
   .rbccm-maas-mata__hero::before {
     content: "";
