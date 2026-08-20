@@ -13,6 +13,13 @@
        (multi-paragraph copy stays intact).
        ============================================================ -->
 
+  <!-- Asset cache-buster — sourced from the AssetVersion Datum in
+       Properties. Appended as ?v=… to every <link>/<script> URL below
+       so browsers/CDN treat the file as new after a deploy. Bump the
+       Datum value (format YYYY-MM-DD-HHMM recommended) whenever a new
+       maas-mata.css, maas-mata.js, or rbccm-json-bind.js is deployed. -->
+  <xsl:variable name="ASSET_VERSION" select="normalize-space(/Properties/Datum[@ID='AssetVersion'])" />
+
   <!-- Hero -->
   <xsl:variable name="HERO_EYEBROW"        select="/Properties/Datum[@ID='HeroEyebrow']" />
   <xsl:variable name="HERO_TITLE_1"        select="/Properties/Datum[@ID='HeroTitleLine1']" />
@@ -186,7 +193,9 @@
          inside maas-mata.css as a fallback so the animations still
          run if the CDN is ever blocked. -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="/assets/rbccm/css/pages/maas-mata.css"/>
+    <link rel="stylesheet">
+      <xsl:attribute name="href">/assets/rbccm/css/pages/maas-mata.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </link>
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
       <xsl:if test="$COLOR_SCHEME = 'dark'">
@@ -635,8 +644,12 @@
          RBCCMBind global. If this file is ever removed, the page
          gracefully falls back to XSL-baked Datums (bootstrap
          checks for RBCCMBind and no-ops when missing). -->
-    <script src="/assets/rbccm/js/pages/rbccm-json-bind.js"></script>
-    <script src="/assets/rbccm/js/pages/maas-mata.js"></script>
+    <script>
+      <xsl:attribute name="src">/assets/rbccm/js/pages/rbccm-json-bind.js?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </script>
+    <script>
+      <xsl:attribute name="src">/assets/rbccm/js/pages/maas-mata.js?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </script>
 
   </xsl:template>
 </xsl:stylesheet>

@@ -38,6 +38,15 @@
      ============================================================ -->
 <Properties ComponentID="maas-mata-v1">
 
+  <!-- ═══ 0. ASSET VERSION ═══════════════════════════════════
+       Cache-buster appended as ?v=<value> to every CSS/JS URL
+       emitted by the XSL. Bump this value whenever a new
+       maas-mata.css, maas-mata.js, or rbccm-json-bind.js is
+       deployed. Format: YYYY-MM-DD-HHMM (24-hour, sorts
+       chronologically, unique per minute). Any short unique
+       string also works — semver, git sha, etc. -->
+  <Datum ID="AssetVersion" Type="String" Name="Asset version (cache-buster) — bump on any CSS/JS deploy. Format: YYYY-MM-DD-HHMM">2026-08-20-1400</Datum>
+
   <!-- ═══ 1. HERO ════════════════════════════════════════════
        Eyebrow renders above a yellow 45x2 underline. Title is
        a two-line H1 with per-line colour (line 1 dark navy,
