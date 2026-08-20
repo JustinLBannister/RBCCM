@@ -177,7 +177,7 @@
 
   <!-- ═══ 3b. NEW STANDARD — body paragraphs (repeater) ══════ -->
   <Group ID="NSB-0" Name="New Standard Paragraph" Replicatable="true">
-    <Datum ID="Paragraph" Name="Paragraph body" Type="Textarea">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
+    <Datum ID="NsParagraph" Name="Paragraph body" Type="Textarea">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
   </Group>
 
   <!-- ═══ 4. AWARDS (repeater) ═══════════════════════════════
@@ -191,9 +191,9 @@
   </Group>
 
   <Group ID="AWD-0" Name="Award" Replicatable="true">
-    <Datum ID="Year" Name="Year" Type="String">2026</Datum>
-    <Datum ID="Title" Name="Award title" Type="String">Best Trading Analytics Platform</Datum>
-    <Datum ID="Issuer" Name="Award issuer" Type="String">TradingTech Insights Awards USA</Datum>
+    <Datum ID="AwardYear" Name="Year" Type="String">2026</Datum>
+    <Datum ID="AwardTitle" Name="Award title" Type="String">Best Trading Analytics Platform</Datum>
+    <Datum ID="AwardIssuer" Name="Award issuer" Type="String">TradingTech Insights Awards USA</Datum>
   </Group>
 
   <!-- ═══ 5b. PLATFORM CARDS (repeater, expects exactly 2) ═══
@@ -202,18 +202,18 @@
        Bullets is a separate nested repeater so authors don't
        have to hand-format lists. -->
   <Group ID="PLT-0" Name="Platform Card" Replicatable="true">
-    <Datum ID="Theme" Name="Theme" Type="SelectSingle">
+    <Datum ID="PlatformTheme" Name="Theme" Type="SelectSingle">
       <Option Selected="true"><Display>Dark (navy card)</Display><Value>dark</Value></Option>
       <Option><Display>Light (white card)</Display><Value>light</Value></Option>
     </Datum>
-    <Datum ID="Eyebrow" Name="Card eyebrow" Type="String">MATA – Analytics</Datum>
-    <Datum ID="Title" Name="Card title" Type="String">Transform data into trading intelligence</Datum>
-    <Datum ID="Body" Name="Card body" Type="Textarea">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
-    <Datum ID="Bullet1" Name="Bullet 1" Type="String">Quantify expected execution costs before commitment</Datum>
-    <Datum ID="Bullet2" Name="Bullet 2" Type="String">Compare strategies side by side to evaluate potential outcomes</Datum>
-    <Datum ID="Bullet3" Name="Bullet 3" Type="String">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
-    <Datum ID="Bullet4" Name="Bullet 4" Type="String">Monitor market conditions and portfolio exposures</Datum>
-    <Datum ID="Bullet5" Name="Bullet 5" Type="String">Model scenarios across asset classes</Datum>
+    <Datum ID="PlatformEyebrow" Name="Card eyebrow" Type="String">MATA – Analytics</Datum>
+    <Datum ID="PlatformTitle" Name="Card title" Type="String">Transform data into trading intelligence</Datum>
+    <Datum ID="PlatformBody" Name="Card body" Type="Textarea">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
+    <Datum ID="PlatformBullet1" Name="Bullet 1" Type="String">Quantify expected execution costs before commitment</Datum>
+    <Datum ID="PlatformBullet2" Name="Bullet 2" Type="String">Compare strategies side by side to evaluate potential outcomes</Datum>
+    <Datum ID="PlatformBullet3" Name="Bullet 3" Type="String">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
+    <Datum ID="PlatformBullet4" Name="Bullet 4" Type="String">Monitor market conditions and portfolio exposures</Datum>
+    <Datum ID="PlatformBullet5" Name="Bullet 5" Type="String">Model scenarios across asset classes</Datum>
   </Group>
 
   <!-- ═══ 6b. INNOVATION ERA — feature list (repeater) ═══════
@@ -221,9 +221,9 @@
        or "01" — the XSL wraps in / marks so authors don't have
        to remember. -->
   <Group ID="INV-0" Name="Innovation Feature" Replicatable="true">
-    <Datum ID="Number" Name="Number (e.g. 01)" Type="String">01</Datum>
-    <Datum ID="Title" Name="Feature title" Type="String">Model with depth</Datum>
-    <Datum ID="Body" Name="Feature body" Type="Textarea">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
+    <Datum ID="FeatureNumber" Name="Number (e.g. 01)" Type="String">01</Datum>
+    <Datum ID="FeatureTitle" Name="Feature title" Type="String">Model with depth</Datum>
+    <Datum ID="FeatureBody" Name="Feature body" Type="Textarea">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
   </Group>
 
   <!-- ═══ 7b. MATA CAPABILITY CARDS (repeater, 3 expected) ═══
@@ -231,15 +231,15 @@
        symbol from the inline sprite (equities / fx / futures
        / info). -->
   <Group ID="MTC-0" Name="MATA Capability Card" Replicatable="true">
-    <Datum ID="Icon" Name="Icon" Type="SelectSingle">
+    <Datum ID="CardIcon" Name="Icon" Type="SelectSingle">
       <Option Selected="true"><Display>Equities (chart)</Display><Value>equities</Value></Option>
       <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
       <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
       <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
     </Datum>
-    <Datum ID="Title" Name="Card title" Type="String">Equities</Datum>
-    <Datum ID="Subtitle" Name="Card subtitle" Type="String">Cash Equities, ETFs &amp; ADRs</Datum>
-    <Datum ID="Body" Name="Card body" Type="Textarea">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
+    <Datum ID="CardTitle" Name="Card title" Type="String">Equities</Datum>
+    <Datum ID="CardSubtitle" Name="Card subtitle" Type="String">Cash Equities, ETFs &amp; ADRs</Datum>
+    <Datum ID="CardBody" Name="Card body" Type="Textarea">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
   </Group>
 
   <!-- ═══ 8b. MARKET INSIGHTS (repeater) ═════════════════════
@@ -248,11 +248,11 @@
        as swipeable carousel slides on mobile / narrower cards
        on desktop. -->
   <Group ID="MKT-0" Name="Market Insight" Replicatable="true">
-    <Datum ID="Eyebrow" Name="Card eyebrow" Type="String">Insights</Datum>
-    <Datum ID="Title" Name="Card title" Type="String">Lorem ipsum dolor sit amet consectetur adipiscing elit</Datum>
-    <Datum ID="Body" Name="Card body" Type="Textarea">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</Datum>
-    <Datum ID="CtaLabel" Name="CTA label (e.g. '2 min read')" Type="String">2 min read</Datum>
-    <Datum ID="CtaHref" Name="CTA URL" Type="String">#</Datum>
+    <Datum ID="InsightEyebrow" Name="Card eyebrow" Type="String">Insights</Datum>
+    <Datum ID="InsightTitle" Name="Card title" Type="String">Lorem ipsum dolor sit amet consectetur adipiscing elit</Datum>
+    <Datum ID="InsightBody" Name="Card body" Type="Textarea">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</Datum>
+    <Datum ID="InsightCtaLabel" Name="CTA label (e.g. '2 min read')" Type="String">2 min read</Datum>
+    <Datum ID="InsightCtaHref" Name="CTA URL" Type="String">#</Datum>
   </Group>
 
   <!-- ═══ 10b. NEWSLETTER FORM FIELDS (repeater) ═════════════
@@ -261,9 +261,9 @@
        Name is the Marketo field name (must match Marketo
        exactly), Label is the visible field label. -->
   <Group ID="NLF-0" Name="Newsletter Field" Replicatable="true">
-    <Datum ID="Label" Name="Field label" Type="String">First Name</Datum>
-    <Datum ID="Name" Name="Marketo field name" Type="String">firstName</Datum>
-    <Datum ID="Type" Name="Input type" Type="SelectSingle">
+    <Datum ID="FieldLabel" Name="Field label" Type="String">First Name</Datum>
+    <Datum ID="FieldName" Name="Marketo field name" Type="String">firstName</Datum>
+    <Datum ID="FieldType" Name="Input type" Type="SelectSingle">
       <Option Selected="true"><Display>Text</Display><Value>text</Value></Option>
       <Option><Display>Email</Display><Value>email</Value></Option>
     </Datum>
