@@ -98,8 +98,9 @@
        ============================================================ -->
   <xsl:template match="/">
 
-    <!-- Component stylesheet + script. animate.css CDN also required
-         (loaded once on the page shell alongside other RBCCM assets). -->
+    <!-- Component stylesheet + animate.css keyframes (drives the
+         data-animate / data-animate-hero fade + zoom entrances). -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="/assets/rbccm/css/pages/maas-mata.css"/>
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
