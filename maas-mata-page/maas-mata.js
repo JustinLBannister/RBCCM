@@ -528,6 +528,21 @@
   RBCCMBind.load({
     url: '/assets/rbccm/js/pages/data/maas-mata.json',
     fallbackSelector: '#fallback-data',
-    root: document.getElementById('rbccm-mm-page')
+    root: document.getElementById('rbccm-mm-page'),
+    /* Runs after the bind pass finishes (sync or async fetch). Handles
+       touch-ups that data-json attributes can't express directly. */
+    onRendered: function (/* data, root */) {
+      /* Platform card theme swap. Bind writes data-theme="light|dark"
+         from JSON via data-json-attr-data-theme; here we translate that
+         to the BEM modifier class so all existing CSS rules apply. */
+      var cards = document.querySelectorAll('.rbccm-maas-mata__platform-card[data-theme]');
+      for (var i = 0; i < cards.length; i++) {
+        var theme = (cards[i].getAttribute('data-theme') || '').toLowerCase();
+        if (theme !== 'light' && theme !== 'dark') continue;
+        cards[i].classList.remove('rbccm-maas-mata__platform-card--light');
+        cards[i].classList.remove('rbccm-maas-mata__platform-card--dark');
+        cards[i].classList.add('rbccm-maas-mata__platform-card--' + theme);
+      }
+    }
   });
 })();

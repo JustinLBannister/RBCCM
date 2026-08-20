@@ -341,7 +341,7 @@
                    NOTE: theme class stays dark (Figma default); JSON
                    theme swap needs a data-json-class hook wired
                    separately if editors want to flip per-card. -->
-              <article>
+              <article data-json-attr-data-theme="theme">
                 <xsl:attribute name="class">rbccm-maas-mata__platform-card<xsl:choose>
                     <xsl:when test="translate($PLT1_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
@@ -435,7 +435,7 @@
                    promotes it to the implicit template when JSON binds. -->
               <article class="rbccm-maas-mata__mata-cap-card">
                 <div class="rbccm-maas-mata__mata-cap-content">
-                  <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use></svg>
+                  <svg class="rbccm-maas-mata__mata-cap-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use data-json-attr-href="iconHref"><xsl:attribute name="href">#mata-cap-icon-<xsl:value-of select="$C1_ICON" /></xsl:attribute></use></svg>
                   <h3 class="rbccm-maas-mata__mata-cap-title" data-json="title"><xsl:value-of select="$C1_TITLE" /></h3>
                   <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="subtitle"><xsl:value-of select="$C1_SUBTITLE" /></p>
                   <p class="rbccm-maas-mata__mata-cap-body" data-json-html="body"><xsl:value-of select="$C1_BODY" disable-output-escaping="yes" /></p>

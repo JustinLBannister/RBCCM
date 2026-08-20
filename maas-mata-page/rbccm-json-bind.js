@@ -259,6 +259,7 @@
     var url = opts.url;
     var fallbackSelector = opts.fallbackSelector;
     var root = opts.root || document.body;
+    var onRendered = typeof opts.onRendered === 'function' ? opts.onRendered : null;
     if (opts.debug === false) DEBUG = false;
 
     function useFallback() {
@@ -274,6 +275,13 @@
         bindScope(root, data);
         log('Rendered from', source);
         if (data && data.meta && data.meta.title) document.title = data.meta.title;
+        // Post-render hook — page-level scripts use this for touch-ups
+        // that data-json attributes can't express (e.g. class swaps
+        // driven by an attribute value written by data-json-attr-*).
+        if (onRendered) {
+          try { onRendered(data, root); }
+          catch (e) { err('onRendered callback error:', e); }
+        }
       } catch (e) { err('Render error:', e); }
     }
 
