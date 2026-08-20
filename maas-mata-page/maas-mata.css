@@ -2978,12 +2978,51 @@
     font-weight: 400 !important;
   }
 
-  /* New Standard: force each heading span onto its own line
-     (some environments strip display:block from spans). */
+  /* New Standard heading: "A new standard for" on one line,
+     "multi-asset trading." on the next. Lead + highlight are
+     the two block-level rows; accent lives inline inside the
+     highlight span so it colours "trading" yellow without
+     forcing a third line. */
   .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-lead,
-  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-highlight,
-  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-accent {
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-highlight {
     display: block !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-accent {
+    display: inline !important;
+  }
+
+  /* Platforms heading: tighten the gap under it — global rules
+     were adding ~30px extra margin-bottom. Section owns its own
+     gap already. */
+  .rbccm-maas-mata .rbccm-maas-mata__platforms-heading {
+    margin: 0 0 32px !important;
+    letter-spacing: 0 !important;
+  }
+  @media (min-width: 992px) {
+    .rbccm-maas-mata .rbccm-maas-mata__platforms-heading {
+      margin: 0 0 40px !important;
+    }
+  }
+
+  /* Chart play button — sits on top of the reveal image. If the
+     page shell adds any transform/positioning to buttons, force
+     absolute + high z-index so the click target lands over the
+     poster. */
+  .rbccm-maas-mata .rbccm-maas-mata__chart-image-play {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 5 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__chart-image-play:hover,
+  .rbccm-maas-mata .rbccm-maas-mata__chart-image-play:focus-visible {
+    transform: translate(-50%, -50%) scale(1.04) !important;
   }
 
   /* New Standard body paragraphs — beat unified2.css line-height +

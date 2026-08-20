@@ -250,10 +250,11 @@
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>
         <xsl:if test="$CHART_HAS_VIDEO">
-          <button type="button" class="rbccm-maas-mata__chart-play" data-video-play="" aria-label="Play video">
+          <button type="button" class="rbccm-maas-mata__chart-image-play" data-video-play="" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="rbccm-mm-video-modal">
             <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
             <xsl:attribute name="data-bc-player"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:attribute>
             <xsl:attribute name="data-bc-video"><xsl:value-of select="$CHART_BC_VIDEO" /></xsl:attribute>
+            <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
           </button>
         </xsl:if>
       </div>
@@ -267,8 +268,7 @@
           <div class="rbccm-maas-mata__container">
             <h2 class="rbccm-maas-mata__new-standard-heading" data-animate="fadeInUp">
               <span class="rbccm-maas-mata__new-standard-heading-lead" data-json="newStandard.headingLead"><xsl:value-of select="$NS_LEAD" /></span>
-              <span class="rbccm-maas-mata__new-standard-heading-highlight" data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span>
-              <span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span>
+              <span class="rbccm-maas-mata__new-standard-heading-highlight"><span data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span> <span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span>.</span>
             </h2>
             <div class="rbccm-maas-mata__new-standard-body" data-animate="fadeInUp" data-animate-delay="150" data-json-list="newStandard.body">
               <template><p data-json=""></p></template>
