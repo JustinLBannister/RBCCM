@@ -100,7 +100,7 @@
 
     <!-- Component stylesheet + script. animate.css CDN also required
          (loaded once on the page shell alongside other RBCCM assets). -->
-    <link rel="stylesheet" href="/assets/rbccm/css/page/maas-mata.css"/>
+    <link rel="stylesheet" href="/assets/rbccm/css/pages/maas-mata.css"/>
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
       <xsl:if test="$COLOR_SCHEME = 'dark'">
@@ -162,7 +162,7 @@
           </img>
         </picture>
         <xsl:if test="$CHART_HAS_VIDEO">
-          <button type="button" class="rbccm-maas-mata__chart-play" aria-label="Play video">
+          <button type="button" class="rbccm-maas-mata__chart-play" data-video-play="" aria-label="Play video">
             <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
             <xsl:attribute name="data-bc-player"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:attribute>
             <xsl:attribute name="data-bc-video"><xsl:value-of select="$CHART_BC_VIDEO" /></xsl:attribute>
@@ -447,29 +447,25 @@
         </div>
       </section>
 
-
-      <!-- ═══ VIDEO MODAL (mounted at page root, hidden by default) ═══
-           Only rendered when the chart card has a Brightcove
-           video attached — otherwise there's no play button to
-           trigger it and the modal would be dead weight in the
-           DOM. -->
-      <xsl:if test="$CHART_HAS_VIDEO">
-        <div class="rbccm-maas-mata__video-modal" data-video-modal="" hidden="hidden" role="dialog" aria-modal="true" aria-label="Video player">
-          <div class="rbccm-maas-mata__video-modal-backdrop" data-video-close=""></div>
-          <div class="rbccm-maas-mata__video-modal-dialog">
-            <button type="button" class="rbccm-maas-mata__video-modal-close" data-video-close="" aria-label="Close video">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <div class="rbccm-maas-mata__video-modal-frame">
-              <iframe class="rbccm-maas-mata__video-modal-iframe" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
-            </div>
-          </div>
-        </div>
-      </xsl:if>
-
     </div><!-- /.rbccm-maas-mata -->
 
-    <script src="/assets/rbccm/js/page/maas-mata.js"></script>
+    <!-- Video modal: only emitted when the chart card has a Brightcove
+         video attached, otherwise there's no play button to trigger it. -->
+    <xsl:if test="$CHART_HAS_VIDEO">
+      <div class="rbccm-maas-mata__video-modal" id="rbccm-mm-video-modal" hidden="hidden" role="dialog" aria-modal="true" aria-label="Video player">
+        <div class="rbccm-maas-mata__video-modal-backdrop" data-video-close=""></div>
+        <div class="rbccm-maas-mata__video-modal-dialog">
+          <button type="button" class="rbccm-maas-mata__video-modal-close" data-video-close="" aria-label="Close video">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <div class="rbccm-maas-mata__video-modal-frame">
+            <iframe class="rbccm-maas-mata__video-modal-iframe" data-video-iframe="" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+          </div>
+        </div>
+      </div>
+    </xsl:if>
+
+    <script src="/assets/rbccm/js/pages/maas-mata.js"></script>
 
   </xsl:template>
 </xsl:stylesheet>

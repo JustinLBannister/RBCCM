@@ -19,11 +19,6 @@
     var lastTrigger = null;
 
     function bcSrc(acct, player, video) {
-      // Brightcove iframe embed URL. account+player are required;
-      // player defaults to "default" when omitted. autoplay=1 fires
-      // the video as soon as the modal opens (user just clicked the
-      // big play button — that IS the user gesture required for
-      // autoplay to succeed in modern browsers).
       var p = player || 'default';
       return 'https://players.brightcove.net/' + encodeURIComponent(acct) +
              '/' + encodeURIComponent(p) + '_default/index.html?videoId=' +
@@ -41,13 +36,10 @@
       lastTrigger = trigger;
       iframe.src = bcSrc(acct, player, video);
       modal.hidden = false;
-      // Next tick so the display swap has committed before adding
-      // the class that drives the transition.
       requestAnimationFrame(function () {
         modal.classList.add('is-open');
       });
       document.body.classList.add('rbccm-maas-mata--modal-open');
-      // Move focus into the modal (close button is a sensible default).
       var closeBtn = modal.querySelector('.rbccm-maas-mata__video-modal-close');
       if (closeBtn) closeBtn.focus();
     }
@@ -55,17 +47,13 @@
     function close() {
       modal.classList.remove('is-open');
       document.body.classList.remove('rbccm-maas-mata--modal-open');
-      // Clear src to stop the video and release network/memory.
       iframe.src = '';
-      // Wait for transition-out before actually hiding.
       setTimeout(function () { modal.hidden = true; }, 220);
       if (lastTrigger && typeof lastTrigger.focus === 'function') {
         lastTrigger.focus();
       }
     }
 
-    // Delegate play-button clicks so the handler still catches
-    // buttons injected after DOMContentLoaded (JSON bind, etc.).
     document.addEventListener('click', function (e) {
       var trigger = e.target.closest('[data-video-play]');
       if (trigger) {
@@ -523,7 +511,7 @@
 (function () {
   if (typeof window.RBCCMBind !== 'object' || typeof RBCCMBind.load !== 'function') return;
   RBCCMBind.load({
-    url: '/assets/rbccm/js/page/data/maas-mata.json',
+    url: '/assets/rbccm/js/pages/data/maas-mata.json',
     fallbackSelector: '#fallback-data',
     root: document.getElementById('rbccm-mm-page')
   });
