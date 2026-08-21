@@ -2922,7 +2922,12 @@
      corporate/VDI browsers ignore or block third-party CSS
      animations even when the file is delivered). */
   .animate__animated {
-    animation-duration: 1s;
+    /* Bumped from the animate.css default of 1s to 1.6s for a
+       smoother, less abrupt fade. Also softened the timing to an
+       ease-out curve so elements decelerate into place instead of
+       tapering linearly. */
+    animation-duration: 1.6s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     animation-fill-mode: both;
   }
   .animate__fadeIn      { animation-name: rbccm-mm-fadeIn;      }

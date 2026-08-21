@@ -1,223 +1,166 @@
 # MAAS+MATA Workflow
 
-Dev runbook: how the page renders, how marketing edits copy, and how we ship changes.
+How the page works, how marketing edits copy, and how dev ships changes.
 
-## Overview
+## The Big Idea
 
-The MAAS+MATA page is rendered server-side by TeamSite from an XSL component skin and its Properties/Datums. On top of that, a small JavaScript runtime (`rbccm-json-bind.js`) can optionally fetch a JSON file at page load and rebind any element on the page from that JSON. That JSON is what marketing edits in a standalone HTML CMS.
+The MAAS+MATA page has two layers:
 
-Two publish paths exist:
+1. **The page itself** — layout, styling, interactivity. Dev owns this.
+2. **The copy on the page** — headlines, body text, awards, links. Marketing drafts changes in a simple web form (the CMS) and hands the result to dev.
 
-- **Live URL** (default): XSL renders from TeamSite Datums. JSON is never fetched. Editors cannot change live copy without a dev push.
-- **Preview URL** (`?preview=draft`): Same XSL render, but on page load the runtime fetches `/assets/rbccm/js/pages/data/maas-mata.json` and rebinds every element that carries a `data-json` attribute. Marketing uses this URL to review copy changes before we promote them.
+**Two-step publishing.** Marketing's exported file gets dropped on the server for a **preview URL** first, so stakeholders can see the changes in context. When approved, dev copies those approved values into TeamSite's Datums (the actual source of the live page) and publishes the component. The preview file is for iteration and review; the Datums are what live readers see.
 
-Net effect: marketing can iterate copy on their own; dev only touches the page when layout, CSS, JS, or component structure changes.
+## Two URLs
 
-## URLs
+- **Live page** — <https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions>
+- **Preview page** — same URL with `?preview=draft` on the end.
 
-- **Live:** <https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions>
-- **Preview:** <https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions?preview=draft>
-
-Preview is opt-in per URL — no cookie, no header, no auth. Add `?preview=draft` to any visit and JSON is applied on top of XSL. Remove the flag and the page reverts to Datum defaults on next load.
-
-## File Layout
-
-| File | Where it lives |
-|---|---|
-| `MAAS MATA.component` | TeamSite component template at `//strplvact10001.fg.rbc.com/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Site Template/MAAS MATA.component` (component ID `1786807660057`). Currently one bulk editor block containing both the XSL skin and the Properties/Datums — will be split into per-section components later when other pages reuse the same building blocks. |
-| `maas-mata.xsl` (in bulk) | The XSL portion of the `.component` file above. Renders the page markup from Datums. |
-| `maas-mata-properties.xml` (in bulk) | The Properties/Datums portion of the same `.component` file. Default copy (fallbacks) that render if JSON is not applied. |
-| `maas-mata.css` | `/assets/rbccm/css/pages/maas-mata.css` |
-| `maas-mata.js` | `/assets/rbccm/js/pages/maas-mata.js` |
-| `rbccm-json-bind.js` | `/assets/rbccm/js/pages/rbccm-json-bind.js` (shared runtime — reusable across future pages) |
-| `maas-mata.json` | `/assets/rbccm/js/pages/data/maas-mata.json` (marketing-editable content; only fetched when `?preview=draft` is on the URL) |
-| `preview-generator.html` | `/assets/rbccm/tools/preview-generator.html` — internal-only. Standalone HTML file; marketing loads it directly in a browser to draft and export JSON. Local source file is named `maas-mata-cms.html`; deploys as `preview-generator.html`. |
-
-All `/assets/rbccm/…` paths are the RBCCM production server. Update via the standard TeamSite upload path.
-
-### Where to host the CMS
-
-The CMS is a single, self-contained HTML file — no build, no server-side code, no login. It writes drafts to browser localStorage and exports JSON on demand. Deployed location:
-
-- <https://www.rbccm.com/assets/rbccm/tools/preview-generator.html> (gated by internal network / VPN). Marketing bookmarks this URL and uses it directly.
-- Local source file is named `maas-mata-cms.html` — deploys as `preview-generator.html`.
-
-The CMS knows nothing about the live site — it only produces JSON. Safe to host internally without exposing anything sensitive.
+The preview URL shows the latest draft copy that marketing is working on (loaded from a JSON file dev keeps in sync). The live URL always shows the current published version (loaded from TeamSite Datums). The two are independent — pushing a new draft to preview never touches live. Live is only updated when dev copies approved values into the Datums and publishes the component.
 
 ## Marketing Workflow
 
-This is what marketing does. It does not touch the live site.
+Marketing updates copy through a web form (the CMS) and hands the result to dev. No code, no TeamSite login needed.
 
-1. Open <https://www.rbccm.com/assets/rbccm/tools/preview-generator.html>. On first load it seeds with the current production copy (SAMPLE seed).
-2. Edit any field. Every input shows a "Figma:" reference so the editor knows exactly which element on the page it maps to. State auto-saves to localStorage — reloading does not lose work.
-3. Click **Export draft → download**. A modal collects editor name + note (audit trail), then downloads a file named `maas-mata-draft_YYYY-MM-DD-HHMM_<editor>.json`.
-4. Send the JSON to dev (email, ticket, ping — however the team wants).
+### Making an update
 
-The CMS also has a **Load JSON** button. Editors can paste an existing exported JSON back in to continue editing where they left off (or to load a version dev has already deployed).
+1. Open <https://www.rbccm.com/assets/rbccm/tools/preview-generator.html>. The form opens with the current page copy already filled in.
+2. Change whatever needs changing — headlines, body text, awards, links, whatever. Every field shows a "Figma:" hint so you know which part of the page it controls.
+3. Edits save automatically as you type. You can close the tab and come back later without losing anything.
+4. When you're ready to hand it over, click **Export draft → download**. It'll ask for your name and a short note (so dev knows who sent it and why), then save a file to your computer.
+5. Send that file to dev — email, ticket, ping, whatever the team prefers.
 
-## Dev Workflow — Publishing Copy Changes
+### Previewing before it goes live
 
-When marketing sends over a `maas-mata-draft_*.json` file:
+Once dev uploads your file, visit the live page URL with `?preview=draft` on the end. You'll see the edits applied. Nobody else does — the preview flag is only visible to whoever adds it to the URL.
 
-1. Rename the file to `maas-mata.json`.
-2. Upload to `/assets/rbccm/js/pages/data/maas-mata.json` (overwrite the existing file).
-3. Verify at the preview URL: <https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions?preview=draft>
-4. Hard-reload (Cmd+Shift+R). Confirm the edits appear. The live URL (without `?preview=draft`) is untouched.
-5. When approved by stakeholder, the same file already lives at the JSON path — nothing else to do. There is no separate "promote to live" step because live and preview both read the same JSON path; only the URL flag decides whether the runtime fetches it.
+When the copy looks right and stakeholders approve, tell dev to promote it. No re-export needed on your side.
 
-**Rollback:** keep the previous `maas-mata.json` as `maas-mata.YYYY-MM-DD.json` alongside. To roll back, rename the backup over the current file.
+### Making more changes to the same draft
 
-## Dev Workflow — Updating the Component
+If you want to keep editing a draft you already sent, open the CMS and click **Load JSON**, then paste in the file you exported. It picks up where you left off. Export again when done and hand the new file to dev.
 
-When the layout, CSS, or JS needs to change (i.e. anything not editable via JSON):
+### Rules of thumb
 
-### Layout / markup
+- **Big copy changes:** update in the CMS, don't ask dev to hand-edit — that way it stays in the JSON and won't get overwritten next time.
+- **Small typo fixes:** same thing. Once dev has to hand-edit, the CMS gets out of sync.
+- **New sections or new fields:** those need dev involvement (they change the page structure). Ask, and we'll add the field so you can edit it in the CMS afterward.
+- **Images:** upload the image file to dev separately. In the CMS, put the image path (e.g. `/assets/rbccm/images/…/whatever.png`) into the relevant field.
 
-- Edit `MAAS MATA.component` at `//strplvact10001.fg.rbc.com/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Site Template/` — currently one bulk editor block that contains the XSL skin and the Properties/Datums together. Future plan: break into per-section components (hero, awards, platforms, etc.) once other pages reuse the same blocks. Until then, all edits happen in the single `.component` file.
-- Structural fallbacks live inside the XSL — the copy in the fallback cards is what renders on the live URL if JSON is not applied. Keep it representative.
-- When adding a new editable element, add a `data-json="path"` attribute to it (see attribute reference below), and add the same path to the CMS SAMPLE seed + SCHEMA so marketing can edit it.
+## For Dev
 
-### CSS
+### To publish new copy from marketing
 
-- Edit `maas-mata.css` and upload to `/assets/rbccm/css/pages/maas-mata.css`.
-- The `unified.css` / `unified2.css` page shell wins by specificity in many places — defensive rules in the file use `!important` where necessary.
+Two steps: first get it on preview so stakeholders can review, then promote to live.
 
-### JS behaviours
+**Step 1 — Preview.** Marketing sends a file named something like `maas-mata-draft_2026-08-20-1400_kim.json`.
 
-- Edit `maas-mata.js` (video modal, animate.css triggers, carousels, chart ticker, JSON-bind bootstrap) and upload to `/assets/rbccm/js/pages/maas-mata.js`.
-- The bind runtime itself lives in `rbccm-json-bind.js` and is generic — do not edit it for page-specific tweaks. Page-specific post-bind touch-ups go in the `onRendered` callback in `maas-mata.js`.
+1. Rename it to `maas-mata.json`.
+2. Upload to `/assets/rbccm/js/pages/data/maas-mata.json` (overwrite what's there).
+3. Open the preview URL (`?preview=draft`), hard-reload, confirm the edits look right.
+
+At this point the live URL is still showing the old copy. Only people who visit with `?preview=draft` see the new version.
+
+**Step 2 — Promote to live.** Once stakeholders approve:
+
+1. Open the `MAAS MATA.component` in TeamSite.
+2. Update the Datums in the Properties block to match the approved values from the JSON.
+3. Publish the component through the normal TeamSite workflow.
+4. The live URL now shows the new copy.
+
+**Why two steps?** The live page only reads the Datums — it never fetches the JSON. The JSON is what powers the preview URL so marketing can iterate quickly without pushing changes to production. Promotion to live is the deliberate act of copying the approved values into Datums.
+
+**Shortcut for text-heavy updates:** if the update is dozens of field edits, easier to update the Datums by hand than transcribe from the JSON. Open the CMS with the approved JSON loaded (paste it via **Load JSON**), then use it as a side-by-side reference while editing Datums in TeamSite.
+
+**Rollback (preview only):** keep the previous JSON around as `maas-mata.2026-08-15.json`. To revert the preview view, rename the backup over the current file. To revert live, restore the previous Datum values in TeamSite.
+
+### To change layout, styling, or behavior
+
+| Task | File | Where it lives |
+|---|---|---|
+| Change page structure or copy defaults | `MAAS MATA.component` | TeamSite: `//strplvact10001.fg.rbc.com/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Site Template/MAAS MATA.component` (component ID `1786807660057`). Currently one bulk block containing both the XSL skin and the Properties. Will split into per-section pieces later once other pages reuse them. |
+| Change styling | `maas-mata.css` | `/assets/rbccm/css/pages/maas-mata.css` |
+| Change page behavior (modals, carousels, scroll effects) | `maas-mata.js` | `/assets/rbccm/js/pages/maas-mata.js` |
+| Change how JSON binding itself works | `rbccm-json-bind.js` | `/assets/rbccm/js/pages/rbccm-json-bind.js`. This is the shared engine that swaps text and images from the JSON file into the page. Only touch this if you're changing how binding works for **every** page that uses it. For anything MAAS+MATA-specific, edit `maas-mata.js` instead. |
+
+After a CSS or JS upload, **bump the `AssetVersion` Datum** in the Properties block (format: `YYYY-MM-DD-HHMM`, e.g. `2026-08-20-1400`). The XSL appends this to every stylesheet and script URL as `?v=…`, so browsers see it as a new file and fetch a fresh copy. Without the bump, the CDN can serve the old file for hours.
+
+To add a new editable field: put a `data-json="path.to.value"` attribute on the element in the XSL, then add the same field to the CMS's SAMPLE seed and SCHEMA so it appears in the editor.
 
 ### Animations
 
-The page uses [animate.css](https://animate.style/) for entrance fades. The CDN link is in the XSL, and the four keyframes we actually use (`fadeIn`, `fadeInUp`, `fadeInDown`, `zoomIn`) are also copied into `maas-mata.css` so animations still work if the CDN is ever blocked.
+Entrance fades use animate.css. The CDN link is in the XSL, and the four keyframes we use (`fadeIn`, `fadeInUp`, `fadeInDown`, `zoomIn`) are also copied into the local CSS as a fallback in case the CDN is blocked.
 
-Elements opt in with `data-animate="fadeInUp"` (fires on scroll into view) or `data-animate-hero="fadeInUp"` (fires on load). Containers with `data-stagger-parent="fadeInUp"` stagger their children.
+Elements opt in by adding `data-animate="fadeInUp"` (fires on scroll into view) or `data-animate-hero="fadeInUp"` (fires on load). Timing is set via `data-animate-delay` in milliseconds.
 
-Two ways to turn animations off: the OS-level `prefers-reduced-motion` setting is respected, and appending `?noanim=1` to any URL skips them for that visit.
+Users can turn animations off two ways: their OS's "reduce motion" setting is respected, and adding `?noanim=1` to any URL skips them for that visit.
 
-One quirk to know about: animations sometimes don't fire on RBC corporate laptops / VDI. Cause isn't fully pinned down — likely the corp browser policy or GPU restrictions. Content itself is never hidden by default, so worst case is "no fade in," not "nothing shows up." If someone reports it, have them try `?noanim=1` first to confirm they see the page content, then check DevTools for `animation-name` on any `[data-animate]` element to see if the corp browser is stripping it.
+One thing to know: animations sometimes don't fire on RBC corporate laptops or VDI sessions. Cause isn't fully pinned down (likely corp browser policy or GPU restrictions). Content still shows either way — you just don't see the fade-in. If a user reports this, have them try `?noanim=1` first to confirm they at least see the page.
 
-### Cache-busting
+### Attribute reference for JSON binding
 
-Handled automatically by an `AssetVersion` Datum in the Properties block. The XSL reads that value and appends `?v={value}` to every `<link>` and `<script>` URL for `maas-mata.css`, `maas-mata.js`, and `rbccm-json-bind.js`.
-
-**When you deploy a new CSS or JS file, edit the `AssetVersion` Datum** in the TeamSite Properties editor and re-save the component. No XSL edit needed. Browsers and the CDN treat all three script/stylesheet URLs as new files on the next page load; between deploys, everything caches normally.
-
-**Format:** `YYYY-MM-DD-HHMM` (24-hour). Example: `2026-08-20-1400`. Sorts chronologically, unique per minute. Any short unique string works (semver, git sha) but the date format keeps history readable at a glance in the Datum editor.
-
-## How JSON Binds Work (Attribute Reference)
-
-Every editable element on the page carries a `data-json*` attribute that tells the runtime where to pull its content from in the JSON. When the page loads with `?preview=draft`, the runtime walks the DOM under `#rbccm-mm-page`, reads each attribute, and sets the corresponding text / attribute / list.
+When the page loads with `?preview=draft`, the runtime looks for these attributes on elements under `#rbccm-mm-page`:
 
 | Attribute | What it does |
 |---|---|
-| `data-json="path"` | Sets `textContent` from JSON at `path`. Empty string (`""`) binds to the current scope value (used inside lists of primitives). |
-| `data-json-html="path"` | Sets `innerHTML` — use for body copy that may include `<em>`, `<br>`, links, etc. |
-| `data-json-attr-<name>="path"` | Sets any attribute. Common uses: `data-json-attr-href="cta.href"`, `data-json-attr-src="image"`, `data-json-attr-alt="alt"`, `data-json-attr-data-theme="theme"`. |
-| `data-json-list="path"` | Renders an array. The first element child (or `<template>`) is cloned once per array item; nested `data-json` paths inside resolve against each item. |
-| `data-json-list-fallback` | (optional) Marks a fallback child that will be removed when the list binds. Not required — the runtime auto-strips non-template children. |
-| `data-json-if="path"` | Hides the element if the value is falsy. |
+| `data-json="path"` | Sets the element's text from the JSON at `path`. |
+| `data-json-html="path"` | Same as above but sets HTML — use for copy that may include `<em>`, `<br>`, links. |
+| `data-json-attr-<name>="path"` | Sets any attribute. Common uses: `data-json-attr-href` for links, `data-json-attr-src` for images. |
+| `data-json-list="path"` | For repeaters (award cards, insight cards, feature blocks). Clones the first child card once per item in the array. |
+| `data-json-if="path"` | Hides the element if the value is empty/falsy. |
 
-### List binding — how repeaters work
-
-A container marked with `data-json-list="path.to.array"` has one of two setups:
-
-- An explicit `<template>` child. The runtime clones the template once per JSON item and binds each clone.
-- No `<template>`, only fallback children (the XSL default cards). The runtime promotes the **first** fallback child to be the implicit template, strips all fallback children, and clones the promoted template once per JSON item.
-
-Practical consequence: the **first** fallback card in each list section must carry the `data-json="…"` hooks. Subsequent fallback cards do not need them — they are removed when the JSON binds. In the current XSL, this is the pattern used for `platforms`, `innovationEra`, `mataCapabilities`, and `marketInsights`.
-
-### Post-bind touch-ups
-
-For things `data-json` cannot express directly (e.g. swapping a BEM modifier class based on a JSON value), use the `onRendered` callback exposed by `RBCCMBind.load({...})`. See the current implementation in `maas-mata.js` for the platform card theme swap.
+For repeaters, the **first** card in the list needs the inner `data-json` attributes — that's the one the runtime clones. Other cards get thrown away when JSON binds. If you need to swap a class based on a JSON value (like the platform card's dark/light theme), use the `onRendered` callback in `maas-mata.js` — there's an example in the file.
 
 ## Troubleshooting
 
-### Preview URL still shows old copy
+**Preview URL isn't showing the new copy.**
+Hard-reload with Cmd+Shift+R. If that doesn't help, open the JSON file in a browser tab and confirm it actually contains the edits. If it does, check DevTools → Network for `maas-mata.json` — a stale file size means the CDN is serving an old copy; bump `AssetVersion` in the Properties.
 
-- Hard-reload (Cmd+Shift+R).
-- Confirm the JSON at `/assets/rbccm/js/pages/data/maas-mata.json` actually contains the new edits (open it in a browser tab).
-- Check DevTools → Network. Look for `maas-mata.json` — is it 200 OK? What size? If it is the old file size, CDN cache is stale.
+**Console warning: "no `<template>` child".**
+The deployed `rbccm-json-bind.js` is the old version. Re-upload it and bump `AssetVersion`.
 
-### Warnings in the console like "no `<template>` child"
+**A section renders empty on preview.**
+The JSON has the wrong shape for that section (usually a plain string where the runtime wanted a list of objects). Ask marketing to re-export from the CMS — the form enforces the right structure automatically.
 
-- You are running an old `rbccm-json-bind.js`. The current runtime auto-promotes the first fallback child to a template. Re-upload the runtime and bump `$ASSET_VERSION` in the XSL.
+**Live URL is showing draft content when it shouldn't.**
+Check the URL bar carefully — Chrome autocomplete loves to re-append `?preview=draft`. If it's really not there, the deployed `maas-mata.js` is missing the preview flag check. Re-upload it.
 
-### A section renders empty when `?preview=draft` is on
-
-- The JSON provided the wrong shape (e.g. a string instead of an array of objects). Check the field in question against the CMS SCHEMA. Ask the editor to re-export from the CMS — its schema enforces correct shapes.
-
-### Live URL (no `?preview=draft`) shows draft content
-
-- It should not. If it does, either (a) the URL still has the query string somewhere (Chrome autocomplete adds it back), or (b) the deployed `maas-mata.js` is the pre-gate version. Confirm the current file has `isPreview = /\?preview=draft/ …` early return.
-
-### Play button is missing on the chart image
-
-- Fill in the three Brightcove chart Datums (Account ID, Player ID, Video ID) in `maas-mata-properties.xml`. The XSL used to guard the button, but the current version always renders it — the modal iframe just has no src when the Datums are empty.
+**Play button isn't showing on the chart image.**
+Fill in the three Brightcove Datums (Account ID, Player ID, Video ID) in the Properties block. The button always renders now — but without those values the modal opens to an empty player.
 
 ## Accessibility
 
-Status as of 2026-08-20: **real violations fixed, structural work paused pending a11y team's next review.**
+Two real issues from the last audit were fixed and shipped:
 
-### What was flagged (from the audit CSV)
+- The "2 min read" label on Market Insights cards was too light against white. Now it's a darker grey.
+- The "Autofill with LinkedIn" button used LinkedIn's brand blue, which was borderline against white text. Now it's a slightly darker blue.
 
-The audit surfaced items in three buckets:
+Everything else in the audit is either a false positive (the scanner can't measure contrast on elements that fade in from invisible) or is structural — heading tag levels and a `<main>` landmark. Those are TODOs, not shipped.
 
-**Real violations (fixed).** Two colour-contrast failures against WCAG 2.1 AA (1.4.3):
+### Heading tags — SEO vs. accessibility
 
-- `.rbccm-maas-mata__featured-cta-read` — "2 min read" label on the market-insights card. Colour was `--grey-500` (#8A8F97) on white, roughly 3.2:1. Changed to `--grey-700` (#4A4E55), roughly 8:1. Passes AA with headroom.
-- `.rbccm-maas-mata__newsletter-linkedin` — "Autofill with LinkedIn" button. Background was LinkedIn brand blue (#0A66C2), 4.55:1 against white — technically AA-passing but marginal, and axe flagged it as serious. Darkened to #075D9F (roughly 5.4:1). Hover state matches at #054A80.
+Right now the page uses `<h1>` on the hero eyebrow and `<h5>`/`<h6>`/`<h4>` on section eyebrows. This was chosen to match the SEO guidance (one `<h1>` per page, section headings under it). The accessibility scanner wants headings to descend sequentially (h1 → h2 → h3, no skipping), which conflicts with what SEO wants. We need to pick one:
 
-Both fixes shipped in the current `maas-mata.css`. No further action needed on these.
+- **Leave as-is** — SEO happy, accessibility gets a "best practice" warning (not a WCAG violation).
+- **Swap eyebrows to plain paragraphs, move the `<h1>` to the hero title** — accessibility happy, SEO loses one heading signal.
+- **Middle ground** — hero `<h1>` on the title, section eyebrows become plain paragraphs. Best of both.
 
-**False positives ("Needs Review" contrast flags).** Every remaining contrast flag in the report is on light text over the dark-strip background inside a `data-animate` element. Axe throws "Needs Review" — not "Violation" — because it cannot compute contrast on elements that are mid-animation, at `opacity: 0` during the fade-in state, or sit above a gradient background. Real rendered contrast on all of these is 8:1 or better (white / light grey on navy — standard high-contrast pattern). Safe to mark reviewed and compliant on the report.
+Need input from SEO and accessibility before we make the change. Once decided, let me know and I'll apply it.
 
-**Structural best-practice flags (moderate).** Two categories, not blocking any WCAG level but worth cleaning up:
+### Other TODOs
 
-- **Heading order.** Section eyebrows use `<h5>`, `<h6>`, and `<h4>` tags as visual accents. Combined with the real section headings (`<h2>`), this trips the "headings should descend sequentially" check. Also: the hero eyebrow is currently an `<h1>`, and the hero title is a `<p>`. The real page H1 should be the hero title.
-- **Landmarks.** The component root is a `<div>`, so the chart-image div and the Market Insights section content sit outside any landmark. Wrapping the whole component in `<main>` would satisfy the check.
-
-**Page-shell items (still to do, not part of the MAAS+MATA component).** These are in TeamSite's global header/meta and need coordination — likely with Joon and the TeamSite team — but they do need to get done:
-
-- `meta[name="viewport"]` has `maximum-scale=1.0` — blocks user zoom (WCAG 1.4.4). Fix: strip `maximum-scale=1.0` (and `user-scalable=no` if present) from the viewport meta in the page shell.
-- `.search-toggle` ARIA warning — the search button in the topnav. Fix on the shell side.
-
-**Note on the heading-tag choices.** The current heading levels (`<h1>` on hero eyebrow, `<h5>` / `<h6>` / `<h4>` on section eyebrows) were picked to satisfy the SEO doc's tag guidance — one `<h1>` per page, section headings descend from that. The a11y "heading order" flag comes from screen-reader convention (headings should descend sequentially without skipping levels), which is a different lens. These two goals partly conflict. Options for the a11y pass:
-
-- **Keep the SEO-driven tags as-is** and accept the a11y best-practice flag. WCAG doesn't strictly require sequential descent — it's a best-practice, not an AA violation.
-- **Swap eyebrows to `<p>`** and move the `<h1>` to the hero title (most a11y-standard approach). Reduces one signal SEO expects from the eyebrow line but keeps a real H1 on the page.
-- **Hybrid** — keep the hero H1 on the title (not the eyebrow), and turn only the section-level eyebrows into `<p>` while leaving the section headings as `<h2>` / `<h3>` as they are today.
-
-Whichever way we go, we should confirm with both the SEO owner and the a11y team so the choice is documented.
-
-### What we started, then paused
-
-We began the structural fixes and pulled back before shipping so the a11y team could weigh in:
-
-- Wrapped the component root in `<main>` (was `<div>`) — reverted.
-- Swapped the hero eyebrow from `<h1>` to `<p>`, and the hero title from `<p>` to `<h1>` — reverted.
-- Swapped all section eyebrows from `<h5>` / `<h6>` / `<h4>` to `<p>` with the same class — reverted.
-- Dropped tag prefixes from the CSS selectors (`h5.__eyebrow` → `.__eyebrow`) so styling stayed intact through the tag swap — reverted.
-
-None of these changes were deployed. The XSL and CSS are back at pre-a11y state. The changes are known-good — parses clean, XSL and CSS have been validated — so we can re-apply the pass quickly when we decide to proceed.
-
-### What to do next
-
-Open TODOs, roughly in priority:
-
-1. **Heading-tag decision.** Confirm with the SEO owner + a11y team which of the three heading-tag options above we should adopt. Once we pick, re-apply the changes — the pattern is worked out (eyebrows → `<p>`, hero title → `<h1>`, CSS selectors drop the tag prefix). Estimated 20 minutes of work; blocked on the call.
-2. **Wrap component in `<main>`.** Swap the root `<div class="rbccm-maas-mata">` to `<main class="rbccm-maas-mata">`. Purely additive; no design impact. Clears the "all page content contained by landmarks" flag.
-3. **Canonical URL.** Add a `<link rel="canonical" href="…">` for the MAAS+MATA page. If TeamSite doesn't already inject one on the page shell, add it from the XSL. Values: EN → the live URL; FR (when it lands) → the FR URL. Also add `<link rel="alternate" hreflang="…">` for both.
-4. **Viewport meta — strip `maximum-scale=1.0`** (and `user-scalable=no` if present). Lives in the TeamSite page shell — need to coordinate with Joon / the shell team. WCAG 1.4.4 fix.
-5. **`.search-toggle` ARIA warning.** Search button in the topnav. Also page-shell, same coordination as above.
-6. **Mark the "Needs Review" contrast flags reviewed** on the a11y report with a note: "Light-on-navy dark-strip pattern; axe cannot measure through fade-in state or gradient background. Visual contrast >= 8:1."
+- **Wrap the page in `<main>`.** One-line XSL change. Clears the "content should be in a landmark" flag.
+- **Add a canonical URL** (`<link rel="canonical" href="…">`) and `<link rel="alternate" hreflang="…">` tags for EN + FR.
+- **Viewport meta.** The page shell has `maximum-scale=1.0` which blocks user zoom (WCAG issue).
+- **Search button ARIA warning** — also in top nav shell.
+- **Mark the false-positive contrast flags reviewed** on the report with a short note explaining why (scanner can't measure through fade-in animation).
 
 ## Who Owns What
 
-- **Marketing owns:** Copy in `maas-mata.json` (via the CMS). Draft, export, hand off.
-- **Dev owns:** The XSL skin, sidecar CSS, sidecar JS, the `rbccm-json-bind` runtime, Datums (fallback copy), and uploading marketing's JSON exports.
-- **Both:** The CMS schema. When dev adds a new editable field to the XSL, both sides update the CMS at the same time (SAMPLE + SCHEMA) so the field surfaces in the editor.
+- **Marketing** — page copy, via the CMS.
+- **Dev** — layout, styling, behaviour, the CMS itself, and uploading marketing's copy exports.
+- **Both** — when dev adds a new editable field, the CMS needs to be updated to match so it shows up for marketing to fill in.
 
 ---
 
-*Questions or updates to this doc — ping Justin.*
+*Questions or changes — ping Justin.*
