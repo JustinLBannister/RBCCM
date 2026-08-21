@@ -141,9 +141,9 @@ Everything else in the audit is either a false positive (the scanner can't measu
 
 Right now the page uses `<h1>` on the hero eyebrow and `<h5>`/`<h6>`/`<h4>` on section eyebrows. This was chosen to match the SEO guidance (one `<h1>` per page, section headings under it). The accessibility scanner wants headings to descend sequentially (h1 → h2 → h3, no skipping), which conflicts with what SEO wants. We need to pick one:
 
-- **Leave as-is** — SEO happy, accessibility gets a "best practice" warning (not a WCAG violation).
-- **Swap eyebrows to plain paragraphs, move the `<h1>` to the hero title** — accessibility happy, SEO loses one heading signal.
-- **Middle ground** — hero `<h1>` on the title, section eyebrows become plain paragraphs. Best of both.
+- Leave the tags as they are. Accessibility will keep flagging it, but it's a best-practice note, not a WCAG failure.
+- Change the eyebrows to regular paragraphs, and put the `<h1>` on the hero title instead. Clears the accessibility flag. SEO loses one heading it was counting on.
+- Same as above, but only change the section eyebrows — keep the hero eyebrow structure alone. Middle ground; needs SEO to say if that trade-off is fine.
 
 Need input from SEO and accessibility before we make the change. Once decided, let me know and I'll apply it.
 
