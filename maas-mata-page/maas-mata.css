@@ -2910,15 +2910,28 @@
   /* Lock body scroll while modal is open. Applied via JS. */
   body.rbccm-maas-mata--modal-open { overflow: hidden; }
 
-  /* Animate.css — using the CDN library as-is, with its defaults
-     (1s duration, ease timing, fill-mode: both). JS attaches the
-     .animate__animated + .animate__<name> classes on scroll-in
-     (data-animate) or on page load (data-animate-hero). No local
-     keyframes, no custom timing — matches the v1 approach. */
+  /* Animate.css hooks — matches the local maas-mata.html pattern.
+     Elements start hidden at opacity:0 and only reveal when JS has
+     added the .rbccm-anim-ready class to <body> (so nothing shows
+     before the animation runs). Once revealed, animate.css keyframes
+     from the CDN take over with their defaults (1s, ease, fill-mode
+     both). If JS never runs, the reduced-motion block below still
+     forces content visible for users with that preference. */
+  [data-animate],
+  [data-animate-hero],
+  [data-stagger-parent] > * {
+    opacity: 0;
+  }
+  .rbccm-anim-ready [data-animate].animate__animated,
+  .rbccm-anim-ready [data-animate-hero].animate__animated,
+  .rbccm-anim-ready [data-stagger-parent] > .animate__animated {
+    opacity: 1;
+  }
   @media (prefers-reduced-motion: reduce) {
     [data-animate],
     [data-animate-hero],
     [data-stagger-parent] > * {
+      opacity: 1 !important;
       animation: none !important;
     }
   }
