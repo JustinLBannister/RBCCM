@@ -470,7 +470,7 @@
     position: relative;
     z-index: 2;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__chart { padding: 0 170px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__chart { padding: 0 23px; } }
   /* Chart card — Figma spec: 1100 × 366 fixed on wide viewports,
      30px radius, 1px inner border @ 13% white, 16/53.4 spread shadow.
      width 100% + max-width 1100 lets it collapse gracefully under 1100
@@ -534,7 +534,7 @@
     gap: 32px;
     text-align: center;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__awards { padding: 40px 170px 30px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__awards { padding: 40px 23px 30px; } }
   /* Mobile: drop the section's 24 side padding so the carousel
      track can run edge-to-edge (the peek off the right needs the
      viewport itself as its right edge). Eyebrow + controls get
@@ -824,7 +824,7 @@
   @media (min-width: 992px) {
     .rbccm-maas-mata__platforms {
       gap: 60px;
-      padding: 80px 170px;
+      padding: 80px 23px;
     }
   }
   /* Below 988: every child of the platforms section fills the
@@ -935,12 +935,12 @@
     text-align: left;
     margin: 0 auto;
   }
-  /* Swap from stacked to side-by-side at 988px, the minimum room
-     for two 470-wide cards + 16 gap + 16 side gutters
-     (470*2 + 16 + 16*2 = 988). Below that they'd overlap or
-     force horizontal scroll, so mobile layout continues past
-     720 into tablet territory. */
-  @media (min-width: 992px) {
+  /* Swap from stacked to side-by-side only when there's real room
+     for the two cards + gap + container padding: 956 (grid max) +
+     46 (23px section padding × 2) = 1002. Round up to 1024 for a
+     safety cushion. Below that, cards stack in a centered column
+     like mobile so nothing overflows. */
+  @media (min-width: 1024px) {
     .rbccm-maas-mata__platforms-grid {
       flex-direction: row;
       justify-content: center;
@@ -983,11 +983,10 @@
     text-decoration: none;
     transition: box-shadow 200ms ease, transform 200ms ease;
   }
-  /* Card fixed-width kicks in at 988 - the same breakpoint where
-     the row swaps to horizontal and there's room for two 470-wide
-     cards. Below 988 the card stays align-self: stretch and fills
+  /* Card fixed-width kicks in at the same breakpoint the grid
+     swaps to horizontal (1024). Below that the card stretches
      100% of its (column-stacked) parent. */
-  @media (min-width: 992px) {
+  @media (min-width: 1024px) {
     .rbccm-maas-mata__platform-card {
       width: 470px;
       max-width: 470px;
@@ -1161,9 +1160,13 @@
     padding: 60px 23px;
     background: #F1F5FB;
   }
+  /* Desktop keeps mobile's 23px horizontal gutter — the inner
+     container's 1100 max-width + margin auto handles the
+     centering, so the 170px side padding wasn't needed. Vertical
+     padding bumps from 60 → 80 for a bit more breathing room. */
   @media (min-width: 992px) {
     .rbccm-maas-mata__innovation-era {
-      padding: 80px 170px;
+      padding: 80px 23px;
     }
   }
   /* Container caps content at the 1140 rail and centres it inside
@@ -1342,7 +1345,7 @@
     padding: 80px 23px;
     background: #fff;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__why-rbc { padding: 80px 170px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__why-rbc { padding: 80px 23px; } }
   /* Inner container zeroed — section owns the 1440/170 rail directly.
      Container itself becomes a flex-column so the 60px rhythm from the
      Figma section-gap applies between the header row and the stats row
@@ -1536,7 +1539,7 @@
     color: #fff;
     text-align: center;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__assets { padding: 80px 170px 0; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__assets { padding: 80px 23px 0; } }
   .rbccm-maas-mata__assets > .rbccm-maas-mata__container { padding: 0; max-width: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; }
   /* Eyebrow "ASSET COVERAGE" — mirrors the platforms eyebrow: Roboto
      14/16.8 wt 400, letter-spacing 3, uppercase, warm-yellow, with the
@@ -1696,7 +1699,7 @@
     background: transparent;
     color: #fff;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__market-insights { padding: 80px 170px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__market-insights { padding: 80px 23px; } }
   .rbccm-maas-mata__market-insights > .rbccm-maas-mata__container { padding: 0; max-width: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; }
   /* Section H2 "Market insights" — mirrors the assets/platforms
      heading: RBC Display 42/52.5 wt 500, centred, white. No margin —
@@ -2447,7 +2450,7 @@
   }
   @media (min-width: 992px) {
     .rbccm-maas-mata__mata-cap {
-      padding: 80px 170px;
+      padding: 80px 23px;
     }
   }
 
