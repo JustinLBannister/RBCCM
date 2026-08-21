@@ -2907,57 +2907,11 @@
   /* Lock body scroll while modal is open. Applied via JS. */
   body.rbccm-maas-mata--modal-open { overflow: hidden; }
 
-  /* -------------------------------------------------------------
-     Animate.css hooks. Elements marked with data-animate (scroll
-     triggered) or data-animate-hero (fires on load) start hidden
-     via opacity:0, then animate.css keyframes take over when JS
-     adds the .animate__animated + .animate__<name> classes.
-     animation-fill-mode: both (baked into animate.css) means the
-     element retains its ending opacity after the animation, so
-     the initial opacity:0 doesn't reappear.
-     Reduced-motion users skip everything — JS forces opacity:1
-     and never adds the animation classes. ------------------------ */
-  /* Inline the 4 animate.css keyframes we actually use so the
-     component doesn't depend on the CDN stylesheet loading (some
-     corporate/VDI browsers ignore or block third-party CSS
-     animations even when the file is delivered). */
-  .animate__animated {
-    /* Bumped from the animate.css default of 1s to 1.6s for a
-       smoother, less abrupt fade. Also softened the timing to an
-       ease-out curve so elements decelerate into place instead of
-       tapering linearly. */
-    animation-duration: 1.6s;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    animation-fill-mode: both;
-  }
-  .animate__fadeIn      { animation-name: rbccm-mm-fadeIn;      }
-  .animate__fadeInUp    { animation-name: rbccm-mm-fadeInUp;    }
-  .animate__fadeInDown  { animation-name: rbccm-mm-fadeInDown;  }
-  .animate__zoomIn      { animation-name: rbccm-mm-zoomIn;      }
-  @keyframes rbccm-mm-fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  @keyframes rbccm-mm-fadeInUp {
-    from { opacity: 0; transform: translate3d(0, 24px, 0); }
-    to   { opacity: 1; transform: translate3d(0, 0, 0); }
-  }
-  @keyframes rbccm-mm-fadeInDown {
-    from { opacity: 0; transform: translate3d(0, -24px, 0); }
-    to   { opacity: 1; transform: translate3d(0, 0, 0); }
-  }
-  @keyframes rbccm-mm-zoomIn {
-    from { opacity: 0; transform: scale3d(0.6, 0.6, 0.6); }
-    50%  { opacity: 1; }
-    to   { transform: scale3d(1, 1, 1); }
-  }
-
-  /* No "hidden until animate" pattern — content is visible by
-     default. Animate.css keyframes we inlined above start from
-     opacity:0 and end at opacity:1 with animation-fill-mode: both,
-     so the entrance still plays when JS adds the classes. If JS
-     doesn't fire on some browsers, content just appears (no
-     animation) — always better than "stuck at opacity 0". */
+  /* Animate.css — using the CDN library as-is, with its defaults
+     (1s duration, ease timing, fill-mode: both). JS attaches the
+     .animate__animated + .animate__<name> classes on scroll-in
+     (data-animate) or on page load (data-animate-hero). No local
+     keyframes, no custom timing — matches the v1 approach. */
   @media (prefers-reduced-motion: reduce) {
     [data-animate],
     [data-animate-hero],
