@@ -279,10 +279,18 @@
        verbatim. Escape any literal < or & to &lt; / &amp; only
        if the schema contains them (most JSON-LD doesn't).
        ═══════════════════════════════════════════════════════════ -->
-  <Datum ID="SeoJsonLd" Type="Textarea" Name="SEO — JSON-LD structured data (paste full @graph block from SEO)">{
+  <!-- IMPORTANT: keep the CDATA wrapper below when editing this Datum.
+       TeamSite otherwise entity-encodes square brackets and injects
+       stray template markers into JSON strings, which breaks the
+       structured data. CDATA tells TeamSite "hand this back verbatim,
+       don't touch it." Paste the full JSON block from SEO between
+       the <![CDATA[ and ]]> markers. -->
+  <Datum ID="SeoJsonLd" Type="Textarea" Name="SEO — JSON-LD structured data (paste full @graph block from SEO, keep CDATA wrapper)"><![CDATA[
+{
   "@context": "https://schema.org",
   "@graph": []
-}</Datum>
+}
+]]></Datum>
 
 
   <!-- ═══ 8b. MARKET INSIGHTS (3 fixed cards — carousel needs
