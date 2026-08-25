@@ -293,10 +293,10 @@
              preview. The Brightcove attrs are set from Datums when
              filled; when empty, the modal opens with an empty iframe
              (useful for design review, not for a live launch). -->
-        <button type="button" class="rbccm-maas-mata__chart-image-play" data-video-play="" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="rbccm-mm-video-modal">
-          <xsl:attribute name="data-bc-account"><xsl:value-of select="$CHART_BC_ACCOUNT" /></xsl:attribute>
-          <xsl:attribute name="data-bc-player"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:attribute>
-          <xsl:attribute name="data-bc-video"><xsl:value-of select="$CHART_BC_VIDEO" /></xsl:attribute>
+        <!-- Play button — uses the site-standard Bootstrap modal
+             (#herovideo below). data-toggle/data-target are handled
+             by the page-shell's Bootstrap JS; nothing custom here. -->
+        <button type="button" class="rbccm-maas-mata__chart-image-play" data-toggle="modal" data-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
           <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
         </button>
       </div>
@@ -579,20 +579,36 @@
 
     </div><!-- /.rbccm-maas-mata -->
 
-    <!-- Video modal always emitted so the play button has something to
-         trigger in preview. Iframe stays empty when no Brightcove video
-         is configured — modal will still open/close cleanly. -->
-      <div class="rbccm-maas-mata__video-modal" id="rbccm-mm-video-modal" hidden="hidden" role="dialog" aria-modal="true" aria-label="Video player">
-        <div class="rbccm-maas-mata__video-modal-backdrop" data-video-close=""></div>
-        <div class="rbccm-maas-mata__video-modal-dialog">
-          <button type="button" class="rbccm-maas-mata__video-modal-close" data-video-close="" aria-label="Close video">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </button>
-          <div class="rbccm-maas-mata__video-modal-frame">
-            <iframe class="rbccm-maas-mata__video-modal-iframe" data-video-iframe="" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+    <!-- Site-standard Bootstrap video modal (matches the pattern used
+         on the home page and elsewhere). Bootstrap owns open/close via
+         data-toggle="modal" on the trigger + data-dismiss="modal" on
+         the button; no custom JS needed. Brightcove player is embedded
+         directly in the iframe src. -->
+    <div role="dialog" class="modal fade" tabindex="-1" id="herovideo">
+      <div role="document" class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;">
+        <div class="modal-content">
+          <div>
+            <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+              <button aria-label="Close Modal" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal">×</button>
+            </div>
+            <div class="modal-body" style="padding: 0px;">
+              <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+                <div style="margin-bottom: 20px;">
+                  <h2 style="font-size: 20px;"></h2>
+                  <div>
+                    <div style="position: relative; display: block; max-width: 960px;">
+                      <div style="padding-top: 56.25%;">
+                        <iframe src="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
     <!-- rbccm-json-bind must load BEFORE maas-mata.js so the
          bootstrap block at the bottom of maas-mata.js finds the

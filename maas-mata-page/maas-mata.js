@@ -5,73 +5,36 @@
    ticker. RBCCMBind bootstrap at the bottom runs only when the runtime
    is present (preview builds). Otherwise Datums render server-side. */
 
-  // ---- Brightcove video modal ---------------------------------
-  // Play button on the chart image opens a modal with a Brightcove
-  // iframe. Data attributes (data-bc-account / -player / -video)
-  // live on the play button so the CMS can populate per page.
-  // The iframe src is built + injected on open (lazy load), and
-  // cleared on close so the player stops playing.
+  // ---- Video modal (Bootstrap-managed) ------------------------
+  // The modal itself (#herovideo) uses Bootstrap's standard modal
+  // pattern via data-toggle / data-dismiss — no custom open/close
+  // JS needed. Only extra work here: reset the iframe src when the
+  // modal closes so the video actually stops playing (otherwise
+  // Bootstrap just hides the element and audio keeps going).
   (function () {
-    var modal = document.getElementById('rbccm-mm-video-modal');
+    var modal = document.getElementById('herovideo');
     if (!modal) return;
-    var iframe = modal.querySelector('[data-video-iframe]');
-    var closers = modal.querySelectorAll('[data-video-close]');
-    var lastTrigger = null;
-
-    function bcSrc(acct, player, video) {
-      var p = player || 'default';
-      return 'https://players.brightcove.net/' + encodeURIComponent(acct) +
-             '/' + encodeURIComponent(p) + '_default/index.html?videoId=' +
-             encodeURIComponent(video) + '&autoplay=1';
+    var iframe = modal.querySelector('iframe');
+    if (!iframe) return;
+    var originalSrc = iframe.getAttribute('src');
+    // Bootstrap 3/4 event
+    var $modal = window.jQuery ? window.jQuery(modal) : null;
+    function stop() {
+      var src = iframe.getAttribute('src');
+      iframe.setAttribute('src', '');
+      // Restore on next tick so the next open plays from the start.
+      setTimeout(function () { iframe.setAttribute('src', originalSrc); }, 100);
     }
-
-    // Fallback video for design review / preview. Plays when the
-    // Brightcove Datums are empty so the modal always has something
-    // to show. Replace with the real Brightcove video once configured.
-    var FALLBACK_VIDEO_SRC = 'https://www.youtube.com/embed/L_LUpnjgPso?autoplay=1&rel=0';
-
-    function open(trigger) {
-      var acct  = trigger.getAttribute('data-bc-account') || '';
-      var player = trigger.getAttribute('data-bc-player') || '';
-      var video = trigger.getAttribute('data-bc-video') || '';
-      lastTrigger = trigger;
-      // Prefer Brightcove when both account + video are set; otherwise
-      // fall back to the YouTube placeholder so the modal isn't empty.
-      if (acct && video) {
-        iframe.src = bcSrc(acct, player, video);
-      } else {
-        iframe.src = FALLBACK_VIDEO_SRC;
-      }
-      modal.hidden = false;
-      requestAnimationFrame(function () {
-        modal.classList.add('is-open');
+    if ($modal && $modal.on) {
+      $modal.on('hidden.bs.modal', stop);
+    } else {
+      // Fallback for anywhere Bootstrap jQuery isn't loaded — watch
+      // for the display change ourselves.
+      var mo = new MutationObserver(function () {
+        if (!modal.classList.contains('in') && modal.style.display === 'none') stop();
       });
-      document.body.classList.add('rbccm-maas-mata--modal-open');
-      var closeBtn = modal.querySelector('.rbccm-maas-mata__video-modal-close');
-      if (closeBtn) closeBtn.focus();
+      mo.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
     }
-
-    function close() {
-      modal.classList.remove('is-open');
-      document.body.classList.remove('rbccm-maas-mata--modal-open');
-      iframe.src = '';
-      setTimeout(function () { modal.hidden = true; }, 220);
-      if (lastTrigger && typeof lastTrigger.focus === 'function') {
-        lastTrigger.focus();
-      }
-    }
-
-    document.addEventListener('click', function (e) {
-      var trigger = e.target.closest('[data-video-play]');
-      if (trigger) {
-        e.preventDefault();
-        open(trigger);
-      }
-    });
-    closers.forEach(function (el) { el.addEventListener('click', close); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !modal.hidden) close();
-    });
   })();
 
   // ---- animate.css bindings ----------------------------------
