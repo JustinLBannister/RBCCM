@@ -25,16 +25,23 @@
              encodeURIComponent(video) + '&autoplay=1';
     }
 
+    // Fallback video for design review / preview. Plays when the
+    // Brightcove Datums are empty so the modal always has something
+    // to show. Replace with the real Brightcove video once configured.
+    var FALLBACK_VIDEO_SRC = 'https://www.youtube.com/embed/L_LUpnjgPso?autoplay=1&rel=0';
+
     function open(trigger) {
       var acct  = trigger.getAttribute('data-bc-account') || '';
       var player = trigger.getAttribute('data-bc-player') || '';
       var video = trigger.getAttribute('data-bc-video') || '';
-      if (!acct || !video) {
-        console.warn('[maas-mata] video modal: missing Brightcove account or video id');
-        return;
-      }
       lastTrigger = trigger;
-      iframe.src = bcSrc(acct, player, video);
+      // Prefer Brightcove when both account + video are set; otherwise
+      // fall back to the YouTube placeholder so the modal isn't empty.
+      if (acct && video) {
+        iframe.src = bcSrc(acct, player, video);
+      } else {
+        iframe.src = FALLBACK_VIDEO_SRC;
+      }
       modal.hidden = false;
       requestAnimationFrame(function () {
         modal.classList.add('is-open');

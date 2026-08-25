@@ -197,6 +197,11 @@
   <xsl:variable name="FLD5_NAME"  select="/Properties/Datum[@ID='Field5Name']"  />
   <xsl:variable name="FLD5_TYPE"  select="/Properties/Datum[@ID='Field5Type']/Option[@Selected='true']/Value" />
 
+  <!-- SEO / JSON-LD — single Datum, pasted verbatim by whoever
+       owns SEO. XSL outputs it inside a <script type="application/ld+json">
+       tag without escaping so the JSON survives unchanged. -->
+  <xsl:variable name="SEO_JSONLD" select="/Properties/Datum[@ID='SeoJsonLd']" />
+
 
 
   <!-- ============================================================
@@ -212,6 +217,14 @@
     <link rel="stylesheet">
       <xsl:attribute name="href">/assets/rbccm/css/pages/maas-mata.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
     </link>
+
+    <!-- JSON-LD structured data. Whole @graph block lives in
+         the SeoJsonLd Datum. When SEO delivers a new schema, paste
+         it into that field verbatim — no XSL edit needed. -->
+    <script type="application/ld+json">
+      <xsl:value-of select="$SEO_JSONLD" disable-output-escaping="yes" />
+    </script>
+
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
       <xsl:if test="$COLOR_SCHEME = 'dark'">
@@ -558,95 +571,11 @@
       </div><!-- /.deep-band -->
 
 
-      <!-- ═══ 10. NEWSLETTER ═══════════════════════════════════
-           The <form> element gets Marketo data-* attributes on
-           it; the Marketo loader (loaded elsewhere on the page)
-           watches for that + injects its own field markup INSIDE
-           the form. Everything below <div class="__fields"> is
-           an author-editable fallback that also renders standalone
-           if Marketo doesn't take over. -->
-      <section class="rbccm-maas-mata__newsletter" aria-label="Stay informed">
-        <div class="rbccm-maas-mata__container">
-          <h2 class="rbccm-maas-mata__newsletter-heading" data-json="newsletter.heading"><xsl:value-of select="$NL_HEADING" /></h2>
-          <p class="rbccm-maas-mata__newsletter-body" data-json-html="newsletter.body"><xsl:value-of select="$NL_BODY" disable-output-escaping="yes" /></p>
 
-          <form class="rbccm-maas-mata__newsletter-form" method="post" data-json-attr-data-marketo-form-id="newsletter.marketoFormId">
-            <xsl:if test="$NL_MARKETO_BASE != ''">
-              <xsl:attribute name="data-marketo-base-url"><xsl:value-of select="$NL_MARKETO_BASE" /></xsl:attribute>
-            </xsl:if>
-            <xsl:if test="$NL_MARKETO_MUNCHKIN != ''">
-              <xsl:attribute name="data-marketo-munchkin-id"><xsl:value-of select="$NL_MARKETO_MUNCHKIN" /></xsl:attribute>
-            </xsl:if>
-            <xsl:if test="$NL_MARKETO_FORM != ''">
-              <xsl:attribute name="data-marketo-form-id"><xsl:value-of select="$NL_MARKETO_FORM" /></xsl:attribute>
-            </xsl:if>
+      <!-- Newsletter section removed — the site's shared Marketo
+           component is now dropped in on the page separately. If
+           we ever bring it back in-component, restore from git. -->
 
-            <div class="rbccm-maas-mata__newsletter-fields" data-json-list="newsletter.fields">
-              <label class="rbccm-maas-mata__newsletter-field">
-                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD1_LABEL" /></span>
-                <input class="rbccm-maas-mata__newsletter-input">
-                  <xsl:attribute name="name"><xsl:value-of select="$FLD1_NAME" /></xsl:attribute>
-                  <xsl:attribute name="type"><xsl:value-of select="$FLD1_TYPE" /></xsl:attribute>
-                </input>
-              </label>
-              <label class="rbccm-maas-mata__newsletter-field">
-                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD2_LABEL" /></span>
-                <input class="rbccm-maas-mata__newsletter-input">
-                  <xsl:attribute name="name"><xsl:value-of select="$FLD2_NAME" /></xsl:attribute>
-                  <xsl:attribute name="type"><xsl:value-of select="$FLD2_TYPE" /></xsl:attribute>
-                </input>
-              </label>
-              <label class="rbccm-maas-mata__newsletter-field">
-                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD3_LABEL" /></span>
-                <input class="rbccm-maas-mata__newsletter-input">
-                  <xsl:attribute name="name"><xsl:value-of select="$FLD3_NAME" /></xsl:attribute>
-                  <xsl:attribute name="type"><xsl:value-of select="$FLD3_TYPE" /></xsl:attribute>
-                </input>
-              </label>
-              <label class="rbccm-maas-mata__newsletter-field">
-                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD4_LABEL" /></span>
-                <input class="rbccm-maas-mata__newsletter-input">
-                  <xsl:attribute name="name"><xsl:value-of select="$FLD4_NAME" /></xsl:attribute>
-                  <xsl:attribute name="type"><xsl:value-of select="$FLD4_TYPE" /></xsl:attribute>
-                </input>
-              </label>
-              <label class="rbccm-maas-mata__newsletter-field">
-                <span class="rbccm-maas-mata__newsletter-label"><xsl:value-of select="$FLD5_LABEL" /></span>
-                <input class="rbccm-maas-mata__newsletter-input">
-                  <xsl:attribute name="name"><xsl:value-of select="$FLD5_NAME" /></xsl:attribute>
-                  <xsl:attribute name="type"><xsl:value-of select="$FLD5_TYPE" /></xsl:attribute>
-                </input>
-              </label>
-            </div>
-
-            <xsl:if test="normalize-space($NL_LINKEDIN_HREF) != ''">
-              <a class="rbccm-maas-mata__newsletter-linkedin">
-                <xsl:attribute name="href"><xsl:value-of select="$NL_LINKEDIN_HREF" /></xsl:attribute>
-                <xsl:value-of select="$NL_LINKEDIN_LABEL" />
-              </a>
-            </xsl:if>
-
-            <label class="rbccm-maas-mata__newsletter-consent">
-              <input type="checkbox" class="rbccm-maas-mata__newsletter-consent-check" />
-              <span>
-                <xsl:value-of select="$NL_CONSENT" disable-output-escaping="yes" />
-                <xsl:text> </xsl:text>
-                <a class="rbccm-maas-mata__newsletter-privacy">
-                  <xsl:attribute name="href"><xsl:value-of select="$NL_PRIVACY_HREF" /></xsl:attribute>
-                  <xsl:value-of select="$NL_PRIVACY_LABEL" />
-                </a>
-              </span>
-            </label>
-
-            <button type="submit" class="rbccm-maas-mata__newsletter-submit">
-              <span class="rbccm-maas-mata__newsletter-submit-label" data-json="newsletter.submitLabel"><xsl:value-of select="$NL_SUBMIT_LABEL" /></span>
-              <svg class="rbccm-maas-mata__newsletter-submit-icon" xmlns="http://www.w3.org/2000/svg" width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true" focusable="false">
-                <path d="M0.530273 0.530273L5.53027 5.53027L0.530273 10.5303" stroke="white" stroke-width="1.5"/>
-              </svg>
-            </button>
-          </form>
-        </div>
-      </section>
 
     </div><!-- /.rbccm-maas-mata -->
 

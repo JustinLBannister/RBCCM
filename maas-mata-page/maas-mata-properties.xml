@@ -271,6 +271,20 @@
   <Datum ID="Card3Body" Type="Textarea" Name="Card 3 — body">Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures.</Datum>
 
 
+  <!-- ═══ 8a. SEO — JSON-LD structured data ═══════════════════
+       Single Textarea holding the entire JSON-LD @graph block.
+       When SEO (Joon) delivers a new schema, paste the whole
+       thing here — no field-by-field re-entry. The XSL wraps
+       this value in a <script type="application/ld+json"> tag
+       verbatim. Escape any literal < or & to &lt; / &amp; only
+       if the schema contains them (most JSON-LD doesn't).
+       ═══════════════════════════════════════════════════════════ -->
+  <Datum ID="SeoJsonLd" Type="Textarea" Name="SEO — JSON-LD structured data (paste full @graph block from SEO)">{
+  "@context": "https://schema.org",
+  "@graph": []
+}</Datum>
+
+
   <!-- ═══ 8b. MARKET INSIGHTS (3 fixed cards — carousel needs
        a minimum of 3 to activate). ═════════════════════════════ -->
   <Datum ID="Insight1Eyebrow" Type="String" Name="Insight 1 — eyebrow">Insights</Datum>
