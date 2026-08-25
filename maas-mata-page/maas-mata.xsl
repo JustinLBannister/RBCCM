@@ -163,6 +163,22 @@
   <xsl:variable name="INS1_BODY"      select="/Properties/Datum[@ID='Insight1Body']" />
   <xsl:variable name="INS1_CTA_LABEL" select="/Properties/Datum[@ID='Insight1CtaLabel']" />
   <xsl:variable name="INS1_CTA_HREF"  select="/Properties/Datum[@ID='Insight1CtaHref']" />
+  <xsl:variable name="INS1_IMAGE"     select="/Properties/Datum[@ID='Insight1Image']" />
+  <xsl:variable name="INS1_IMAGE_ALT" select="/Properties/Datum[@ID='Insight1ImageAlt']" />
+  <xsl:variable name="INS2_EYEBROW"   select="/Properties/Datum[@ID='Insight2Eyebrow']" />
+  <xsl:variable name="INS2_TITLE"     select="/Properties/Datum[@ID='Insight2Title']" />
+  <xsl:variable name="INS2_BODY"      select="/Properties/Datum[@ID='Insight2Body']" />
+  <xsl:variable name="INS2_CTA_LABEL" select="/Properties/Datum[@ID='Insight2CtaLabel']" />
+  <xsl:variable name="INS2_CTA_HREF"  select="/Properties/Datum[@ID='Insight2CtaHref']" />
+  <xsl:variable name="INS2_IMAGE"     select="/Properties/Datum[@ID='Insight2Image']" />
+  <xsl:variable name="INS2_IMAGE_ALT" select="/Properties/Datum[@ID='Insight2ImageAlt']" />
+  <xsl:variable name="INS3_EYEBROW"   select="/Properties/Datum[@ID='Insight3Eyebrow']" />
+  <xsl:variable name="INS3_TITLE"     select="/Properties/Datum[@ID='Insight3Title']" />
+  <xsl:variable name="INS3_BODY"      select="/Properties/Datum[@ID='Insight3Body']" />
+  <xsl:variable name="INS3_CTA_LABEL" select="/Properties/Datum[@ID='Insight3CtaLabel']" />
+  <xsl:variable name="INS3_CTA_HREF"  select="/Properties/Datum[@ID='Insight3CtaHref']" />
+  <xsl:variable name="INS3_IMAGE"     select="/Properties/Datum[@ID='Insight3Image']" />
+  <xsl:variable name="INS3_IMAGE_ALT" select="/Properties/Datum[@ID='Insight3ImageAlt']" />
 
   <!-- Newsletter form fields (5 fixed slots) -->
   <xsl:variable name="FLD1_LABEL" select="/Properties/Datum[@ID='Field1Label']" />
@@ -495,7 +511,17 @@
                   <xsl:attribute name="href"><xsl:value-of select="$INS1_CTA_HREF" /></xsl:attribute>
                   <span class="rbccm-maas-mata__featured-cta-read" data-json="cta.label"><xsl:value-of select="$INS1_CTA_LABEL" /></span>
                   <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a></div><div class="rbccm-maas-mata__featured-illustration"></div></article>
+                </a></div><div class="rbccm-maas-mata__featured-illustration"><img data-json-attr-src="image" data-json-attr-alt="imageAlt"><xsl:attribute name="src"><xsl:value-of select="$INS1_IMAGE" /></xsl:attribute><xsl:attribute name="alt"><xsl:value-of select="$INS1_IMAGE_ALT" /></xsl:attribute></img></div></article>
+              <article class="rbccm-maas-mata__featured-card"><div class="rbccm-maas-mata__featured-body"><h4 class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS2_EYEBROW" /></h4><div class="rbccm-maas-mata__featured-content"><h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS2_TITLE" /></h3><p class="rbccm-maas-mata__featured-copy"><xsl:value-of select="$INS2_BODY" disable-output-escaping="yes" /></p></div><a class="rbccm-maas-mata__featured-cta">
+                  <xsl:attribute name="href"><xsl:value-of select="$INS2_CTA_HREF" /></xsl:attribute>
+                  <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="$INS2_CTA_LABEL" /></span>
+                  <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a></div><div class="rbccm-maas-mata__featured-illustration"><img><xsl:attribute name="src"><xsl:value-of select="$INS2_IMAGE" /></xsl:attribute><xsl:attribute name="alt"><xsl:value-of select="$INS2_IMAGE_ALT" /></xsl:attribute></img></div></article>
+              <article class="rbccm-maas-mata__featured-card"><div class="rbccm-maas-mata__featured-body"><h4 class="rbccm-maas-mata__featured-eyebrow"><xsl:value-of select="$INS3_EYEBROW" /></h4><div class="rbccm-maas-mata__featured-content"><h3 class="rbccm-maas-mata__featured-title"><xsl:value-of select="$INS3_TITLE" /></h3><p class="rbccm-maas-mata__featured-copy"><xsl:value-of select="$INS3_BODY" disable-output-escaping="yes" /></p></div><a class="rbccm-maas-mata__featured-cta">
+                  <xsl:attribute name="href"><xsl:value-of select="$INS3_CTA_HREF" /></xsl:attribute>
+                  <span class="rbccm-maas-mata__featured-cta-read"><xsl:value-of select="$INS3_CTA_LABEL" /></span>
+                  <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a></div><div class="rbccm-maas-mata__featured-illustration"><img><xsl:attribute name="src"><xsl:value-of select="$INS3_IMAGE" /></xsl:attribute><xsl:attribute name="alt"><xsl:value-of select="$INS3_IMAGE_ALT" /></xsl:attribute></img></div></article>
             </div>
 
             <div class="rbccm-maas-mata__insights-controls" data-animate="zoomIn" data-animate-delay="350" data-insights-controls="">

@@ -136,7 +136,7 @@
     .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
       height: 50px;
       padding: 12px 35px;
-      font-size: 19.507px;
+      font-size: 14px;
     }
     .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
       width: 23px;
@@ -366,6 +366,27 @@
     padding: 0;
   }
 
+  /* Font-family + letter-spacing lock on the big serif headings.
+     unified.css sets its own font-family and letter-spacing on
+     h1/h2 via tag selectors, which was suppressing RBCDisplay and
+     opening tracking. !important here restores our stack. */
+  .rbccm-maas-mata .rbccm-maas-mata__hero-title,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-lead,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-highlight,
+  .rbccm-maas-mata .rbccm-maas-mata__new-standard-heading-accent,
+  .rbccm-maas-mata .rbccm-maas-mata__platforms-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__innovation-era-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__mata-cap-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__market-insights-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__demo-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__demo-heading-highlight,
+  .rbccm-maas-mata .rbccm-maas-mata__newsletter-heading,
+  .rbccm-maas-mata .rbccm-maas-mata__feature-title {
+    font-family: RBCDisplay, Georgia, Times, serif !important;
+    letter-spacing: 0 !important;
+  }
+
   .rbccm-maas-mata__hero-eyebrow {
     color: #0051A5;
     font-family: Roboto, Arial, sans-serif;
@@ -394,7 +415,7 @@
      capped at 560 so "Trade with Clarity." fits on one line at
      tablet widths). Desktop bumps type up and drops the cap. */
   .rbccm-maas-mata__hero-title {
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 50px;
     font-weight: 500;
     line-height: 100%;
@@ -437,7 +458,7 @@
     .rbccm-maas-mata__hero-subtitle {
       font-size: 21.945px;
       max-width: 776px;
-      margin: 0 auto 40px;
+      margin: 48px auto;
     }
   }
   .rbccm-maas-mata__hero-subtitle strong { font-weight: 700; }
@@ -534,14 +555,14 @@
     gap: 32px;
     text-align: center;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__awards { padding: 40px 23px 30px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__awards { padding: 3px 23px 40px; } }
   /* Mobile: drop the section's 24 side padding so the carousel
      track can run edge-to-edge (the peek off the right needs the
      viewport itself as its right edge). Eyebrow + controls get
      their own inset via their child rules below so they stay
      centred inside the visible width. */
   @media (max-width: 871px) {
-    .rbccm-maas-mata__awards { padding-left: 0; padding-right: 0; }
+    .rbccm-maas-mata__awards { padding: 36px 0 0; }
     .rbccm-maas-mata__awards-eyebrow,
     .rbccm-maas-mata__awards-controls {
       padding-left: 23px;
@@ -610,20 +631,26 @@
     }
     .rbccm-maas-mata__awards-grid::-webkit-scrollbar { display: none; }
     .rbccm-maas-mata__awards-grid > .rbccm-maas-mata__award-card {
-      /* Figma mobile spec: card is Hug 264 x 127 - fixed width,
-         not viewport-fluid. Keeping the same 264 as desktop means
-         the swipe still peeks the next card on any phone wider
-         than ~310, and the card content stays the intended shape.
-         min-height 127 equalises heights so 2-line vs 3-line
-         titles don't cause vertical jitter mid-swipe. */
+      /* Mobile carousel card: 264 wide (matches desktop) so the
+         next card peeks on any phone >310px. Height equalisation
+         needs help — align-items: stretch on the flex parent gives
+         all cards the tallest child's height; height:100% on the
+         card itself opts each into that stretch, and min-height
+         sets a comfortable floor if all cards happen to have
+         short copy. */
       flex: 0 0 264px;
       width: 264px;
       max-width: 264px;
       min-height: 127px;
+      height: 100%;
       scroll-snap-align: start;
       align-self: stretch;
     }
-    .rbccm-maas-mata__awards-grid { align-items: stretch; }
+    /* Force the track container itself to accept a tallest-child
+       height so align-items: stretch has something to work with. */
+    .rbccm-maas-mata__awards-grid {
+      align-items: stretch;
+    }
   }
   /* Carousel controls row (mobile only). Arrows flank the dot
      pagination. Hidden at tablet+ where all three cards fit in the
@@ -814,7 +841,7 @@
     align-items: center;
     align-self: stretch;
     gap: 32px;
-    padding: 80px 16px;
+    padding: 100px 0 60px 0;
     background: linear-gradient(180deg, #09254A 0%, #05152A 100%);
     text-align: center;
   }
@@ -903,7 +930,7 @@
   .rbccm-maas-mata__platforms-heading {
     color: #FFFFFF;
     text-align: center;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 36px;
     font-style: normal;
     font-weight: 500;
@@ -1207,7 +1234,7 @@
      padding controls horizontal inset. */
   .rbccm-maas-mata__innovation-era-heading {
     color: #000;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 36px;
     font-style: normal;
     font-weight: 500;
@@ -1307,7 +1334,7 @@
      bright blue. */
   .rbccm-maas-mata__feature-number {
     color: #0051A5;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1317,10 +1344,11 @@
   /* Title — Figma: RBC Display 24/30 wt 500, black. */
   .rbccm-maas-mata__feature-title {
     color: #000;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 24px;
     font-weight: 500;
     line-height: 30px;
+    letter-spacing: 0;
     margin: 0;
   }
   /* Body — Figma: Roboto 14/24 wt 400, #494949. */
@@ -1405,7 +1433,7 @@
      310 fixed width per Figma so it wraps to the intended two lines. */
   .rbccm-maas-mata__why-rbc-heading {
     color: #000;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 42px;
     font-weight: 500;
     line-height: 125%;
@@ -1469,14 +1497,14 @@
   }
   .rbccm-maas-mata__stat-value {
     color: #003168;
-    font-family: "RBC Display", RBCDisplay, Georgia, serif;
+    font-family: RBCDisplay, Georgia, serif;
     font-size: 50px;
     font-weight: 500;
     line-height: 100%;
   }
   .rbccm-maas-mata__stat-value-suffix {
     color: #FFC72C;
-    font-family: "RBC Display", RBCDisplay, Georgia, serif;
+    font-family: RBCDisplay, Georgia, serif;
     font-size: 40px;
     font-weight: 500;
     line-height: 100%;
@@ -1570,7 +1598,7 @@
      centred, white. */
   .rbccm-maas-mata__assets-heading {
     color: #fff;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 42px;
     font-weight: 500;
     line-height: 125%;
@@ -1699,7 +1727,10 @@
     background: transparent;
     color: #fff;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__market-insights { padding: 80px 23px; } }
+  /* 80 top, 10 bottom — the demo section below contributes its
+     own 100 top padding, so total gap between the story tile
+     carousel and the "See the Platform" heading = 10 + 100 = 110. */
+  @media (min-width: 992px) { .rbccm-maas-mata__market-insights { padding: 80px 23px 10px; } }
   .rbccm-maas-mata__market-insights > .rbccm-maas-mata__container { padding: 0; max-width: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; }
   /* Section H2 "Market insights" — mirrors the assets/platforms
      heading: RBC Display 42/52.5 wt 500, centred, white. No margin —
@@ -1721,7 +1752,7 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     margin: 0 auto;
-    padding: 15px 35px 0;
+    padding: 0px 35px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1754,7 +1785,7 @@
 
   .rbccm-maas-mata__market-insights-heading {
     color: #fff;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 42px;
     font-weight: 500;
     line-height: 125%;
@@ -2001,7 +2032,7 @@
     text-align: center;
   }
   @media (min-width: 992px) {
-    .rbccm-maas-mata__demo { padding: 90px 0 100px; }
+    .rbccm-maas-mata__demo { padding: 100px 0; }
   }
   /* Inner content stack — Figma: 686 fixed wide, flex-column, gap 41,
      centre-aligned. Holds eyebrow + heading + body. */
@@ -2055,7 +2086,7 @@
   .rbccm-maas-mata__demo-heading {
     color: #FFFFFF;
     text-align: center;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 50px;
     font-style: normal;
     font-weight: 500;
@@ -2095,6 +2126,34 @@
   }
 
   /* Newsletter (simplified — Marketo owns the form fields) */
+  /* -------------------------------------------------------------
+     MARKETO PASS-THROUGH.
+     Marketo replaces our XSL fallback markup with its own .mktoForm
+     DOM at runtime. Our page-level typography (defense block, RBC
+     Display headings, letter-spacing) was cascading into the
+     Marketo-generated fields, making the form look different from
+     the home-page instance. This block restores the Marketo default
+     look (Arial/Verdana 13/normal, #333 text, green button skin)
+     inside our newsletter container only. Anything Marketo sets
+     inline still wins — we only reset the inherited stack.
+     ------------------------------------------------------------- */
+  .rbccm-maas-mata__newsletter .mktoForm,
+  .rbccm-maas-mata__newsletter .mktoForm * {
+    font-family: Arial, Verdana, sans-serif !important;
+    letter-spacing: normal !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+  }
+  .rbccm-maas-mata__newsletter .mktoForm,
+  .rbccm-maas-mata__newsletter .mktoForm .mktoField,
+  .rbccm-maas-mata__newsletter .mktoForm .mktoLabel,
+  .rbccm-maas-mata__newsletter .mktoForm label,
+  .rbccm-maas-mata__newsletter .mktoForm .mktoInstruction,
+  .rbccm-maas-mata__newsletter .mktoForm input,
+  .rbccm-maas-mata__newsletter .mktoForm .mktoButton {
+    font-size: 13px !important;
+    font-weight: normal !important;
+  }
   .rbccm-maas-mata__newsletter { background: #E7EEF1; padding: 51px 0; }
   .rbccm-maas-mata__newsletter-heading {
     font-family: 'RBC Display', var(--sans);
@@ -2317,13 +2376,13 @@
     text-align: center;
     color: #fff;
   }
-  @media (min-width: 992px) { .rbccm-maas-mata__new-standard { padding: 80px 0 85px; } }
+  @media (min-width: 992px) { .rbccm-maas-mata__new-standard { padding: 80px 0 82px; } }
   /* Heading typography per Figma "title-mobile" / desktop specs.
      All three parts share family/size/weight/line-height at each
      breakpoint - only color differs. Mobile: 50px / 100% LH,
      block width auto. Desktop: 75px / 110% LH, max-width 872. */
   .rbccm-maas-mata__new-standard-heading {
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 50px;
     font-style: normal;
     font-weight: 500;
@@ -2360,7 +2419,7 @@
     .rbccm-maas-mata__new-standard-heading-lead,
     .rbccm-maas-mata__new-standard-heading-highlight,
     .rbccm-maas-mata__new-standard-heading-accent {
-      font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+      font-family: RBCDisplay, Georgia, Times, serif;
       font-size: 50px;
       font-weight: 500;
       line-height: 100%;
@@ -2382,6 +2441,12 @@
     font-style: normal;
     font-weight: 400;
     line-height: 150%;  /* 24px */
+  }
+  /* Mobile: widen the gap before the "See MAAS in action" button. */
+  @media (max-width: 991px) {
+    .rbccm-maas-mata__new-standard-body {
+      margin: 0 auto 55px;
+    }
   }
   .rbccm-maas-mata__new-standard-body p { margin: 0 0 21px; }
   .rbccm-maas-mata__new-standard-body p:last-child { margin-bottom: 0; }
@@ -2513,7 +2578,7 @@
   .rbccm-maas-mata__mata-cap-heading {
     color: #FFFFFF;
     text-align: center;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-family: RBCDisplay, Georgia, Times, serif;
     font-size: 36px;
     font-style: normal;
     font-weight: 500;
@@ -3154,6 +3219,6 @@
   }
   @media (min-width: 992px) {
     .rbccm-maas-mata .rbccm-maas-mata__platforms-heading {
-      margin: 50px 0 60px !important;
+      margin: 60px 0 60px !important;
     }
   }
