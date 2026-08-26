@@ -974,7 +974,9 @@
     .rbccm-maas-mata__platforms-grid {
       flex-direction: row;
       justify-content: center;
-      align-items: flex-start;
+      /* stretch so both cards match the tallest of the pair — keeps
+         them level even when one has more bullets than the other. */
+      align-items: stretch;
     }
   }
   /* Platform card — Figma: 425 fixed, flex-column, padding 40 30,
@@ -2097,18 +2099,26 @@
     margin: 0;
     width: 100%;
     max-width: 100%;
-    /* Mobile: allow the highlight span to wrap to its own line
-       so 50px "expert." doesn't push past the viewport (it was
-       causing horizontal overflow on the whole page). Tablet+
-       has room to keep both parts on one line. */
+    /* Wrap on regular whitespace, and break inside a single long
+       unbroken string (e.g. someone pastes "supercalifragilistic…"
+       into the highlight span) instead of overflowing the section.
+       Applies at every breakpoint — desktop no longer forces
+       nowrap. */
     white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
   @media (min-width: 992px) {
     .rbccm-maas-mata__demo-heading {
       font-size: 75px;
       line-height: 110%;   /* 82.5px */
-      white-space: nowrap;
     }
+  }
+  /* If the highlight span itself is one big unbroken word, allow
+     mid-word breaking so it never blows out the container. */
+  .rbccm-maas-mata__demo-heading-highlight {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .rbccm-maas-mata__demo-heading-highlight { color: #FFC72C; font-style: normal; }
   /* Body — Figma description/desktop: Roboto 16/24 wt 400, white,

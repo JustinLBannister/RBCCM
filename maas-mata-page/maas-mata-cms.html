@@ -137,6 +137,156 @@
   .group-title { font-size: 12px; font-weight: 600; color: var(--grey-800); margin-bottom: 8px; }
 
   .array { margin-bottom: 12px; }
+  /* Item-count badge for repeaters with min/max limits. Colour tracks
+     status: green = in range, amber = below minimum, red = at cap. */
+  .array-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 4px 0 10px;
+    border: 1px solid transparent;
+  }
+  .array-badge--ok   { background: #E7F5EA; color: #1F5E2A; border-color: #C4E5CB; }
+  .array-badge--warn { background: #FFF4E5; color: #7A4B00; border-color: #F5D9A6; }
+  .array-badge--cap  { background: #FDECEC; color: #8A1F1F; border-color: #F3C4C4; }
+
+  /* ------------------------------------------------------------
+     ARTICLE PICKER — modal that pulls the insights RSS feeds
+     (same feeds article-visualizer.html uses) so marketing can
+     pick a live article instead of typing title / body / image
+     by hand. Only appears on the Insights section.
+     ------------------------------------------------------------ */
+  .picker-btn {
+    background: var(--navy);
+    color: #fff;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .picker-btn:hover { background: var(--navy-dark); }
+  .picker-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 33, 68, 0.55);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .picker-modal.open { display: flex; }
+  .picker-modal-dialog {
+    background: #fff;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 33, 68, 0.28);
+  }
+  .picker-modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--grey-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .picker-modal-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .picker-modal-close {
+    background: transparent;
+    border: 0;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--grey-600);
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .picker-modal-toolbar {
+    padding: 12px 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .picker-modal-toolbar input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--grey-300);
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 200px;
+  }
+  .picker-modal-toolbar select {
+    padding: 6px 10px;
+    border: 1px solid var(--grey-300);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .picker-modal-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+  .picker-article {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--grey-100);
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .picker-article:hover { background: #F8FAFB; }
+  .picker-article-thumb {
+    width: 72px;
+    height: 48px;
+    background: var(--grey-200);
+    background-size: cover;
+    background-position: center;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .picker-article-body { flex: 1; min-width: 0; }
+  .picker-article-meta {
+    font-size: 11px;
+    color: var(--grey-600);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .picker-article-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+    margin: 0 0 4px;
+    line-height: 1.35;
+  }
+  .picker-article-desc {
+    font-size: 12px;
+    color: var(--grey-700);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .picker-status {
+    padding: 24px;
+    text-align: center;
+    color: var(--grey-600);
+    font-size: 13px;
+  }
   .array-item {
     border: 1px solid var(--grey-200); border-radius: 4px;
     padding: 12px; margin-bottom: 8px; background: #fdfdfd; position: relative;
@@ -291,6 +441,31 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Article picker modal — opens when marketing clicks "Pick article
+     from feed" on an Insights item. Hidden by default (display: none
+     via .picker-modal without .open). Same feeds used by
+     article-visualizer.html (2024 / 2025 / 2026 insights XML). -->
+<div class="picker-modal" id="article-picker">
+  <div class="picker-modal-dialog">
+    <div class="picker-modal-head">
+      <span class="picker-modal-title">Pick an insights article</span>
+      <button type="button" class="picker-modal-close" data-picker-action="close" aria-label="Close">×</button>
+    </div>
+    <div class="picker-modal-toolbar">
+      <input type="search" id="picker-search" placeholder="Search title or description…">
+      <select id="picker-year">
+        <option value="all">All years</option>
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+      </select>
+    </div>
+    <div class="picker-modal-list" id="picker-list">
+      <div class="picker-status">Loading articles…</div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   'use strict';
@@ -309,7 +484,7 @@
   // thoughtLeadership → marketInsights so exported JSON keys match
   // the data-json paths the XSL emits. Bump forces reset for any
   // drafts saved under the old key names.
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4e';
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4f';
 
   // ==============================================================
   // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
@@ -335,7 +510,10 @@
       // Brightcove video modal overlay. The chart data fields below
       // (labels/quotes/quality) still exist for the v3 legacy block
       // that's kept hidden in markup, but editors don't need to
-      // touch them anymore. Only the video sub-object matters for v4.
+      // touch them anymore. Only the poster + video sub-objects
+      // matter for v4.
+      posterImage: "https://www.rbccm.com/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png",
+      posterAlt: "MAAS Execution Console — cross-asset portfolio chart with live quote strip.",
       leftLabel: "MAAS · Execution Console",
       rightLabel: "MATA · Analytics",
       leftHeadline: "Portfolio · Cross-Asset",
@@ -507,12 +685,8 @@
       headlineHighlight: "expert",
       body: "Connect with our product teams to arrange a custom demo.",
       cta: { label: "Request a demo", href: "#demo" }
-    },
-    newsletter: {
-      heading: "Stay informed",
-      body: "Get the latest updates and insights from RBC Capital Markets delivered to your inbox.",
-      marketoFormId: ""
     }
+    // Newsletter removed — handled by the shared Marketo component.
   };
 
   // ==============================================================
@@ -522,11 +696,13 @@
     hero: {
       label: 'Hero',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero (v4: "Multi-Asset Agency Solutions")' },
-        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline (v4: "Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
-        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline (v4: "RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
-        primaryCta: { type: 'cta', label: 'Primary CTA', figmaRef: 'The blue "Request demo" button' },
-        secondaryCta: { type: 'cta', label: 'Secondary CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 used this for the "Watch the video" text link but v4 has a single Request demo CTA only.' }
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero ("Multi-Asset Agency Solutions")' },
+        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline ("Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
+        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline ("RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
+        primaryCta: { type: 'cta', label: 'Primary CTA', figmaRef: 'The blue "Request demo" button' }
+        // secondaryCta intentionally omitted — the hero only has
+        // one CTA. Keeping the SAMPLE key for backward compatibility
+        // but not exposing it in the CMS UI.
       }
     },
     chartCard: {
@@ -536,6 +712,14 @@
       // editors only need to fill in the video sub-object.
       label: 'Chart / Video',
       fields: {
+        posterImage: {
+          type: 'text', label: 'Poster image URL',
+          figmaRef: 'The still image shown behind the play button — the dashboard screenshot. Full URL or an /assets/... path. Default is the current MAAS Execution Console reveal PNG.'
+        },
+        posterAlt: {
+          type: 'text', label: 'Poster image alt text',
+          figmaRef: 'Screen-reader description of the poster image (accessibility). Example: "MAAS Execution Console — cross-asset portfolio chart with live quote strip."'
+        },
         video: {
           type: 'object', label: 'Video (Brightcove)',
           figmaRef: 'The video that plays when the user clicks the play button on the chart screenshot. Brightcove Account ID + Video ID are the two you MUST fill in — Player ID defaults to "default".',
@@ -546,13 +730,13 @@
             videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The video ID from Brightcove Studio (long numeric string, e.g. "6371076976112").' }
           }
         },
-        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
-        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.' },
+        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
         quotes: {
           type: 'array', label: 'Legacy: Quotes (right column)',
-          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
+          figmaRef: 'static screenshot ignores this. Kept for legacy chart block.',
           itemLabelKey: 'label',
           defaultItem: { label: '', value: '', delta: '', positive: true },
           itemFields: {
@@ -564,7 +748,7 @@
         },
         quality: {
           type: 'object', label: 'Legacy: Execution quality box',
-          figmaRef: 'v4 static screenshot ignores this. Kept for legacy chart block.',
+          figmaRef: 'static screenshot ignores this. Kept for legacy chart block.',
           fields: {
             label: { type: 'text', label: 'Label', figmaRef: 'Legacy label field.' },
             score: { type: 'text', label: 'Score', figmaRef: 'Legacy score field.' },
@@ -576,12 +760,12 @@
     newStandard: {
       label: 'A New Standard',
       fields: {
-        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey (v4: "A new standard for").' },
-        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent (v4: "multi-asset ").' },
-        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup (v4: "trading").' },
+        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey ("A new standard for").' },
+        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent ("multi-asset ").' },
+        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup ("trading").' },
         body: {
           type: 'stringArray', label: 'Body paragraphs',
-          figmaRef: 'Each row is a separate paragraph under the heading. v4 uses 3 paragraphs; add or remove rows as needed.'
+          figmaRef: 'Each row is a separate paragraph under the heading.'
         },
         cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "See MAAS in action" button below the body copy.' }
       }
@@ -589,16 +773,17 @@
     awards: {
       label: 'Awards',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges (v4: "See why the world\'s top institutions choose MAAS")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges ("See why the world\'s top institutions choose MAAS")' },
         items: {
           type: 'array', label: 'Award badges',
-          figmaRef: 'v4: 3 award cards (was 4 in v3). Each has a year pill, a title, and an issuer.',
+          figmaRef: '3 award cards (was 4 in ). Each has a year pill, a title, and an issuer.',
           itemLabelKey: 'title',
+          min: 3, max: 3,
           defaultItem: { year: '', title: '', issuer: '' },
           itemFields: {
-            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card (v4 examples: "2026" / "2025")' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text (v4 examples: "Best Trading Analytics Platform", "Overall Best Provider, Algorithmic Trading", "Best Provider, Multi-User Clients")' },
-            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title (v4: "TradingTech Insights Awards USA" / "The Trade")' }
+            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text' },
+            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title ("TradingTech Insights Awards USA" / "The Trade")' }
           }
         }
       }
@@ -606,25 +791,26 @@
     platforms: {
       label: 'Platforms (MAAS / MATA cards)',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading (v4: "Two platforms, one unified ecosystem.")' },
-        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline (v4: "Better insight for stronger execution")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading ("Two platforms, one unified ecosystem.")' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline ("Better insight for stronger execution")' },
         cards: {
           type: 'array', label: 'Cards',
-          figmaRef: 'The two large side-by-side platform cards. v4 order: MATA (navy/dark) on the left, MAAS (white/light) on the right. Each has 5-6 bullets.',
+          figmaRef: 'The two large side-by-side platform cards. Each has 5-6 bullets.',
           itemLabelKey: 'title',
+          min: 2, max: 2,
           defaultItem: { theme: 'dark', eyebrow: '', title: '', acronym: '', body: '', bullets: [], cta: { label: '', href: '' } },
           itemFields: {
             theme: {
               type: 'select', label: 'Theme',
-              figmaRef: 'v4: Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
+              figmaRef: 'Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
               options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ]
             },
-            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase label at the top of the card (v4: "MATA – Analytics" / "MAAS - Execution")' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Card headline (v4: "Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
-            acronym: { type: 'text', label: 'Acronym (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 showed spaced "MAAS"/"MATA" under the title but v4 dropped it in favour of the new title/body treatment.' },
-            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card (v4: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
-            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: 'v4: 5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. v4 examples: MATA — "Quantify expected execution costs before commitment", "Compare strategies side by side to evaluate potential outcomes", etc. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
-            cta: { type: 'cta', label: 'CTA (v4 unused)', figmaRef: 'v4 REMOVED — leave blank. v3 had "Explore MAAS/MATA →" links but v4 platform cards have no CTA.' }
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase label at the top of the card ("MATA – Analytics" / "MAAS - Execution")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card headline ("Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
+            acronym: { type: 'text', label: 'Acronym', figmaRef: 'leave blank.' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card ("Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
+            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: '5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'leave blank.' }
           }
         }
       }
@@ -632,16 +818,17 @@
     innovationEra: {
       label: 'Innovation Era',
       fields: {
-        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band (v4: "Innovation for the next execution era")' },
-        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading (v4: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band ("Innovation for the next execution era")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading ("Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
         features: {
           type: 'array', label: 'Features',
-          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03). v4 titles: "Model with depth", "Connect with ease", "Optimize with experts".',
+          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03).',
           itemLabelKey: 'title',
+          min: 3, max: 3,
           defaultItem: { number: '', title: '', body: '' },
           itemFields: {
             number: { type: 'text', label: 'Number', figmaRef: 'The "/01", "/02", "/03" number label in yellow' },
-            title: { type: 'text', label: 'Title', figmaRef: 'Feature title (v4 examples: "Model with depth" / "Connect with ease" / "Optimize with experts")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Feature title' },
             body: { type: 'textarea', label: 'Body', figmaRef: 'Short description under the title' }
           }
         }
@@ -649,7 +836,7 @@
     },
     whyRbc: {
       hidden: true,
-      label: 'Why RBC (v4 REMOVED - legacy)',
+      label: 'Why RBC',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("OUR NUMBERS")' },
         heading: { type: 'text', label: 'Heading', figmaRef: 'The big serif heading ("Why RBC Capital Markets")' },
@@ -669,7 +856,7 @@
     },
     assetCoverage: {
       hidden: true,
-      label: 'Asset Coverage (v4 REMOVED - replaced by MATA Capabilities)',
+      label: 'Asset Coverage',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("ASSET COVERAGE")' },
         heading: { type: 'text', label: 'Heading', figmaRef: 'Big white section heading ("Connected across the desk")' },
@@ -700,19 +887,22 @@
     marketInsights: {
       label: 'Market Insights',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading (v4: "Trends Shaping Institutional Trading").' },
-        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading (v4: "Market insights"). v3 called this section "Thought leadership".' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow uppercase caption above the section heading ("Trends Shaping Institutional Trading").' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading ("Market insights").' },
         items: {
           type: 'array', label: 'Insight cards',
-          figmaRef: 'v4: 3-card Slick-style carousel (was a single featured card in v3). Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
+          figmaRef: '3-card Slick-style carousel (was a single featured card in ). Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
           itemLabelKey: 'title',
-          defaultItem: { eyebrow: 'Insights', title: '', body: '', cta: { label: '', href: '' }, image: './insights-featured-story.jpg' },
+          min: 3, max: 9,
+          pickerType: 'article',
+          defaultItem: { eyebrow: 'Insights', title: '', body: '', cta: { label: '', href: '' }, image: './insights-featured-story.jpg', imageAlt: '' },
           itemFields: {
-            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card (v4: "Insights"). v3 said "Insights · Featured story" — v4 simplified.' },
-            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card (v4 lorem placeholder: "Lorem ipsum dolor sit amet consectetur adipiscing elit")' },
-            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph (v4 lorem placeholder)' },
-            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom (v4: "2 min read"). Label is what shows; href goes to the article.' },
-            image: { type: 'text', label: 'Illustration image URL', figmaRef: 'Path to the right-side illustration image. Default: ./insights-featured-story.jpg' }
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card ("Insights").' },
+            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom ("2 min read"). Label is what shows; href goes to the article.' },
+            image: { type: 'text', label: 'Illustration image URL', figmaRef: 'Path to the right-side illustration image.' },
+            imageAlt: { type: 'text', label: 'Illustration alt text', figmaRef: 'Accessibility description of the image. Screen readers read this aloud. Defaults to the article title when picked from the feed.' }
           }
         }
       }
@@ -720,24 +910,17 @@
     demoCta: {
       label: 'Demo CTA',
       fields: {
-        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption (v4: "See the platform")' },
-        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline (v4: "Talk with an " — note trailing space)' },
-        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline (v4: "expert" — period is added by markup)' },
-        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline (v4: "Connect with our product teams to arrange a custom demo.")' },
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption ("See the platform")' },
+        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline ("Talk with an " — note trailing space)' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline ("expert" — period is added by markup)' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline ("Connect with our product teams to arrange a custom demo.")' },
         cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "Request a demo →" button' }
       }
     },
-    newsletter: {
-      label: 'Newsletter',
-      fields: {
-        heading: { type: 'text', label: 'Heading', figmaRef: 'The section heading ("Stay informed")' },
-        body: { type: 'textarea', label: 'Body', figmaRef: 'The one-line paragraph under Stay informed' },
-        marketoFormId: {
-          type: 'text', label: 'Marketo form ID',
-          figmaRef: 'The Marketo form ID that gets embedded. Form fields (first name, email, consent, etc.) come from Marketo — they are NOT editable here.'
-        }
-      }
-    }
+    // Newsletter section removed — the site's shared Marketo signup
+    // component is dropped onto the page separately, so nothing to
+    // edit here. If we ever bring the newsletter back in-component,
+    // restore this block from git.
   };
 
   // ==============================================================
@@ -885,6 +1068,15 @@
     }
     if (def.type === 'array') {
       var arr2 = Array.isArray(val) ? val : [];
+      // Layout limits from the schema. min defaults to 0, max to
+      // Infinity if not set. When min === max the section is locked
+      // (Add and Delete are hidden entirely). Otherwise Add disables
+      // at max, Delete disables at min.
+      var min = typeof def.min === 'number' ? def.min : 0;
+      var max = typeof def.max === 'number' ? def.max : Infinity;
+      var atMax = arr2.length >= max;
+      var atMin = arr2.length <= min;
+      var locked = (min === max);
       var itemsHtml2 = arr2.map(function (item, i) {
         var itemPath = path + '.' + i;
         var itemLabel = def.itemLabelKey && item[def.itemLabelKey] ? item[def.itemLabelKey] : ('Item ' + (i + 1));
@@ -892,24 +1084,61 @@
         Object.keys(def.itemFields).forEach(function (k) {
           itemInner += renderField(k, def.itemFields[k], itemPath);
         });
+        var deleteBtn = locked
+          ? ''
+          : '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (atMin ? ' disabled title="Minimum reached — cannot delete"' : '') + '>Delete</button>';
+        // "Pick from feed" button — only rendered when the schema
+        // opts in via pickerType. Clicking opens the article picker
+        // modal; on select, the modal populates this item's fields.
+        var pickerBtn = def.pickerType === 'article'
+          ? '<button type="button" class="picker-btn" data-picker-action="open" data-picker-target="' + esc(path + '.' + i) + '">Pick article from feed</button>'
+          : '';
         return '<div class="array-item">'
           + '<div class="array-item-header">'
           +   '<span class="array-item-title">' + esc(itemLabel) + '</span>'
           +   '<div class="array-item-actions">'
           +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
           +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr2.length - 1 ? ' disabled' : '') + '>↓</button>'
-          +     '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '">Delete</button>'
+          +     deleteBtn
           +   '</div>'
           + '</div>'
+          + pickerBtn
           + itemInner
           + '</div>';
       }).join('');
       var defaultJson = JSON.stringify(def.defaultItem).replace(/'/g, "&#39;");
+
+      // Count badge + human-readable status. Colors: green when in
+      // range, amber when below min, red when at hard cap.
+      var badge = '';
+      if (max !== Infinity || min > 0) {
+        var status, cls;
+        if (locked) {
+          status = arr2.length + ' of ' + max + ' items — layout locked (this section requires exactly ' + max + ')';
+          cls = arr2.length === max ? 'array-badge--ok' : 'array-badge--warn';
+        } else if (arr2.length < min) {
+          status = arr2.length + ' of ' + max + ' items — need at least ' + min + ' for this section to display';
+          cls = 'array-badge--warn';
+        } else if (arr2.length >= max) {
+          status = arr2.length + ' of ' + max + ' items — maximum reached';
+          cls = 'array-badge--cap';
+        } else {
+          status = arr2.length + ' of ' + max + ' items (' + min + '–' + max + ' allowed)';
+          cls = 'array-badge--ok';
+        }
+        badge = '<div class="array-badge ' + cls + '">' + esc(status) + '</div>';
+      }
+
+      var addBtn = locked
+        ? ''
+        : '<button class="ghost small array-add" data-array-action="add-obj" data-array-path="' + esc(path) + '" data-default=\'' + defaultJson + '\'' + (atMax ? ' disabled title="Maximum reached"' : '') + '>+ Add item</button>';
+
       return '<div class="field">'
         + '<label class="field-label">' + esc(def.label) + '</label>'
         + figmaChip(def.figmaRef)
+        + badge
         + '<div class="array">' + itemsHtml2 + '</div>'
-        + '<button class="ghost small array-add" data-array-action="add-obj" data-array-path="' + esc(path) + '" data-default=\'' + defaultJson + '\'>+ Add item</button>'
+        + addBtn
         + '</div>';
     }
     return '';
@@ -1011,23 +1240,251 @@
     var arr = getPath(state, arrPath);
     if (!Array.isArray(arr) && (action !== 'add-string' && action !== 'add-obj')) return;
 
+    // Look up the field's min/max limits from the SCHEMA (so
+    // programmatic add/delete respects the same rules the UI
+    // enforces via disabled buttons). We walk the schema by the
+    // dotted path; only array fields will have min/max set.
+    function schemaAt(pathStr) {
+      var parts = String(pathStr).split('.');
+      var node = SCHEMA[parts[0]];
+      if (!node) return null;
+      var fields = node.fields || {};
+      for (var i = 1; i < parts.length; i++) {
+        var seg = parts[i];
+        if (/^\d+$/.test(seg)) { node = node && node.itemFields ? { fields: node.itemFields } : null; continue; }
+        node = fields[seg];
+        if (!node) return null;
+        fields = node.fields || node.itemFields || {};
+      }
+      return node;
+    }
+    var limits = schemaAt(arrPath) || {};
+    var min = typeof limits.min === 'number' ? limits.min : 0;
+    var max = typeof limits.max === 'number' ? limits.max : Infinity;
+
     if (action === 'up' && idx > 0) {
       var t = arr[idx - 1]; arr[idx - 1] = arr[idx]; arr[idx] = t;
     } else if (action === 'down' && idx < arr.length - 1) {
       var t2 = arr[idx + 1]; arr[idx + 1] = arr[idx]; arr[idx] = t2;
     } else if (action === 'delete') {
+      if (Array.isArray(arr) && arr.length <= min) {
+        toast('This section requires at least ' + min + ' item' + (min === 1 ? '' : 's') + '.', true);
+        return;
+      }
       arr.splice(idx, 1);
     } else if (action === 'add-string') {
       if (!Array.isArray(arr)) setPath(state, arrPath, []);
-      getPath(state, arrPath).push('');
+      var cur1 = getPath(state, arrPath);
+      if (cur1.length >= max) {
+        toast('Maximum of ' + max + ' items reached.', true);
+        return;
+      }
+      cur1.push('');
     } else if (action === 'add-obj') {
       var def = JSON.parse(btn.getAttribute('data-default'));
       if (!Array.isArray(arr)) setPath(state, arrPath, []);
-      getPath(state, arrPath).push(deepClone(def));
+      var cur2 = getPath(state, arrPath);
+      if (cur2.length >= max) {
+        toast('Maximum of ' + max + ' items reached.', true);
+        return;
+      }
+      cur2.push(deepClone(def));
     }
 
     save();
     renderSection(currentSection);
+  });
+
+  // ==============================================================
+  // ARTICLE PICKER
+  //
+  // Small feed-picker module for the Insights section. Mirrors the
+  // approach in /assets/rbccm/js/components/data/article-visualizer.html:
+  // fetch the 2024–2026 insights XML feeds (same-origin when deployed
+  // to rbccm.com), parse <news> nodes, show a searchable list, and
+  // populate the currently-active Insights item on click.
+  //
+  // When the CMS is opened from file:// or from a different origin
+  // the fetch will fail — we surface a status message pointing to
+  // the deployed URL. On rbccm.com it "just works" because feeds are
+  // same-origin.
+  // ==============================================================
+  var picker = {
+    articles: null,   // cached across opens
+    loading: false,
+    target: null,     // dotted path of the item currently being edited
+    modal: document.getElementById('article-picker'),
+    listEl: document.getElementById('picker-list'),
+    searchEl: document.getElementById('picker-search'),
+    yearEl: document.getElementById('picker-year')
+  };
+
+  function pickerFetchFeeds() {
+    if (picker.articles) return Promise.resolve(picker.articles);
+    if (picker.loading) return picker.loading;
+    var years = [2024, 2025, 2026];
+    picker.loading = Promise.all(years.map(function (y) {
+      // Try same-origin first, then absolute rbccm.com URL as fallback.
+      var sameOrigin = '/en/insights/data/' + y + '-insights';
+      var absolute = 'https://www.rbccm.com/en/insights/data/' + y + '-insights';
+      function tryUrl(url) {
+        return fetch(url).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        });
+      }
+      return tryUrl(sameOrigin)
+        .catch(function () { return tryUrl(absolute); })
+        .then(function (xml) { return { year: y, xml: xml }; })
+        .catch(function () { return { year: y, xml: '' }; });
+    })).then(function (feeds) {
+      var out = [];
+      feeds.forEach(function (f) {
+        pickerParseNews(f.xml, f.year).forEach(function (a) { out.push(a); });
+      });
+      out.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+      picker.articles = out;
+      picker.loading = null;
+      return out;
+    });
+    return picker.loading;
+  }
+
+  function pickerParseNews(xmlStr, feedYear) {
+    if (!xmlStr) return [];
+    var doc;
+    try {
+      // Strip stray & that aren't already part of an entity — RBC feeds
+      // occasionally emit unescaped ampersands in titles.
+      var cleaned = xmlStr.replace(/&(?![a-z]+;|#\d+;|#x[0-9a-f]+;)/gi, '&amp;');
+      doc = new DOMParser().parseFromString(cleaned, 'application/xml');
+    } catch (e) { return []; }
+    if (!doc || doc.getElementsByTagName('parsererror').length > 0) return [];
+    function child(node, name) {
+      var el = node.getElementsByTagName(name)[0];
+      return el ? (el.textContent || '').trim() : '';
+    }
+    return Array.prototype.slice.call(doc.getElementsByTagName('news')).map(function (n) {
+      var dateStr = child(n, 'date');
+      var ts = dateStr ? Date.parse(dateStr) : 0;
+      if (isNaN(ts)) ts = 0;
+      var readtime = child(n, 'readtime') || child(n, 'watchtime') || '';
+      return {
+        title: child(n, 'title'),
+        desc: child(n, 'description'),
+        link: child(n, 'link'),
+        image: child(n, 'thumbnail') || child(n, 'image') || '',
+        date: dateStr,
+        ts: ts,
+        year: feedYear,
+        readtime: readtime
+      };
+    });
+  }
+
+  function pickerRenderList(filter, yearFilter) {
+    if (!picker.articles) return;
+    var q = (filter || '').trim().toLowerCase();
+    var y = yearFilter === 'all' ? null : parseInt(yearFilter, 10);
+    var list = picker.articles.filter(function (a) {
+      if (y && a.year !== y) return false;
+      if (!q) return true;
+      return (a.title + ' ' + a.desc).toLowerCase().indexOf(q) !== -1;
+    });
+    if (!list.length) {
+      picker.listEl.innerHTML = '<div class="picker-status">No matching articles.</div>';
+      return;
+    }
+    picker.listEl.innerHTML = list.map(function (a, i) {
+      var thumbStyle = a.image ? ' style="background-image:url(' + a.image.replace(/"/g, '&quot;') + ')"' : '';
+      var date = a.date ? a.date.slice(0, 10) : '';
+      return '<div class="picker-article" data-picker-action="pick" data-picker-i="' + i + '">'
+        + '<div class="picker-article-thumb"' + thumbStyle + '></div>'
+        + '<div class="picker-article-body">'
+        +   '<div class="picker-article-meta">' + esc((a.year || '') + (date ? ' · ' + date : '') + (a.readtime ? ' · ' + a.readtime + ' min' : '')) + '</div>'
+        +   '<h4 class="picker-article-title">' + esc(a.title) + '</h4>'
+        +   '<p class="picker-article-desc">' + esc(a.desc) + '</p>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    // Cache the filtered list on the container so click handler can
+    // look up the exact article by index without re-filtering.
+    picker.listEl._filtered = list;
+  }
+
+  function pickerOpen(itemPath) {
+    picker.target = itemPath;
+    picker.modal.classList.add('open');
+    picker.searchEl.value = '';
+    picker.yearEl.value = 'all';
+    picker.listEl.innerHTML = '<div class="picker-status">Loading articles from feeds…</div>';
+    pickerFetchFeeds().then(function (articles) {
+      if (!articles.length) {
+        picker.listEl.innerHTML = '<div class="picker-status">No articles loaded. If you are opening the CMS locally (file://), open it via the RBCCM URL instead — the feeds are only reachable from rbccm.com.</div>';
+        return;
+      }
+      pickerRenderList('', 'all');
+    }).catch(function () {
+      picker.listEl.innerHTML = '<div class="picker-status">Feed fetch failed. Open the CMS from rbccm.com so the article feeds are reachable.</div>';
+    });
+  }
+
+  function pickerClose() {
+    picker.modal.classList.remove('open');
+    picker.target = null;
+  }
+
+  function pickerPick(article) {
+    if (!picker.target || !article) { pickerClose(); return; }
+    var item = getPath(state, picker.target);
+    if (!item) { pickerClose(); return; }
+    // Populate every card-visible field the feed gives us:
+    //   title, body, CTA (label + href), image, image alt.
+    // Eyebrow stays as "Insights" (the card's default eyebrow) so
+    // it doesn't clobber the branded pill above the title.
+    item.title = article.title || '';
+    item.body = article.desc || '';
+    item.cta = item.cta || {};
+    item.cta.href = article.link || '';
+    item.cta.label = article.readtime ? (article.readtime + ' min read') : (item.cta.label || 'Read more');
+    if (article.image) item.image = article.image;
+    // Screen-reader alt text — default to the article title, which
+    // reads better than "Featured insight illustration" for real
+    // stories. Marketing can override in the CMS if needed.
+    item.imageAlt = article.title || item.imageAlt || '';
+    save();
+    renderSection(currentSection);
+    pickerClose();
+    toast('Article loaded into ' + picker.target);
+  }
+
+  // Delegated click handlers for picker open/close/pick.
+  document.addEventListener('click', function (e) {
+    var openBtn = e.target.closest('[data-picker-action="open"]');
+    if (openBtn) { e.preventDefault(); pickerOpen(openBtn.getAttribute('data-picker-target')); return; }
+    var closeBtn = e.target.closest('[data-picker-action="close"]');
+    if (closeBtn) { pickerClose(); return; }
+    var pickRow = e.target.closest('[data-picker-action="pick"]');
+    if (pickRow) {
+      var idx = parseInt(pickRow.getAttribute('data-picker-i'), 10);
+      var list = picker.listEl._filtered || [];
+      pickerPick(list[idx]);
+    }
+  });
+
+  // Click backdrop to close.
+  picker.modal.addEventListener('click', function (e) {
+    if (e.target === picker.modal) pickerClose();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && picker.modal.classList.contains('open')) pickerClose();
+  });
+
+  picker.searchEl.addEventListener('input', function () {
+    pickerRenderList(picker.searchEl.value, picker.yearEl.value);
+  });
+  picker.yearEl.addEventListener('change', function () {
+    pickerRenderList(picker.searchEl.value, picker.yearEl.value);
   });
 
   document.getElementById('btn-copy').addEventListener('click', function () {

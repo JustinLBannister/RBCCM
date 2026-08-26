@@ -285,7 +285,10 @@
 
       <!-- ═══ 2. CHART CARD ═══════════════════════════════════ -->
       <div class="rbccm-maas-mata__chart rbccm-maas-mata__chart-image" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600">
-        <img class="rbccm-maas-mata__chart-image-poster">
+        <!-- Poster image: XSL fills src/alt from Datums on the live
+             page; data-json-attr-* lets ?preview=draft rebind from
+             chartCard.posterImage / .posterAlt in the CMS JSON. -->
+        <img class="rbccm-maas-mata__chart-image-poster" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
           <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>
