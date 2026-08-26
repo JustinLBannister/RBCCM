@@ -152,6 +152,17 @@
   .array-badge--warn { background: #FFF4E5; color: #7A4B00; border-color: #F5D9A6; }
   .array-badge--cap  { background: #FDECEC; color: #8A1F1F; border-color: #F3C4C4; }
 
+  /* Character counter under text inputs with a maxLength cap. Turns
+     amber when the user is within 2 chars of the limit so they know
+     they're about to be blocked. */
+  .char-count {
+    font-size: 11px;
+    color: var(--grey-600);
+    margin-top: 4px;
+    text-align: right;
+  }
+  .char-count--near-cap { color: #8A1F1F; font-weight: 500; }
+
   /* ------------------------------------------------------------
      ARTICLE PICKER — modal that pulls the insights RSS feeds
      (same feeds article-visualizer.html uses) so marketing can
@@ -911,8 +922,8 @@
       label: 'Demo CTA',
       fields: {
         eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption ("See the platform")' },
-        headlinePrefix: { type: 'text', label: 'Headline (normal text)', figmaRef: 'The regular-color part of the big headline ("Talk with an " — note trailing space)' },
-        headlineHighlight: { type: 'text', label: 'Highlighted word', figmaRef: 'The yellow italic word at the end of the headline ("expert" — period is added by markup)' },
+        headlinePrefix: { type: 'text', label: 'Headline (normal text)', maxLength: 25, figmaRef: 'The regular-color part of the big headline ("Talk with an " — note trailing space). Kept short so the heading fits on one line at desktop.' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word', maxLength: 20, figmaRef: 'The yellow word at the end of the headline ("expert" — period is added by markup). Kept short so the heading fits on one line at desktop.' },
         body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline ("Connect with our product teams to arrange a custom demo.")' },
         cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "Request a demo →" button' }
       }
@@ -989,14 +1000,25 @@
     if (def.hidden || (typeof def.label === 'string' && /^\s*Legacy:/i.test(def.label))) return '';
 
     if (def.type === 'text' || def.type === 'url') {
-      return fieldWrap(def.label, def.figmaRef,
-        '<input type="text" data-path="' + esc(path) + '" value="' + esc(val || '') + '">',
-        def.hint);
+      // Optional maxLength cap. When set: input enforces via native
+      // maxlength attribute AND a small live counter appears below
+      // so marketing can see "18 / 25 characters" as they type.
+      var textMax = typeof def.maxLength === 'number' ? def.maxLength : null;
+      var textAttrs = 'data-path="' + esc(path) + '" value="' + esc(val || '') + '"' + (textMax ? ' maxlength="' + textMax + '"' : '');
+      var textInput = '<input type="text" ' + textAttrs + '>';
+      if (textMax) {
+        textInput += '<div class="char-count" data-count-for="' + esc(path) + '">' + (val || '').length + ' / ' + textMax + ' characters</div>';
+      }
+      return fieldWrap(def.label, def.figmaRef, textInput, def.hint);
     }
     if (def.type === 'textarea') {
-      return fieldWrap(def.label, def.figmaRef,
-        '<textarea data-path="' + esc(path) + '">' + esc(val || '') + '</textarea>',
-        def.hint);
+      var taMax = typeof def.maxLength === 'number' ? def.maxLength : null;
+      var taAttrs = 'data-path="' + esc(path) + '"' + (taMax ? ' maxlength="' + taMax + '"' : '');
+      var taInput = '<textarea ' + taAttrs + '>' + esc(val || '') + '</textarea>';
+      if (taMax) {
+        taInput += '<div class="char-count" data-count-for="' + esc(path) + '">' + (val || '').length + ' / ' + taMax + ' characters</div>';
+      }
+      return fieldWrap(def.label, def.figmaRef, taInput, def.hint);
     }
     if (def.type === 'checkbox') {
       return '<div class="field">'
@@ -1219,6 +1241,17 @@
     if (!path) return;
     var val = el.type === 'checkbox' ? el.checked : el.value;
     setPath(state, path, val);
+    // Live-update the "N / max characters" counter if this input has
+    // a max attached.
+    var max = el.getAttribute('maxlength');
+    if (max) {
+      var counter = document.querySelector('.char-count[data-count-for="' + path.replace(/"/g, '\\"') + '"]');
+      if (counter) {
+        var len = (val || '').length;
+        counter.textContent = len + ' / ' + max + ' characters';
+        counter.classList.toggle('char-count--near-cap', len >= max - 2);
+      }
+    }
     save();
   });
   document.getElementById('form-pane').addEventListener('change', function (e) {
