@@ -66,9 +66,12 @@
        Id hides the play button. -->
   <Datum ID="ChartImage" Type="String" Name="Chart image URL (upload to /assets/rbccm/images/... then paste the path here)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
   <Datum ID="ChartImageAlt" Type="String" Name="Chart image alt text">MAAS Execution Console — cross-asset portfolio chart with +$15,500.90 delta and live quote strip.</Datum>
-  <Datum ID="ChartBrightcoveAccount" Type="String" Name="Brightcove account ID"/>
-  <Datum ID="ChartBrightcovePlayer" Type="String" Name="Brightcove player ID">default</Datum>
-  <Datum ID="ChartBrightcoveVideoId" Type="String" Name="Brightcove video ID (blank hides play button)"/>
+  <!-- Brightcove account + player are RBC-wide constants — same on
+       every video hosted on the site. Only the Video ID changes when
+       a new video ships. -->
+  <Datum ID="ChartBrightcoveAccount" Type="String" Name="Brightcove account ID (RBC-wide constant — do not change)">6021289101001</Datum>
+  <Datum ID="ChartBrightcovePlayer"  Type="String" Name="Brightcove player ID (RBC-wide constant — do not change)">VyvCc9BZx</Datum>
+  <Datum ID="ChartBrightcoveVideoId" Type="String" Name="Brightcove video ID (this is the one that changes per video; blank falls back to the FPO clip)">6385114247112</Datum>
 
 
   <!-- ═══ 3. NEW STANDARD ═════════════════════════════════════

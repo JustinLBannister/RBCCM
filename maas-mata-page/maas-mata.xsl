@@ -36,6 +36,30 @@
   <xsl:variable name="CHART_BC_VIDEO"      select="normalize-space(/Properties/Datum[@ID='ChartBrightcoveVideoId'])" />
   <xsl:variable name="CHART_HAS_VIDEO"     select="$CHART_BC_VIDEO != ''" />
 
+  <!-- Video modal iframe URL. Built from the three Brightcove Datums
+       when they're all set. Falls back to the FPO Brightcove video
+       so the modal always has something to play while marketing
+       lines up the real one. Account and Player IDs are hidden in
+       the CMS — only the Video ID is editable there. -->
+  <xsl:variable name="BC_IFRAME_SRC">
+    <xsl:choose>
+      <xsl:when test="$CHART_BC_VIDEO != '' and $CHART_BC_ACCOUNT != ''">
+        <xsl:text>https://players.brightcove.net/</xsl:text>
+        <xsl:value-of select="$CHART_BC_ACCOUNT" />
+        <xsl:text>/</xsl:text>
+        <xsl:choose>
+          <xsl:when test="$CHART_BC_PLAYER != ''"><xsl:value-of select="$CHART_BC_PLAYER" /></xsl:when>
+          <xsl:otherwise>default</xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>_default/index.html?videoId=</xsl:text>
+        <xsl:value-of select="$CHART_BC_VIDEO" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <!-- New Standard -->
   <xsl:variable name="NS_LEAD"             select="/Properties/Datum[@ID='NewStandardHeadingLead']" />
   <xsl:variable name="NS_HIGHLIGHT"        select="/Properties/Datum[@ID='NewStandardHeadingHighlight']" />
@@ -601,7 +625,9 @@
                   <div>
                     <div style="position: relative; display: block; max-width: 960px;">
                       <div style="padding-top: 56.25%;">
-                        <iframe src="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+                        <iframe style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0">
+                          <xsl:attribute name="src"><xsl:value-of select="$BC_IFRAME_SRC" /></xsl:attribute>
+                        </iframe>
                       </div>
                     </div>
                   </div>

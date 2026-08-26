@@ -536,10 +536,13 @@
       ],
       quality: { label: "Execution quality", score: "98.2", trend: "+ 1.4% vs Benchmark" },
       video: {
+        // Account + Player are RBC constants — same across every video
+        // on the site. Only videoId changes per video; that's the only
+        // field exposed in the CMS UI.
         title: "Platform demo",
-        accountId: "6415665624001",
-        playerId: "default",
-        videoId: "6371076976112"
+        accountId: "6021289101001",
+        playerId: "VyvCc9BZx",
+        videoId: "6385114247112"
       }
     },
     // v4 NEW section: "A new standard for multi-asset trading" —
@@ -733,12 +736,13 @@
         },
         video: {
           type: 'object', label: 'Video (Brightcove)',
-          figmaRef: 'The video that plays when the user clicks the play button on the chart screenshot. Brightcove Account ID + Video ID are the two you MUST fill in — Player ID defaults to "default".',
+          figmaRef: 'The video that plays when the user clicks the play button on the chart. Only the Video ID needs to change per video — Account and Player IDs are one-time constants dev sets in TeamSite.',
           fields: {
-            title: { type: 'text', label: 'Video title', figmaRef: 'Screen-reader label for the modal (not visible on the page). e.g. "Platform demo".' },
-            accountId: { type: 'text', label: 'Brightcove Account ID', figmaRef: 'The numeric Brightcove Account ID (e.g. "6415665624001"). Find it in the Brightcove Studio URL or ask RBC digital.' },
-            playerId: { type: 'text', label: 'Brightcove Player ID', figmaRef: 'Player ID. Leave as "default" unless a specific player was created for this video.' },
-            videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The video ID from Brightcove Studio (long numeric string, e.g. "6371076976112").' }
+            videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The Video ID from Brightcove Studio (long numeric string, e.g. "6371076976112"). Copy from the Brightcove Studio URL after the "videoId=" segment.' },
+            // Account + Player are dev-managed constants — hidden from the CMS to keep marketing from breaking playback.
+            title:     { hidden: true, type: 'text', label: 'Video title' },
+            accountId: { hidden: true, type: 'text', label: 'Brightcove Account ID' },
+            playerId:  { hidden: true, type: 'text', label: 'Brightcove Player ID' }
           }
         },
         leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
