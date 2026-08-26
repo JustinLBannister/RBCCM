@@ -2112,13 +2112,10 @@
     .rbccm-maas-mata__demo-heading {
       font-size: 75px;
       line-height: 110%;   /* 82.5px */
+      /* Text is capped at ~25/20 chars by the CMS so it always fits
+         on one line at desktop — no wrap. */
+      white-space: nowrap;
     }
-  }
-  /* If the highlight span itself is one big unbroken word, allow
-     mid-word breaking so it never blows out the container. */
-  .rbccm-maas-mata__demo-heading-highlight {
-    overflow-wrap: anywhere;
-    word-break: break-word;
   }
   .rbccm-maas-mata__demo-heading-highlight { color: #FFC72C; font-style: normal; }
   /* Body — Figma description/desktop: Roboto 16/24 wt 400, white,

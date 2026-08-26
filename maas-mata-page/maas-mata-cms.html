@@ -495,7 +495,7 @@
   // thoughtLeadership → marketInsights so exported JSON keys match
   // the data-json paths the XSL emits. Bump forces reset for any
   // drafts saved under the old key names.
-  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4f';
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4g';
 
   // ==============================================================
   // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
@@ -824,7 +824,7 @@
             title: { type: 'text', label: 'Title', figmaRef: 'Card headline ("Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
             acronym: { type: 'text', label: 'Acronym', figmaRef: 'leave blank.' },
             body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card ("Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
-            bullets: { type: 'stringArray', label: 'Bullets', figmaRef: '5–6 bullet points below the body copy. Each row is one bullet. Adding/removing rows changes the visible list. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
+            bullets: { type: 'stringArray', label: 'Bullets', min: 5, max: 5, figmaRef: 'Exactly 5 bullet points below the body copy — required so both cards line up at the same height without CSS overrides. Each row is one bullet. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
             cta: { type: 'cta', label: 'CTA', figmaRef: 'leave blank.' }
           }
         }
@@ -1072,24 +1072,60 @@
     }
     if (def.type === 'stringArray') {
       var arr = Array.isArray(val) ? val : [];
+      // Layout limits mirror the object-array renderer: min defaults
+      // to 0, max to Infinity. When min === max the row count is
+      // locked (Add and Delete are hidden entirely). Otherwise Add
+      // disables at max, Delete disables at min. Used for bullets
+      // fields where the visual layout requires a fixed row count.
+      var saMin = typeof def.min === 'number' ? def.min : 0;
+      var saMax = typeof def.max === 'number' ? def.max : Infinity;
+      var saAtMax = arr.length >= saMax;
+      var saAtMin = arr.length <= saMin;
+      var saLocked = (saMin === saMax);
       var itemsHtml = arr.map(function (s, i) {
+        var delBtn = saLocked
+          ? ''
+          : '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (saAtMin ? ' disabled title="Minimum reached — cannot delete"' : '') + '>×</button>';
         return '<div class="array-item">'
           + '<div class="array-item-header">'
           +   '<span class="array-item-title">Item ' + (i + 1) + '</span>'
           +   '<div class="array-item-actions">'
           +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
           +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr.length - 1 ? ' disabled' : '') + '>↓</button>'
-          +     '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '">×</button>'
+          +     delBtn
           +   '</div>'
           + '</div>'
           + '<input type="text" data-path="' + esc(path) + '.' + i + '" value="' + esc(s) + '">'
           + '</div>';
       }).join('');
+      // Count badge — same three-state pattern as object arrays.
+      var saBadge = '';
+      if (saMax !== Infinity || saMin > 0) {
+        var saStatus, saCls;
+        if (saLocked) {
+          saStatus = arr.length + ' of ' + saMax + ' items — layout locked (this section requires exactly ' + saMax + ')';
+          saCls = arr.length === saMax ? 'array-badge--ok' : 'array-badge--warn';
+        } else if (arr.length < saMin) {
+          saStatus = arr.length + ' of ' + saMax + ' items — need at least ' + saMin + ' for this section to display';
+          saCls = 'array-badge--warn';
+        } else if (arr.length >= saMax) {
+          saStatus = arr.length + ' of ' + saMax + ' items — maximum reached';
+          saCls = 'array-badge--danger';
+        } else {
+          saStatus = arr.length + ' of ' + saMax + ' items';
+          saCls = 'array-badge--ok';
+        }
+        saBadge = '<span class="array-badge ' + saCls + '">' + esc(saStatus) + '</span>';
+      }
+      var saAddBtn = saLocked
+        ? ''
+        : '<button class="ghost small array-add" data-array-action="add-string" data-array-path="' + esc(path) + '"' + (saAtMax ? ' disabled title="Maximum reached"' : '') + '>+ Add item</button>';
       return '<div class="field">'
         + '<label class="field-label">' + esc(def.label) + '</label>'
+        + saBadge
         + figmaChip(def.figmaRef)
         + '<div class="array">' + itemsHtml + '</div>'
-        + '<button class="ghost small array-add" data-array-action="add-string" data-array-path="' + esc(path) + '">+ Add item</button>'
+        + saAddBtn
         + '</div>';
     }
     if (def.type === 'array') {
