@@ -539,7 +539,7 @@
 
 
         <!-- 8. MARKET INSIGHTS -->
-        <section class="rbccm-maas-mata__market-insights">
+        <section class="rbccm-maas-mata__market-insights" aria-label="Market insights">
           <div class="rbccm-maas-mata__container">
             <h5 class="rbccm-maas-mata__market-insights-eyebrow" data-animate="fadeInUp" data-json="marketInsights.eyebrow"><xsl:value-of select="$MK_EYEBROW" /></h5>
             <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading"><xsl:value-of select="$MK_HEADING" /></h2>
@@ -621,11 +621,10 @@
             <div class="modal-body" style="padding: 0px;">
               <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
                 <div style="margin-bottom: 20px;">
-                  <h2 style="font-size: 20px;"></h2>
                   <div>
                     <div style="position: relative; display: block; max-width: 960px;">
                       <div style="padding-top: 56.25%;">
-                        <iframe style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0">
+                        <iframe title="MAAS + MATA platform overview video" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0">
                           <xsl:attribute name="src"><xsl:value-of select="$BC_IFRAME_SRC" /></xsl:attribute>
                         </iframe>
                       </div>
