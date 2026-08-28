@@ -3138,14 +3138,23 @@
     opacity: 0 !important;
     z-index: 0 !important;
   }
-  /* Shine sweep re-enabled in the override block too — matches the
-     base rule above. Same 600ms ease-out sweep for both yellow and
-     primary variants. */
+  /* Shine sweep re-enabled — transition-based (not keyframe) so it
+     retriggers reliably on every hover. Base rule sets left:-60% +
+     opacity:0. On hover, we transition to left:120% + opacity:1 in
+     one continuous motion. transition-property covers both so they
+     ease together across 600ms. */
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow::before,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary::before {
+    transition: left 600ms ease-out, opacity 600ms ease-out !important;
+    animation: none !important;
+  }
   .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:hover::before,
   .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:focus-visible::before,
   .rbccm-maas-mata .rbccm-maas-mata__btn--primary:hover::before,
   .rbccm-maas-mata .rbccm-maas-mata__btn--primary:focus-visible::before {
-    animation: rbccm-mm-shine-sweep 600ms ease-out !important;
+    left: 120% !important;
+    opacity: 1 !important;
+    animation: none !important;
   }
   .rbccm-maas-mata .rbccm-maas-mata__btn--yellow { position: relative !important; overflow: hidden !important; }
   .rbccm-maas-mata .rbccm-maas-mata__btn--primary { position: relative !important; overflow: hidden !important; }
