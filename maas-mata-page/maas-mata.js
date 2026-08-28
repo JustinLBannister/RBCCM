@@ -8,30 +8,52 @@
   // ---- Video modal (Bootstrap-managed) ------------------------
   // The modal itself (#herovideo) uses Bootstrap's standard modal
   // pattern via data-toggle / data-dismiss — no custom open/close
-  // JS needed. Only extra work here: reset the iframe src when the
-  // modal closes so the video actually stops playing (otherwise
-  // Bootstrap just hides the element and audio keeps going).
+  // JS needed. Extra work here:
+  //   • On modal SHOW: rewrite the iframe src with &autoplay=1 so the
+  //     Brightcove player starts playing immediately (user already
+  //     clicked the play button that opened the modal — this counts as
+  //     a user gesture, so browser autoplay policy is satisfied).
+  //   • On modal HIDE: strip the src so the video actually stops
+  //     (otherwise Bootstrap just hides the element and audio keeps
+  //     going).
   (function () {
     var modal = document.getElementById('herovideo');
     if (!modal) return;
     var iframe = modal.querySelector('iframe');
     if (!iframe) return;
-    var originalSrc = iframe.getAttribute('src');
-    // Bootstrap 3/4 event
-    var $modal = window.jQuery ? window.jQuery(modal) : null;
-    function stop() {
-      var src = iframe.getAttribute('src');
-      iframe.setAttribute('src', '');
-      // Restore on next tick so the next open plays from the start.
-      setTimeout(function () { iframe.setAttribute('src', originalSrc); }, 100);
+    var originalSrc = iframe.getAttribute('src') || '';
+    // Blank the iframe on load so the Brightcove player doesn't start
+    // buffering on page load — we swap the real src in on modal open.
+    iframe.setAttribute('src', '');
+
+    // Append (or overwrite) an ?autoplay=1 param on the Brightcove URL.
+    function withAutoplay(url) {
+      if (!url) return url;
+      // Strip any existing autoplay param, then append fresh.
+      var stripped = url.replace(/([&?])autoplay=[^&]*&?/, '$1').replace(/[&?]$/, '');
+      var sep = stripped.indexOf('?') === -1 ? '?' : '&';
+      return stripped + sep + 'autoplay=1';
     }
+
+    var $modal = window.jQuery ? window.jQuery(modal) : null;
+
+    function play() {
+      iframe.setAttribute('src', withAutoplay(originalSrc));
+    }
+    function stop() {
+      iframe.setAttribute('src', '');
+    }
+
     if ($modal && $modal.on) {
+      $modal.on('show.bs.modal',   play);
       $modal.on('hidden.bs.modal', stop);
     } else {
       // Fallback for anywhere Bootstrap jQuery isn't loaded — watch
       // for the display change ourselves.
       var mo = new MutationObserver(function () {
-        if (!modal.classList.contains('in') && modal.style.display === 'none') stop();
+        var shown = modal.classList.contains('in') || modal.style.display === 'block';
+        if (shown && !iframe.getAttribute('src')) play();
+        else if (!shown && modal.style.display === 'none') stop();
       });
       mo.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
     }
