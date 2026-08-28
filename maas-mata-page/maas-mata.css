@@ -175,11 +175,13 @@
        the hover; button stays anchored in place. */
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   }
-  /* Shine sweep disabled — the pseudo-element stays at opacity 0
-     regardless of hover. Arrow flyby carries the hover effect. */
+  /* Shine sweep re-enabled — soft white diagonal band sweeps across
+     the button on hover / keyboard focus. Runs once per interaction,
+     600ms with an ease-out curve. Pairs with the arrow flyby on
+     icon-bearing yellow buttons. */
   .rbccm-maas-mata__btn--yellow:hover::before,
   .rbccm-maas-mata__btn--yellow:focus-visible::before {
-    animation: none;
+    animation: rbccm-mm-shine-sweep 600ms ease-out;
   }
   @keyframes rbccm-mm-shine-sweep {
     0%   { left: -60%; opacity: 0; }

@@ -26,13 +26,20 @@
     // buffering on page load — we swap the real src in on modal open.
     iframe.setAttribute('src', '');
 
-    // Append (or overwrite) an ?autoplay=1 param on the Brightcove URL.
+    // Append autoplay=1 + muted=1 to the Brightcove URL. muted=1 is
+    // required for autoplay to reliably fire across browsers (Chrome,
+    // Safari, Firefox all allow muted autoplay universally; unmuted
+    // autoplay is blocked or intermittent in cross-origin iframes).
+    // User can unmute in the player once video starts.
     function withAutoplay(url) {
       if (!url) return url;
-      // Strip any existing autoplay param, then append fresh.
-      var stripped = url.replace(/([&?])autoplay=[^&]*&?/, '$1').replace(/[&?]$/, '');
+      // Strip any existing autoplay/muted params, then append fresh.
+      var stripped = url
+        .replace(/([&?])autoplay=[^&]*&?/, '$1')
+        .replace(/([&?])muted=[^&]*&?/,    '$1')
+        .replace(/[&?]$/, '');
       var sep = stripped.indexOf('?') === -1 ? '?' : '&';
-      return stripped + sep + 'autoplay=1';
+      return stripped + sep + 'autoplay=1&muted=1';
     }
 
     var $modal = window.jQuery ? window.jQuery(modal) : null;
