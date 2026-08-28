@@ -3138,14 +3138,34 @@
     opacity: 0 !important;
     z-index: 0 !important;
   }
-  /* Shine sweep disabled in the override block too — matches the
-     base rule above. */
+  /* Shine sweep re-enabled in the override block too — matches the
+     base rule above. Same 600ms ease-out sweep for both yellow and
+     primary variants. */
   .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:hover::before,
-  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:focus-visible::before {
-    animation: none !important;
+  .rbccm-maas-mata .rbccm-maas-mata__btn--yellow:focus-visible::before,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary:hover::before,
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary:focus-visible::before {
+    animation: rbccm-mm-shine-sweep 600ms ease-out !important;
   }
   .rbccm-maas-mata .rbccm-maas-mata__btn--yellow { position: relative !important; overflow: hidden !important; }
   .rbccm-maas-mata .rbccm-maas-mata__btn--primary { position: relative !important; overflow: hidden !important; }
+  /* Mirror the yellow ::before setup for primary so the shine sweep
+     has something to travel across. Slightly softer opacity since
+     white shimmer on the blue button reads more strongly than on yellow. */
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: -60% !important;
+    width: 40% !important;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%) !important;
+    transform: skewX(-18deg) !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    z-index: 0 !important;
+  }
+  .rbccm-maas-mata .rbccm-maas-mata__btn--primary > * { position: relative !important; z-index: 1 !important; }
 
   /* Featured CTA arrow flyby — same animation, scoped to the
      Market Insights read-more chip so global .btn styles don't
