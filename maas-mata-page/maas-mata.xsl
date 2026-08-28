@@ -244,10 +244,14 @@
 
     <!-- JSON-LD structured data. Whole @graph block lives in
          the SeoJsonLd Datum. When SEO delivers a new schema, paste
-         it into that field verbatim — no XSL edit needed. -->
-    <script type="application/ld+json">
-      <xsl:value-of select="$SEO_JSONLD" disable-output-escaping="yes" />
-    </script>
+         it into that field verbatim — no XSL edit needed. Guard:
+         only emit the <script> tag when the Datum is non-empty, so
+         pages without an override don't ship a broken empty stub. -->
+    <xsl:if test="normalize-space($SEO_JSONLD) != ''">
+      <script type="application/ld+json">
+        <xsl:value-of select="$SEO_JSONLD" disable-output-escaping="yes" />
+      </script>
+    </xsl:if>
 
 
     <div class="rbccm-maas-mata" id="rbccm-mm-page">
