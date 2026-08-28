@@ -31,6 +31,34 @@
   .rbccm-maas-mata__btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 50px; padding: 12px 35px; border-radius: 100px; border: 1px solid transparent; cursor: pointer; font-family: Roboto, Arial, sans-serif; font-size: 18px; line-height: 29.26px; text-decoration: none; }
   .rbccm-maas-mata__btn--primary { background: #0051A5; color: #fff; font-weight: 500; position: relative; overflow: hidden; }
   .rbccm-maas-mata__btn--primary:hover { background: #003168; }
+  /* Shine sweep on primary — mirrors the yellow-button treatment so
+     the hero "Request demo" button shares the same interaction
+     vocabulary. Soft white diagonal band travels across on hover /
+     focus, zero-width at rest. z-index keeps it above the fill but
+     below text/icon. */
+  .rbccm-maas-mata__btn--primary::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 0;
+  }
+  .rbccm-maas-mata__btn--primary > * { position: relative; z-index: 1; }
+  .rbccm-maas-mata__btn--primary:hover::before,
+  .rbccm-maas-mata__btn--primary:focus-visible::before {
+    animation: rbccm-mm-shine-sweep 600ms ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-maas-mata__btn--primary:hover::before,
+    .rbccm-maas-mata__btn--primary:focus-visible::before {
+      animation: none;
+    }
+  }
   /* Mobile spec (Figma): 14/29.26 Roboto wt 500, white text,
      bright-blue #0051A5 fill, 50 tall x 12/35 pad, 100px pill.
      Layout values match the base; only the type-size shrinks. */
