@@ -117,6 +117,14 @@
     background: rgba(255, 255, 255, 0.08);
     box-shadow: none;
   }
+  /* Visible keyboard focus — yellow ring at 2px, 3px offset. Matches
+     the chart-image play button treatment so all interactive elements
+     on the dark strip share one focus vocabulary. Passes 3:1 contrast
+     against the #061730 section background. */
+  .rbccm-maas-mata__new-standard .rbccm-maas-mata__btn--yellow:focus-visible {
+    outline: 2px solid #FFC72C;
+    outline-offset: 3px;
+  }
 
   /* Mobile size override for the demo CTA. Figma spec: 40px tall,
      14/29.26 Roboto, tighter side padding, 10px icon gap. */
