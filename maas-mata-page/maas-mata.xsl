@@ -621,7 +621,7 @@
          data-toggle="modal" on the trigger + data-dismiss="modal" on
          the button; no custom JS needed. Brightcove player is embedded
          directly in the iframe src. -->
-    <div role="dialog" class="modal fade" tabindex="-1" id="herovideo">
+    <div role="dialog" class="modal fade" tabindex="-1" id="herovideo" aria-label="Video" aria-describedby="herovideo-desc">
       <div role="document" class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;">
         <div class="modal-content">
           <div>
@@ -631,6 +631,7 @@
             <div class="modal-body" style="padding: 0px;">
               <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
                 <div style="margin-bottom: 20px;">
+                  <p id="herovideo-desc" class="sr-only">Video opens in an embedded player.</p>
                   <div>
                     <div style="position: relative; display: block; max-width: 960px;">
                       <div style="padding-top: 56.25%;">
@@ -640,6 +641,9 @@
                       </div>
                     </div>
                   </div>
+                  <!-- Focus guard: catches Tab escapes out of the iframe and
+                       loops focus back to the close button. See maas-mata.js. -->
+                  <span tabindex="0" aria-hidden="true" data-focus-guard="herovideo"></span>
                 </div>
               </div>
             </div>

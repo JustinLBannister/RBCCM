@@ -51,16 +51,51 @@
       iframe.setAttribute('src', '');
     }
 
+    // Focus management, per RBCCM Bootstrap 3.4.1 modal a11y spec:
+    // remember the trigger on open, move focus to the close button once
+    // the modal is visible, and return focus to the trigger on close.
+    // The focus-guard <span> after the iframe catches Tab escapes and
+    // loops focus back to the close button.
+    var trigger = null;
+    var closeBtn = modal.querySelector('.close');
+    var guard    = modal.querySelector('[data-focus-guard="herovideo"]');
+
+    function focusClose() {
+      if (closeBtn) closeBtn.focus();
+    }
+    function focusTrigger() {
+      if (trigger && typeof trigger.focus === 'function') trigger.focus();
+      trigger = null;
+    }
+    function onGuardFocus() {
+      // Anything tabbing past the iframe hits the guard first;
+      // bounce back to the close button so focus never escapes.
+      focusClose();
+    }
+    if (guard) guard.addEventListener('focus', onGuardFocus);
+
     if ($modal && $modal.on) {
-      $modal.on('show.bs.modal',   play);
-      $modal.on('hidden.bs.modal', stop);
+      $modal.on('show.bs.modal', function (e) {
+        trigger = (e && e.relatedTarget) || document.activeElement;
+        play();
+      });
+      $modal.on('shown.bs.modal',  focusClose);
+      $modal.on('hidden.bs.modal', function () { stop(); focusTrigger(); });
     } else {
       // Fallback for anywhere Bootstrap jQuery isn't loaded — watch
       // for the display change ourselves.
+      var wasShown = false;
       var mo = new MutationObserver(function () {
         var shown = modal.classList.contains('in') || modal.style.display === 'block';
-        if (shown && !iframe.getAttribute('src')) play();
-        else if (!shown && modal.style.display === 'none') stop();
+        if (shown && !wasShown) {
+          trigger = document.activeElement;
+          play();
+          setTimeout(focusClose, 0);
+        } else if (!shown && wasShown) {
+          stop();
+          focusTrigger();
+        }
+        wasShown = shown;
       });
       mo.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
     }
