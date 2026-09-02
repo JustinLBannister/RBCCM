@@ -7,7 +7,7 @@
 
   Every string field defaults to blank. Blank falls back to the
   per-locale default in the XSL (EN or FR based on the Locale
-  Datum). Integer count/threshold fields also fall back when blank
+  Datum). Number count/threshold fields also fall back when blank
   — MinSlideCount defaults to 2, thresholds to the JS presets
   (desktop 5, tablet 3, mobile 2).
 -->
@@ -41,12 +41,12 @@
     cards as a static left-aligned row inside slick's own DOM.
     Slick stays initialized either way — no destroy/rebuild.
   -->
-  <Datum ID="MinSlideCount"      Type="Integer" Name="Minimum slides to render section">2</Datum>
-  <Datum ID="MaxSlideCount"      Type="Integer" Name="Maximum slides to render section">8</Datum>
-  <Datum ID="CarouselMin"        Type="Integer" Name="Carousel activation min (fallback for all breakpoints)"/>
-  <Datum ID="CarouselMinDesktop" Type="Integer" Name="Carousel activation min — desktop (1300px and up)"/>
-  <Datum ID="CarouselMinTablet"  Type="Integer" Name="Carousel activation min — tablet (640-1299px)"/>
-  <Datum ID="CarouselMinMobile"  Type="Integer" Name="Carousel activation min — mobile (under 640px)"/>
+  <Datum ID="MinSlideCount"      Type="Number" Name="Minimum slides to render section">2</Datum>
+  <Datum ID="MaxSlideCount"      Type="Number" Name="Maximum slides to render section">8</Datum>
+  <Datum ID="CarouselMin"        Type="Number" Name="Carousel activation min (fallback for all breakpoints)"/>
+  <Datum ID="CarouselMinDesktop" Type="Number" Name="Carousel activation min — desktop (1300px and up)"/>
+  <Datum ID="CarouselMinTablet"  Type="Number" Name="Carousel activation min — tablet (640-1299px)"/>
+  <Datum ID="CarouselMinMobile"  Type="Number" Name="Carousel activation min — mobile (under 640px)"/>
 
   <!--
     Cache buster. Bump when pushing new CSS or JS so browsers
