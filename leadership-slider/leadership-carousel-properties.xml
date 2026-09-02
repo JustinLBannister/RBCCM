@@ -1,0 +1,153 @@
+<!--
+  Leadership Carousel — Properties
+
+  Ships alongside:
+    /assets/rbccm/css/components/leadership-carousel.css
+    /assets/rbccm/js/components/leadership-carousel.js
+
+  Every string field defaults to blank. Blank falls back to the
+  per-locale default in the XSL (EN or FR based on the Locale
+  Datum). Integer count/threshold fields also fall back when blank
+  — MinSlideCount defaults to 2, thresholds to the JS presets
+  (desktop 5, tablet 3, mobile 2).
+-->
+<Properties ComponentID="1554499053453">
+
+  <!-- Content -->
+  <Datum ID="Heading"    Type="String" Name="Section Heading">European leadership</Datum>
+  <Datum ID="Subheading" Type="String" Name="Section Subheading (optional)"/>
+
+  <!-- Card action -->
+  <Datum ID="LinkType"     Type="String"  Name="Card Action (linkedin, biography, or both)">linkedin</Datum>
+  <Datum ID="ShowEmail"    Type="Boolean" Name="Show email link in bio modal">false</Datum>
+  <Datum ID="ContactIcons" Type="Boolean" Name="Show contact info as icons in bio modal">false</Datum>
+
+  <!-- Rendering -->
+  <Datum ID="ColorScheme"             Type="String" Name="Color Scheme (light, lightblue, dark)">light</Datum>
+  <Datum ID="HeadingAlignment"        Type="String" Name="Heading Alignment (left or center)">left</Datum>
+  <Datum ID="BackgroundImage"         Type="String" Name="Background Image URL"/>
+  <Datum ID="BackgroundImagePosition" Type="String" Name="Background Image Position"/>
+  <Datum ID="BackgroundImageSize"     Type="String" Name="Background Image Size"/>
+  <Datum ID="BackgroundImageRepeat"   Type="String" Name="Background Image Repeat"/>
+
+  <!--
+    Render range + carousel activation.
+
+    MinSlideCount / MaxSlideCount gate whether the section renders
+    at all. Outside the window the XSL skips the whole block.
+
+    CarouselMin* controls whether swipe/dots/infinite are on at
+    each breakpoint. Below the threshold, that breakpoint renders
+    cards as a static left-aligned row inside slick's own DOM.
+    Slick stays initialized either way — no destroy/rebuild.
+  -->
+  <Datum ID="MinSlideCount"      Type="Integer" Name="Minimum slides to render section">2</Datum>
+  <Datum ID="MaxSlideCount"      Type="Integer" Name="Maximum slides to render section">8</Datum>
+  <Datum ID="CarouselMin"        Type="Integer" Name="Carousel activation min (fallback for all breakpoints)"/>
+  <Datum ID="CarouselMinDesktop" Type="Integer" Name="Carousel activation min — desktop (1300px and up)"/>
+  <Datum ID="CarouselMinTablet"  Type="Integer" Name="Carousel activation min — tablet (640-1299px)"/>
+  <Datum ID="CarouselMinMobile"  Type="Integer" Name="Carousel activation min — mobile (under 640px)"/>
+
+  <!--
+    Cache buster. Bump when pushing new CSS or JS so browsers
+    refetch instead of serving cached copies. Any string works
+    (semver, date, sha). Same pattern as cta-band, filter-by,
+    tabbed-panels, story-carousel.
+  -->
+  <Datum ID="AssetVersion" Type="String" Name="Asset version — bump to force fresh CSS + JS">1</Datum>
+
+
+  <!-- Localization -->
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+  <!-- Aria on the carousel shell -->
+  <Datum ID="CarouselAriaLabel"    Type="String" Name="Carousel Aria Label"/>
+  <Datum ID="TrackRegionLabel"     Type="String" Name="Card Region Aria Label"/>
+  <Datum ID="KeyboardInstructions" Type="String" Name="SR-only Keyboard Instructions"/>
+  <Datum ID="DotsListLabel"        Type="String" Name="Pagination Dots UL Aria Label"/>
+
+  <!-- Prev / Next / Close -->
+  <Datum ID="PrevButtonLabel"  Type="String" Name="Previous Arrow Aria Label"/>
+  <Datum ID="NextButtonLabel"  Type="String" Name="Next Arrow Aria Label"/>
+  <Datum ID="CloseButtonLabel" Type="String" Name="Modal Close Button Aria Label"/>
+
+  <!-- Card action labels -->
+  <Datum ID="BioButtonLabel"       Type="String" Name="Biography Button Text"/>
+  <Datum ID="BioAriaTemplate"      Type="String" Name="Biography Aria Label — use {name}"/>
+  <Datum ID="LinkedInAriaTemplate" Type="String" Name="LinkedIn Aria Label — use {name}"/>
+  <Datum ID="LinkedInModalLabel"   Type="String" Name="Modal LinkedIn Link Text"/>
+  <Datum ID="EmailModalLabel"      Type="String" Name="Modal Email Link Text"/>
+
+  <!--
+    Slide + dot label templates. Placeholders: {name}, {role},
+    {n}, {total}. JS strips orphan commas when a placeholder
+    resolves empty, so "{name}, {role}, slide N" reads cleanly
+    even when {role} is missing.
+
+    Three variants exist for slide labels so the JS can pick
+    whichever matches the content available on the card.
+    Two variants for the active dot's label ("current" language
+    is baked into the label because NVDA doesn't reliably
+    announce aria-current on plain buttons).
+  -->
+  <Datum ID="SlideRoleDescription"         Type="String" Name="Slide aria-roledescription"/>
+  <Datum ID="SlideAriaTemplate"            Type="String" Name="Slide Aria Label — no name available"/>
+  <Datum ID="SlideAriaNameOnlyTemplate"    Type="String" Name="Slide Aria Label — name only"/>
+  <Datum ID="SlideAriaNameTemplate"        Type="String" Name="Slide Aria Label — name + role"/>
+
+  <Datum ID="DotAriaTemplate"              Type="String" Name="Inactive Dot Aria Label"/>
+  <Datum ID="DotAriaCurrentTemplate"       Type="String" Name="Active Dot Aria Label — with name"/>
+  <Datum ID="DotAriaCurrentNoNameTemplate" Type="String" Name="Active Dot Aria Label — no name"/>
+
+  <Datum ID="AnnounceTemplate"             Type="String" Name="Live Region — no name"/>
+  <Datum ID="AnnounceNameTemplate"         Type="String" Name="Live Region — with name"/>
+
+  <!-- Placeholder text is URL-encoded — EN 'Team Member', FR 'Membre de l'équipe' -->
+  <Datum ID="PlaceholderImageText" Type="String" Name="Missing-image Placeholder Text (URL-encoded)"/>
+
+</Properties>
+
+
+<!--
+  Locale defaults (reference for the XSL — not read by TeamSite)
+
+                                   EN                              FR
+  CarouselAriaLabel                European leadership team        Carrousel de l'équipe de
+                                   carousel                        direction européenne
+  TrackRegionLabel                 Leadership cards                Cartes de l'équipe de direction
+  KeyboardInstructions             Use left and right arrow keys   Utilisez les flèches gauche et
+                                   to navigate between slides.     droite pour naviguer entre les
+                                   Use Tab to move between cards.  diapositives. Utilisez Tab pour
+                                                                   passer d'une carte à l'autre.
+  DotsListLabel                    Slide selection                 Sélection de diapositive
+
+  PrevButtonLabel                  Previous slide                  Diapositive précédente
+  NextButtonLabel                  Next slide                      Diapositive suivante
+  CloseButtonLabel                 Close                           Fermer
+
+  BioButtonLabel                   Biography                       Biographie
+  BioAriaTemplate                  Read {name}'s biography         Lire la biographie de {name}
+  LinkedInAriaTemplate             {name} on LinkedIn, opens in    Voir le profil LinkedIn de {name}
+                                   new tab
+  LinkedInModalLabel               View LinkedIn profile           Voir le profil LinkedIn
+  EmailModalLabel                  Contact through email           Courriel
+
+  SlideRoleDescription             slide                           diapositive
+  SlideAriaTemplate                slide {n} of {total}            diapositive {n} sur {total}
+  SlideAriaNameOnlyTemplate        {name}, slide {n} of {total}    {name}, diapositive {n} sur {total}
+  SlideAriaNameTemplate            {name}, {role}, slide {n}       {name}, {role}, diapositive
+                                   of {total}                      {n} sur {total}
+
+  DotAriaTemplate                  Go to slide {n} of {total}      Aller à la diapositive {n}
+                                                                   sur {total}
+  DotAriaCurrentTemplate           Current slide: {name},          Diapositive actuelle : {name},
+                                   slide {n} of {total}            diapositive {n} sur {total}
+  DotAriaCurrentNoNameTemplate     Current slide {n} of {total}    Diapositive actuelle {n} sur
+                                                                   {total}
+
+  AnnounceTemplate                 Slide {n} of {total}            Diapositive {n} sur {total}
+  AnnounceNameTemplate             {name}, slide {n} of {total}    {name}, diapositive {n} sur
+                                                                   {total}
+
+  PlaceholderImageText             Team%20Member                   Membre%20de%20l%27%C3%A9quipe
+-->

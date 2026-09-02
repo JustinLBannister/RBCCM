@@ -1,6 +1,18 @@
 /* ============================================================
-   Leadership Carousel - Slick
-   Path: /assets/rbccm/css/sub/test/leadership-carousel.css
+   Leadership Carousel — component styles
+   Deploy path: /assets/rbccm/css/components/leadership-carousel.css
+
+   Snapshot source: production CSS as of 2026-08-28. Prior repo baseline
+   was largely in sync; this snapshot adds the three prod-only rulesets
+   that were missing locally:
+     • .rbccm-leadership--on-ltblue          (light-blue color scheme)
+     • .rbccm-leadership__card-displayboth   (LinkType='both' card variant)
+     • .contact-details .blue-circle-outline (modal contact icons)
+   Everything else is unchanged from what was already in the repo.
+
+   Companion files:
+     • /assets/rbccm/js/components/leadership-carousel.js
+     • leadership-carousel.xsl (skin — DCR-driven author data)
 ============================================================ */
 
 /* -- Screen reader only -- */
@@ -25,15 +37,23 @@
       width: 100%;
     }
 
-    /* -- Inner container -- */
+    /* -- Inner container --
+       16px horizontal gutter on mobile so the first card doesn't
+       touch the viewport edge (matches the heading's 0 16px padding
+       above so headings and cards line up left). Padding drops away
+       at 1170px where the max-width takes over and centres the block. */
     .rbccm-leadership__inner {
       box-sizing: border-box;
       margin: 0 auto;
       max-width: 1200px;
+      padding: 0 16px;
       position: relative;
     }
     @media (min-width: 1170px) {
-      .rbccm-leadership__inner { max-width: 1140px; }
+      .rbccm-leadership__inner {
+        max-width: 1140px;
+        padding: 0;
+      }
     }
 
     /* -- Heading --
@@ -83,7 +103,19 @@
     #rbccm-leadership .slick-prev,
     #rbccm-leadership .slick-next { display: none !important; }
 
-    /* -- Active card border -- */
+    /* -- Active card border --
+       Card widths:
+         mobile (< 560px) → 343px (fat card, one-per-view)
+         560px+           → 270px (multi-card view, tidy 1/2/3/4 math)
+       With variableWidth: true and centerMode: false, slick shows N
+       cards where N = floor(container_width / 290)  (270 card + 20 gap).
+           <  560px viewport → 1 card @ 343
+           560-849  viewport → 2 cards @ 270
+           850-1139 viewport → 3 cards @ 270
+           1140+    viewport → 4 cards @ 270
+       Same 270px card at every desktop-ish size keeps the 263px bio
+       photos from cropping weirdly when the browser resizes. Mobile
+       gets the wider 343 so single-column reads comfortably. */
     .rbccm-leadership__card {
       border: 1px solid #A8A8A8;
       box-sizing: border-box;
@@ -92,11 +124,11 @@
       margin: 0 8px;
       width: 343px !important;
     }
-    @media (min-width: 1025px) {
-      .rbccm-leadership__card { width: 273px !important; }
-    }
-    @media (min-width: 1300px) {
-      .rbccm-leadership__card { margin: 0 20px 0 0; width: 270px !important; }
+    @media (min-width: 560px) {
+      .rbccm-leadership__card {
+        margin: 0 20px 0 0;
+        width: 270px !important;
+      }
     }
     /* Active-card border. `.slick-center` was the marker while the
        carousel ran in centerMode; that class isn't applied under the
@@ -629,4 +661,80 @@
     }
     #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__btn:focus-visible {
       outline-color: #ffffff;
+    }
+
+
+    /* ============================================================
+       Prod-additions block (2026-08-28 snapshot sync)
+       Three rulesets present in prod that were missing from the
+       repo baseline. Left grouped at the end so they're easy to
+       find and diff-review; refactor into the topical sections
+       above whenever the file gets its next big cleanup.
+       ============================================================ */
+
+    /* Modifier: --on-ltblue
+       Light-blue section background — pairs with --on-dark and the
+       default (white) as the three available color schemes. Uses
+       #f0f6fc so cards + text stay readable without any of the
+       dark-scheme text/dot inversions. */
+    #rbccm-leadership.rbccm-leadership--on-ltblue {
+      background-color: #f0f6fc;
+    }
+
+    /* Card variant: __card-displayboth
+       Applied to the LinkedIn anchor when LinkType='both' so both
+       the Biography button AND the LinkedIn icon can coexist on the
+       same card. Currently a hook class — layout tweak (spacing,
+       positioning) lives with the site-standard rules for cards
+       that carry two action elements. */
+    .rbccm-leadership__card-displayboth {
+      /* Placeholder: prod ships this class as a marker so specific
+         two-action card layouts can be targeted per page. Add
+         property overrides here as designs require. */
+    }
+
+    /* Modal contact icons (ContactIcons=true)
+       Blue circular outline around a FA icon; fills on hover.
+       Used inside the biography modal when the ContactIcons Datum
+       is enabled — otherwise the modal footer falls back to plain
+       text links styled by .rbccm-leadership__modal-footer. */
+    .contact-details {
+      margin-bottom: 20px;
+    }
+
+    .contact-details .blue-circle-outline {
+      border-color: #006ac3;
+      color: #006ac3;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      text-align: center;
+      line-height: 100%;
+      margin: 0 4px 0 0;
+      padding: 6px 3px;
+      -webkit-transition: background 50ms, color 50ms;
+      transition: background 50ms, color 50ms;
+    }
+    .contact-details .blue-circle-outline:hover {
+      color: #fff;
+      background: #006ac3;
+    }
+    .contact-details a.blue-circle-outline[hidden="hidden"] {
+      display: none;
+    }
+
+    /* --no-controls: applied by JS when the current bucket is below
+       the carousel threshold. Slick stays initialized; only the outer
+       chrome (arrows + dots wrap) hides. */
+    #rbccm-leadership.rbccm-leadership--no-controls .rbccm-leadership__btn,
+    #rbccm-leadership.rbccm-leadership--no-controls .rbccm-leadership__dots-wrap {
+      display: none !important;
+    }
+    /* Kill the dots list too in case slick reveals it mid-resize. */
+    #rbccm-leadership.rbccm-leadership--no-controls .slick-dots {
+      display: none !important;
+    }
+    /* No carousel = no keyboard-nav instructions worth announcing. */
+    #rbccm-leadership.rbccm-leadership--no-controls #rbccm-lead-instructions {
+      display: none;
     }
