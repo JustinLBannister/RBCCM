@@ -730,6 +730,16 @@
     #rbccm-leadership.rbccm-leadership--no-controls .rbccm-leadership__dots-wrap {
       display: none !important;
     }
+    /* Collapse the carousel grid to a single "track" column at every
+       breakpoint. Slick still runs underneath — this only strips the
+       prev/dots/next slots so the track re-aligns with the 1140
+       heading rail (and, at ≥1300, drops the -68px gutter breakout). */
+    #rbccm-leadership.rbccm-leadership--no-controls .rbccm-leadership__carousel {
+      grid-template-columns: 1fr;
+      grid-template-areas: "track";
+      margin: 4px auto 0;
+      max-width: 1140px;
+    }
     /* Kill the dots list too in case slick reveals it mid-resize. */
     #rbccm-leadership.rbccm-leadership--no-controls .slick-dots {
       display: none !important;
