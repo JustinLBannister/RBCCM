@@ -354,10 +354,11 @@
   }
   .rbccm-maas-mata__hero > * { position: relative; z-index: 1; }
 
-  /* Section eyebrows are semantic <h5>s for outline purposes -
-     reset the browser's default h5 margins, padding, and bold
-     weight in one shot so each section's own eyebrow rule owns
-     100% of the visual treatment. */
+  /* Section eyebrows: the hero eyebrow is a real H1 for SEO; the
+     rest are plain <div>s (non-heading) so they don't compete in
+     the outline. This rule zeroes margin/padding + resets weight
+     so each section's own eyebrow rule owns 100% of the visual
+     treatment. */
   .rbccm-maas-mata__hero-eyebrow,
   .rbccm-maas-mata__awards-eyebrow,
   .rbccm-maas-mata__platforms-eyebrow,
@@ -385,7 +386,7 @@
   h3.rbccm-maas-mata__featured-title,
   h3.rbccm-maas-mata__platform-title,
   h3.rbccm-maas-mata__mata-cap-title,
-  h6.rbccm-maas-mata__platform-eyebrow,
+  div.rbccm-maas-mata__platform-eyebrow,
   p.rbccm-maas-mata__award-issuer,
   p.rbccm-maas-mata__feature-body,
   p.rbccm-maas-mata__platform-body,
@@ -611,10 +612,10 @@
       box-sizing: border-box;
     }
   }
-  /* Awards eyebrow "SEE WHY THE WORLD'S TOP INSTITUTIONS CHOOSE
+  /* Awards eyebrow "See why the world's top institutions choose
      MAAS" - Figma: Roboto 16/19.2 weight 500, letter-spacing
-     1.92, colour #C3C3C3, uppercase, centered. Mobile stretches
-     full-width per spec. */
+     1.92, colour #C3C3C3, sentence case, centered. Mobile
+     stretches full-width per spec. */
   .rbccm-maas-mata__awards-eyebrow {
     color: #C3C3C3;
     text-align: center;
@@ -625,7 +626,6 @@
     font-weight: 500;
     line-height: 120%;      /* 19.2px */
     letter-spacing: 1.92px;
-    text-transform: uppercase;
     margin: 0 auto;
     max-width: 329px;
     align-self: center;
@@ -908,13 +908,14 @@
      letter-spacing 3px, uppercase, warm yellow. 45×2 yellow underline
      via ::after with a 15px gap sits inside a 360 × 40 eyebrow "box"
      (per Figma), which the paragraph flex-centres by margin: 0 auto. */
-  /* Platforms eyebrow "TWO PLATFORMS, ONE UNIFIED ECOSYSTEM."
+  /* Platforms eyebrow "Two platforms, one unified ecosystem"
      Figma spec differs by breakpoint on width/height:
        Mobile:  align-self: stretch (fills parent), height 49
        Desktop: fixed 858w, height 40
      Everything else identical: yellow, Roboto 14/400/120%, LS 3,
-     uppercase, centered. ::after generates the 45x2 yellow rule
-     underneath - matches spec's "line below" without adding markup. */
+     sentence case, centered. ::after generates the 45x2 yellow
+     rule underneath - matches spec's "line below" without adding
+     markup. */
   .rbccm-maas-mata__platforms-eyebrow {
     color: #FFC72C;
     text-align: center;
@@ -926,7 +927,6 @@
     font-weight: 400;
     line-height: 120%;      /* 16.8px */
     letter-spacing: 3px;
-    text-transform: uppercase;
     margin: 0 auto;
     padding: 15px 35px;
     display: flex;
@@ -1097,16 +1097,12 @@
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.13);
   }
-  /* Eyebrow "MAAS - EXECUTION" — Figma: 12/100% Roboto wt 400,
-     uppercase, letter-spacing 0.96, text centred, colour-matched
-     rule beneath the text (137px light / 135px dark, 0.5px tall,
-     10px gap). Whole block sits at flex-start of the card (left);
-     the text-align inside centres above the line. Rule + gap are
-     drawn via a ::after pseudo so we don't need extra markup. */
-  /* Eyebrow "MAAS - EXECUTION" — inline-flex row with
-     the text on the left and a 0.5px rule that fills the remaining
-     card content width. The rule grows via flex: 1 so it always
-     stops at the card's inner edge regardless of card width. */
+  /* Eyebrow "MAAS - Execution" — inline-flex row with the text
+     on the left and a 0.5px rule that fills the remaining card
+     content width. The rule grows via flex: 1 so it always stops
+     at the card's inner edge regardless of card width. Type spec:
+     Roboto 12/100% wt 400, letter-spacing 0.96, sentence case
+     (per SEO/copy pass). */
   .rbccm-maas-mata__platform-eyebrow {
     display: inline-flex;
     flex-direction: row;
@@ -1118,7 +1114,6 @@
     font-weight: 400;
     line-height: 100%;
     letter-spacing: 0.96px;
-    text-transform: uppercase;
     font-feature-settings: 'liga' off, 'clig' off;
     margin: 0;
     padding: 0;
@@ -1778,10 +1773,10 @@
   /* Section H2 "Market insights" — mirrors the assets/platforms
      heading: RBC Display 42/52.5 wt 500, centred, white. No margin —
      parent section gap (40px) owns spacing. */
-  /* Eyebrow "TRENDS SHAPING INSTITUTIONAL TRADING" - mirrors the
-     platforms + mata-cap eyebrow treatment: yellow uppercase text
-     with a 45x2 yellow rule beneath. Mobile stretches full-width,
-     desktop pins to 858. */
+  /* Eyebrow "Trends shaping institutional trading" - mirrors the
+     platforms + mata-cap eyebrow treatment: yellow sentence-case
+     text with a 45x2 yellow rule beneath. Mobile stretches
+     full-width, desktop pins to 858. */
   .rbccm-maas-mata__market-insights-eyebrow {
     color: #FFC72C;
     text-align: center;
@@ -1793,7 +1788,6 @@
     font-weight: 400;
     line-height: 120%;      /* 16.8px */
     letter-spacing: 3px;
-    text-transform: uppercase;
     margin: 0 auto;
     padding: 0px 35px 0;
     display: flex;
@@ -2090,9 +2084,10 @@
     padding: 0 23px;
     box-sizing: border-box;
   }
-  /* Eyebrow "SEE THE PLATFORM" — mirrors the platforms eyebrow
-     (Roboto 14/16.8 wt 400, letter-spacing 3, uppercase, warm-yellow,
-     45×2 yellow underline via ::after with 15px gap). */
+  /* Eyebrow "See the platform" — mirrors the platforms eyebrow
+     (Roboto 14/16.8 wt 400, letter-spacing 3, sentence case,
+     warm-yellow, 45×2 yellow underline via ::after with 15px
+     gap). */
   .rbccm-maas-mata__demo-eyebrow {
     display: flex;
     flex-direction: column;
@@ -2106,7 +2101,6 @@
     font-weight: 400;
     line-height: 120%;
     letter-spacing: 3px;
-    text-transform: uppercase;
   }
   @media (min-width: 992px) {
     /* Desktop: 5 more on bottom so the eyebrow's yellow rule sits
@@ -2567,7 +2561,7 @@
     }
   }
 
-  /* Eyebrow "MATA CAPABILITIES" - same treatment as the platforms
+  /* Eyebrow "MATA capabilities" - same treatment as the platforms
      eyebrow, with a 45x2 yellow rule underneath via ::after. */
   .rbccm-maas-mata__mata-cap-eyebrow {
     color: #FFC72C;
@@ -2580,7 +2574,6 @@
     font-weight: 400;
     line-height: 120%;      /* 16.8px */
     letter-spacing: 3px;
-    text-transform: uppercase;
     margin: 0 auto;
     padding: 15px 35px;
     display: flex;

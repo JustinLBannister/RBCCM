@@ -358,9 +358,9 @@
 
         <!-- 4. AWARDS -->
         <section class="rbccm-maas-mata__awards" aria-label="Awards">
-          <h5 class="rbccm-maas-mata__awards-eyebrow" data-animate="fadeInUp" data-json="awards.eyebrow">
+          <div class="rbccm-maas-mata__awards-eyebrow" data-animate="fadeInUp" data-json="awards.eyebrow">
             <xsl:value-of select="$AWD_EYEBROW" />
-          </h5>
+          </div>
 
           <div class="rbccm-maas-mata__awards-grid rbccm-maas-mata__awards-grid--3" data-awards-track="" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="awards.items">
             <template>
@@ -401,7 +401,7 @@
         <!-- 5. PLATFORMS -->
         <section class="rbccm-maas-mata__platforms" id="platform" aria-label="Two platforms, one unified ecosystem">
           <div class="rbccm-maas-mata__container">
-            <h5 class="rbccm-maas-mata__platforms-eyebrow" data-animate="fadeInUp" data-json="platforms.eyebrow"><xsl:value-of select="$PLATFORMS_EYEBROW" /></h5>
+            <div class="rbccm-maas-mata__platforms-eyebrow" data-animate="fadeInUp" data-json="platforms.eyebrow"><xsl:value-of select="$PLATFORMS_EYEBROW" /></div>
             <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading"><xsl:value-of select="$PLATFORMS_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__platforms-grid" data-stagger-parent="fadeInUp" data-stagger-step="150" data-json-list="platforms.cards">
@@ -415,7 +415,7 @@
                     <xsl:when test="translate($PLT1_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
                   </xsl:choose></xsl:attribute>
-                <h6 class="rbccm-maas-mata__platform-eyebrow" data-json="eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title" data-json="title"><xsl:value-of select="$PLT1_TITLE" /></h3>
+                <div class="rbccm-maas-mata__platform-eyebrow" data-json="eyebrow"><xsl:value-of select="$PLT1_EYEBROW" /></div><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title" data-json="title"><xsl:value-of select="$PLT1_TITLE" /></h3>
                 <p class="rbccm-maas-mata__platform-body" data-json-html="body"><xsl:value-of select="$PLT1_BODY" disable-output-escaping="yes" /></p>
                 <!-- Nested list: first <li> becomes the implicit template
                      when JSON provides bullets[]. data-json="" binds the
@@ -433,7 +433,7 @@
                     <xsl:when test="translate($PLT2_THEME, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'dark'"> rbccm-maas-mata__platform-card--dark</xsl:when>
                     <xsl:otherwise> rbccm-maas-mata__platform-card--light</xsl:otherwise>
                   </xsl:choose></xsl:attribute>
-                <h6 class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT2_EYEBROW" /></h6><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT2_TITLE" /></h3>
+                <div class="rbccm-maas-mata__platform-eyebrow"><xsl:value-of select="$PLT2_EYEBROW" /></div><div class="rbccm-maas-mata__platform-content"><h3 class="rbccm-maas-mata__platform-title"><xsl:value-of select="$PLT2_TITLE" /></h3>
                 <p class="rbccm-maas-mata__platform-body"><xsl:value-of select="$PLT2_BODY" disable-output-escaping="yes" /></p>
                 <ul class="rbccm-maas-mata__platform-list">
                   <xsl:if test="normalize-space($PLT2_B1) != ''"><li><xsl:value-of select="$PLT2_B1" /></li></xsl:if>
@@ -491,8 +491,8 @@
       <div class="rbccm-maas-mata__deep-band">
 
         <!-- 7. MATA CAPABILITIES -->
-        <section class="rbccm-maas-mata__mata-cap" aria-label="MATA Capabilities">
-          <h5 class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow"><xsl:value-of select="$MC_EYEBROW" /></h5>
+        <section class="rbccm-maas-mata__mata-cap" aria-label="MATA capabilities">
+          <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow"><xsl:value-of select="$MC_EYEBROW" /></div>
           <div class="rbccm-maas-mata__mata-cap-header" data-animate="fadeInUp" data-animate-delay="100">
             <h2 class="rbccm-maas-mata__mata-cap-heading" data-json="mataCapabilities.heading"><xsl:value-of select="$MC_HEADING" /></h2>
             <p class="rbccm-maas-mata__mata-cap-sub" data-json-html="mataCapabilities.subheading"><xsl:value-of select="$MC_SUBHEADING" disable-output-escaping="yes" /></p>
@@ -545,7 +545,7 @@
         <!-- 8. MARKET INSIGHTS -->
         <section class="rbccm-maas-mata__market-insights" aria-label="Market insights">
           <div class="rbccm-maas-mata__container">
-            <h5 class="rbccm-maas-mata__market-insights-eyebrow" data-animate="fadeInUp" data-json="marketInsights.eyebrow"><xsl:value-of select="$MK_EYEBROW" /></h5>
+            <div class="rbccm-maas-mata__market-insights-eyebrow" data-animate="fadeInUp" data-json="marketInsights.eyebrow"><xsl:value-of select="$MK_EYEBROW" /></div>
             <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading"><xsl:value-of select="$MK_HEADING" /></h2>
 
             <div class="rbccm-maas-mata__featured-track" data-animate="fadeInUp" data-animate-delay="200" data-insights-track="" data-json-list="marketInsights.items">
@@ -590,7 +590,7 @@
         <!-- 9. DEMO CTA -->
         <section class="rbccm-maas-mata__demo" id="demo" aria-label="See the platform">
           <div class="rbccm-maas-mata__container">
-            <h5 class="rbccm-maas-mata__demo-eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow"><xsl:value-of select="$DEMO_EYEBROW" /></h5>
+            <div class="rbccm-maas-mata__demo-eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow"><xsl:value-of select="$DEMO_EYEBROW" /></div>
             <h2 class="rbccm-maas-mata__demo-heading" data-animate="fadeInUp" data-animate-delay="100">
               <span data-json="demoCta.headlinePrefix"><xsl:value-of select="$DEMO_PREFIX" /></span><xsl:text>&#160;</xsl:text><span class="rbccm-maas-mata__demo-heading-highlight" data-json="demoCta.headlineHighlight"><xsl:value-of select="$DEMO_HIGHLIGHT" /></span>.
             </h2>
