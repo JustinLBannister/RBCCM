@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>In the Media — redesign mock (shared .rbccm-filter component)</title>
+<!-- Font Awesome 4 — used for .fa-phone icon on media contact cards.
+     RBCCM production site already loads FA4; this CDN link is for
+     the standalone mock only. -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  /* ============================================================
+     In the Media — redesign mock
+     Standalone HTML — no dependencies.
+
+     Filter bar
+     ─────────────────────────────────────────────────────────────
+     Consumes the SHARED .rbccm-filter component (same one used
+     on Conference Insights, migration-candidate for Upcoming
+     Conferences). Everything below the filter (article cards,
+     related content, media contacts) is page-scoped under
+     .rbccm-itm-*.
+
+     Article cards carry the data attributes the shared filter-by.js
+     runtime reads:
+       data-year         → matches "Year" dropdown
+       data-region       → matches "Region" dropdown
+                            (space-separated list, e.g. "global us")
+       data-type         → matches "Type" dropdown (media | press)
+       data-search-text  → lowercased haystack for the search input
+
+     Data source alignment (every filter + field ties to a DCR field):
+       year         → /press_release/publish_date  (YYYY-MM-DD)
+       region       → /press_release/region
+       type         → /press_release/topic  (media | press)
+       search       → /press_release/title + /press_release/description
+       card date    → /press_release/publish_date
+       card title   → /press_release/title
+       card body    → /press_release/description
+       runtime      → /press_release/time_to_read OR time_to_watch
+       external ↗   → /press_release/content: <link> vs <content>
+
+     Redesign moves vs current v1:
+       1. Shared .rbccm-filter bar at the TOP replaces the pipe-year
+          list at the bottom
+       2. Article rows become cards with hover state
+       3. Grouped by month with sticky subheaders
+       4. Side promo tiles moved to end as related-content CTAs
+       5. Media contacts become real people-cards with email
+       6. External ↗ indicator on links that leave the site
+     ============================================================ */
+  :root {
+    --Blue-Dark-Blue:   #003168;
+    --Blue-Bright-Blue: #0051A5;
+    --Yellow-Warm:      #FFC72C;
+    --navy-800:         #002144;
+    --navy-700:         #003168;
+    --navy-600:         #0051A5;
+    --grey-50:          #F7F9FB;
+    --grey-100:         #EEF2F6;
+    --grey-200:         #E1E7EE;
+    --grey-300:         #C9D2DC;
+    --grey-500:         #6E7580;
+    --grey-700:         #3E464F;
+    --ink:              #1B1F27;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 400 16px/1.5 Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: #fff;
+  }
+  h1, h2, h3, h4 { margin: 0; font-family: Roboto, sans-serif; }
+  a { color: inherit; text-decoration: none; }
+
+  .demo-note {
+    background: #F4F6FA; color: #3E464F; padding: 10px 24px;
+    font: 500 12px/1.4 Roboto, sans-serif; letter-spacing: 0.04em; text-transform: uppercase;
+    border-bottom: 1px solid var(--grey-200);
+  }
+
+  /* ============================================================
+     HERO (in-the-media-scoped)
+     ============================================================ */
+  .rbccm-itm-hero {
+    background: linear-gradient(135deg, #041a3a 0%, #0a2a5a 60%, #0f3d80 100%);
+    color: #fff;
+    padding: 60px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rbccm-itm-hero::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 4px; background: var(--Yellow-Warm);
+  }
+  .rbccm-itm-hero__crumbs {
+    max-width: 1140px; margin: 0 auto 20px;
+    font-size: 13px; color: rgba(255,255,255,0.75);
+  }
+  .rbccm-itm-hero__crumbs a:hover { text-decoration: underline; }
+  .rbccm-itm-hero__title {
+    max-width: 1140px; margin: 0 auto;
+    font-family: RBCDisplay, Georgia, "Times New Roman", serif;
+    font-size: 48px; font-weight: 500; line-height: 1.1;
+  }
+
+  /* ============================================================
+     SHARED FILTER COMPONENT — .rbccm-filter
+     Pasted verbatim from filter-by.css so this mock works standalone.
+     In prod: <link rel="stylesheet" href="/assets/rbccm/css/components/filter-by.css">
+     ============================================================ */
+  [data-filter-bound="true"] { scroll-margin-top: var(--rbccm-filter-scroll-offset, 100px); }
+
+  .rbccm-filter { padding: var(--rbccm-filter-pt-m, 40px) 16px var(--rbccm-filter-pb-m, 40px); }
+  @media (min-width: 768px) {
+    .rbccm-filter { padding: var(--rbccm-filter-pt-d, 43px) 16px var(--rbccm-filter-pb-d, 43px); }
+  }
+  .rbccm-filter__inner { max-width: 1140px; margin: 0 auto; }
+  .rbccm-filter__row { display: flex; flex-direction: column; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+  @media (min-width: 768px) {
+    .rbccm-filter__row { flex-direction: row; align-items: center; gap: 16px; justify-content: flex-start; }
+  }
+  .rbccm-filter__filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  /* Desktop: filter-group grows to fill the space between the "Filter
+     by:" label (natural width) and the "Clear filters" button
+     (natural width) — the 4 dropdowns then share that space equally. */
+  @media (min-width: 768px) { .rbccm-filter__filter-group { flex: 1 1 auto; } }
+  .rbccm-filter__filter-label {
+    color: var(--Blue-Dark-Blue);
+    display: inline-block;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    padding: 11px 0 6px 0;
+  }
+  .rbccm-filter__select-wrap { display: block; flex: 1 1 0; min-width: 0; position: relative; }
+  @media (max-width: 767px) {
+    .rbccm-filter__select-wrap[data-filter="type"] { flex: 1 1 100%; }
+  }
+  @media (min-width: 768px) {
+    /* Desktop: 4 dropdowns share the row equally, filling the space
+       between the "Filter by:" label and the "Clear filters" button. */
+    .rbccm-filter__select-wrap { flex: 1 1 0; width: auto; min-width: 0; }
+  }
+  .rbccm-filter__select {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #A8A8A8;
+    border-radius: 5px;
+    color: #252525;
+    cursor: pointer;
+    display: flex;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    padding: 6.5px 20px 6.5px 10px;
+    text-align: left;
+    transition: border-color 0.15s ease;
+    width: 100%;
+  }
+  .rbccm-filter__select-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+  .rbccm-filter__select:hover, .rbccm-filter__select:focus, .rbccm-filter__select[aria-expanded="true"] {
+    border-color: var(--Blue-Bright-Blue); outline: none;
+  }
+  .rbccm-filter__select-chevron {
+    color: var(--Blue-Dark-Blue);
+    pointer-events: none;
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.15s ease;
+  }
+  .rbccm-filter__select[aria-expanded="true"] + .rbccm-filter__select-chevron { transform: translateY(-50%) rotate(180deg); }
+  .rbccm-filter__select-panel {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #929292;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.25);
+    display: flex; flex-direction: column;
+    left: 0;
+    list-style: none;
+    margin: 4px 0 0 0;
+    min-width: 100%;
+    padding: 10px 0;
+    position: absolute;
+    top: 100%;
+    width: max-content;
+    max-width: min(320px, 100vw - 32px);
+    z-index: 30;
+  }
+  .rbccm-filter__select-panel[hidden] { display: none; }
+  .rbccm-filter__select-option {
+    align-items: flex-start;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+  }
+  .rbccm-filter__select-option:hover, .rbccm-filter__select-option:focus-visible { background: rgba(0,81,165,0.08); }
+  .rbccm-filter__select-option[aria-selected="true"] { color: var(--Blue-Bright-Blue); font-weight: 500; }
+  .rbccm-filter__search {
+    align-items: center; align-self: stretch;
+    background: #fff;
+    border: 1px solid #A8A8A8;
+    border-radius: 5px;
+    display: flex; gap: 10px; margin: 0;
+    padding: 7px 10px;
+    transition: border-color 0.15s ease;
+    width: 100%;
+  }
+  .rbccm-filter__search:hover, .rbccm-filter__search:focus-within { border-color: var(--Blue-Bright-Blue); }
+
+  /* Desktop layout — two rows:
+       Row 1: [Filter by:  Type  Year  Month  Region] ................. [Clear filters]
+       Row 2: [........................ Search bar (full width) ...........................]
+     Achieved via CSS `order` so the DOM stays in a mobile-friendly
+     source order (filter-group → search → clear) but reflows on
+     desktop to show Search full-width on its own row. */
+  @media (min-width: 768px) {
+    .rbccm-filter__filter-group { order: 1; }
+    .rbccm-filter__reset        { order: 2; margin-left: auto; }
+    .rbccm-filter__search       { order: 3; flex: 1 1 100%; width: 100%; max-width: none; margin-left: 0; }
+  }
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .rbccm-filter__filter-group { flex: 1 1 100%; }
+    .rbccm-filter__filter-group .rbccm-filter__select-wrap { flex: 1 1 0; width: auto; }
+    /* Tablet: filter-group is full-width row 1, so Search (row 2) and
+       Clear (row 3) each become their own row. Push Clear to the
+       bottom to match the mobile stack order. Force full-width so
+       search stretches edge-to-edge inside the tablist container
+       even if flex context tries to shrink it. */
+    .rbccm-filter__search { order: 2; flex: 1 1 100% !important; width: 100% !important; max-width: none !important; }
+    .rbccm-filter__reset  { order: 3; margin-left: auto; }
+  }
+  .rbccm-filter__search-icon { color: var(--Blue-Dark-Blue); flex-shrink: 0; }
+  .rbccm-filter__search-input {
+    background: transparent; border: 0;
+    color: #252525;
+    flex: 1;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    outline: none;
+    padding: 4px 0 0 0;
+    width: 100%; min-width: 0;
+  }
+  .rbccm-filter__search-input::placeholder { color: #6f6f6f; opacity: 1; }
+  .rbccm-filter__reset {
+    background: transparent;
+    border: 1px solid var(--Blue-Bright-Blue);
+    border-radius: 5px;
+    color: var(--Blue-Bright-Blue);
+    cursor: pointer;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    padding: 11px 20px 6px 20px;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  .rbccm-filter__reset:hover, .rbccm-filter__reset:focus-visible {
+    background: var(--Blue-Bright-Blue); color: #fff; outline: none;
+  }
+  .rbccm-filter__sr-only {
+    border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden;
+    padding: 0; position: absolute; white-space: nowrap; width: 1px;
+  }
+
+  /* ---------- Pagination (from shared filter-by.css) ---------- */
+  .rbccm-filter__pagination {
+    align-items: center; display: flex; flex-wrap: wrap;
+    gap: 26px; justify-content: center;
+    margin: 32px 0;
+  }
+  .rbccm-filter__pagination:empty { display: none; }
+  .rbccm-filter__page-btn {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--Blue-Dark-Blue);
+    border-radius: 50%;
+    color: #252525;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400; line-height: normal;
+    height: 40px; min-width: 40px;
+    justify-content: center;
+    padding: 4px 10px 0 10px;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .rbccm-filter__page-btn--prev, .rbccm-filter__page-btn--next {
+    border-color: transparent; background: transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .rbccm-filter__page-btn--prev { padding: 0 10px 0 6px; }
+  .rbccm-filter__page-btn--next { padding: 0 6px 0 10px; }
+  .rbccm-filter__page-btn:hover, .rbccm-filter__page-btn:focus-visible {
+    background: var(--Blue-Dark-Blue); border-color: var(--Blue-Dark-Blue);
+    color: #fff; outline: none;
+  }
+  .rbccm-filter__page-btn--active,
+  .rbccm-filter__page-btn--active:hover,
+  .rbccm-filter__page-btn--active:focus-visible {
+    background: var(--Blue-Dark-Blue); border-color: var(--Blue-Dark-Blue);
+    color: #fff; cursor: default;
+  }
+  .rbccm-filter__page-btn[disabled] { cursor: default; opacity: 0.4; pointer-events: none; }
+  .rbccm-filter__page-btn-icon { color: var(--Blue-Dark-Blue); display: block; flex: none; transition: color 0.2s ease; }
+  .rbccm-filter__page-btn--prev:hover .rbccm-filter__page-btn-icon,
+  .rbccm-filter__page-btn--next:hover .rbccm-filter__page-btn-icon,
+  .rbccm-filter__page-btn--prev:focus-visible .rbccm-filter__page-btn-icon,
+  .rbccm-filter__page-btn--next:focus-visible .rbccm-filter__page-btn-icon { color: #fff; }
+  .rbccm-filter__page-ellipsis {
+    align-items: center; background: #fff;
+    border: 1px solid var(--Blue-Dark-Blue); border-radius: 50%;
+    color: var(--Blue-Dark-Blue);
+    display: inline-flex;
+    font-family: RBCDisplay, Georgia, Times, serif;
+    font-size: 16px; font-weight: 400;
+    height: 40px; min-width: 40px; width: 40px;
+    justify-content: center; opacity: 0.4;
+    padding: 0; user-select: none;
+  }
+  @media (max-width: 1023px) {
+    .rbccm-filter__pagination { gap: 18px; margin: 24px 0; }
+    .rbccm-filter__page-btn, .rbccm-filter__page-ellipsis { font-size: 14px; height: 34px; min-width: 34px; width: auto; }
+    .rbccm-filter__page-ellipsis { width: 34px; }
+    .rbccm-filter__page-btn-icon { height: 14px; width: auto; }
+  }
+  @media (max-width: 767px) {
+    .rbccm-filter__pagination { gap: 12px; margin: 20px 0; }
+    .rbccm-filter__page-btn, .rbccm-filter__page-ellipsis {
+      font-size: 12px; height: 28px; min-width: 28px; padding: 3px 6px 0 6px; width: auto;
+    }
+    .rbccm-filter__page-ellipsis { padding: 0; width: 28px; }
+    .rbccm-filter__page-btn--prev { padding: 0 6px 0 4px; }
+    .rbccm-filter__page-btn--next { padding: 0 4px 0 6px; }
+    .rbccm-filter__page-btn-icon { height: 12px; width: auto; }
+  }
+
+  /* ============================================================
+     IN-THE-MEDIA-scoped component (article list + cards + contacts)
+     ─────────────────────────────────────────────────────────────
+     Each section (hero, filter, featured, article list, contacts)
+     is self-contained — owns its own max-width + padding rather
+     than sharing a page-level wrapper. Hero/filter/contacts already
+     followed this pattern; featured + article list now do too, so
+     the outer <main> wrapper is gone.
+     ============================================================ */
+
+  /* Article list section — sibling of hero/filter/contacts. */
+  .rbccm-itm-list-section {
+    max-width: 1140px; margin: 0 auto;
+    padding: 40px 0 60px;
+  }
+  /* Section H2 — mirrors the .rbccm-itm-contacts__title spec
+     (RBCDisplay 29/34.8 wt 500 letter-spacing 1px #002144).
+     Left-aligned by default here since the list sits below a
+     left-aligned filter bar. */
+  .rbccm-itm-list-section__title {
+    color: #002144;
+    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    font-size: 29px;
+    font-weight: 500;
+    line-height: 34.8px;
+    letter-spacing: 1px;
+    text-align: left;
+    margin: 0 0 24px;
+  }
+  @media (max-width: 991px) {
+    .rbccm-itm-list-section__title {
+      font-size: 24px;
+      line-height: 120%;
+      letter-spacing: 0;
+    }
+  }
+  /* ---------- Article list — matches "How we think > Newsroom" pattern
+     from the About page:
+       - Left blue rule (3px)
+       - Date (small grey)
+       - Title (bright-blue link, medium weight)
+       - Summary (dark grey body)
+     No card border, no chips, no arrow, no shadow. Region tag stays
+     inline with the date as a low-contrast pill so filter context
+     remains visible without disrupting the pattern.
+     Anchors carry target="_blank" + rel="noopener" + aria-label
+     "(opens in new tab)" per the About-page pattern. */
+  /* 2-column grid on desktop → 10 items renders as 5 rows × 2 cols.
+     Mobile stacks to 1 column since side-by-side would be too tight. */
+  .rbccm-itm-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+    row-gap: 32px;
+    padding: 8px 0 0;
+  }
+  @media (max-width: 767px) {
+    .rbccm-itm-list { grid-template-columns: 1fr; row-gap: 28px; }
+  }
+  /* Item — ported 1:1 from .rbccm-how-we-think__news-item:
+       - 3px bright-blue (#006AC3) left rail
+       - Yellow (#FFC72C) fill animates bottom → top ONLY when the
+         inner anchor is hovered/focused (not the whole item region),
+         via :has() lifting the anchor state up to the item.
+       - Reduced-motion respected.
+     Typography matches how-we-think spec so a future migration to
+     a shared .rbccm-news-item component is a rename, nothing more. */
+  .rbccm-itm-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    gap: 6px;
+    padding-left: 16px;
+    border-left: 3px solid #006AC3;
+  }
+  .rbccm-itm-card::before {
+    content: "";
+    position: absolute;
+    left: -3px; bottom: 0;
+    width: 3px; height: 0;
+    background: #FFC72C;
+    transition: height 0.4s ease;
+    pointer-events: none;
+  }
+  .rbccm-itm-card:has(.rbccm-itm-card__link:hover)::before,
+  .rbccm-itm-card:has(.rbccm-itm-card__link:focus-visible)::before {
+    height: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-itm-card::before { transition: none; }
+  }
+  .rbccm-itm-card__date {
+    color: #6B7280;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+  }
+  /* Type indicator — sits inline in the date row next to the region
+     pill. Small dot + label. Color varies by type:
+       press → yellow dot  (matches the brand accent)
+       media → navy dot    (matches the H2 color)
+     Injected via JS from data-type so the HTML stays clean. */
+  .rbccm-itm-card__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    color: #003168;
+    font-family: "Roboto Medium", Roboto, Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .rbccm-itm-card__eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  /* Both variants use navy for text + dot — matches the H2 color and
+     keeps the two eyebrows visually consistent. Type differentiation
+     lives at card level (navy rail + tint on press release cards). */
+  .rbccm-itm-card__eyebrow--press::before { background: #002144; }
+  .rbccm-itm-card__eyebrow--media::before { background: #002144; }
+  /* Press release items get a darker (navy) left rail so scanning
+     the list, users can tell "internal RBC announcement" vs external
+     media coverage at a glance. Same 3px width so cards still align
+     row-to-row. Yellow hover fill still overlays either color. */
+  .rbccm-itm-card[data-type="press"] {
+    border-left-color: #003168;
+  }
+  /* Subtle navy tint + vertical padding for breathing room. No
+     negative margins, so the row-gap stays a uniform 32px between
+     every card regardless of type. Press cards end up 24px taller;
+     the grid's auto-stretch keeps rows equal height. */
+  .rbccm-itm-card[data-type="press"] {
+    background: rgba(0, 49, 104, 0.03);
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .rbccm-itm-card__link {
+    color: #006AC3;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: none;
+    align-self: flex-start;
+  }
+  .rbccm-itm-card__link:hover,
+  .rbccm-itm-card__link:focus-visible {
+    text-decoration: underline;
+    color: #003168;
+    outline: none;
+  }
+  .rbccm-itm-card__summary {
+    color: #494949;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 15px;
+    margin: 4px 0 0;
+  }
+  .rbccm-itm-card__region {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    background: var(--grey-100); color: var(--grey-700);
+    border-radius: 100px;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  /* Pagination host — sits directly under the list.
+     Hidden by default and revealed only when a filter is active.
+     The archive spans 10+ years → without this gate, showing 100+
+     pages at rest is useless noise. filter-by.js should toggle
+     .is-active on this element whenever any filter is set (Type,
+     Year, Month, Region, or Search has content).
+     Actual pagination CSS ships with the shared filter-by
+     component (.rbccm-filter__page-*), already included above. */
+  .rbccm-filter__pagination-host { margin-top: 20px; display: none; }
+  .rbccm-filter__pagination-host.is-active { display: block; }
+
+  /* Idle-state hint — visible only when no filter is applied.
+     Tells the user why pagination isn't showing and points them
+     at the filter bar. Hidden as soon as any filter kicks in. */
+  .rbccm-itm-archive-hint {
+    margin: 20px 0 0;
+    padding: 16px 20px;
+    background: var(--grey-50);
+    border-left: 3px solid var(--Blue-Bright-Blue);
+    font: 400 14px/1.5 Roboto, sans-serif;
+    color: var(--grey-700);
+    text-align: left;
+  }
+  .rbccm-itm-archive-hint.is-hidden { display: none; }
+
+  /* Related content */
+  .rbccm-itm-related { background: var(--grey-50); padding: 60px 24px; border-top: 1px solid var(--grey-200); }
+  .rbccm-itm-related__inner { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .rbccm-itm-related__title { font: 500 22px/1.2 Roboto, sans-serif; color: var(--navy-800); margin-bottom: 4px; }
+  .rbccm-itm-related__cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 768px) { .rbccm-itm-related__cards { grid-template-columns: 1fr 1fr; } }
+  .rbccm-itm-related__card {
+    display: flex; align-items: center; gap: 20px;
+    background: #fff;
+    border: 1px solid var(--grey-200);
+    border-radius: 10px;
+    padding: 20px 24px;
+    color: var(--ink);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .rbccm-itm-related__card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,33,68,0.10); }
+  .rbccm-itm-related__thumb { width: 88px; height: 88px; border-radius: 8px; background: linear-gradient(135deg, #0a2a5a, #123f80); flex-shrink: 0; }
+  .rbccm-itm-related__thumb--alt { background: linear-gradient(135deg, #2a3a5c, #4a5c7a); }
+  .rbccm-itm-related__eyebrow {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--navy-600); font-weight: 500; margin-bottom: 6px;
+  }
+  .rbccm-itm-related__heading { font: 500 18px/1.3 Roboto, sans-serif; color: var(--navy-800); margin: 0 0 4px; }
+  .rbccm-itm-related__desc { font-size: 13px; color: var(--grey-700); }
+
+  /* Media contacts */
+  /* ---------- Media contacts — tabs pattern
+     Mirrors .rbccm-how-we-think exactly, section shell + heading +
+     lede + tablist + panels, scoped under .rbccm-itm-contacts.
+  ---------- */
+  .rbccm-itm-contacts {
+    --itmc-navy: #003168;
+    --itmc-navy-dark: #002144;
+    --itmc-blue: #0051A5;
+    --itmc-ink: #082043;
+    --itmc-text: #494949;
+    --itmc-muted: #6B7280;
+    --itmc-hairline: #D8D8D8;
+    --itmc-serif: "RBC Display", RBCDisplay, Georgia, Times, serif;
+    --itmc-sans: Roboto, Arial, sans-serif;
+
+    /* Section shell. Padding + borders exposed as custom properties
+       so Datums can override just top/bottom without touching sides.
+         --itmc-pt-m / --itmc-pb-m   mobile top/bottom (default 40px)
+         --itmc-pt-d / --itmc-pb-d   desktop top/bottom (default 64px)
+         --itmc-border-top           any border shorthand or 'none'
+         --itmc-border-bottom        any border shorthand or 'none'
+       Horizontal padding stays hardcoded so left/right always align
+       with the site grid. */
+    display: block;
+    padding: var(--itmc-pt-m, 40px) 16px var(--itmc-pb-m, 40px);
+    background: #fff;
+    border-top:    var(--itmc-border-top, 1px solid #ccc);
+    border-bottom: var(--itmc-border-bottom, none);
+    max-width: none;
+    margin: 0;
+  }
+  @media (min-width: 992px) {
+    .rbccm-itm-contacts {
+      padding: var(--itmc-pt-d, 64px) 24px var(--itmc-pb-d, 64px);
+    }
+  }
+  @media (min-width: 1440px) {
+    .rbccm-itm-contacts {
+      padding: var(--itmc-pt-d, 64px) 170px var(--itmc-pb-d, 64px);
+    }
+  }
+
+  /* ColorScheme modifiers — mirror the leadership carousel API.
+       (default)    white bg, navy H2, black lede
+       --on-ltblue  light blue bg (#EFF6FD) with same type treatment
+       --on-dark    dark navy bg with white type + inverted defaults
+     Cards keep their white background regardless so they still read
+     against a colored or dark section bg. */
+  .rbccm-itm-contacts--on-ltblue { background: #EFF6FD; }
+  .rbccm-itm-contacts--on-dark   { background: var(--itmc-navy-dark, #002144); }
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__title,
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__lede { color: #FFF; }
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__tab   { color: #FFF; border-bottom-color: rgba(255,255,255,0.35); }
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__tab.is-active { color: #FFF; }
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__tab.is-active::after { background: #FFC72C; }
+  /* On dark: tab hover flips to yellow so it doesn't fade into the
+     navy background (base rule uses --itmc-ink navy, invisible here). */
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__tab:hover,
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__tab:focus-visible { color: #FFC72C; }
+
+  /* Lede anchor — default blue, on-dark flips to yellow so it stays
+     legible against the navy section bg. Underline always on. */
+  .rbccm-itm-contacts__lede a {
+    color: var(--navy-600);
+    text-decoration: underline;
+  }
+  .rbccm-itm-contacts--on-dark .rbccm-itm-contacts__lede a {
+    color: #FFC72C;
+  }
+  .rbccm-itm-contacts *,
+  .rbccm-itm-contacts *::before,
+  .rbccm-itm-contacts *::after { box-sizing: border-box; }
+
+  /* Section H2 — matches .rbccm-how-we-think__heading exactly.
+     Desktop: RBCDisplay 29/34.8 wt 500, letter-spacing 1px, #002144.
+     Mobile (<992): RBC Display 24/120% wt 500, letter-spacing 0. */
+  .rbccm-itm-contacts__title {
+    color: #002144;
+    font-family: var(--itmc-serif);
+    font-size: 29px;
+    font-weight: 500;
+    line-height: 34.8px;
+    letter-spacing: 1px;
+    text-align: center;  /* default — matches how-we-think */
+    margin: 0 auto 32px;
+    max-width: 1140px;
+    width: 100%;
+  }
+  @media (max-width: 991px) {
+    .rbccm-itm-contacts__title {
+      font-size: 24px;
+      line-height: 120%;
+      letter-spacing: 0;
+    }
+  }
+
+  /* Lede — matches .rbccm-how-we-think__panel-lede.
+     Desktop: Roboto 18/26 wt 400 #000. Mobile (<992): 16/120%. */
+  .rbccm-itm-contacts__lede {
+    text-align: center;  /* default — matches how-we-think */
+    color: #000;
+    font-family: var(--itmc-sans);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 26px;
+    margin: 0 auto 32px;
+    max-width: 1140px;
+    width: 100%;
+  }
+  @media (max-width: 991px) {
+    .rbccm-itm-contacts__lede {
+      font-size: 16px;
+      line-height: 120%;
+    }
+  }
+
+  /* Alignment modifiers — mirror the shared /tabbed-panels/
+     component's --title-left / --lede-left / --align-left API.
+     Defaults are centered; consumers opt into left-alignment. */
+  .rbccm-itm-contacts--title-left .rbccm-itm-contacts__title { text-align: left; }
+  .rbccm-itm-contacts--lede-left  .rbccm-itm-contacts__lede  { text-align: left; }
+  .rbccm-itm-contacts--align-left .rbccm-itm-contacts__title,
+  .rbccm-itm-contacts--align-left .rbccm-itm-contacts__lede { text-align: left; }
+
+  /* ---------- Tablist wrapper ----------
+     Mobile: flex column so tabs + panels stack as accordion.
+     Desktop: grid with N columns so tabs sit in row 1 and panels
+     span row 2. Progressive-enhancement `order` values interleave
+     panels next to their tabs on mobile even without JS. */
+  .rbccm-itm-contacts__tablist {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--itmc-hairline);
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;   /* center the tablist under section (block layout) */
+  }
+  /* PE fallback order for accordion visual (mobile, no JS) */
+  .rbccm-itm-contacts__tab[data-panel="global"]      { order: 1; }
+  .rbccm-itm-contacts__panel[data-panel="global"]    { order: 2; }
+  .rbccm-itm-contacts__tab[data-panel="canada"]      { order: 3; }
+  .rbccm-itm-contacts__panel[data-panel="canada"]    { order: 4; }
+  .rbccm-itm-contacts__tab[data-panel="us"]          { order: 5; }
+  .rbccm-itm-contacts__panel[data-panel="us"]        { order: 6; }
+  .rbccm-itm-contacts__tab[data-panel="europeapac"]  { order: 7; }
+  .rbccm-itm-contacts__panel[data-panel="europeapac"]{ order: 8; }
+
+  /* ---------- Tab (mobile-first accordion header) ---------- */
+  .rbccm-itm-contacts__tab {
+    position: relative;
+    appearance: none;
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--itmc-hairline);
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    font-family: "Roboto Medium", Roboto, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    gap: 12px;
+    justify-content: space-between;
+    line-height: 120%;
+    margin: 0;
+    padding: 18px 4px;
+    text-align: left;
+    transition: color 150ms ease;
+    width: 100%;
+  }
+  .rbccm-itm-contacts__tab:hover      { color: var(--itmc-ink); }
+  .rbccm-itm-contacts__tab.is-active  { color: #000; }
+  .rbccm-itm-contacts__tab:focus-visible { outline: 2px solid var(--itmc-blue); outline-offset: -2px; }
+
+  /* Chevron — SVG drawn UP-pointing. Default rotates 180° → points
+     DOWN ("click to expand"). Active rotates 0° → points UP
+     ("click to collapse"). Hidden on desktop. */
+  .rbccm-itm-contacts__tab-chevron {
+    display: block;
+    width: 24px; height: 24px;
+    fill: currentColor;
+    flex-shrink: 0;
+    transform: rotate(180deg);
+    transition: transform 0.25s ease;
+  }
+  .rbccm-itm-contacts__tab.is-active .rbccm-itm-contacts__tab-chevron {
+    transform: rotate(0deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rbccm-itm-contacts__tab-chevron { transition: none; }
+  }
+
+  /* ---------- Panels ---------- */
+  .rbccm-itm-contacts__panel {
+    display: none;
+    padding: 32px 0;
+  }
+  .rbccm-itm-contacts__panel.is-active { display: block; }
+  /* Mobile: close the bottom of the open panel so accordion reads
+     as a full-bordered box. */
+  @media (max-width: 991px) {
+    .rbccm-itm-contacts__panel.is-active {
+      border-bottom: 1px solid var(--itmc-hairline);
+    }
+  }
+
+  /* ---------- Desktop overrides (≥992) ---------- */
+  @media (min-width: 992px) {
+    .rbccm-itm-contacts__tablist {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: auto;
+      border-top: none;
+    }
+    .rbccm-itm-contacts__tab {
+      grid-row: 1;
+      border-top: none;
+      border-bottom: 1px solid #000;
+      flex-direction: column;
+      font-family: Roboto, Arial, sans-serif;
+      font-weight: 500;
+      gap: 0;
+      justify-content: center;
+      line-height: 32px;
+      padding: 16px;
+      text-align: center;
+    }
+    /* Active tab: 3px black underline centred on the row-1 hairline. */
+    .rbccm-itm-contacts__tab.is-active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      bottom: -2px;
+      height: 3px;
+      background: #000;
+      pointer-events: none;
+    }
+    .rbccm-itm-contacts__tab-chevron { display: none; }
+    .rbccm-itm-contacts__panel {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      padding: 32px 0 0 0;
+    }
+  }
+  /* Grid always resolves to 4 columns on desktop (≥768) so a lone
+     card (e.g. Global's single contact) still occupies exactly a
+     quarter of the row — the remaining 3 tracks stay empty rather
+     than collapsing the card to full width. Mobile stacks 1-up. */
+  .rbccm-itm-contacts__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px 16px;
+  }
+  @media (min-width: 768px) {
+    .rbccm-itm-contacts__grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  /* Force every direct child (cards) onto column tracks — even
+     though grid does this by default, this guards against future
+     wrapper elements slipping in and disrupting the 1/4 slot. */
+  .rbccm-itm-contacts__grid > .rbccm-itm-contact { min-width: 0; }
+  /* Contact card — leadership card pattern without the photo slot
+     (media contacts have no headshots in the DCR). Layout: name
+     top-left, role below, phone number below role, 44×44 phone
+     icon anchored bottom-right (same slot the leadership card
+     puts LinkedIn). Whole card is a tel: anchor.
+
+     Typography per leadership spec:
+       • Name: Roboto 16/normal wt 500 capitalize #000
+       • Role: Roboto 16/19 wt 400 capitalize #454545
+       • Phone: Roboto 14 wt 400 #6B7280 (smaller than role,
+         since it's supporting info — the icon is the affordance)
+     Border: 1px solid #A8A8A8, no radius (flat card). */
+  .rbccm-itm-contact {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 24px 84px;   /* 24 top/sides, extra bottom for the icon */
+    min-height: 220px;
+    background: #fff;
+    border: 1px solid #A8A8A8;
+    color: #000;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+  }
+  .rbccm-itm-contact:hover,
+  .rbccm-itm-contact:focus-visible {
+    border-color: var(--Blue-Bright-Blue);
+    outline: none;
+    text-decoration: none;
+  }
+
+  .rbccm-itm-contact__name {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: normal;
+    text-transform: capitalize;
+    color: #000;
+    text-align: left;
+    margin: 0 0 8px;
+  }
+  .rbccm-itm-contact__role {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19px;
+    text-transform: capitalize;
+    color: #454545;
+    text-align: left;
+    margin: 0 0 10px;
+  }
+  .rbccm-itm-contact__phone {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    color: #6B7280;
+    text-align: left;
+    margin: 0;
+  }
+  /* 44×44 circle wrapping the Font Awesome 4 fa-phone glyph.
+     Anchored bottom-right, mirrors the leadership LinkedIn-icon
+     slot. Card owns the click; the icon is decorative. */
+  .rbccm-itm-contact__phone-icon {
+    position: absolute;
+    right: 20px; bottom: 20px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid #0051A5;
+    color: #0051A5;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    font-size: 20px;
+    line-height: 1;
+    pointer-events: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .rbccm-itm-contact:hover .rbccm-itm-contact__phone-icon,
+  .rbccm-itm-contact:focus-visible .rbccm-itm-contact__phone-icon {
+    background: #0051A5;
+    color: #fff;
+  }
+  .rbccm-itm-contact__phone-icon .fa { display: block; }
+</style>
+</head>
+<body>
+
+<div class="demo-note">In the Media — redesign mock (uses shared .rbccm-filter component + .rbccm-itm-* page classes)</div>
+
+<!-- Hero -->
+<header class="rbccm-itm-hero">
+  <nav class="rbccm-itm-hero__crumbs" aria-label="Breadcrumb">
+    <a href="#">Home</a> / <a href="#">About Us</a> / <span>In the media</span>
+  </nav>
+  <h1 class="rbccm-itm-hero__title">In the media</h1>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────────
+     SHARED FILTER COMPONENT — .rbccm-filter
+     Consumes the site's shared filter-by pattern.
+     data-container points to the article list this filter drives.
+     ───────────────────────────────────────────────────────────── -->
+<section class="rbccm-filter"
+         aria-label="Filter media coverage"
+         data-container="#rbccm-itm-list"
+         style="--rbccm-filter-pt-m: 20px; --rbccm-filter-pt-d: 24px; --rbccm-filter-pb-m: 20px; --rbccm-filter-pb-d: 24px;"
+         data-page-size="10"
+         data-page-size-filtered="10"
+         data-empty-heading="No coverage found"
+         data-empty-message="We couldn't find any media coverage that matches your current filters."
+         data-empty-message-emphasis="Try adjusting your filters or search terms."
+         data-empty-clear-label="Clear filters"
+         data-filter-bound="true">
+  <div class="rbccm-filter__inner">
+    <div class="rbccm-filter__row">
+
+      <div class="rbccm-filter__filter-group">
+        <span class="rbccm-filter__filter-label">Filter by:</span>
+
+        <!-- Type → /press_release/topic (media | press)
+             Left unselected on landing so users know they can drill
+             down. The initial 10 items happen to all be media coverage
+             (that's what recent activity looks like) — no client-side
+             filter is being applied. -->
+        <div class="rbccm-filter__select-wrap" data-filter="type">
+          <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Type">
+            <span class="rbccm-filter__select-label">Type</span>
+          </button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filter__select-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+          <ul class="rbccm-filter__select-panel" role="listbox" aria-label="Type" hidden>
+            <li class="rbccm-filter__select-option" role="option" data-value=""      aria-selected="true"  tabindex="-1">Type</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="media" aria-selected="false" tabindex="-1">Media coverage</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="press" aria-selected="false" tabindex="-1">Press releases</li>
+          </ul>
+        </div>
+
+        <!-- Year → /press_release/publish_date -->
+        <div class="rbccm-filter__select-wrap" data-filter="year">
+          <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
+            <span class="rbccm-filter__select-label">Year</span>
+          </button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filter__select-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+          <ul class="rbccm-filter__select-panel" role="listbox" aria-label="Year" hidden>
+            <li class="rbccm-filter__select-option" role="option" data-value=""     aria-selected="true"  tabindex="-1">Year</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2026" aria-selected="false" tabindex="-1">2026</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2025" aria-selected="false" tabindex="-1">2025</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2024" aria-selected="false" tabindex="-1">2024</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2023" aria-selected="false" tabindex="-1">2023</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2022" aria-selected="false" tabindex="-1">2022</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2021" aria-selected="false" tabindex="-1">2021</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2020" aria-selected="false" tabindex="-1">2020</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2019" aria-selected="false" tabindex="-1">2019</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2018" aria-selected="false" tabindex="-1">2018</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2017" aria-selected="false" tabindex="-1">2017</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2016" aria-selected="false" tabindex="-1">2016</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2015" aria-selected="false" tabindex="-1">2015</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2014" aria-selected="false" tabindex="-1">2014</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2013" aria-selected="false" tabindex="-1">2013</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2012" aria-selected="false" tabindex="-1">2012</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="2011" aria-selected="false" tabindex="-1">2011</li>
+          </ul>
+        </div>
+
+        <!-- Month → /press_release/publish_date (month component)
+             Combines with Year to narrow to a specific month. Values
+             are two-digit strings (01-12) so numeric ordering is
+             preserved and matches the ISO month format from the DCR
+             date field. -->
+        <div class="rbccm-filter__select-wrap" data-filter="month">
+          <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Month">
+            <span class="rbccm-filter__select-label">Month</span>
+          </button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filter__select-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+          <ul class="rbccm-filter__select-panel" role="listbox" aria-label="Month" hidden>
+            <li class="rbccm-filter__select-option" role="option" data-value=""   aria-selected="true"  tabindex="-1">Month</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="01" aria-selected="false" tabindex="-1">January</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="02" aria-selected="false" tabindex="-1">February</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="03" aria-selected="false" tabindex="-1">March</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="04" aria-selected="false" tabindex="-1">April</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="05" aria-selected="false" tabindex="-1">May</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="06" aria-selected="false" tabindex="-1">June</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="07" aria-selected="false" tabindex="-1">July</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="08" aria-selected="false" tabindex="-1">August</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="09" aria-selected="false" tabindex="-1">September</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="10" aria-selected="false" tabindex="-1">October</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="11" aria-selected="false" tabindex="-1">November</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="12" aria-selected="false" tabindex="-1">December</li>
+          </ul>
+        </div>
+
+        <!-- Region → /press_release/region -->
+        <div class="rbccm-filter__select-wrap" data-filter="region">
+          <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Region">
+            <span class="rbccm-filter__select-label">Region</span>
+          </button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filter__select-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+          <ul class="rbccm-filter__select-panel" role="listbox" aria-label="Region" hidden>
+            <li class="rbccm-filter__select-option" role="option" data-value=""       aria-selected="true"  tabindex="-1">Region</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="global" aria-selected="false" tabindex="-1">Global</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="ca"     aria-selected="false" tabindex="-1">Canada</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="us"     aria-selected="false" tabindex="-1">United States</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="gb"     aria-selected="false" tabindex="-1">United Kingdom</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="au"     aria-selected="false" tabindex="-1">Australia</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="fr"     aria-selected="false" tabindex="-1">France</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="de"     aria-selected="false" tabindex="-1">Germany</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="hk"     aria-selected="false" tabindex="-1">China / Hong Kong</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="sg"     aria-selected="false" tabindex="-1">Singapore</li>
+            <li class="rbccm-filter__select-option" role="option" data-value="ae"     aria-selected="false" tabindex="-1">United Arab Emirates</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <label class="rbccm-filter__search">
+        <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filter__search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/></svg>
+        <span class="rbccm-filter__sr-only">Search media coverage and/or press releases by title or keyword</span>
+        <input type="search" class="rbccm-filter__search-input" data-filter="search" placeholder="Search media coverage and/or press releases" aria-label="Search media coverage and/or press releases by title or keyword">
+      </label>
+
+      <button type="button" class="rbccm-filter__reset">Clear filters</button>
+
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+
+  <!-- Article list — data-* attributes let the shared filter-by.js
+       runtime process cards without any list-specific wiring.
+       Month headers dropped; each item's own date renders month + day + year,
+       which reads cleanly in a paginated list (headers would fracture
+       across page boundaries otherwise). -->
+  <section class="rbccm-itm-list-section" aria-labelledby="rbccm-itm-list-heading">
+    <h2 class="rbccm-itm-list-section__title" id="rbccm-itm-list-heading">Newsroom</h2>
+    <div id="rbccm-itm-list" class="rbccm-itm-list">
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global" data-type="media"
+           data-search-text="rbc tv rishi jaluria on bloomberg workday earnings better than feared vibe coding">
+        <span class="rbccm-itm-card__date">August 28, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="https://www.bloomberg.com/news/videos/2026-08-27/the-close-8-27-2026-video" target="_blank" rel="noopener" aria-label="RBC TV: Rishi Jaluria on Bloomberg (opens in new tab)">RBC TV: Rishi Jaluria on Bloomberg</a>
+        <p class="rbccm-itm-card__summary">Workday earnings, "better-than-feared" results, vibe coding and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global" data-type="media"
+           data-search-text="rbc tv rishi jaluria yahoo finance market domination overtime">
+        <span class="rbccm-itm-card__date">August 27, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="https://finance.yahoo.com/video/ai-winner-victim-inside-salesforces-125416021.html" target="_blank" rel="noopener" aria-label="RBC TV: Rishi Jaluria on Yahoo! Finance (opens in new tab)">RBC TV: Rishi Jaluria on Yahoo! Finance</a>
+        <p class="rbccm-itm-card__summary">Yahoo! Finance: Market Domination Overtime</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global" data-type="media"
+           data-search-text="rbc tv amy wu silverman on bloomberg ai sentiment tech stock volatility">
+        <span class="rbccm-itm-card__date">August 27, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="https://www.bloomberg.com/news/videos/2026-08-27/markets-don-t-signal-ai-sentiment-shift-wu-silverman-video" target="_blank" rel="noopener" aria-label="RBC TV: Amy Wu Silverman on Bloomberg (opens in new tab)">RBC TV: Amy Wu Silverman on Bloomberg</a>
+        <p class="rbccm-itm-card__summary">AI sentiment, tech stock volatility, market outlook and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="ca" data-type="media"
+           data-search-text="rbc tv nathan janzen bnn bloomberg tariffs canadian economy trade war job market">
+        <span class="rbccm-itm-card__date">August 26, 2026<span class="rbccm-itm-card__region">Canada</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="RBC TV: Nathan Janzen on BNN Bloomberg (opens in new tab)">RBC TV: Nathan Janzen on BNN Bloomberg</a>
+        <p class="rbccm-itm-card__summary">How significant the newly implemented tariffs are for the Canadian economy, how the trade war affects Canada's job market and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global" data-type="media"
+           data-search-text="rbc tv helima croft cnbc strait of hormuz iran oman deal flows">
+        <span class="rbccm-itm-card__date">August 26, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="RBC TV: Helima Croft on CNBC (opens in new tab)">RBC TV: Helima Croft on CNBC</a>
+        <p class="rbccm-itm-card__summary">The latest news regarding the Strait of Hormuz, how flows in the strait are nowhere near normal, the Iran-Oman deal and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global us" data-type="media"
+           data-search-text="rbc radio nik modi money talks grocery prices america product lines">
+        <span class="rbccm-itm-card__date">August 21, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="RBC Radio: Nik Modi on Money Talks (opens in new tab)">RBC Radio: Nik Modi on Money Talks</a>
+        <p class="rbccm-itm-card__summary">Rising grocery prices in America, which product lines have driven the price rises, who's hurting and who's winning and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global" data-type="media"
+           data-search-text="rbc tv helima croft cnbc crude prices sanctions iran treasury secretary bessent hormuz">
+        <span class="rbccm-itm-card__date">August 21, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="RBC TV: Helima Croft on CNBC (opens in new tab)">RBC TV: Helima Croft on CNBC</a>
+        <p class="rbccm-itm-card__summary">Crude prices, sanctions on Iran, Treasury Secretary Bessent's Thursday remarks on the Strait of Hormuz and more.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="08" data-region="global us" data-type="media"
+           data-search-text="rbc tv lori calvasina cnbc market trends impact rising bond yields">
+        <span class="rbccm-itm-card__date">August 19, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="RBC TV: Lori Calvasina on CNBC (opens in new tab)">RBC TV: Lori Calvasina on CNBC</a>
+        <p class="rbccm-itm-card__summary">The latest market trends, the impact of rising bond yields on the market and more.</p>
+      </div>
+
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="07" data-region="global us" data-type="press"
+           data-search-text="rbc capital markets appoints new leadership global equities">
+        <span class="rbccm-itm-card__date">July 24, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="/en/newsroom/2026/07/rbc-capital-markets-appoints-new-leadership-global-equities" aria-label="RBC Capital Markets appoints new leadership across Global Equities">RBC Capital Markets appoints new leadership across Global Equities</a>
+        <p class="rbccm-itm-card__summary">Announcement of new senior appointments spanning the equity trading, sales, and research organizations.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="07" data-region="global" data-type="media"
+           data-search-text="op-ed north american energy transition cross-border infrastructure capital allocation">
+        <span class="rbccm-itm-card__date">July 15, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" target="_blank" rel="noopener" aria-label="Op-ed: The next phase of North American energy transition (opens in new tab)">Op-ed: The next phase of North American energy transition</a>
+        <p class="rbccm-itm-card__summary">Perspectives on cross-border energy infrastructure, capital allocation, and policy signals.</p>
+      </div>
+
+      <div class="rbccm-itm-card"
+           data-year="2026" data-month="06" data-region="global" data-type="press"
+           data-search-text="rbc capital markets q2 2026 results earnings quarterly">
+        <span class="rbccm-itm-card__date">June 12, 2026<span class="rbccm-itm-card__region">Global</span></span>
+        <a class="rbccm-itm-card__link" href="#" aria-label="RBC Capital Markets reports Q2 2026 results">RBC Capital Markets reports Q2 2026 results</a>
+        <p class="rbccm-itm-card__summary">Second-quarter earnings summary, segment performance, and forward-looking commentary from the executive team.</p>
+      </div>
+
+    </div>
+
+    <!-- Idle-state hint — shown when no filter is applied. Explains
+         why pagination isn't visible and directs the user to filters.
+         filter-by.js should add .is-hidden here (and .is-active on
+         .rbccm-filter__pagination-host below) as soon as any filter
+         is set. -->
+    <p class="rbccm-itm-archive-hint">
+      Showing the 10 most recent items. The archive spans 10+ years — use the filters above (Type, Year, Month, Region, or Search) to page through the full set.
+    </p>
+
+    <!-- Pagination — matches shared .rbccm-filter__pagination markup.
+         In production, filter-by.js renders this dynamically based on
+         data-page-size + filtered item count; this static example shows
+         the shape of page 1 with ~16 pages in the filtered result set.
+         Hidden by default via .rbccm-filter__pagination-host CSS —
+         reveals when .is-active is added by filter-by.js on any
+         active filter. -->
+    <div class="rbccm-filter__pagination-host">
+      <nav class="rbccm-filter__pagination" aria-label="Pagination">
+        <button type="button" class="rbccm-filter__page-btn rbccm-filter__page-btn--prev" aria-label="Previous page" disabled>
+          <svg class="rbccm-filter__page-btn-icon" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M13 1L2.111 11.889L13 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" class="rbccm-filter__page-btn rbccm-filter__page-btn--active" aria-current="page" aria-label="Page 1">1</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 2">2</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 3">3</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 4">4</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 5">5</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 6">6</button>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 7">7</button>
+        <span class="rbccm-filter__page-ellipsis" aria-hidden="true">…</span>
+        <button type="button" class="rbccm-filter__page-btn" aria-label="Page 16">16</button>
+        <button type="button" class="rbccm-filter__page-btn rbccm-filter__page-btn--next" aria-label="Next page">
+          <svg class="rbccm-filter__page-btn-icon" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M1 1L11.889 11.889L1 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </nav>
+    </div>
+
+  </section>
+
+
+<!-- Media contacts — mirrors the "How we think" tab pattern
+     (rbccm-how-we-think__tablist + __tab + __panel). Same
+     data-panel / aria-expanded / aria-controls contract. -->
+<section class="rbccm-itm-contacts rbccm-itm-contacts--align-left" id="rbccm-itm-contacts" aria-label="Media contacts">
+  <h2 class="rbccm-itm-contacts__title" id="rbccm-itm-contacts-heading">Media contacts</h2>
+  <p class="rbccm-itm-contacts__lede">If you are not a member of the media and are looking for information or assistance, please visit the <a href="/en/our-offices">Our Offices</a> section for details on how to contact us.</p>
+
+  <div class="rbccm-itm-contacts__tablist" role="group" aria-label="Media contact regions">
+    <button type="button" class="rbccm-itm-contacts__tab is-active" data-panel="global" aria-expanded="true" aria-controls="itm-contacts-panel-global" aria-label="Global, section 1 of 4">Global<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-itm-contacts__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-itm-contacts__tab" data-panel="canada" aria-expanded="false" aria-controls="itm-contacts-panel-canada" aria-label="Canada, section 2 of 4">Canada<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-itm-contacts__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-itm-contacts__tab" data-panel="us" aria-expanded="false" aria-controls="itm-contacts-panel-us" aria-label="US, section 3 of 4">US<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-itm-contacts__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-itm-contacts__tab" data-panel="europeapac" aria-expanded="false" aria-controls="itm-contacts-panel-europeapac" aria-label="Europe / Asia Pacific, section 4 of 4">Europe / Asia Pacific<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-itm-contacts__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+
+  <!-- Global -->
+  <div class="rbccm-itm-contacts__panel is-active" id="itm-contacts-panel-global" data-panel="global" role="region" aria-label="Global media contacts" tabindex="0">
+    <div class="rbccm-itm-contacts__grid">
+      <a class="rbccm-itm-contact" href="tel:+12126185589" aria-label="Call Sanam Heidary at +1 212 618 5589">
+        <h3 class="rbccm-itm-contact__name">Sanam Heidary</h3>
+        <p class="rbccm-itm-contact__role">General Inquiries</p>
+        <p class="rbccm-itm-contact__phone">+1.212.618.5589</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Canada -->
+  <div class="rbccm-itm-contacts__panel" id="itm-contacts-panel-canada" data-panel="canada" role="region" aria-label="Canada media contacts" tabindex="0">
+    <div class="rbccm-itm-contacts__grid">
+      <a class="rbccm-itm-contact" href="tel:+14372432381" aria-label="Call Elyse Lalonde at +1 437 243 2381">
+        <h3 class="rbccm-itm-contact__name">Elyse Lalonde</h3>
+        <p class="rbccm-itm-contact__role">General Inquiries</p>
+        <p class="rbccm-itm-contact__phone">+1.437.243.2381</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+13658890965" aria-label="Call Maggie Cheung at +1 365 889 0965">
+        <h3 class="rbccm-itm-contact__name">Maggie Cheung</h3>
+        <p class="rbccm-itm-contact__role">Investment Banking</p>
+        <p class="rbccm-itm-contact__phone">+1.365.889.0965</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+14162769115" aria-label="Call Kyle English at +1 416 276 9115">
+        <h3 class="rbccm-itm-contact__name">Kyle English</h3>
+        <p class="rbccm-itm-contact__role">Global Markets, Equity Research, Macro Strategy</p>
+        <p class="rbccm-itm-contact__phone">+1.416.276.9115</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+14372315010" aria-label="Call Sophie Leadbetter at +1 437 231 5010">
+        <h3 class="rbccm-itm-contact__name">Sophie Leadbetter</h3>
+        <p class="rbccm-itm-contact__role">RBC Economics</p>
+        <p class="rbccm-itm-contact__phone">+1.437.231.5010</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- US -->
+  <div class="rbccm-itm-contacts__panel" id="itm-contacts-panel-us" data-panel="us" role="region" aria-label="US media contacts" tabindex="0">
+    <div class="rbccm-itm-contacts__grid">
+      <a class="rbccm-itm-contact" href="tel:+19299897882" aria-label="Call Chloe Brooke at +1 929 989 7882">
+        <h3 class="rbccm-itm-contact__name">Chloe Brooke</h3>
+        <p class="rbccm-itm-contact__role">Research, Investment Banking, Municipal Finance, RBC Economics</p>
+        <p class="rbccm-itm-contact__phone">+1.929.989.7882</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+12128145096" aria-label="Call Emily Burnham at +1 212 814 5096">
+        <h3 class="rbccm-itm-contact__name">Emily Burnham</h3>
+        <p class="rbccm-itm-contact__role">Equities, Fixed Income, Currencies &amp; Commodities, Macro Strategy</p>
+        <p class="rbccm-itm-contact__phone">+1.212.814.5096</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+12126182057" aria-label="Call Elisa Barsotti at +1 212 618 2057">
+        <h3 class="rbccm-itm-contact__name">Elisa Barsotti</h3>
+        <p class="rbccm-itm-contact__role">General Inquiries</p>
+        <p class="rbccm-itm-contact__phone">+1.212.618.2057</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Europe / Asia Pacific -->
+  <div class="rbccm-itm-contacts__panel" id="itm-contacts-panel-europeapac" data-panel="europeapac" role="region" aria-label="Europe and Asia Pacific media contacts" tabindex="0">
+    <div class="rbccm-itm-contacts__grid">
+      <a class="rbccm-itm-contact" href="tel:+442070297821" aria-label="Call Louisa Fairman at +44 20 7029 7821">
+        <h3 class="rbccm-itm-contact__name">Louisa Fairman</h3>
+        <p class="rbccm-itm-contact__role">General Inquiries (Europe / Asia Pacific)</p>
+        <p class="rbccm-itm-contact__phone">+44.20.7029.7821</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+442076534978" aria-label="Call Adam Lister at +44 207 653 4978">
+        <h3 class="rbccm-itm-contact__name">Adam Lister</h3>
+        <p class="rbccm-itm-contact__role">General Inquiries (Europe), Global Investment Banking, ESG / Climate</p>
+        <p class="rbccm-itm-contact__phone">+44.207.653.4978</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+      <a class="rbccm-itm-contact" href="tel:+442070290805" aria-label="Call Rebecca Smallridge at +44 207 029 0805">
+        <h3 class="rbccm-itm-contact__name">Rebecca Smallridge</h3>
+        <p class="rbccm-itm-contact__role">Global Markets (Europe), Equity Research, FICC &amp; Macro Strategy</p>
+        <p class="rbccm-itm-contact__phone">+44.207.029.0805</p>
+        <span class="rbccm-itm-contact__phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+      </a>
+    </div>
+  </div>
+
+  </div><!-- /rbccm-itm-contacts__tablist -->
+
+</section>
+
+<script>
+  /* Minimal listbox behavior so the shared filter's custom dropdowns
+     work in this standalone mock. In prod, filter-by.js drives all
+     of this — the mock only needs enough JS to demo click-to-open. */
+  document.querySelectorAll('.rbccm-filter__select').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrap = btn.closest('.rbccm-filter__select-wrap');
+      const panel = wrap.querySelector('.rbccm-filter__select-panel');
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      // Close every other panel first
+      document.querySelectorAll('.rbccm-filter__select').forEach(x => {
+        x.setAttribute('aria-expanded', 'false');
+        x.closest('.rbccm-filter__select-wrap').querySelector('.rbccm-filter__select-panel').hidden = true;
+      });
+      if (!open) { btn.setAttribute('aria-expanded', 'true'); panel.hidden = false; }
+    });
+  });
+  document.querySelectorAll('.rbccm-filter__select-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const panel = opt.closest('.rbccm-filter__select-panel');
+      panel.querySelectorAll('.rbccm-filter__select-option').forEach(o => o.setAttribute('aria-selected', 'false'));
+      opt.setAttribute('aria-selected', 'true');
+      const wrap = opt.closest('.rbccm-filter__select-wrap');
+      wrap.querySelector('.rbccm-filter__select-label').textContent = opt.textContent;
+      wrap.querySelector('.rbccm-filter__select').setAttribute('aria-expanded', 'false');
+      panel.hidden = true;
+    });
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.rbccm-filter__select-wrap')) {
+      document.querySelectorAll('.rbccm-filter__select').forEach(x => {
+        x.setAttribute('aria-expanded', 'false');
+        x.closest('.rbccm-filter__select-wrap').querySelector('.rbccm-filter__select-panel').hidden = true;
+      });
+    }
+  });
+  /* Pagination gate — reveal .rbccm-filter__pagination-host and hide
+     the archive hint whenever any filter is active. In production
+     this logic lives in filter-by.js; the mock replicates it here so
+     the reviewer can see the conditional behavior. */
+  (function () {
+    const host   = document.querySelector('.rbccm-filter__pagination-host');
+    const hint   = document.querySelector('.rbccm-itm-archive-hint');
+    const search = document.querySelector('.rbccm-filter__search-input');
+
+    function anyFilterActive() {
+      // Any select-wrap with a non-empty option selected
+      const hasSelect = Array.from(document.querySelectorAll('.rbccm-filter__select-wrap'))
+        .some(w => {
+          const opt = w.querySelector('.rbccm-filter__select-option[aria-selected="true"]');
+          return opt && opt.getAttribute('data-value') !== '';
+        });
+      const hasSearch = search && search.value.trim() !== '';
+      return hasSelect || hasSearch;
+    }
+    function syncPagination() {
+      const active = anyFilterActive();
+      if (host) host.classList.toggle('is-active', active);
+      if (hint) hint.classList.toggle('is-hidden', active);
+    }
+    // Any option pick, any search keystroke, and the clear button
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.rbccm-filter__select-option')) setTimeout(syncPagination, 0);
+      if (e.target.closest('.rbccm-filter__reset'))         setTimeout(syncPagination, 0);
+    });
+    search && search.addEventListener('input', syncPagination);
+    syncPagination();
+  })();
+
+  /* Media contacts tab switching — matches How we think pattern */
+  document.querySelectorAll('.rbccm-itm-contacts__tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetPanel = tab.getAttribute('data-panel');
+      const root = tab.closest('.rbccm-itm-contacts');
+      root.querySelectorAll('.rbccm-itm-contacts__tab').forEach(t => {
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-expanded', active ? 'true' : 'false');
+      });
+      root.querySelectorAll('.rbccm-itm-contacts__panel').forEach(p => {
+        p.classList.toggle('is-active', p.getAttribute('data-panel') === targetPanel);
+      });
+    });
+  });
+
+  /* Clear all filters */
+  document.querySelector('.rbccm-filter__reset')?.addEventListener('click', () => {
+    document.querySelectorAll('.rbccm-filter__select-wrap').forEach(wrap => {
+      const first = wrap.querySelector('.rbccm-filter__select-option');
+      wrap.querySelectorAll('.rbccm-filter__select-option').forEach(o => o.setAttribute('aria-selected', 'false'));
+      first?.setAttribute('aria-selected', 'true');
+      wrap.querySelector('.rbccm-filter__select-label').textContent = first?.textContent || '';
+    });
+    document.querySelector('.rbccm-filter__search-input').value = '';
+  });
+
+  /* Auto-inject the type indicator (Press release / Media coverage)
+     into each article card's date row based on its data-type. Keeps
+     the card HTML clean — one place to change the copy or ordering. */
+  document.querySelectorAll('.rbccm-itm-card[data-type]').forEach(function (card) {
+    var type = card.getAttribute('data-type');
+    if (!type || card.querySelector('.rbccm-itm-card__eyebrow')) return;
+    var dateEl = card.querySelector('.rbccm-itm-card__date');
+    if (!dateEl) return;
+    var tag = document.createElement('span');
+    tag.className = 'rbccm-itm-card__eyebrow rbccm-itm-card__eyebrow--' + type;
+    tag.textContent = (type === 'press') ? 'Press release' : 'Media coverage';
+    dateEl.appendChild(tag);
+  });
+
+  /* Appearance gallery — clones the media contacts section once per
+     variant and re-classes / re-styles the clone. Keeps HTML source
+     compact while still showing each combo with real content. */
+  (function () {
+    var source = document.getElementById('rbccm-itm-contacts');
+    if (!source) return;
+
+    var VARIANTS = [
+      { label: 'Default (white bg)',                                        classes: 'rbccm-itm-contacts--align-left', style: '' },
+      { label: '--on-ltblue',                                                classes: 'rbccm-itm-contacts--on-ltblue rbccm-itm-contacts--align-left', style: '' },
+      { label: '--on-dark',                                                  classes: 'rbccm-itm-contacts--on-dark rbccm-itm-contacts--align-left',   style: '' },
+      { label: 'Default + border-top + border-bottom',                       classes: 'rbccm-itm-contacts--align-left', style: '--itmc-border-top: 1px solid #D8D8D8; --itmc-border-bottom: 1px solid #D8D8D8;' },
+      { label: 'Padding tuner (desktop 96 top / 32 bottom)',                 classes: 'rbccm-itm-contacts--align-left', style: '--itmc-pt-d: 96px; --itmc-pb-d: 32px;' },
+      { label: '--on-dark + background image (SVG data URL pattern)',        classes: 'rbccm-itm-contacts--on-dark rbccm-itm-contacts--align-left',   style: "background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.06'%3E%3Cpath d='M60 0L60 120M0 60L120 60M0 0L120 120M120 0L0 120'/%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3C/g%3E%3C/svg%3E\"); background-repeat: repeat; background-size: 240px 240px;" }
+    ];
+
+    var galleryHeader = document.createElement('div');
+    galleryHeader.style.cssText = 'padding: 40px 24px 16px; max-width: 1140px; margin: 40px auto 0; border-top: 3px dashed #FFC72C; font: 500 14px/1 Roboto, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280;';
+    galleryHeader.textContent = 'Appearance variants gallery — media contacts section';
+    source.parentNode.insertBefore(galleryHeader, source.nextSibling);
+    var insertAfter = galleryHeader;
+
+    VARIANTS.forEach(function (v, i) {
+      var label = document.createElement('div');
+      label.style.cssText = 'padding: 24px 24px 8px; max-width: 1140px; margin: 0 auto; font: 500 12px/1 Roboto, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280;';
+      label.textContent = (i + 1) + ' — ' + v.label;
+
+      var clone = source.cloneNode(true);
+      clone.id = 'rbccm-itm-contacts-demo-' + (i + 1);
+      // Reset id collisions on inner elements so tab-switch JS still
+      // scopes to the closest .rbccm-itm-contacts wrapper.
+      clone.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+      clone.className = 'rbccm-itm-contacts ' + v.classes;
+      if (v.style) clone.setAttribute('style', v.style); else clone.removeAttribute('style');
+
+      insertAfter.parentNode.insertBefore(label, insertAfter.nextSibling);
+      label.parentNode.insertBefore(clone, label.nextSibling);
+      insertAfter = clone;
+    });
+
+    // Rebind the tab switching to the cloned instances too. Scoped
+    // per-instance so clicking a tab in demo 3 doesn't reach into demo 4.
+    document.querySelectorAll('.rbccm-itm-contacts').forEach(function (root) {
+      root.querySelectorAll('.rbccm-itm-contacts__tab').forEach(function (tab) {
+        // Skip if already bound (source instance was bound earlier).
+        if (tab.__demoBound) return;
+        tab.__demoBound = true;
+        tab.addEventListener('click', function () {
+          var target = tab.getAttribute('data-panel');
+          root.querySelectorAll('.rbccm-itm-contacts__tab').forEach(function (t) {
+            var active = t === tab;
+            t.classList.toggle('is-active', active);
+            t.setAttribute('aria-expanded', active ? 'true' : 'false');
+          });
+          root.querySelectorAll('.rbccm-itm-contacts__panel').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-panel') === target);
+          });
+        });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
