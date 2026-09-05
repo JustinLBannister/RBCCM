@@ -23,13 +23,20 @@
   feeds on page load. The Preset Datum still drives the outer
   section's modifier class so the JS coordinator picks the right
   adapter.
+
+  Structure note: content Datums live inside <Data> (matches the
+  About-page pattern the XSL was modeled on). The XSL reads them
+  via /Properties/Data/Datum[@ID='X'].
 -->
 <Properties ComponentID="rbccm-filtered-content">
+</Properties>
+
+<Data>
 
   <!-- Preset selector: picks which variant this instance renders as.
-       TeamSite schema: each <Option> is element-only content with a
-       <Display> label child and a <Value> machine-value child.
-       No <Options> wrapper, no Value="" attribute, no text content. -->
+       Each <Option> is element-only (Display label + Value machine-
+       value children). The bare text after the closing </Option> is
+       the default value. -->
   <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
     <Option>
       <Display>In the Media &amp; Press Releases</Display>
@@ -90,33 +97,29 @@
   <Datum ID="JsPath" Type="String" Name="Sidecar JS path">/assets/rbccm/js/components/filtered-content.js</Datum>
   <Datum ID="CacheVersion" Type="String" Name="Cache buster (bump after each sidecar deploy)">2026-09-05</Datum>
 
-</Properties>
+  <!--
+    Data block populated at publish time by the MetaQueryExternal
+    when the ITM preset is selected. Ignored for CI/Deals presets
+    (their JS adapters fetch on page load).
 
-<!--
-  Data block: populated at publish time by the MetaQueryExternal
-  when the ITM preset is selected. Ignored for CI/Deals presets
-  (their JS adapters fetch on page load).
+    Query widening vs. the About page:
+      OLD (About page):
+        TeamSite/Templating/DCR/Type:article/news
+        AND TeamSite/Metadata/publishdate greater than 2015 00 00
+        then XSL filters OUT topic='press'
 
-  Query widening vs. the About page:
-    OLD (About page):
-      TeamSite/Templating/DCR/Type:article/news
+      NEW (this component, ITM preset):
+        TeamSite/Templating/DCR/Type:article/news
+        AND TeamSite/Metadata/publishdate greater than 2015 00 00
+        (NO topic filter, press releases included)
+
+    If press releases live under a different DCR type in TeamSite
+    (e.g. article/press release rather than article/news with
+    topic=press), broaden the qQuery to an OR:
+      (TeamSite/Templating/DCR/Type:article/news
+       OR TeamSite/Templating/DCR/Type:article/press release)
       AND TeamSite/Metadata/publishdate greater than 2015 00 00
-      then XSL filters OUT topic='press'
-
-    NEW (this component, ITM preset):
-      TeamSite/Templating/DCR/Type:article/news
-      AND TeamSite/Metadata/publishdate greater than 2015 00 00
-      (NO topic filter, press releases included)
-
-  If press releases live under a different DCR type in TeamSite
-  (e.g. article/press release rather than article/news with
-  topic=press), broaden the qQuery to an OR:
-    (TeamSite/Templating/DCR/Type:article/news
-     OR TeamSite/Templating/DCR/Type:article/press release)
-    AND TeamSite/Metadata/publishdate greater than 2015 00 00
--->
-<Data>
-
+  -->
   <External>
     <Parameters>
       <Datum ID="qQuery" Name="qQuery" Type="String" Label="Query">TeamSite/Templating/DCR/Type:article/news AND TeamSite/Metadata/publishdate:&gt;2015-00-00</Datum>
