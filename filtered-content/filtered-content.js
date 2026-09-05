@@ -295,32 +295,80 @@
       return !!yearLoadedCache[year];
     }
 
+    /* Fetch one year's archive. On the RBC archive endpoints, a URL like
+       /en/about-us/data/2025 actually returns items spanning 2025 back
+       through the earliest available year (2010) — one endpoint = all
+       history from that year down. So instead of trusting the year arg
+       to stamp items, we parse each <date> for its real year and mark
+       every year we actually saw as loaded. If the requested year has
+       no dedicated endpoint (404 / empty), we fall back to the earliest
+       available year (last entry in availableYears), which is the
+       master archive on the RBC feed. */
     function fetchYearArchive(year) {
       if (!yearFeedTemplate) return Promise.resolve();
-      var url = yearFeedTemplate.replace('{year}', year);
+      return fetchYearArchiveUrl(yearFeedTemplate.replace('{year}', year), year, true);
+    }
+
+    function fetchYearArchiveUrl(url, requestedYear, allowFallback) {
       return fetch(url).then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.text();
       }).then(function (xmlStr) {
         var doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
-        if (!doc || doc.getElementsByTagName('parsererror').length > 0) return;
+        if (!doc || doc.getElementsByTagName('parsererror').length > 0) return null;
         var newsNodes = doc.getElementsByTagName('news');
-        if (!newsNodes.length) return;
+        if (!newsNodes.length) return null;
         var frag = document.createDocumentFragment();
+        var yearsSeen = {};
+        var addedForRequested = false;
         for (var i = 0; i < newsNodes.length; i++) {
-          var li = buildYearArchiveItem(newsNodes[i], year);
-          if (li) frag.appendChild(li);
+          var built = buildYearArchiveItem(newsNodes[i]);
+          if (!built) continue;
+          frag.appendChild(built.li);
+          if (built.year) {
+            yearsSeen[built.year] = true;
+            if (built.year === String(requestedYear)) addedForRequested = true;
+          }
+        }
+        /* If the endpoint returned items but none for the requested year,
+           and we haven't already tried the fallback, try the master
+           archive at the earliest available year. */
+        if (!addedForRequested && allowFallback && availableYears.length > 0) {
+          var fallbackYear = availableYears[availableYears.length - 1];
+          if (fallbackYear && fallbackYear !== String(requestedYear)) {
+            return fetchYearArchiveUrl(
+              yearFeedTemplate.replace('{year}', fallbackYear),
+              requestedYear,
+              false
+            );
+          }
         }
         container.appendChild(frag);
-        /* Mark this year loaded + refresh the engine's item cache so
-           the freshly injected <li>s participate in future matches. */
-        yearLoadedCache[year] = true;
+        /* Mark every year that actually appeared in the feed as loaded
+           so re-selecting any of them skips a redundant fetch. */
+        for (var y in yearsSeen) {
+          if (yearsSeen.hasOwnProperty(y)) yearLoadedCache[y] = true;
+        }
+        yearLoadedCache[requestedYear] = true;
         allItems = container.querySelectorAll(itemSelector);
         /* Clear per-item cached search haystacks — items with the same
            dim tokens will regenerate cleanly on next haystackFor() call. */
         for (var j = 0; j < allItems.length; j++) delete allItems[j].__rbccmHaystack;
+        return null;
       }).catch(function (err) {
-        console.warn('[rbccm-filtered-content] year lazy-load failed for ' + year + ':', err);
+        /* Direct-year endpoint may 404 for older years — fall back to
+           the master archive at the earliest available year. */
+        if (allowFallback && availableYears.length > 0) {
+          var fallbackYear = availableYears[availableYears.length - 1];
+          if (fallbackYear && fallbackYear !== String(requestedYear)) {
+            return fetchYearArchiveUrl(
+              yearFeedTemplate.replace('{year}', fallbackYear),
+              requestedYear,
+              false
+            );
+          }
+        }
+        console.warn('[rbccm-filtered-content] year lazy-load failed for ' + requestedYear + ':', err);
       });
     }
 
@@ -331,8 +379,10 @@
          <link>...</link>
          <title><![CDATA[ ... ]]></title>
          <description><![CDATA[ ... ]]></description>
-         <topic><![CDATA[ media|press|(blank) ]]></topic> */
-    function buildYearArchiveItem(node, year) {
+         <topic><![CDATA[ media|press|(blank) ]]></topic>
+       Returns { li, year } so the caller can track which years were
+       actually present in the feed (endpoints span multiple years). */
+    function buildYearArchiveItem(node) {
       var getText = function (tag) {
         var el = node.getElementsByTagName(tag)[0];
         return el ? String(el.textContent || '').trim() : '';
@@ -346,6 +396,8 @@
 
       var monthTok = (dateStr.match(/^([A-Za-z]+)/) || [])[1];
       var monthNum = monthTok ? (MONTH_NUM[monthTok.toLowerCase()] || '') : '';
+      var yearMatch = dateStr.match(/(\d{4})/);
+      var itemYear = yearMatch ? yearMatch[1] : '';
       var typeToken = topic.indexOf('press') !== -1 ? 'press' : 'media';
       var eyebrowLabel = typeToken === 'press' ? 'Press release' : 'Media coverage';
       var eyebrowMod = typeToken === 'press'
@@ -357,7 +409,7 @@
       var li = document.createElement('li');
       li.className = 'rbccm-filtered-content__item';
       li.setAttribute('data-type', typeToken);
-      li.setAttribute('data-year', String(year));
+      if (itemYear) li.setAttribute('data-year', itemYear);
       if (monthNum) li.setAttribute('data-month', monthNum);
       li.setAttribute('data-search-text', haystack);
 
@@ -376,7 +428,7 @@
             '</div>' +
           '</div>' +
         '</div>';
-      return li;
+      return { li: li, year: itemYear };
     }
 
     /* -------- Register every dropdown in the filter markup --------
