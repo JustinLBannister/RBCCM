@@ -1,6 +1,6 @@
 <!--
-  RBCCM Filtered Content — Properties
-  ------------------------------------------------------------------
+  RBCCM Filtered Content - Properties
+
   Component publishes one of three preset variants driven by the
   Preset Datum. Content editors pick a preset per instance; the
   filter chrome + list container render the same way, only the
@@ -19,16 +19,14 @@
   users narrow to one or the other.
 
   For conference-insights and deals-and-transactions, the External
-  block is unused — filtered-content.js fetches the respective
-  DCR feeds on page load. The Preset Datum still drives the outer
+  block is unused. filtered-content.js fetches the respective DCR
+  feeds on page load. The Preset Datum still drives the outer
   section's modifier class so the JS coordinator picks the right
   adapter.
 -->
 <Properties ComponentID="rbccm-filtered-content">
 
-  <!-- ================================================================
-       Preset selector — picks which variant this instance renders as.
-       ================================================================ -->
+  <!-- Preset selector: picks which variant this instance renders as. -->
   <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
     <Options>
       <Option Value="in-the-media-and-press-releases">In the Media &amp; Press Releases</Option>
@@ -38,20 +36,16 @@
     in-the-media-and-press-releases
   </Datum>
 
-  <!-- ================================================================
-       Section identity + pagination
-       ================================================================ -->
+  <!-- Section identity + pagination. -->
   <Datum ID="SectionID" Type="String" Name="Section ID (unique per page)">rbccm-filtered-content-1</Datum>
   <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label">Filter articles</Datum>
 
   <Datum ID="PageSize" Type="Number" Name="Items per page (default view)">10</Datum>
   <Datum ID="PageSizeFiltered" Type="Number" Name="Items per page (when a filter is active)">10</Datum>
 
-  <!-- ================================================================
-       Filter chrome — dropdown visibility per preset. Set false to
-       hide a dimension entirely (e.g. Deals preset hides Type / Month
-       / Region / Search).
-       ================================================================ -->
+  <!-- Filter chrome: dropdown visibility per preset. Set false to
+       hide a dimension entirely (e.g. Deals preset hides Type,
+       Month, Region, Search). -->
   <Datum ID="ShowType" Type="Boolean" Name="Show Type dropdown">true</Datum>
   <Datum ID="ShowYear" Type="Boolean" Name="Show Year dropdown">true</Datum>
   <Datum ID="ShowMonth" Type="Boolean" Name="Show Month dropdown">true</Datum>
@@ -59,51 +53,57 @@
   <Datum ID="ShowSearch" Type="Boolean" Name="Show search input">true</Datum>
 
   <Datum ID="FilterByLabel" Type="String" Name="'Filter by:' label">Filter by:</Datum>
-  <Datum ID="ClearFiltersLabel" Type="String" Name="Clear-filters button label">Clear filters</Datum>
+  <Datum ID="ClearFiltersLabel" Type="String" Name="Clear filters button label">Clear filters</Datum>
 
   <Datum ID="SearchPlaceholder" Type="String" Name="Search input placeholder">Search media coverage and/or press releases</Datum>
   <Datum ID="SearchAriaLabel" Type="String" Name="Search input ARIA label">Search media coverage and/or press releases by title or keyword</Datum>
-  <Datum ID="SearchScreenReaderLabel" Type="String" Name="Search input SR-only label">Search media coverage and/or press releases</Datum>
+  <Datum ID="SearchScreenReaderLabel" Type="String" Name="Search input SR only label">Search media coverage and/or press releases</Datum>
 
-  <!-- ================================================================
-       Empty state (rendered by JS when filters return zero results)
-       ================================================================ -->
-  <Datum ID="EmptyHeading" Type="String" Name="Empty state — heading">No results found</Datum>
-  <Datum ID="EmptyMessage" Type="String" Name="Empty state — message">We couldn't find any results that match your current filters.</Datum>
-  <Datum ID="EmptyMessageEmphasis" Type="String" Name="Empty state — emphasized message">Try adjusting your filters or search terms.</Datum>
-  <Datum ID="EmptyClearLabel" Type="String" Name="Empty state — clear button label">Clear filters</Datum>
+  <!-- Empty state (rendered by JS when filters return zero results). -->
+  <Datum ID="EmptyHeading" Type="String" Name="Empty state heading">No results found</Datum>
+  <Datum ID="EmptyMessage" Type="String" Name="Empty state message">We couldn't find any results that match your current filters.</Datum>
+  <Datum ID="EmptyMessageEmphasis" Type="String" Name="Empty state emphasized message">Try adjusting your filters or search terms.</Datum>
+  <Datum ID="EmptyClearLabel" Type="String" Name="Empty state clear button label">Clear filters</Datum>
 
-  <!-- ================================================================
-       ITM preset — internal article page (used for the ?dcr= fallback
+  <!-- ITM preset: internal article page (used for the ?dcr= fallback
        when a metaResult record has no external link authored).
-       Matches the ViewPage Datum from the current About-page XSL.
-       ================================================================ -->
+       Matches the ViewPage Datum from the current About-page XSL. -->
   <Datum ID="ViewPage" Type="PageLink" Name="View Article Page (internal link fallback)"><![CDATA[$PAGE_LINK[about-us]]]></Datum>
+
+  <!-- Sidecar asset paths + cache buster.
+       The XSL emits a <link> for CssPath at the top of the rendered
+       output and a <script> for JsPath at the bottom. Both get
+       ?v=<CacheVersion> appended so a fresh publish forces browsers
+       to pull the new file instead of a cached one. Bump CacheVersion
+       after every deploy of the sidecar CSS or JS. -->
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path">/assets/rbccm/css/components/filtered-content.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path">/assets/rbccm/js/components/filtered-content.js</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Cache buster (bump after each sidecar deploy)">2026-09-05</Datum>
 
 </Properties>
 
 <!--
-  Data block — populated at publish time by the MetaQueryExternal
+  Data block: populated at publish time by the MetaQueryExternal
   when the ITM preset is selected. Ignored for CI/Deals presets
   (their JS adapters fetch on page load).
 
   Query widening vs. the About page:
     OLD (About page):
       TeamSite/Templating/DCR/Type:article/news
-      AND TeamSite/Metadata/publishdate:>2015-00-00
+      AND TeamSite/Metadata/publishdate greater than 2015 00 00
       then XSL filters OUT topic='press'
 
     NEW (this component, ITM preset):
       TeamSite/Templating/DCR/Type:article/news
-      AND TeamSite/Metadata/publishdate:>2015-00-00
-      (NO topic filter — press releases included)
+      AND TeamSite/Metadata/publishdate greater than 2015 00 00
+      (NO topic filter, press releases included)
 
   If press releases live under a different DCR type in TeamSite
-  (e.g. article/press-release rather than article/news with
+  (e.g. article/press release rather than article/news with
   topic=press), broaden the qQuery to an OR:
     (TeamSite/Templating/DCR/Type:article/news
-     OR TeamSite/Templating/DCR/Type:article/press-release)
-    AND TeamSite/Metadata/publishdate:>2015-00-00
+     OR TeamSite/Templating/DCR/Type:article/press release)
+    AND TeamSite/Metadata/publishdate greater than 2015 00 00
 -->
 <Data>
 

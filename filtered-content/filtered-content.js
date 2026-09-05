@@ -257,11 +257,11 @@
     var paginationHost = ensurePaginationHost(container);
 
     /* -------- Register every dropdown in the filter markup --------
-       Each `.rbccm-filtered-content__select-wrap[data-filter="<dim>"]` gets a
+       Each `.rbccm-filtered-content__select-wrapper[data-filter="<dim>"]` gets a
        custom-styled popup listbox built from item data-<dim> values.
        Wrap is hidden if no items carry that attribute. */
     var dropdowns = [];      /* [{ dim, wrap, button, panel, getValue, setValue, close }] */
-    var dropdownWraps = filterRoot.querySelectorAll('.rbccm-filtered-content__select-wrap[data-filter]');
+    var dropdownWraps = filterRoot.querySelectorAll('.rbccm-filtered-content__select-wrapper[data-filter]');
     for (var d = 0; d < dropdownWraps.length; d++) {
       var w = dropdownWraps[d];
       var dm = w.getAttribute('data-filter');
@@ -840,7 +840,7 @@
       emptyState.innerHTML = '';
 
       var iconWrap = document.createElement('div');
-      iconWrap.className = 'rbccm-filtered-content__empty-icon-wrap';
+      iconWrap.className = 'rbccm-filtered-content__empty-icon-wrapper';
       iconWrap.setAttribute('aria-hidden', 'true');
       iconWrap.innerHTML = EMPTY_ICON_SVG;
       emptyState.appendChild(iconWrap);
@@ -883,7 +883,7 @@
       nav.className = 'rbccm-filtered-content__pagination';
       nav.setAttribute('aria-label', 'Pagination');
 
-      nav.appendChild(buildArrowBtn('prev', currentPage === 0));
+      nav.appendChild(buildArrowBtn('previous', currentPage === 0));
       var pages = computePageList(currentPage, totalPages);
       for (var i = 0; i < pages.length; i++) {
         if (pages[i] === '…') {
@@ -997,7 +997,7 @@
        scroll-to-top. Focus semantics preserved, scroll semantics owned
        entirely by scrollToFirstResult. */
     function focusRebuiltPageBtn(pageIndex) {
-      var buttons = paginationHost.querySelectorAll('.rbccm-filtered-content__page-btn:not(.rbccm-filtered-content__page-btn--prev):not(.rbccm-filtered-content__page-btn--next)');
+      var buttons = paginationHost.querySelectorAll('.rbccm-filtered-content__page-button:not(.rbccm-filtered-content__page-button--previous):not(.rbccm-filtered-content__page-button--next)');
       /* Match by the button label (page number, 1-indexed). */
       var target = String(pageIndex + 1);
       for (var i = 0; i < buttons.length; i++) {
@@ -1006,21 +1006,21 @@
     }
 
     function focusRebuiltArrowBtn(dir) {
-      var arrow = paginationHost.querySelector('.rbccm-filtered-content__page-btn--' + dir);
+      var arrow = paginationHost.querySelector('.rbccm-filtered-content__page-button--' + dir);
       /* If the arrow is now disabled (reached start/end of range), fall
          back to the newly-current page number so focus doesn't land on
          an unreachable control. */
       if (arrow && !arrow.hasAttribute('disabled')) { arrow.focus({ preventScroll: true }); return; }
-      var active = paginationHost.querySelector('.rbccm-filtered-content__page-btn--active');
+      var active = paginationHost.querySelector('.rbccm-filtered-content__page-button--active');
       if (active) active.focus({ preventScroll: true });
     }
 
     function buildPageBtn(pageIndex) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'rbccm-filtered-content__page-btn';
+      btn.className = 'rbccm-filtered-content__page-button';
       if (pageIndex === currentPage) {
-        btn.className += ' rbccm-filtered-content__page-btn--active';
+        btn.className += ' rbccm-filtered-content__page-button--active';
         btn.setAttribute('aria-current', 'page');
       }
       btn.textContent = String(pageIndex + 1);
@@ -1040,22 +1040,22 @@
     function buildArrowBtn(dir, disabled) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'rbccm-filtered-content__page-btn rbccm-filtered-content__page-btn--' + dir;
-      btn.setAttribute('aria-label', dir === 'prev' ? strings.prevPageLabel : strings.nextPageLabel);
+      btn.className = 'rbccm-filtered-content__page-button rbccm-filtered-content__page-button--' + dir;
+      btn.setAttribute('aria-label', dir === 'previous' ? strings.prevPageLabel : strings.nextPageLabel);
       /* Chevron SVG — 14x24 viewBox from the RBC design spec. Base path
          is a right-facing chevron; prev mirrors it horizontally to point
          left. stroke="currentColor" so hover/focus/dark/disabled states
          adapt automatically. */
-      var chevronPath = dir === 'prev'
+      var chevronPath = dir === 'previous'
         ? 'M13 1L2.111 11.889L13 22.778'
         : 'M1 1L11.889 11.889L1 22.778';
       btn.innerHTML =
-        '<svg class="rbccm-filtered-content__page-btn-icon" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
+        '<svg class="rbccm-filtered-content__page-button-icon" width="14" height="24" viewBox="0 0 14 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
           '<path d="' + chevronPath + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" />' +
         '</svg>';
       if (disabled) btn.setAttribute('disabled', 'disabled');
       btn.addEventListener('click', function () {
-        if (dir === 'prev' && currentPage > 0) currentPage--;
+        if (dir === 'previous' && currentPage > 0) currentPage--;
         if (dir === 'next') currentPage++;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
@@ -1420,7 +1420,7 @@
       }
 
       var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>';
-      var metaHtml = '<p class="rbccm-filtered-content__card-meta"><span>' + esc(entry.meta || '') + '</span>' + arrowSvg + '</p>';
+      var metaHtml = '<p class="rbccm-filtered-content__card-metadata"><span>' + esc(entry.meta || '') + '</span>' + arrowSvg + '</p>';
       var bottomHtml = taxonomyHtml
         ? '<div class="rbccm-filtered-content__card-bottom">' + metaHtml + taxonomyHtml + '</div>'
         : metaHtml;
@@ -1432,7 +1432,7 @@
             '<div class="rbccm-filtered-content__card-label">' + esc(entry.eyebrow || 'Insights') + '</div>' +
             '<div class="rbccm-filtered-content__card-divider" aria-hidden="true"></div>' +
             '<h2 class="rbccm-filtered-content__card-title">' + esc(entry.title || '') + '</h2>' +
-            '<p class="rbccm-filtered-content__card-desc">' + esc(entry.description || '') + '</p>' +
+            '<p class="rbccm-filtered-content__card-description">' + esc(entry.description || '') + '</p>' +
             bottomHtml +
           '</div>' +
         '</a>';
@@ -1580,7 +1580,7 @@
       var metaInner = '';
       if (regionHtml || eyebrowHtml) {
         metaInner =
-          '<div class="rbccm-filtered-content__card-footer-meta">' +
+          '<div class="rbccm-filtered-content__card-footer-metadata">' +
             regionHtml + eyebrowHtml +
           '</div>';
       }
@@ -1694,7 +1694,7 @@
            __card-info    → amount (deal value) + deal title + role (desc)
            __card-bottom  → status line (specialty|type / status) + Read more
          Subclasses __card-value / __card-status / __card-link are new;
-         __card-title / __card-desc collide with CI tile classes and get
+         __card-title / __card-description collide with CI tile classes and get
          re-styled under the .rbccm-filtered-content--deals-and-transactions
          scope. */
       var logoHtml = entry.thumbnail
@@ -1720,7 +1720,7 @@
           '<div class="rbccm-filtered-content__card-info">' +
             '<p class="rbccm-filtered-content__card-value">' + esc(entry.amount || '') + '</p>' +
             (entry.title ? '<p class="rbccm-filtered-content__card-title">' + esc(entry.title) + '</p>' : '') +
-            (entry.role  ? '<p class="rbccm-filtered-content__card-desc">' + esc(entry.role) + '</p>' : '') +
+            (entry.role  ? '<p class="rbccm-filtered-content__card-description">' + esc(entry.role) + '</p>' : '') +
           '</div>' +
           '<div class="rbccm-filtered-content__card-bottom">' +
             (statusLineText ? '<p class="rbccm-filtered-content__card-status">' + esc(statusLineText) + '</p>' : '') +
