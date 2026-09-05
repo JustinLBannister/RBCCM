@@ -1,0 +1,443 @@
+<!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <!--
+    Skin: RBCCM Filtered Content
+    ------------------------------------------------------------------
+    Preset-driven filter + list component. Three variants:
+      - conference-insights            (JS adapter fetches insights feed + whitelist)
+      - in-the-media-and-press-releases (server-rendered inline via MetaQueryExternal)
+      - deals-and-transactions          (JS adapter fetches deals feed)
+
+    The In-the-Media preset publishes its list items INLINE via the
+    MetaQueryExternal declared in Properties.xml — we iterate the
+    Result/records/metaResult set here and emit .rbccm-filtered-content__item
+    <li>s with the data-* attributes the shared filter engine reads.
+    On page load, filtered-content.js sees pre-existing items in the
+    DOM and skips its async fetch adapter for this preset.
+
+    CI and Deals presets emit an empty <ul> here; their JS adapters
+    fetch + populate on load.
+
+    Filter chrome (dropdowns / search / clear filters) is identical
+    across all presets in markup — the shared filter engine auto-hides
+    any dropdown whose corresponding data-<dim> attribute doesn't
+    appear on any item, so a preset with no `type` metadata gets no
+    Type dropdown, and so on.
+  -->
+
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
+  <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
+
+  <xsl:template match="/">
+
+    <!-- ============================================================
+         Config variables (read from Properties/Data Datums)
+         ============================================================ -->
+    <xsl:variable name="PRESET" select="/Properties/Data/Datum[@ID='Preset']"/>
+    <xsl:variable name="SECTION_ID" select="/Properties/Data/Datum[@ID='SectionID']"/>
+    <xsl:variable name="PAGE_SIZE" select="/Properties/Data/Datum[@ID='PageSize']"/>
+    <xsl:variable name="PAGE_SIZE_FILTERED" select="/Properties/Data/Datum[@ID='PageSizeFiltered']"/>
+    <xsl:variable name="ARIA_LABEL" select="/Properties/Data/Datum[@ID='SectionAriaLabel']"/>
+    <xsl:variable name="FILTER_BY_LABEL" select="/Properties/Data/Datum[@ID='FilterByLabel']"/>
+    <xsl:variable name="CLEAR_LABEL" select="/Properties/Data/Datum[@ID='ClearFiltersLabel']"/>
+    <xsl:variable name="SEARCH_PLACEHOLDER" select="/Properties/Data/Datum[@ID='SearchPlaceholder']"/>
+    <xsl:variable name="SEARCH_ARIA" select="/Properties/Data/Datum[@ID='SearchAriaLabel']"/>
+    <xsl:variable name="SEARCH_SR" select="/Properties/Data/Datum[@ID='SearchScreenReaderLabel']"/>
+    <xsl:variable name="EMPTY_HEADING" select="/Properties/Data/Datum[@ID='EmptyHeading']"/>
+    <xsl:variable name="EMPTY_MESSAGE" select="/Properties/Data/Datum[@ID='EmptyMessage']"/>
+    <xsl:variable name="EMPTY_MESSAGE_EMPHASIS" select="/Properties/Data/Datum[@ID='EmptyMessageEmphasis']"/>
+    <xsl:variable name="EMPTY_CLEAR_LABEL" select="/Properties/Data/Datum[@ID='EmptyClearLabel']"/>
+    <xsl:variable name="VIEW_PAGE" select="/Properties/Data/Datum[@ID='ViewPage']"/>
+
+    <!-- ITM-specific: which dropdowns to show. Boolean Datums default
+         to true so authors can turn any dimension off without editing
+         the XSL. -->
+    <xsl:variable name="SHOW_TYPE" select="/Properties/Data/Datum[@ID='ShowType']"/>
+    <xsl:variable name="SHOW_YEAR" select="/Properties/Data/Datum[@ID='ShowYear']"/>
+    <xsl:variable name="SHOW_MONTH" select="/Properties/Data/Datum[@ID='ShowMonth']"/>
+    <xsl:variable name="SHOW_REGION" select="/Properties/Data/Datum[@ID='ShowRegion']"/>
+    <xsl:variable name="SHOW_SEARCH" select="/Properties/Data/Datum[@ID='ShowSearch']"/>
+
+    <!-- Chevron SVG reused across every dropdown. -->
+    <xsl:variable name="CHEVRON_SVG">
+      <![CDATA[<svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>]]>
+    </xsl:variable>
+
+    <!-- Preset -> BEM modifier class name. -->
+    <xsl:variable name="PRESET_MOD">
+      <xsl:text>rbccm-filtered-content--</xsl:text>
+      <xsl:value-of select="$PRESET"/>
+    </xsl:variable>
+
+    <!-- ============================================================
+         Root section
+         ============================================================ -->
+    <section>
+      <xsl:attribute name="class">rbccm-filtered-content <xsl:value-of select="$PRESET_MOD"/></xsl:attribute>
+      <xsl:if test="$SECTION_ID != ''">
+        <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
+        <xsl:attribute name="data-container">#<xsl:value-of select="$SECTION_ID"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$PAGE_SIZE != ''">
+        <xsl:attribute name="data-page-size"><xsl:value-of select="$PAGE_SIZE"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$PAGE_SIZE_FILTERED != ''">
+        <xsl:attribute name="data-page-size-filtered"><xsl:value-of select="$PAGE_SIZE_FILTERED"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$EMPTY_HEADING != ''">
+        <xsl:attribute name="data-empty-heading"><xsl:value-of select="$EMPTY_HEADING"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$EMPTY_MESSAGE != ''">
+        <xsl:attribute name="data-empty-message"><xsl:value-of select="$EMPTY_MESSAGE"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$EMPTY_MESSAGE_EMPHASIS != ''">
+        <xsl:attribute name="data-empty-message-emphasis"><xsl:value-of select="$EMPTY_MESSAGE_EMPHASIS"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$EMPTY_CLEAR_LABEL != ''">
+        <xsl:attribute name="data-empty-clear-label"><xsl:value-of select="$EMPTY_CLEAR_LABEL"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$ARIA_LABEL != ''">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL"/></xsl:attribute>
+      </xsl:if>
+
+      <!-- ============================================================
+           Filter chrome
+           ============================================================ -->
+      <section class="rbccm-filtered-content__filter">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL"/></xsl:attribute>
+        <div class="rbccm-filtered-content__filter-inner">
+          <div class="rbccm-filtered-content__filter-row">
+
+            <div class="rbccm-filtered-content__group">
+              <span class="rbccm-filtered-content__group-label"><xsl:value-of select="$FILTER_BY_LABEL"/></span>
+
+              <!-- Type dropdown (ITM only usually) -->
+              <xsl:if test="$SHOW_TYPE = 'true'">
+                <div class="rbccm-filtered-content__select-wrap" data-filter="type">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Type">
+                    <span class="rbccm-filtered-content__select-label">Type</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
+
+              <!-- Year dropdown -->
+              <xsl:if test="$SHOW_YEAR = 'true'">
+                <div class="rbccm-filtered-content__select-wrap" data-filter="year">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
+                    <span class="rbccm-filtered-content__select-label">Year</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
+
+              <!-- Month dropdown (ITM only) -->
+              <xsl:if test="$SHOW_MONTH = 'true'">
+                <div class="rbccm-filtered-content__select-wrap" data-filter="month">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Month">
+                    <span class="rbccm-filtered-content__select-label">Month</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
+
+              <!-- Region dropdown -->
+              <xsl:if test="$SHOW_REGION = 'true'">
+                <div class="rbccm-filtered-content__select-wrap" data-filter="region">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Region">
+                    <span class="rbccm-filtered-content__select-label">Region</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
+
+            </div>
+
+            <!-- Search input -->
+            <xsl:if test="$SHOW_SEARCH = 'true'">
+              <div class="rbccm-filtered-content__search">
+                <svg class="rbccm-filtered-content__search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="13.5" y1="13.5" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <label class="rbccm-filtered-content__sr-only">
+                  <xsl:attribute name="for"><xsl:value-of select="$SECTION_ID"/>-search</xsl:attribute>
+                  <xsl:value-of select="$SEARCH_SR"/>
+                </label>
+                <input type="search" class="rbccm-filtered-content__search-input" data-filter="search">
+                  <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/>-search</xsl:attribute>
+                  <xsl:attribute name="placeholder"><xsl:value-of select="$SEARCH_PLACEHOLDER"/></xsl:attribute>
+                  <xsl:attribute name="aria-label"><xsl:value-of select="$SEARCH_ARIA"/></xsl:attribute>
+                </input>
+              </div>
+            </xsl:if>
+
+            <button type="button" class="rbccm-filtered-content__reset">
+              <xsl:value-of select="$CLEAR_LABEL"/>
+            </button>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           List container
+           - ITM preset: items rendered inline from metaResult
+           - CI / Deals presets: empty <ul>, JS adapter populates
+           ============================================================ -->
+      <div class="rbccm-filtered-content__inner">
+        <ul class="rbccm-filtered-content__list">
+
+          <xsl:choose>
+            <!-- ============================================================
+                 IN-THE-MEDIA & PRESS-RELEASES — server-rendered inline
+                 from MetaQueryExternal metaResult records.
+                 ============================================================ -->
+            <xsl:when test="$PRESET = 'in-the-media-and-press-releases'">
+
+              <xsl:variable name="ARTICLES" select="/Properties/Data/Result/records"/>
+              <xsl:for-each select="$ARTICLES/metaResult">
+                <xsl:sort select="./attr[ @key = 'TeamSite/Metadata/publishdate' ]" order="descending"/>
+
+                <!-- Metadata field reads -->
+                <xsl:variable name="ARTICLE_TITLE" select="./attr[ @key = 'TeamSite/Metadata/Title' ]"/>
+                <xsl:variable name="ARTICLE_DESCRIPTION" select="./attr[ @key = 'TeamSite/Metadata/Description' ]"/>
+                <xsl:variable name="ARTICLE_DATE" select="./attr[ @key = 'TeamSite/Metadata/publishdate' ]"/>
+                <xsl:variable name="ARTICLE_REGION" select="./attr[ @key = 'TeamSite/Metadata/region' ]"/>
+                <xsl:variable name="ARTICLE_TOPIC" select="./attr[ @key = 'TeamSite/Metadata/topic' ]"/>
+                <xsl:variable name="ARTICLE_OUTLET" select="./attr[ @key = 'TeamSite/Metadata/outlet' ]"/>
+                <xsl:variable name="ARTICLE_FEATURED" select="./attr[ @key = 'TeamSite/Metadata/featured' ]"/>
+                <xsl:variable name="ARTICLE_LINK_META" select="./attr[ @key = 'TeamSite/Metadata/link' ]"/>
+                <xsl:variable name="ARTICLE_ID" select="./@path"/>
+
+                <!-- Type token: 'press' if topic is 'press', 'media' otherwise.
+                     Filter dropdown 'Type' auto-populates from data-type
+                     tokens found on items. -->
+                <xsl:variable name="TYPE_TOKEN">
+                  <xsl:choose>
+                    <xsl:when test="$ARTICLE_TOPIC = 'press'">press</xsl:when>
+                    <xsl:otherwise>media</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <!-- Eyebrow label matching the type token. -->
+                <xsl:variable name="EYEBROW_LABEL">
+                  <xsl:choose>
+                    <xsl:when test="$TYPE_TOKEN = 'press'">Press release</xsl:when>
+                    <xsl:otherwise>Media coverage</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <xsl:variable name="EYEBROW_MOD">
+                  <xsl:choose>
+                    <xsl:when test="$TYPE_TOKEN = 'press'">rbccm-filtered-content__card-eyebrow--press</xsl:when>
+                    <xsl:otherwise>rbccm-filtered-content__card-eyebrow--media</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <!-- Date decomposition for data-year / data-month attrs. -->
+                <xsl:variable name="YEAR" select="substring($ARTICLE_DATE, 1, 4)"/>
+                <xsl:variable name="MONTH" select="substring($ARTICLE_DATE, 6, 2)"/>
+
+                <!-- Link resolution: external link if authored, else the
+                     ViewPage with ?dcr=<path>. Matches the About-page
+                     pattern for internally-hosted press releases. -->
+                <xsl:variable name="ARTICLE_LINK">
+                  <xsl:choose>
+                    <xsl:when test="$ARTICLE_LINK_META != ''">
+                      <xsl:value-of select="$ARTICLE_LINK_META"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="concat($VIEW_PAGE, '?dcr=', $ARTICLE_ID)"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <!-- External flag: media links leave the RBC domain; press
+                     releases stay on-site. Flip target/rel attrs accordingly. -->
+                <xsl:variable name="IS_EXTERNAL">
+                  <xsl:choose>
+                    <xsl:when test="$TYPE_TOKEN = 'media' and $ARTICLE_LINK_META != ''">true</xsl:when>
+                    <xsl:otherwise>false</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <!-- Long-format date ("June 28, 2025") for the topbar. -->
+                <xsl:variable name="DATE_LONG">
+                  <xsl:call-template name="FORMAT_LONG_DATE">
+                    <xsl:with-param name="publish_date" select="$ARTICLE_DATE"/>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <!-- Region display label (Global / US / Canada / Europe / APAC). -->
+                <xsl:variable name="REGION_LABEL">
+                  <xsl:call-template name="REGION_LABEL_FROM_TOKEN">
+                    <xsl:with-param name="token" select="$ARTICLE_REGION"/>
+                  </xsl:call-template>
+                </xsl:variable>
+
+                <!-- Search haystack: title + description + outlet + featured, lowercased.
+                     Filter engine augments this with dimension tokens at runtime. -->
+                <xsl:variable name="HAYSTACK">
+                  <xsl:value-of select="translate(concat($ARTICLE_TITLE, ' ', $ARTICLE_DESCRIPTION, ' ', $ARTICLE_OUTLET, ' ', $ARTICLE_FEATURED),
+                                                  'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                                                  'abcdefghijklmnopqrstuvwxyz')"/>
+                </xsl:variable>
+
+                <li class="rbccm-filtered-content__item">
+                  <xsl:attribute name="data-type"><xsl:value-of select="$TYPE_TOKEN"/></xsl:attribute>
+                  <xsl:attribute name="data-year"><xsl:value-of select="$YEAR"/></xsl:attribute>
+                  <xsl:attribute name="data-month"><xsl:value-of select="$MONTH"/></xsl:attribute>
+                  <xsl:attribute name="data-region"><xsl:value-of select="$ARTICLE_REGION"/></xsl:attribute>
+                  <xsl:attribute name="data-search-text"><xsl:value-of select="$HAYSTACK"/></xsl:attribute>
+
+                  <div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">
+
+                    <!-- Topbar renders whenever we have EITHER outlet OR date.
+                         Outlet is only emitted when TeamSite/Metadata/outlet
+                         is populated — the field may not exist in the DCR
+                         schema yet, in which case the topbar collapses to
+                         just the publish date on the right. -->
+                    <xsl:if test="$ARTICLE_OUTLET != '' or $DATE_LONG != ''">
+                      <div class="rbccm-filtered-content__card-topbar">
+                        <xsl:if test="$ARTICLE_OUTLET != ''">
+                          <div class="rbccm-filtered-content__card-source">
+                            <xsl:value-of select="$ARTICLE_OUTLET"/>
+                          </div>
+                        </xsl:if>
+                        <xsl:if test="$DATE_LONG != ''">
+                          <div class="rbccm-filtered-content__card-date">
+                            <xsl:value-of select="$DATE_LONG"/>
+                          </div>
+                        </xsl:if>
+                      </div>
+                    </xsl:if>
+
+                    <h3 class="rbccm-filtered-content__card-title">
+                      <a>
+                        <xsl:attribute name="href"><xsl:value-of select="$ARTICLE_LINK"/></xsl:attribute>
+                        <xsl:if test="$IS_EXTERNAL = 'true'">
+                          <xsl:attribute name="target">_blank</xsl:attribute>
+                          <xsl:attribute name="rel">noopener</xsl:attribute>
+                        </xsl:if>
+                        <xsl:value-of select="$ARTICLE_TITLE" disable-output-escaping="yes"/>
+                      </a>
+                    </h3>
+
+                    <!-- Footer renders whenever we have Featured, region, or
+                         eyebrow. Featured is only emitted when
+                         TeamSite/Metadata/featured is populated — the field
+                         may not exist in the DCR schema yet, in which case
+                         the footer collapses to just the meta cluster
+                         (region pill + type eyebrow) on the right. -->
+                    <xsl:if test="$ARTICLE_FEATURED != '' or $REGION_LABEL != '' or $EYEBROW_LABEL != ''">
+                      <div class="rbccm-filtered-content__card-footer">
+
+                        <xsl:if test="$ARTICLE_FEATURED != ''">
+                          <div class="rbccm-filtered-content__card-featured">
+                            <span class="rbccm-filtered-content__card-featured-label">Featured:</span>
+                            <span class="rbccm-filtered-content__card-featured-name">
+                              <xsl:value-of select="$ARTICLE_FEATURED"/>
+                            </span>
+                          </div>
+                        </xsl:if>
+
+                        <xsl:if test="$REGION_LABEL != '' or $EYEBROW_LABEL != ''">
+                          <div class="rbccm-filtered-content__card-footer-meta">
+                            <xsl:if test="$REGION_LABEL != ''">
+                              <span class="rbccm-filtered-content__card-region">
+                                <xsl:value-of select="$REGION_LABEL"/>
+                              </span>
+                            </xsl:if>
+                            <xsl:if test="$EYEBROW_LABEL != ''">
+                              <span>
+                                <xsl:attribute name="class">rbccm-filtered-content__card-eyebrow <xsl:value-of select="$EYEBROW_MOD"/></xsl:attribute>
+                                <xsl:value-of select="$EYEBROW_LABEL"/>
+                              </span>
+                            </xsl:if>
+                          </div>
+                        </xsl:if>
+
+                      </div>
+                    </xsl:if>
+
+                  </div>
+                </li>
+
+              </xsl:for-each>
+
+            </xsl:when>
+
+            <!-- ============================================================
+                 CI / Deals presets — JS adapter populates on load.
+                 Empty <ul>; nothing to render server-side.
+                 ============================================================ -->
+            <xsl:otherwise/>
+
+          </xsl:choose>
+
+        </ul>
+      </div>
+
+    </section>
+
+  </xsl:template>
+
+  <!-- ================================================================
+       FORMAT_LONG_DATE — "YYYY-MM-DD" -> "Month D, YYYY"
+       ================================================================ -->
+  <xsl:template name="FORMAT_LONG_DATE">
+    <xsl:param name="publish_date"/>
+    <xsl:if test="$publish_date != ''">
+      <xsl:variable name="vYear" select="substring($publish_date, 1, 4)"/>
+      <xsl:variable name="vMonthNum" select="number(substring($publish_date, 6, 2))"/>
+      <xsl:variable name="vDay" select="number(substring($publish_date, 9, 2))"/>
+      <xsl:choose>
+        <xsl:when test="$vMonthNum = 1">January</xsl:when>
+        <xsl:when test="$vMonthNum = 2">February</xsl:when>
+        <xsl:when test="$vMonthNum = 3">March</xsl:when>
+        <xsl:when test="$vMonthNum = 4">April</xsl:when>
+        <xsl:when test="$vMonthNum = 5">May</xsl:when>
+        <xsl:when test="$vMonthNum = 6">June</xsl:when>
+        <xsl:when test="$vMonthNum = 7">July</xsl:when>
+        <xsl:when test="$vMonthNum = 8">August</xsl:when>
+        <xsl:when test="$vMonthNum = 9">September</xsl:when>
+        <xsl:when test="$vMonthNum = 10">October</xsl:when>
+        <xsl:when test="$vMonthNum = 11">November</xsl:when>
+        <xsl:when test="$vMonthNum = 12">December</xsl:when>
+      </xsl:choose>
+      <xsl:text> </xsl:text>
+      <xsl:value-of select="$vDay"/>, <xsl:value-of select="$vYear"/>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- ================================================================
+       REGION_LABEL_FROM_TOKEN — first raw region code -> display label
+       Handles the buckets our JS filter also uses: Global / US / Canada
+       / Europe / APAC. Any other/unknown code falls through to the
+       raw value.
+       ================================================================ -->
+  <xsl:template name="REGION_LABEL_FROM_TOKEN">
+    <xsl:param name="token"/>
+    <xsl:variable name="first">
+      <xsl:choose>
+        <xsl:when test="contains($token, ' ')">
+          <xsl:value-of select="substring-before($token, ' ')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$token"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="lower" select="translate($first, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:choose>
+      <xsl:when test="$lower = 'global'">Global</xsl:when>
+      <xsl:when test="$lower = 'us' or $lower = 'usa'">US</xsl:when>
+      <xsl:when test="$lower = 'ca' or $lower = 'canada'">Canada</xsl:when>
+      <xsl:when test="$lower = 'gb' or $lower = 'uk' or $lower = 'europe' or $lower = 'emea' or $lower = 'de' or $lower = 'fr' or $lower = 'it' or $lower = 'ie' or $lower = 'lu' or $lower = 'ch' or $lower = 'be' or $lower = 'ae'">Europe</xsl:when>
+      <xsl:when test="$lower = 'au' or $lower = 'hk' or $lower = 'my' or $lower = 'sg' or $lower = 'apac' or $lower = 'asia' or $lower = 'asia-pacific'">APAC</xsl:when>
+      <xsl:otherwise><xsl:value-of select="$first"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+</xsl:stylesheet>
