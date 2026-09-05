@@ -40,7 +40,15 @@
   <xsl:template match="/">
 
     <!-- Config variables read from Properties/Data Datums. -->
-    <xsl:variable name="PRESET" select="/Properties/Data/Datum[@ID='Preset']"/>
+
+    <!-- Preset: read ONLY the trailing text node of the Datum, NOT its
+         full text content. The Datum contains <Option>/<Display>/<Value>
+         children (for the editor UI dropdown) plus a trailing text
+         node that holds either the default value OR the value the
+         editor selected. Plain <xsl:value-of select="Datum"/> would
+         concatenate every Display + Value + the default text. Using
+         text()[last()] isolates the actual selected/default value. -->
+    <xsl:variable name="PRESET" select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
     <xsl:variable name="SECTION_ID" select="/Properties/Data/Datum[@ID='SectionID']"/>
     <xsl:variable name="PAGE_SIZE" select="/Properties/Data/Datum[@ID='PageSize']"/>
     <xsl:variable name="PAGE_SIZE_FILTERED" select="/Properties/Data/Datum[@ID='PageSizeFiltered']"/>
