@@ -27,21 +27,21 @@
 <Properties ComponentID="rbccm-filtered-content">
 
   <!-- Preset selector: picks which variant this instance renders as.
-       TeamSite schema: each <Option> holds a <Display> label followed
-       by the machine value as text content. No <Options> wrapper, no
-       Value="" attribute. -->
+       TeamSite schema: each <Option> is element-only content with a
+       <Display> label child and a <Value> machine-value child.
+       No <Options> wrapper, no Value="" attribute, no text content. -->
   <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
     <Option>
       <Display>In the Media &amp; Press Releases</Display>
-      in-the-media-and-press-releases
+      <Value>in-the-media-and-press-releases</Value>
     </Option>
     <Option>
       <Display>Conference Insights</Display>
-      conference-insights
+      <Value>conference-insights</Value>
     </Option>
     <Option>
       <Display>Deals &amp; Transactions</Display>
-      deals-and-transactions
+      <Value>deals-and-transactions</Value>
     </Option>
     in-the-media-and-press-releases
   </Datum>
