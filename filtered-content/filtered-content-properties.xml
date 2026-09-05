@@ -87,6 +87,24 @@
        Matches the ViewPage Datum from the current About-page XSL. -->
   <Datum ID="ViewPage" Type="PageLink" Name="View Article Page (internal link fallback)"><![CDATA[$PAGE_LINK[about-us]]]></Datum>
 
+  <!-- Lazy per-year archive loading (ITM preset).
+       AvailableYears : comma-separated list of years the Year dropdown
+                        should offer. Update annually as new years fill
+                        in. Also add older years back to whatever depth
+                        of history the RBC archive supports (currently
+                        2010 onward).
+       YearFeedUrlTemplate : URL template with {year} placeholder that
+                             the JS substitutes when fetching a year on
+                             demand. Points at the existing RBCCM per
+                             year XML archive.
+       The main MetaQueryExternal below still seeds the DOM with the
+       most recent 200 items (the current year, effectively). When the
+       user selects an older year from the dropdown, JS fetches that
+       year's archive from the template URL, parses the news nodes,
+       injects <li> items, and the filter engine surfaces them. -->
+  <Datum ID="AvailableYears" Type="String" Name="Year dropdown values (comma separated)">2026,2025,2024,2023,2022,2021,2020,2019,2018,2017,2016,2015,2014,2013,2012,2011,2010</Datum>
+  <Datum ID="YearFeedUrlTemplate" Type="String" Name="Per year archive URL template (use {year})">/en/about-us/data/{year}</Datum>
+
   <!-- Sidecar asset paths + cache buster.
        The XSL emits a <link> for CssPath at the top of the rendered
        output and a <script> for JsPath at the bottom. Both get

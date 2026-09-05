@@ -64,6 +64,17 @@
     <xsl:variable name="EMPTY_CLEAR_LABEL" select="/Properties/Data/Datum[@ID='EmptyClearLabel']"/>
     <xsl:variable name="VIEW_PAGE" select="/Properties/Data/Datum[@ID='ViewPage']"/>
 
+    <!-- Lazy per-year archive loading (ITM preset).
+         AvailableYears : comma-separated list of years the Year dropdown
+                          should offer, e.g. "2010,2011,...,2026".
+         YearFeedUrlTemplate : URL template with {year} placeholder,
+                               e.g. "/en/about-us/data/{year}".
+         When both are set, the JS filter engine builds the Year
+         dropdown from AvailableYears and fetches per-year XML on demand
+         when the user selects a year that isn't already in the DOM. -->
+    <xsl:variable name="AVAILABLE_YEARS" select="/Properties/Data/Datum[@ID='AvailableYears']"/>
+    <xsl:variable name="YEAR_FEED_TEMPLATE" select="/Properties/Data/Datum[@ID='YearFeedUrlTemplate']"/>
+
     <!-- Dropdown visibility toggles (Boolean Datums). Set false to
          hide a dimension entirely on a given preset instance. -->
     <xsl:variable name="SHOW_TYPE" select="/Properties/Data/Datum[@ID='ShowType']"/>
@@ -133,6 +144,12 @@
       </xsl:if>
       <xsl:if test="$ARIA_LABEL != ''">
         <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$AVAILABLE_YEARS != ''">
+        <xsl:attribute name="data-available-years"><xsl:value-of select="$AVAILABLE_YEARS"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$YEAR_FEED_TEMPLATE != ''">
+        <xsl:attribute name="data-year-feed-template"><xsl:value-of select="$YEAR_FEED_TEMPLATE"/></xsl:attribute>
       </xsl:if>
 
       <!-- Filter chrome (dropdowns + search + reset). -->

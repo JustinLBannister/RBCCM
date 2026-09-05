@@ -256,6 +256,129 @@
     var emptyState     = ensureEmptyState(container, isDark);
     var paginationHost = ensurePaginationHost(container);
 
+    /* -------- Lazy per-year loading --------
+       When the ITM component has a full archive available at per-year URLs
+       (e.g. /en/about-us/data/{year}), the XSL can seed the initial DOM
+       with just the current year and let the JS fetch older years on
+       demand as the user selects them from the Year dropdown.
+
+       Two data attributes control this:
+         data-available-years        comma-separated list of years the
+                                     Year dropdown should offer, e.g.
+                                     "2010,2011,...,2026". When present,
+                                     Year dropdown is built from this
+                                     list instead of auto-populating from
+                                     items already in the DOM.
+         data-year-feed-template     URL template with {year} placeholder,
+                                     e.g. "/en/about-us/data/{year}". On
+                                     year select, if no items exist in the
+                                     DOM for that year, JS fetches this
+                                     URL, parses the <news> nodes, and
+                                     injects <li>s into the container
+                                     before running the filter.
+
+       yearLoadedCache tracks which years are known-loaded in the DOM
+       so re-selecting a year doesn't re-fetch. Seeded lazily on first
+       year-select from whatever items are already in the DOM. */
+    var availableYears   = (filterRoot.getAttribute('data-available-years') || '').split(/[\s,]+/).filter(Boolean);
+    var yearFeedTemplate = filterRoot.getAttribute('data-year-feed-template') || '';
+    var yearLoadedCache  = null;
+
+    function isYearLoaded(year) {
+      if (!yearLoadedCache) {
+        yearLoadedCache = {};
+        for (var i = 0; i < allItems.length; i++) {
+          var y = allItems[i].getAttribute('data-year');
+          if (y) yearLoadedCache[y] = true;
+        }
+      }
+      return !!yearLoadedCache[year];
+    }
+
+    function fetchYearArchive(year) {
+      if (!yearFeedTemplate) return Promise.resolve();
+      var url = yearFeedTemplate.replace('{year}', year);
+      return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      }).then(function (xmlStr) {
+        var doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
+        if (!doc || doc.getElementsByTagName('parsererror').length > 0) return;
+        var newsNodes = doc.getElementsByTagName('news');
+        if (!newsNodes.length) return;
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < newsNodes.length; i++) {
+          var li = buildYearArchiveItem(newsNodes[i], year);
+          if (li) frag.appendChild(li);
+        }
+        container.appendChild(frag);
+        /* Mark this year loaded + refresh the engine's item cache so
+           the freshly injected <li>s participate in future matches. */
+        yearLoadedCache[year] = true;
+        allItems = container.querySelectorAll(itemSelector);
+        /* Clear per-item cached search haystacks — items with the same
+           dim tokens will regenerate cleanly on next haystackFor() call. */
+        for (var j = 0; j < allItems.length; j++) delete allItems[j].__rbccmHaystack;
+      }).catch(function (err) {
+        console.warn('[rbccm-filtered-content] year lazy-load failed for ' + year + ':', err);
+      });
+    }
+
+    /* Convert a <news> node from the archive feed into a
+       .rbccm-filtered-content__item <li> that matches the shape of the
+       inline server-rendered items. Feed fields:
+         <date>September 4, 2026</date>
+         <link>...</link>
+         <title><![CDATA[ ... ]]></title>
+         <description><![CDATA[ ... ]]></description>
+         <topic><![CDATA[ media|press|(blank) ]]></topic> */
+    function buildYearArchiveItem(node, year) {
+      var getText = function (tag) {
+        var el = node.getElementsByTagName(tag)[0];
+        return el ? String(el.textContent || '').trim() : '';
+      };
+      var title = getText('title');
+      if (!title) return null;
+      var link = getText('link');
+      var description = getText('description');
+      var dateStr = getText('date');   /* "September 4, 2026" */
+      var topic = getText('topic').toLowerCase();
+
+      var monthTok = (dateStr.match(/^([A-Za-z]+)/) || [])[1];
+      var monthNum = monthTok ? (MONTH_NUM[monthTok.toLowerCase()] || '') : '';
+      var typeToken = topic.indexOf('press') !== -1 ? 'press' : 'media';
+      var eyebrowLabel = typeToken === 'press' ? 'Press release' : 'Media coverage';
+      var eyebrowMod = typeToken === 'press'
+        ? 'rbccm-filtered-content__card-eyebrow--press'
+        : 'rbccm-filtered-content__card-eyebrow--media';
+      var isExternal = /^https?:\/\//i.test(link);
+      var haystack = (title + ' ' + description).toLowerCase();
+
+      var li = document.createElement('li');
+      li.className = 'rbccm-filtered-content__item';
+      li.setAttribute('data-type', typeToken);
+      li.setAttribute('data-year', String(year));
+      if (monthNum) li.setAttribute('data-month', monthNum);
+      li.setAttribute('data-search-text', haystack);
+
+      var linkAttrs = ' href="' + esc(link || '#') + '"';
+      if (isExternal) linkAttrs += ' target="_blank" rel="noopener"';
+
+      li.innerHTML =
+        '<div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">' +
+          '<div class="rbccm-filtered-content__card-topbar">' +
+            '<div class="rbccm-filtered-content__card-date">' + esc(dateStr) + '</div>' +
+          '</div>' +
+          '<h3 class="rbccm-filtered-content__card-title"><a' + linkAttrs + '>' + esc(title) + '</a></h3>' +
+          '<div class="rbccm-filtered-content__card-footer">' +
+            '<div class="rbccm-filtered-content__card-footer-metadata">' +
+              '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' + esc(eyebrowLabel) + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      return li;
+    }
+
     /* -------- Register every dropdown in the filter markup --------
        Each `.rbccm-filtered-content__select-wrapper[data-filter="<dim>"]` gets a
        custom-styled popup listbox built from item data-<dim> values.
@@ -298,6 +421,22 @@
           if (!seen[tokens[t]]) {
             seen[tokens[t]] = true;
             rawTokens.push(tokens[t]);
+          }
+        }
+      }
+
+      /* Year dropdown special case: when data-available-years is authored,
+         use that list verbatim instead of auto-populating from items.
+         This lets the ITM preset offer historical years (e.g. 2010-2026)
+         in the dropdown while only having the current year's items in
+         the DOM initially — lazy-loaded on year select. Seed the `seen`
+         map with each authored year so subsequent logic treats them as
+         known values. */
+      if (dim === 'year' && availableYears.length > 0) {
+        for (var ay = 0; ay < availableYears.length; ay++) {
+          if (!seen[availableYears[ay]]) {
+            seen[availableYears[ay]] = true;
+            rawTokens.push(availableYears[ay]);
           }
         }
       }
@@ -444,10 +583,20 @@
         (function (opt) {
           opt.addEventListener('click', function (e) {
             e.stopPropagation();
-            setValue(opt.getAttribute('data-value'));
+            var value = opt.getAttribute('data-value');
+            setValue(value);
             close();
             button.focus();
-            apply(true);
+
+            /* Year dropdown + lazy-load: if this year's items aren't in
+               the DOM yet, fetch the per-year archive first, inject the
+               items, then run apply(). If the year IS loaded (or if
+               lazy-load isn't configured), apply immediately. */
+            if (dim === 'year' && value !== '' && yearFeedTemplate && !isYearLoaded(value)) {
+              fetchYearArchive(value).then(function () { apply(true); });
+            } else {
+              apply(true);
+            }
           });
           opt.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -821,11 +970,25 @@
       if (!isNaN(p) && p > 0) currentPage = p - 1;
     }
 
+    /* If the URL is hydrating a year we haven't loaded yet, fetch that
+       year's archive first so the deep-linked page can actually match
+       items. Falls through to a no-op if lazy-load isn't configured or
+       the year is already in the DOM. Returns a Promise so callers can
+       chain apply() after the fetch. */
+    function ensureUrlYearLoaded() {
+      if (!yearFeedTemplate || !window.URLSearchParams) return Promise.resolve();
+      try {
+        var y = new URLSearchParams(window.location.search).get('year');
+        if (y && !isYearLoaded(y)) return fetchYearArchive(y);
+      } catch (e) { /* silent */ }
+      return Promise.resolve();
+    }
+
     /* Back / forward — re-apply state from the URL that the browser
        just restored. Don't reset page — the URL is authoritative. */
     window.addEventListener('popstate', function () {
       readUrlState();
-      apply(false);
+      ensureUrlYearLoaded().then(function () { apply(false); });
     });
 
     /* ---------- Empty state ---------- */
@@ -1094,9 +1257,11 @@
 
     /* Hydrate filter + page state from the URL BEFORE the first apply()
        so a deep link like ?year=2026&region=us&page=3 lands directly
-       on that filtered page instead of flashing page 1 first. */
+       on that filtered page instead of flashing page 1 first. If the
+       URL year isn't in the DOM yet, ensureUrlYearLoaded() fetches
+       that archive first so the deep link actually matches items. */
     readUrlState();
-    apply(false);
+    ensureUrlYearLoaded().then(function () { apply(false); });
 
     /* Signal to consumer CSS that the filter has initialized and tiles
        are in their correct visible/hidden state. Consumers can hide the
