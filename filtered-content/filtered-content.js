@@ -1983,7 +1983,9 @@
     'data-empty-message',
     'data-empty-message-emphasis',
     'data-empty-clear-label',
-    'data-scroll-target'
+    'data-scroll-target',
+    'data-available-years',
+    'data-year-feed-template'
   ];
 
   function detectPreset(root) {
