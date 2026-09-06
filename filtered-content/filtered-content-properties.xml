@@ -103,7 +103,11 @@
        year's archive from the template URL, parses the news nodes,
        injects <li> items, and the filter engine surfaces them. -->
   <Datum ID="AvailableYears" Type="String" Name="Year dropdown values (comma separated)">2026,2025,2024,2023,2022,2021,2020,2019,2018,2017,2016,2015,2014,2013,2012,2011,2010</Datum>
-  <Datum ID="YearFeedUrlTemplate" Type="String" Name="Per year archive URL template (use {year})">/en/about-us/data/{year}</Datum>
+  <!-- The base /en/about-us/data/{year} endpoint hard-caps at 150 items
+       and returns most-recent-first, so high-volume years only reach
+       back to July/August. Appending ?qPagesize=500 lifts the cap and
+       returns the entire year (359 items for 2025, e.g.). -->
+  <Datum ID="YearFeedUrlTemplate" Type="String" Name="Per year archive URL template (use {year})">/en/about-us/data/{year}?qPagesize=500</Datum>
 
   <!-- Sidecar asset paths + cache buster.
        The XSL emits a <link> for CssPath at the top of the rendered

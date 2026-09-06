@@ -284,12 +284,28 @@
     var yearFeedTemplate = filterRoot.getAttribute('data-year-feed-template') || '';
     var yearLoadedCache  = null;
 
+    /* Track link URLs already present in the DOM so lazy-fetched
+       archives can dedup against them. Rebuilt every time we seed
+       (i.e. same time as yearLoadedCache). */
+    var seededLinkSet = null;
+
     function isYearLoaded(year) {
       if (!yearLoadedCache) {
         yearLoadedCache = {};
+        seededLinkSet   = {};
         for (var i = 0; i < allItems.length; i++) {
           var y = allItems[i].getAttribute('data-year');
           if (y) yearLoadedCache[y] = true;
+          var a = allItems[i].querySelector('a[href]');
+          if (a) seededLinkSet[a.getAttribute('href')] = true;
+        }
+        /* The CURRENT year (first entry in availableYears) is seeded
+           from a MetaQueryExternal capped at 200 items, so it may only
+           cover recent months. Treat it as NOT loaded so selecting it
+           triggers the archive fetch (which returns the full year with
+           ?qPagesize=500). Dedup by link URL below prevents dupes. */
+        if (availableYears.length > 0) {
+          delete yearLoadedCache[availableYears[0]];
         }
       }
       return !!yearLoadedCache[year];
@@ -321,9 +337,16 @@
         var frag = document.createDocumentFragment();
         var yearsSeen = {};
         var addedForRequested = false;
+        /* Ensure seed set exists (may not have been triggered yet if
+           this is the very first fetch on this filter instance). */
+        if (!seededLinkSet) { isYearLoaded('__seed__'); }
         for (var i = 0; i < newsNodes.length; i++) {
           var built = buildYearArchiveItem(newsNodes[i]);
           if (!built) continue;
+          /* Dedup against server-rendered items — the current year's
+             initial 200 items overlap with the fetched archive. */
+          if (built.link && seededLinkSet[built.link]) continue;
+          if (built.link) seededLinkSet[built.link] = true;
           frag.appendChild(built.li);
           if (built.year) {
             yearsSeen[built.year] = true;
@@ -343,7 +366,15 @@
             );
           }
         }
-        container.appendChild(frag);
+        /* `container` may be the OUTER section (when data-container
+           points at it) rather than the list <ul>. Inject items into
+           the actual list so they participate in the grid — appending
+           to the section would put them AFTER the pagination host. */
+        var listEl = container.matches && container.matches('ul')
+          ? container
+          : (container.querySelector && container.querySelector('.rbccm-filtered-content__list'))
+              || container;
+        listEl.appendChild(frag);
         /* Mark every year that actually appeared in the feed as loaded
            so re-selecting any of them skips a redundant fetch. */
         for (var y in yearsSeen) {
@@ -444,7 +475,7 @@
             '</div>' +
           '</div>' +
         '</div>';
-      return { li: li, year: itemYear };
+      return { li: li, year: itemYear, link: link };
     }
 
     /* -------- Register every dropdown in the filter markup --------
