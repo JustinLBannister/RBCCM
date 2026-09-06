@@ -394,8 +394,17 @@
       var dateStr = getText('date');   /* "September 4, 2026" */
       var topic = getText('topic').toLowerCase();
 
+      /* Local month lookup — MONTH_NUM lives in a different IIFE and
+         isn't visible from bindFilter's closure. Keep this table in
+         sync if the shared one gains new tokens. */
+      var LOCAL_MONTH_NUM = {
+        january:'01', february:'02', march:'03', april:'04', may:'05', june:'06',
+        july:'07', august:'08', september:'09', october:'10', november:'11', december:'12',
+        jan:'01', feb:'02', mar:'03', apr:'04', jun:'06', jul:'07',
+        aug:'08', sep:'09', sept:'09', oct:'10', nov:'11', dec:'12'
+      };
       var monthTok = (dateStr.match(/^([A-Za-z]+)/) || [])[1];
-      var monthNum = monthTok ? (MONTH_NUM[monthTok.toLowerCase()] || '') : '';
+      var monthNum = monthTok ? (LOCAL_MONTH_NUM[monthTok.toLowerCase()] || '') : '';
       var yearMatch = dateStr.match(/(\d{4})/);
       var itemYear = yearMatch ? yearMatch[1] : '';
       var typeToken = topic.indexOf('press') !== -1 ? 'press' : 'media';
@@ -489,6 +498,21 @@
           if (!seen[availableYears[ay]]) {
             seen[availableYears[ay]] = true;
             rawTokens.push(availableYears[ay]);
+          }
+        }
+      }
+
+      /* Month dropdown special case: months are universal, so always
+         offer all 12 rather than auto-populating from whatever items
+         happen to be in the DOM. Otherwise the initial DOM (which may
+         only cover the current year, e.g. Apr-Sep) would show a partial
+         month list, and lazy-loading older years wouldn't extend it. */
+      if (dim === 'month') {
+        var allMonths = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+        for (var am = 0; am < allMonths.length; am++) {
+          if (!seen[allMonths[am]]) {
+            seen[allMonths[am]] = true;
+            rawTokens.push(allMonths[am]);
           }
         }
       }
