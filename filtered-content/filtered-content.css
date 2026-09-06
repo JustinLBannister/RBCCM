@@ -46,22 +46,19 @@
    Block: rbccm-filtered-content__filter
    ========================================================================= */
 
-/* Vertical padding is authored via CSS custom properties so the filter
-   XSL can override just top/bottom via Datums when this component sits
-   on a page that needs different spacing:
-     --rbccm-filtered-content-padding-top-mobile   mobile padding-top     (default 40px)
-     --rbccm-filtered-content-padding-bottom-mobile   mobile padding-bottom  (default 40px)
-     --rbccm-filtered-content-padding-top-desktop   desktop padding-top    (default 43px, in the 768px block)
-     --rbccm-filtered-content-padding-bottom-desktop   desktop padding-bottom (default 43px, in the 768px block)
-   Horizontal (16px gutter) stays hardcoded. */
-.rbccm-filtered-content__filter {
-  padding: var(--rbccm-filtered-content-padding-top-mobile, 40px) 16px var(--rbccm-filtered-content-padding-bottom-mobile, 40px);
-}
+/* The .__filter block used to carry its own vertical padding via CSS
+   custom props, which stacked with the outer .rbccm-filtered-content's
+   padding (also authored via the same custom props) — content editors
+   had no way to tune one without moving both, and defaults doubled up
+   (80px on mobile, ~86px on desktop). The outer section now owns all
+   vertical padding; the filter chrome sits inside it and just centers
+   its own content.
 
-@media (min-width: 768px) {
-  .rbccm-filtered-content__filter {
-    padding: var(--rbccm-filtered-content-padding-top-desktop, 43px) 16px var(--rbccm-filtered-content-padding-bottom-desktop, 43px);
-  }
+   Horizontal 16px gutter kept so the chrome doesn't kiss the section
+   edges on narrow viewports where the outer section's own 16px isn't
+   enough (e.g. if authors override the outer padding to 0). */
+.rbccm-filtered-content__filter {
+  padding: 0 16px;
 }
 
 .rbccm-filtered-content__filter-inner {

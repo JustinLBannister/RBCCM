@@ -152,9 +152,12 @@
         <xsl:attribute name="data-year-feed-template"><xsl:value-of select="$YEAR_FEED_TEMPLATE"/></xsl:attribute>
       </xsl:if>
 
-      <!-- Filter chrome (dropdowns + search + reset). -->
-      <section class="rbccm-filtered-content__filter">
-        <xsl:attribute name="aria-label"><xsl:value-of select="$ARIA_LABEL"/></xsl:attribute>
+      <!-- Filter chrome (dropdowns + search + reset).
+           A <div>, not a <section>: the outer .rbccm-filtered-content
+           is already the landmark and carries the aria-label. Nested
+           sections with duplicate labels create two "Filter articles"
+           landmarks in screen readers. -->
+      <div class="rbccm-filtered-content__filter">
         <div class="rbccm-filtered-content__filter-inner">
           <div class="rbccm-filtered-content__filter-row">
 
@@ -223,7 +226,7 @@
 
           </div>
         </div>
-      </section>
+      </div>
 
       <!-- List container. ITM preset renders items inline from metaResult;
            CI / Deals leave the UL empty for the JS adapters to populate. -->
