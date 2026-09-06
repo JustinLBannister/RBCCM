@@ -1785,8 +1785,12 @@ a.rbccm-filtered-content__card:active {
   display: flex;
   flex-direction: column;
 }
-/* Single-column: close the list with a border-bottom on the last card. */
-.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item:last-child .rbccm-filtered-content__card--article {
+/* Close the list with a border-bottom on the last row of visible items.
+   JS's paginate() tags the last 1-2 visible items with
+   `is-last-visible-row` after every apply so this rule stays accurate
+   across pagination (DOM-order :last-child would match hidden items on
+   any page > 1). */
+.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item.is-last-visible-row .rbccm-filtered-content__card--article {
   border-bottom: 1px solid #CCC;
 }
 
@@ -1807,12 +1811,10 @@ a.rbccm-filtered-content__card:active {
     column-gap: 32px;
     row-gap: 0;
   }
-  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item:last-child .rbccm-filtered-content__card--article {
-    border-bottom: 0;
-  }
-  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item:nth-last-child(-n+2) .rbccm-filtered-content__card--article {
-    border-bottom: 1px solid #CCC;
-  }
+  /* Bottom edge — desktop uses the same is-last-visible-row hook from
+     JS. paginate() adds the class to the last 2 visible items on desktop
+     (2-col grid) and the last 1 on single-column layouts; both cases
+     resolve to the correct row closure here. */
 }
 
 /* Card / row wrapper. Content stays inside the card's box (no bleed

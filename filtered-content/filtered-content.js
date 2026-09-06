@@ -1042,6 +1042,26 @@
         else matched[m].setAttribute('hidden', 'hidden');
       }
 
+      /* Mark the last row of currently-visible items with
+         `is-last-visible-row` so CSS can draw a border-bottom on the
+         real last row (not the DOM-last items, which pagination
+         usually has hidden). The 2-col ITM grid gets the last 2
+         visible; other presets can key off the same class if they
+         later want a matching bottom rule. */
+      var visibleItems = [];
+      for (var v = 0; v < matched.length; v++) {
+        matched[v].classList.remove('is-last-visible-row');
+        if (!matched[v].hasAttribute('hidden')) visibleItems.push(matched[v]);
+      }
+      if (visibleItems.length > 0) {
+        /* Assume up to 2 columns for the ITM preset; harmless on
+           single-column layouts (last 2 == last 1 visually). */
+        var lastRowSize = Math.min(2, visibleItems.length);
+        for (var lr = visibleItems.length - lastRowSize; lr < visibleItems.length; lr++) {
+          visibleItems[lr].classList.add('is-last-visible-row');
+        }
+      }
+
       /* The featured-hero layout only makes sense on page 1 unfiltered,
          since the featured tile is index 0. Mirror the `is-filtered`
          class as `is-past-first-page` on page 2+ so the CSS grid can
