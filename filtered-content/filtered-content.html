@@ -349,6 +349,16 @@
                       </a>
                     </h3>
 
+                    <!-- Description (legacy behavior: writes the article
+                         description below the title when the DCR supplies
+                         one). Only emits when populated so items with a
+                         blank description don't reserve empty space. -->
+                    <xsl:if test="$ARTICLE_DESCRIPTION != ''">
+                      <p class="rbccm-filtered-content__card-description">
+                        <xsl:value-of select="$ARTICLE_DESCRIPTION" disable-output-escaping="yes"/>
+                      </p>
+                    </xsl:if>
+
                     <!-- Footer renders when we have Featured OR region OR
                          eyebrow. Featured only emits when the metadata
                          field is populated (may not yet exist in the DCR). -->

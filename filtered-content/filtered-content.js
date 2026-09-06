@@ -505,12 +505,20 @@
       var linkAttrs = ' href="' + localEsc(link || '#') + '"';
       if (isExternal) linkAttrs += ' target="_blank" rel="noopener"';
 
+      /* Description block only emits when populated so items with a
+         blank <description> don't leave an empty <p> in the DOM.
+         Mirrors the XSL template for server-rendered items. */
+      var descriptionHtml = description
+        ? '<p class="rbccm-filtered-content__card-description">' + localEsc(description) + '</p>'
+        : '';
+
       li.innerHTML =
         '<div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">' +
           '<div class="rbccm-filtered-content__card-topbar">' +
             '<div class="rbccm-filtered-content__card-date">' + localEsc(dateStr) + '</div>' +
           '</div>' +
           '<h3 class="rbccm-filtered-content__card-title"><a' + linkAttrs + '>' + localEsc(title) + '</a></h3>' +
+          descriptionHtml +
           '<div class="rbccm-filtered-content__card-footer">' +
             '<div class="rbccm-filtered-content__card-footer-metadata">' +
               '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' + localEsc(eyebrowLabel) + '</span>' +

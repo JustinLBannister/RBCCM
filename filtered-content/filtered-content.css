@@ -58,7 +58,8 @@
    edges on narrow viewports where the outer section's own 16px isn't
    enough (e.g. if authors override the outer padding to 0). */
 .rbccm-filtered-content__filter {
-  padding: 0 16px;
+  padding: 0;
+  margin-bottom: 50px;
 }
 
 .rbccm-filtered-content__filter-inner {
@@ -1923,7 +1924,7 @@ a.rbccm-filtered-content__card:active {
   align-self: stretch;
   color: var(--Blue-Bright-Blue, #0051A5);
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
   font-size: 18px;
@@ -1931,6 +1932,21 @@ a.rbccm-filtered-content__card:active {
   font-weight: 700;
   line-height: 130%; /* 23.4px */
   margin: 0;
+}
+
+/* Description sits between title and footer. Takes flex-grow so any
+   leftover vertical space in a grid-stretched card is absorbed here
+   (footer stays bottom-pinned via margin-top: auto). Typography is
+   the base __card-description look, tweaked for ITM's tighter row. */
+.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card--article .rbccm-filtered-content__card-description {
+  color: #383838;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 140%;
+  margin: 8px 0 0 0;
+  flex: 1 1 auto;
 }
 
 /* Bottom row — "Featured:" label + person name on the left, region pill
