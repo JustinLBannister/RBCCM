@@ -320,9 +320,51 @@
        no dedicated endpoint (404 / empty), we fall back to the earliest
        available year (last entry in availableYears), which is the
        master archive on the RBC feed. */
+    /* Insert N skeleton row placeholders into the list. Sized to
+       roughly match the real ITM item shape so the container height
+       stays consistent when real items land. Skeleton rows use their
+       own class (not `__item`) so filter/pagination logic ignores
+       them. */
+    function injectSkeletonRows(count) {
+      var listEl = container.matches && container.matches('ul')
+        ? container
+        : (container.querySelector && container.querySelector('.rbccm-filtered-content__list'))
+            || container;
+      if (!listEl) return;
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < count; i++) {
+        var li = document.createElement('li');
+        li.className = 'rbccm-filtered-content__skeleton-row';
+        li.setAttribute('aria-hidden', 'true');
+        li.innerHTML =
+          '<div class="rbccm-filtered-content__skeleton-row-bar rbccm-filtered-content__skeleton-row-bar--title"></div>' +
+          '<div class="rbccm-filtered-content__skeleton-row-bar rbccm-filtered-content__skeleton-row-bar--footer"></div>';
+        frag.appendChild(li);
+      }
+      listEl.appendChild(frag);
+    }
+
+    function removeSkeletonRows() {
+      var rows = container.querySelectorAll('.rbccm-filtered-content__skeleton-row');
+      for (var i = 0; i < rows.length; i++) {
+        rows[i].parentNode && rows[i].parentNode.removeChild(rows[i]);
+      }
+    }
+
     function fetchYearArchive(year) {
       if (!yearFeedTemplate) return Promise.resolve();
-      return fetchYearArchiveUrl(yearFeedTemplate.replace('{year}', year), year, true);
+      /* Loading state — hide real items via `.is-lazy-loading` on
+         root and inject skeleton rows in their place. Clear on
+         success OR failure so a failed fetch doesn't leave the
+         list stuck in skeleton mode. */
+      container.classList.add('is-lazy-loading');
+      injectSkeletonRows(pageSize > 0 ? pageSize : 6);
+      var clear = function () {
+        container.classList.remove('is-lazy-loading');
+        removeSkeletonRows();
+      };
+      return fetchYearArchiveUrl(yearFeedTemplate.replace('{year}', year), year, true)
+        .then(function (r) { clear(); return r; }, function (e) { clear(); throw e; });
     }
 
     function fetchYearArchiveUrl(url, requestedYear, allowFallback) {

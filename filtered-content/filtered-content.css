@@ -1078,6 +1078,55 @@
   }
 }
 
+/* ---------- Lazy-load skeleton rows ----------
+   While a per-year archive fetch is in flight (JS toggles
+   `.is-lazy-loading` on the root section), hide the current items
+   and show skeleton row placeholders in their slots. Skeleton rows
+   share the ITM item's visual shape (border-top separator + row
+   height) so the container doesn't jump when real items land.
+
+   Reuses the shimmer keyframe above; no new animation. */
+.rbccm-filtered-content.is-lazy-loading .rbccm-filtered-content__item {
+  display: none !important;
+}
+.rbccm-filtered-content__skeleton-row {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #CCC;
+  padding: 14px 0;
+  min-height: 110px;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+/* Two stacked bars — a wide "title" (blue-ish) and a narrower
+   "footer" row — to hint at the real ITM item shape. */
+.rbccm-filtered-content__skeleton-row-bar {
+  background: #e5e7eb;
+  border-radius: 4px;
+  height: 14px;
+  margin: 12px 0;
+}
+.rbccm-filtered-content__skeleton-row-bar--title { width: 80%; height: 18px; }
+.rbccm-filtered-content__skeleton-row-bar--footer { width: 35%; margin-top: auto; }
+.rbccm-filtered-content__skeleton-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,0.85) 50%,
+    rgba(255,255,255,0)    100%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  animation: rbccm-filtered-content-skeleton-shimmer 1.4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__skeleton-row::before { animation: none; }
+}
+
 /* Each <li> is a transparent wrapper — display: contents removes the li box
    from the visual layout so the <a> card inside remains the direct CSS Grid
    child and every existing card style (featured span, hover, focus) keeps
