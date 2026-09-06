@@ -1056,6 +1056,12 @@
       return false;
     }
 
+    /* First apply() runs during init — skip the refresh fade there so
+       the list doesn't flash on initial page load. Every subsequent
+       call (filter change, pagination, post-fetch re-apply) gets the
+       brief opacity dip via the `is-refreshing` class. */
+    var applyRunCount = 0;
+
     function apply(resetPage) {
       if (resetPage) currentPage = 0;
       var r = computeMatches();
@@ -1074,6 +1080,19 @@
          the user tries combos). Pagination handlers below use pushState
          so back button walks page steps. Init call uses replaceState. */
       writeUrlState(false);
+
+      /* Brief opacity fade (~120ms in, 120ms out) for visual continuity
+         on sync state changes. Skip on: (a) the first apply during init
+         so the list doesn't flash on page load; (b) when the lazy-load
+         skeleton is currently showing — the skeleton already provides
+         the loading affordance and stacking a fade on top looks messy. */
+      applyRunCount++;
+      if (applyRunCount > 1 && !container.classList.contains('is-lazy-loading')) {
+        container.classList.add('is-refreshing');
+        setTimeout(function () {
+          container.classList.remove('is-refreshing');
+        }, 120);
+      }
     }
 
 

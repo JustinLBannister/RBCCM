@@ -1078,6 +1078,24 @@
   }
 }
 
+/* ---------- Refresh fade ----------
+   Brief opacity dip on any sync state change (filter click, pagination
+   click, post-fetch re-apply). Best-practice UX: gives visual continuity
+   without artificial delay. Skipped on initial page load and while the
+   lazy-load skeleton is showing (that path already has its own affordance).
+   Transition timing matches the setTimeout in apply(); the class is
+   toggled off after ~120ms so the fade-in animates back on its own. */
+.rbccm-filtered-content__list {
+  transition: opacity 0.12s ease;
+}
+.rbccm-filtered-content.is-refreshing .rbccm-filtered-content__list {
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__list { transition: none; }
+  .rbccm-filtered-content.is-refreshing .rbccm-filtered-content__list { opacity: 1; }
+}
+
 /* ---------- Lazy-load skeleton rows ----------
    While a per-year archive fetch is in flight (JS toggles
    `.is-lazy-loading` on the root section), hide the current items
