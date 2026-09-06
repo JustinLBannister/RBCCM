@@ -394,6 +394,13 @@
       var dateStr = getText('date');   /* "September 4, 2026" */
       var topic = getText('topic').toLowerCase();
 
+      /* Local HTML-escape — the shared `esc` helper lives in a
+         different IIFE and isn't visible from bindFilter's closure. */
+      var localEsc = function (s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      };
       /* Local month lookup — MONTH_NUM lives in a different IIFE and
          isn't visible from bindFilter's closure. Keep this table in
          sync if the shared one gains new tokens. */
@@ -422,18 +429,18 @@
       if (monthNum) li.setAttribute('data-month', monthNum);
       li.setAttribute('data-search-text', haystack);
 
-      var linkAttrs = ' href="' + esc(link || '#') + '"';
+      var linkAttrs = ' href="' + localEsc(link || '#') + '"';
       if (isExternal) linkAttrs += ' target="_blank" rel="noopener"';
 
       li.innerHTML =
         '<div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">' +
           '<div class="rbccm-filtered-content__card-topbar">' +
-            '<div class="rbccm-filtered-content__card-date">' + esc(dateStr) + '</div>' +
+            '<div class="rbccm-filtered-content__card-date">' + localEsc(dateStr) + '</div>' +
           '</div>' +
-          '<h3 class="rbccm-filtered-content__card-title"><a' + linkAttrs + '>' + esc(title) + '</a></h3>' +
+          '<h3 class="rbccm-filtered-content__card-title"><a' + linkAttrs + '>' + localEsc(title) + '</a></h3>' +
           '<div class="rbccm-filtered-content__card-footer">' +
             '<div class="rbccm-filtered-content__card-footer-metadata">' +
-              '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' + esc(eyebrowLabel) + '</span>' +
+              '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' + localEsc(eyebrowLabel) + '</span>' +
             '</div>' +
           '</div>' +
         '</div>';
