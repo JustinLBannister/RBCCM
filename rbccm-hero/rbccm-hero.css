@@ -1,0 +1,695 @@
+/* =========================================================================
+   RBCCM Hero - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-hero.css
+
+   Purpose
+   -------------------------------------------------------------------------
+   Shared hero shell + per-page variant modifiers. Each RBCCM page that
+   ships a big top-of-page hero authors its own markup with the shared
+   .rbccm-hero block + a --{page-slug} modifier that owns the variant's
+   layout, typography ramp, background treatment, and section-specific
+   accents.
+
+   The BASE block owns:
+     - Vertical padding response (compensates for the fixed site nav)
+     - Container max-width + centring
+     - Font-family locks (RBCDisplay + Roboto -- defends against
+       unified.css sibling rules that reset h1/h2 tag-level)
+     - Overflow clipping so decorative bg/halos don't bleed to siblings
+     - Reset of margin/padding on inner elements when a tag-selector
+       from the CMS global stylesheet would otherwise interfere
+
+   Each VARIANT modifier owns:
+     - Layout (centred vs split-column vs full-bleed image, etc.)
+     - Background treatment (glow halo, chart image, gradient, plain)
+     - Typography ramp (H1 size + weight + colour flip)
+     - Aside/media slot styling
+     - CTA button row layout
+
+   Consumers
+   -------------------------------------------------------------------------
+     MAAS+MATA page          .rbccm-hero.rbccm-hero--maas-mata
+     Strategy & Economics    .rbccm-hero.rbccm-hero--strategy-and-economics
+     (candidate) Insights hub, About Us, others as they migrate.
+
+   Adding a new variant
+   -------------------------------------------------------------------------
+   1. Author page markup with `.rbccm-hero.rbccm-hero--{page-slug}`
+   2. Add a new modifier block at the bottom of this file with the
+      variant's layout + typography + bg treatment
+   3. Load rbccm-hero.css BEFORE the page's own CSS so page rules can
+      still override if needed
+   ========================================================================= */
+
+/* ---------- Base block -------------------------------------------------- */
+.rbccm-hero {
+  --rbccm-hero-ink:        #082043;
+  --rbccm-hero-navy:       #003168;
+  --rbccm-hero-navy-dark:  #002144;
+  --rbccm-hero-blue:       #0051A5;
+  --rbccm-hero-yellow:     #FFC72C;
+  --rbccm-hero-serif:      RBCDisplay, Georgia, Times, serif;
+  --rbccm-hero-sans:       Roboto, Arial, sans-serif;
+
+  /* Vertical padding compensates for the fixed site navbar (~55px)
+     sitting on top of the hero. Variants can override via inline
+     `style="--rbccm-hero-pt-m: 120px; --rbccm-hero-pt-d: 160px;"`
+     or by re-declaring in their modifier block. */
+  padding-top:    var(--rbccm-hero-pt-m, 95px);
+  padding-bottom: var(--rbccm-hero-pb-m, 75px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.rbccm-hero *,
+.rbccm-hero *::before,
+.rbccm-hero *::after { box-sizing: border-box; }
+
+@media (min-width: 992px) {
+  .rbccm-hero {
+    padding-top:    var(--rbccm-hero-pt-d, 130px);
+    padding-bottom: var(--rbccm-hero-pb-d, 120px);
+  }
+}
+
+/* Container -- max width + horizontal gutter. Individual variants can
+   override to full-bleed by targeting .rbccm-hero__container inside
+   their modifier scope. */
+.rbccm-hero__container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+@media (min-width: 992px) {
+  .rbccm-hero__container { padding: 0 24px; }
+}
+
+/* Safety net for direct children of the hero that sit OUTSIDE the
+   container -- keeps them above decorative ::before backdrops that
+   variants layer at z-index 0. */
+.rbccm-hero > * { position: relative; z-index: 1; }
+
+/* Font-family lock on the big serif visual headings. unified.css
+   sets its own font-family + letter-spacing on h1/h2 via tag
+   selectors, which suppresses RBCDisplay and opens tracking. The
+   lock targets the semantic classes (not h1/h2 raw tags), because
+   MAAS+MATA authors the H1 on the eyebrow (Roboto uppercase, SEO)
+   and the visual "title" as a <p>. Locking the tag would force
+   serif onto the sans eyebrow. */
+.rbccm-hero .rbccm-hero__title,
+.rbccm-hero .rbccm-hero__title-line {
+  font-family: var(--rbccm-hero-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Reset margin/padding on inner elements where a CMS global tag
+   rule would otherwise apply !important margins. Tag-agnostic --
+   authors can use <h1> or <p> for either element depending on
+   their page's semantic needs. Variants own the visual margin via
+   their own class rules. */
+h1.rbccm-hero__eyebrow, p.rbccm-hero__eyebrow,
+h1.rbccm-hero__title,   p.rbccm-hero__title,
+h1.rbccm-hero__subtitle, p.rbccm-hero__subtitle,
+h1.rbccm-hero__body,    p.rbccm-hero__body {
+  padding: 0;
+}
+
+
+/* =========================================================================
+   Variant: MAAS + MATA
+   -------------------------------------------------------------------------
+   Centred hero. Eyebrow with yellow underline, 2-line H1 (last line
+   flips to bright blue), subtitle, dual CTA row. Soft blue glow halo
+   at top-centre via ::before. Faint graph-paper backdrop across the
+   whole hero (ported from `.rbccm-maas-mata` page-root pattern:
+   1.2px vertical + horizontal rules @ 23.35px pitch, plus a small
+   "cross" accent at every intersection). If the consumer page also
+   paints the graph paper site-wide (as maas-mata.css does today),
+   the two stacks are visually identical and layer harmlessly.
+   ========================================================================= */
+.rbccm-hero--maas-mata {
+  background-color: #fff;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 49, 104, 0.025) 0,
+      rgba(0, 49, 104, 0.025) 1.2px,
+      transparent 1.2px,
+      transparent 23.35px,
+      rgba(0, 49, 104, 0.01) 23.35px,
+      rgba(0, 49, 104, 0.01) 24.55px,
+      transparent 24.55px,
+      transparent 46.70px,
+      rgba(0, 49, 104, 0.01) 46.70px,
+      rgba(0, 49, 104, 0.01) 47.90px,
+      transparent 47.90px,
+      transparent 70.05px,
+      rgba(0, 49, 104, 0.01) 70.05px,
+      rgba(0, 49, 104, 0.01) 71.25px,
+      transparent 71.25px,
+      transparent 93.40px,
+      rgba(0, 49, 104, 0.01) 93.40px,
+      rgba(0, 49, 104, 0.01) 94.60px,
+      transparent 94.60px,
+      transparent 116.75px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(0, 49, 104, 0.025) 0,
+      rgba(0, 49, 104, 0.025) 1.2px,
+      transparent 1.2px,
+      transparent 23.35px,
+      rgba(0, 49, 104, 0.01) 23.35px,
+      rgba(0, 49, 104, 0.01) 24.55px,
+      transparent 24.55px,
+      transparent 46.70px,
+      rgba(0, 49, 104, 0.01) 46.70px,
+      rgba(0, 49, 104, 0.01) 47.90px,
+      transparent 47.90px,
+      transparent 70.05px,
+      rgba(0, 49, 104, 0.01) 70.05px,
+      rgba(0, 49, 104, 0.01) 71.25px,
+      transparent 71.25px,
+      transparent 93.40px,
+      rgba(0, 49, 104, 0.01) 93.40px,
+      rgba(0, 49, 104, 0.01) 94.60px,
+      transparent 94.60px,
+      transparent 116.75px
+    ),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='116.75' height='116.75' viewBox='0 0 116.75 116.75'><rect x='54.1975' y='57.778' width='8.355' height='1.194' fill='%23003168' fill-opacity='0.05'/><rect x='57.778' y='54.1975' width='1.194' height='8.355' fill='%23003168' fill-opacity='0.05'/></svg>");
+  background-size: auto, auto, 116.75px 116.75px;
+  background-position: 0 0, 0 0, -57.775px -57.775px;
+  background-repeat: repeat, repeat, repeat;
+}
+.rbccm-hero--maas-mata .rbccm-hero__container { text-align: center; }
+
+/* Glow halo -- soft light-blue disc, blurred, sitting at top-centre
+   like a backdrop. Kept OUT of the accessibility tree via ::before. */
+.rbccm-hero--maas-mata::before {
+  content: "";
+  position: absolute;
+  top: -369px;
+  left: 50%;
+  width: 702px;
+  height: 702px;
+  margin-left: -351px;
+  border-radius: 50%;
+  background: rgba(0, 81, 165, 0.04);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Eyebrow -- uppercase, blue, letter-spaced, with a 45x2 yellow
+   underline directly beneath via ::after. Bottom margin of 80px
+   lands the eyebrow-to-H1 measurement per Figma. */
+.rbccm-hero--maas-mata .rbccm-hero__eyebrow {
+  color: var(--rbccm-hero-blue);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 120%;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 80px;
+}
+.rbccm-hero--maas-mata .rbccm-hero__eyebrow::after {
+  content: "";
+  display: block;
+  width: 45px;
+  height: 2px;
+  background: var(--rbccm-hero-yellow);
+  margin: 15px auto 0;
+}
+
+/* Title -- RBCDisplay 50/75px, 2 lines. Last line flips to blue via
+   __title-line:last-child. */
+.rbccm-hero--maas-mata .rbccm-hero__title {
+  font-family: var(--rbccm-hero-serif);
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 100%;
+  color: var(--rbccm-hero-ink);
+  max-width: 342px;
+  margin: 0 auto 12px;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--maas-mata .rbccm-hero__title { max-width: 100%; }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata .rbccm-hero__title {
+    font-size: 75px;
+    max-width: none;
+    margin: 0 0 20px;
+  }
+}
+.rbccm-hero--maas-mata .rbccm-hero__title-line { display: block; }
+.rbccm-hero--maas-mata .rbccm-hero__title-line:last-child { color: var(--rbccm-hero-blue); }
+
+/* Subtitle -- Roboto, centered, cap width. */
+.rbccm-hero--maas-mata .rbccm-hero__subtitle {
+  color: var(--rbccm-hero-ink);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 120%;
+  max-width: 343px;
+  margin: 0 auto 32px;
+}
+.rbccm-hero--maas-mata .rbccm-hero__subtitle strong { font-weight: 700; }
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata .rbccm-hero__subtitle {
+    font-size: 21.945px;
+    max-width: 776px;
+    margin: 48px auto;
+  }
+}
+
+/* CTA row -- two buttons centered, 12px gap. Wraps on narrow. */
+.rbccm-hero--maas-mata .rbccm-hero__actions {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+
+/* =========================================================================
+   Variant: Strategy & Economics
+   -------------------------------------------------------------------------
+   Mobile-first spec (per Justin's Figma-derived measurements).
+   Outer bg: soft blue-grey #E7EEF1. Content stacks: H1 + body copy,
+   then a dark-navy "Latest insight" card below. Fixed 781px mobile
+   height, 23px horizontal padding, content capped at 1320px inside.
+   Desktop layout override lands at >=992px (grid split, insight
+   card moves to the right column) -- kept as a light layer atop the
+   mobile base so nothing shifts unexpectedly.
+   ========================================================================= */
+.rbccm-hero--strategy-and-economics {
+  background: #E7EEF1;
+  color: var(--rbccm-hero-ink);
+  /* Vertical rhythm from the Figma spec:
+       frame height    781px
+       content height  568.1875px
+       remainder       ~212.8125px  -> split ~106px top / ~106px bottom
+     Using padding rather than a fixed height so the section grows
+     with content if the copy runs longer than Figma expected. Outer
+     23px horizontal gutter matches the Figma spec exactly.
+
+     Top padding also carries the shared nav compensation: the base
+     .rbccm-hero block sets 95px top on mobile to clear the fixed
+     nav, but the shorthand below would clobber it, so we add the
+     95 back in (95 + 106 = 201px total). Bottom stays at 106px. */
+  padding: 201px 23px 106px;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* 8px warm-yellow rule at the bottom, per Figma. Applied on the
+     base variant so it carries through both mobile and desktop. */
+  border-bottom: 8px solid var(--Yellow-Warm-Yellow, #FFC72C);
+  /* position: relative is inherited from the shared block base; keeps
+     the bg-video slot anchored to this section. */
+}
+
+/* Optional background video slot. When an author includes an
+   `.rbccm-hero__bg-video` element inside the section, it fills the
+   entire section as an absolute-cover backdrop and the solid
+   #E7EEF1 fallback stays behind it (visible until the video paints,
+   and if the source ever fails). aria-hidden on the wrapper keeps
+   assistive tech from announcing decorative motion. In production
+   this element hosts a Brightcove Player iframe with autoplay,
+   muted, loop, playsinline, controls disabled - same URL contract
+   as featured-conferences.js already uses. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video video,
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  display: block;
+}
+
+/* Content column lifted above the video. Base container already
+   sits at z-index 1 (from the shared block's `> *` z-index safety
+   net), so this rule just makes the intent explicit. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Inner column: fills the outer flex, stacks its own child (the
+   1320-capped content column) centred. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__container {
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 0;
+}
+
+/* Content column - the actual copy + card stack. Fills 100% on
+   mobile (no cap until desktop authors a max-width). 51px gap
+   between the text block and the insight card. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 51px;
+  align-self: stretch;
+}
+
+/* Top block: H1 + paragraph, 24px gap between them. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__lede {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  align-self: stretch;
+}
+
+/* H1 -- RBC Display 39px / 120% / weight 500, colour #003168.
+   Left-aligned, no bottom margin (gap on the parent handles rhythm). */
+.rbccm-hero--strategy-and-economics .rbccm-hero__title {
+  color: var(--rbccm-hero-navy);
+  font-family: var(--rbccm-hero-serif);
+  font-size: 39px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%; /* 46.8px */
+  margin: 0;
+}
+
+/* Body copy -- Roboto 16/150%, #444, ligatures off per spec. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__body {
+  color: #444;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+  align-self: stretch;
+  margin: 0;
+}
+
+/* -------- Insight card -------- */
+/* Dark navy card. 30/20 padding, 10px radius, subtle grey border,
+   soft box shadow. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-card {
+  display: flex;
+  padding: 30px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 10px;
+  border: 1px solid #D7D7D7;
+  background: #051B38;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Pill row wrapper. 12px bottom padding pushes the H3 down. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow-row {
+  display: flex;
+  padding-bottom: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow-inner {
+  display: flex;
+  padding-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+/* Yellow pill with a 4x4 navy dot + tiny uppercase label. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow {
+  display: flex;
+  padding: 2px 8px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 100px;
+  background: var(--rbccm-hero-yellow);
+  color: var(--rbccm-hero-navy);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 13.5px; /* 150% */
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  aspect-ratio: 1 / 1;
+  border-radius: 33554400px;
+  background: var(--rbccm-hero-navy);
+}
+
+/* Card H3 -- RBC Display 22 / 25.65 line-height, white. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-title {
+  display: flex;
+  padding-bottom: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  color: #FFF;
+  font-family: var(--rbccm-hero-serif);
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 25.65px;
+  margin: 0;
+}
+
+/* Card body copy -- Roboto 12 / 18.6, warm light grey. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-body {
+  display: flex;
+  padding-bottom: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  color: #D7D7D7;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18.6px; /* 155% */
+  margin: 0;
+}
+
+/* Divider row: date left, read-more right. Top hairline in warm
+   light grey at 77% alpha. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-footer {
+  display: flex;
+  padding-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-top: 1px solid rgba(215, 215, 215, 0.77);
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #D7D7D7;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Read more link -- warm-yellow 11/700, uppercase-ish tracking,
+   with a small chevron+shaft SVG icon on the right. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--rbccm-hero-yellow);
+  leading-trim: both;
+  text-edge: cap;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16.5px; /* 150% */
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover,
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible {
+  opacity: 0.85;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* -------- Desktop layout (>=992): full Figma spec --------
+   Section switches from mobile's padded stack to a horizontal band.
+   Row centres a 1100px content bar with space-between so the H1
+   column sits left, the insight card right. Between 992 and 1099
+   the columns flex naturally (lede holds a 562 floor, card takes
+   the leftover); at 1100+ a second query below relaxes to fixed
+   widths + a wider 75px gap that only fits at full width.
+
+   H1 scales up to 65px w/ -1.08px tracking; body copy to 21/27.2.
+
+   A soft blur ellipse (Figma "Ellipse 56") sits behind the text
+   column so text stays readable if the section carries a video
+   backdrop rather than the solid #E7EEF1 fill. */
+@media (min-width: 992px) {
+
+  .rbccm-hero--strategy-and-economics {
+    display: flex;
+    height: auto;
+    /* Vertical rhythm mirrors the mobile approach: no fixed height,
+       padding derived from the Figma frame vs. content-column delta.
+       116px top / 116px bottom is half the difference between the
+       525px frame and its child row, so the visible geometry matches
+       Figma at exactly-Figma widths and the section grows naturally
+       if the copy or card runs taller than expected.
+
+       Top padding also carries the shared nav compensation: the base
+       .rbccm-hero block sets 130px top on desktop to clear the fixed
+       nav, but the shorthand below would clobber it, so we add the
+       130 back in (130 + 116 = 246px total). Bottom stays at 116px.
+       Section owns the outer horizontal gutter (23px, same as mobile);
+       container underneath sits at padding:0 and just centres the row. */
+    padding: 246px 23px 116px;
+    align-items: center;
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  /* Content container behaves as the flex host for the row.
+     No horizontal padding here -- the parent section (or the page
+     shell above it) owns the outer gutter, so this element just
+     centres its child. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__container {
+    max-width: none;
+    width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: none;
+  }
+
+  /* Row: fills available width up to a 1100px cap so it responds
+     down through mid-widths instead of hard-locking to 1100.
+     Between 992 and 1099 the columns flex naturally: the lede holds
+     a 562px minimum on the left, and the insight card takes whatever
+     width is left over up to the 1100 cap. The mobile 51px gap
+     carries through so the columns never touch as they flex. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1100px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 51px;
+    align-self: auto;
+  }
+
+  /* Left column: 540px floor + basis, 32px gap between H1 and body.
+     flex: 1 0 540px grows above 540 to fill leftover space at wider
+     viewports but never shrinks below 540, so the type never
+     compresses even in the mid-range 992-1099 window. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__lede {
+    flex: 1 0 540px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+  }
+
+  /* H1: RBC Display 65 / 100% / weight 500 / -1.08px tracking. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__title {
+    font-size: 65px;
+    line-height: 100%; /* 65px */
+    letter-spacing: -1.08px;
+  }
+
+  /* Body copy: Roboto 21 / 27.2px line-height. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__body {
+    font-size: 21px;
+    line-height: 27.2px; /* 129.524% */
+  }
+
+  /* Right column: 482px base, grows to fill remaining space up to
+     the 1100px row cap. min-width: 0 lets it shrink freely inside
+     the flex row so nothing overflows between 992 and 1100. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-card {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 482px;
+    padding: 40px 30px;
+    align-self: auto;
+  }
+
+  /* Extra right-padding on the title + body so they don't run to
+     the card edge -- leaves optical breathing room at desktop widths
+     where the card is fixed at 482. Title gets 40px, body 30px. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-title {
+    padding-right: 40px;
+  }
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-body {
+    padding-right: 30px;
+  }
+
+  /* Blur ellipse behind the text column -- Figma "Ellipse 56".
+     527 x 200 rounded blob (border-radius: 527px is huge on purpose;
+     Figma exported it that way to guarantee a pill regardless of
+     dimensions), tinted #E7EEF2 with a 50px blur so it reads as a
+     soft glow. Anchored bottom-left of the section per the design.
+     Only shown at desktop (mobile stack doesn't need it). Absolute
+     positioned; the __blur element sits directly inside the section. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__blur {
+    position: absolute;
+    left: 148px;
+    bottom: 79px;
+    width: 527px;
+    height: 200px;
+    border-radius: 527px;
+    background: #E7EEF2;
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+
+/* -------- Desktop layout (>=1100): full-width Figma spec --------
+   Above 1100 the row hits its 1100 max-width and stops growing.
+   The lede + card flex declarations from 992+ already do the right
+   thing here (lede holds 540 floor, both grow to share leftover
+   space), so all this breakpoint changes is the parent gap -- 51 ->
+   75px, the Figma spec at full width. */
+@media (min-width: 1100px) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+    gap: 75px;
+  }
+}

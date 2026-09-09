@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBCCM Hero -- local preview</title>
+<link rel="stylesheet" href="../rbccm-button/rbccm-button.css">
+<link rel="stylesheet" href="rbccm-hero.css">
+<style>
+  body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- =============================================================
+     Variant A -- MAAS + MATA (centred, glow halo, 2-line title)
+     ============================================================= -->
+<div class="demo-note">Variant A -- .rbccm-hero--maas-mata (centred, glow halo)</div>
+
+<section class="rbccm-hero rbccm-hero--maas-mata" aria-label="MAAS+MATA hero">
+  <div class="rbccm-hero__container">
+    <!-- H1 sits on the eyebrow for SEO (matches production maas-mata
+         markup -- the eyebrow is the descriptive H1, the visual "title"
+         below is a <p>). Uppercase Roboto styling comes from the
+         __eyebrow class rule regardless of tag. -->
+    <h1 class="rbccm-hero__eyebrow">Multi-Asset Agency Solutions</h1>
+    <p class="rbccm-hero__title">
+      <span class="rbccm-hero__title-line">Trade with clarity.</span>
+      <span class="rbccm-hero__title-line">Execute with control.</span>
+    </p>
+    <p class="rbccm-hero__subtitle">
+      RBC Capital Markets' <strong>multi-asset trading platform</strong> is the
+      only solution that keeps intelligence connected from decision to action.
+    </p>
+    <div class="rbccm-hero__actions">
+      <a class="rbccm-button rbccm-button--primary" href="#">
+        <span class="rbccm-button__label">Request a demo</span>
+        <svg class="rbccm-button__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z"/>
+        </svg>
+      </a>
+      <a class="rbccm-button rbccm-button--secondary" href="#">
+        <span class="rbccm-button__label">Watch the video</span>
+        <svg class="rbccm-button__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================================
+     Variant B -- Strategy & Economics (split 2-col, insight aside)
+     ============================================================= -->
+<div class="demo-note">Variant B -- .rbccm-hero--strategy-and-economics (split-column, insight card aside)</div>
+
+<section class="rbccm-hero rbccm-hero--strategy-and-economics" aria-label="Strategy & Economics hero">
+
+  <!-- Optional background video slot. Production swaps in a Brightcove
+       Player iframe with autoplay+muted+loop+playsinline+controls=off:
+       <iframe src="https://players.brightcove.net/{account}/{player}_default/index.html?videoId={id}&autoplay=true&muted=true&loop=true&playsinline=true&controls=false" allow="autoplay"></iframe>
+       For the local preview we drop in a stable public MP4 (Google's
+       Big Buck Bunny sample) so the layer visibly works without needing
+       Brightcove credentials. Author omits this whole block if they
+       want the solid #E7EEF1 bg to show through. -->
+  <div class="rbccm-hero__bg-video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Blur ellipse (Figma "Ellipse 56"). Only visible at >=992 via
+       CSS; sits behind the text column so text stays readable when
+       a video backdrop plays underneath. Decorative -- aria-hidden. -->
+  <div class="rbccm-hero__blur" aria-hidden="true"></div>
+
+  <div class="rbccm-hero__container">
+    <div class="rbccm-hero__grid">
+
+      <!-- Top block: H1 + body copy, 24px gap -->
+      <div class="rbccm-hero__lede">
+        <h1 class="rbccm-hero__title">Macro economics &amp; market strategy insights</h1>
+        <p class="rbccm-hero__body">Turning macro complexity into market clarity across economics, geopolitics, and global markets -- to drive better business and investment decisions.</p>
+      </div>
+
+      <!-- Dark navy Latest Insight card -->
+      <article class="rbccm-hero__insight-card">
+        <div class="rbccm-hero__insight-eyebrow-row">
+          <div class="rbccm-hero__insight-eyebrow-inner">
+            <p class="rbccm-hero__insight-eyebrow">Latest Insight</p>
+          </div>
+        </div>
+        <h3 class="rbccm-hero__insight-title">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</h3>
+        <p class="rbccm-hero__insight-body">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</p>
+        <footer class="rbccm-hero__insight-footer">
+          <span class="rbccm-hero__insight-date">July 14, 2025</span>
+          <a class="rbccm-hero__insight-link" href="#">
+            Read more
+            <svg class="rbccm-hero__insight-link-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2.70801 6.5H10.2913" stroke="#FFC72C" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 2.70825L10.2917 6.49992L6.5 10.2916" stroke="#FFC72C" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </footer>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

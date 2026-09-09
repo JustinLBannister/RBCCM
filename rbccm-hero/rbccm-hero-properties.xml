@@ -1,0 +1,370 @@
+<!--
+  RBCCM Hero - Properties + Data
+  ==============================================================
+  Preset-driven hero component. The Preset Datum picks the
+  variant; each variant has its own set of content Datums that
+  live in the same file. Unused Datums for a given preset are
+  ignored by the XSL (matches the tabbed-panels + filtered-content
+  pattern).
+
+  Presets:
+    maas-mata               Centred hero with eyebrow, 2-line
+                            title (line 2 flips to blue), subtitle,
+                            and up to 2 CTA buttons.
+    strategy-and-economics  Split 2-column band with title + body
+                            on the left, a dark navy "latest
+                            insight" card on the right, and an
+                            optional Brightcove video backdrop.
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every editable text field ships as a pair:
+    <Field>Text       String / Textarea with the copy itself
+    <Field>Tag        Enum picker: h1 | h2 | h3 | h4 | h5 | h6
+                                 | p  | div | span
+  The XSL emits the tag dynamically via xsl:element name="{tag}",
+  so an author can promote an eyebrow to <h1> for SEO, drop a
+  visual title to a <p> to keep it out of the outline, etc. Each
+  field defaults to the semantically-neutral choice used in the
+  local preview HTML.
+
+  Sidecar assets are loaded from paths declared below and cache-
+  busted via ?v={CacheVersion} appended by the XSL. Bump
+  CacheVersion after every deploy of rbccm-hero.css.
+-->
+<Properties ComponentID="rbccm-hero">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (unique per page)">rbccm-hero-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label">Page hero</Datum>
+
+  <!-- Sidecar CSS path + cache buster. The XSL emits a <link> for
+       CssPath at the top of the rendered output with ?v={CacheVersion}
+       appended. Bump CacheVersion after every deploy of the CSS. -->
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path">/assets/rbccm/css/components/rbccm-hero.css</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Cache buster (bump after each sidecar deploy)">1</Datum>
+
+  <!-- rbccm-button.css is the shared pill-button system used by the
+       MAAS+MATA preset's CTA row. Loaded from the same convention
+       and cache-busted with the same version stamp. Leave blank to
+       skip the button stylesheet include (a page that already loads
+       it does not need the hero to load it again). -->
+  <Datum ID="ButtonCssPath" Type="String" Name="Shared button CSS path (blank = skip)">/assets/rbccm/css/components/rbccm-button.css</Datum>
+
+  <!-- rbccm-hero.js hydrates the Strategy and Economics insight card
+       from the RBCCM insights XML feeds when SeInsightSource is
+       auto-latest. Only emitted for that preset. Blank = skip (use
+       the MAAS+MATA preset without JS, or hydrate elsewhere). -->
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (S+E hydrator)">/assets/rbccm/js/components/rbccm-hero.js</Datum>
+
+  <!--
+    Preset selector - picks which variant this instance renders as.
+    Each preset consumes its own Datum sub-set below (Mm* for
+    MAAS+MATA, Se* for Strategy and Economics); unused Datums are
+    ignored. Bare text after the closing Option is the default.
+  -->
+  <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
+    <Option>
+      <Display>MAAS + MATA (centred, glow halo, 2-line title, dual CTA)</Display>
+      <Value>maas-mata</Value>
+    </Option>
+    <Option>
+      <Display>Strategy and Economics (split column with insight card + optional video bg)</Display>
+      <Value>strategy-and-economics</Value>
+    </Option>
+    maas-mata
+  </Datum>
+
+
+  <!-- ============================================================
+       MAAS + MATA preset Datums
+       ============================================================
+       All IDs prefixed with "Mm" so they never collide with the
+       Strategy and Economics preset. Structure mirrors the local
+       preview markup:
+
+         section.rbccm-hero.rbccm-hero__maas-mata
+           .rbccm-hero__container
+             <MmEyebrowTag>  MmEyebrowText           </MmEyebrowTag>
+             <MmTitleTag>
+               <span>       MmTitleLine1Text        </span>
+               <span>       MmTitleLine2Text        </span>
+             </MmTitleTag>
+             <MmSubtitleTag> MmSubtitleText          </MmSubtitleTag>
+             <div class="rbccm-hero__actions">
+               <a> MmCta1Label + icon </a>
+               <a> MmCta2Label + icon </a>
+             </div>
+
+       (Class names in this comment use __ substitution for the BEM
+       modifier so the XML comment stays well-formed.)
+       ============================================================ -->
+
+  <!-- Eyebrow. In production maas-mata authors this as an H1 for
+       SEO; the visual "title" below stays a paragraph. -->
+  <Datum ID="MmEyebrowText" Type="String" Name="MAAS+MATA :: eyebrow text">Multi-Asset Agency Solutions</Datum>
+  <Datum ID="MmEyebrowTag" Type="String" Name="MAAS+MATA :: eyebrow tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h1
+  </Datum>
+
+  <!-- Title outer wrapper. Inner lines are always <span>s (visual
+       line breaks). Tag picker controls only the wrapper element. -->
+  <Datum ID="MmTitleLine1Text" Type="String" Name="MAAS+MATA :: title line 1 (dark navy)">Trade with clarity.</Datum>
+  <Datum ID="MmTitleLine2Text" Type="String" Name="MAAS+MATA :: title line 2 (bright blue)">Execute with control.</Datum>
+  <Datum ID="MmTitleTag" Type="String" Name="MAAS+MATA :: title wrapper tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <!-- Subtitle. Supports inline HTML (strong, em, br) so authors
+       can emphasise a phrase. XSL uses disable-output-escaping so
+       markup survives. -->
+  <Datum ID="MmSubtitleText" Type="Textarea" Name="MAAS+MATA :: subtitle (HTML allowed)">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
+  <Datum ID="MmSubtitleTag" Type="String" Name="MAAS+MATA :: subtitle tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <!-- CTA 1. Blank Label hides the button entirely. Style picks
+       one of the rbccm-button variants. Icon slot is a raw SVG
+       path payload (author pastes the "d" attribute contents),
+       so any Figma icon can drop in without editing the XSL. -->
+  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA :: CTA 1 label">Request a demo</Datum>
+  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA :: CTA 1 URL">#</Datum>
+  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA :: CTA 1 aria-label (optional)"></Datum>
+  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA :: CTA 1 title attribute (optional)"></Datum>
+  <Datum ID="MmCta1Style" Type="String" Name="MAAS+MATA :: CTA 1 style">
+    <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
+    <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
+    <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
+    <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
+    primary
+  </Datum>
+  <Datum ID="MmCta1IconPath" Type="String" Name="MAAS+MATA :: CTA 1 SVG path 'd' payload (blank = no icon)">M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z</Datum>
+  <Datum ID="MmCta1IconViewBox" Type="String" Name="MAAS+MATA :: CTA 1 SVG viewBox">0 0 24 24</Datum>
+
+  <!-- CTA 2. Same shape as CTA 1. Blank Label hides the button. -->
+  <Datum ID="MmCta2Label" Type="String" Name="MAAS+MATA :: CTA 2 label">Watch the video</Datum>
+  <Datum ID="MmCta2Href" Type="String" Name="MAAS+MATA :: CTA 2 URL">#</Datum>
+  <Datum ID="MmCta2AriaLabel" Type="String" Name="MAAS+MATA :: CTA 2 aria-label (optional)"></Datum>
+  <Datum ID="MmCta2Title" Type="String" Name="MAAS+MATA :: CTA 2 title attribute (optional)"></Datum>
+  <Datum ID="MmCta2Style" Type="String" Name="MAAS+MATA :: CTA 2 style">
+    <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
+    <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
+    <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
+    <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
+    secondary
+  </Datum>
+  <Datum ID="MmCta2IconPath" Type="String" Name="MAAS+MATA :: CTA 2 SVG path 'd' payload (blank = no icon)">M8 5v14l11-7z</Datum>
+  <Datum ID="MmCta2IconViewBox" Type="String" Name="MAAS+MATA :: CTA 2 SVG viewBox">0 0 24 24</Datum>
+
+
+  <!-- ============================================================
+       Strategy and Economics preset Datums
+       ============================================================
+       All IDs prefixed with "Se". Structure mirrors the local
+       preview markup:
+
+         section.rbccm-hero.rbccm-hero__strategy-and-economics
+           .rbccm-hero__bg-video       (Brightcove iframe if VideoId set)
+           .rbccm-hero__blur           (desktop-only decorative ellipse)
+           .rbccm-hero__container
+             .rbccm-hero__grid
+               .rbccm-hero__lede
+                 <SeTitleTag>   SeTitleText   </SeTitleTag>
+                 <SeBodyTag>    SeBodyText    </SeBodyTag>
+               .rbccm-hero__insight-card
+                 .rbccm-hero__insight-eyebrow-row
+                   .rbccm-hero__insight-eyebrow-inner
+                     <SeInsightEyebrowTag> SeInsightEyebrowText </...>
+                 <SeInsightTitleTag> SeInsightTitleText </...>
+                 <SeInsightBodyTag>  SeInsightBodyText  </...>
+                 <footer .rbccm-hero__insight-footer>
+                   <SeInsightDateTag> SeInsightDateText </...>
+                   <a class="rbccm-hero__insight-link">
+                     SeInsightLinkLabel + arrow SVG
+                   </a>
+       ============================================================ -->
+
+  <!-- Optional Brightcove backdrop. Same account+player constants
+       as every other RBC video. Blank VideoId leaves the section on
+       its solid #E7EEF1 fill. -->
+  <Datum ID="SeBgBrightcoveAccount" Type="String" Name="S+E :: Brightcove account ID (RBC-wide constant)">6021289101001</Datum>
+  <Datum ID="SeBgBrightcovePlayer" Type="String" Name="S+E :: Brightcove player ID (RBC-wide constant)">VyvCc9BZx</Datum>
+  <Datum ID="SeBgBrightcoveVideoId" Type="String" Name="S+E :: Brightcove video ID (blank = no video, solid bg only)"></Datum>
+
+  <!-- Insight card source. auto-latest is hydrated client-side by
+       rbccm-hero.js from the RBCCM insights XML feeds listed in
+       SeInsightFeedUrls; manual always uses the SeInsight* Datums
+       below. In auto-latest mode the SeInsight* Datums also render
+       server-side as the pre-hydration fallback that shows while
+       the feed loads (and as the no-JS fallback). -->
+  <Datum ID="SeInsightSource" Type="String" Name="S+E :: insight card source">
+    <Option>
+      <Display>Auto - latest Strategy and Economics article from feed</Display>
+      <Value>auto-latest</Value>
+    </Option>
+    <Option>
+      <Display>Manual - always use the SeInsight* Datums below</Display>
+      <Value>manual</Value>
+    </Option>
+    auto-latest
+  </Datum>
+
+  <!-- Comma-separated list of insights XML feed URLs the hydrator
+       walks. Default covers 2024/2025/2026 - update once a year
+       when a new year feed goes live (or every year in bulk). -->
+  <Datum ID="SeInsightFeedUrls" Type="String" Name="S+E :: feed URLs (comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
+
+  <!-- Comma-separated list of tag keywords. rbccm-hero.js checks each
+       feed record's &lt;tags&gt; field for a case-insensitive substring
+       match against any keyword; a record survives the filter as
+       long as AT LEAST ONE keyword hits. Newest surviving record
+       wins. RBCCM's insights feed doesn't ship a top-level S+E
+       category, so this keyword set is how we hand-carve the topic
+       out of the general Insights firehose. Tune as taxonomy evolves.
+       Ignored when SeInsightPinnedUrl is set. -->
+  <Datum ID="SeInsightTagKeywords" Type="String" Name="S+E :: tag keywords (comma-separated, any-match)">economic,strategy,macro,geopolitics,monetary,inflation</Datum>
+
+  <!-- Optional PIN mode. Paste a specific article URL (either the
+       full https URL or the /en/ path) and the hydrator will look
+       up THAT record in the feeds by URL match and use its title /
+       description / date / link. Overrides the keyword search
+       entirely - useful when editorial wants a specific piece
+       featured regardless of what's newest. Blank = fall back to
+       keyword-based auto-latest. -->
+  <Datum ID="SeInsightPinnedUrl" Type="String" Name="S+E :: pin a specific article URL (blank = auto-latest)"></Datum>
+
+  <!-- Optional CTA link override for auto-latest mode. Blank uses
+       the feed record's own article URL. Editorial sometimes wants
+       "Read more" to point at a hub page instead of the article. -->
+  <Datum ID="SeInsightAutoLinkOverride" Type="String" Name="S+E :: auto-mode link override (blank = feed URL)"></Datum>
+
+  <!-- Left column: title + body. -->
+  <Datum ID="SeTitleText" Type="String" Name="S+E :: title">Macro economics &amp; market strategy insights</Datum>
+  <Datum ID="SeTitleTag" Type="String" Name="S+E :: title tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h1
+  </Datum>
+
+  <Datum ID="SeBodyText" Type="Textarea" Name="S+E :: body copy (HTML allowed)">Turning macro complexity into market clarity across economics, geopolitics, and global markets - to drive better business and investment decisions.</Datum>
+  <Datum ID="SeBodyTag" Type="String" Name="S+E :: body tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <!-- Insight card: pill eyebrow + title + body + footer (date + link). -->
+  <Datum ID="SeInsightEyebrowText" Type="String" Name="S+E :: insight card eyebrow (pill label)">Latest Insight</Datum>
+  <Datum ID="SeInsightEyebrowTag" Type="String" Name="S+E :: insight eyebrow tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <Datum ID="SeInsightTitleText" Type="String" Name="S+E :: insight card title">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
+  <Datum ID="SeInsightTitleTag" Type="String" Name="S+E :: insight card title tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h3
+  </Datum>
+
+  <Datum ID="SeInsightBodyText" Type="Textarea" Name="S+E :: insight card body (HTML allowed)">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
+  <Datum ID="SeInsightBodyTag" Type="String" Name="S+E :: insight card body tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <Datum ID="SeInsightDateText" Type="String" Name="S+E :: insight card date">July 14, 2025</Datum>
+  <Datum ID="SeInsightDateTag" Type="String" Name="S+E :: insight card date tag">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    span
+  </Datum>
+
+  <!-- Link is always an anchor tag (it needs an href to work). The
+       label text renders inside a <span>, so no tag picker here.
+       In auto-latest mode the LinkLabel is still used (label text
+       stays constant across articles); LinkHref is overridden by
+       the feed record's URL unless SeInsightAutoLinkOverride is set. -->
+  <Datum ID="SeInsightLinkLabel" Type="String" Name="S+E :: insight card link label">Read more</Datum>
+  <Datum ID="SeInsightLinkHref" Type="String" Name="S+E :: insight card link URL (manual mode only)">#</Datum>
+  <Datum ID="SeInsightLinkAriaLabel" Type="String" Name="S+E :: insight card link aria-label (optional)"></Datum>
+
+
+
+</Data>
