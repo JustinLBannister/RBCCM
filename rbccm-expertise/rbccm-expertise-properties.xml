@@ -1,0 +1,221 @@
+<!--
+  RBCCM Expertise - Properties + Data
+  ==============================================================
+  Preset-driven pillar/column-list. Section header + 4 pillar
+  slots, each with a preset icon, title, and short body. On
+  desktop pillars sit in a 4-column row separated by thin blue
+  dividers; below 1245px they collapse into a Slick slider
+  (see rbccm-expertise.js).
+
+  Presets:
+    strategy-and-economics-expertise
+      Light-blue section, dark-blue heading + icons, warm-gray
+      body, 1px gray dividers. Sits directly under the S+E hero
+      on the S+E page.
+
+    why-rbc-capital-markets
+      White section, dark-blue heading, bright-blue pillar titles,
+      black body, 2px bright-blue dividers. No icons (variant CSS
+      hides the slot regardless of IconName selection). Section
+      description typically left blank.
+
+  Icon library
+  ==============================================================
+  The IconName Datum takes an enum value; the XSL swaps in the
+  matching inline SVG at render time. Current library:
+    globe    Latitude/longitude globe (Geopolitics)
+    bank     Classical building with columns (Economics)
+    chart    Ascending bar chart with data-point cap (Equity Markets)
+    search   Magnifying glass (Cross-Asset Strategy)
+    none     Skip the icon slot for this pillar
+  Add more by extending the iconSvg template in rbccm-expertise.xsl
+  and adding the value here.
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every editable text field ships as a pair:
+    <Field>Text       String / Textarea with the copy itself
+    <Field>Tag        Enum picker: h1..h6, p, div, span
+  XSL emits the tag via xsl:element name="{tag}", guarded by
+  the pickTag allow-list.
+-->
+<Properties ComponentID="rbccm-expertise">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. Deploy-time plumbing.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-expertise-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">Areas of expertise</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-expertise.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - set once at deploy, editors don't change)">/assets/rbccm/js/components/rbccm-expertise.js</Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Strategy and Economics - Areas of expertise</Display>
+      <Value>strategy-and-economics-expertise</Value>
+    </Option>
+    <Option>
+      <Display>Why RBC Capital Markets</Display>
+      <Value>why-rbc-capital-markets</Value>
+    </Option>
+    strategy-and-economics-expertise
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header
+       ============================================================
+       What editors set here: the big headline and short description
+       that sit at the top of the section. The tag pickers let you
+       promote the title to h2 for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-expertise__header-center modifier that centers the
+       title + description block. (Class name uses __ substitution
+       for the BEM modifier so this XML comment stays well-formed;
+       emitted markup uses the double-hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">Areas of expertise</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+
+  <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - blank hides the description; HTML allowed)">Comprehensive macro intelligence led by world-class strategists across key market pillars.</Datum>
+  <Datum ID="SectionDescriptionTag" Type="String" Name="Section description tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+
+  <!-- ============================================================
+       Pillar slots (exactly 4 - REQUIRED)
+       ============================================================
+       This section renders 4 pillars. Fill in every pillar's Title
+       and Body. Blank titles hide the pillar but degrade the
+       section's identity and skew the divider math - keep all 4
+       populated.
+       .............................................................
+       This section is intentionally locked to 4 pillars. The Slick
+       carousel runtime (rbccm-expertise.js) assumes 4 slides so it
+       can step down cleanly (4 / 3 / 2 / 1 per view) as the viewport
+       narrows. Blanking a slot will not hard-crash the runtime, but
+       it degrades the visual identity of the section and skews the
+       divider math.
+       .............................................................
+       Per pillar:
+         Pillar{N}IconName   preset icon enum (globe|bank|chart|search|none)
+         Pillar{N}TitleText  headline (required)
+         Pillar{N}TitleTag   tag picker (default h3)
+         Pillar{N}BodyText   one-line body copy (required)
+         Pillar{N}BodyTag    tag picker (default p)
+       ============================================================ -->
+
+  <!-- ==== Pillar 1 ==== -->
+  <Datum ID="Pillar1IconName" Type="String" Name="Pillar 1 : icon (pick from library)">
+    <Option><Display>Globe (geopolitics/world)</Display><Value>globe</Value></Option>
+    <Option><Display>Bank (economics/institution)</Display><Value>bank</Value></Option>
+    <Option><Display>Chart (equity/markets)</Display><Value>chart</Value></Option>
+    <Option><Display>Search (analysis/strategy)</Display><Value>search</Value></Option>
+    <Option><Display>None (skip icon slot)</Display><Value>none</Value></Option>
+    globe
+  </Datum>
+  <Datum ID="Pillar1TitleText" Type="String" Name="Pillar 1 : title (required - do not blank)">Geopolitics</Datum>
+  <Datum ID="Pillar1TitleTag" Type="String" Name="Pillar 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Pillar1BodyText" Type="Textarea" Name="Pillar 1 : body (required - do not blank; HTML allowed)">Global political developments, energy, and their market impact.</Datum>
+  <Datum ID="Pillar1BodyTag" Type="String" Name="Pillar 1 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+
+  <!-- ==== Pillar 2 ==== -->
+  <Datum ID="Pillar2IconName" Type="String" Name="Pillar 2 : icon (pick from library)">
+    <Option><Display>Globe (geopolitics/world)</Display><Value>globe</Value></Option>
+    <Option><Display>Bank (economics/institution)</Display><Value>bank</Value></Option>
+    <Option><Display>Chart (equity/markets)</Display><Value>chart</Value></Option>
+    <Option><Display>Search (analysis/strategy)</Display><Value>search</Value></Option>
+    <Option><Display>None (skip icon slot)</Display><Value>none</Value></Option>
+    bank
+  </Datum>
+  <Datum ID="Pillar2TitleText" Type="String" Name="Pillar 2 : title (required - do not blank)">Economics</Datum>
+  <Datum ID="Pillar2TitleTag" Type="String" Name="Pillar 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Pillar2BodyText" Type="Textarea" Name="Pillar 2 : body (required - do not blank; HTML allowed)">Growth, inflation, and policy dynamics across North America and global markets.</Datum>
+  <Datum ID="Pillar2BodyTag" Type="String" Name="Pillar 2 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+
+  <!-- ==== Pillar 3 ==== -->
+  <Datum ID="Pillar3IconName" Type="String" Name="Pillar 3 : icon (pick from library)">
+    <Option><Display>Globe (geopolitics/world)</Display><Value>globe</Value></Option>
+    <Option><Display>Bank (economics/institution)</Display><Value>bank</Value></Option>
+    <Option><Display>Chart (equity/markets)</Display><Value>chart</Value></Option>
+    <Option><Display>Search (analysis/strategy)</Display><Value>search</Value></Option>
+    <Option><Display>None (skip icon slot)</Display><Value>none</Value></Option>
+    chart
+  </Datum>
+  <Datum ID="Pillar3TitleText" Type="String" Name="Pillar 3 : title (required - do not blank)">Equity Markets</Datum>
+  <Datum ID="Pillar3TitleTag" Type="String" Name="Pillar 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Pillar3BodyText" Type="Textarea" Name="Pillar 3 : body (required - do not blank; HTML allowed)">How macro forces transmit across equities, rates, credit and FX.</Datum>
+  <Datum ID="Pillar3BodyTag" Type="String" Name="Pillar 3 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+
+  <!-- ==== Pillar 4 ==== -->
+  <Datum ID="Pillar4IconName" Type="String" Name="Pillar 4 : icon (pick from library)">
+    <Option><Display>Globe (geopolitics/world)</Display><Value>globe</Value></Option>
+    <Option><Display>Bank (economics/institution)</Display><Value>bank</Value></Option>
+    <Option><Display>Chart (equity/markets)</Display><Value>chart</Value></Option>
+    <Option><Display>Search (analysis/strategy)</Display><Value>search</Value></Option>
+    <Option><Display>None (skip icon slot)</Display><Value>none</Value></Option>
+    search
+  </Datum>
+  <Datum ID="Pillar4TitleText" Type="String" Name="Pillar 4 : title (required - do not blank)">Cross-Asset Strategy</Datum>
+  <Datum ID="Pillar4TitleTag" Type="String" Name="Pillar 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Pillar4BodyText" Type="Textarea" Name="Pillar 4 : body (required - do not blank; HTML allowed)">A deep bench spanning every asset class.</Datum>
+  <Datum ID="Pillar4BodyTag" Type="String" Name="Pillar 4 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+
+</Data>

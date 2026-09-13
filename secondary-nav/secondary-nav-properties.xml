@@ -1,0 +1,64 @@
+<!-- ============================================================
+     Secondary Nav — Properties block
+     Component-level authoring inputs and repeatable nav items.
+     Consumed by the corresponding XSL template (to be authored).
+     ============================================================ -->
+<Properties ComponentID="secondary-nav-v1">
+
+  <!-- ─── Localization ─── -->
+  <!-- Locale: 'en' (default) or 'fr'. Flips all baked-in default
+       strings at once (aria labels, etc.) without the author
+       needing to fill in each override individually. Any individual
+       override below still beats the locale default. -->
+  <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
+
+  <!-- ─── Optional accessibility overrides ─── -->
+  <!-- Each override is optional. Priority order per string:
+         (1) individual override wins if set
+         (2) otherwise, locale-appropriate default from XSL
+         (3) fallback to English
+       Populate an individual override for one-off wording that
+       differs from the standard translation. -->
+  <Datum ID="NavAriaLabel"       Type="String" Name="Nav Aria Label (override)"></Datum>
+  <Datum ID="PrevArrowAriaLabel" Type="String" Name="Prev Arrow Aria Label (override)"></Datum>
+  <Datum ID="NextArrowAriaLabel" Type="String" Name="Next Arrow Aria Label (override)"></Datum>
+
+  <!-- ─── Nav Items (Repeatable) ─────────────────────────────
+       Each Nav Item row carries a URL picker + a label + two
+       optional per-item toggles.
+
+       ItemLabel is optional. When blank, the XSL derives the label
+       from the URL's final slug (e.g., `industry-coverage` →
+       `Industry Coverage`). Author fills it in only for special
+       cases like `Mergers & Acquisitions` (the "&" can't live in
+       a URL slug).
+
+       OpenInNewTab defaults false because these are internal links
+       inside the same site. Available per-item for the odd case
+       where an external or cross-app destination needs it.
+
+       IsActive lets authors flag which item is "current." When one
+       or more items carry IsActive=true, the XSL applies the
+       active-state classes. When none are set, JS falls back to
+       URL matching (compares each item's href against the current
+       page URL and applies the active class at runtime).
+
+       Minimum 1 item required (component won't render without at
+       least one). No maximum imposed; scroll handles overflow.
+       ─────────────────────────────────────────────────────── -->
+  <Group ID="NAV-ITEMS"
+         Name="Nav Item"
+         Replicatable="true"
+         CloneGroupID="secondary-nav-item"
+         MinReplicates="1">
+
+    <Datum ID="ItemLink"     Type="Link"    Name="Nav Item Link (URL picker)" Required="true"></Datum>
+    <Datum ID="ItemLabel"    Type="String"  Name="Nav Item Label (blank = derive from URL slug)"></Datum>
+    <Datum ID="IsActive"     Type="Boolean" Name="Set as active on this page?">false</Datum>
+    <Datum ID="OpenInNewTab" Type="Boolean" Name="Open link in new tab?">false</Datum>
+
+  </Group>
+
+</Properties>
+</content>
+</invoke>

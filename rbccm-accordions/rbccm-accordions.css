@@ -1,0 +1,644 @@
+/* =========================================================================
+   RBCCM Accordions - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-accordions.css
+
+   Purpose
+   =========================================================================
+   Shared accordion-section shell + per-page variant modifiers. Each
+   consumer page authors its own markup with the shared .rbccm-accordions
+   block + a --{page-slug} modifier that owns the variant's palette and
+   any structural quirks.
+
+   Base block owns:
+     Section shell + container max-width + horizontal gutter
+     Disclosure interaction primitives (aria-expanded, is-open)
+     "Expand all" button base pill
+     Reduced-motion guards
+
+   Each VARIANT modifier owns:
+     Palette + typography ramp
+     Card fill / border / shadow
+     Item-toggle icon color
+     Any layout override (single-col vs 2-col expanded body, etc.)
+
+   Consumers
+   =========================================================================
+     Strategy and Economics Notes    .rbccm-accordions--strategy-and-economics-notes
+
+   Adding a new variant
+   =========================================================================
+   1. Author page markup with `.rbccm-accordions.rbccm-accordions--{slug}`
+   2. Add a modifier block at the bottom of this file with the variant's
+      palette / any typography overrides
+   3. Load rbccm-accordions.css BEFORE the page's own CSS so page rules
+      can still override if needed
+   ========================================================================= */
+
+/* ---------- Base block ---------------------------------------------------- */
+.rbccm-accordions {
+  --rbccm-acc-ink:        #FFF;
+  --rbccm-acc-navy:       #031B37;
+  --rbccm-acc-yellow:     #FFC72C;
+  --rbccm-acc-gray:       #D7D7D7;
+  --rbccm-acc-serif:      RBCDisplay, Georgia, Times, serif;
+  --rbccm-acc-sans:       Roboto, Arial, sans-serif;
+
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.rbccm-accordions *,
+.rbccm-accordions *::before,
+.rbccm-accordions *::after { box-sizing: border-box; }
+
+/* Font-family lock on visual headings. Defends against unified.css
+   tag-level rules that would suppress RBCDisplay. Targets classes
+   so authors can choose their semantic tag freely. */
+.rbccm-accordions .rbccm-accordions__title,
+.rbccm-accordions .rbccm-accordions__item-title {
+  font-family: var(--rbccm-acc-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Reset margin/padding on inner elements where a CMS global tag
+   rule would otherwise inject !important margins. Tag-agnostic. */
+h1.rbccm-accordions__title,        h2.rbccm-accordions__title,
+h3.rbccm-accordions__title,        h4.rbccm-accordions__title,
+h5.rbccm-accordions__title,        h6.rbccm-accordions__title,
+p.rbccm-accordions__title,         div.rbccm-accordions__title,
+h1.rbccm-accordions__description,  h2.rbccm-accordions__description,
+h3.rbccm-accordions__description,  h4.rbccm-accordions__description,
+h5.rbccm-accordions__description,  h6.rbccm-accordions__description,
+p.rbccm-accordions__description,   div.rbccm-accordions__description,
+h1.rbccm-accordions__item-eyebrow, h2.rbccm-accordions__item-eyebrow,
+h3.rbccm-accordions__item-eyebrow, h4.rbccm-accordions__item-eyebrow,
+h5.rbccm-accordions__item-eyebrow, h6.rbccm-accordions__item-eyebrow,
+p.rbccm-accordions__item-eyebrow,  div.rbccm-accordions__item-eyebrow, span.rbccm-accordions__item-eyebrow,
+h1.rbccm-accordions__item-title,   h2.rbccm-accordions__item-title,
+h3.rbccm-accordions__item-title,   h4.rbccm-accordions__item-title,
+h5.rbccm-accordions__item-title,   h6.rbccm-accordions__item-title,
+p.rbccm-accordions__item-title,    div.rbccm-accordions__item-title,
+h1.rbccm-accordions__item-summary, h2.rbccm-accordions__item-summary,
+h3.rbccm-accordions__item-summary, h4.rbccm-accordions__item-summary,
+h5.rbccm-accordions__item-summary, h6.rbccm-accordions__item-summary,
+p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Container wrapper -- max-width + horizontal gutter overridden per variant. */
+.rbccm-accordions__container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header row (title + description + expand-all). Mobile stacks; desktop
+   flips to row with lede left / button right (via variant + breakpoint). */
+.rbccm-accordions__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  align-self: stretch;
+  margin-bottom: 32px;
+}
+
+/* Lede sub-container (h2 + description) */
+.rbccm-accordions__header-lede {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 17px;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+/* "Expand all" pill button -- base shell. Hover / focus fades to a
+   filled gold pill with navy text, matching the CTA-band "Log in to
+   RBC Insights" language on this page. Pure color transitions, no
+   flash / shine pseudo. */
+.rbccm-accordions__expand-all {
+  display: inline-flex;
+  padding: 7px 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: 100px;
+  border: 0.5px solid var(--rbccm-acc-gray);
+  background: transparent;
+  color: var(--rbccm-acc-gray);
+  font-family: var(--rbccm-acc-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16.5px; /* 117.857% */
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    color 250ms ease;
+}
+.rbccm-accordions__expand-all:hover,
+.rbccm-accordions__expand-all:focus-visible {
+  background: #FFC72C;              /* RBC gold */
+  border-color: #FFC72C;
+  color: #003168;                   /* RBC deep navy */
+}
+
+/* Accordion list container */
+.rbccm-accordions__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* Accordion item card (base shell -- palette per variant). The whole
+   card is a click target (see JS): cursor pointer signals that to
+   mouse users. Interactive children inside the expanded body (links,
+   nested buttons) keep default cursor so they still read as their
+   own affordance. */
+.rbccm-accordions__item {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  align-self: stretch;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.rbccm-accordions__item-expanded,
+.rbccm-accordions__item-expanded * {
+  cursor: auto;
+}
+.rbccm-accordions__item-expanded a,
+.rbccm-accordions__item-expanded button {
+  cursor: pointer;
+}
+
+/* Item top row: category eyebrow + byline on the left, +/- toggle on right. */
+.rbccm-accordions__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 12px;
+  width: 100%;
+}
+.rbccm-accordions__item-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Toggle button -- icon-only. Sized to match the SVG exactly (16x16)
+   so it hugs the icon; the whole card is the click surface anyway. */
+.rbccm-accordions__item-toggle {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--rbccm-acc-yellow);
+}
+.rbccm-accordions__item-toggle:focus-visible {
+  outline: 2px solid var(--rbccm-acc-yellow);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* One SVG, one animation. The icon inherits its color from the
+   button (currentColor) so a variant modifier can flip the palette
+   without touching markup. On is-open the icon rotates 45deg
+   clockwise (a symmetric plus becomes a visually identical X) and
+   the color transitions from warm yellow to bright blue. */
+.rbccm-accordions__item-toggle-icon {
+  display: block;
+  fill: currentColor;
+  transform-origin: center center;
+  transition: transform 220ms cubic-bezier(0.55, 0, 0.1, 1),
+              color 220ms ease;
+  will-change: transform;
+}
+.rbccm-accordions__item.is-open .rbccm-accordions__item-toggle-icon {
+  transform: rotate(45deg);
+}
+
+/* Item body block (title + one-line summary). Shown in BOTH collapsed
+   and expanded states; is-open reveals the extra __expanded block below. */
+.rbccm-accordions__item-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* Expanded content -- hidden until .is-open. On desktop this becomes a
+   two-column layout (per Figma); mobile keeps it single column. */
+.rbccm-accordions__item-expanded {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  width: 100%;
+}
+.rbccm-accordions__item.is-open .rbccm-accordions__item-expanded {
+  display: flex;
+}
+
+/* "Read more" CTA inside expanded body. Color is inherited by
+   the arrow icon via stroke=currentColor so the variant modifier
+   only needs to flip `color` on the link to repaint text + icon.
+   Underline uses the same soft-fade pattern as the ITM card-title /
+   "See all" links, the leading-experts CTAs, the S&E hero Read more,
+   and the platforms card CTAs: text-decoration always present in the
+   layout but starts invisible (transparent color + 0 thickness) and
+   fades to currentColor + auto thickness over 250ms on hover / focus. */
+.rbccm-accordions__item-readmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--rbccm-acc-sans);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16.8px; /* 120% */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    opacity 150ms ease,
+    color 150ms ease,
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+.rbccm-accordions__item-readmore:hover,
+.rbccm-accordions__item-readmore:focus-visible {
+  opacity: 0.85;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-accordions__item-readmore-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.rbccm-accordions__item-readmore-icon path {
+  stroke: currentColor;
+}
+/* Arrow right-bounce on hover / keyboard focus. Same 450ms translateX
+   nudge as the S&E hero's Read more (rbccm-hero-arrow-bounce) so both
+   Read-more affordances feel like one interaction. Unique keyframe
+   name keeps the accordion component independently deployable. */
+.rbccm-accordions__item-readmore:hover .rbccm-accordions__item-readmore-icon,
+.rbccm-accordions__item-readmore:focus-visible .rbccm-accordions__item-readmore-icon {
+  animation: rbccm-acc-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-acc-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics Notes
+   =========================================================================
+   Mobile-first spec per Figma. Dark navy #031B37 background, yellow
+   category eyebrow, gray body copy, white RBCDisplay titles. Cards use
+   a semi-transparent gray fill over the navy so they read as raised
+   without needing a distinct color.
+   ========================================================================= */
+.rbccm-accordions--strategy-and-economics-notes {
+  background: var(--rbccm-acc-navy);
+  color: var(--rbccm-acc-ink);
+  padding: 60px 23px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__container {
+  width: 100%;
+  max-width: 1100px; /* caps at 1100 on desktop, fills below */
+  padding: 0;
+}
+
+/* Section title (h2): RBC Display 32 / 24.318 line-height / 700 / white.
+   Tight line-height per Figma (75.99%). !important because the
+   author can pick any tag (h1..h6, p, div, span) via the tag
+   picker Datum, and unified.css ships tag-level rules that would
+   override our styling. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__title {
+  color: #FFF !important;
+  font-family: var(--rbccm-acc-serif) !important;
+  font-size: 32px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 24.318px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Section description: Roboto 16/150% white, ligatures off per spec.
+   !important for the same tag-picker reason as above. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__description {
+  color: #FFF !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-family: var(--rbccm-acc-sans) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Card body: subtle white border + light gray fill + 15px radius. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(209, 209, 209, 0.05);
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+}
+/* Hover / focus state on collapsed cards -- warm-yellow ring
+   telegraphs the card is interactive. Uses :focus-within so a
+   keyboard user focusing the toggle button lights up the whole
+   card, not just the button. is-open cards skip this rule
+   because they already own their own bright treatment below. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item:not(.is-open):hover,
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item:not(.is-open):focus-within {
+  border-color: var(--rbccm-acc-yellow);
+  background: rgba(209, 209, 209, 0.05);
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+}
+
+/* Category eyebrow -- warm yellow, uppercase, tight tracking.
+   !important on every property because the author can pick any
+   tag (h1..h6, p, div, span) via the tag picker Datum. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-eyebrow {
+  color: var(--rbccm-acc-yellow) !important;
+  font-family: var(--rbccm-acc-sans) !important;
+  font-size: 10px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 15px !important; /* 150% */
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Byline (Name | Date) -- warm gray, no tracking. Always a <p>,
+   no tag picker; kept without !important. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-byline {
+  color: var(--rbccm-acc-gray);
+  font-family: var(--rbccm-acc-sans);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 15px; /* 150% */
+  margin: 0;
+}
+
+/* Item title (h3): RBC Display 18 / 120% / weight 500 / white.
+   Tag-picker guarded. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-title {
+  color: #FFF !important;
+  font-family: var(--rbccm-acc-serif) !important;
+  font-size: 18px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 21.6px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Item one-line summary: Roboto 14/16.8 warm gray. Tag-picker guarded. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-summary {
+  color: var(--rbccm-acc-gray) !important;
+  font-family: var(--rbccm-acc-sans) !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 16.8px !important; /* 120% */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* -------- Open state --------
+   The card flips inside-out on expand: dark navy card becomes a
+   light-blue tile with a warm-yellow top rule; every child shifts
+   its color to sit on the light bg. Structure + spacing unchanged
+   so the layout doesn't jump on toggle. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open {
+  border: 0;
+  border-top: 3px solid var(--rbccm-acc-yellow);
+  background: #E7EEF1; /* Blue/Light Blue */
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+}
+
+/* Eyebrow flips from warm yellow to bright blue on open. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-eyebrow {
+  color: #0051A5 !important; /* Blue/Bright Blue */
+}
+
+/* Byline flips from warm gray to dark gray. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-byline {
+  color: #494949;
+}
+
+/* Toggle color palette per state. currentColor cascades to the SVG
+   fill so no markup changes needed to swap yellow <-> blue. Focus
+   ring follows the same palette so it stays legible on either bg. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-toggle {
+  color: var(--rbccm-acc-yellow);
+}
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-toggle {
+  color: #0051A5; /* Blue/Bright Blue */
+}
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-toggle:focus-visible {
+  outline-color: #0051A5;
+}
+
+/* Title flips from white to dark blue when open. Tag-picker guarded. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-title {
+  color: #003168 !important; /* Blue/Dark Blue */
+}
+
+/* Body block gets a small bottom pad on open so the summary/lede
+   sits a touch further above the divider than the parent gap alone
+   provides. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-body {
+  padding-bottom: 5px;
+}
+
+/* Summary keeps its base Roboto 14/16.8/400 shape in both states --
+   only the color flips (warm gray -> dark blue) on open. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-summary {
+  color: #003168 !important; /* Blue/Dark Blue */
+}
+
+/* Expanded block gets a hairline divider at its top separating the
+   dark-blue title/lede pair above from the body copy below. Parent
+   gap 20px covers the space above the divider; padding-top 18px
+   covers the space between the divider and the body content. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded {
+  border-top: 1px solid rgba(112, 112, 112, 0.20);
+  padding-top: 18px;
+  gap: 20px;
+}
+
+/* Body copy: warm dark gray, Roboto 14/16.8. Paragraphs inside
+   __item-expanded-copy get 20px bottom margin per spec; last
+   paragraph strips it so the divider before the read-more link
+   sits cleanly. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy {
+  color: #494949;
+  font-family: var(--rbccm-acc-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16.8px; /* 120% */
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+}
+/* Duplicate the font stack onto the <p> tags so unified.css tag-
+   level rules can't override the inherited styling. Preserves
+   the 20px inter-paragraph rhythm; last paragraph strips its
+   bottom margin so the read-more link hugs the body cleanly. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p {
+  color: #494949 !important;
+  font-family: var(--rbccm-acc-sans) !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 16.8px !important; /* 120% */
+  margin: 0 0 17px 0 !important;
+  padding: 0 !important;
+}
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p:last-child {
+  margin-bottom: 0;
+}
+
+/* Read-more link lives in the open (light-blue) state, so its
+   default palette is bright blue. Icon stroke follows via
+   currentColor (see base rule) so no separate SVG override
+   needed for the arrow color. */
+.rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-readmore {
+  color: #0051A5; /* Blue/Bright Blue */
+}
+
+
+/* Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base header is left; --header-center flips the header block
+   (title + description) to center. Aligns the Expand-all button row
+   too on mobile; desktop row layout is unchanged since the button
+   sits on its own axis via space-between. */
+.rbccm-accordions--header-center .rbccm-accordions__header,
+.rbccm-accordions--header-center .rbccm-accordions__header-lede {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-accordions--header-center .rbccm-accordions__title,
+.rbccm-accordions--header-center .rbccm-accordions__description {
+  text-align: center !important;
+}
+
+
+/* Reduced motion -- kill button transitions, keep static state
+   changes. The toggle icon still visually rotates on is-open (via
+   the transform rule above), but the animation itself is instant. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-accordions__expand-all,
+  .rbccm-accordions__item,
+  .rbccm-accordions__item-toggle-icon,
+  .rbccm-accordions__item-readmore {
+    transition: none;
+  }
+  /* Kill the Read-more arrow bounce for motion-sensitive users. */
+  .rbccm-accordions__item-readmore:hover .rbccm-accordions__item-readmore-icon,
+  .rbccm-accordions__item-readmore:focus-visible .rbccm-accordions__item-readmore-icon {
+    animation: none !important;
+  }
+}
+
+
+/* =========================================================================
+   Desktop breakpoint (>=992px)
+   =========================================================================
+   Header row: lede column on the left (title + description), Expand-all
+   pill on the right, both vertically centered with the space between
+   them filling the container. Rest of the layout keeps its mobile
+   values until further desktop spec lands.
+   ========================================================================= */
+@media (min-width: 992px) {
+  .rbccm-accordions--strategy-and-economics-notes {
+    padding: 80px 23px;
+  }
+  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+  }
+
+  /* Two-column layout on desktop. The GRID lives on __item-expanded
+     (not on __item-expanded-copy) so the read-more link can share
+     the same track system as the paragraphs. __item-expanded-copy
+     is promoted to display: contents so its <p> children participate
+     in the parent grid directly -- read-more becomes a peer grid
+     item and can pin to the right column's left edge.
+
+     Auto-flow with 2 paragraphs + read-more:
+       p1 -> col 1, row 1
+       p2 -> col 2, row 1
+       read-more (grid-column: 2) -> col 2, row 2 (left-aligned)
+     With 3 paragraphs:
+       p3 -> col 1, row 2 ; read-more forces col 2, row 2. */
+  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+    row-gap: 20px;
+    align-content: start;
+  }
+  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy {
+    display: contents;
+  }
+  /* Grid gap handles inter-paragraph spacing, so kill the 20px
+     bottom-margin the mobile rule sets on paragraphs. */
+  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p {
+    margin: 0;
+  }
+
+  /* Read-more sits in the right column, aligned to that column's
+     left edge (matches the right-column paragraph's alignment).
+     align-self: end pushes it to the bottom of its row so it
+     visually terminates the body block. */
+  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-readmore {
+    grid-column: 2;
+    justify-self: start;
+    align-self: end;
+  }
+}

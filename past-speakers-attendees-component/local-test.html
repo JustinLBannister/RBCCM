@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Past Speakers &amp; Attendees — Local Test</title>
+
+  <!-- jQuery + Slick (needed by the JS for mobile carousel) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+
+  <!-- Component CSS (same file deployed to /assets/rbccm/css/sub/test/) -->
+  <link rel="stylesheet" href="./past-speakers-attendees.css"/>
+
+  <style>
+    /* Bare page reset so the component renders in isolation */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #001934;
+      font-family: Roboto, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================
+       Static render of <section class="rbccm-past-speakers-attendees">
+       (mirrors what the XSL component outputs)
+       ==================================================== -->
+  <section class="rbccm-past-speakers-attendees" id="rbccm-past-speakers-attendees" aria-label="Past speakers and attendees">
+    <div class="rbccm-past-speakers-attendees__container">
+
+      <h2 class="rbccm-past-speakers-attendees__heading">Past speakers &amp; attendees</h2>
+
+      <div class="rbccm-past-speakers-attendees__cards" id="rbccm-past-speakers-attendees-cards">
+
+        <!-- Card 1 — Jennifer Morrison -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="Jennifer Morrison"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">Jennifer Morrison</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">CEO, TechVentures Inc.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — David Chen -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="David Chen"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">David Chen</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">Founder &amp; CEO, QuantumBio</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — Sarah Williams -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="Sarah Williams"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">Sarah Williams</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">Managing Director, RBC Capital Markets</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Marcus Thompson -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="Marcus Thompson"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">Marcus Thompson</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">CTO, EnergyNext Solutions</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 — Michelle Anderson -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="Michelle Anderson"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">Michelle Anderson</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">Chief Innovation Officer, MediTech Labs</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 — Robert Chang -->
+        <div class="rbccm-past-speakers-attendees__card">
+          <div class="rbccm-past-speakers-attendees__card-media">
+            <img loading="lazy" src="https://fpoimg.com/400x400?text=Speaker&amp;bg_color=e5e5e5&amp;text_color=666666" alt="Robert Chang"/>
+          </div>
+          <div class="rbccm-past-speakers-attendees__card-body">
+            <div class="rbccm-past-speakers-attendees__card-meta">
+              <h3 class="rbccm-past-speakers-attendees__card-name">Robert Chang</h3>
+              <p class="rbccm-past-speakers-attendees__card-title">Head of Technology Banking, RBC Capital Markets</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mobile slick controls (arrows + dots) -->
+      <div class="rbccm-past-speakers-attendees__controls">
+        <button id="rbccm-psa-prev" class="rbccm-past-speakers-attendees__btn" type="button" aria-label="Previous speaker" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+            <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div id="rbccm-psa-dots" class="rbccm-past-speakers-attendees__dots"></div>
+        <button id="rbccm-psa-next" class="rbccm-past-speakers-attendees__btn" type="button" aria-label="Next speaker" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+            <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Component JS (mobile slick init) -->
+  <script src="./past-speakers-attendees.js"></script>
+
+</body>
+</html>

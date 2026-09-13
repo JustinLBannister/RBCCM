@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upcoming Conferences -- Local Test</title>
+
+  <!-- jQuery + Slick (needed by the JS for mobile carousel) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+
+  <!-- The component CSS -- same file you'd deploy to /assets/rbccm/css/sub/test/ -->
+  <link rel="stylesheet" href="./upcoming-conferences.css"/>
+
+  <style>
+    /* Bare-minimum page reset so the section renders in isolation */
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #001934;
+      font-family: Roboto, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================
+       Sample render mirroring what the V2 XSL will output
+       once it's reading from the Events List Datum.
+
+       12 mock upcoming events seeded across Jun / Jul / Aug 2026 and
+       New York / Toronto / London / Chicago. This exercises:
+        - The default-6 visible cap (cards 7-12 hidden via CSS until filtered)
+        - The Month dropdown (3 options auto-build)
+        - The Region dropdown (4 options auto-build)
+        - Title search (any text in event names)
+        - Empty state (search a non-matching string)
+
+       The placeholder image is the same one the live XSL emits for cards
+       that don't have a per-event image yet.
+       ==================================================== -->
+  <section class="rbccm-upcoming-conferences" id="rbccm-upcoming-conferences" aria-label="Upcoming conferences">
+    <div class="rbccm-upcoming-conferences__container">
+
+      <h2 class="rbccm-upcoming-conferences__heading">Upcoming conference programming</h2>
+      <p class="rbccm-upcoming-conferences__intro">Connect with industry leaders and explore market-shaping trends at our upcoming global events.</p>
+
+      <!-- Filters / search (JS populates the Month + Region dropdown options) -->
+      <div class="rbccm-upcoming-conferences__filters">
+        <div class="rbccm-upcoming-conferences__filter-group">
+          <span class="rbccm-upcoming-conferences__filter-label">Filter by:</span>
+          <label class="rbccm-upcoming-conferences__select-wrap">
+            <span class="rbccm-upcoming-conferences__sr-only">Month</span>
+            <select class="rbccm-upcoming-conferences__select" id="rbccm-uc-filter-month" aria-label="Filter by month">
+              <option value="">Month</option>
+            </select>
+            <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </label>
+          <label class="rbccm-upcoming-conferences__select-wrap">
+            <span class="rbccm-upcoming-conferences__sr-only">Region</span>
+            <select class="rbccm-upcoming-conferences__select" id="rbccm-uc-filter-region" aria-label="Filter by region">
+              <option value="">Region</option>
+            </select>
+            <svg class="rbccm-upcoming-conferences__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </label>
+        </div>
+
+        <label class="rbccm-upcoming-conferences__search">
+          <svg class="rbccm-upcoming-conferences__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="rbccm-upcoming-conferences__sr-only">Search conferences by title</span>
+          <input type="search" id="rbccm-uc-search" class="rbccm-upcoming-conferences__search-input" aria-label="Search conferences by title" placeholder="Search conferences by title"/>
+        </label>
+      </div>
+
+      <!-- Cards (first 6 visible by default; 7-12 hidden until a filter activates) -->
+      <div class="rbccm-upcoming-conferences__cards" id="rbccm-upcoming-conferences-cards">
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="New York"
+           data-title="global energy, power & infrastructure conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Global Energy, Power & Infrastructure Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">02-03</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Global Energy, Power &amp; Infrastructure Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              New York
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="New York"
+           data-title="investor sessions for canadian reits and reocs">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Investor Sessions for Canadian REITs and REOCs"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">03-04</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Investor Sessions for Canadian REITs and REOCs</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              New York
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="Toronto"
+           data-title="canadian private technology conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Canadian Private Technology Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">04</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Canadian Private Technology Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Toronto
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="New York"
+           data-title="financial technology conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Financial Technology Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">09</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Financial Technology Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              New York
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="New York"
+           data-title="global mining and materials conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Global Mining and Materials Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">11-12</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Global Mining and Materials Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              New York
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="June" data-month-short="JUN" data-region="London"
+           data-title="rbc energy transition conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="RBC Energy Transition Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUN 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">25</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">RBC Energy Transition Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              London
+            </p>
+          </div>
+        </a>
+
+        <!-- Cards 7-12: hidden by default via CSS :nth-of-type(n+7).
+             Search/filter reveals them via JS adding `.is-filtered` to the wrapper. -->
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="July" data-month-short="JUL" data-region="London"
+           data-title="rbc consumer & retail conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="RBC Consumer & Retail Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUL 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">03</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">RBC Consumer &amp; Retail Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              London
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="July" data-month-short="JUL" data-region="Toronto"
+           data-title="canadian asset manager conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Canadian Asset Manager Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">JUL 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">15</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Canadian Asset Manager Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Toronto
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="August" data-month-short="AUG" data-region="Chicago"
+           data-title="global industrials conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Global Industrials Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">AUG 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">11-12</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Global Industrials Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Chicago
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="August" data-month-short="AUG" data-region="New York"
+           data-title="consumer day">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Consumer Day"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">AUG 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">19</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Consumer Day</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              New York
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="August" data-month-short="AUG" data-region="London"
+           data-title="precious metals conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Precious Metals Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">AUG 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">25</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Precious Metals Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              London
+            </p>
+          </div>
+        </a>
+
+        <a class="rbccm-upcoming-conferences__card"
+           href="#" data-month="August" data-month-short="AUG" data-region="Toronto"
+           data-title="forest products conference">
+          <div class="rbccm-upcoming-conferences__card-media">
+            <img loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp" alt="Forest Products Conference"/>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-date">
+            <div class="rbccm-upcoming-conferences__card-month">AUG 2026</div>
+            <div class="rbccm-upcoming-conferences__card-day">28-29</div>
+          </div>
+          <div class="rbccm-upcoming-conferences__card-body">
+            <span class="rbccm-upcoming-conferences__card-divider" aria-hidden="true"></span>
+            <h3 class="rbccm-upcoming-conferences__card-title">Forest Products Conference</h3>
+            <p class="rbccm-upcoming-conferences__card-location">
+              <svg class="rbccm-upcoming-conferences__pin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.3334 6.66671C13.3334 9.99537 9.64075 13.462 8.40075 14.5327C8.28523 14.6196 8.14461 14.6665 8.00008 14.6665C7.85555 14.6665 7.71493 14.6196 7.59941 14.5327C6.35941 13.462 2.66675 9.99537 2.66675 6.66671C2.66675 5.25222 3.22865 3.89567 4.22885 2.89547C5.22904 1.89528 6.58559 1.33337 8.00008 1.33337C9.41457 1.33337 10.7711 1.89528 11.7713 2.89547C12.7715 3.89567 13.3334 5.25222 13.3334 6.66671Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8.66663C9.10457 8.66663 10 7.7712 10 6.66663C10 5.56206 9.10457 4.66663 8 4.66663C6.89543 4.66663 6 5.56206 6 6.66663C6 7.7712 6.89543 8.66663 8 8.66663Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Toronto
+            </p>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Empty state (shown when no card matches the active filter / search) -->
+      <div class="rbccm-upcoming-conferences__empty" id="rbccm-uc-empty" hidden>
+        <div class="rbccm-upcoming-conferences__empty-icon-wrap">
+          <svg class="rbccm-upcoming-conferences__empty-icon" xmlns="http://www.w3.org/2000/svg" width="43" height="43" viewBox="0 0 43 43" fill="none" aria-hidden="true">
+            <g clip-path="url(#rbccm-uc-empty-clip)">
+              <path d="M4.57628 42.4419C3.83654 43.1811 2.74615 43.1766 2.05053 42.477L0.485079 40.9024C-0.16078 40.2526 -0.169829 39.1647 0.500915 38.4945L8.78624 30.207C9.32465 29.6693 10.0316 29.5583 10.743 29.8108L11.6355 28.9131C8.20485 24.2944 8.38696 17.9302 12.1637 13.5073L8.47519 13.47C4.83982 13.4326 1.97927 10.4509 1.90461 6.83857C1.83449 3.36098 4.61926 0.00566013 8.31344 0.00566013L36.5593 0C40.2298 0 43.0315 3.29759 42.9998 6.76046C42.967 10.4078 40.0793 13.4473 36.4021 13.4666L30.767 13.496C34.9102 18.3343 34.684 25.4106 30.4333 29.9523C26.1622 34.5155 19.1166 35.1494 14.0775 31.3639L13.1941 32.2729C13.4441 32.9657 13.3344 33.6857 12.7971 34.2223L4.57628 42.443V42.4419ZM36.203 12.5745C39.5274 12.5893 42.1142 9.89843 42.1017 6.69367C42.0893 3.49909 39.49 0.861472 36.2223 0.862604L8.56341 0.875056C5.30923 0.876188 2.77443 3.61456 2.80271 6.76951C2.83099 9.90862 5.34543 12.5066 8.54871 12.5723L13.0539 12.5836C17.7695 8.14153 25.1691 8.14153 29.8836 12.5802L36.203 12.5734V12.5745ZM20.8257 10.1633C14.4678 10.5233 9.71827 15.9921 10.1074 22.2454C10.4965 28.5089 15.8737 33.2872 22.1389 32.9182C28.4188 32.5491 33.2101 27.1562 32.838 20.8542C32.4715 14.6484 27.1531 9.80561 20.8268 10.1633H20.8257ZM12.6478 31.5235C12.9453 31.245 13.1421 31.0628 13.3661 30.7922C12.9826 30.4209 12.6207 30.0938 12.2497 29.6579C11.9284 29.8402 11.735 30.1051 11.4828 30.3813L12.6478 31.5235ZM3.94512 41.8046L12.1615 33.5883C12.5234 33.2272 12.5121 32.6929 12.1682 32.3488L10.6458 30.8262C10.3042 30.4843 9.77822 30.4832 9.42192 30.8398L1.17279 39.0821C0.789346 39.4658 0.84477 40.0092 1.19767 40.3624L2.6387 41.8046C2.99726 42.1634 3.52888 42.2212 3.94512 41.8046Z" fill="#1D86F0"/>
+              <path d="M36.2033 12.5746L29.8839 12.5814C25.1694 8.14156 17.7697 8.14156 13.0542 12.5848L8.54899 12.5734C5.34458 12.5078 2.83127 9.90979 2.80299 6.77068C2.77358 3.61572 5.30951 0.877354 8.56369 0.876222L36.2225 0.86377C39.4903 0.862638 42.0896 3.49913 42.102 6.69484C42.1156 9.8996 39.5288 12.5904 36.2033 12.5757V12.5746ZM36.6297 8.24911L35.6977 7.3016C36.1909 6.42202 35.9624 5.38735 35.2159 4.81907C34.4422 4.23155 33.3971 4.33343 32.7433 4.98774C32.0714 5.66016 32.0171 6.71182 32.5566 7.43631C33.1426 8.2242 34.1651 8.42231 35.0485 7.94912L36.0189 8.89097C36.2044 9.07096 36.5019 9.02002 36.6377 8.86832C36.7824 8.70644 36.813 8.43363 36.6309 8.24684L36.6297 8.24911ZM27.1918 7.16123C27.5549 7.16123 27.616 6.78879 27.5821 6.62465C27.5368 6.4107 27.3649 6.27599 27.0776 6.27599H7.97213C7.64637 6.27599 7.46652 6.50239 7.49028 6.76615C7.50951 6.97218 7.66786 7.16802 7.96873 7.16802L27.1918 7.16123Z" fill="#D5E7FE"/>
+              <path d="M20.826 10.1631C27.1522 9.80542 32.4707 14.6482 32.8372 20.854C33.2093 27.156 28.4179 32.549 22.1381 32.918C15.8729 33.287 10.4968 28.5088 10.1065 22.2453C9.71742 15.9919 14.4669 10.5231 20.8249 10.1631H20.826ZM20.3181 11.9574C14.9273 12.6061 11.2127 17.5213 11.9106 22.8101C12.6017 28.0492 17.3863 31.7588 22.6414 31.1215C27.9044 30.4819 31.6676 25.6934 31.0511 20.4148C30.4347 15.1361 25.6795 11.3122 20.3181 11.9574Z" fill="#D5E7FE"/>
+              <path d="M3.94529 41.8046C3.52904 42.2211 2.99742 42.1634 2.63886 41.8046L1.19784 40.3624C0.844934 40.0092 0.78951 39.4658 1.17295 39.082L9.42322 30.8386C9.77951 30.482 10.3055 30.4843 10.6471 30.825L12.1695 32.3476C12.5134 32.6917 12.5236 33.2249 12.1627 33.5872L3.94642 41.8034L3.94529 41.8046Z" fill="#D5E7FE"/>
+              <path d="M27.1916 7.16097L7.96852 7.16776C7.66651 7.16776 7.50929 6.97192 7.49006 6.76589C7.46518 6.50326 7.64616 6.27686 7.97191 6.27686H27.0774C27.3635 6.27686 27.5366 6.41157 27.5818 6.62439C27.6169 6.7874 27.5547 7.16097 27.1916 7.16097Z" fill="#1D86F0"/>
+              <path d="M36.6297 8.2492C36.8129 8.43485 36.7812 8.70767 36.6364 8.87068C36.5018 9.02237 36.2032 9.07218 36.0177 8.89332L35.0472 7.95148C34.1639 8.42466 33.1413 8.22543 32.5554 7.43867C32.017 6.71417 32.0702 5.66252 32.7421 4.9901C33.3958 4.33579 34.441 4.2339 35.2146 4.82143C35.9623 5.38857 36.1897 6.42437 35.6965 7.30396L36.6285 8.25146L36.6297 8.2492ZM33.9512 5.34555C33.3517 5.43046 33.0101 5.9659 33.1097 6.50928C33.2002 7.00171 33.6775 7.37867 34.2181 7.2983C34.7588 7.21792 35.1196 6.76285 35.054 6.19231C34.9997 5.72025 34.5462 5.26065 33.9512 5.34442V5.34555Z" fill="#1D86F0"/>
+              <path d="M20.3181 11.9574C25.6795 11.3121 30.4381 15.161 31.0511 20.4148C31.6642 25.6685 27.9044 30.4819 22.6414 31.1215C17.3863 31.7599 12.6017 28.0491 11.9106 22.8101C11.2127 17.5224 14.9273 12.606 20.3181 11.9574ZM21.3361 12.7849C16.4147 12.863 12.604 16.9372 12.725 21.7596C12.846 26.5628 16.8173 30.3788 21.629 30.2928C26.4588 30.2068 30.3136 26.2186 30.2186 21.3589C30.1259 16.6055 26.2145 12.7079 21.3361 12.7849Z" fill="#1D86F0"/>
+              <path d="M33.9511 5.34539C34.545 5.26162 34.9985 5.72123 35.054 6.19328C35.1196 6.76382 34.7339 7.22229 34.2181 7.29927C33.7023 7.37625 33.2001 7.00155 33.1096 6.51025C33.0101 5.96574 33.3528 5.43029 33.9511 5.34652V5.34539Z" fill="#D5E7FE"/>
+            </g>
+            <defs>
+              <clipPath id="rbccm-uc-empty-clip">
+                <rect width="43" height="43" fill="white"/>
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
+        <h3 class="rbccm-upcoming-conferences__empty-heading">No conferences found</h3>
+        <p class="rbccm-upcoming-conferences__empty-message">We couldn't find any conferences that match your current filters.</p>
+        <p class="rbccm-upcoming-conferences__empty-message rbccm-upcoming-conferences__empty-message--emphasis">Try adjusting your filters or search terms.</p>
+        <button type="button" class="rbccm-upcoming-conferences__empty-clear" id="rbccm-uc-clear">Clear filters</button>
+      </div>
+
+      <!-- Mobile slick controls -->
+      <div class="rbccm-upcoming-conferences__controls">
+        <button id="rbccm-uc-prev" class="rbccm-upcoming-conferences__btn" type="button" aria-label="Previous conference" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+            <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div id="rbccm-uc-dots" class="rbccm-upcoming-conferences__dots"></div>
+        <button id="rbccm-uc-next" class="rbccm-upcoming-conferences__btn" type="button" aria-label="Next conference" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+            <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- CTA opens the conference listing modal -->
+      <div class="rbccm-upcoming-conferences__cta-wrap">
+        <a class="rbccm-upcoming-conferences__cta" href="#conference-listing-modal" data-toggle="modal" data-target="#conference-listing-modal" aria-label="View full list of 2026 Conferences">View full list of 2026 Conferences</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Component JS -->
+  <script src="./upcoming-conferences.js"></script>
+
+</body>
+</html>

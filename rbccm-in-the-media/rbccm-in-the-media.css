@@ -1,0 +1,662 @@
+/* =========================================================================
+   RBCCM In the Media - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-in-the-media.css
+
+   Purpose
+   =========================================================================
+   Section title + 2-column layout on desktop (single-col stack mobile):
+     - Left: featured video card (277 image w/ gradient + play button
+             overlay + navy content pane w/ yellow eyebrow + white
+             title + gray expert credit)
+     - Right: chronological list of media appearances (source + date
+              topbar, bright-blue quoted title, Featured: person)
+   "See all media appearances" link sits on its own row at the bottom
+   so mobile gets clean gap spacing and desktop can restack cleanly.
+
+   Card list typography + underline-sweep hover is ported from the
+   filtered-content "in-the-media-and-press-releases" preset so the
+   two components read as one visual system.
+
+   Consumers
+   =========================================================================
+     Strategy and Economics - In the media
+       .rbccm-in-the-media--strategy-and-economics-in-the-media
+   ========================================================================= */
+
+
+/* ---------- Base block --------------------------------------------------- */
+.rbccm-in-the-media {
+  --rbccm-in-the-media-navy:        #003168;
+  --rbccm-in-the-media-navy-deep:   #051B38;
+  --rbccm-in-the-media-gold:        #FFC72C;
+  --rbccm-in-the-media-blue-bright: #0051A5;
+  --rbccm-in-the-media-white:       #FFFFFF;
+  --rbccm-in-the-media-gray:        #D7D7D7;
+  --rbccm-in-the-media-body-gray:   #383838;
+  --rbccm-in-the-media-rule:        #CCC;
+  --rbccm-in-the-media-serif:       "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --rbccm-in-the-media-sans:        Roboto, Arial, sans-serif;
+
+  --rbccm-in-the-media-bg-color:    #F9F9F9;
+
+  align-items: flex-start;
+  background: var(--rbccm-in-the-media-bg-color);
+  border-bottom: 1px solid #E5E7EB;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 60px 23px;
+  position: relative;
+  width: 100%;
+}
+.rbccm-in-the-media *,
+.rbccm-in-the-media *::before,
+.rbccm-in-the-media *::after { box-sizing: border-box; }
+
+/* Font-family lock on tag-pickable heading nodes. */
+.rbccm-in-the-media .rbccm-in-the-media__title,
+.rbccm-in-the-media .rbccm-in-the-media__featured-title {
+  font-family: var(--rbccm-in-the-media-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Tag-agnostic margin/padding reset on tag-pickable elements. */
+h1.rbccm-in-the-media__title, h2.rbccm-in-the-media__title,
+h3.rbccm-in-the-media__title, h4.rbccm-in-the-media__title,
+h5.rbccm-in-the-media__title, h6.rbccm-in-the-media__title,
+p.rbccm-in-the-media__title,  div.rbccm-in-the-media__title,
+h1.rbccm-in-the-media__featured-title, h2.rbccm-in-the-media__featured-title,
+h3.rbccm-in-the-media__featured-title, h4.rbccm-in-the-media__featured-title,
+h5.rbccm-in-the-media__featured-title, h6.rbccm-in-the-media__featured-title,
+p.rbccm-in-the-media__featured-title,  div.rbccm-in-the-media__featured-title {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+/* ---------- Container ---------------------------------------------------- */
+.rbccm-in-the-media__inner {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+
+/* ---------- Section title ------------------------------------------------ */
+.rbccm-in-the-media .rbccm-in-the-media__title {
+  color: var(--rbccm-in-the-media-navy) !important;
+  font-family: var(--rbccm-in-the-media-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 0 18px 0 !important;
+  padding: 0 !important;
+}
+
+/* ---------- Section subhead (optional) -----------------------------------
+   Only rendered when the SectionSubhead Datum is non-empty. Tag-agnostic
+   guards mirror the __title pattern so unified.css tag rules can't stamp
+   on it. Bottom margin picks up the same 18px rhythm the title uses. */
+h1.rbccm-in-the-media__subtitle, h2.rbccm-in-the-media__subtitle,
+h3.rbccm-in-the-media__subtitle, h4.rbccm-in-the-media__subtitle,
+h5.rbccm-in-the-media__subtitle, h6.rbccm-in-the-media__subtitle,
+p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
+  color: var(--rbccm-in-the-media-body-gray) !important;
+  font-family: var(--rbccm-in-the-media-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: -6px 0 24px 0 !important; /* tighten to the title, breathe below */
+  max-width: 720px;
+  padding: 0 !important;
+}
+
+
+/* Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base is left; --header-center flips the title + subhead
+   block to center. The featured card + list layout below is
+   unaffected -- only the top-of-section header block moves. */
+.rbccm-in-the-media--header-center .rbccm-in-the-media__inner {
+  align-items: center;
+}
+.rbccm-in-the-media--header-center .rbccm-in-the-media__title,
+.rbccm-in-the-media--header-center .rbccm-in-the-media__subtitle {
+  text-align: center !important;
+  align-self: center;
+}
+
+
+/* ---------- Content wrapper --------------------------------------------- */
+/* On mobile this is a single flex column (featured on top, list below).
+   Desktop breakpoint below swaps to a 2-column grid. Margin-bottom
+   separates content from the See-all link row below. */
+.rbccm-in-the-media__content {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+
+/* =========================================================================
+   Featured video card (left column desktop / top on mobile)
+   ========================================================================= */
+.rbccm-in-the-media__featured {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Media (video thumbnail) frame. Fixed 277 height per spec on mobile;
+   desktop can override via breakpoint if needed. Rendered as an <a>
+   that links out to the source outlet -- we can't embed the video
+   here because the original video is hosted on the outlet's site
+   (CNBC, Bloomberg, etc). The play-glyph child is decorative and
+   acts as a visual affordance only. */
+.rbccm-in-the-media__media {
+  align-items: flex-start;
+  align-self: stretch;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 277px;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  width: 100%;
+}
+.rbccm-in-the-media__media:focus-visible {
+  /* Bright-blue on the section's F9F9F9 bg (5.7:1) instead of gold
+     (1.53:1) so the ring passes WCAG 1.4.11 non-text contrast. */
+  outline: 3px solid var(--rbccm-in-the-media-blue-bright);
+  outline-offset: 2px;
+}
+
+/* Real <img> layer -- pinned to fill the media frame, cropped to cover.
+   0.8 opacity + a top-to-bottom fade (via ::after) matches the Figma
+   spec: `opacity: 0.8; background: linear-gradient(180deg,
+   rgba(255,255,255,0.00) 0%, #051B38 100.01%), url(...) lightgray
+   -200.608px 0px / 193.987% 120.578% no-repeat`. Per-card focal via
+   --rbccm-in-the-media-focal. */
+.rbccm-in-the-media__image {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: var(--rbccm-in-the-media-focal, 50% 30%);
+  opacity: 0.8;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+/* Bottom-fade to navy over the image so the bottom edge blends into
+   the dark content pane below. */
+.rbccm-in-the-media__media::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #051B38 100.01%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Play glyph -- 72x72 white glass circle w/ white play triangle.
+   Decorative overlay on the media frame; the whole __media anchor
+   is what actually links out to the source outlet. Grow on media
+   hover/focus so the affordance responds to the parent anchor. */
+/* Play button -- soft hover state (subtle scale + brighter fill) as
+   the invitation, then an "explode" state on click/launch (scoped
+   via the .is-launching class the JS adds on click) that expands
+   the ring outward while everything fades to transparent -- reads
+   as the play button dissolving into the video underneath. */
+.rbccm-in-the-media__play {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.20);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 2px solid rgba(255, 255, 255, 1);
+  border-radius: 72px;
+  color: #FFF;
+  display: inline-flex;
+  height: 72px;
+  justify-content: center;
+  left: 50%;
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 250ms ease,
+    background-color 250ms ease;
+  width: 72px;
+  z-index: 2;
+}
+/* Hover / focus: subtle scale + brighter fill -- the "invitation" state. */
+.rbccm-in-the-media__media:hover .rbccm-in-the-media__play,
+.rbccm-in-the-media__media:focus-visible .rbccm-in-the-media__play {
+  background: rgba(255, 255, 255, 0.30);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+/* Explode -- click / launch state. JS toggles .is-launching on the
+   .__play span when the media anchor is clicked (or activated via
+   keyboard) so the ring visibly dissolves outward while the target
+   opens in a new tab. Duration + easing tuned to feel like a quick,
+   confident "ok, playing" gesture; transitions ALL properties this
+   time so the ring, blur, border, fill and glyph fade in parallel. */
+.rbccm-in-the-media__play.is-launching {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  border-color: rgba(255, 255, 255, 0);
+  opacity: 0;
+  /* scale(0) collapses the ring inward, reads as the button "sucking
+     itself in" and pulling the eye toward whatever plays behind. */
+  transform: translate(-50%, -50%) scale(0);
+  transition:
+    transform 450ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 350ms ease,
+    background-color 350ms ease,
+    border-color 350ms ease,
+    backdrop-filter 350ms ease,
+    -webkit-backdrop-filter 350ms ease;
+}
+.rbccm-in-the-media__play svg {
+  display: block;
+  height: 24px;
+  width: 24px;
+  transition: opacity 250ms ease;
+}
+.rbccm-in-the-media__play.is-launching svg {
+  opacity: 0;
+}
+
+/* Content pane below the media -- solid navy with the eyebrow + title
+   + expert credit. Padding matches Figma spec (32/22). */
+.rbccm-in-the-media__featured-content {
+  align-items: flex-start;
+  align-self: stretch;
+  background: var(--rbccm-in-the-media-navy-deep);
+  display: flex;
+  flex-direction: column;
+  padding: 32px 22px;
+}
+
+.rbccm-in-the-media__eyebrow {
+  color: var(--rbccm-in-the-media-gold);
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 16.5px; /* 150% */
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.rbccm-in-the-media .rbccm-in-the-media__featured-title {
+  color: var(--rbccm-in-the-media-white) !important;
+  font-family: var(--rbccm-in-the-media-serif) !important;
+  font-size: 24px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 120% !important; /* 28.8px */
+  margin: 0 !important;
+  padding: 0 16px 0 0 !important;
+}
+
+/* "Featured Expert:" credit line. Padding-top gives the visual gap
+   below the title; height left auto so text can wrap without clipping. */
+.rbccm-in-the-media__featured-expert {
+  align-items: flex-start;
+  align-self: stretch;
+  color: var(--rbccm-in-the-media-gray);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 19.5px; /* 150% */
+  padding-top: 16px;
+}
+
+
+/* =========================================================================
+   Media-appearance list (right column desktop / bottom on mobile)
+   =========================================================================
+   Pattern ported from filtered-content
+   .rbccm-filtered-content--in-the-media-and-press-releases card block
+   so both components share the row shape: 28px topbar w/ source left
+   + date right, bright-blue quoted title w/ underline-sweep hover,
+   compact Featured: person credit below.
+   ========================================================================= */
+.rbccm-in-the-media__list {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.rbccm-in-the-media__item {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Article row wrapper. Border-top on each row creates the divider;
+   :last-child gets a matching border-bottom to close the list. */
+.rbccm-in-the-media__card {
+  align-items: flex-start;
+  align-self: stretch;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--rbccm-in-the-media-rule);
+  color: inherit;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 10px 0;
+  margin: 0;
+  width: 100%;
+}
+.rbccm-in-the-media__item:last-child .rbccm-in-the-media__card {
+  border-bottom: 1px solid var(--rbccm-in-the-media-rule);
+}
+
+/* Topbar -- outlet left, publish date right. Fixed 28 height matches
+   ITM's compact meta strip. */
+.rbccm-in-the-media__card-topbar {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  height: 28px;
+  justify-content: space-between;
+}
+.rbccm-in-the-media__card-source {
+  color: var(--rbccm-in-the-media-navy);
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  line-height: 16.5px;
+  margin: 0;
+  text-transform: uppercase;
+}
+.rbccm-in-the-media__card-date {
+  color: var(--rbccm-in-the-media-body-gray);
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16.5px;
+  margin: 0;
+}
+
+/* Card title -- bright blue serif quoted headline. Anchor gets an
+   underline-sweep on hover via ::after (so text-decoration doesn't
+   clash with the serif's own descenders). */
+.rbccm-in-the-media__card-title {
+  align-items: flex-start;
+  align-self: stretch;
+  color: var(--rbccm-in-the-media-blue-bright);
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  font-family: var(--rbccm-in-the-media-serif);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%; /* 23.4px */
+  margin: 0;
+}
+/* Card-title link -- real text-decoration: underline that "grows" via
+   an animated text-decoration-thickness. Uses the real underline
+   property (not an ::after bar or a background gradient), so wrapped
+   titles get an underline on EVERY line. On hover / focus the
+   thickness transitions 0 -> 2px, which reads as the stroke growing
+   in per line. Color also fades in from transparent to currentColor
+   so the entrance feels intentional rather than a sudden pop. */
+.rbccm-in-the-media__card-title a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+.rbccm-in-the-media__card-title a:hover,
+.rbccm-in-the-media__card-title a:focus-visible {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto; /* browser default -- matches the "See all media appearances" link, which also relies on auto */
+}
+.rbccm-in-the-media__card-title a:hover {
+  outline: none;
+}
+/* Keyboard focus: keep the underline-sweep AND a visible ring so
+   the row-level focus target reads clearly for keyboard users. */
+.rbccm-in-the-media__card-title a:focus-visible {
+  outline: 2px solid var(--rbccm-in-the-media-blue-bright);
+  outline-offset: 3px;
+}
+
+/* "Featured: Name" credit row. Label medium (500), name regular
+   (400). Both 11/16.5 Roboto -- matches Figma. */
+.rbccm-in-the-media__card-featured {
+  align-items: baseline;
+  color: var(--rbccm-in-the-media-body-gray);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 11px;
+  font-weight: 400;
+  gap: 6px;
+  line-height: 16.5px; /* 150% */
+  margin: 0;
+}
+.rbccm-in-the-media__card-featured-label {
+  font-weight: 700;
+}
+
+
+/* =========================================================================
+   "See all media appearances" link row
+   ========================================================================= */
+.rbccm-in-the-media__see-all {
+  align-items: center;
+  color: var(--rbccm-in-the-media-blue-bright);
+  display: inline-flex;
+  font-family: var(--rbccm-in-the-media-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  gap: 15px;
+  letter-spacing: 1px;
+  line-height: 16.5px; /* 91.667% */
+  /* Underline is always present in the layout but starts invisible
+     (transparent color + 0 thickness). On hover / focus it fades in
+     with the same color + thickness transition as the card-title
+     links above, so the whole component uses one entrance feel. */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+  width: fit-content;
+}
+.rbccm-in-the-media__see-all:hover {
+  color: var(--rbccm-in-the-media-blue-bright);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+/* Keyboard focus: keep the underline AND a visible 2px ring so
+   keyboard users get a stronger cue than sighted mouse users. */
+.rbccm-in-the-media__see-all:focus-visible {
+  color: var(--rbccm-in-the-media-blue-bright);
+  outline: 2px solid var(--rbccm-in-the-media-blue-bright);
+  outline-offset: 3px;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-in-the-media__see-all svg {
+  aspect-ratio: 1 / 1;
+  color: currentColor;
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+}
+
+/* Subtle right-bounce on hover / keyboard focus. The arrow nudges 6px
+   right, snaps back, without ever leaving the link area (softer than
+   the fly-by animation used on the platforms + leading-experts CTAs). */
+.rbccm-in-the-media__see-all:hover svg,
+.rbccm-in-the-media__see-all:focus-visible svg {
+  animation: rbccm-itm-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-itm-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* =========================================================================
+   Desktop -- 2-column grid: featured left + list right.
+   "See all" link stays on its own row anchored under the left column.
+   ========================================================================= */
+@media (min-width: 992px) {
+  .rbccm-in-the-media {
+    padding: 80px 23px;
+    gap: 0;
+  }
+  .rbccm-in-the-media__inner {
+    gap: 0;
+  }
+  .rbccm-in-the-media__content {
+    column-gap: 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 24px;
+  }
+  .rbccm-in-the-media__featured {
+    grid-column: 1 / span 1;
+    grid-row: 1;
+  }
+  .rbccm-in-the-media__list {
+    grid-column: 2 / span 1;
+    grid-row: 1;
+    height: 100%; /* fill the grid row height set by the taller featured card */
+    /* Items keep their natural content height; leftover space
+       spreads between them so the row-separator borders distribute
+       evenly down the column. First item hugs the top, last item
+       hugs the bottom. */
+    justify-content: space-between;
+  }
+  /* "See all" anchors under the featured column on desktop. */
+  .rbccm-in-the-media__see-all {
+    grid-column: 1 / span 1;
+    grid-row: 2;
+  }
+
+  .rbccm-in-the-media .rbccm-in-the-media__title {
+    font-size: 42px !important;
+    line-height: 125% !important; /* 52.5px */
+    margin: 0 0 33px 0 !important; /* +15 over mobile's 18 */
+  }
+
+  /* Desktop -- featured content pane gets uniform 32px padding
+     (mobile uses 32/22 to breathe within the narrower viewport)
+     and a locked 227px height so the featured column matches the
+     Figma-spec total (277 image + 227 pane). Contents pin to the
+     bottom of the pane. */
+  .rbccm-in-the-media__featured-content {
+    justify-content: flex-end;
+    max-height: 227px;
+    min-height: 227px;
+    padding: 32px;
+  }
+
+  /* Desktop -- card padding bumps to 20/0 so rows breathe more
+     inside the taller stretched column (mobile stays 10/0). */
+  .rbccm-in-the-media__card {
+    padding: 20px 0;
+  }
+
+  /* Lock each list item to an exact third of the 504px list column
+     (matches the featured card total: 277 image + 227 content pane)
+     so the three rows land at equal heights regardless of content
+     length. Overrides the space-between distribution above. */
+  .rbccm-in-the-media__item {
+    max-height: calc(504px / 3);
+    min-height: calc(504px / 3);
+  }
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics - In the media
+   ========================================================================= */
+.rbccm-in-the-media--strategy-and-economics-in-the-media {
+  /* Section bg + border already default to the Figma spec (F9F9F9
+     with E5E7EB border-bottom). Kept as a named modifier for future
+     preset expansion. */
+}
+
+
+/* =========================================================================
+   Reduced motion -- kill hover animations.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-in-the-media__play,
+  .rbccm-in-the-media__see-all,
+  .rbccm-in-the-media__card-title a {
+    transition: none !important;
+  }
+  /* Kill the see-all arrow bounce for motion-sensitive users. */
+  .rbccm-in-the-media__see-all:hover svg,
+  .rbccm-in-the-media__see-all:focus-visible svg {
+    animation: none !important;
+  }
+  .rbccm-in-the-media__media:hover .rbccm-in-the-media__play,
+  .rbccm-in-the-media__media:focus-visible .rbccm-in-the-media__play {
+    transform: translate(-50%, -50%) !important;
+  }
+  /* Motion-sensitive users still get the "launching" cue via opacity
+     only -- no scale, no blur transition. */
+  .rbccm-in-the-media__play.is-launching {
+    opacity: 0;
+    transform: translate(-50%, -50%) !important;
+    transition: opacity 200ms ease !important;
+  }
+}

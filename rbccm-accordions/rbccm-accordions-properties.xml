@@ -1,0 +1,373 @@
+<!--
+  RBCCM Accordions - Properties + Data
+  ==============================================================
+  Preset-driven accordion-section component. The Preset Datum picks
+  the variant; each variant has its own set of content Datums that
+  live in the same file. Unused Datums for a given preset are
+  ignored by the XSL (matches the tabbed-panels + rbccm-hero
+  pattern).
+
+  Presets:
+    strategy-and-economics-notes  Dark navy notes section with
+                                  eyebrow / byline / title / summary
+                                  and an expandable body per row.
+                                  Author fills up to 8 note slots;
+                                  blank Category label hides the row.
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every editable text field ships as a pair:
+    <Field>Text       String / Textarea with the copy itself
+    <Field>Tag        Enum picker: h1 | h2 | h3 | h4 | h5 | h6
+                                 | p  | div | span
+  The XSL emits the tag dynamically via xsl:element name="{tag}",
+  so authors can promote a title to <h2> for SEO, drop a category
+  eyebrow to a <p>, etc.
+
+  Sidecar assets are loaded from paths declared below and cache-
+  busted via ?v={CacheVersion} appended by the XSL. See the
+  "Last updated" Datum at the top of the Data block - editors
+  bump it after each content save and it doubles as the cache
+  buster.
+-->
+<Properties ComponentID="rbccm-accordions">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. Deploy-time plumbing.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-accordions-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">Notes</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-accordions.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - set once at deploy, editors don't change)">/assets/rbccm/js/components/rbccm-accordions.js</Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Strategy and Economics Notes (dark navy, expandable notes)</Display>
+      <Value>strategy-and-economics-notes</Value>
+    </Option>
+    strategy-and-economics-notes
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header (title + description + Expand all)
+       ============================================================
+       What editors set here: the big headline and short description
+       that sit at the top of the section, plus the labels on the
+       Expand all / Collapse all toggle. The tag pickers let you
+       promote the title to h2 for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-accordions__header-center modifier that centers the
+       title + description block. (Class name in this comment uses __
+       in place of the BEM double-hyphen modifier so the XML comment
+       stays well-formed; emitted markup uses the real BEM double-
+       hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">S&amp;E Notes</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+
+  <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - blank hides the description; HTML allowed)">Timely, short-form commentary from our economists and strategists.</Datum>
+  <Datum ID="SectionDescriptionTag" Type="String" Name="Section description tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+  <Datum ID="ExpandAllLabel" Type="String" Name="Expand-all button label - collapsed state (required - do not blank)">Expand all</Datum>
+  <Datum ID="CollapseAllLabel" Type="String" Name="Expand-all button label - expanded state (required - do not blank)">Collapse all</Datum>
+
+
+  <!-- ============================================================
+       Note slots (repeater, 8 slots)
+       ============================================================
+       This section renders up to 8 notes. Fill in a Category on
+       any slot you want visible; blank Category hides the row.
+       3 slots are populated by default matching Figma; slots 4-8
+       ship blank and stay hidden until you fill them in.
+       .............................................................
+       Per note:
+         Item{N}CategoryText     eyebrow (e.g. "Economics")
+         Item{N}CategoryTag      picker (default span for the pill)
+         Item{N}Author           byline name
+         Item{N}Date             byline date string
+         Item{N}TitleText        RBC Display headline
+         Item{N}TitleTag         picker (default h3)
+         Item{N}SummaryText      one-line summary shown collapsed
+         Item{N}SummaryTag       picker (default p)
+         Item{N}BodyHtml         expanded body copy (Textarea, HTML
+                                 supported via disable-output-escaping)
+         Item{N}ReadMoreLabel    CTA label; blank hides the link
+         Item{N}ReadMoreHref     CTA URL
+         Item{N}ReadMoreAria     optional aria-label
+       ============================================================ -->
+
+  <!-- ==== Item 1 ==== -->
+  <Datum ID="Item1CategoryText" Type="String" Name="Item 1 : category eyebrow (required - blank hides this row)">Economics</Datum>
+  <Datum ID="Item1CategoryTag" Type="String" Name="Item 1 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item1Author" Type="String" Name="Item 1 : author name (optional - blank hides the byline name)">Frances Donald</Datum>
+  <Datum ID="Item1Date" Type="String" Name="Item 1 : date string (optional - blank hides the byline date)">Aug 12, 2026</Datum>
+  <Datum ID="Item1TitleText" Type="String" Name="Item 1 : title (required - do not blank)">BoC Rate Decision Preview</Datum>
+  <Datum ID="Item1TitleTag" Type="String" Name="Item 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h3
+  </Datum>
+  <Datum ID="Item1SummaryText" Type="Textarea" Name="Item 1 : one-line summary (required - shown in collapsed state)">Inflation tick-up reduces probability of a 50bps cut next week; 25bps remains baseline.</Datum>
+  <Datum ID="Item1SummaryTag" Type="String" Name="Item 1 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item1BodyHtml" Type="Textarea" Name="Item 1 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;Headline CPI came in two tenths above consensus, and the trimmed-mean measures the Bank watches most closely stopped decelerating for the first time since March.&lt;/p&gt;&lt;p&gt;Financial conditions have loosened materially since the spring. Our baseline: 25bps next week, 25bps in the following meeting, and a terminal rate of 2.25% by mid-2026.&lt;/p&gt;</Datum>
+  <Datum ID="Item1ReadMoreLabel" Type="String" Name="Item 1 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item1ReadMoreHref" Type="String" Name="Item 1 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item1ReadMoreAria" Type="String" Name="Item 1 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <!-- ==== Item 2 ==== -->
+  <Datum ID="Item2CategoryText" Type="String" Name="Item 2 : category eyebrow (required - blank hides this row)">Geopolitics</Datum>
+  <Datum ID="Item2CategoryTag" Type="String" Name="Item 2 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item2Author" Type="String" Name="Item 2 : author name (optional - blank hides the byline name)">Helima Croft</Datum>
+  <Datum ID="Item2Date" Type="String" Name="Item 2 : date string (optional - blank hides the byline date)">Aug 28, 2026</Datum>
+  <Datum ID="Item2TitleText" Type="String" Name="Item 2 : title (required - do not blank)">Iran conflict: six-month update</Datum>
+  <Datum ID="Item2TitleTag" Type="String" Name="Item 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h3
+  </Datum>
+  <Datum ID="Item2SummaryText" Type="Textarea" Name="Item 2 : one-line summary (required - shown in collapsed state)">Diplomatic resolution remains elusive; markets modestly pricing in a sustained Strait of Hormuz premium.</Datum>
+  <Datum ID="Item2SummaryTag" Type="String" Name="Item 2 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item2BodyHtml" Type="Textarea" Name="Item 2 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;As the Iran conflict reaches its six-month mark, diplomatic resolution remains elusive despite repeated market optimism about swift resolution.&lt;/p&gt;&lt;p&gt;Our base case: modest crude premium through year-end, with tail risk on any escalation into shipping lanes.&lt;/p&gt;</Datum>
+  <Datum ID="Item2ReadMoreLabel" Type="String" Name="Item 2 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item2ReadMoreHref" Type="String" Name="Item 2 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item2ReadMoreAria" Type="String" Name="Item 2 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <!-- ==== Item 3 ==== -->
+  <Datum ID="Item3CategoryText" Type="String" Name="Item 3 : category eyebrow (required - blank hides this row)">Equity Markets</Datum>
+  <Datum ID="Item3CategoryTag" Type="String" Name="Item 3 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item3Author" Type="String" Name="Item 3 : author name (optional - blank hides the byline name)">Lori Calvasina</Datum>
+  <Datum ID="Item3Date" Type="String" Name="Item 3 : date string (optional - blank hides the byline date)">Sep 2, 2026</Datum>
+  <Datum ID="Item3TitleText" Type="String" Name="Item 3 : title (required - do not blank)">S&amp;P 500 target refresh</Datum>
+  <Datum ID="Item3TitleTag" Type="String" Name="Item 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h3
+  </Datum>
+  <Datum ID="Item3SummaryText" Type="Textarea" Name="Item 3 : one-line summary (required - shown in collapsed state)">Lifting our year-end target on stronger earnings breadth; still constructive but tail risks widen.</Datum>
+  <Datum ID="Item3SummaryTag" Type="String" Name="Item 3 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+  <Datum ID="Item3BodyHtml" Type="Textarea" Name="Item 3 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;Earnings breadth has broadened noticeably in Q2, with 60%+ of S&amp;amp;P 500 constituents beating on both revenue and EPS.&lt;/p&gt;</Datum>
+  <Datum ID="Item3ReadMoreLabel" Type="String" Name="Item 3 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item3ReadMoreHref" Type="String" Name="Item 3 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item3ReadMoreAria" Type="String" Name="Item 3 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <!-- ==== Items 4-8 : blank by default, hidden until the author
+       fills in a Category value. Same field shape as Items 1-3. ==== -->
+  <Datum ID="Item4CategoryText" Type="String" Name="Item 4 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item4CategoryTag" Type="String" Name="Item 4 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item4Author" Type="String" Name="Item 4 : author name (optional - blank hides the byline name)"></Datum>
+  <Datum ID="Item4Date" Type="String" Name="Item 4 : date string (optional - blank hides the byline date)"></Datum>
+  <Datum ID="Item4TitleText" Type="String" Name="Item 4 : title (required if row is used - blank hides the row)"></Datum>
+  <Datum ID="Item4TitleTag" Type="String" Name="Item 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Item4SummaryText" Type="Textarea" Name="Item 4 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
+  <Datum ID="Item4SummaryTag" Type="String" Name="Item 4 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item4BodyHtml" Type="Textarea" Name="Item 4 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item4ReadMoreLabel" Type="String" Name="Item 4 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item4ReadMoreHref" Type="String" Name="Item 4 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item4ReadMoreAria" Type="String" Name="Item 4 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <Datum ID="Item5CategoryText" Type="String" Name="Item 5 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item5CategoryTag" Type="String" Name="Item 5 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item5Author" Type="String" Name="Item 5 : author name (optional - blank hides the byline name)"></Datum>
+  <Datum ID="Item5Date" Type="String" Name="Item 5 : date string (optional - blank hides the byline date)"></Datum>
+  <Datum ID="Item5TitleText" Type="String" Name="Item 5 : title (required if row is used - blank hides the row)"></Datum>
+  <Datum ID="Item5TitleTag" Type="String" Name="Item 5 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Item5SummaryText" Type="Textarea" Name="Item 5 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
+  <Datum ID="Item5SummaryTag" Type="String" Name="Item 5 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item5BodyHtml" Type="Textarea" Name="Item 5 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item5ReadMoreLabel" Type="String" Name="Item 5 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item5ReadMoreHref" Type="String" Name="Item 5 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item5ReadMoreAria" Type="String" Name="Item 5 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <Datum ID="Item6CategoryText" Type="String" Name="Item 6 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item6CategoryTag" Type="String" Name="Item 6 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item6Author" Type="String" Name="Item 6 : author name (optional - blank hides the byline name)"></Datum>
+  <Datum ID="Item6Date" Type="String" Name="Item 6 : date string (optional - blank hides the byline date)"></Datum>
+  <Datum ID="Item6TitleText" Type="String" Name="Item 6 : title (required if row is used - blank hides the row)"></Datum>
+  <Datum ID="Item6TitleTag" Type="String" Name="Item 6 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Item6SummaryText" Type="Textarea" Name="Item 6 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
+  <Datum ID="Item6SummaryTag" Type="String" Name="Item 6 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item6BodyHtml" Type="Textarea" Name="Item 6 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item6ReadMoreLabel" Type="String" Name="Item 6 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item6ReadMoreHref" Type="String" Name="Item 6 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item6ReadMoreAria" Type="String" Name="Item 6 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <Datum ID="Item7CategoryText" Type="String" Name="Item 7 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item7CategoryTag" Type="String" Name="Item 7 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item7Author" Type="String" Name="Item 7 : author name (optional - blank hides the byline name)"></Datum>
+  <Datum ID="Item7Date" Type="String" Name="Item 7 : date string (optional - blank hides the byline date)"></Datum>
+  <Datum ID="Item7TitleText" Type="String" Name="Item 7 : title (required if row is used - blank hides the row)"></Datum>
+  <Datum ID="Item7TitleTag" Type="String" Name="Item 7 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Item7SummaryText" Type="Textarea" Name="Item 7 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
+  <Datum ID="Item7SummaryTag" Type="String" Name="Item 7 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item7BodyHtml" Type="Textarea" Name="Item 7 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item7ReadMoreLabel" Type="String" Name="Item 7 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item7ReadMoreHref" Type="String" Name="Item 7 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item7ReadMoreAria" Type="String" Name="Item 7 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+  <Datum ID="Item8CategoryText" Type="String" Name="Item 8 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item8CategoryTag" Type="String" Name="Item 8 : category tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item8Author" Type="String" Name="Item 8 : author name (optional - blank hides the byline name)"></Datum>
+  <Datum ID="Item8Date" Type="String" Name="Item 8 : date string (optional - blank hides the byline date)"></Datum>
+  <Datum ID="Item8TitleText" Type="String" Name="Item 8 : title (required if row is used - blank hides the row)"></Datum>
+  <Datum ID="Item8TitleTag" Type="String" Name="Item 8 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Item8SummaryText" Type="Textarea" Name="Item 8 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
+  <Datum ID="Item8SummaryTag" Type="String" Name="Item 8 : summary tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Item8BodyHtml" Type="Textarea" Name="Item 8 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item8ReadMoreLabel" Type="String" Name="Item 8 : read-more label (optional - blank hides the link)">Read more</Datum>
+  <Datum ID="Item8ReadMoreHref" Type="String" Name="Item 8 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="Item8ReadMoreAria" Type="String" Name="Item 8 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
+
+</Data>

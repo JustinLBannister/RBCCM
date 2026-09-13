@@ -129,6 +129,15 @@
     'technology-innovation':           'Technology & Innovation'
   };
 
+  /* Type dropdown labels -- ITM preset uses "press" and "media" as the
+     raw data-type tokens, but the dropdown should read "Press release"
+     and "Media coverage" (matching the eyebrow labels on the cards
+     themselves). Applied via formatValue() below. */
+  var TYPE_LABELS = {
+    'press':  'Press release',
+    'media':  'Media coverage'
+  };
+
   var DEFAULT_STRINGS = {
     emptyHeading:           'No results found',
     emptyMessage:           "We couldn't find any results that match your current filters.",
@@ -197,6 +206,12 @@
          for unknown topics (new taxonomy entries not yet added to map). */
       return TOPIC_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
+    if (dim === 'type') {
+      /* ITM type tokens ("press" / "media") map to human labels
+         "Press release" / "Media coverage" so the dropdown option
+         reads the same way as the eyebrow on the card itself. */
+      return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
+    }
     /* Generic fallback for any other dimension: title-case each word,
        keep known acronyms all-caps ("apac" → "APAC", not "Apac"). */
     return genericTitleCase(value);
@@ -231,6 +246,23 @@
     return el;
   }
 
+  /* Active-filter chip row. Auto-injected as the last child of the
+     `.__filter-inner` wrapper so it appears directly below the filter
+     controls. Starts hidden -- syncChips() below toggles visibility. */
+  function ensureChipRow(filterRoot) {
+    var inner = filterRoot.querySelector('.rbccm-filtered-content__filter-inner')
+             || filterRoot;
+    var existing = inner.querySelector(':scope > .rbccm-filtered-content__chip-row');
+    if (existing) return existing;
+    var el = document.createElement('div');
+    el.className = 'rbccm-filtered-content__chip-row';
+    el.setAttribute('role', 'list');
+    el.setAttribute('aria-label', 'Active filters');
+    el.hidden = true;
+    inner.appendChild(el);
+    return el;
+  }
+
   function bindFilter(filterRoot) {
     if (filterRoot.getAttribute('data-filter-bound') === 'true') return;
     filterRoot.setAttribute('data-filter-bound', 'true');
@@ -255,6 +287,7 @@
     var allItems       = container.querySelectorAll(itemSelector);
     var emptyState     = ensureEmptyState(container, isDark);
     var paginationHost = ensurePaginationHost(container);
+    var chipRow        = ensureChipRow(filterRoot);
 
     /* -------- Lazy per-year loading --------
        When the ITM component has a full archive available at per-year URLs
@@ -1084,6 +1117,95 @@
       return false;
     }
 
+    /* ---------- Active-filter chips ----------
+       Renders one dismissible pill in the auto-injected chip row per
+       active dropdown or search value. Runs after every apply(). The
+       X button on each chip clears just that filter and re-runs
+       apply(true) so pagination resets to page 1.
+
+       Order: chips follow the dropdown order in the markup (so Type
+       appears left of Year, matching the input row), search last. */
+    function syncChips() {
+      if (!chipRow) return;
+      while (chipRow.firstChild) chipRow.removeChild(chipRow.firstChild);
+
+      var built = [];
+      for (var i = 0; i < dropdowns.length; i++) {
+        var dd  = dropdowns[i];
+        var val = (dd.getValue() || '').trim();
+        if (!val) continue;
+        built.push({
+          key:     dd.dim,
+          label:   formatValue(val, dd.dim),
+          onClear: (function (dropdown) {
+            return function () { dropdown.setValue(''); apply(true); };
+          })(dd)
+        });
+      }
+      if (searchInput && searchInput.value && searchInput.value.trim()) {
+        built.push({
+          key:     'search',
+          label:   '"' + searchInput.value.trim() + '"',
+          onClear: function () { searchInput.value = ''; apply(true); }
+        });
+      }
+
+      if (!built.length) {
+        chipRow.hidden = true;
+        return;
+      }
+      chipRow.hidden = false;
+
+      /* Dimension label prefix ("Type: Press release"). Kept subtle
+         visually but carried in the accessible name for AT users. */
+      var DIM_LABELS = { type:'Type', year:'Year', month:'Month',
+                         region:'Region', topic:'Topic', search:'Search' };
+
+      for (var j = 0; j < built.length; j++) {
+        var c = built[j];
+        var dimName = DIM_LABELS[c.key] || c.key;
+
+        var chip = document.createElement('span');
+        chip.className = 'rbccm-filtered-content__chip';
+        chip.setAttribute('role', 'listitem');
+
+        var labelWrap = document.createElement('span');
+        labelWrap.className = 'rbccm-filtered-content__chip-label';
+
+        var dimSpan = document.createElement('span');
+        dimSpan.className = 'rbccm-filtered-content__chip-dim';
+        dimSpan.textContent = dimName + ':';
+        labelWrap.appendChild(dimSpan);
+
+        var valSpan = document.createElement('span');
+        valSpan.className = 'rbccm-filtered-content__chip-value';
+        valSpan.textContent = c.label;
+        labelWrap.appendChild(valSpan);
+
+        chip.appendChild(labelWrap);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rbccm-filtered-content__chip-remove';
+        btn.setAttribute('aria-label', 'Remove ' + dimName + ' filter: ' + c.label);
+        /* Inline X glyph -- small SVG so it inherits currentColor and
+           stays crisp at any zoom without pulling in a sprite. */
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" aria-hidden="true" focusable="false">'
+                      + '<path d="M1 1L9 9 M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+                      + '</svg>';
+        (function (handler) {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            handler();
+          });
+        })(c.onClear);
+
+        chip.appendChild(btn);
+        chipRow.appendChild(chip);
+      }
+    }
+
+
     function apply(resetPage) {
       if (resetPage) currentPage = 0;
       var r = computeMatches();
@@ -1097,6 +1219,7 @@
 
       paginate(r.matched, r.unmatched, isFiltered);
       renderEmptyState(r.matched.length === 0 && isFiltered);
+      syncChips();
 
       /* Sync URL. Filter changes use replaceState (no history bloat as
          the user tries combos). Pagination handlers below use pushState
@@ -1176,6 +1299,71 @@
     });
 
     /* ---------- Empty state ---------- */
+    /* Build a natural-language recap of the currently-active filters so
+       the empty-state message names WHAT the user was looking for
+       instead of just saying "your current filters." Examples:
+         Type=media, Year=2004    -> "We couldn't find any media coverage in 2004."
+         Type=press, Year=2025    -> "We couldn't find any press releases in 2025."
+         Year=2018 alone          -> "We couldn't find any media coverage in 2018."
+         search only              -> "We couldn't find any media coverage matching \"donald\"."
+       Falls back to the generic data-empty-message when we somehow
+       land here with zero filters active (defensive). */
+    function buildDynamicEmptyMessage() {
+      var typeLabel = '';
+      var yearLabel = '';
+      var monthLabel = '';
+      var regionLabel = '';
+      var topicLabel = '';
+      var searchQuery = (searchInput && searchInput.value) ? searchInput.value.trim() : '';
+
+      for (var i = 0; i < dropdowns.length; i++) {
+        var dd = dropdowns[i];
+        var v = (dd.getValue() || '').trim();
+        if (!v) continue;
+        var pretty = formatValue(v, dd.dim);
+        if (dd.dim === 'type')        typeLabel   = pretty;
+        else if (dd.dim === 'year')   yearLabel   = pretty;
+        else if (dd.dim === 'month')  monthLabel  = pretty;
+        else if (dd.dim === 'region') regionLabel = pretty;
+        else if (dd.dim === 'topic')  topicLabel  = pretty;
+      }
+
+      if (!typeLabel && !yearLabel && !monthLabel && !regionLabel && !topicLabel && !searchQuery) {
+        return strings.emptyMessage || '';
+      }
+
+      /* Subject noun -- lowercase the type label if set ("Press release"
+         becomes "press releases"; "Media coverage" stays "media coverage").
+         Otherwise use the generic fallback authored on data-empty-message-
+         subject, or "coverage" as a last resort. */
+      var subject;
+      if (typeLabel) {
+        var lower = typeLabel.toLowerCase();
+        /* Simple pluralization for the two ITM cases -- press release ->
+           press releases; media coverage is already a mass noun so it
+           stays. Guarded to a one-word check so we don't accidentally
+           add "s" to values that are already plural or use a different
+           idiom for other presets. */
+        subject = /release$/.test(lower) ? lower + 's' : lower;
+      } else {
+        subject = strings.emptyMessageSubject || 'coverage';
+      }
+
+      var parts = ["We couldn't find any " + subject];
+      if (regionLabel) parts.push('in ' + regionLabel);
+      if (topicLabel)  parts.push('on ' + topicLabel);
+      if (monthLabel && yearLabel) {
+        parts.push('for ' + monthLabel + ' ' + yearLabel);
+      } else if (yearLabel) {
+        parts.push('in ' + yearLabel);
+      } else if (monthLabel) {
+        parts.push('for ' + monthLabel);
+      }
+      if (searchQuery) parts.push('matching "' + searchQuery + '"');
+
+      return parts.join(' ') + '.';
+    }
+
     function renderEmptyState(show) {
       if (!show) {
         emptyState.classList.remove('is-visible');
@@ -1198,10 +1386,16 @@
         heading.textContent = strings.emptyHeading;
         emptyState.appendChild(heading);
       }
-      if (strings.emptyMessage) {
+      /* Dynamic recap of the active filters replaces the old static
+         data-empty-message string. buildDynamicEmptyMessage() falls
+         back to the authored data-empty-message when there are somehow
+         zero filters active, so the authored copy still gets used in
+         defensive corner cases. */
+      var dynamicMsg = buildDynamicEmptyMessage();
+      if (dynamicMsg) {
         var msg1 = document.createElement('p');
         msg1.className = 'rbccm-filtered-content__empty-message';
-        msg1.textContent = strings.emptyMessage;
+        msg1.textContent = dynamicMsg;
         emptyState.appendChild(msg1);
       }
       if (strings.emptyMessageEmphasis) {
@@ -1967,19 +2161,87 @@
     return MONTH_FULL[d.getUTCMonth()] + ' ' + String(d.getUTCDate()).padStart(2, '0') + ', ' + d.getUTCFullYear();
   }
 
+  /* Concatenated-title parser for the ITM feed. Real items follow:
+       "RBC {KIND}: {PERSON} on {NETWORK}   [optionally: (timecode)]"
+     where KIND is TV / Radio / Podcast / Talks. Returns
+     { kind, person, source, timecode, raw } — fields not matched
+     come back as ''. Trailing "(...)" only extracts when it clearly
+     looks like a timecode / modifier ("starts, HH:MM", "from HH:MM",
+     or a bare HH:MM); anything else (e.g. "(Video)") stays in the
+     source. Used as a fallback when the feed's dedicated <outlet> /
+     <featured> tags come back blank (which they do today). */
+  function parseITMTitle(raw) {
+    var out = { kind: '', person: '', source: '', timecode: '', raw: raw || '' };
+    if (!raw) return out;
+    var s = String(raw).replace(/\s+/g, ' ').trim();
+
+    var paren = s.match(/^(.+?)\s*\((?:(starts|from)[,\s].*?|\d+:\d+(?::\d+)?)\)\s*$/i);
+    if (paren) { s = paren[1].trim(); out.timecode = raw.match(/\(([^)]+)\)\s*$/)[1].trim(); }
+
+    /* Shape A: "RBC {KIND}: {PERSON} on {NETWORK}" */
+    var m = s.match(/^RBC\s+([A-Za-z]+):\s*(.+?)\s+on\s+(.+)$/i);
+    if (m) {
+      out.kind   = 'RBC ' + m[1].trim();
+      out.person = m[2].trim();
+      out.source = m[3].trim();
+      return out;
+    }
+
+    /* Shape B (fallback, no RBC prefix): "{PERSON} on {NETWORK}" */
+    m = s.match(/^(.+?)\s+on\s+(.+)$/i);
+    if (m) {
+      out.person = m[1].trim();
+      out.source = m[2].trim();
+      return out;
+    }
+
+    return out;
+  }
+
   function buildITMEntry(node) {
     var title = child(node, 'title').trim();
     if (!title) return null;
     var link = child(node, 'link').trim();
     var dateStr = child(node, 'date').trim() || child(node, 'publish_date').trim();
+    /* Try the dedicated feed tags first (in case the schema gets
+       richer later) — today they ship blank on every real item, so
+       fall through to parsing the concatenated title. */
     var outlet = child(node, 'outlet').trim() || child(node, 'publication').trim() || child(node, 'source').trim();
     /* Description / summary for the row body — try common tag names. */
     var description = child(node, 'description').trim() || child(node, 'summary').trim() || child(node, 'abstract').trim();
     /* "Featured" person from the feed (kept in searchText for filtering). */
     var featured = child(node, 'featured').trim() || child(node, 'person').trim() || child(node, 'spokesperson').trim();
+
+    /* Title-parse fallback: when the feed's dedicated tags are blank
+       (the common case), pull outlet + featured out of the title.
+       kind (e.g. "RBC TV") is always populated from the parse so
+       row-render can display the kind label if design calls for it. */
+    var parsed = parseITMTitle(title);
+    if (!outlet)   outlet   = parsed.source;
+    if (!featured) featured = parsed.person;
+    var kind = parsed.kind;
+
     /* Feed may expose either a "topic" (media / press) or a "type" field. */
     var rawType = (child(node, 'topic') || child(node, 'type') || '').trim().toLowerCase();
-    var type = rawType.indexOf('press') !== -1 ? 'press' : (rawType.indexOf('media') !== -1 ? 'media' : '');
+    /* Type resolution priority — <topic> is unreliable (blank /
+       misclassified on several items), so we harden with the link
+       shape and, as a last resort, the title parse:
+         1. link on /rbccm/ or /assets/rbccm/  -> press
+         2. <topic> contains "press"           -> press
+         3. <topic> contains "media"           -> media
+         4. title parses cleanly               -> media
+         5. otherwise                          -> ''  (shows in both) */
+    var type = '';
+    if (link.indexOf('/rbccm/') === 0 || link.indexOf('/assets/rbccm/') === 0) {
+      type = 'press';
+    } else if (rawType.indexOf('press') !== -1) {
+      type = 'press';
+    } else if (rawType.indexOf('media') !== -1) {
+      type = 'media';
+    } else if (parsed.kind || parsed.person || parsed.source) {
+      type = 'media';
+    }
+
     var region = child(node, 'region').trim();
     var dateTs = dateStr ? Date.parse(dateStr) : 0;
     if (isNaN(dateTs)) dateTs = 0;
@@ -1994,6 +2256,7 @@
       external: isExternal,
       outlet: outlet,
       featured: featured,
+      kind: kind,                                /* "RBC TV" / "RBC Radio" / etc — blank when unparseable */
       description: description,
       type: type,
       year: parseYear(dateStr),

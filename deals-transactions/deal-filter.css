@@ -1,0 +1,429 @@
+/* =============================================================
+   Deal Filter (rbccm-deal-filter)
+   -------------------------------------------------------------
+   BEM block. Lives above the deal tombstone list and drives the
+   client-side filter UI (year, transaction type, future amount).
+   Behaviour in filter-deals.js / new-filters-deals.js.
+   ============================================================= */
+
+/* -- Bar container (was #yf-filter-bar) -- */
+.rbccm-deal-filter {
+  background: #fff;
+  border: 1px solid #d3d3d3;
+  margin-bottom: 20px;
+  padding: 5px 0;
+}
+
+/* Bootstrap-style centring widths when not sticky.
+   Matches the live behaviour where the bar uses .container. */
+.rbccm-deal-filter.container {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+@media (min-width: 768px) {
+  .rbccm-deal-filter.container { margin-left: auto; margin-right: auto; max-width: 720px; }
+}
+@media (min-width: 992px) {
+  .rbccm-deal-filter.container { max-width: 940px; }
+}
+@media (min-width: 1200px) {
+  .rbccm-deal-filter.container { max-width: 1140px; }
+}
+
+/* Inner flex container — was the unnamed first child of #yf-filter-bar. */
+.rbccm-deal-filter__inner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 !important;
+  justify-content: flex-start;
+  max-width: 1140px;
+}
+.rbccm-deal-filter__inner.rbccm-deal-filter--sticky {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+/* -- Sticky modifier (was .is-sticky) --
+   JS adds this when the user scrolls past the bar so it pins to
+   the top of the viewport. */
+.rbccm-deal-filter--sticky {
+  position: fixed;
+  top: 60px; /* matches STICKY_TOP in the JS */
+  left: 0;
+  right: 0;
+  z-index: 500;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid #d3d3d3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+@media (max-width: 1199px) {
+  .rbccm-deal-filter.rbccm-deal-filter--sticky { padding: 0 15px !important; }
+}
+@media (min-width: 1200px) {
+  .rbccm-deal-filter.rbccm-deal-filter--sticky { padding: 0 15px !important; }
+}
+
+/* -- Filter row (was #yf-x-row) -- */
+.rbccm-deal-filter__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 1164px;
+  margin: 15px 10px 15px 0;
+  width: auto;
+}
+
+/* -- "Filter by:" label (was #yf-x-filter-lbl) -- */
+.rbccm-deal-filter__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  margin-right: 2px;
+}
+
+/* -- SR-only utility for hidden instructions / live regions -- */
+.rbccm-deal-filter__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* -- Dropdown wrapper (was #yf-x-year-wrap, #yf-x-type-wrap) -- */
+.rbccm-deal-filter__dropdown {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* -- Dropdown trigger button (was #yf-x-year-btn, #yf-x-type-btn) -- */
+.rbccm-deal-filter__dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid #0051A5;
+  border-radius: 4px;
+  background: #fff;
+  color: #0051A5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  justify-content: space-between;
+  gap: 6px;
+}
+.rbccm-deal-filter__dropdown-btn:hover {
+  background: #f0f6ff;
+}
+.rbccm-deal-filter__dropdown-btn:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 2px;
+}
+
+/* Per-dropdown min widths */
+.rbccm-deal-filter__dropdown-btn--year { min-width: 110px; }
+.rbccm-deal-filter__dropdown-btn--type { min-width: 140px; }
+
+/* -- Dropdown chevron arrow (was .arrow inside the button) -- */
+.rbccm-deal-filter__dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+.rbccm-deal-filter__dropdown-btn[aria-expanded="true"] .rbccm-deal-filter__dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* -- Dropdown list (was #yf-x-year-lb, #yf-x-type-lb) -- */
+.rbccm-deal-filter__dropdown-list {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 700;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px 0;
+  margin: 0;
+  list-style: none;
+}
+.rbccm-deal-filter__dropdown-list--year { min-width: 180px; }
+.rbccm-deal-filter__dropdown-list--type { min-width: 240px; }
+
+/* JS toggles this to open the list. Replaces inline style. */
+.rbccm-deal-filter__dropdown-list.is-open { display: block; }
+
+/* -- Dropdown items (was the <li>s in the lists) -- */
+.rbccm-deal-filter__dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+.rbccm-deal-filter__dropdown-item:hover,
+.rbccm-deal-filter__dropdown-item.is-keyboard-focused {
+  background: #f0f6ff;
+}
+.rbccm-deal-filter__dropdown-item[aria-selected="true"],
+.rbccm-deal-filter__dropdown-item--active {
+  background: #e8f0fb;
+  color: #0051A5;
+  font-weight: 600;
+}
+/* Hide the "All years/types" placeholder item (data-value="") */
+.rbccm-deal-filter__dropdown-item[data-value=""] {
+  display: none !important;
+}
+
+/* Optional per-item count pill (was .ycnt, .tcnt — hidden today) */
+.rbccm-deal-filter__dropdown-item-count {
+  display: none !important;
+}
+
+/* -- Amount range (was #yf-x-amt-* — hidden today, kept for future) -- */
+.rbccm-deal-filter__amount {
+  display: none; /* hidden until product wants it back */
+  align-items: center;
+  gap: 8px;
+  vertical-align: middle;
+}
+.rbccm-deal-filter__amount-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+.rbccm-deal-filter__amount-range {
+  position: relative;
+  display: inline-block;
+  width: 160px;
+  height: 28px;
+}
+.rbccm-deal-filter__amount-range input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  outline: none;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.rbccm-deal-filter__amount-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0051A5;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  pointer-events: all;
+}
+.rbccm-deal-filter__amount-track {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: #d3d3d3;
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.rbccm-deal-filter__amount-fill {
+  position: absolute;
+  height: 4px;
+  background: #0051A5;
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.rbccm-deal-filter__amount-value {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 110px;
+}
+.rbccm-deal-filter__amount-clear {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0051A5;
+  font-size: 15px;
+  padding: 0;
+  line-height: 1;
+}
+
+/* -- Result count text (was #yf-x-count) -- */
+.rbccm-deal-filter__count {
+  display: none; /* shown by JS when no matches */
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 0 auto;
+  white-space: nowrap;
+  padding-right: 5px;
+  text-align: left;
+}
+.rbccm-deal-filter__count--empty {
+  color: #c00;
+  display: block;
+}
+
+/* -- Active filter tags (was #yf-x-tags) -- */
+.rbccm-deal-filter__tags {
+  max-width: 1132px;
+  display: none; /* shown by JS when one+ tag */
+  font-size: 12px;
+  text-align: left;
+  box-sizing: border-box;
+  margin: 15px 0;
+}
+.rbccm-deal-filter__tags.is-visible { display: block; }
+
+.rbccm-deal-filter__tags-label {
+  color: #777;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+/* Tag pill (was .yf-x-tag) */
+.rbccm-deal-filter__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #e8f0fb;
+  color: #0051A5;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+/* Tag remove × button (was .yf-x-tag button) */
+.rbccm-deal-filter__tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0051A5;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 0 0 3px;
+}
+.rbccm-deal-filter__tag-remove:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Inline "and" between tag groups (was .yf-x-tag-or) */
+.rbccm-deal-filter__tag-separator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: #777;
+  margin-right: 4px;
+}
+
+/* -- Pagination strip (was #yf-x-pagination) -- */
+.rbccm-deal-filter__pagination {
+  display: none; /* shown by JS when matched > PAGE_SIZE */
+  text-align: center;
+  padding: 28px 0 12px;
+  width: 100%;
+  clear: both;
+}
+.rbccm-deal-filter__pagination.is-visible { display: block; }
+
+.rbccm-deal-filter__page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  margin: 0 3px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  vertical-align: middle;
+}
+.rbccm-deal-filter__page-btn:hover {
+  background: #f0f6ff;
+  border-color: #0051A5;
+  color: #0051A5;
+}
+.rbccm-deal-filter__page-btn--active,
+.rbccm-deal-filter__page-btn[aria-current="page"] {
+  background: #0051A5;
+  border-color: #0051A5;
+  color: #fff;
+}
+.rbccm-deal-filter__page-btn:disabled {
+  opacity: .35;
+  cursor: default;
+  pointer-events: none;
+}
+.rbccm-deal-filter__page-btn:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 2px;
+}
+
+.rbccm-deal-filter__page-ellipsis {
+  display: inline-block;
+  padding: 0 6px;
+  line-height: 36px;
+  color: #999;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.rbccm-deal-filter__page-info {
+  display: none;
+  font-size: 12px;
+  color: #666;
+  margin-left: 14px;
+  vertical-align: middle;
+}
+.rbccm-deal-filter__pagination.is-visible .rbccm-deal-filter__page-info {
+  display: inline-block;
+}
+
+/* -- Suppress the host page's #load-more when filter is mounted --
+   The filter has its own pagination; the KO Load More button is
+   redundant. Kept hidden but takes no layout space. */
+.rbccm-deal-filter-host #load-more {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

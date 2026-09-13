@@ -1,0 +1,452 @@
+/* =========================================================================
+   RBCCM Platforms - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-platforms.css
+
+   Purpose
+   =========================================================================
+   Section header + 4-card grid (2x2 desktop, stacked mobile). Each card
+   is a navy tile with a thematic bg image (behind a subtle left-fade
+   gradient so title + body + gold "Explore" link stay legible over any
+   image). Whole card is an anchor -- entire tile is clickable.
+
+   Layout
+   =========================================================================
+   Section = flex column, gap 60 between the header block and the grid
+   block. Section padding 60/23 all breakpoints (bumps to 80/23 at 992).
+   Grid = 1 column mobile, 2 columns at >=768.
+
+   Photo hookup
+   =========================================================================
+   Each card gets a real <img class="rbccm-platforms__photo"> child.
+   Using an <img> element instead of a background gives us:
+     - real alt text for a11y (fed from the DAM Description)
+     - browser image loading semantics (lazy, priority, LCP)
+     - object-position control per card for focal framing
+   Per-card focal point overrides via inline style:
+     style="--rbccm-platforms-focal: 50% 50%"
+   For mobile/desktop asset swaps, wrap the <img> in a <picture>
+   with a <source media="(min-width: 992px)" srcset="...">.
+   Falls back to a light-gray fill on the card itself if the img is
+   missing / errors out.
+
+   Consumers
+   =========================================================================
+     Strategy and Economics - Platforms
+       .rbccm-platforms--strategy-and-economics-platforms
+   ========================================================================= */
+
+
+/* ---------- Base block --------------------------------------------------- */
+.rbccm-platforms {
+  --rbccm-platforms-navy:      #003168;
+  --rbccm-platforms-navy-deep: #002144;
+  --rbccm-platforms-gold:      #FFC72C;
+  --rbccm-platforms-white:     #FFFFFF;
+  --rbccm-platforms-gray:      #494949;
+  --rbccm-platforms-serif:     "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --rbccm-platforms-sans:      Roboto, Arial, sans-serif;
+
+  --rbccm-platforms-bg-color:  transparent;
+
+  align-items: center;
+  background: var(--rbccm-platforms-bg-color);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 60px; /* between header block and grid block */
+  overflow: hidden;
+  padding: 60px 23px;
+  position: relative;
+  width: 100%;
+}
+.rbccm-platforms *,
+.rbccm-platforms *::before,
+.rbccm-platforms *::after { box-sizing: border-box; }
+
+/* Font-family lock on tag-pickable heading nodes. */
+.rbccm-platforms .rbccm-platforms__title,
+.rbccm-platforms .rbccm-platforms__card-title {
+  font-family: var(--rbccm-platforms-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Tag-agnostic margin/padding reset on tag-pickable elements. */
+h1.rbccm-platforms__title, h2.rbccm-platforms__title,
+h3.rbccm-platforms__title, h4.rbccm-platforms__title,
+h5.rbccm-platforms__title, h6.rbccm-platforms__title,
+p.rbccm-platforms__title,  div.rbccm-platforms__title,
+h1.rbccm-platforms__subtitle, h2.rbccm-platforms__subtitle,
+h3.rbccm-platforms__subtitle, h4.rbccm-platforms__subtitle,
+h5.rbccm-platforms__subtitle, h6.rbccm-platforms__subtitle,
+p.rbccm-platforms__subtitle,  div.rbccm-platforms__subtitle,
+h1.rbccm-platforms__card-title, h2.rbccm-platforms__card-title,
+h3.rbccm-platforms__card-title, h4.rbccm-platforms__card-title,
+h5.rbccm-platforms__card-title, h6.rbccm-platforms__card-title,
+p.rbccm-platforms__card-title,  div.rbccm-platforms__card-title,
+h1.rbccm-platforms__card-body, h2.rbccm-platforms__card-body,
+h3.rbccm-platforms__card-body, h4.rbccm-platforms__card-body,
+h5.rbccm-platforms__card-body, h6.rbccm-platforms__card-body,
+p.rbccm-platforms__card-body,  div.rbccm-platforms__card-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+/* ---------- Container ---------------------------------------------------- */
+.rbccm-platforms__inner {
+  align-items: stretch;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 55px; /* header block -> grid block (mobile); desktop drops to 45 */
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+
+/* ---------- Section header ---------------------------------------------- */
+.rbccm-platforms__header {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.rbccm-platforms .rbccm-platforms__title {
+  color: var(--rbccm-platforms-navy) !important;
+  font-family: var(--rbccm-platforms-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rbccm-platforms .rbccm-platforms__subtitle {
+  color: var(--rbccm-platforms-gray) !important;
+  font-family: var(--rbccm-platforms-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: 0 !important;
+  max-width: 720px;
+  padding: 0 !important;
+}
+
+
+/* ---------- Grid --------------------------------------------------------- */
+.rbccm-platforms__grid {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+
+/* ---------- Card --------------------------------------------------------- */
+/* Whole tile is an anchor. Layer stack (bottom to top):
+     1. solid navy fill    (background-color on .__card)
+     2. bg photo           (.__photo -- real <img>, object-fit cover,
+                            scales on hover)
+     3. content stack      (positioned relative + z-index 2)
+   Source images carry the navy fade in the pixels, so no gradient
+   overlay layer is needed. Card height fixed at 253 min (mobile),
+   200 min desktop. */
+.rbccm-platforms__card {
+  --rbccm-platforms-body-max-width: 340px; /* per-card override via inline style */
+
+  align-items: flex-start;
+  align-self: stretch;
+  /* No background-color: the source images carry the navy tone in
+     the pixels, so a solid fallback would flash a different navy
+     while the img loads. Card falls back to transparent. */
+  border: 1px solid rgba(0, 49, 104, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+  color: var(--rbccm-platforms-white);
+  display: flex;
+  flex-direction: column;
+  height: auto; /* sizes to content -- 253 min floor below */
+  justify-content: space-between; /* content docks top, CTA docks bottom */
+  min-height: 253px;
+  overflow: hidden;
+  padding: 30px;
+  position: relative;
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+/* Real <img> layer -- pinned to fill the card, cropped to cover.
+   Author may override the focal point per card with
+   style="--rbccm-platforms-focal: 70% 50%".
+   Default focal is center center. */
+.rbccm-platforms__photo {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: var(--rbccm-platforms-focal, 50% 50%);
+  position: absolute;
+  /* Rest state: 1.2x zoom-in anchored center-center so the tile art
+     reads at the intended visual weight regardless of card size.
+     Per-card override via --rbccm-platforms-scale. */
+  transform: scale(var(--rbccm-platforms-scale, 1.2));
+  transform-origin: center center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  z-index: 0;
+}
+
+/* Card content sits above the photo. Applies to the direct children
+   we render (content wrapper + CTA); the <img> is z-index 0. */
+.rbccm-platforms__card-content,
+.rbccm-platforms__card-cta {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover / focus: lift card + scale photo. */
+.rbccm-platforms__card:hover,
+.rbccm-platforms__card:focus-visible {
+  color: var(--rbccm-platforms-white);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px 0 rgba(0, 33, 68, 0.25);
+}
+.rbccm-platforms__card:hover .rbccm-platforms__photo,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__photo {
+  /* Multiply base --scale by 1.04 so hover stays proportional
+     whether the rest scale is 1.2, 1.5, etc. */
+  transform: scale(calc(var(--rbccm-platforms-scale, 1.2) * 1.04));
+}
+.rbccm-platforms__card:focus-visible {
+  /* Navy (10.6:1 on the S+E section bg) instead of gold (1.36:1)
+     so the ring passes WCAG 1.4.11 non-text contrast. */
+  outline: 2px solid var(--rbccm-platforms-navy);
+  outline-offset: 3px;
+}
+
+
+/* ---------- Card content ------------------------------------------------ */
+/* Content wrapper -- flex column, gap 16 between h3 and body, grows to
+   push the CTA row to the bottom via flex: 1 0 0. */
+.rbccm-platforms__card-content {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.rbccm-platforms__card-title {
+  color: var(--rbccm-platforms-white) !important;
+  font-family: var(--rbccm-platforms-serif) !important;
+  font-feature-settings: 'ss01' on !important;
+  font-size: 30px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 110% !important; /* 33px */
+  margin: 0 !important;
+  max-width: 100%; /* headline can span the full card width */
+  padding: 0 !important;
+}
+
+.rbccm-platforms__card-body {
+  color: var(--rbccm-platforms-white) !important;
+  font-family: var(--rbccm-platforms-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: 0 !important;
+  /* Body flows full card width on mobile (cards stack full-width so
+     there's no right-side photo overlap risk). The per-card
+     max-width via --rbccm-platforms-body-max-width kicks in at 768+
+     when the 2-column grid starts and the photo pane returns. */
+  max-width: 100%;
+  padding: 0 !important;
+}
+
+
+/* ---------- Explore CTA ------------------------------------------------- */
+/* Visual cue only -- whole card is the anchor. Underline is off at
+   rest and appears on card hover / focus-within (see hover rule
+   below the arrow-flyby block).
+
+   `margin-top: auto` explicitly pins the CTA to the bottom of the
+   card's flex column regardless of how tall the content wrapper
+   above is. Belt-and-suspenders with the card's own
+   `justify-content: space-between`, so the CTA still docks bottom
+   if the wrapper's height changes or if extra siblings are added. */
+.rbccm-platforms__card-cta {
+  align-items: center;
+  color: var(--rbccm-platforms-gold);
+  display: inline-flex;
+  font-family: var(--rbccm-platforms-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  gap: 10px;
+  justify-content: center;
+  /* Line-height tightened to 1 so the glyph fills the span box with
+     no half-leading above/below. The old 29.26 (from the Figma
+     Roboto spec) was leaving ~6.6px of empty space below the text
+     which pushed the visible bottom of "Explore" off the card's
+     bottom padding line. */
+  line-height: 1;
+  margin-top: auto;
+  /* Soft-fade underline -- same pattern as the ITM card-title / "See
+     all" links, the leading-experts CTAs, and the S&E hero Read more:
+     text-decoration always present in the layout but starts invisible
+     (transparent color + 0 thickness) and fades to currentColor + auto
+     thickness over 250ms when the parent card is hovered / focused. */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-decoration-skip-ink: auto;
+  text-decoration-style: solid;
+  text-underline-offset: 3px;
+  text-underline-position: from-font;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+/* Underline the CTA text (not the arrow) when the whole card is
+   hovered or receives keyboard focus. Scoped to the inner text
+   span so the arrow SVG stays clean. */
+.rbccm-platforms__card:hover .rbccm-platforms__card-cta,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-platforms__card-cta svg {
+  aspect-ratio: 1 / 1;
+  color: currentColor;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+/* Arrow right-bounce on hover / keyboard focus. Same 450ms translateX
+   nudge as the S&E hero's Read more, the accordion Read more, and the
+   leading-experts CTA arrows -- softer than the old fly-by that ran
+   the arrow off-screen and re-entered from the left. Unique keyframe
+   name keeps the platforms component independently deployable. */
+.rbccm-platforms__card:hover .rbccm-platforms__card-cta svg,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta svg {
+  animation: rbccm-plat-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-plat-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* -------- Tablet+ (>=768) : 2-column grid ------------------------------- */
+@media (min-width: 768px) {
+  .rbccm-platforms__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+
+/* -------- Desktop (>=992) ----------------------------------------------- */
+@media (min-width: 992px) {
+  .rbccm-platforms {
+    padding: 80px 23px;
+  }
+  .rbccm-platforms__inner {
+    gap: 45px;
+  }
+  .rbccm-platforms .rbccm-platforms__title {
+    font-size: 42px !important;
+    line-height: 125% !important; /* 52.5px */
+  }
+  /* Desktop card: 200px min-height floor (down from the mobile 253). */
+  .rbccm-platforms__card {
+    min-height: 200px;
+  }
+  /* Per-card body cap. Value pulled from the card's own
+     --rbccm-platforms-body-max-width custom prop (set inline per
+     card in the markup), so each of the 4 cards can have its own
+     cap (e.g. 340 / 274 / 295 / 274). Kicks in at desktop only --
+     mobile leaves body full-width since cards stack. */
+  .rbccm-platforms__card-body {
+    max-width: var(--rbccm-platforms-body-max-width);
+  }
+  /* Tighten the title -> body gap inside each card at desktop. */
+  .rbccm-platforms__card-content {
+    gap: 2px;
+  }
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics - Platforms
+   Pale bg (#E7EEF1). Header alignment is now driven by the shared
+   HeaderAlignment Datum (see --header-center modifier below), so this
+   variant no longer hard-codes center on the header. Editors flip the
+   Datum to opt into center. Reuses the base's --rbccm-platforms-bg-color
+   custom property so the bg swap stays in one place.
+   ========================================================================= */
+.rbccm-platforms--strategy-and-economics-platforms {
+  --rbccm-platforms-bg-color: #E7EEF1;
+}
+
+
+/* =========================================================================
+   Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base is flex-start (left); --header-center centers the
+   header block (title + subtitle). Subtitle keeps its 720px max-width
+   from the base and centers within it via margin auto.
+   ========================================================================= */
+.rbccm-platforms--header-center .rbccm-platforms__header {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-platforms--header-center .rbccm-platforms__title,
+.rbccm-platforms--header-center .rbccm-platforms__subtitle {
+  text-align: center !important;
+}
+.rbccm-platforms--header-center .rbccm-platforms__subtitle {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* =========================================================================
+   Reduced motion -- kill card lift + photo scale + arrow fly-by.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-platforms__card,
+  .rbccm-platforms__photo,
+  .rbccm-platforms__card-cta {
+    transition: none !important;
+  }
+  .rbccm-platforms__card:hover,
+  .rbccm-platforms__card:focus-visible {
+    transform: none !important;
+  }
+  .rbccm-platforms__card:hover .rbccm-platforms__photo,
+  .rbccm-platforms__card:focus-visible .rbccm-platforms__photo {
+    /* Keep rest-state scale on hover so the photo doesn't jump for
+       motion-sensitive users. */
+    transform: scale(var(--rbccm-platforms-scale, 1.2)) !important;
+  }
+  .rbccm-platforms__card:hover .rbccm-platforms__card-cta svg,
+  .rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta svg {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conference Insights — Page Integration Test</title>
+
+  <!-- Hero stylesheet -->
+  <link rel="stylesheet" href="conference-insights-hero/conference-insights-hero.css">
+
+  <!-- Tiles stylesheet -->
+  <link rel="stylesheet" href="conference-insights-tiles/conference-insights-tiles.css">
+
+  <!-- Filter component stylesheet (shared filter/pagination/empty state) -->
+  <link rel="stylesheet" href="filter-by/filter-by.css">
+
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; }
+    .local-test-header { padding: 12px 16px; background: #e7edf1; border-bottom: 1px solid #d0d8df; font-size: 13px; color: #555; }
+  </style>
+
+  <!-- ============================================================
+       Feed enhancement config — LOCAL TEST ONLY
+       Redirects the tiles feed script from the production RBCCM URLs
+       to local fixture files. Requires serving this folder over HTTP
+       (e.g. `python3 -m http.server 8000` from the RBCCM/ root) since
+       browsers block fetch() from file:// URLs.
+
+       To test against the real production feeds instead, comment out
+       this <script> block — the feed JS will fall back to its default
+       URLs. (You'd need to actually run from rbccm.com for that to work
+       due to CORS.)
+       ============================================================ -->
+  <script>
+    window.RBCCM_FEED_CONFIG = {
+      years: [2025, 2026],
+      feedUrlTemplate: 'local-test-fixtures/{year}-insights.xml',
+      whitelistUrl:    'local-test-fixtures/whitelist.json'
+    };
+  </script>
+</head>
+<body>
+
+  <div class="local-test-header">
+    Conference Insights — full page integration with filter + pagination + featured tile pattern. Hero (breadcrumbs + H1 + subtitle) on top; then the shared filter component; then the tiles grid (page 1 renders featured hero + 3-up; filtered or subsequent pages render a 3×2 dense grid). Resize the window to test the mobile-first behavior.
+  </div>
+
+
+  <!-- ============================================================
+       HERO — breadcrumbs + H1 + subtitle
+       ============================================================ -->
+  <section class="rbccm-conference-insights-hero" id="rbccm-conference-insights-hero" aria-labelledby="rbccm-conference-insights-hero-title">
+    <div class="rbccm-conference-insights-hero__inner">
+
+      <nav class="rbccm-conference-insights-hero__breadcrumbs" aria-label="Breadcrumb">
+        <ol class="rbccm-conference-insights-hero__breadcrumb-list">
+          <li class="rbccm-conference-insights-hero__breadcrumb"><a href="/">Home</a></li>
+          <li class="rbccm-conference-insights-hero__breadcrumb"><a href="/en/about-us">About Us</a></li>
+          <li class="rbccm-conference-insights-hero__breadcrumb rbccm-conference-insights-hero__breadcrumb--current"><a href="#" aria-current="page" onclick="return false;">Conferences</a></li>
+        </ol>
+      </nav>
+
+      <h1 class="rbccm-conference-insights-hero__title" id="rbccm-conference-insights-hero-title">Conference insights</h1>
+      <p class="rbccm-conference-insights-hero__subtitle">Voices that shaped the market.</p>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FILTER — Month + Region + Industry + search + Clear
+       Targets #rbccm-conference-insights-tiles via data-container.
+       Page 1 = 4 items (featured hero + 3-up). Filtered or page 2+ =
+       6 items (dense 3×2 grid).
+       ============================================================ -->
+  <section class="rbccm-filter"
+           data-container="#rbccm-conference-insights-tiles"
+           data-page-size="4"
+           data-page-size-filtered="6"
+           data-empty-heading="No articles found"
+           data-empty-message="We couldn't find any articles that match your current filters."
+           data-empty-message-emphasis="Try adjusting your filters or search terms."
+           data-empty-clear-label="Clear filters"
+           aria-label="Filter conference insights">
+
+    <div class="rbccm-filter__inner">
+
+      <div class="rbccm-filter__row">
+
+        <div class="rbccm-filter__filter-group">
+          <span class="rbccm-filter__filter-label">Filter by:</span>
+
+          <div class="rbccm-filter__select-wrap" data-filter="year">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by year">
+              <span class="rbccm-filter__select-label">Year</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <div class="rbccm-filter__select-wrap" data-filter="region">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by region">
+              <span class="rbccm-filter__select-label">Region</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <div class="rbccm-filter__select-wrap" data-filter="topic">
+            <button type="button" class="rbccm-filter__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by topic">
+              <span class="rbccm-filter__select-label">Topic</span>
+            </button>
+            <svg class="rbccm-filter__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+              <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 3.67706e-07 10.5929 3.67706e-07H1.00086C0.808614 -0.000164459 0.620396 0.0550878 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.0894087 0.586693C0.00995282 0.761749 -0.0173596 0.955998 0.0107422 1.14618C0.0388441 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+
+        <label class="rbccm-filter__search">
+          <svg class="rbccm-filter__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/>
+          </svg>
+          <span class="rbccm-filter__sr-only">Search conference insights articles</span>
+          <input type="search" class="rbccm-filter__search-input" data-filter="search" placeholder="Search conference insights articles" aria-label="Search conference insights articles by title or keyword">
+        </label>
+
+        <button type="button" class="rbccm-filter__reset" aria-label="Clear all filters">Clear filters</button>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       TILES — featured + 3-up grid + View all
+       Row is empty at server-render time; the feed script populates it
+       from Joe's whitelist + the year XML feeds at runtime.
+       The first matched tile gets the `--featured` modifier.
+       ============================================================ -->
+  <section class="rbccm-conference-insights-tiles" id="rbccm-conference-insights-tiles">
+    <div class="rbccm-conference-insights-tiles__inner">
+
+      <div class="rbccm-conference-insights-tiles__skeleton" aria-hidden="true">
+          <div class="rbccm-conference-insights-tiles__skeleton-card rbccm-conference-insights-tiles__skeleton-card--featured">
+            <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+            <div class="rbccm-conference-insights-tiles__skeleton-body">
+              <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+            </div>
+          </div>
+          <div class="rbccm-conference-insights-tiles__skeleton-row">
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="rbccm-conference-insights-tiles__skeleton-card">
+              <div class="rbccm-conference-insights-tiles__skeleton-image"></div>
+              <div class="rbccm-conference-insights-tiles__skeleton-body">
+                <div class="rbccm-conference-insights-tiles__skeleton-title"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-desc rbccm-conference-insights-tiles__skeleton-desc--short"></div>
+                <div class="rbccm-conference-insights-tiles__skeleton-meta"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty row — the feed script populates this at runtime from
+             local-test-fixtures/{year}-insights.xml + whitelist.json.
+             Once feed fetch completes, the row fills with tiles and the
+             skeleton fades out via the [data-filter-ready] CSS rule. -->
+        <ul class="rbccm-conference-insights-tiles__row"></ul>
+
+      <!-- Filter JS auto-injects empty state + pagination inside this container.
+           No "View all" button on this page — this IS the "all articles" view.
+           That button belongs on preview modules (e.g. upcoming-conferences)
+           where a 3-4 tile teaser links here. -->
+
+    </div>
+  </section>
+
+  <!-- Tiles JS (load-more handler; safe to leave even when load-more isn't active) -->
+  <script src="conference-insights-tiles/conference-insights-tiles.js"></script>
+
+  <!-- Filter component JS (drives dropdowns, search, empty state, pagination) -->
+  <script src="filter-by/filter-by.js"></script>
+
+  <!-- Tiles feed enhancement — fetches whitelist + year XML feeds (via the
+       RBCCM_FEED_CONFIG override at the top of this file), cross-references
+       titles against Joe's whitelist, and renders matched articles as tiles
+       with data-year / data-region / data-topic / data-search-text populated.
+       Then fires `rbccm:tiles-populated` which filter-by.js listens for and
+       re-scans to pick up the fresh dropdown values. -->
+  <script src="conference-insights-tiles/conference-insights-tiles-feed.js"></script>
+
+</body>
+</html>

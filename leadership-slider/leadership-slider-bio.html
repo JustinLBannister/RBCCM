@@ -288,7 +288,10 @@
 
       <xsl:variable name="placeholderUrl" select="concat('https://fpoimg.com/276x263?text=', $placeholderText, '&amp;text_color=8F8F8F&amp;bg_color=e6e6e6')"/>
 
-      <link rel="stylesheet" href="/assets/rbccm/css/sub/test/leadership-carousel.css"/>
+      <!-- Local test uses the sibling CSS file. Change back to
+           /assets/rbccm/css/sub/test/leadership-carousel.css before
+           deploying anywhere on rbccm.com. -->
+      <link rel="stylesheet" href="./leadership-carousel.css"/>
 
       <!-- Precomputed class + style strings. Keeps xsl:attribute calls simple. -->
       <xsl:variable name="sectionClass">
@@ -652,7 +655,7 @@
               useCSS:          true,
               useTransform:    true,
               fade:            false,
-              centerMode:      true,
+              centerMode:      false,
               centerPadding:   '0px',
               adaptiveHeight:  false,
               rows:            1,
@@ -676,9 +679,9 @@
               mobileFirst:     false,
               responsive: [
                 { breakpoint: 99999, settings: { centerMode:false, centerPadding:'0px', draggable:false, infinite:true,  slidesToScroll:1, swipe:false, touchMove:false, variableWidth:true } },
-                { breakpoint: 1300,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
-                { breakpoint: 1025,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
-                { breakpoint: 640,   settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
+                { breakpoint: 1300,  settings: { centerMode:false,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+                { breakpoint: 1025,  settings: { centerMode:false,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+                { breakpoint: 640,   settings: { centerMode:false,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
               ],
               asNavFor:       null,
               waitForAnimate: true,

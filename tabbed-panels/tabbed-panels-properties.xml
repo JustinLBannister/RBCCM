@@ -1,0 +1,524 @@
+<!--
+  RBCCM Tabbed Panels - Properties
+
+  Preset-driven "tablist + panels" component. The Preset Datum picks
+  the variant; each variant has its own content-shape Datums that
+  live in the same file. Unused Datums for a given preset are
+  ignored by XSL (matches the filtered-content pattern).
+
+  Presets:
+    generic            (default) Fixed 4 tabs, WYSIWYG panel content
+    media-contacts     Fixed 4 tabs, structured contact repeater
+                       (Tab{N}Contact{1..6}Name/Role/Phone)
+    how-we-think       Fixed 3 tabs (Insights, Newsroom, Conferences),
+                       content sourced from DCR pickers + a
+                       MetaQueryExternal + a conferences EventsList
+    conference-insights Nested tabs — 3 conferences (outer) each with
+                       Overview/Speakers/Insights inner tabs.
+
+  Placement modes drive the layout modifier on the root:
+    standalone       (default)   full section shell + padding
+    compact-headless             drops padding + hides title/lede;
+                                 use when the surrounding page owns
+                                 its own heading (In the Media pattern)
+    dark                         inverted color treatment
+
+  Alignment modes control title/lede text-align:
+    center           (default)
+    title-left
+    lede-left
+    align-left                   both left-aligned
+
+  Sidecar assets are loaded from paths declared below and cache-busted
+  via ?v={CacheVersion} appended by the XSL. Bump CacheVersion after
+  every deploy of tabbed-panels.css or tabbed-panels.js.
+
+  Structure note: content Datums live inside <Data> (matches the
+  filtered-content pattern the XSL reads via /Properties/Data/Datum).
+-->
+<Properties ComponentID="rbccm-tabbed-panels">
+</Properties>
+
+<Data>
+
+  <!-- Section identity + a11y. -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (unique per page)">rbccm-tabbed-panels-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label">Tabbed content</Datum>
+  <Datum ID="TablistAriaLabel" Type="String" Name="Tablist ARIA label">Content sections</Datum>
+
+  <!-- Optional section title + lede. Blank = hidden. -->
+  <Datum ID="Title" Type="String" Name="Section title (optional)"></Datum>
+  <Datum ID="Lede" Type="String" Name="Section lede paragraph (optional)"></Datum>
+
+  <!--
+    Preset selector - picks which variant this instance renders as.
+    Each preset consumes its own Datum sub-set below; unused Datums
+    are ignored. Bare text after the closing Option is the default.
+  -->
+  <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
+    <Option>
+      <Display>Generic (WYSIWYG panels)</Display>
+      <Value>generic</Value>
+    </Option>
+    <Option>
+      <Display>Media contacts (structured contact grid)</Display>
+      <Value>media-contacts</Value>
+    </Option>
+    <Option>
+      <Display>How we think (3 tabs: Insights / Newsroom / Conferences)</Display>
+      <Value>how-we-think</Value>
+    </Option>
+    <Option>
+      <Display>Conference insights (nested: conferences with Overview/Speakers/Insights)</Display>
+      <Value>conference-insights</Value>
+    </Option>
+    generic
+  </Datum>
+
+  <!--
+    Placement mode. Picks the outer modifier class:
+      standalone       : rbccm-tabbed-panels (default, white bg)
+      on-ltblue        : rbccm-tabbed-panels__on-ltblue
+                         (light-blue #EFF6FD bg tone; used by
+                         Media Contacts on the In the Media page)
+      compact-headless : rbccm-tabbed-panels__compact + __headless
+                         (drops padding + hides title/lede; use inside
+                         a page that already owns its own heading)
+      dark             : rbccm-tabbed-panels__dark (navy bg, yellow underline)
+    (Actual class output uses the BEM modifier form; class names are
+    shown here with __ substitution so this XML comment stays valid.)
+  -->
+  <Datum ID="Placement" Type="String" Name="Placement mode">
+    <Option>
+      <Display>Standalone (default, white bg)</Display>
+      <Value>standalone</Value>
+    </Option>
+    <Option>
+      <Display>Standalone on light-blue bg</Display>
+      <Value>on-ltblue</Value>
+    </Option>
+    <Option>
+      <Display>Compact + headless (inside a page that owns its H2)</Display>
+      <Value>compact-headless</Value>
+    </Option>
+    <Option>
+      <Display>Dark (navy bg, yellow underline on active)</Display>
+      <Value>dark</Value>
+    </Option>
+    standalone
+  </Datum>
+
+  <!--
+    Alignment mode for the section title + lede. Only applies when
+    Placement is "standalone" or "dark" (compact-headless hides both).
+      center      : both centered (default)
+      title-left  : title left-aligned, lede stays centered
+      lede-left   : lede left-aligned, title stays centered
+      align-left  : both left-aligned (shortcut)
+  -->
+  <Datum ID="Alignment" Type="String" Name="Title/lede alignment">
+    <Option>
+      <Display>Center (default)</Display>
+      <Value>center</Value>
+    </Option>
+    <Option>
+      <Display>Title left, lede center</Display>
+      <Value>title-left</Value>
+    </Option>
+    <Option>
+      <Display>Title center, lede left</Display>
+      <Value>lede-left</Value>
+    </Option>
+    <Option>
+      <Display>Both left</Display>
+      <Value>align-left</Value>
+    </Option>
+    center
+  </Datum>
+
+  <!--
+    Fixed 4 tab slots. For each tab:
+      Tab{N}Label   short label shown on the tab button (e.g. "Global")
+      Tab{N}Slug    optional URL-friendly slug used for id/data-panel.
+                    If blank, XSL derives one from Label (lowercased,
+                    non-alphanum removed).
+      Tab{N}Content HTML content for the panel. Rich Text — author can
+                    paste any markup. For a media-contact grid, use the
+                    documented .rbccm-tabbed-panels__contact-* pattern:
+
+                      <div class="rbccm-tabbed-panels__contact-grid">
+                        <a class="rbccm-tabbed-panels__contact-card"
+                           href="tel:+12126185589"
+                           aria-label="Call Sanam Heidary at +1 212 618 5589">
+                          <h3 class="rbccm-tabbed-panels__contact-name">Sanam Heidary</h3>
+                          <p class="rbccm-tabbed-panels__contact-role">General Inquiries</p>
+                          <p class="rbccm-tabbed-panels__contact-phone">+1.212.618.5589</p>
+                          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true">
+                            <i class="fa fa-phone"></i>
+                          </span>
+                        </a>
+                        [ ...more cards... ]
+                      </div>
+
+    Leave a Tab{N}Label BLANK to skip that tab entirely (XSL will not
+    render its button or panel). Editors typically use 2, 3, or 4 tabs
+    depending on the page.
+  -->
+  <Datum ID="Tab1Label" Type="String" Name="Tab 1 - label">Global</Datum>
+  <Datum ID="Tab1Slug"  Type="String" Name="Tab 1 - slug (optional; auto-derived from label if blank)"></Datum>
+  <Datum ID="Tab1Content" Type="String" Name="Tab 1 - panel content (HTML)"></Datum>
+
+  <Datum ID="Tab2Label" Type="String" Name="Tab 2 - label">Canada</Datum>
+  <Datum ID="Tab2Slug"  Type="String" Name="Tab 2 - slug (optional; auto-derived from label if blank)"></Datum>
+  <Datum ID="Tab2Content" Type="String" Name="Tab 2 - panel content (HTML)"></Datum>
+
+  <Datum ID="Tab3Label" Type="String" Name="Tab 3 - label">US</Datum>
+  <Datum ID="Tab3Slug"  Type="String" Name="Tab 3 - slug (optional; auto-derived from label if blank)"></Datum>
+  <Datum ID="Tab3Content" Type="String" Name="Tab 3 - panel content (HTML)"></Datum>
+
+  <Datum ID="Tab4Label" Type="String" Name="Tab 4 - label">Europe / Asia Pacific</Datum>
+  <Datum ID="Tab4Slug"  Type="String" Name="Tab 4 - slug (optional; auto-derived from label if blank)"></Datum>
+  <Datum ID="Tab4Content" Type="String" Name="Tab 4 - panel content (HTML)"></Datum>
+
+  <!-- Sidecar asset paths + cache buster.
+       The XSL emits a <link> for CssPath at the top of the rendered
+       output and a <script> for JsPath at the bottom. Both get
+       ?v=<CacheVersion> appended so a fresh publish forces browsers
+       to pull the new file instead of a cached one. Bump CacheVersion
+       after every deploy of the sidecar CSS or JS. -->
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path">/assets/rbccm/css/components/tabbed-panels.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path">/assets/rbccm/js/components/tabbed-panels.js</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Cache buster (bump after each sidecar deploy)">1</Datum>
+
+  <!-- ============================================================
+       HOW WE THINK preset Datums
+       ============================================================
+       Ported from the standalone how-we-think component. All IDs
+       prefixed with "Hwt" so they never collide with another preset
+       that happens to have similarly named fields.
+
+       Three tabs: Insights / Newsroom / Conferences.
+         Insights    - author supplies up to 3 article URLs; JS
+                       hydrates each tile from the 2024/2025/2026
+                       insights feeds by slug match.
+         Newsroom    - server-rendered from the MetaQueryExternal
+                       block at the bottom of this file. Top 3
+                       localised articles by publishdate.
+         Conferences - server-rendered from HwtEventsList DCR pick,
+                       filtered to sitelocation contains
+                       "rbccm-homepage" and future-dated, capped
+                       at 3.
+       Every field is optional; blank Datums drop their bit of
+       markup rather than emit empty shells.
+       ============================================================ -->
+
+  <!-- Insights tab -->
+  <Datum ID="HwtInsightsTabLabel" Type="String" Name="HWT :: Insights tab label">Insights</Datum>
+  <Datum ID="HwtInsightsLede"     Type="Textarea" Name="HWT :: Insights tab lede (optional)">Our global expertise and data-driven perspectives help clients make informed, strategic decisions across all major sectors.</Datum>
+  <Datum ID="HwtInsightsCtaLabel"     Type="String" Name="HWT :: Insights CTA label">More insights</Datum>
+  <Datum ID="HwtInsightsCtaLink"      Type="String" Name="HWT :: Insights CTA link">/en/insights</Datum>
+  <Datum ID="HwtInsightsCtaNewTab"    Type="Boolean" Name="HWT :: Insights CTA new tab">false</Datum>
+  <Datum ID="HwtInsightsCtaTitle"     Type="String" Name="HWT :: Insights CTA title attr (optional)"></Datum>
+  <Datum ID="HwtInsightsCtaAriaLabel" Type="String" Name="HWT :: Insights CTA aria-label (optional)"></Datum>
+
+  <!-- Insights tile URL slots. JS hydrates matched tiles from the
+       insights year feeds. Blank slot renders nothing. Non-matching
+       URL is dropped by the JS at hydration time. Optional overrides
+       let authors force an eyebrow or read-time string without
+       editing the underlying article DCR. -->
+  <Datum ID="HwtInsightSlide1Url"              Type="String" Name="HWT :: Insight tile 1 - URL"></Datum>
+  <Datum ID="HwtInsightSlide1EyebrowOverride"  Type="String" Name="HWT :: Insight tile 1 - eyebrow override (blank uses feed)"></Datum>
+  <Datum ID="HwtInsightSlide1ReadTimeOverride" Type="String" Name="HWT :: Insight tile 1 - read/watch/listen time override (blank uses feed)"></Datum>
+
+  <Datum ID="HwtInsightSlide2Url"              Type="String" Name="HWT :: Insight tile 2 - URL"></Datum>
+  <Datum ID="HwtInsightSlide2EyebrowOverride"  Type="String" Name="HWT :: Insight tile 2 - eyebrow override (blank uses feed)"></Datum>
+  <Datum ID="HwtInsightSlide2ReadTimeOverride" Type="String" Name="HWT :: Insight tile 2 - read/watch/listen time override (blank uses feed)"></Datum>
+
+  <Datum ID="HwtInsightSlide3Url"              Type="String" Name="HWT :: Insight tile 3 - URL"></Datum>
+  <Datum ID="HwtInsightSlide3EyebrowOverride"  Type="String" Name="HWT :: Insight tile 3 - eyebrow override (blank uses feed)"></Datum>
+  <Datum ID="HwtInsightSlide3ReadTimeOverride" Type="String" Name="HWT :: Insight tile 3 - read/watch/listen time override (blank uses feed)"></Datum>
+
+  <!-- Newsroom tab -->
+  <Datum ID="HwtNewsroomTabLabel" Type="String" Name="HWT :: Newsroom tab label">Newsroom</Datum>
+  <Datum ID="HwtNewsroomLede"     Type="Textarea" Name="HWT :: Newsroom tab lede (optional)">In the media. RBC Capital Markets experts share insights with global outlets.</Datum>
+  <Datum ID="HwtNewsroomCtaLabel"     Type="String" Name="HWT :: Newsroom CTA label">Show more media hits</Datum>
+  <Datum ID="HwtNewsroomCtaLink"      Type="String" Name="HWT :: Newsroom CTA link">/en/about-us/in-the-media</Datum>
+  <Datum ID="HwtNewsroomCtaNewTab"    Type="Boolean" Name="HWT :: Newsroom CTA new tab">false</Datum>
+  <Datum ID="HwtNewsroomCtaTitle"     Type="String" Name="HWT :: Newsroom CTA title attr (optional)"></Datum>
+  <Datum ID="HwtNewsroomCtaAriaLabel" Type="String" Name="HWT :: Newsroom CTA aria-label (optional)"></Datum>
+
+  <!-- Conferences tab -->
+  <Datum ID="HwtConferencesTabLabel" Type="String" Name="HWT :: Conferences tab label">Conferences</Datum>
+  <Datum ID="HwtConferencesLede"     Type="Textarea" Name="HWT :: Conferences tab lede (optional)">Where our teams are meeting clients, industry leaders, and policymakers next.</Datum>
+  <Datum ID="HwtConferencesCtaLabel"     Type="String" Name="HWT :: Conferences CTA label">Review upcoming events</Datum>
+  <Datum ID="HwtConferencesCtaLink"      Type="String" Name="HWT :: Conferences CTA link">/en/about-us/conferences</Datum>
+  <Datum ID="HwtConferencesCtaNewTab"    Type="Boolean" Name="HWT :: Conferences CTA new tab">false</Datum>
+  <Datum ID="HwtConferencesCtaTitle"     Type="String" Name="HWT :: Conferences CTA title attr (optional)"></Datum>
+  <Datum ID="HwtConferencesCtaAriaLabel" Type="String" Name="HWT :: Conferences CTA aria-label (optional)"></Datum>
+
+  <!-- Locale (en or fr). Filters the Newsroom result set to items
+       whose TeamSite/Metadata/language matches. Legacy records with
+       no language attr are treated as en. -->
+  <Datum ID="HwtLocale" Type="String" Name="HWT :: Locale (en or fr)">en</Datum>
+
+  <!-- Events List DCR pick - identical binding to the live homepage
+       featured-conferences component. Text node inside DCR is the
+       default path so authors don't need to touch the picker. XSL
+       walks /DCR/events/event and filters by sitelocation contains
+       "rbccm-homepage", future-dated, sorted by event_date. -->
+  <Datum ID="HwtEventsList" Type="DCR" Name="HWT :: Events List (Conferences tab source)">
+    <DCR Category="about-us" Type="conferences">templatedata/about-us/conferences/data/conferences</DCR>
+  </Datum>
+
+  <!-- Newsroom External :: MetaQueryExternal.findByQuery.
+       TeamSite runs this at page-serve time and injects results at
+       /Properties/Data/Result/records/metaResult, which the how-we-
+       think preset's XSL iterates to render the top 3 news items.
+       qPagesize=20 gives the language filter enough candidates to
+       still emit 3 matching items after localisation. -->
+  <External>
+    <Parameters>
+      <Datum ID="qQuery" Name="qQuery" Type="String" Label="Query">TeamSite/Templating/DCR/Type:article/news AND TeamSite/Metadata/publishdate:&gt;2015-00-00</Datum>
+      <Datum ID="qSort" Name="qSort" Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
+      <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">20</Datum>
+      <Datum ID="qOffset" Name="qOffset" Type="String" Label="Offset">0</Datum>
+    </Parameters>
+    <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>
+    <Method>findByQuery</Method>
+  </External>
+
+  <!-- ============================================================
+       CONFERENCE INSIGHTS preset Datums
+       ============================================================
+       Ported from the standalone featured-conferences component.
+       All IDs prefixed with "Ci" so they never collide with any
+       other preset's fields.
+
+       Structure: fixed 3 conferences (outer tabs). Each conference
+       has three inner panels: Overview, Speakers, Insights. Author
+       can hide Speakers or Insights per-conference via ShowSpeakers
+       or ShowInsights (accepted values: no / false / hide).
+
+       Media: Overview panel renders either a Brightcove video
+       facade (click-to-play iframe swap) or a static poster image,
+       controlled per-conference by MediaMode (video / image).
+       Poster falls back to CiDefaultPoster when no per-conference
+       BCPoster is set.
+
+       Design: this preset ships a dark navy background by default
+       (baked into the modifier CSS). Authors do NOT need to add
+       Placement=dark; picking Preset=conference-insights is enough.
+       ============================================================ -->
+
+  <!-- Brightcove globals (defaults are the values used by the live
+       featured-conferences component). -->
+  <Datum ID="CiBCAccount" Type="String" Name="CI :: Brightcove account ID">6021289101001</Datum>
+  <Datum ID="CiBCPlayer"  Type="String" Name="CI :: Brightcove player ID">VyvCc9BZx</Datum>
+  <Datum ID="CiBCEmbed"   Type="String" Name="CI :: Brightcove embed ID">default</Datum>
+
+  <!-- Default poster image used for any conference whose own BCPoster
+       is blank. Full https URL. Authors change once and it applies to
+       every conference that doesn't override. -->
+  <Datum ID="CiDefaultPoster" Type="String" Name="CI :: Default poster image URL (fallback)">https://www.rbccm.com/assets/rbccm/images/conferences/conference-global-financial-institutions.webp</Datum>
+
+  <!-- Optional ARIA overrides. Blank falls back to JS-supplied English. -->
+  <Datum ID="CiAriaSpeakersCarouselLabel" Type="String" Name="CI :: ARIA - Speakers carousel label"></Datum>
+  <Datum ID="CiAriaInsightsCarouselLabel" Type="String" Name="CI :: ARIA - Insights carousel label"></Datum>
+  <Datum ID="CiAriaPrevSpeakerLabel"      Type="String" Name="CI :: ARIA - Previous speaker button"></Datum>
+  <Datum ID="CiAriaNextSpeakerLabel"      Type="String" Name="CI :: ARIA - Next speaker button"></Datum>
+  <Datum ID="CiAriaPrevInsightLabel"      Type="String" Name="CI :: ARIA - Previous insight button"></Datum>
+  <Datum ID="CiAriaNextInsightLabel"      Type="String" Name="CI :: ARIA - Next insight button"></Datum>
+  <Datum ID="CiAriaSpeakersDotsLabel"     Type="String" Name="CI :: ARIA - Speakers dots strip"></Datum>
+  <Datum ID="CiAriaInsightsDotsLabel"     Type="String" Name="CI :: ARIA - Insights dots strip"></Datum>
+  <Datum ID="CiAriaViewAllInsightsLabel"  Type="String" Name="CI :: ARIA - View all insights CTA"></Datum>
+
+  <!-- ============================================================
+       Conference 1
+       ============================================================ -->
+  <Datum ID="Ci1Name"           Type="String"   Name="CI Conf 1 - Name (outer tab label)">Global Healthcare Conference</Datum>
+  <Datum ID="Ci1BCVideoId"      Type="String"   Name="CI Conf 1 - Brightcove Video ID"></Datum>
+  <Datum ID="Ci1BCPoster"       Type="String"   Name="CI Conf 1 - Poster image URL (blank uses section default)"></Datum>
+  <Datum ID="Ci1MediaMode"      Type="String"   Name="CI Conf 1 - Media mode (video or image; blank = image)">image</Datum>
+  <Datum ID="Ci1ShowSpeakers"   Type="String"   Name="CI Conf 1 - Show Speakers (blank = show; no/false/hide = hide)"></Datum>
+  <Datum ID="Ci1ShowInsights"   Type="String"   Name="CI Conf 1 - Show Insights (blank = show; no/false/hide = hide)"></Datum>
+
+  <Datum ID="Ci1Date"           Type="String"   Name="CI Conf 1 - Date"></Datum>
+  <Datum ID="Ci1Location"       Type="String"   Name="CI Conf 1 - Location"></Datum>
+  <Datum ID="Ci1Format"         Type="String"   Name="CI Conf 1 - Format"></Datum>
+  <Datum ID="Ci1OverviewHeading" Type="String"  Name="CI Conf 1 - Overview heading">Conference overview</Datum>
+  <Datum ID="Ci1OverviewBody"   Type="Textarea" Name="CI Conf 1 - Overview body (HTML)"></Datum>
+  <Datum ID="Ci1KeyTopicsLabel" Type="String"   Name="CI Conf 1 - Key topics label">Key topics:</Datum>
+  <Datum ID="Ci1KeyTopics"      Type="Textarea" Name="CI Conf 1 - Key topics (HTML)"></Datum>
+  <Datum ID="Ci1ContactText"    Type="Textarea" Name="CI Conf 1 - Contact text (italicized)"></Datum>
+
+  <Datum ID="Ci1SpeakersHeading"  Type="String"   Name="CI Conf 1 - Speakers heading">Featured speakers</Datum>
+  <Datum ID="Ci1SpeakersIntro"    Type="Textarea" Name="CI Conf 1 - Speakers intro (HTML)"></Datum>
+  <Datum ID="Ci1SpeakersFootnote" Type="Textarea" Name="CI Conf 1 - Speakers footnote (HTML)"></Datum>
+
+  <Datum ID="Ci1Speaker1Name"   Type="String" Name="CI Conf 1 - Speaker 1 name"></Datum>
+  <Datum ID="Ci1Speaker1Title"  Type="String" Name="CI Conf 1 - Speaker 1 title"></Datum>
+  <Datum ID="Ci1Speaker1Image"  Type="String" Name="CI Conf 1 - Speaker 1 image URL"></Datum>
+  <Datum ID="Ci1Speaker1Alt"    Type="String" Name="CI Conf 1 - Speaker 1 image alt"></Datum>
+  <Datum ID="Ci1Speaker2Name"   Type="String" Name="CI Conf 1 - Speaker 2 name"></Datum>
+  <Datum ID="Ci1Speaker2Title"  Type="String" Name="CI Conf 1 - Speaker 2 title"></Datum>
+  <Datum ID="Ci1Speaker2Image"  Type="String" Name="CI Conf 1 - Speaker 2 image URL"></Datum>
+  <Datum ID="Ci1Speaker2Alt"    Type="String" Name="CI Conf 1 - Speaker 2 image alt"></Datum>
+  <Datum ID="Ci1Speaker3Name"   Type="String" Name="CI Conf 1 - Speaker 3 name"></Datum>
+  <Datum ID="Ci1Speaker3Title"  Type="String" Name="CI Conf 1 - Speaker 3 title"></Datum>
+  <Datum ID="Ci1Speaker3Image"  Type="String" Name="CI Conf 1 - Speaker 3 image URL"></Datum>
+  <Datum ID="Ci1Speaker3Alt"    Type="String" Name="CI Conf 1 - Speaker 3 image alt"></Datum>
+
+  <Datum ID="Ci1InsightsCTAText"  Type="String"   Name="CI Conf 1 - Insights CTA label">View all conference insights</Datum>
+  <Datum ID="Ci1InsightsCTAHref"  Type="String"   Name="CI Conf 1 - Insights CTA URL"></Datum>
+  <Datum ID="Ci1InsightsIntro"    Type="Textarea" Name="CI Conf 1 - Insights intro (HTML)"></Datum>
+  <Datum ID="Ci1InsightsFootnote" Type="Textarea" Name="CI Conf 1 - Insights footnote (shown when no insights populated)">+ Additional insights to be announced</Datum>
+
+  <Datum ID="Ci1Insight1Label"       Type="String"   Name="CI Conf 1 - Insight 1 label">INSIGHTS</Datum>
+  <Datum ID="Ci1Insight1Title"       Type="String"   Name="CI Conf 1 - Insight 1 title"></Datum>
+  <Datum ID="Ci1Insight1Description" Type="Textarea" Name="CI Conf 1 - Insight 1 description (HTML)"></Datum>
+  <Datum ID="Ci1Insight1Meta"        Type="String"   Name="CI Conf 1 - Insight 1 meta (e.g. 6 min read)"></Datum>
+  <Datum ID="Ci1Insight1Image"       Type="String"   Name="CI Conf 1 - Insight 1 image URL"></Datum>
+  <Datum ID="Ci1Insight1ImageAlt"    Type="String"   Name="CI Conf 1 - Insight 1 image alt"></Datum>
+  <Datum ID="Ci1Insight1Href"        Type="String"   Name="CI Conf 1 - Insight 1 link URL"></Datum>
+  <Datum ID="Ci1Insight2Label"       Type="String"   Name="CI Conf 1 - Insight 2 label">INSIGHTS</Datum>
+  <Datum ID="Ci1Insight2Title"       Type="String"   Name="CI Conf 1 - Insight 2 title"></Datum>
+  <Datum ID="Ci1Insight2Description" Type="Textarea" Name="CI Conf 1 - Insight 2 description (HTML)"></Datum>
+  <Datum ID="Ci1Insight2Meta"        Type="String"   Name="CI Conf 1 - Insight 2 meta"></Datum>
+  <Datum ID="Ci1Insight2Image"       Type="String"   Name="CI Conf 1 - Insight 2 image URL"></Datum>
+  <Datum ID="Ci1Insight2ImageAlt"    Type="String"   Name="CI Conf 1 - Insight 2 image alt"></Datum>
+  <Datum ID="Ci1Insight2Href"        Type="String"   Name="CI Conf 1 - Insight 2 link URL"></Datum>
+  <Datum ID="Ci1Insight3Label"       Type="String"   Name="CI Conf 1 - Insight 3 label">INSIGHTS</Datum>
+  <Datum ID="Ci1Insight3Title"       Type="String"   Name="CI Conf 1 - Insight 3 title"></Datum>
+  <Datum ID="Ci1Insight3Description" Type="Textarea" Name="CI Conf 1 - Insight 3 description (HTML)"></Datum>
+  <Datum ID="Ci1Insight3Meta"        Type="String"   Name="CI Conf 1 - Insight 3 meta"></Datum>
+  <Datum ID="Ci1Insight3Image"       Type="String"   Name="CI Conf 1 - Insight 3 image URL"></Datum>
+  <Datum ID="Ci1Insight3ImageAlt"    Type="String"   Name="CI Conf 1 - Insight 3 image alt"></Datum>
+  <Datum ID="Ci1Insight3Href"        Type="String"   Name="CI Conf 1 - Insight 3 link URL"></Datum>
+
+  <!-- ============================================================
+       Conference 2
+       ============================================================ -->
+  <Datum ID="Ci2Name"           Type="String"   Name="CI Conf 2 - Name (outer tab label)">Global Energy Conference</Datum>
+  <Datum ID="Ci2BCVideoId"      Type="String"   Name="CI Conf 2 - Brightcove Video ID"></Datum>
+  <Datum ID="Ci2BCPoster"       Type="String"   Name="CI Conf 2 - Poster image URL (blank uses section default)"></Datum>
+  <Datum ID="Ci2MediaMode"      Type="String"   Name="CI Conf 2 - Media mode (video or image; blank = image)">image</Datum>
+  <Datum ID="Ci2ShowSpeakers"   Type="String"   Name="CI Conf 2 - Show Speakers (blank = show; no/false/hide = hide)"></Datum>
+  <Datum ID="Ci2ShowInsights"   Type="String"   Name="CI Conf 2 - Show Insights (blank = show; no/false/hide = hide)"></Datum>
+
+  <Datum ID="Ci2Date"           Type="String"   Name="CI Conf 2 - Date"></Datum>
+  <Datum ID="Ci2Location"       Type="String"   Name="CI Conf 2 - Location"></Datum>
+  <Datum ID="Ci2Format"         Type="String"   Name="CI Conf 2 - Format"></Datum>
+  <Datum ID="Ci2OverviewHeading" Type="String"  Name="CI Conf 2 - Overview heading">Conference overview</Datum>
+  <Datum ID="Ci2OverviewBody"   Type="Textarea" Name="CI Conf 2 - Overview body (HTML)"></Datum>
+  <Datum ID="Ci2KeyTopicsLabel" Type="String"   Name="CI Conf 2 - Key topics label">Key topics:</Datum>
+  <Datum ID="Ci2KeyTopics"      Type="Textarea" Name="CI Conf 2 - Key topics (HTML)"></Datum>
+  <Datum ID="Ci2ContactText"    Type="Textarea" Name="CI Conf 2 - Contact text (italicized)"></Datum>
+
+  <Datum ID="Ci2SpeakersHeading"  Type="String"   Name="CI Conf 2 - Speakers heading">Featured speakers</Datum>
+  <Datum ID="Ci2SpeakersIntro"    Type="Textarea" Name="CI Conf 2 - Speakers intro (HTML)"></Datum>
+  <Datum ID="Ci2SpeakersFootnote" Type="Textarea" Name="CI Conf 2 - Speakers footnote (HTML)"></Datum>
+
+  <Datum ID="Ci2Speaker1Name"   Type="String" Name="CI Conf 2 - Speaker 1 name"></Datum>
+  <Datum ID="Ci2Speaker1Title"  Type="String" Name="CI Conf 2 - Speaker 1 title"></Datum>
+  <Datum ID="Ci2Speaker1Image"  Type="String" Name="CI Conf 2 - Speaker 1 image URL"></Datum>
+  <Datum ID="Ci2Speaker1Alt"    Type="String" Name="CI Conf 2 - Speaker 1 image alt"></Datum>
+  <Datum ID="Ci2Speaker2Name"   Type="String" Name="CI Conf 2 - Speaker 2 name"></Datum>
+  <Datum ID="Ci2Speaker2Title"  Type="String" Name="CI Conf 2 - Speaker 2 title"></Datum>
+  <Datum ID="Ci2Speaker2Image"  Type="String" Name="CI Conf 2 - Speaker 2 image URL"></Datum>
+  <Datum ID="Ci2Speaker2Alt"    Type="String" Name="CI Conf 2 - Speaker 2 image alt"></Datum>
+  <Datum ID="Ci2Speaker3Name"   Type="String" Name="CI Conf 2 - Speaker 3 name"></Datum>
+  <Datum ID="Ci2Speaker3Title"  Type="String" Name="CI Conf 2 - Speaker 3 title"></Datum>
+  <Datum ID="Ci2Speaker3Image"  Type="String" Name="CI Conf 2 - Speaker 3 image URL"></Datum>
+  <Datum ID="Ci2Speaker3Alt"    Type="String" Name="CI Conf 2 - Speaker 3 image alt"></Datum>
+
+  <Datum ID="Ci2InsightsCTAText"  Type="String"   Name="CI Conf 2 - Insights CTA label">View all conference insights</Datum>
+  <Datum ID="Ci2InsightsCTAHref"  Type="String"   Name="CI Conf 2 - Insights CTA URL"></Datum>
+  <Datum ID="Ci2InsightsIntro"    Type="Textarea" Name="CI Conf 2 - Insights intro (HTML)"></Datum>
+  <Datum ID="Ci2InsightsFootnote" Type="Textarea" Name="CI Conf 2 - Insights footnote (shown when no insights populated)">+ Additional insights to be announced</Datum>
+
+  <Datum ID="Ci2Insight1Label"       Type="String"   Name="CI Conf 2 - Insight 1 label">INSIGHTS</Datum>
+  <Datum ID="Ci2Insight1Title"       Type="String"   Name="CI Conf 2 - Insight 1 title"></Datum>
+  <Datum ID="Ci2Insight1Description" Type="Textarea" Name="CI Conf 2 - Insight 1 description (HTML)"></Datum>
+  <Datum ID="Ci2Insight1Meta"        Type="String"   Name="CI Conf 2 - Insight 1 meta"></Datum>
+  <Datum ID="Ci2Insight1Image"       Type="String"   Name="CI Conf 2 - Insight 1 image URL"></Datum>
+  <Datum ID="Ci2Insight1ImageAlt"    Type="String"   Name="CI Conf 2 - Insight 1 image alt"></Datum>
+  <Datum ID="Ci2Insight1Href"        Type="String"   Name="CI Conf 2 - Insight 1 link URL"></Datum>
+  <Datum ID="Ci2Insight2Label"       Type="String"   Name="CI Conf 2 - Insight 2 label">INSIGHTS</Datum>
+  <Datum ID="Ci2Insight2Title"       Type="String"   Name="CI Conf 2 - Insight 2 title"></Datum>
+  <Datum ID="Ci2Insight2Description" Type="Textarea" Name="CI Conf 2 - Insight 2 description (HTML)"></Datum>
+  <Datum ID="Ci2Insight2Meta"        Type="String"   Name="CI Conf 2 - Insight 2 meta"></Datum>
+  <Datum ID="Ci2Insight2Image"       Type="String"   Name="CI Conf 2 - Insight 2 image URL"></Datum>
+  <Datum ID="Ci2Insight2ImageAlt"    Type="String"   Name="CI Conf 2 - Insight 2 image alt"></Datum>
+  <Datum ID="Ci2Insight2Href"        Type="String"   Name="CI Conf 2 - Insight 2 link URL"></Datum>
+  <Datum ID="Ci2Insight3Label"       Type="String"   Name="CI Conf 2 - Insight 3 label">INSIGHTS</Datum>
+  <Datum ID="Ci2Insight3Title"       Type="String"   Name="CI Conf 2 - Insight 3 title"></Datum>
+  <Datum ID="Ci2Insight3Description" Type="Textarea" Name="CI Conf 2 - Insight 3 description (HTML)"></Datum>
+  <Datum ID="Ci2Insight3Meta"        Type="String"   Name="CI Conf 2 - Insight 3 meta"></Datum>
+  <Datum ID="Ci2Insight3Image"       Type="String"   Name="CI Conf 2 - Insight 3 image URL"></Datum>
+  <Datum ID="Ci2Insight3ImageAlt"    Type="String"   Name="CI Conf 2 - Insight 3 image alt"></Datum>
+  <Datum ID="Ci2Insight3Href"        Type="String"   Name="CI Conf 2 - Insight 3 link URL"></Datum>
+
+  <!-- ============================================================
+       Conference 3
+       ============================================================ -->
+  <Datum ID="Ci3Name"           Type="String"   Name="CI Conf 3 - Name (outer tab label)">Global Communications Infrastructure Conference</Datum>
+  <Datum ID="Ci3BCVideoId"      Type="String"   Name="CI Conf 3 - Brightcove Video ID"></Datum>
+  <Datum ID="Ci3BCPoster"       Type="String"   Name="CI Conf 3 - Poster image URL (blank uses section default)"></Datum>
+  <Datum ID="Ci3MediaMode"      Type="String"   Name="CI Conf 3 - Media mode (video or image; blank = image)">image</Datum>
+  <Datum ID="Ci3ShowSpeakers"   Type="String"   Name="CI Conf 3 - Show Speakers (blank = show; no/false/hide = hide)"></Datum>
+  <Datum ID="Ci3ShowInsights"   Type="String"   Name="CI Conf 3 - Show Insights (blank = show; no/false/hide = hide)"></Datum>
+
+  <Datum ID="Ci3Date"           Type="String"   Name="CI Conf 3 - Date"></Datum>
+  <Datum ID="Ci3Location"       Type="String"   Name="CI Conf 3 - Location"></Datum>
+  <Datum ID="Ci3Format"         Type="String"   Name="CI Conf 3 - Format"></Datum>
+  <Datum ID="Ci3OverviewHeading" Type="String"  Name="CI Conf 3 - Overview heading">Conference overview</Datum>
+  <Datum ID="Ci3OverviewBody"   Type="Textarea" Name="CI Conf 3 - Overview body (HTML)"></Datum>
+  <Datum ID="Ci3KeyTopicsLabel" Type="String"   Name="CI Conf 3 - Key topics label">Key topics:</Datum>
+  <Datum ID="Ci3KeyTopics"      Type="Textarea" Name="CI Conf 3 - Key topics (HTML)"></Datum>
+  <Datum ID="Ci3ContactText"    Type="Textarea" Name="CI Conf 3 - Contact text (italicized)"></Datum>
+
+  <Datum ID="Ci3SpeakersHeading"  Type="String"   Name="CI Conf 3 - Speakers heading">Featured speakers</Datum>
+  <Datum ID="Ci3SpeakersIntro"    Type="Textarea" Name="CI Conf 3 - Speakers intro (HTML)"></Datum>
+  <Datum ID="Ci3SpeakersFootnote" Type="Textarea" Name="CI Conf 3 - Speakers footnote (HTML)"></Datum>
+
+  <Datum ID="Ci3Speaker1Name"   Type="String" Name="CI Conf 3 - Speaker 1 name"></Datum>
+  <Datum ID="Ci3Speaker1Title"  Type="String" Name="CI Conf 3 - Speaker 1 title"></Datum>
+  <Datum ID="Ci3Speaker1Image"  Type="String" Name="CI Conf 3 - Speaker 1 image URL"></Datum>
+  <Datum ID="Ci3Speaker1Alt"    Type="String" Name="CI Conf 3 - Speaker 1 image alt"></Datum>
+  <Datum ID="Ci3Speaker2Name"   Type="String" Name="CI Conf 3 - Speaker 2 name"></Datum>
+  <Datum ID="Ci3Speaker2Title"  Type="String" Name="CI Conf 3 - Speaker 2 title"></Datum>
+  <Datum ID="Ci3Speaker2Image"  Type="String" Name="CI Conf 3 - Speaker 2 image URL"></Datum>
+  <Datum ID="Ci3Speaker2Alt"    Type="String" Name="CI Conf 3 - Speaker 2 image alt"></Datum>
+  <Datum ID="Ci3Speaker3Name"   Type="String" Name="CI Conf 3 - Speaker 3 name"></Datum>
+  <Datum ID="Ci3Speaker3Title"  Type="String" Name="CI Conf 3 - Speaker 3 title"></Datum>
+  <Datum ID="Ci3Speaker3Image"  Type="String" Name="CI Conf 3 - Speaker 3 image URL"></Datum>
+  <Datum ID="Ci3Speaker3Alt"    Type="String" Name="CI Conf 3 - Speaker 3 image alt"></Datum>
+
+  <Datum ID="Ci3InsightsCTAText"  Type="String"   Name="CI Conf 3 - Insights CTA label">View all conference insights</Datum>
+  <Datum ID="Ci3InsightsCTAHref"  Type="String"   Name="CI Conf 3 - Insights CTA URL"></Datum>
+  <Datum ID="Ci3InsightsIntro"    Type="Textarea" Name="CI Conf 3 - Insights intro (HTML)"></Datum>
+  <Datum ID="Ci3InsightsFootnote" Type="Textarea" Name="CI Conf 3 - Insights footnote (shown when no insights populated)">+ Additional insights to be announced</Datum>
+
+  <Datum ID="Ci3Insight1Label"       Type="String"   Name="CI Conf 3 - Insight 1 label">INSIGHTS</Datum>
+  <Datum ID="Ci3Insight1Title"       Type="String"   Name="CI Conf 3 - Insight 1 title"></Datum>
+  <Datum ID="Ci3Insight1Description" Type="Textarea" Name="CI Conf 3 - Insight 1 description (HTML)"></Datum>
+  <Datum ID="Ci3Insight1Meta"        Type="String"   Name="CI Conf 3 - Insight 1 meta"></Datum>
+  <Datum ID="Ci3Insight1Image"       Type="String"   Name="CI Conf 3 - Insight 1 image URL"></Datum>
+  <Datum ID="Ci3Insight1ImageAlt"    Type="String"   Name="CI Conf 3 - Insight 1 image alt"></Datum>
+  <Datum ID="Ci3Insight1Href"        Type="String"   Name="CI Conf 3 - Insight 1 link URL"></Datum>
+  <Datum ID="Ci3Insight2Label"       Type="String"   Name="CI Conf 3 - Insight 2 label">INSIGHTS</Datum>
+  <Datum ID="Ci3Insight2Title"       Type="String"   Name="CI Conf 3 - Insight 2 title"></Datum>
+  <Datum ID="Ci3Insight2Description" Type="Textarea" Name="CI Conf 3 - Insight 2 description (HTML)"></Datum>
+  <Datum ID="Ci3Insight2Meta"        Type="String"   Name="CI Conf 3 - Insight 2 meta"></Datum>
+  <Datum ID="Ci3Insight2Image"       Type="String"   Name="CI Conf 3 - Insight 2 image URL"></Datum>
+  <Datum ID="Ci3Insight2ImageAlt"    Type="String"   Name="CI Conf 3 - Insight 2 image alt"></Datum>
+  <Datum ID="Ci3Insight2Href"        Type="String"   Name="CI Conf 3 - Insight 2 link URL"></Datum>
+  <Datum ID="Ci3Insight3Label"       Type="String"   Name="CI Conf 3 - Insight 3 label">INSIGHTS</Datum>
+  <Datum ID="Ci3Insight3Title"       Type="String"   Name="CI Conf 3 - Insight 3 title"></Datum>
+  <Datum ID="Ci3Insight3Description" Type="Textarea" Name="CI Conf 3 - Insight 3 description (HTML)"></Datum>
+  <Datum ID="Ci3Insight3Meta"        Type="String"   Name="CI Conf 3 - Insight 3 meta"></Datum>
+  <Datum ID="Ci3Insight3Image"       Type="String"   Name="CI Conf 3 - Insight 3 image URL"></Datum>
+  <Datum ID="Ci3Insight3ImageAlt"    Type="String"   Name="CI Conf 3 - Insight 3 image alt"></Datum>
+  <Datum ID="Ci3Insight3Href"        Type="String"   Name="CI Conf 3 - Insight 3 link URL"></Datum>
+
+</Data>

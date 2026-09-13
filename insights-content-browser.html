@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Builder</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Roboto, Arial, sans-serif;
+      background: #F5F5F5;
+      color: #252525;
+    }
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 96px;
+    }
+    .hero { margin-bottom: 20px; }
+    .hero h1 {
+      font-family: RBCDisplay, Georgia, Times, serif;
+      color: #003168;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.15;
+      margin: 0 0 8px;
+    }
+    .hero p {
+      color: #454545;
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 0;
+      max-width: 720px;
+    }
+    .help {
+      background: #FFF9E6;
+      border: 1px solid #F2AF00;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #6B4D00;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .help-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      background: #F2AF00;
+      color: #ffffff;
+      border-radius: 50%;
+      text-align: center;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .controls {
+      background: #ffffff;
+      border: 1px solid #DADADA;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .controls-row {
+      display: grid;
+      gap: 12px;
+      align-items: end;
+    }
+    .controls-row.source-row {
+      grid-template-columns: 1fr;
+    }
+    .controls-row.filter-row {
+      grid-template-columns: 2fr 1fr 1fr;
+      padding-top: 12px;
+      border-top: 1px solid #EAEAEA;
+    }
+    .source-status {
+      font-size: 12px;
+      color: #6E6E6E;
+      margin-top: 4px;
+    }
+    .source-status.is-error { color: #A32D2D; }
+    .source-status.is-loading::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #DADADA;
+      border-top-color: #003168;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+    .control-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6E6E6E;
+      margin-bottom: 6px;
+    }
+    .control-group input,
+    .control-group select {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #DADADA;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #252525;
+    }
+    .control-group input:focus,
+    .control-group select:focus {
+      outline: none;
+      border-color: #003168;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat {
+      background: #ffffff;
+      border: 1px solid #DADADA;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6E6E6E;
+    }
+    .stat-value {
+      font-family: RBCDisplay, Georgia, Times, serif;
+      color: #003168;
+      font-size: 22px;
+      font-weight: 500;
+      margin-top: 2px;
+      line-height: 1;
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: #6E6E6E;
+      margin-top: 3px;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: 160px 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+    .month-rail {
+      position: sticky;
+      top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-right: 12px;
+      border-right: 1px solid #DADADA;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    .month-jump {
+      background: none;
+      border: none;
+      text-align: right;
+      cursor: pointer;
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 13px;
+      color: #454545;
+      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .month-jump:hover { background: #F5F5F5; color: #003168; }
+    .month-jump-count {
+      color: #6E6E6E;
+      font-size: 11px;
+      display: block;
+      margin-top: 2px;
+    }
+    .articles-column { min-width: 0; }
+    .month-section {
+      margin-bottom: 32px;
+      scroll-margin-top: 20px;
+    }
+    .month-header {
+      font-family: RBCDisplay, Georgia, Times, serif;
+      color: #003168;
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #F2AF00;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .month-count {
+      font-family: Roboto, sans-serif;
+      font-size: 11px;
+      color: #6E6E6E;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-weight: 400;
+    }
+    .article-card {
+      background: #ffffff;
+      border: 1px solid #DADADA;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 14px;
+      align-items: start;
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .article-card:hover { border-color: #003168; background: #FAFCFF; }
+    .article-card.is-selected { border-color: #003168; background: #F1F7FE; }
+    .article-check {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #DADADA;
+      border-radius: 3px;
+      cursor: pointer;
+      margin: 2px 0 0;
+      background: #ffffff;
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .article-check:hover { border-color: #003168; }
+    .article-check:checked {
+      background: #003168;
+      border-color: #003168;
+    }
+    .article-check:checked::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 0;
+      width: 5px;
+      height: 10px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .article-body { min-width: 0; }
+    .article-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #252525;
+      line-height: 1.35;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .article-title a { color: inherit; text-decoration: none; }
+    .article-title a:hover { color: #003168; text-decoration: underline; }
+    .whitelist-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #F2AF00;
+      border-radius: 50%;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .article-sub {
+      font-size: 12px;
+      color: #6E6E6E;
+    }
+    .article-desc {
+      font-size: 12.5px;
+      color: #454545;
+      line-height: 1.5;
+      margin: 6px 0 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .article-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .pill {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.4;
+    }
+    .pill-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .pill.region {
+      background: #E6F1FB;
+      color: #0C447C;
+      border: 1px solid #B5D4F4;
+    }
+    .pill.region .pill-label { color: #185FA5; }
+    .pill.topic {
+      background: #E1F5EE;
+      color: #085041;
+      border: 1px solid #9FE1CB;
+    }
+    .pill.topic .pill-label { color: #0F6E56; }
+    .badges {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+    .badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge.type-audio { background: #E6F1FB; color: #0C447C; }
+    .badge.type-video { background: #FCEBEB; color: #791F1F; }
+    .badge.type-text  { background: #F1EFE8; color: #444441; }
+    .badge.year       { background: #F5F5F5; color: #454545; font-family: monospace; }
+    .loading, .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6E6E6E;
+      font-size: 15px;
+    }
+    .loading::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #DADADA;
+      border-top-color: #003168;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+      vertical-align: -3px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .selected-panel {
+      background: #ffffff;
+      border: 1px solid #DADADA;
+      border-radius: 8px;
+      padding: 16px;
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+    }
+    .selected-header {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6E6E6E;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .selected-header strong {
+      color: #003168;
+      font-family: RBCDisplay, Georgia, Times, serif;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    .selected-list {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 120px;
+      max-height: 55vh;
+      border-top: 1px solid #EAEAEA;
+      padding-top: 8px;
+    }
+    .selected-item {
+      padding: 10px 4px;
+      border-bottom: 1px solid #EAEAEA;
+    }
+    .selected-item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: start;
+    }
+    .selected-item-title {
+      font-size: 13px;
+      color: #252525;
+      line-height: 1.35;
+      flex: 1;
+      font-weight: 500;
+    }
+    .selected-item-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #A8A8A8;
+      font-size: 18px;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .selected-item-remove:hover { color: #003168; }
+    .selected-item-nodes {
+      margin-top: 6px;
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 3px 8px;
+      font-size: 11px;
+    }
+    .selected-item-nodes dt {
+      color: #6E6E6E;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      font-size: 10px;
+      padding-top: 2px;
+    }
+    .selected-item-nodes dd {
+      margin: 0;
+      color: #252525;
+      word-break: break-word;
+    }
+    .empty-node {
+      color: #A8A8A8;
+      font-style: italic;
+      font-size: 10px;
+    }
+    .selected-empty {
+      color: #6E6E6E;
+      font-size: 13px;
+      padding: 24px 8px;
+      text-align: center;
+      font-style: italic;
+    }
+    .selected-actions {
+      border-top: 1px solid #EAEAEA;
+      padding-top: 12px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn {
+      width: 100%;
+      height: 38px;
+      border-radius: 4px;
+      border: 1px solid #003168;
+      background: #003168;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #002144; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary { background: #ffffff; color: #003168; }
+    .btn-secondary:hover { background: #F1F7FE; }
+    .json-preview {
+      display: none;
+      background: #F5F5F5;
+      border: 1px solid #DADADA;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 200px;
+      overflow: auto;
+      margin-top: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      width: 100%;
+      resize: vertical;
+    }
+    .json-preview.is-visible { display: block; }
+    @media (max-width: 1080px) {
+      .timeline { grid-template-columns: 140px 1fr 300px; }
+    }
+    @media (max-width: 900px) {
+      .timeline { grid-template-columns: 1fr; }
+      .month-rail { position: static; max-height: none; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #DADADA; padding: 0 0 12px; }
+      .month-jump { text-align: center; flex-shrink: 0; }
+      .selected-panel { position: static; max-height: none; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .controls { grid-template-columns: 1fr 1fr; }
+      .article-card { grid-template-columns: 24px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <h1>JSON Builder</h1>
+      <p>Every article currently available across the 2024, 2025 and 2026 insights feeds. Use this to see what content is available before adding an article to the Conference Insights page.</p>
+    </div>
+
+    <div class="help">
+      <span class="help-icon">i</span>
+      <div>Every article currently published to the 2024, 2025 and 2026 insights feeds. Tick any article to see every field in its feed node, and Export JSON to copy the raw node data.</div>
+    </div>
+
+    <div class="controls">
+      <div class="controls-row source-row">
+        <div class="control-group">
+          <label for="data-source">Data source</label>
+          <select id="data-source">
+            <option value="all-proxy">All feeds — 2024, 2025, 2026</option>
+            <option value="2026-proxy">2026 insights feed</option>
+            <option value="2025-proxy">2025 insights feed</option>
+            <option value="2024-proxy">2024 insights feed</option>
+          </select>
+          <div class="source-status" id="source-status">Showing sample data.</div>
+        </div>
+      </div>
+      <div class="controls-row filter-row">
+        <div class="control-group">
+          <label for="search">Search titles and descriptions</label>
+          <input type="text" id="search" placeholder="Type to filter">
+        </div>
+        <div class="control-group">
+          <label for="filter-year">Year</label>
+          <select id="filter-year">
+            <option value="">All years</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="filter-type">Format</label>
+          <select id="filter-type">
+            <option value="">All formats</option>
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
+            <option value="text">Text</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats"></div>
+
+    <div class="timeline">
+      <div class="month-rail" id="month-rail"></div>
+      <div class="articles-column" id="articles-column">
+        <div class="loading">Loading feeds…</div>
+      </div>
+      <div class="selected-panel">
+        <div class="selected-header">Selected <strong id="selected-count">0</strong></div>
+        <div class="selected-list" id="selected-list">
+          <div class="selected-empty">Nothing selected yet. Tick articles on the left to see all their data here.</div>
+        </div>
+        <div class="selected-actions">
+          <button class="btn" id="export-json" disabled>Export JSON</button>
+          <button class="btn btn-secondary" id="clear-all" disabled>Clear all</button>
+          <button class="btn btn-secondary" id="copy-json" disabled>Copy JSON</button>
+          <textarea class="json-preview" id="json-preview" readonly rows="10"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+
+  var REGION_LABELS = { us: 'US', canada: 'Canada', global: 'Global', europe: 'Europe', apac: 'APAC' };
+  var TOPIC_LABELS = {
+    'energy': 'Energy',
+    'energy-transition': 'Energy Transition',
+    'financial-institutions': 'Financial Institutions',
+    'healthcare': 'Healthcare',
+    'industrials': 'Industrials',
+    'markets-economics': 'Markets & Economics',
+    'mining-materials': 'Mining & Materials',
+    'power-utilities-infrastructure': 'Power, Utilities & Infrastructure',
+    'technology-innovation': 'Technology & Innovation'
+  };
+
+
+  var state = {
+    articles: [],
+    selected: {},
+    filter: { search: '', year: '', type: '' }
+  };
+
+  function normalizeTitle(t) {
+    if (!t) return '';
+    return t.toLowerCase()
+      .replace(/[‘’]/g, "'")
+      .replace(/[“”]/g, '"')
+      .replace(/[–—]/g, '-')
+      .replace(/[^\w\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function escapeStrayAmpersands(s) {
+    if (!s) return s;
+    var parts = s.split(/(<!\[CDATA\[[\s\S]*?\]\]>)/);
+    for (var i = 0; i < parts.length; i += 2) {
+      parts[i] = parts[i].replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+    }
+    return parts.join('');
+  }
+
+  function child(node, name) {
+    var el = node.getElementsByTagName(name)[0];
+    return el ? (el.textContent || '').trim() : '';
+  }
+
+  function parseNews(xmlStr, feedYear) {
+    if (!xmlStr) return [];
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(escapeStrayAmpersands(xmlStr), 'application/xml');
+    } catch (e) { return []; }
+    if (!doc || doc.getElementsByTagName('parsererror').length > 0) return [];
+    return Array.prototype.slice.call(doc.getElementsByTagName('news')).map(function (n) {
+      var dateStr = child(n, 'date');
+      var ts = dateStr ? Date.parse(dateStr) : 0;
+      if (isNaN(ts)) ts = 0;
+      var type = (child(n, 'type') || 'text').toLowerCase();
+      var duration = '';
+      if (type === 'audio' && child(n, 'watchtime')) duration = child(n, 'watchtime');
+      else if (type === 'video' && child(n, 'watchtime')) duration = child(n, 'watchtime');
+      else if (child(n, 'readtime')) duration = child(n, 'readtime');
+      else duration = child(n, 'watchtime') || child(n, 'readtime') || '';
+      var nodes = {};
+      var childNodes = n.getElementsByTagName('*');
+      for (var i = 0; i < childNodes.length; i++) {
+        var el = childNodes[i];
+        if (el.parentNode !== n) continue;
+        nodes[el.tagName] = (el.textContent || '').trim();
+      }
+      return {
+        title: child(n, 'title'),
+        desc: child(n, 'description'),
+        date: dateStr,
+        ts: ts,
+        link: child(n, 'link'),
+        type: type,
+        duration: duration,
+        year: feedYear,
+        region: (child(n, 'region') || '').split(/[\s,]+/)[0].toLowerCase() || '',
+        topic: '',
+        nodes: nodes,
+        matchKey: normalizeTitle(child(n, 'title'))
+      };
+    });
+  }
+
+  function loadLive() {
+    var years = [2024, 2025, 2026];
+    return Promise.all(years.map(function (y) {
+      return fetch('https://www.rbccm.com/en/insights/data/' + y + '-insights')
+        .then(function (r) { return r.ok ? r.text() : ''; })
+        .catch(function () { return ''; })
+        .then(function (xml) { return { year: y, xml: xml }; });
+    })).then(function (feeds) {
+      var articles = [];
+      feeds.forEach(function (f) {
+        parseNews(f.xml, f.year).forEach(function (a) { articles.push(a); });
+      });
+      return articles;
+    });
+  }
+
+  function loadWhitelistLive() {
+    return fetch('/assets/rbccm/js/components/data/conference-insights-whitelist.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; });
+  }
+
+  function passesFilter(a) {
+    var f = state.filter;
+    if (f.search && (a.title + ' ' + a.desc).toLowerCase().indexOf(f.search) === -1) return false;
+    if (f.year && a.year !== parseInt(f.year, 10)) return false;
+    if (f.type && a.type !== f.type) return false;
+    return true;
+  }
+
+  function formatDate(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate();
+  }
+
+  function formatDuration(a) {
+    var suffix = a.type === 'audio' ? ' listen' : a.type === 'video' ? ' watch' : ' read';
+    return a.duration ? a.duration + suffix : '';
+  }
+
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+  function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function renderStats() {
+    var visible = state.articles.filter(passesFilter);
+    var byYear = { 2024: 0, 2025: 0, 2026: 0 };
+    visible.forEach(function (a) {
+      if (byYear[a.year] !== undefined) byYear[a.year]++;
+    });
+    document.getElementById('stats').innerHTML = '' +
+      '<div class="stat"><div class="stat-label">Showing</div><div class="stat-value">' + visible.length + '</div><div class="stat-sub">of ' + state.articles.length + ' total</div></div>' +
+      '<div class="stat"><div class="stat-label">2026</div><div class="stat-value">' + byYear[2026] + '</div><div class="stat-sub">available</div></div>' +
+      '<div class="stat"><div class="stat-label">2025</div><div class="stat-value">' + byYear[2025] + '</div><div class="stat-sub">available</div></div>' +
+      '<div class="stat"><div class="stat-label">2024</div><div class="stat-value">' + byYear[2024] + '</div><div class="stat-sub">available</div></div>';
+  }
+
+  function renderMonthRail(byMonth) {
+    var rail = document.getElementById('month-rail');
+    rail.innerHTML = '';
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    Object.keys(byMonth).sort(function (a, b) { return b.localeCompare(a); }).forEach(function (key) {
+      var parts = key.split('-');
+      var btn = document.createElement('button');
+      btn.className = 'month-jump';
+      btn.innerHTML = months[parseInt(parts[1], 10)] + ' ' + parts[0] +
+        '<span class="month-jump-count">' + byMonth[key].length + ' article' + (byMonth[key].length === 1 ? '' : 's') + '</span>';
+      btn.addEventListener('click', function () {
+        var target = document.getElementById('month-' + key);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      rail.appendChild(btn);
+    });
+  }
+
+  function renderArticles() {
+    var visible = state.articles.filter(passesFilter);
+    var byMonth = {};
+    visible.forEach(function (a) {
+      if (!a.ts) return;
+      var d = new Date(a.ts);
+      var key = d.getFullYear() + '-' + String(d.getMonth()).padStart(2, '0');
+      (byMonth[key] = byMonth[key] || []).push(a);
+    });
+    renderMonthRail(byMonth);
+    var col = document.getElementById('articles-column');
+    if (visible.length === 0) {
+      col.innerHTML = '<div class="empty-state">No articles match the current filters.</div>';
+      return;
+    }
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var html = '';
+    Object.keys(byMonth).sort(function (a, b) { return b.localeCompare(a); }).forEach(function (key) {
+      var parts = key.split('-');
+      html += '<section class="month-section" id="month-' + key + '">';
+      html += '<h2 class="month-header">' + months[parseInt(parts[1], 10)] + ' ' + parts[0] +
+              '<span class="month-count">' + byMonth[key].length + ' article' + (byMonth[key].length === 1 ? '' : 's') + '</span></h2>';
+      byMonth[key].forEach(function (a) {
+        var pills = '';
+        if (a.region && REGION_LABELS[a.region]) {
+          pills += '<span class="pill region"><span class="pill-label">Region</span>' + escapeHtml(REGION_LABELS[a.region]) + '</span>';
+        }
+        if (a.topic && TOPIC_LABELS[a.topic]) {
+          pills += '<span class="pill topic"><span class="pill-label">Topic</span>' + escapeHtml(TOPIC_LABELS[a.topic]) + '</span>';
+        }
+        var titleLink = a.link ? '<a href="' + escapeHtml(a.link) + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>' : escapeHtml(a.title);
+        var checked = state.selected[a.matchKey] ? 'checked' : '';
+        var sel = state.selected[a.matchKey] ? ' is-selected' : '';
+        html += '<label class="article-card' + sel + '" data-key="' + escapeHtml(a.matchKey) + '">' +
+          '<input type="checkbox" class="article-check" ' + checked + ' data-key="' + escapeHtml(a.matchKey) + '">' +
+          '<div class="article-body">' +
+            '<h3 class="article-title">' + titleLink + '</h3>' +
+            '<div class="article-sub">' + escapeHtml(formatDate(a.ts) + (formatDuration(a) ? ' · ' + formatDuration(a) : '')) + '</div>' +
+            (a.desc ? '<p class="article-desc">' + escapeHtml(a.desc) + '</p>' : '') +
+            (pills ? '<div class="article-tags">' + pills + '</div>' : '') +
+          '</div>' +
+          '<div class="badges">' +
+            '<span class="badge type-' + a.type + '">' + capitalize(a.type) + '</span>' +
+            '<span class="badge year">' + a.year + '</span>' +
+          '</div>' +
+        '</label>';
+      });
+      html += '</section>';
+    });
+    col.innerHTML = html;
+  }
+
+  function renderSelected() {
+    var list = document.getElementById('selected-list');
+    var keys = Object.keys(state.selected);
+    document.getElementById('selected-count').textContent = keys.length;
+    document.getElementById('export-json').disabled = keys.length === 0;
+    document.getElementById('clear-all').disabled = keys.length === 0;
+    document.getElementById('copy-json').disabled = keys.length === 0;
+    if (keys.length === 0) {
+      list.innerHTML = '<div class="selected-empty">Nothing selected yet. Tick articles on the left to see all their data here.</div>';
+      return;
+    }
+    var items = keys.map(function (k) { return state.selected[k]; })
+      .sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+    list.innerHTML = items.map(function (a) {
+      var nodes = a.nodes || {};
+      var nodeKeys = Object.keys(nodes);
+      var nodesHtml = '';
+      nodeKeys.forEach(function (k) {
+        var val = nodes[k];
+        var display;
+        if (!val) {
+          display = '<span class="empty-node">— empty —</span>';
+        } else if (k === 'link') {
+          display = '<a href="' + escapeHtml(val) + '" target="_blank" rel="noopener">' + escapeHtml(val) + '</a>';
+        } else {
+          display = escapeHtml(val);
+        }
+        nodesHtml += '<dt>' + escapeHtml(k) + '</dt><dd>' + display + '</dd>';
+      });
+      return '<div class="selected-item">' +
+        '<div class="selected-item-head">' +
+          '<div class="selected-item-title">' + escapeHtml(a.title) + '</div>' +
+          '<button class="selected-item-remove" data-key="' + escapeHtml(a.matchKey) + '" aria-label="Remove">×</button>' +
+        '</div>' +
+        '<dl class="selected-item-nodes">' + nodesHtml + '</dl>' +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleArticle(matchKey) {
+    var found = state.articles.filter(function (a) { return a.matchKey === matchKey; })[0];
+    if (!found) return;
+    if (state.selected[matchKey]) delete state.selected[matchKey];
+    else state.selected[matchKey] = found;
+    renderSelected();
+    var card = document.querySelector('.article-card[data-key="' + matchKey + '"]');
+    if (card) {
+      if (state.selected[matchKey]) card.classList.add('is-selected');
+      else card.classList.remove('is-selected');
+    }
+  }
+
+  function buildJson() {
+    var items = Object.keys(state.selected).map(function (k) { return state.selected[k]; })
+      .sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+    var payload = items.map(function (a) { return a.nodes || {}; });
+    return JSON.stringify(payload, null, 2);
+  }
+
+  function exportJson() {
+    var out = document.getElementById('json-preview');
+    out.value = buildJson();
+    out.classList.add('is-visible');
+    out.select();
+  }
+
+  function copyJson() {
+    var btn = document.getElementById('copy-json');
+    var originalText = btn.textContent;
+    var json = buildJson();
+    var done = function () {
+      btn.textContent = 'Copied ✓';
+      setTimeout(function () { btn.textContent = originalText; }, 1500);
+    };
+    var fail = function () {
+      btn.textContent = 'Copy failed';
+      setTimeout(function () { btn.textContent = originalText; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(json).then(done).catch(fail);
+    } else {
+      var out = document.getElementById('json-preview');
+      out.value = json;
+      out.classList.add('is-visible');
+      out.select();
+      try { document.execCommand('copy'); done(); } catch (e) { fail(); }
+    }
+  }
+
+  function clearAll() {
+    state.selected = {};
+    renderSelected();
+    document.querySelectorAll('.article-check').forEach(function (c) { c.checked = false; });
+    document.querySelectorAll('.article-card').forEach(function (c) { c.classList.remove('is-selected'); });
+    var preview = document.getElementById('json-preview');
+    preview.classList.remove('is-visible');
+    preview.value = '';
+  }
+
+  function bindControls() {
+    document.getElementById('search').addEventListener('input', function (e) {
+      state.filter.search = e.target.value.trim().toLowerCase();
+      renderStats(); renderArticles();
+    });
+    document.getElementById('filter-year').addEventListener('change', function (e) {
+      state.filter.year = e.target.value; renderStats(); renderArticles();
+    });
+    document.getElementById('filter-type').addEventListener('change', function (e) {
+      state.filter.type = e.target.value; renderStats(); renderArticles();
+    });
+    document.getElementById('articles-column').addEventListener('change', function (e) {
+      var el = e.target;
+      if (el && el.classList && el.classList.contains('article-check')) {
+        toggleArticle(el.getAttribute('data-key'));
+      }
+    });
+    document.getElementById('selected-list').addEventListener('click', function (e) {
+      if (e.target && e.target.classList.contains('selected-item-remove')) {
+        var key = e.target.getAttribute('data-key');
+        var box = document.querySelector('.article-check[data-key="' + key + '"]');
+        if (box) box.checked = false;
+        toggleArticle(key);
+      }
+    });
+    document.getElementById('export-json').addEventListener('click', exportJson);
+    document.getElementById('clear-all').addEventListener('click', clearAll);
+    document.getElementById('copy-json').addEventListener('click', copyJson);
+  }
+
+  function setSourceStatus(msg, cls) {
+    var el = document.getElementById('source-status');
+    el.textContent = msg;
+    el.className = 'source-status' + (cls ? ' ' + cls : '');
+  }
+
+  function switchDataSource(sourceKey) {
+    state.articles = [];
+    state.selected = {};
+    var useProxy = sourceKey.indexOf('proxy') !== -1;
+    var baseKey = sourceKey.replace('-proxy', '');
+    var years = baseKey === 'all' ? [2024, 2025, 2026] : [parseInt(baseKey, 10)];
+    var label = (baseKey === 'all' ? 'all feeds' : baseKey + ' feed') + (useProxy ? ' via proxy' : ' direct');
+    setSourceStatus('Fetching ' + label + '…', 'is-loading');
+    document.getElementById('articles-column').innerHTML = '<div class="loading">Loading feeds…</div>';
+    Promise.all(years.map(function (y) {
+      var targetUrl = 'https://www.rbccm.com/en/insights/data/' + y + '-insights';
+      var url = useProxy ? 'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl) : targetUrl;
+      return fetch(url)
+        .then(function (r) {
+          if (!r.ok) return { year: y, xml: '', error: 'HTTP ' + r.status };
+          return r.text().then(function (xml) { return { year: y, xml: xml, error: null }; });
+        })
+        .catch(function (err) {
+          return { year: y, xml: '', error: err && err.message ? err.message : 'Network / CORS blocked' };
+        });
+    })).then(function (feeds) {
+      var articles = [];
+      var errors = [];
+      feeds.forEach(function (f) {
+        if (f.error) errors.push(f.year + ' → ' + f.error);
+        parseNews(f.xml, f.year).forEach(function (a) { articles.push(a); });
+      });
+      if (articles.length === 0) {
+        var msg = 'No articles loaded.';
+        if (errors.length) msg += ' Details: ' + errors.join('; ') + '. If this is a CORS block, host the file on rbccm.com or use Sample data.';
+        setSourceStatus(msg, 'is-error');
+        document.getElementById('articles-column').innerHTML =
+          '<div class="empty-state">Live feed returned no articles. Most likely the browser blocked the cross-origin request. Pick “Sample data” to preview locally.</div>';
+        return;
+      }
+      state.articles = articles;
+      state.articles.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+      var statusMsg = 'Loaded ' + state.articles.length + ' articles from ' + label + '.';
+      if (errors.length) statusMsg += ' Partial — ' + errors.length + ' feed(s) failed: ' + errors.join('; ');
+      setSourceStatus(statusMsg);
+      renderStats();
+      renderArticles();
+      renderSelected();
+    }).catch(function (err) {
+      setSourceStatus('Fetch failed: ' + (err && err.message ? err.message : 'unknown error') + '. Refresh to retry.', 'is-error');
+      document.getElementById('articles-column').innerHTML =
+        '<div class="empty-state">Fetch failed. Try refreshing the page.</div>';
+    });
+  }
+
+  function bootstrap() {
+    bindControls();
+    renderStats();
+    renderSelected();
+    document.getElementById('data-source').addEventListener('change', function (e) {
+      switchDataSource(e.target.value);
+    });
+    switchDataSource('all-proxy');
+  }
+
+  bootstrap();
+})();
+</script>
+</body>
+</html>

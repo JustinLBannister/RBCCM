@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBCCM Accordions -- local preview</title>
+<link rel="stylesheet" href="rbccm-accordions.css">
+<style>
+  body { margin: 0; background: #0a0f1a; font-family: Roboto, Arial, sans-serif; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-note">Variant -- .rbccm-accordions __ strategy-and-economics-notes (mobile-first)</div>
+
+<section class="rbccm-accordions rbccm-accordions--strategy-and-economics-notes" aria-label="Strategy and Economics notes">
+  <div class="rbccm-accordions__container">
+
+    <!-- Header: title + description + Expand all -->
+    <div class="rbccm-accordions__header">
+      <div class="rbccm-accordions__header-lede">
+        <h2 class="rbccm-accordions__title">S&amp;E Notes</h2>
+        <p class="rbccm-accordions__description">Timely, short-form commentary from our economists and strategists.</p>
+      </div>
+      <button class="rbccm-accordions__expand-all" type="button" data-accordions-expand-all aria-expanded="false">Expand all</button>
+    </div>
+
+    <!-- List of notes -->
+    <div class="rbccm-accordions__list">
+
+      <!-- Item 1 -- collapsed -->
+      <article class="rbccm-accordions__item">
+        <div class="rbccm-accordions__item-header">
+          <div class="rbccm-accordions__item-meta">
+            <p class="rbccm-accordions__item-eyebrow">Economics</p>
+            <p class="rbccm-accordions__item-byline">Frances Donald | Aug 12, 2026</p>
+          </div>
+          <button class="rbccm-accordions__item-toggle" type="button"
+                  aria-expanded="false" aria-controls="acc-1-body"
+                  aria-label="Expand note: BoC Rate Decision Preview">
+            <svg class="rbccm-accordions__item-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M9 2C9 1.44687 8.55312 1 8 1C7.44688 1 7 1.44687 7 2V7H2C1.44687 7 1 7.44688 1 8C1 8.55312 1.44687 9 2 9H7V14C7 14.5531 7.44688 15 8 15C8.55312 15 9 14.5531 9 14V9H14C14.5531 9 15 8.55312 15 8C15 7.44688 14.5531 7 14 7H9V2Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <div class="rbccm-accordions__item-body">
+          <h3 class="rbccm-accordions__item-title">BoC Rate Decision Preview</h3>
+          <p class="rbccm-accordions__item-summary">Inflation tick-up reduces probability of a 50bps cut next week; 25bps remains baseline.</p>
+        </div>
+        <div class="rbccm-accordions__item-expanded" id="acc-1-body" role="region" aria-label="Expanded commentary">
+          <div class="rbccm-accordions__item-expanded-copy">
+            <p>Headline CPI came in two tenths above consensus, and the trimmed-mean measures the Bank watches most closely stopped decelerating for the first time since March. That is not, on its own, an argument against easing.</p>
+            <p>Financial conditions have loosened materially since the spring. Our baseline: 25bps next week, 25bps in the following meeting, and a terminal rate of 2.25% by mid-2026.</p>
+          </div>
+          <a class="rbccm-accordions__item-readmore" href="#">Read more
+            <svg class="rbccm-accordions__item-readmore-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2.70801 6.5H10.2913" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 2.70831L10.2917 6.49998L6.5 10.2916" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Item 2 -- collapsed by default (matches production - authors
+           can expand individual notes or use "Expand all") -->
+      <article class="rbccm-accordions__item">
+        <div class="rbccm-accordions__item-header">
+          <div class="rbccm-accordions__item-meta">
+            <p class="rbccm-accordions__item-eyebrow">Geopolitics</p>
+            <p class="rbccm-accordions__item-byline">Helima Croft | Aug 28, 2026</p>
+          </div>
+          <button class="rbccm-accordions__item-toggle" type="button"
+                  aria-expanded="false" aria-controls="acc-2-body"
+                  aria-label="Expand note: Iran conflict outlook">
+            <svg class="rbccm-accordions__item-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M9 2C9 1.44687 8.55312 1 8 1C7.44688 1 7 1.44687 7 2V7H2C1.44687 7 1 7.44688 1 8C1 8.55312 1.44687 9 2 9H7V14C7 14.5531 7.44688 15 8 15C8.55312 15 9 14.5531 9 14V9H14C14.5531 9 15 8.55312 15 8C15 7.44688 14.5531 7 14 7H9V2Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <div class="rbccm-accordions__item-body">
+          <h3 class="rbccm-accordions__item-title">Iran conflict: six-month update</h3>
+          <p class="rbccm-accordions__item-summary">Diplomatic resolution remains elusive; markets modestly pricing in a sustained Strait of Hormuz premium.</p>
+        </div>
+        <div class="rbccm-accordions__item-expanded" id="acc-2-body" role="region" aria-label="Expanded commentary">
+          <div class="rbccm-accordions__item-expanded-copy">
+            <p>As the Iran conflict reaches its six-month mark, diplomatic resolution remains elusive despite repeated market optimism about swift resolution. Energy markets have partially normalized but structural risk persists.</p>
+            <p>Our base case: modest crude premium through year-end, with tail risk on any escalation into shipping lanes. Strategic petroleum reserves remain the swing factor.</p>
+          </div>
+          <a class="rbccm-accordions__item-readmore" href="#">Read more
+            <svg class="rbccm-accordions__item-readmore-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2.70801 6.5H10.2913" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 2.70831L10.2917 6.49998L6.5 10.2916" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Item 3 -- collapsed -->
+      <article class="rbccm-accordions__item">
+        <div class="rbccm-accordions__item-header">
+          <div class="rbccm-accordions__item-meta">
+            <p class="rbccm-accordions__item-eyebrow">Equity Markets</p>
+            <p class="rbccm-accordions__item-byline">Lori Calvasina | Sep 2, 2026</p>
+          </div>
+          <button class="rbccm-accordions__item-toggle" type="button"
+                  aria-expanded="false" aria-controls="acc-3-body"
+                  aria-label="Expand note: S&amp;P 500 target refresh">
+            <svg class="rbccm-accordions__item-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M9 2C9 1.44687 8.55312 1 8 1C7.44688 1 7 1.44687 7 2V7H2C1.44687 7 1 7.44688 1 8C1 8.55312 1.44687 9 2 9H7V14C7 14.5531 7.44688 15 8 15C8.55312 15 9 14.5531 9 14V9H14C14.5531 9 15 8.55312 15 8C15 7.44688 14.5531 7 14 7H9V2Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <div class="rbccm-accordions__item-body">
+          <h3 class="rbccm-accordions__item-title">S&amp;P 500 target refresh</h3>
+          <p class="rbccm-accordions__item-summary">Lifting our year-end target on stronger earnings breadth; still constructive but tail risks widen.</p>
+        </div>
+        <div class="rbccm-accordions__item-expanded" id="acc-3-body" role="region" aria-label="Expanded commentary">
+          <div class="rbccm-accordions__item-expanded-copy">
+            <p>Earnings breadth has broadened noticeably in Q2, with 60%+ of S&amp;P 500 constituents beating on both revenue and EPS. That's the strongest breadth since late 2023.</p>
+          </div>
+          <a class="rbccm-accordions__item-readmore" href="#">Read more
+            <svg class="rbccm-accordions__item-readmore-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2.70801 6.5H10.2913" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 2.70831L10.2917 6.49998L6.5 10.2916" stroke="currentColor" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<script src="rbccm-accordions.js"></script>
+</body>
+</html>

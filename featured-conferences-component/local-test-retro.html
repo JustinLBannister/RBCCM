@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Featured Conferences RETRO (V1) -- Local Test</title>
+
+  <!-- Retro component CSS -->
+  <link rel="stylesheet" href="./featured-conferences-retro.css"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #001934; font-family: Roboto, Arial, sans-serif; }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================
+       Static render mirroring the RETRO (V1) XSL output.
+       - Outer tablist present but hidden via CSS.
+       - Inner tabs: Global Healthcare + Canadian Industrials VISIBLE;
+         Global Energy (-gep) + Overview/Speakers/Insights hidden via CSS.
+       - JS defaults to the -ghc tab.
+       Production renders 3 identical conference panels (the GHC/CIC/GEP
+       content is fixed, not data-driven); this preview shows one panel.
+       ==================================================== -->
+  <section class="rbccm-featured-conferences" id="rbccm-featured-conferences" aria-label="Featured conferences">
+    <div class="rbccm-featured-conferences__container">
+
+      <h2 class="rbccm-featured-conferences__heading">Featured conferences</h2>
+
+      <!-- OUTER TABS (hidden via CSS in retro) -->
+      <div class="rbccm-featured-conferences__tablist" role="tablist">
+        <button type="button" class="rbccm-featured-conferences__tab" role="tab" aria-expanded="false" data-panel="conf-1" aria-controls="panel-conf-1">Conference 1</button>
+      </div>
+
+      <!-- OUTER PANELS -->
+      <div class="rbccm-featured-conferences__panels">
+        <div class="rbccm-featured-conferences__panel" role="tabpanel" id="panel-conf-1" data-panel="conf-1">
+          <div class="rbccm-featured-conferences__inner-wrap">
+
+            <!-- ===== INNER TAB A: Global Healthcare Conference (VISIBLE) ===== -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-ghc">
+              <span class="rbccm-featured-conferences__inner-tab-label">Global Healthcare Conference</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-1-ghc">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <img class="conference-image" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1100&q=80" alt="Global Healthcare Conference panel"/>
+                </div>
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">May 19-20, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person</div>
+                  </div>
+                </div>
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>The Global Healthcare Conference connects leaders, companies, and investors across the healthcare ecosystem - from life sciences, services, and medtech to tools and diagnostics - for a cross-sector view of where healthcare is headed.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Biopharma innovation | MedTech momentum | Competitive dynamics | Regulatory and policy shifts | M&amp;A and partnership | Capital formation | AI-driven drug discovery | Digital health transformation | Healthcare utilization | Care delivery evolution</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== INNER TAB B: Canadian Industrials Conference (VISIBLE) ===== -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-cic">
+              <span class="rbccm-featured-conferences__inner-tab-label">Canadian Industrials Conference</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-1-cic">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <img class="conference-image" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1100&q=80" alt="Canadian Industrials Conference participants"/>
+                </div>
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">May 19-21, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">Toronto, CA</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person</div>
+                  </div>
+                </div>
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>The Canadian Industrials Conference brings together North American companies and investors across the sectors driving industrial growth - from transportation and infrastructure to engineering and construction, industrial products, aerospace and defence, and business services - to examine the forces shaping supply chain resilience and long-term competitiveness.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Infrastructure renewal | Energy corridor growth | Rail network demand | Power capacity needs | Critical minerals investment | Defence modernization | Housing supply pressures | Productivity improvement | Industrial automation | Cross-border trade resilience</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== INNER TAB C: Global Energy, Power & Infrastructure (HIDDEN via CSS) ===== -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-gep">
+              <span class="rbccm-featured-conferences__inner-tab-label">Global Energy, Power &amp; Infrastructure Conference</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-1-gep">
+              <div class="rbccm-featured-conferences__overview">
+                <div class="rbccm-featured-conferences__video video-reel-wrap">
+                  <div class="rbccm-featured-conferences__video-frame">
+                    <iframe src="//players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385583003112" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen"></iframe>
+                  </div>
+                </div>
+                <div class="rbccm-featured-conferences__info">
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Date</div>
+                    <div class="rbccm-featured-conferences__info-value">June 2-3, 2026</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item">
+                    <div class="rbccm-featured-conferences__info-label">Location</div>
+                    <div class="rbccm-featured-conferences__info-value">New York, NY</div>
+                  </div>
+                  <div class="rbccm-featured-conferences__info-item rbccm-featured-conferences__info-item--full">
+                    <div class="rbccm-featured-conferences__info-label">Format</div>
+                    <div class="rbccm-featured-conferences__info-value">In-person &amp; virtual</div>
+                  </div>
+                </div>
+                <div class="rbccm-featured-conferences__overview-body">
+                  <h3 class="rbccm-featured-conferences__overview-heading">Conference overview</h3>
+                  <div class="rbccm-featured-conferences__overview-text">
+                    <p>The Global Energy, Power &amp; Infrastructure Conference is a long-standing forum, uniting executives and investors across the energy and utility value chain - from oil and gas producers and services to midstream, infrastructure, and energy transition - to assess the opportunities and risks shaping the sector's trajectory.</p>
+                  </div>
+                  <p class="rbccm-featured-conferences__topics">
+                    <strong>Key themes</strong>
+                    <span class="rbccm-featured-conferences__topics-list">Energy security | Rising power demand | Infrastructure investment | Grid modernization | Natural gas growth | Resource development | Capital discipline | Customer affordability | Transition pragmatism | Cross-border trade resilience</span>
+                  </p>
+                  <p class="rbccm-featured-conferences__contact"><em>Please contact your RBC representative to attend or get more information.</em></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== Overview / Speakers / Insights (HIDDEN via CSS in retro) - minimal stubs ===== -->
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-overview">
+              <span class="rbccm-featured-conferences__inner-tab-label">Overview</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--overview" role="tabpanel" data-inner="conf-1-overview">
+              <div class="rbccm-featured-conferences__overview"><div class="rbccm-featured-conferences__overview-body"><h3 class="rbccm-featured-conferences__overview-heading">Overview (hidden in retro)</h3></div></div>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-speakers">
+              <span class="rbccm-featured-conferences__inner-tab-label">Speakers</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--speakers" role="tabpanel" data-inner="conf-1-speakers">
+              <h3 class="rbccm-featured-conferences__speakers-heading">Speakers (hidden in retro)</h3>
+            </div>
+
+            <button type="button" class="rbccm-featured-conferences__inner-tab" role="tab" aria-expanded="false" data-inner="conf-1-insights">
+              <span class="rbccm-featured-conferences__inner-tab-label">Insights</span>
+              <svg class="rbccm-featured-conferences__inner-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="rbccm-featured-conferences__inner-panel rbccm-featured-conferences__inner-panel--insights" role="tabpanel" data-inner="conf-1-insights">
+              <div class="rbccm-featured-conferences__insights"><p style="color:#fff;">Insights (hidden in retro)</p></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Retro component JS -->
+  <script src="./featured-conferences-retro.js"></script>
+
+</body>
+</html>

@@ -4,35 +4,54 @@
 
    Behavior
    -------------------------------------------------------------------------
-   For every .rbccm-hero--strategy-and-economics section marked with
-   data-hero-source="auto-latest":
+   Runs on every .rbccm-hero--strategy-and-economics section whose
+   data-hero-source is either "auto-latest" or "dcr-picker".
+
+   The dispatch splits on data-hero-source per section:
+
+     auto-latest   Full flow. Pinned URL match if data-hero-pinned-url
+                   is set; otherwise newest record surviving the
+                   data-hero-tag-keywords filter.
+
+     dcr-picker    Fallback flow. Runs only when data-hero-pinned-url
+                   is non-empty. Pinned-URL match ONLY - no keyword
+                   scan. If the URL match hits, the feed record
+                   overwrites the DCR-rendered card; if it misses,
+                   the server-rendered DCR content stays in place.
+                   Purpose: safety net for pages where the TeamSite
+                   DCR pipeline is broken, so editors can point at
+                   an insights-feed article by URL and still ship.
 
      1. Read config from data-* attrs authored by the XSL:
-          data-hero-feed-urls      comma-separated XML feed URLs
-          data-hero-pinned-url     optional specific article URL to pin;
-                                   accepts a full https URL or the /en/
-                                   path. When present it OVERRIDES the
-                                   keyword search - the hydrator matches
-                                   this URL against feed records by slug
-                                   and uses that specific record's
-                                   title / description / date. Blank =
-                                   fall back to keyword-based auto-latest.
+          data-hero-feed-urls      comma-separated XML feed URLs.
+                                   Emitted in both auto-latest and
+                                   dcr-picker modes.
+          data-hero-pinned-url     optional specific article URL to
+                                   pin; accepts a full https URL or
+                                   the /en/ path. In auto-latest it
+                                   OVERRIDES the keyword search. In
+                                   dcr-picker it is the ONLY lookup
+                                   the hydrator performs. Emitted
+                                   in both modes.
           data-hero-tag-keywords   comma-separated keywords; records
                                    whose <tags> contain ANY keyword
-                                   (case-insensitive substring) survive.
-                                   Only consulted when data-hero-pinned-url
-                                   is blank.
-          data-hero-locale         "en" or "fr" (currently informational -
-                                   the RBCCM insights feeds are per-locale
-                                   so language filtering is implicit in
-                                   the URL choice)
-          data-hero-link-override  optional CTA href override
+                                   (case-insensitive substring)
+                                   survive. Only consulted in
+                                   auto-latest mode when
+                                   data-hero-pinned-url is blank.
+          data-hero-locale         "en" or "fr" (currently
+                                   informational - the RBCCM insights
+                                   feeds are per-locale so language
+                                   filtering is implicit in the URL
+                                   choice). auto-latest only.
+          data-hero-link-override  optional CTA href override.
+                                   auto-latest only.
      2. Fetch every feed in parallel, parse XML, collect <news> records.
-     3. Select record: pinned URL match if provided, else newest by
-        keyword filter.
+     3. Select record per the mode rules above.
      4. Overwrite the insight card's title / body / date / href in place.
-        The XSL pre-rendered the manual SeInsight* Datums as fallback,
-        which stays visible if the fetch fails or nothing matched.
+        The XSL pre-rendered fallback (SeInsight* Datums in auto-latest,
+        DCR-resolved content in dcr-picker) stays visible if the fetch
+        fails or nothing matched.
 
    Field shape confirmed against
    https://www.rbccm.com/en/insights/data/2026-insights (Sept 2026):
@@ -51,7 +70,10 @@
    ========================================================================= */
 
 (function () {
-  var ROOT_SEL = '.rbccm-hero--strategy-and-economics[data-hero-source="auto-latest"]';
+  /* Matches both hydrator-eligible modes. The per-section dispatch
+     inside hydrateSection() then routes on data-hero-source and
+     the presence of data-hero-pinned-url. */
+  var ROOT_SEL = '.rbccm-hero--strategy-and-economics[data-hero-source="auto-latest"], .rbccm-hero--strategy-and-economics[data-hero-source="dcr-picker"]';
   var CARD_SEL = '.rbccm-hero__insight-card';
   var HYDRATED = 'is-hydrated';
 
@@ -181,20 +203,36 @@
     if (section.getAttribute('data-hero-bound') === 'true') return;
     section.setAttribute('data-hero-bound', 'true');
 
+    var mode   = section.getAttribute('data-hero-source') || '';
+    var pinned = section.getAttribute('data-hero-pinned-url') || '';
+
+    /* dcr-picker mode: the server-rendered DCR content is the primary
+       path. The hydrator only runs as a fallback when the author has
+       set a pinned URL. No keyword scan in this mode. */
+    if (mode === 'dcr-picker' && !pinned) return;
+
     var feedAttr = section.getAttribute('data-hero-feed-urls') || '';
     var feeds = feedAttr.split(',').map(function (u) { return u.trim(); }).filter(Boolean);
     if (!feeds.length) return;
 
-    var pinned   = section.getAttribute('data-hero-pinned-url') || '';
     var keywords = section.getAttribute('data-hero-tag-keywords') || '';
     var override = section.getAttribute('data-hero-link-override') || '';
     var keepFn   = makeTagFilter(keywords);
 
     Promise.all(feeds.map(fetchFeed)).then(function (docs) {
-      /* Pinned URL takes precedence when set; falls through to
-         auto-latest only if the target slug isn't in any feed. */
-      var rec = pinned ? pickPinned(docs, pinned) : null;
-      if (!rec) rec = pickLatest(docs, keepFn);
+      var rec;
+      if (mode === 'dcr-picker') {
+        /* dcr-picker fallback: pinned URL is the ONLY lookup. If it
+           doesn't match a feed record, leave the DCR-rendered card
+           in place - do not fall through to a keyword scan. */
+        rec = pickPinned(docs, pinned);
+      } else {
+        /* auto-latest: pinned URL takes precedence when set; falls
+           through to keyword-filtered latest when the target slug
+           isn't in any feed. */
+        rec = pinned ? pickPinned(docs, pinned) : null;
+        if (!rec) rec = pickLatest(docs, keepFn);
+      }
       if (rec) hydrateCard(section, rec, override);
     });
   }

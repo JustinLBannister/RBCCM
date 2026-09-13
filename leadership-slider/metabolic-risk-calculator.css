@@ -1,0 +1,828 @@
+/*
+ * Metabolic Risk Calculator — skin for Gravity Form 18 ("Waist To Height Ratio")
+ *
+ * Scoped to #metabolic-risk (put that ID on the Divi Code module / section
+ * that wraps the [gravityform id="18"] shortcode).
+ *
+ * Targets the real form 18 fields by ID:
+ *   #field_18_36  radio   Metric / Imperial
+ *   #field_18_29  number  Height (ft)   — shown when Imperial
+ *   #field_18_31  number  Height (in)   — shown when Imperial
+ *   #field_18_38  number  Height (cm)   — shown when Metric
+ *   #field_18_1   number  Waist (in)    — shown when Imperial
+ *   #field_18_39  number  Waist (cm)    — shown when Metric
+ *
+ * Add three GF HTML fields for the section headers (any field ID) with these
+ * CSS classes set in Appearance > Custom CSS Class:
+ *   mrc-section-head mrc-head-units    (before field 36)
+ *   mrc-section-head mrc-head-height   (before field 29)
+ *   mrc-section-head mrc-head-waist    (after field 38, before field 1)
+ * and one for the video row with class:  mrc-field mrc-field--video
+ *
+ * Field order in the editor should be:
+ *   [units head] 36, [height head] 29, 31, 38, [waist head] 1, 39, [video]
+ * (drag Height (cm) 38 above Waist (in) 1 — reordering does not change IDs).
+ */
+
+#metabolic-risk {
+  --mrc-teal: #156875;
+  --mrc-teal-dark: #0f525d;
+  --mrc-lime: #b8dc4d;
+  --mrc-lime-soft: #ecf5cd;
+  --mrc-lime-pale: #f2f8dd;
+  --mrc-ink: #23323a;
+  --mrc-body: #4c5761;
+  --mrc-muted: #7d8790;
+  --mrc-line: #e4e6ea;
+  --mrc-field-border: #d4d7dc;
+  --mrc-card: #ffffff;
+  --mrc-blue-soft: #e9f3f5;
+
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 56px 20px 0;
+  color: var(--mrc-body);
+  font-family: "Texta", "Avenir Next", Helvetica, Arial, sans-serif;
+}
+
+#metabolic-risk *,
+#metabolic-risk *::before,
+#metabolic-risk *::after {
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero header                                                         */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 34px;
+  max-width: 860px;
+  margin: 0 auto 46px;
+  padding: 0 12px;
+}
+
+#metabolic-risk .mrc-hero-icon {
+  flex: 0 0 auto;
+  width: 132px;
+  height: 132px;
+}
+
+#metabolic-risk .mrc-hero-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#metabolic-risk .mrc-title {
+  margin: 0 0 14px;
+  color: var(--mrc-teal);
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 54px;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+#metabolic-risk .mrc-title-rule {
+  display: block;
+  width: 120px;
+  height: 6px;
+  margin: 0 0 22px;
+  background: var(--mrc-lime);
+}
+
+#metabolic-risk .mrc-intro {
+  max-width: 560px;
+  margin: 0;
+  color: var(--mrc-ink);
+  font-size: 21px;
+  line-height: 1.55;
+}
+
+/* ------------------------------------------------------------------ */
+/* Card shell + "Calculator" tab                                       */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-card {
+  position: relative;
+  margin: 0 0 34px;
+  padding: 54px 56px 44px;
+  border-radius: 28px;
+  background: var(--mrc-card);
+  box-shadow: 0 10px 30px rgba(31, 51, 61, 0.06);
+}
+
+#metabolic-risk .mrc-card-tab {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 13px 46px;
+  border-radius: 12px 12px 18px 18px;
+  background: var(--mrc-lime);
+  color: var(--mrc-teal);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ */
+/* Gravity Forms resets inside the card                                */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .gform_wrapper {
+  margin: 0;
+}
+
+#metabolic-risk .gform_wrapper .gform_heading,
+#metabolic-risk .gform_wrapper .gform_required_legend,
+#metabolic-risk .gfield_required {
+  display: none;
+}
+
+#metabolic-risk .gfield_visibility_hidden,
+#metabolic-risk .gform_hidden {
+  display: none !important;
+}
+
+#metabolic-risk .gform_wrapper.gravity-theme .gform_fields,
+#metabolic-risk .gform_fields {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#metabolic-risk .gfield {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+}
+
+#metabolic-risk fieldset.gfield {
+  border: 0;
+}
+
+/* Content fields indent to clear the icon gutter of section headers. */
+#metabolic-risk #field_18_36,
+#metabolic-risk #field_18_38,
+#metabolic-risk #field_18_1,
+#metabolic-risk #field_18_39,
+#metabolic-risk .mrc-field--video {
+  padding-left: 104px;
+}
+
+/* Feet / Inches share one row. */
+#metabolic-risk #field_18_29 {
+  grid-column: 1 / 7;
+  padding-left: 104px;
+  padding-right: 16px;
+}
+
+#metabolic-risk #field_18_31 {
+  grid-column: 7 / -1;
+  padding-left: 16px;
+}
+
+/* The unit radio's legend is covered by the section header. */
+#metabolic-risk #field_18_36 .gfield_label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ */
+/* Section headers (GF HTML fields)                                    */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-section-head {
+  margin-top: 34px;
+  padding-top: 36px;
+  border-top: 1px solid var(--mrc-line);
+}
+
+#metabolic-risk .mrc-section-head:first-child,
+#metabolic-risk .mrc-head-units {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+#metabolic-risk .mrc-section-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 22px;
+}
+
+#metabolic-risk .mrc-section-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--mrc-lime-soft);
+  color: var(--mrc-teal);
+}
+
+#metabolic-risk .mrc-section-icon svg {
+  width: 38px;
+  height: 38px;
+}
+
+#metabolic-risk .mrc-section-title {
+  margin: 0;
+  color: var(--mrc-teal);
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Unit hint on the waist header (updated by JS to cm / in) */
+#metabolic-risk .mrc-unit-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: var(--mrc-lime-soft);
+  color: var(--mrc-teal);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Radio pills (field 36 — Metric / Imperial)                          */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk #field_18_36 .gfield_radio {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#metabolic-risk #field_18_36 .gchoice {
+  position: relative;
+  margin: 0;
+}
+
+#metabolic-risk #field_18_36 .gfield-choice-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#metabolic-risk #field_18_36 .gchoice label {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px 30px;
+  border: 1px solid var(--mrc-field-border);
+  border-radius: 999px;
+  background: #f7f7f8;
+  color: var(--mrc-ink);
+  cursor: pointer;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+#metabolic-risk #field_18_36 .gchoice label::before {
+  content: "";
+  display: block;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #9aa3ab;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+#metabolic-risk #field_18_36 .gchoice.mrc-selected label,
+#metabolic-risk #field_18_36 .gchoice label:hover {
+  border-color: var(--mrc-lime);
+  background: var(--mrc-lime-pale);
+}
+
+#metabolic-risk #field_18_36 .gchoice.mrc-selected label::before {
+  border-color: var(--mrc-teal);
+  box-shadow: inset 0 0 0 5px #ffffff, inset 0 0 0 12px var(--mrc-teal);
+}
+
+#metabolic-risk #field_18_36 .gfield-choice-input:focus-visible + label {
+  outline: 2px solid var(--mrc-teal);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Number fields (heights + waists)                                    */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk #field_18_29 .gfield_label,
+#metabolic-risk #field_18_31 .gfield_label,
+#metabolic-risk #field_18_38 .gfield_label,
+#metabolic-risk #field_18_1 .gfield_label,
+#metabolic-risk #field_18_39 .gfield_label {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--mrc-ink);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+#metabolic-risk .ginput_container_number {
+  position: relative;
+}
+
+#metabolic-risk .ginput_container_number input {
+  width: 100%;
+  margin: 0;
+  padding: 20px 24px;
+  border: 1px solid var(--mrc-field-border);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--mrc-ink);
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+#metabolic-risk .ginput_container_number input::placeholder {
+  color: var(--mrc-muted);
+}
+
+#metabolic-risk .ginput_container_number input:focus {
+  border-color: var(--mrc-teal);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(21, 104, 117, 0.12);
+}
+
+/* Unit suffix boxes (pure CSS, no extra markup needed) */
+
+#metabolic-risk #field_18_38 .ginput_container_number input,
+#metabolic-risk #field_18_39 .ginput_container_number input,
+#metabolic-risk #field_18_1 .ginput_container_number input {
+  padding-right: 96px;
+}
+
+#metabolic-risk #field_18_38 .ginput_container_number::after,
+#metabolic-risk #field_18_39 .ginput_container_number::after,
+#metabolic-risk #field_18_1 .ginput_container_number::after {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  border-left: 1px solid var(--mrc-field-border);
+  border-radius: 0 11px 11px 0;
+  background: #f2f3f5;
+  color: var(--mrc-ink);
+  font-size: 19px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+#metabolic-risk #field_18_38 .ginput_container_number::after,
+#metabolic-risk #field_18_39 .ginput_container_number::after {
+  content: "cm";
+}
+
+#metabolic-risk #field_18_1 .ginput_container_number::after {
+  content: "in";
+}
+
+/* Field descriptions + validation */
+
+/* GF's automatic "Please enter a number from X to Y" range hints */
+#metabolic-risk .gfield .instruction,
+#metabolic-risk .gfield_description.instruction {
+  display: none;
+}
+
+#metabolic-risk .gfield_description {
+  margin: 14px 0 0;
+  padding: 0;
+  color: var(--mrc-muted);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+#metabolic-risk .gfield_description.gfield_validation_message,
+#metabolic-risk .gfield_validation_message {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #fdecec;
+  color: #b3261e;
+  font-size: 16px;
+}
+
+#metabolic-risk .gform_validation_errors {
+  margin: 0 0 24px;
+  border-radius: 16px;
+}
+
+/* A little air between the fields inside each section */
+
+#metabolic-risk #field_18_29,
+#metabolic-risk #field_18_31,
+#metabolic-risk #field_18_38,
+#metabolic-risk #field_18_1,
+#metabolic-risk #field_18_39 {
+  margin-bottom: 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Video row (GF HTML field)                                           */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-field--video {
+  margin-top: 24px;
+}
+
+#metabolic-risk .mrc-video-link {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 18px 26px;
+  border-radius: 14px;
+  background: var(--mrc-blue-soft);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+#metabolic-risk .mrc-video-link:hover {
+  background: #ddedf0;
+}
+
+#metabolic-risk .mrc-video-play {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--mrc-teal);
+  color: #ffffff;
+}
+
+#metabolic-risk .mrc-video-play svg {
+  width: 18px;
+  height: 18px;
+  margin-left: 3px;
+}
+
+#metabolic-risk .mrc-video-copy {
+  flex: 1 1 auto;
+}
+
+#metabolic-risk .mrc-video-title {
+  display: block;
+  color: var(--mrc-teal);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#metabolic-risk .mrc-video-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--mrc-muted);
+  font-size: 17px;
+}
+
+#metabolic-risk .mrc-video-arrow {
+  flex: 0 0 auto;
+  color: var(--mrc-teal);
+}
+
+#metabolic-risk .mrc-video-arrow svg {
+  width: 14px;
+  height: 22px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Submit + privacy note                                               */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .gform_footer {
+  margin: 40px 0 0;
+  padding: 0;
+}
+
+#metabolic-risk .gform_button.button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 24px 30px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--mrc-teal);
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  transition: background-color 150ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#metabolic-risk .gform_button.button:hover,
+#metabolic-risk .gform_button.button:focus-visible {
+  background: var(--mrc-teal-dark);
+}
+
+#metabolic-risk .mrc-privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0 0;
+  color: var(--mrc-ink);
+  font-size: 18px;
+}
+
+#metabolic-risk .mrc-privacy svg {
+  width: 16px;
+  height: 20px;
+  color: var(--mrc-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* Result panel (local test / optional inline results)                 */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-result {
+  display: none;
+  margin-top: 28px;
+  padding: 26px 30px;
+  border-radius: 16px;
+  background: var(--mrc-lime-pale);
+  text-align: center;
+}
+
+#metabolic-risk .mrc-result.mrc-result--visible {
+  display: block;
+}
+
+#metabolic-risk .mrc-result-ratio {
+  display: block;
+  color: var(--mrc-teal);
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+#metabolic-risk .mrc-result-label {
+  display: block;
+  margin-top: 6px;
+  color: var(--mrc-ink);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+#metabolic-risk .mrc-result-note {
+  margin: 12px auto 0;
+  max-width: 640px;
+  color: var(--mrc-body);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ */
+/* Why it matters                                                      */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-why {
+  padding: 48px 40px 150px;
+  border-radius: 28px 28px 0 0;
+  background: var(--mrc-card);
+  text-align: center;
+}
+
+#metabolic-risk .mrc-why-title {
+  margin: 0 0 8px;
+  color: var(--mrc-teal);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#metabolic-risk .mrc-why-rule {
+  display: block;
+  width: 54px;
+  height: 5px;
+  margin: 0 auto 40px;
+  background: var(--mrc-lime);
+}
+
+#metabolic-risk .mrc-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+#metabolic-risk .mrc-why-item {
+  padding: 0 34px;
+  border-left: 1px solid var(--mrc-line);
+}
+
+#metabolic-risk .mrc-why-item:first-child {
+  border-left: 0;
+}
+
+#metabolic-risk .mrc-why-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: var(--mrc-lime-soft);
+  color: var(--mrc-teal);
+}
+
+#metabolic-risk .mrc-why-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+#metabolic-risk .mrc-why-item h4 {
+  margin: 0 0 10px;
+  color: var(--mrc-teal);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+#metabolic-risk .mrc-why-item p {
+  margin: 0;
+  color: var(--mrc-body);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ */
+/* Curved teal band + scroll chevron                                   */
+/* ------------------------------------------------------------------ */
+
+#metabolic-risk .mrc-wave {
+  position: relative;
+  margin: -110px calc(50% - 50vw) 0;
+}
+
+#metabolic-risk .mrc-wave svg.mrc-wave-shape {
+  display: block;
+  width: 100%;
+  height: 150px;
+  color: var(--mrc-teal);
+}
+
+#metabolic-risk .mrc-scroll-btn {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--mrc-lime);
+  color: var(--mrc-teal);
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+#metabolic-risk .mrc-scroll-btn:hover {
+  transform: translateX(-50%) translateY(3px);
+}
+
+#metabolic-risk .mrc-scroll-btn svg {
+  width: 22px;
+  height: 14px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive                                                          */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 860px) {
+  #metabolic-risk {
+    padding-top: 40px;
+  }
+
+  #metabolic-risk .mrc-hero {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+  }
+
+  #metabolic-risk .mrc-title {
+    font-size: 40px;
+  }
+
+  #metabolic-risk .mrc-title-rule {
+    margin: 0 auto 18px;
+  }
+
+  #metabolic-risk .mrc-intro {
+    font-size: 19px;
+  }
+
+  #metabolic-risk .mrc-card {
+    padding: 46px 26px 36px;
+  }
+
+  #metabolic-risk #field_18_36,
+  #metabolic-risk #field_18_38,
+  #metabolic-risk #field_18_1,
+  #metabolic-risk #field_18_39,
+  #metabolic-risk .mrc-field--video {
+    padding-left: 0;
+  }
+
+  #metabolic-risk #field_18_29 {
+    grid-column: 1 / 7;
+    padding-left: 0;
+    padding-right: 8px;
+  }
+
+  #metabolic-risk #field_18_31 {
+    grid-column: 7 / -1;
+    padding-left: 8px;
+  }
+
+  #metabolic-risk .mrc-section-icon {
+    width: 58px;
+    height: 58px;
+  }
+
+  #metabolic-risk .mrc-section-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  #metabolic-risk .mrc-section-title {
+    font-size: 23px;
+  }
+
+  #metabolic-risk #field_18_36 .gchoice label {
+    padding: 16px 22px;
+    font-size: 18px;
+  }
+
+  #metabolic-risk .gform_button.button {
+    padding: 20px 24px;
+    font-size: 21px;
+  }
+
+  #metabolic-risk .mrc-why {
+    padding: 40px 22px 140px;
+  }
+
+  #metabolic-risk .mrc-why-grid {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  #metabolic-risk .mrc-why-item {
+    padding: 0;
+    border-left: 0;
+  }
+}

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deals Filter Test Page</title>
+
+  <!-- Bootstrap 3 grid (used by the live site) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <!-- Deal filter component stylesheet (extracted from filter-deals.js inline CSS, BEM rename) -->
+  <link rel="stylesheet" href="../deals-transactions/deal-filter.css">
+
+  <!-- jQuery + Knockout -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js"></script>
+
+  <!-- Stub for formatDate (used by ko.bindingHandlers.dateString) -->
+  <script>
+    function formatDate(v) { return v; }
+  </script>
+
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; padding-top: 60px; }
+
+    /* Fake top nav so sticky offset (60px) is visible */
+    .fake-nav { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #003168; z-index: 600; display: flex; align-items: center; padding: 0 20px; }
+    .fake-nav span { color: #fff; font-size: 18px; font-weight: 700; }
+
+    /* Tile styles matching the live site */
+    .insights-stories { padding: 30px 0; }
+    .insights-stories .row { display: flex; flex-wrap: wrap; }
+    .insights-stories .col-md-4 { margin-bottom: 24px; }
+
+    .deal-tile { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px; height: 100%; display: flex; flex-direction: column; }
+    .deal-tile .deal-date { font-size: 12px; color: #777; margin-bottom: 6px; }
+    .deal-tile h3 { font-size: 16px; font-weight: 700; color: #003168; margin: 0 0 8px; }
+    .deal-tile h3 a { color: inherit; text-decoration: none; }
+    .deal-tile h3 a:hover { text-decoration: underline; }
+    .deal-tile .deal-desc { font-size: 13px; color: #555; flex: 1; }
+    .deal-tile .deal-meta { font-size: 12px; color: #888; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px; }
+    .deal-tile .deal-meta span { display: inline-block; margin-right: 12px; }
+    .deal-tile .deal-status { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; }
+    .deal-tile .deal-status.closed { background: #e8f5e9; color: #2e7d32; }
+    .deal-tile .deal-status.pending { background: #fff3e0; color: #e65100; }
+
+    #load-more { display: block; margin: 0 auto 30px; padding: 10px 32px; font-size: 14px; font-weight: 600; background: #0051A5; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    #load-more:hover { background: #003d80; }
+
+    /* Debug panel */
+    .debug-panel { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; color: #0f0; font-family: monospace; font-size: 12px; padding: 8px 16px; z-index: 999; max-height: 120px; overflow-y: auto; display: none; }
+    .debug-panel.open { display: block; }
+    .debug-toggle { position: fixed; bottom: 8px; right: 16px; z-index: 1000; background: #333; color: #0f0; border: 1px solid #0f0; padding: 4px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <!-- Fake nav bar (simulates the 60px fixed header on rbccm.com) -->
+  <div class="fake-nav"><span>RBC CM - Deals Filter Test</span></div>
+
+  <!-- ============================================================
+       Deal filter component — static BEM markup
+       -------------------------------------------------------------
+       Hand-written here so the JS no longer needs to construct it.
+       When this lands in the live XSL component the same DOM will
+       be emitted directly. ARIA wiring matches WAI-ARIA listbox
+       pattern; lists are populated by the JS at init time.
+       ============================================================ -->
+  <div class="rbccm-deal-filter container rbccm-deal-filter-host" id="rbccm-deal-filter">
+
+    <div class="rbccm-deal-filter__inner">
+
+      <!-- SR-only instructions, referenced by the row's aria-describedby. -->
+      <p id="rbccm-deal-filter-instructions" class="rbccm-deal-filter__sr-only">
+        Filter the deals list by year and transaction type. Selected filters appear below the dropdowns.
+        Use Tab to move between controls, Arrow keys to navigate dropdown options, Enter or Space to select,
+        and Escape to close a dropdown.
+      </p>
+
+      <div class="rbccm-deal-filter__row" role="group"
+           aria-labelledby="rbccm-deal-filter-label"
+           aria-describedby="rbccm-deal-filter-instructions">
+
+        <span class="rbccm-deal-filter__label" id="rbccm-deal-filter-label">Filter by:</span>
+
+        <!-- ── Year dropdown ── -->
+        <div class="rbccm-deal-filter__dropdown rbccm-deal-filter__dropdown--year">
+          <button type="button"
+                  id="rbccm-deal-filter-year-btn"
+                  class="rbccm-deal-filter__dropdown-btn rbccm-deal-filter__dropdown-btn--year"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="rbccm-deal-filter-year-list"
+                  aria-labelledby="rbccm-deal-filter-label rbccm-deal-filter-year-btn-label">
+            <span id="rbccm-deal-filter-year-btn-label">Year</span>
+            <span class="rbccm-deal-filter__dropdown-arrow" aria-hidden="true">&#9660;</span>
+          </button>
+          <ul id="rbccm-deal-filter-year-list"
+              class="rbccm-deal-filter__dropdown-list rbccm-deal-filter__dropdown-list--year"
+              role="listbox"
+              aria-label="Filter by year"
+              tabindex="-1">
+            <!-- "All years" placeholder — clicked to clear the filter. -->
+            <li role="option" data-value="" aria-selected="false"
+                class="rbccm-deal-filter__dropdown-item"
+                id="rbccm-deal-filter-year-opt-all">
+              <span style="font-style:italic;color:#555">All years</span>
+            </li>
+            <!-- Year options injected by JS. -->
+          </ul>
+        </div>
+
+        <!-- ── Transaction type dropdown ── -->
+        <div class="rbccm-deal-filter__dropdown rbccm-deal-filter__dropdown--type">
+          <button type="button"
+                  id="rbccm-deal-filter-type-btn"
+                  class="rbccm-deal-filter__dropdown-btn rbccm-deal-filter__dropdown-btn--type"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="rbccm-deal-filter-type-list"
+                  aria-labelledby="rbccm-deal-filter-label rbccm-deal-filter-type-btn-label">
+            <span id="rbccm-deal-filter-type-btn-label">Transaction type</span>
+            <span class="rbccm-deal-filter__dropdown-arrow" aria-hidden="true">&#9660;</span>
+          </button>
+          <ul id="rbccm-deal-filter-type-list"
+              class="rbccm-deal-filter__dropdown-list rbccm-deal-filter__dropdown-list--type"
+              role="listbox"
+              aria-label="Filter by transaction type"
+              tabindex="-1">
+            <li role="option" data-value="" aria-selected="false"
+                class="rbccm-deal-filter__dropdown-item"
+                id="rbccm-deal-filter-type-opt-all">
+              <span style="font-style:italic;color:#555">All types</span>
+            </li>
+            <!-- Type options injected by JS. -->
+          </ul>
+        </div>
+
+        <!-- ── Amount slider (kept in DOM, hidden until product wants it) ── -->
+        <div class="rbccm-deal-filter__amount" hidden>
+          <span class="rbccm-deal-filter__amount-label" id="rbccm-deal-filter-amount-label">Amount:</span>
+          <div class="rbccm-deal-filter__amount-range">
+            <div class="rbccm-deal-filter__amount-track"></div>
+            <div class="rbccm-deal-filter__amount-fill"></div>
+            <input type="range" class="rbccm-deal-filter__amount-slider"
+                   id="rbccm-deal-filter-amount-min"
+                   aria-label="Minimum amount"
+                   aria-labelledby="rbccm-deal-filter-amount-label">
+            <input type="range" class="rbccm-deal-filter__amount-slider"
+                   id="rbccm-deal-filter-amount-max"
+                   aria-label="Maximum amount"
+                   aria-labelledby="rbccm-deal-filter-amount-label">
+          </div>
+          <span class="rbccm-deal-filter__amount-value" aria-live="polite"></span>
+          <button type="button" class="rbccm-deal-filter__amount-clear"
+                  aria-label="Clear amount filter">&#10005;</button>
+        </div>
+
+        <!-- Live region: "No deals matching filters" + result count announcements. -->
+        <span id="rbccm-deal-filter-count"
+              class="rbccm-deal-filter__count"
+              aria-live="polite"
+              aria-atomic="true"></span>
+      </div>
+
+      <!-- ── Active filter tags ── -->
+      <div class="rbccm-deal-filter__tags"
+           id="rbccm-deal-filter-tags"
+           role="region"
+           aria-label="Active filters"
+           aria-live="polite"
+           aria-atomic="true">
+        <!-- Tags injected by JS. -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== INITIAL TILES (server-rendered on the live site, we show a few as placeholders) ===== -->
+  <div class="insights-stories initial">
+    <div class="tombstones-wrap">
+      <div class="container">
+        <div class="row" id="initial-tiles-row">
+          <!-- populated by JS below from sample data -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KO-BOUND TILES ===== -->
+  <div class="insights-stories ko" style="display:none;">
+    <div class="container">
+      <div class="row" data-bind="foreach: filteredItems().slice(0, show())">
+        <div class="col-md-4">
+          <div class="deal-tile">
+            <div class="deal-date" data-bind="text: date"></div>
+            <h3><a data-bind="attr: {href: link}, text: title"></a></h3>
+            <div class="deal-desc" data-bind="text: description"></div>
+            <div class="deal-meta">
+              <span data-bind="text: role"></span>
+              <span data-bind="visible: amount, text: amount"></span>
+              <span data-bind="visible: region, text: region"></span>
+              <span class="deal-status" data-bind="text: status, css: { closed: status === 'Closed', pending: status !== 'Closed' }, style: { display: status === 'Closed' ? 'none' : '' }"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination strip — JS injects buttons here when results > PAGE_SIZE. -->
+  <nav id="rbccm-deal-filter-pagination"
+       class="rbccm-deal-filter__pagination"
+       aria-label="Deal results pagination">
+    <!-- buttons + page info injected by JS -->
+  </nav>
+
+  <button id="load-more" onclick="window._model && window._model.loadMore()">Load More</button>
+
+  <!-- Debug toggle -->
+  <button class="debug-toggle" onclick="document.getElementById('debug').classList.toggle('open')">Debug</button>
+  <div id="debug" class="debug-panel"></div>
+
+  <!-- ===== SAMPLE XML DATA (embedded since the live endpoint needs the rbccm.com domain) ===== -->
+  <script id="sample-deals-xml" type="text/xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<content>
+  <news><date>December 2025</date><title>Acme Corp Acquisition of Widget Industries</title><link>/transactions/acme-widget</link><thumbnail></thumbnail><description>RBC Capital Markets acted as financial advisor to Acme Corp in its acquisition of Widget Industries, a leading manufacturer of precision components.</description><role>Financial Advisor</role><status>Closed</status><amount>$2.5 Billion</amount><type>M&amp;A</type><region>North America</region><specialty>Industrials</specialty></news>
+  <news><date>November 2025</date><title>Orion Energy IPO</title><link>/transactions/orion-ipo</link><thumbnail></thumbnail><description>RBC Capital Markets served as joint bookrunner in the initial public offering of Orion Energy, a renewable energy company focused on solar and wind.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$800 Million</amount><type>Equity</type><region>North America</region><specialty>Energy</specialty></news>
+  <news><date>October 2025</date><title>BlueStar Healthcare Senior Notes</title><link>/transactions/bluestar-notes</link><thumbnail></thumbnail><description>RBC Capital Markets acted as joint lead manager for BlueStar Healthcare's senior unsecured notes offering to fund expansion into European markets.</description><role>Joint Lead Manager</role><status>Closed</status><amount>$1.2 Billion</amount><type>Debt</type><region>Global</region><specialty>Healthcare</specialty></news>
+  <news><date>September 2025</date><title>GreenField Agriculture Divestiture</title><link>/transactions/greenfield</link><thumbnail></thumbnail><description>RBC Capital Markets advised GreenField Agriculture on the divestiture of its South American operations to a consortium of investors.</description><role>Financial Advisor</role><status>Closed</status><amount>$650 Million</amount><type>M&amp;A</type><region>Latin America</region><specialty>Consumer</specialty></news>
+  <news><date>August 2025</date><title>TechNova Cloud Services Financing</title><link>/transactions/technova</link><thumbnail></thumbnail><description>RBC Capital Markets acted as lead arranger for TechNova's credit facility to support its cloud infrastructure expansion program.</description><role>Lead Arranger</role><status>Closed</status><amount>$3.1 Billion</amount><type>Leveraged Finance</type><region>North America</region><specialty>Technology</specialty></news>
+  <news><date>July 2025</date><title>Pacific Realty Trust REIT Offering</title><link>/transactions/pacific-reit</link><thumbnail></thumbnail><description>RBC Capital Markets served as joint bookrunner for Pacific Realty Trust's follow-on equity offering of common shares.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$450 Million</amount><type>Equity</type><region>North America</region><specialty>Real Estate</specialty></news>
+  <news><date>March 2025</date><title>Atlas Mining Project Finance</title><link>/transactions/atlas-mining</link><thumbnail></thumbnail><description>RBC Capital Markets acted as mandated lead arranger for the project financing of Atlas Mining's new copper extraction facility in Chile.</description><role>Mandated Lead Arranger</role><status>Pending</status><amount>$1.8 Billion</amount><type>Project Finance</type><region>Latin America</region><specialty>Mining</specialty></news>
+  <news><date>January 2025</date><title>NordBank Covered Bond Programme</title><link>/transactions/nordbank-covered</link><thumbnail></thumbnail><description>RBC Capital Markets served as joint lead manager for NordBank's EUR-denominated covered bond issuance under its established programme.</description><role>Joint Lead Manager</role><status>Closed</status><amount>$500 Million</amount><type>Debt</type><region>Europe</region><specialty>Financial Institutions</specialty></news>
+  <news><date>December 2024</date><title>Velocity Logistics Leveraged Buyout</title><link>/transactions/velocity-lbo</link><thumbnail></thumbnail><description>RBC Capital Markets provided financing for the leveraged buyout of Velocity Logistics by a leading private equity sponsor.</description><role>Lead Arranger</role><status>Closed</status><amount>$2.2 Billion</amount><type>Leveraged Finance</type><region>North America</region><specialty>Industrials</specialty></news>
+  <news><date>October 2024</date><title>ClearSky Telecom Convertible Notes</title><link>/transactions/clearsky-convert</link><thumbnail></thumbnail><description>RBC Capital Markets acted as joint bookrunner for ClearSky Telecom's convertible senior notes offering.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$750 Million</amount><type>Equity</type><region>North America</region><specialty>Technology</specialty></news>
+  <news><date>August 2024</date><title>Summit Pharmaceuticals Acquisition</title><link>/transactions/summit-pharma</link><thumbnail></thumbnail><description>RBC Capital Markets served as financial advisor to Summit Pharmaceuticals in its acquisition of BioVantage Therapeutics.</description><role>Financial Advisor</role><status>Closed</status><amount>$4.5 Billion</amount><type>M&amp;A</type><region>Global</region><specialty>Healthcare</specialty></news>
+  <news><date>June 2024</date><title>Maple Infrastructure Bond</title><link>/transactions/maple-infra</link><thumbnail></thumbnail><description>RBC Capital Markets acted as joint lead manager for the Maple Infrastructure green bond issuance supporting sustainable transit projects.</description><role>Joint Lead Manager</role><status>Closed</status><amount>$1.0 Billion</amount><type>Debt</type><region>North America</region><specialty>Infrastructure</specialty></news>
+  <news><date>March 2024</date><title>Frontier Resources Secondary Offering</title><link>/transactions/frontier-secondary</link><thumbnail></thumbnail><description>RBC Capital Markets served as joint bookrunner for Frontier Resources' secondary offering of common shares.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$300 Million</amount><type>Equity</type><region>North America</region><specialty>Energy</specialty></news>
+  <news><date>November 2023</date><title>Sterling Consumer Products Sale</title><link>/transactions/sterling-sale</link><thumbnail></thumbnail><description>RBC Capital Markets advised Sterling Consumer Products on the sale of its personal care division to a strategic buyer.</description><role>Financial Advisor</role><status>Closed</status><amount>$1.6 Billion</amount><type>M&amp;A</type><region>North America</region><specialty>Consumer</specialty></news>
+  <news><date>August 2023</date><title>BrightPath Solar Asset-Backed Securities</title><link>/transactions/brightpath-abs</link><thumbnail></thumbnail><description>RBC Capital Markets acted as structuring agent and joint bookrunner for BrightPath Solar's ABS transaction backed by residential solar loan receivables.</description><role>Structuring Agent</role><status>Closed</status><amount>$550 Million</amount><type>Securitization</type><region>North America</region><specialty>Energy</specialty></news>
+  <news><date>May 2023</date><title>Pinnacle Financial Group Merger</title><link>/transactions/pinnacle-merger</link><thumbnail></thumbnail><description>RBC Capital Markets served as financial advisor to Pinnacle Financial Group in its merger of equals with Heritage Bancshares.</description><role>Financial Advisor</role><status>Closed</status><amount>$3.8 Billion</amount><type>M&amp;A</type><region>North America</region><specialty>Financial Institutions</specialty></news>
+  <news><date>February 2023</date><title>AquaPure Water Utility Revenue Bonds</title><link>/transactions/aquapure-bonds</link><thumbnail></thumbnail><description>RBC Capital Markets served as senior managing underwriter for AquaPure's tax-exempt revenue bonds.</description><role>Senior Managing Underwriter</role><status>Closed</status><amount>$200 Million</amount><type>Municipal</type><region>North America</region><specialty>Infrastructure</specialty></news>
+  <news><date>September 2022</date><title>RedOak Timber REIT IPO</title><link>/transactions/redoak-ipo</link><thumbnail></thumbnail><description>RBC Capital Markets acted as joint bookrunner in the IPO of RedOak Timber REIT, a timberland real estate investment trust.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$420 Million</amount><type>Equity</type><region>North America</region><specialty>Real Estate</specialty></news>
+  <news><date>April 2022</date><title>CobaltTech Semiconductor Facility</title><link>/transactions/cobalttech</link><thumbnail></thumbnail><description>RBC Capital Markets arranged the project financing for CobaltTech's new semiconductor fabrication plant.</description><role>Lead Arranger</role><status>Closed</status><amount>$5.0 Billion</amount><type>Project Finance</type><region>Asia Pacific</region><specialty>Technology</specialty></news>
+  <news><date>January 2022</date><title>Northern Rail Privatization Advisory</title><link>/transactions/northern-rail</link><thumbnail></thumbnail><description>RBC Capital Markets served as financial advisor to the government on the privatization of Northern Rail services.</description><role>Financial Advisor</role><status>Closed</status><amount>$900 Million</amount><type>M&amp;A</type><region>Europe</region><specialty>Infrastructure</specialty></news>
+  <!-- ===== NORMALIZATION TEST FIXTURES ===== -->
+  <!-- Each entry uses a raw <type> string that should map to one of the 4 canonical buckets via TRANSACTION_TYPE_MAP. -->
+  <news><date>February 2026</date><title>Fervo Energy IPO</title><link>/transactions/fervo-ipo</link><thumbnail></thumbnail><description>Test fixture — raw type "IPO" should appear under "Equity Capital Markets" in the dropdown.</description><role>Joint Lead Bookrunner</role><status>Closed</status><amount>$1.9 Billion</amount><type>IPO</type><region>North America</region><specialty>Energy</specialty></news>
+  <news><date>January 2026</date><title>Apex Industries Take-Private</title><link>/transactions/apex-take-private</link><thumbnail></thumbnail><description>Test fixture — raw type "Take Private" should appear under "Mergers and Acquisitions" in the dropdown.</description><role>Financial Advisor</role><status>Closed</status><amount>$2.0 Billion</amount><type>Take Private</type><region>North America</region><specialty>Industrials</specialty></news>
+  <news><date>December 2025</date><title>NewCo Spinout from ParentCo</title><link>/transactions/newco-spinout</link><thumbnail></thumbnail><description>Test fixture — raw type "Spinout" should appear under "Mergers and Acquisitions" in the dropdown.</description><role>Financial Advisor</role><status>Closed</status><amount>$1.2 Billion</amount><type>Spinout</type><region>North America</region><specialty>Technology</specialty></news>
+  <news><date>November 2025</date><title>Helios Solar Follow-On Offering</title><link>/transactions/helios-followon</link><thumbnail></thumbnail><description>Test fixture — raw type "Joint Bookrunner" should appear under "Equity Capital Markets" in the dropdown.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$680 Million</amount><type>Joint Bookrunner</type><region>North America</region><specialty>Energy</specialty></news>
+  <news><date>October 2025</date><title>City of Toronto Sustainable Debenture</title><link>/transactions/toronto-sf</link><thumbnail></thumbnail><description>Test fixture — raw type "Sustainable Finance" should appear under "Debt Capital Markets" in the dropdown.</description><role>Sustainability Structuring Agent</role><status>Closed</status><amount>$500 Million</amount><type>Sustainable Finance</type><region>North America</region><specialty>Public Sector</specialty></news>
+  <news><date>September 2025</date><title>BridgeCo Capital Structuring Mandate</title><link>/transactions/bridgeco-cs</link><thumbnail></thumbnail><description>Test fixture — raw type "Capital Structuring" should appear under "Debt Capital Markets" in the dropdown.</description><role>Lead Arranger</role><status>Closed</status><amount>$1.5 Billion</amount><type>Capital Structuring</type><region>North America</region><specialty>Industrials</specialty></news>
+  <news><date>August 2025</date><title>AuPeak Mining Gold Stream Agreement</title><link>/transactions/aupeak-gold</link><thumbnail></thumbnail><description>Test fixture — raw type "Gold Stream" should appear under "Gold Stream" in the dropdown.</description><role>Structuring Agent</role><status>Closed</status><amount>$400 Million</amount><type>Gold Stream</type><region>Latin America</region><specialty>Mining</specialty></news>
+  <news><date>July 2025</date><title>OrphanCo Hybrid Capital Issue</title><link>/transactions/orphanco-hybrid</link><thumbnail></thumbnail><description>Test fixture — raw type "Hybrid Capital" is NOT in the map; this deal should be excluded from any type-filter result.</description><role>Joint Bookrunner</role><status>Closed</status><amount>$250 Million</amount><type>Hybrid Capital</type><region>Europe</region><specialty>Financial Institutions</specialty></news>
+</content>
+  </script>
+
+  <script>
+  // ===== Intercept $.ajax to rewrite the URL to the full rbccm.com endpoint =====
+  // Falls back to embedded sample data if CORS blocks the request.
+  (function () {
+    var LIVE_URL = 'https://www.rbccm.com/en/expertise/transactions/data/deals.page';
+    var origAjax = $.ajax;
+
+    $.ajax = function (opts) {
+      if (opts && opts.url && opts.url.indexOf('deals.page') !== -1) {
+        debugLog('Intercepted AJAX: ' + opts.url + ' -> trying live URL');
+
+        // Try live URL first
+        var liveOpts = $.extend({}, opts, { url: LIVE_URL });
+        var origSuccess = opts.success;
+        var origDone = null;
+
+        var deferred = $.Deferred();
+        var promise = deferred.promise();
+
+        // Add .done/.fail support
+        promise.done = function (fn) { origDone = fn; return promise; };
+        promise.fail = function (fn) { return promise; };
+
+        origAjax.call($, liveOpts)
+          .done(function (data) {
+            debugLog('Live data loaded successfully from rbccm.com');
+            if (typeof origSuccess === 'function') origSuccess(data);
+            if (typeof origDone === 'function') origDone(data);
+            deferred.resolve(data);
+          })
+          .fail(function () {
+            debugLog('Live fetch failed (CORS?) -> using embedded sample data');
+            var xmlText = document.getElementById('sample-deals-xml').textContent;
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+            if (typeof origSuccess === 'function') origSuccess(xmlDoc);
+            if (typeof origDone === 'function') origDone(xmlDoc);
+            deferred.resolve(xmlDoc);
+          });
+
+        return promise;
+      }
+
+      return origAjax.apply(this, arguments);
+    };
+  })();
+
+  // ===== Debug logger =====
+  function debugLog(msg) {
+    var el = document.getElementById('debug');
+    if (el) {
+      var line = document.createElement('div');
+      line.textContent = new Date().toLocaleTimeString() + ' | ' + msg;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+    console.log('[deals-test]', msg);
+  }
+
+  // ===== Build initial tiles from the sample data (first 6 recent) =====
+  (function () {
+    var xmlText = document.getElementById('sample-deals-xml').textContent;
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xmlText, 'text/xml');
+    var newsItems = doc.querySelectorAll('news');
+    var row = document.getElementById('initial-tiles-row');
+    var count = 0;
+
+    newsItems.forEach(function (node) {
+      if (count >= 6) return;
+
+      var date = node.querySelector('date').textContent;
+      var yearPart = date.trim().split(/\s+/).pop();
+      if (parseInt(yearPart, 10) < 2024) return;
+
+      var title = node.querySelector('title').textContent;
+      var link = node.querySelector('link').textContent;
+      var desc = node.querySelector('description').textContent;
+      var role = node.querySelector('role').textContent;
+      var status = node.querySelector('status').textContent;
+      var amount = node.querySelector('amount').textContent;
+      var region = node.querySelector('region').textContent;
+
+      if (desc.length > 130) {
+        desc = desc.substring(0, desc.substring(0, 130).lastIndexOf(' ')) + '...';
+      }
+
+      var col = document.createElement('div');
+      col.className = 'col-md-4';
+      col.innerHTML =
+        '<div class="deal-tile">' +
+          '<div class="deal-date">' + date + '</div>' +
+          '<h3><a href="' + link + '">' + title + '</a></h3>' +
+          '<div class="deal-desc">' + desc + '</div>' +
+          '<div class="deal-meta">' +
+            '<span>' + role + '</span>' +
+            '<span>' + amount + '</span>' +
+            '<span>' + region + '</span>' +
+            (status !== 'Closed' ? '<span class="deal-status pending">' + status + '</span>' : '') +
+          '</div>' +
+        '</div>';
+
+      row.appendChild(col);
+      count++;
+    });
+
+    debugLog('Built ' + count + ' initial tiles');
+  })();
+
+  // Stub for slick (not needed for testing filters)
+  $.fn.slick = $.fn.slick || function () { return this; };
+  </script>
+
+  <!-- ===== THE SCRIPT UNDER TEST ===== -->
+  <script src="../deals-transactions/new-filters-deals.js"></script>
+
+  <script>
+  // Expose model for console debugging
+  setTimeout(function () {
+    if (window.FormViewModel) {
+      debugLog('FormViewModel loaded. Model bound via KO.');
+    }
+  }, 500);
+  </script>
+
+</body>
+</html>

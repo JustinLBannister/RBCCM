@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metabolic Risk Calculator — form 18 local test</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="metabolic-risk-calculator.css">
+<style>
+  /* Local-test page chrome only — not shipped */
+  body {
+    margin: 0;
+    background: #f2f2f5;
+    font-family: "Avenir Next", Helvetica, Arial, sans-serif;
+  }
+  .after-section {
+    padding: 80px 20px;
+    background: #156875;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!--
+  Simulates the real Gravity Form: ID 18, "Waist To Height Ratio".
+  Real fields:  36 radio Metric/Imperial · 29 Height(ft) · 31 Height(in)
+                38 Height(cm) · 1 Waist(in) · 39 Waist(cm)
+                37/40 hidden calculated WHtR · 41-48 hidden considerations text
+  Conditional logic: 29/31/1 show when 36=Imperial, 38/39 show when 36=Metric.
+
+  The section-header and video divs below are GF HTML fields to add in the
+  editor (IDs 49-52 assumed — actual IDs don't matter, CSS targets classes).
+  Paste each block's inner content into the HTML field's Content box and set
+  the CSS classes shown in Appearance > Custom CSS Class.
+
+  Field order in the editor:
+    [49 units head] 36 [50 height head] 29 31 38 [51 waist head] 1 39 [52 video]
+-->
+<section id="metabolic-risk">
+
+  <header class="mrc-hero">
+    <div class="mrc-hero-icon">
+      <svg viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="mrc-ring-grad" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#156875"/>
+            <stop offset="0.5" stop-color="#156875"/>
+            <stop offset="0.78" stop-color="#b8dc4d"/>
+            <stop offset="1" stop-color="#b8dc4d"/>
+          </linearGradient>
+        </defs>
+        <!-- dotted ring: pathLength 60 + dasharray 0 1 = 60 round dots -->
+        <circle cx="60" cy="60" r="56" pathLength="60" stroke="url(#mrc-ring-grad)" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="0 1"/>
+        <!-- calculator -->
+        <g stroke="#156875" stroke-width="4">
+          <rect x="40" y="32" width="40" height="56" rx="8"/>
+          <rect x="48" y="40" width="24" height="10" rx="3"/>
+        </g>
+        <g stroke="#156875" stroke-width="2.6">
+          <rect x="47.5" y="56.5" width="7" height="6.5" rx="2"/>
+          <rect x="56.5" y="56.5" width="7" height="6.5" rx="2"/>
+          <rect x="65.5" y="56.5" width="7" height="6.5" rx="2"/>
+          <rect x="47.5" y="66.5" width="7" height="6.5" rx="2"/>
+          <rect x="56.5" y="66.5" width="7" height="6.5" rx="2"/>
+          <rect x="47.5" y="76.5" width="7" height="6.5" rx="2"/>
+          <rect x="56.5" y="76.5" width="7" height="6.5" rx="2"/>
+          <rect x="65.5" y="66.5" width="7" height="16.5" rx="2.6"/>
+        </g>
+      </svg>
+    </div>
+    <div class="mrc-hero-copy">
+      <h2 class="mrc-title">Metabolic Risk<br>Calculator</h2>
+      <span class="mrc-title-rule"></span>
+      <p class="mrc-intro">Your waist-to-height ratio is a better measure than BMI for understanding your risk of heart-related conditions. Calculate yours here.</p>
+    </div>
+  </header>
+
+  <div class="mrc-card">
+    <div class="mrc-card-tab">Calculator</div>
+
+    <div class="gform_wrapper gravity-theme" id="gform_wrapper_18">
+      <form method="post" enctype="multipart/form-data" id="gform_18" action="">
+        <div class="gform-body gform_body">
+          <div id="gform_fields_18" class="gform_fields top_label form_sublabel_below description_below">
+
+            <!-- GF HTML field · classes: mrc-section-head mrc-head-units -->
+            <div id="field_18_49" class="gfield gfield--type-html mrc-section-head mrc-head-units">
+              <div class="mrc-section-row">
+                <span class="mrc-section-icon">
+                  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                    <path d="M11 21.5a13 13 0 0 1 26 0H11Z" stroke-linejoin="round"/>
+                    <path d="M24 20V9.8M22.5 19l-7.3-5.4M25.5 19l7.3-5.4" stroke-linecap="round"/>
+                    <path d="M19.2 21.5a4.8 4.8 0 0 1 9.6 0Z" fill="currentColor" stroke="none"/>
+                    <rect x="19.5" y="25.5" width="9" height="9" rx="1"/>
+                    <rect x="22.9" y="28.9" width="2.2" height="2.2" stroke-width="2"/>
+                    <path d="M4.5 30h15M28.5 30h15" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <h3 class="mrc-section-title">1. Unit System</h3>
+              </div>
+            </div>
+
+            <!-- Field 36: radio Metric / Imperial (real field) -->
+            <fieldset id="field_18_36" class="gfield gfield--type-radio gfield--type-choice gfield--input-type-radio gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible">
+              <legend class="gfield_label gform-field-label">Metric / Imperial<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></legend>
+              <div class="ginput_container ginput_container_radio">
+                <div class="gfield_radio" id="input_18_36">
+                  <div class="gchoice gchoice_18_36_0">
+                    <input class="gfield-choice-input" name="input_36" type="radio" value="Metric" id="choice_18_36_0" checked>
+                    <label for="choice_18_36_0" id="label_18_36_0" class="gform-field-label gform-field-label--type-inline">Metric (cm, kg)</label>
+                  </div>
+                  <div class="gchoice gchoice_18_36_1">
+                    <input class="gfield-choice-input" name="input_36" type="radio" value="Imperial" id="choice_18_36_1">
+                    <label for="choice_18_36_1" id="label_18_36_1" class="gform-field-label gform-field-label--type-inline">Imperial (in, lb)</label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- GF HTML field · classes: mrc-section-head mrc-head-height -->
+            <div id="field_18_50" class="gfield gfield--type-html mrc-section-head mrc-head-height">
+              <div class="mrc-section-row">
+                <span class="mrc-section-icon">
+                  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                    <circle cx="17" cy="10.5" r="4.3"/>
+                    <path d="M10.8 39.5V22c0-2.5 2-4.5 4.5-4.5h3.4c2.5 0 4.5 2 4.5 4.5v17.5H10.8Z" stroke-linejoin="round"/>
+                    <path d="M13.6 18l3.4 3.8L20.4 18" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M36.5 8.5v31" stroke-linecap="round"/>
+                    <path d="M36.5 8.5h-6M36.5 39.5h-6M36.5 13.7h-4M36.5 18.9h-6M36.5 24.1h-4M36.5 29.3h-6M36.5 34.5h-4" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <h3 class="mrc-section-title">2. Height</h3>
+              </div>
+            </div>
+
+            <!-- Field 29: Height (ft) — conditional: show when 36 = Imperial -->
+            <div id="field_18_29" class="gfield gfield--type-number gfield_contains_required gfield_visibility_visible" style="display:none;">
+              <label class="gfield_label gform-field-label" for="input_18_29">Height (ft)<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label>
+              <div class="ginput_container ginput_container_number">
+                <input name="input_29" id="input_18_29" type="number" step="any" min="3" max="7" value="3" placeholder="feet" class="large">
+              </div>
+              <div class="gfield_description instruction" id="gfield_instruction_18_29">Please enter a number from <strong>3</strong> to <strong>7</strong>.</div>
+            </div>
+
+            <!-- Field 31: Height (in) — conditional: show when 36 = Imperial -->
+            <div id="field_18_31" class="gfield gfield--type-number gfield_contains_required gfield_visibility_visible" style="display:none;">
+              <label class="gfield_label gform-field-label" for="input_18_31">Height (in)<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label>
+              <div class="ginput_container ginput_container_number">
+                <input name="input_31" id="input_18_31" type="number" step="any" min="0" max="11" value="0" placeholder="inches" class="large">
+              </div>
+            </div>
+
+            <!-- Field 38: Height (cm) — conditional: show when 36 = Metric -->
+            <div id="field_18_38" class="gfield gfield--type-number gfield_contains_required gfield_visibility_visible">
+              <label class="gfield_label gform-field-label" for="input_18_38">Height (cm)<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label>
+              <div class="ginput_container ginput_container_number">
+                <input name="input_38" id="input_18_38" type="number" step="any" class="large">
+              </div>
+            </div>
+
+            <!-- GF HTML field · classes: mrc-section-head mrc-head-waist -->
+            <div id="field_18_51" class="gfield gfield--type-html mrc-section-head mrc-head-waist">
+              <div class="mrc-section-row">
+                <span class="mrc-section-icon">
+                  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                    <circle cx="20" cy="21" r="13.5"/>
+                    <circle cx="20" cy="21" r="7"/>
+                    <rect x="16.4" y="18.9" width="7.2" height="4.2" rx="2.1"/>
+                    <path d="M31.5 28.5c3.2 2.6 7 3.9 12 4v6.8H26.8a17 17 0 0 1-5.6-2.8" stroke-linejoin="round"/>
+                    <path d="M32.5 39.3v-3M36 39.3v-3M39.5 39.3v-3" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <h3 class="mrc-section-title">3. Waist Circumference</h3>
+                <span class="mrc-unit-badge">cm</span>
+              </div>
+            </div>
+
+            <!-- Field 1: Waist (in) — conditional: show when 36 = Imperial -->
+            <div id="field_18_1" class="gfield gfield--type-number gfield_contains_required gfield_visibility_visible" style="display:none;">
+              <label class="gfield_label gform-field-label" for="input_18_1">Waist Circumference (in)<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label>
+              <div class="ginput_container ginput_container_number">
+                <input name="input_1" id="input_18_1" type="number" step="any" min="0" max="120" placeholder="Enter your waist size" class="large">
+              </div>
+              <div class="gfield_description">Measure around your navel.</div>
+            </div>
+
+            <!-- Field 39: Waist (cm) — conditional: show when 36 = Metric -->
+            <div id="field_18_39" class="gfield gfield--type-number gfield_contains_required gfield_visibility_visible">
+              <label class="gfield_label gform-field-label" for="input_18_39">Waist Circumference (cm)<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label>
+              <div class="ginput_container ginput_container_number">
+                <input name="input_39" id="input_18_39" type="number" step="any" placeholder="Enter your waist size" class="large">
+              </div>
+              <div class="gfield_description">Measure around your navel.</div>
+            </div>
+
+            <!-- GF HTML field · classes: mrc-field mrc-field--video -->
+            <div id="field_18_52" class="gfield gfield--type-html mrc-field mrc-field--video">
+              <a class="mrc-video-link" href="#how-to-measure">
+                <span class="mrc-video-play">
+                  <svg viewBox="0 0 14 16" fill="currentColor" aria-hidden="true"><path d="M13 8 1 15.5V.5L13 8Z"/></svg>
+                </span>
+                <span class="mrc-video-copy">
+                  <span class="mrc-video-title">How to Measure Your Waist</span>
+                  <span class="mrc-video-sub">Watch a short video (60 sec)</span>
+                </span>
+                <span class="mrc-video-arrow">
+                  <svg viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m2 2 6 6-6 6"/></svg>
+                </span>
+              </a>
+            </div>
+
+            <!-- Fields 37 / 40: hidden calculated WHtR (rendered but invisible) -->
+            <div id="field_18_37" class="gfield gfield--type-number gfield_visibility_hidden">
+              <div class="ginput_container ginput_container_number">
+                <input name="input_37" id="input_18_37" type="number" step="any" class="large">
+              </div>
+            </div>
+            <div id="field_18_40" class="gfield gfield--type-number gfield_visibility_hidden">
+              <div class="ginput_container ginput_container_number">
+                <input name="input_40" id="input_18_40" type="number" step="any" class="large">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="gform_footer top_label">
+          <input type="submit" id="gform_submit_button_18" class="gform_button button" value="Calculate">
+        </div>
+      </form>
+
+      <!-- Not part of the GF form — add below the shortcode in the Divi Code module -->
+      <p class="mrc-privacy">
+        <svg viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="1" y="8" width="14" height="11" rx="2"/>
+          <path d="M4.5 8V5.5a3.5 3.5 0 0 1 7 0V8"/>
+        </svg>
+        Your information is private and secure.
+      </p>
+
+      <!-- LOCAL TEST ONLY: the live form redirects to the results page (13389)
+           with ?ratio=&considerations=&notes= — this panel just previews the
+           same outcome inline. -->
+      <div class="mrc-result" id="mrc-result" role="status" aria-live="polite">
+        <span class="mrc-result-ratio" id="mrc-result-ratio"></span>
+        <span class="mrc-result-label" id="mrc-result-label"></span>
+        <p class="mrc-result-note" id="mrc-result-note"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mrc-why">
+    <h3 class="mrc-why-title">Why It Matters</h3>
+    <span class="mrc-why-rule"></span>
+    <div class="mrc-why-grid">
+      <div class="mrc-why-item">
+        <span class="mrc-why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M12 20.5S3 15 3 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 9 2.8c0 6.2-9 11.7-9 11.7Z"/>
+            <path d="M5 12h4l1.5-3 2.5 5 1.5-2h4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <h4>Better Indicator</h4>
+        <p>Waist-to-height ratio can be a stronger predictor of heart risk than BMI alone.</p>
+      </div>
+      <div class="mrc-why-item">
+        <span class="mrc-why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <circle cx="11" cy="13" r="8"/>
+            <circle cx="11" cy="13" r="4"/>
+            <circle cx="11" cy="13" r="0.8" fill="currentColor" stroke="none"/>
+            <path d="M11 13 19 5M19 5h2.8M19 5V2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <h4>Personalized Insight</h4>
+        <p>Understand your unique risk and take steps toward a healthier you.</p>
+      </div>
+      <div class="mrc-why-item">
+        <span class="mrc-why-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M12 2.5 20 5.5v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10v-6l8-3Z"/>
+            <path d="m8.5 12 2.4 2.4 4.6-4.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <h4>Empower Your Health</h4>
+        <p>Small changes today can lead to a healthier heart tomorrow.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mrc-wave">
+    <svg class="mrc-wave-shape" viewBox="0 0 1200 150" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 30 C 380 145 820 145 1200 30 L 1200 150 L 0 150 Z" fill="currentColor"/>
+    </svg>
+    <button type="button" class="mrc-scroll-btn" aria-label="Scroll to next section">
+      <svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="m2 2 9 9 9-9"/></svg>
+    </button>
+  </div>
+
+</section>
+
+<div class="after-section">Next page section (scroll target for the chevron)</div>
+
+<script src="metabolic-risk-calculator.js"></script>
+<script>
+  // ================= LOCAL TEST ONLY — none of this ships =================
+  // 1) Simulates GF conditional logic on field 36 (the plugin does this live).
+  // 2) Simulates the calculated WHtR fields (37/40) + conditional confirmations
+  //    — live, GF computes these and redirects to the results page (13389).
+
+  (function () {
+    var IMPERIAL_FIELDS = ["field_18_29", "field_18_31", "field_18_1"];
+    var METRIC_FIELDS = ["field_18_38", "field_18_39"];
+
+    function applyConditionalLogic() {
+      var imperial = document.getElementById("choice_18_36_1").checked;
+      IMPERIAL_FIELDS.forEach(function (id) {
+        document.getElementById(id).style.display = imperial ? "block" : "none";
+      });
+      METRIC_FIELDS.forEach(function (id) {
+        document.getElementById(id).style.display = imperial ? "none" : "block";
+      });
+    }
+
+    ["choice_18_36_0", "choice_18_36_1"].forEach(function (id) {
+      document.getElementById(id).addEventListener("change", applyConditionalLogic);
+    });
+    applyConditionalLogic();
+
+    // Real considerations copy from form 18 (fields 41-48).
+    var CONDITIONS = [
+      { max: 0.4, title: "Take Care (possibly underweight)", note: "A Waist-to-Height ratio of less than 0.4 is below the ‘healthy range’ and indicates you may be underweight. Being underweight can put you at risk for certain medical conditions. Consult your doctor for an evaluation and further support." },
+      { max: 0.5, title: "Healthy, No Action Needed", note: "A Waist-to-Height ratio of 0.4 - 0.49 is considered to be within the healthy range. Maintaining your waist circumference in this range is likely to reduce the risk of obesity-related health issues." },
+      { max: 0.6, title: "Consider Action", note: "A Waist-to-Height ratio of 0.5 - 0.59 is considered above the healthy range and could place you at an increased risk of developing cardiovascular risk factors such as high blood pressure and high cholesterol. It is recommended that you consider finding a sustainable way to manage your weight. Speaking with your doctor about weight management is a great place to start." },
+      { max: Infinity, title: "Take Action", note: "A Waist-to-Height ratio (WHtR) of 0.6 or above puts you at high risk of obesity-related health conditions and could seriously impact your heart health. It's suggested that you take action by speaking with your doctor about weight management and asking for a full assessment." }
+    ];
+
+    document.getElementById("gform_18").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      var imperial = document.getElementById("choice_18_36_1").checked;
+      var ratio;
+      if (imperial) {
+        // {Waist:1} / ({Height (ft):29} * 12 + {Height (in):31})
+        var ft = parseFloat(document.getElementById("input_18_29").value) || 0;
+        var inch = parseFloat(document.getElementById("input_18_31").value) || 0;
+        var waistIn = parseFloat(document.getElementById("input_18_1").value);
+        ratio = waistIn / (ft * 12 + inch);
+        document.getElementById("input_18_37").value = ratio ? ratio.toFixed(2) : "";
+      } else {
+        // {Waist (cm):39} / {Height (cm):38}
+        var hCm = parseFloat(document.getElementById("input_18_38").value);
+        var wCm = parseFloat(document.getElementById("input_18_39").value);
+        ratio = wCm / hCm;
+        document.getElementById("input_18_40").value = ratio ? ratio.toFixed(2) : "";
+      }
+
+      var result = document.getElementById("mrc-result");
+      var ratioEl = document.getElementById("mrc-result-ratio");
+      var labelEl = document.getElementById("mrc-result-label");
+      var noteEl = document.getElementById("mrc-result-note");
+
+      if (!isFinite(ratio) || !ratio) {
+        ratioEl.textContent = "—";
+        labelEl.textContent = "Please enter your height and waist measurement.";
+        noteEl.textContent = "";
+        result.classList.add("mrc-result--visible");
+        return;
+      }
+
+      var rounded = parseFloat(ratio.toFixed(2));
+      var condition = CONDITIONS.filter(function (c) { return rounded < c.max; })[0];
+
+      ratioEl.textContent = rounded.toFixed(2);
+      labelEl.textContent = "Considerations: " + condition.title;
+      noteEl.textContent = condition.note;
+      result.classList.add("mrc-result--visible");
+      result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  })();
+</script>
+</body>
+</html>

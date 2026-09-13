@@ -1,0 +1,75 @@
+<!-- ============================================================
+     CTA Band — Properties + Data
+     ============================================================
+     Shared component. Extracted from MAAS+MATA "Talk with an
+     expert." + US Credentials "Ready to turn insight into
+     results?" — both share ~95% of the same visual system.
+
+     Placement
+     ─────────
+       Standalone      → paints its own dark navy gradient
+       Inside deep-band → transparent; parent paints continuous
+                          gradient across sibling sections
+     No modifier flag needed — CSS derives visual from context.
+
+     Deploy alongside:
+       /assets/rbccm/css/components/cta-band.css
+     ============================================================ -->
+<Properties ComponentID="cta-band-v1">
+
+  <!-- ═══ CONTENT ═════════════════════════════════════════════
+       Every field is optional. Empty Datum → element does not
+       render (eyebrow) or renders empty (heading parts / body).
+       ═════════════════════════════════════════════════════════ -->
+
+  <!-- Eyebrow — small yellow caption above the heading. Leave
+       blank to omit it entirely (US Credentials style). Set to
+       e.g. "SEE THE PLATFORM" for the MAAS+MATA style. -->
+  <Datum ID="Eyebrow" Type="String" Name="Eyebrow (optional — omit for no eyebrow)"></Datum>
+
+  <!-- Heading, split into two halves. Lead renders white, highlight
+       renders yellow (#FFC72C). Together they form one H2. Both
+       are joined with a non-breaking space so line-wrap treats
+       them as a single phrase.
+
+       Examples:
+         Lead: "Talk with an"          Highlight: "expert."
+         Lead: "Ready to turn insight" Highlight: "into results?" -->
+  <Datum ID="HeadingLead" Type="String" Name="Heading — lead (white text)">Talk with an</Datum>
+  <Datum ID="HeadingHighlight" Type="String" Name="Heading — highlight (yellow text)">expert.</Datum>
+
+  <!-- Body paragraph. Textarea so authors can paste multi-line
+       or lightly-formatted copy. Inline HTML supported (bold /
+       italic / anchor) via the XSL's disable-output-escaping. -->
+  <Datum ID="Body" Type="Textarea" Name="Body copy">Connect with our product teams to arrange a custom demo.</Datum>
+
+  <!-- ═══ CTA ═════════════════════════════════════════════════ -->
+  <Datum ID="CtaLabel" Type="String" Name="CTA button label">Request a demo</Datum>
+  <Datum ID="CtaHref" Type="String" Name="CTA URL">#demo</Datum>
+
+  <!-- ═══ TUNABLE WIDTHS ══════════════════════════════════════
+       All three are optional. When left blank the CSS default
+       applies. Set a value to shift the component's proportions
+       for a specific page.
+
+         ContentWidth   Max width of the inner content wrapper.
+                        CSS default: 690px  (MAAS+MATA)
+                        US Credentials uses 758px.
+                        Any CSS length: 500px, 60rem, etc.
+
+         ContentGap     Vertical rhythm between eyebrow, heading,
+                        body, and CTA blocks.
+                        CSS default: 41px  (MAAS+MATA)
+                        US Credentials uses 50px.
+
+         BodyWidth      Max width of the body paragraph.
+                        CSS default: 100% (stretches to
+                        ContentWidth).
+                        US Credentials narrows body to 432px so
+                        it wraps tighter under the heading.
+       ═════════════════════════════════════════════════════════ -->
+  <Datum ID="ContentWidth" Type="String" Name="Content wrapper max-width (optional — default 690px)"></Datum>
+  <Datum ID="ContentGap"   Type="String" Name="Content wrapper vertical gap (optional — default 41px)"></Datum>
+  <Datum ID="BodyWidth"    Type="String" Name="Body paragraph max-width (optional — default 100%, US uses 432px)"></Datum>
+
+</Properties>

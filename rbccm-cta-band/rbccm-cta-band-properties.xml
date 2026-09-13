@@ -1,0 +1,203 @@
+<!--
+  RBCCM CTA Band - Properties + Data
+  ==============================================================
+  Preset-driven CTA banner section. Optional eyebrow, heading
+  (with an optional gold highlight span for the accented word),
+  body copy, and 1-2 buttons.
+
+  Presets:
+    talk-with-an-expert
+      Full-width deep-navy section (linear gradient), gold
+      eyebrow with 45x2 underline, big serif heading (mix of
+      white prefix + gold highlight span), body copy, single
+      yellow primary button with shine-sweep + arrow-flyby.
+      Ported from MAAS+MATA .__demo.
+
+    research-portal
+      Deep-navy section (full-width), no eyebrow, medium serif
+      heading, body copy, two buttons (primary yellow + secondary
+      outlined ghost). Heading + body wrap in a .__intro group
+      with gap 12; actions row below.
+
+  Heading + Body accept HTML
+  ==============================================================
+  Both HeadingText and BodyText are Textareas rendered with
+  disable-output-escaping="yes". Authors can inline the yellow
+  highlight span in HeadingText by wrapping the accent word in
+  <span class="rbccm-cta-band__heading-highlight">expert</span>.
+  Only used by talk-with-an-expert; research-portal ignores the
+  span (variant CSS doesn't color it differently).
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every text field ships as a pair: <Field>Text + <Field>Tag
+  (enum picker: h1..h6, p, div, span). XSL emits the chosen tag
+  via xsl:element name="{tag}", guarded by pickTag allow-list.
+
+  CTA anchor tag is always <a>; only text, href, and target are
+  Datums. Blank <Field>Text hides that button.
+-->
+<Properties ComponentID="rbccm-cta-band">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. Deploy-time plumbing.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-cta-band-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">Call to action</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-cta-band.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - component has no runtime, leave blank)"></Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Talk with an expert (deep navy, single yellow CTA)</Display>
+      <Value>talk-with-an-expert</Value>
+    </Option>
+    <Option>
+      <Display>Research portal (deep navy, two CTAs)</Display>
+      <Value>research-portal</Value>
+    </Option>
+    research-portal
+  </Datum>
+
+  <!-- Optional bg override: when Yes, adds the
+       .rbccm-cta-band__bg-transparent modifier which nulls out the
+       variant's background/gradient. Useful when the CTA band is
+       dropped inside a parent wrapper that already paints its own bg
+       (e.g. MAAS+MATA's .deep-band gradient spanning multiple bands).
+       (Class name uses __ substitution for the BEM modifier so this
+       XML comment stays well-formed; emitted markup uses the
+       double-hyphen prefix.) -->
+  <Datum ID="BgTransparent" Type="String" Name="Background : transparent (optional - use only when a parent wrapper already paints a bg)">
+    <Option><Display>No (use the variant's own bg)</Display><Value>no</Value></Option>
+    <Option><Display>Yes (transparent, parent bg shows through)</Display><Value>yes</Value></Option>
+    no
+  </Datum>
+
+
+  <!-- Header alignment is NOT exposed on this component. Both presets
+       (talk-with-an-expert + research-portal) are inherently centered
+       hero bands - their identity requires the eyebrow / heading /
+       body / CTA row to sit stacked and centered. Exposing an
+       alignment picker would hand editors a knob that doesn't do
+       anything meaningful for either variant. -->
+
+
+  <!-- ============================================================
+       Eyebrow (talk-with-an-expert only)
+       ============================================================
+       What editors set here: the small kicker line that sits above
+       the heading. Only rendered by the talk-with-an-expert preset;
+       research-portal ignores it either way.
+       ============================================================ -->
+  <Datum ID="EyebrowText" Type="String" Name="Eyebrow text (optional - blank hides the eyebrow line)">See the platform</Datum>
+  <Datum ID="EyebrowTag" Type="String" Name="Eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+
+  <!-- ============================================================
+       Heading
+       ============================================================
+       What editors set here: the big serif line at the middle of
+       the band. HTML allowed - inline
+       <span class="rbccm-cta-band__heading-highlight">word</span>
+       to yellow-accent one word in the talk-with-an-expert preset.
+       ============================================================ -->
+  <Datum ID="HeadingText" Type="Textarea" Name="Heading text (required - do not blank; HTML allowed)">Research portal</Datum>
+  <Datum ID="HeadingTag" Type="String" Name="Heading tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+
+
+  <!-- ============================================================
+       Body copy
+       ============================================================
+       What editors set here: the paragraph beneath the heading.
+       HTML allowed. Leave blank to hide.
+       ============================================================ -->
+  <Datum ID="BodyText" Type="Textarea" Name="Body copy (optional - blank hides the paragraph; HTML allowed)">Access market research, commentary and more through our online portal, RBC Insight. It is also accessible via our iPad app.</Datum>
+  <Datum ID="BodyTag" Type="String" Name="Body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    p
+  </Datum>
+
+
+  <!-- ============================================================
+       Primary CTA (yellow pill with arrow)
+       ============================================================
+       What editors set here: the main button - label, destination,
+       and whether it opens in a new tab. Leave the label blank to
+       hide the button entirely.
+       ============================================================ -->
+  <Datum ID="PrimaryCtaText" Type="String" Name="Primary CTA : label (optional - blank hides the button)">Log in to RBC Insights</Datum>
+  <Datum ID="PrimaryCtaHref" Type="String" Name="Primary CTA : URL (required if label is set - full URL or /en/ path)">https://www.rbcinsightresearch.com</Datum>
+  <Datum ID="PrimaryCtaNewTab" Type="String" Name="Primary CTA : open in new tab? (optional - controls target=_blank)">
+    <Option><Display>Yes (target=_blank)</Display><Value>yes</Value></Option>
+    <Option><Display>No (same tab)</Display><Value>no</Value></Option>
+    yes
+  </Datum>
+
+
+  <!-- ============================================================
+       Secondary CTA (outlined ghost; research-portal only)
+       ============================================================
+       What editors set here: an optional second button next to the
+       primary CTA. Only rendered by the research-portal preset.
+       Leave the label blank to hide it.
+       ============================================================ -->
+  <Datum ID="SecondaryCtaText" Type="String" Name="Secondary CTA : label (optional - blank hides the button)">Learn more</Datum>
+  <Datum ID="SecondaryCtaHref" Type="String" Name="Secondary CTA : URL (required if label is set - full URL or /en/ path)">/en/insights/rbc-research</Datum>
+  <Datum ID="SecondaryCtaNewTab" Type="String" Name="Secondary CTA : open in new tab? (optional - controls target=_blank)">
+    <Option><Display>Yes (target=_blank)</Display><Value>yes</Value></Option>
+    <Option><Display>No (same tab)</Display><Value>no</Value></Option>
+    no
+  </Datum>
+
+</Data>

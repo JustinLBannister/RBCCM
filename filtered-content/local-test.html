@@ -242,7 +242,11 @@
   <p class="local-test-section-label" style="margin-top:48px;">Preset: in-the-media-and-press-releases</p>
   <p class="local-test-hint">Filter chrome and pagination render the same way. Item template stubbed as bare <code>&lt;li&gt;</code>s with data attrs — waiting on your ITM item CSS to drop in styling. When your CSS + item markup lands, this preset renders a Type + Year + Month + Region + Search filter over the /press_release DCR feed.</p>
 
-  <section class="rbccm-filtered-content rbccm-filtered-content--in-the-media-and-press-releases"
+  <!-- ITM preset -- Cordelia's requested simplification: Type + Year only.
+       Month, Region and Search stay in the markup but are hidden via the
+       `--hidden-*` modifier classes on the root so bringing them back is
+       just a one-word class removal, no DOM restore needed. -->
+  <section class="rbccm-filtered-content rbccm-filtered-content--in-the-media-and-press-releases rbccm-filtered-content--hidden-month rbccm-filtered-content--hidden-region rbccm-filtered-content--hidden-search"
            id="rbccm-filtered-content-itm"
            data-container="#rbccm-filtered-content-itm"
            data-page-size="10"

@@ -397,7 +397,6 @@
     font-weight: 400;
     line-height: 120%;
     letter-spacing: 3px;
-    text-transform: uppercase;
     /* 80px below the yellow underline to the top of the H1 per Figma.
        The ::after (yellow line) sits INSIDE the eyebrow box, so this
        margin-bottom is measured from the line's bottom edge. */
@@ -460,7 +459,7 @@
   @media (min-width: 992px) {
     .rbccm-maas-mata__hero-subtitle {
       font-size: 21.945px;
-      max-width: 776px;
+      max-width: 832px; /* synced with external maas-mata.css to fit the longer MAAS+MATA copy */
       margin: 0 auto 40px;
     }
   }
@@ -544,7 +543,26 @@
      rhythm; zero bottom padding — the platforms band below has its own
      80px top/bottom and its gradient blends seamlessly out of the flat
      #09254A of this strip. */
-  .rbccm-maas-mata__dark-strip { background: #09254A; color: #fff; padding: 222px 0 0; }
+  /* Dark strip — now carries new-standard + awards + platforms +
+     mata-cap ("Sharper insight. Smarter trades."). Gradient stops
+     tuned so:
+       - Top: soft brighter navy (hero overlap area)
+       - Middle: settled dark navy through the platform cards
+       - Bottom (around mata-cap): mid-dark, then a subtle lift back
+         toward a slightly lighter navy so the transition into the
+         light innovation-era below reads intentional rather than
+         hitting a hard cliff. */
+  .rbccm-maas-mata__dark-strip {
+    background: linear-gradient(
+      180deg,
+      #0B2A56 0%,
+      #09254A 35%,
+      #082043 70%,
+      #0A2A55 100%
+    );
+    color: #fff;
+    padding: 222px 0 0;
+  }
 
   /* Awards — Figma: 40px top/bottom, 170px sides, flex-column, gap 32,
      center-aligned. On desktop the 1440px container ⇒ 1100 inner. Kept
@@ -834,6 +852,11 @@
      Both share display flex column, centered, stretch. Background
      gradient is our own addition (Figma just shows the dark navy;
      the subtle gradient reads better on tall viewports). */
+  /* Platforms — was carrying its OWN #09254A → #05152A gradient that
+     ended DARKER than dark-strip's own gradient at the same point,
+     which created a visible seam right before the mata-cap heading.
+     Dropped the local gradient so dark-strip's shared gradient runs
+     unbroken across new-standard + awards + platforms + mata-cap. */
   .rbccm-maas-mata__platforms {
     display: flex;
     flex-direction: column;
@@ -842,7 +865,7 @@
     align-self: stretch;
     gap: 32px;
     padding: 80px 16px;
-    background: linear-gradient(180deg, #09254A 0%, #05152A 100%);
+    background: transparent;
     text-align: center;
   }
   /* Padding swap aligned to the card-row breakpoint (988) so we
@@ -923,7 +946,7 @@
     height: 2px;
     background: #FFC72C;
   }
-  /* Section H2 "Better insight for stronger execution"
+  /* Section H2 "Stronger execution for sharper insights"
      Mobile  (title-small-mobile): RBC Display 36/43.2 weight 500,
      stretch full-width. Desktop (title-desktop): 42/52.5 weight 500,
      natural width. White, centered at both breakpoints. */
@@ -1174,6 +1197,10 @@
        Desktop: padding 80/170, gap 10
      Swap at 988 to align with the rest of the page's tablet
      breakpoint (platforms section, feature cards, etc.). */
+  /* Innovation-era lives INSIDE the deep-band wrapper (took over the
+     old market-insights slot), but retains its light #F1F5FB card
+     identity — it reads as a bright island inside the deep-band's
+     dark gradient. Text stays dark (light-mode treatment below). */
   .rbccm-maas-mata__innovation-era {
     display: flex;
     flex-direction: column;
@@ -1539,8 +1566,22 @@
      top down to #061730 at the bottom, so the three sections read as
      one continuous surface with no seams between them. Each of the
      three sections goes transparent so the wrapper's gradient shows. */
+  /* Deep-band gradient — starts a touch brighter than the dark-strip's
+     end (#082043) at the very top so the eye reads a soft "lift" into
+     the mata-cap ("Sharper insight. Smarter trades.") section rather
+     than a hard boundary. The bright top sits ABOVE mata-cap, plateaus
+     at #082043 as mata-cap begins (~18%), then keeps darkening slowly
+     all the way through innovation-era + demo. The result: gradient
+     is visible right through the mata-cap section and beyond, no seam. */
   .rbccm-maas-mata__deep-band {
-    background: linear-gradient(180deg, #082043 0%, #061730 100%);
+    background: linear-gradient(
+      180deg,
+      #0D2E5C 0%,
+      #0A2648 8%,
+      #082043 18%,
+      #071A38 55%,
+      #061730 100%
+    );
     color: #fff;
   }
 
@@ -2111,7 +2152,13 @@
   }
 
   /* Newsletter (simplified — Marketo owns the form fields) */
-  .rbccm-maas-mata__newsletter { background: #E7EEF1; padding: 51px 0; }
+  /* Newsletter — soft light gradient washes into the footer so the
+     handoff from the deep-band's dark gradient reads intentional
+     rather than a hard flat block. */
+  .rbccm-maas-mata__newsletter {
+    background: linear-gradient(180deg, #EEF3F6 0%, #E7EEF1 60%, #DDE6EC 100%);
+    padding: 51px 0;
+  }
   .rbccm-maas-mata__newsletter-heading {
     font-family: 'RBC Display', var(--sans);
     font-size: 24px;
@@ -3031,7 +3078,7 @@
       <!-- Subtitle uses data-json-html (not -json) so authors can
            inline <strong> or other markup from the JSON. -->
       <p class="rbccm-maas-mata__hero-subtitle" data-animate-hero="fadeInUp" data-animate-delay="300" data-json-html="hero.subtitle">
-        RBC Capital Markets' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.
+        RBC Capital Markets&rsquo; Multi Asset Agency Solutions (MAAS) connects intelligence to execution, working alongside <strong>MATA</strong> &mdash; our Multi-Asset Trade Analytics platform &mdash; so insight and action stay connected across asset classes.
       </p>
 
       <!-- CTA row. Extra buttons can drop in as siblings if we
@@ -3293,7 +3340,7 @@
     <div class="rbccm-maas-mata__platforms">
       <!-- Section eyebrow + heading. -->
       <div class="rbccm-maas-mata__platforms-eyebrow" data-animate="fadeInUp" data-json="platforms.eyebrow">Two platforms, one unified ecosystem</div>
-      <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading">Better insight for stronger execution</h2>
+      <h2 class="rbccm-maas-mata__platforms-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="platforms.heading">Stronger execution for sharper insights</h2>
       <!-- Platform cards (divs — no click target since there's no
            CTA). Order matters: dark MATA left, light MAAS right.
            Bullet count varies per card. -->
@@ -3340,56 +3387,52 @@
         </article>
       </div>
     </div>
-  </div>
 
-  <!-- ===== INNOVATION FOR THE NEXT EXECUTION ERA =====
-       Heading + body row, then a 3-up features grid (/01 /02 /03).
-       Data lives at innovationEra.{heading,body,features[]}. -->
-  <section class="rbccm-maas-mata__innovation-era">
-    <div class="rbccm-maas-mata__container">
-      <div class="rbccm-maas-mata__innovation-era-header" data-animate="fadeInUp">
-        <h2 class="rbccm-maas-mata__innovation-era-heading" data-json="innovationEra.heading">
-          Innovation for the next execution era
-        </h2>
-        <p class="rbccm-maas-mata__innovation-era-body" data-json="innovationEra.body">
-          Technology, scale and multi-asset expertise — engineered to help you execute with confidence.
+    <!-- ===== MATA CAPABILITIES (relocated into the dark-strip) =====
+         "Sharper insight. Smarter trades." was previously inside the
+         deep-band. Moved up here so it shares the same dark navy
+         surface as new-standard + awards + platforms; the transition
+         to the light innovation-era below now reads intentionally. -->
+    <section class="rbccm-maas-mata__mata-cap" aria-label="MATA capabilities">
+      <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow">MATA capabilities</div>
+      <div class="rbccm-maas-mata__mata-cap-header" data-animate="fadeInUp" data-animate-delay="100">
+        <h2 class="rbccm-maas-mata__mata-cap-heading" data-json="mataCapabilities.heading">Sharper insight. Smarter trades.</h2>
+        <p class="rbccm-maas-mata__mata-cap-sub" data-json="mataCapabilities.subheading">
+          Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.
         </p>
       </div>
-      <div class="rbccm-maas-mata__features-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="innovationEra.features">
-        <template>
-          <article class="rbccm-maas-mata__feature">
-            <div class="rbccm-maas-mata__feature-content">
-              <div class="rbccm-maas-mata__feature-number">/<span data-json="number"></span></div>
-              <h3 class="rbccm-maas-mata__feature-title" data-json="title"></h3>
-              <p class="rbccm-maas-mata__feature-body" data-json="body"></p>
+      <div class="rbccm-maas-mata__mata-cap-cards">
+        <div class="rbccm-maas-mata__mata-cap-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="mataCapabilities.cards">
+          <template>
+            <article class="rbccm-maas-mata__mata-cap-card">
+              <div class="rbccm-maas-mata__mata-cap-content">
+                <svg class="rbccm-maas-mata__mata-cap-icon" data-json-attr-data-icon="icon" viewBox="0 0 30 30" aria-hidden="true"><use data-json-attr-href="iconHref"/></svg>
+                <h3 class="rbccm-maas-mata__mata-cap-title" data-json="title"></h3>
+                <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="subtitle"></p>
+                <p class="rbccm-maas-mata__mata-cap-body" data-json="body"></p>
+              </div>
+            </article>
+          </template>
+          <article class="rbccm-maas-mata__mata-cap-card" data-json-list-fallback>
+            <div class="rbccm-maas-mata__mata-cap-content">
+              <svg class="rbccm-maas-mata__mata-cap-icon" viewBox="0 0 30 30" aria-hidden="true"><use href="#mata-cap-icon-futures"/></svg>
+              <h3 class="rbccm-maas-mata__mata-cap-title">Futures</h3>
+              <p class="rbccm-maas-mata__mata-cap-subtitle">Index, Commodity &amp; Rate Futures</p>
+              <p class="rbccm-maas-mata__mata-cap-body">Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures.</p>
             </div>
           </article>
-        </template>
-        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
-          <div class="rbccm-maas-mata__feature-content">
-            <div class="rbccm-maas-mata__feature-number">/01</div>
-            <h3 class="rbccm-maas-mata__feature-title">Model with depth</h3>
-            <p class="rbccm-maas-mata__feature-body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</p>
-          </div>
-        </article>
-        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
-          <div class="rbccm-maas-mata__feature-content">
-            <div class="rbccm-maas-mata__feature-number">/02</div>
-            <h3 class="rbccm-maas-mata__feature-title">Connect with ease</h3>
-            <p class="rbccm-maas-mata__feature-body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team.</p>
-          </div>
-        </article>
-        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
-          <div class="rbccm-maas-mata__feature-content">
-            <div class="rbccm-maas-mata__feature-number">/03</div>
-            <h3 class="rbccm-maas-mata__feature-title">Optimize with experts</h3>
-            <p class="rbccm-maas-mata__feature-body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</p>
+        </div>
+        <article class="rbccm-maas-mata__mata-cap-wide" data-animate="fadeInUp">
+          <svg class="rbccm-maas-mata__mata-cap-icon" viewBox="0 0 30 30" aria-hidden="true"><use href="#mata-cap-icon-info"/></svg>
+          <div class="rbccm-maas-mata__mata-cap-wide-body">
+            <h3 class="rbccm-maas-mata__mata-cap-title" data-json="mataCapabilities.indexEvents.title">Index events</h3>
+            <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="mataCapabilities.indexEvents.subtitle">120+ Global Indices</p>
+            <p class="rbccm-maas-mata__mata-cap-body" data-json="mataCapabilities.indexEvents.body">Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates.</p>
           </div>
         </article>
       </div>
-    </div>
-  </section>
-
+    </section>
+  </div>
 
   <!-- ===== [LEGACY - REMOVED] WHY RBC =====
        Kept in the tree behind .--legacy so we can restore it fast if
@@ -3457,9 +3500,13 @@
     </div>
   </section>
 
-  <!-- ===== DEEP-BAND WRAPPER (Asset coverage + Market insights + Demo)
-       Single 180deg #082043 → #061730 gradient runs unbroken across all
-       three sections so the transitions read as one continuous surface. -->
+  <!-- ===== DEEP-BAND WRAPPER (Innovation era + Demo) =====
+       MATA cap was pulled from this band up into the dark-strip above,
+       so the band now carries only Innovation era (light callout with
+       its own #F1F5FB bg) and Demo (transparent — shared gradient shows
+       through). Gradient still starts a touch brighter at the top for
+       a soft "arriving" feel where deep-band meets dark-strip. -->
+  <!-- Legacy assets/why-rbc sections above stay behind .--legacy. -->
   <div class="rbccm-maas-mata__deep-band">
 
   <!-- ===== [LEGACY - REMOVED] ASSET COVERAGE =====
@@ -3547,173 +3594,74 @@
   </section>
 
 
-  <!-- ===== MATA CAPABILITIES =====
-       Dark bg, three top cards (Equities / FX / Futures) then one
-       full-width bottom card (Index events). Each card: icon +
-       title + coloured subtitle + body. No CTA. -->
-  <section class="rbccm-maas-mata__mata-cap" aria-label="MATA capabilities">
-    <!-- Removed the .container wrapper so the section's flex
-         gap (40) between eyebrow / header / grid actually kicks
-         in. Section already carries its own padding + max-width. -->
-    <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow">MATA capabilities</div>
-    <!-- Heading + sub grouped in a flex-column wrapper so the
-         gap: 16 between them applies. -->
-    <div class="rbccm-maas-mata__mata-cap-header" data-animate="fadeInUp" data-animate-delay="100">
-      <h2 class="rbccm-maas-mata__mata-cap-heading" data-json="mataCapabilities.heading">Sharper insight. Smarter trades.</h2>
-      <p class="rbccm-maas-mata__mata-cap-sub" data-json="mataCapabilities.subheading">
-        Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.
-      </p>
-    </div>
-    <!-- Cards block: wraps the 3-up grid + the full-width Index
-         events card so they share the internal 16px rhythm instead
-         of the section's 40px gap. -->
-    <div class="rbccm-maas-mata__mata-cap-cards">
-    <div class="rbccm-maas-mata__mata-cap-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="mataCapabilities.cards">
+  <!-- ===== MATA CAPABILITIES relocated into the dark-strip
+       above so "Sharper insight. Smarter trades." lives on the
+       same navy surface as new-standard + awards + platforms.
+       (Original markup here has been fully deleted.) ===== -->
+  <template id="rbccm-maas-mata__mata-cap-relocated-marker" hidden aria-hidden="true">
+    <!-- placeholder retained only to satisfy any stray absolute
+         data-json paths targeting mataCapabilities.* — the real
+         DOM now lives inside .rbccm-maas-mata__dark-strip. -->
+    <div class="rbccm-maas-mata__mata-cap-grid" data-json-list="mataCapabilities.cards"></div>
+  </template>
+
+
+  <!-- ===== INNOVATION FOR THE NEXT EXECUTION ERA =====
+       Heading + body row, then a 3-up features grid (/01 /02 /03).
+       Data lives at innovationEra.{heading,body,features[]}. -->
+  <section class="rbccm-maas-mata__innovation-era">
+    <div class="rbccm-maas-mata__container">
+      <div class="rbccm-maas-mata__innovation-era-header" data-animate="fadeInUp">
+        <h2 class="rbccm-maas-mata__innovation-era-heading" data-json="innovationEra.heading">
+          Innovation for the next execution era
+        </h2>
+        <p class="rbccm-maas-mata__innovation-era-body" data-json="innovationEra.body">
+          Technology, scale and multi-asset expertise — engineered to help you execute with confidence.
+        </p>
+      </div>
+      <div class="rbccm-maas-mata__features-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="innovationEra.features">
         <template>
-          <article class="rbccm-maas-mata__mata-cap-card">
-            <div class="rbccm-maas-mata__mata-cap-content">
-              <!-- JSON-rendered icon: <use> references the SVG
-                   sprite at the top of the page. JSON's "icon"
-                   field ("equities" / "fx" / "futures") maps to
-                   sprite id "mata-cap-icon-<icon>". iconHref is
-                   set by the JSON normalizer (see rbccm-json-bind
-                   wrapper below) so authors just set icon in
-                   plain JSON. -->
-              <svg class="rbccm-maas-mata__mata-cap-icon" data-json-attr-data-icon="icon" viewBox="0 0 30 30" aria-hidden="true"><use data-json-attr-href="iconHref"/></svg>
-              <h3 class="rbccm-maas-mata__mata-cap-title" data-json="title"></h3>
-              <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="subtitle"></p>
-              <p class="rbccm-maas-mata__mata-cap-body" data-json="body"></p>
+          <article class="rbccm-maas-mata__feature">
+            <div class="rbccm-maas-mata__feature-content">
+              <div class="rbccm-maas-mata__feature-number">/<span data-json="number"></span></div>
+              <h3 class="rbccm-maas-mata__feature-title" data-json="title"></h3>
+              <p class="rbccm-maas-mata__feature-body" data-json="body"></p>
             </div>
           </article>
         </template>
-        <!-- Fallbacks: reuse the equities/fx/futures SVG paths from
-             the legacy asset-card svg so no new asset files are needed. -->
-        <article class="rbccm-maas-mata__mata-cap-card" data-json-list-fallback>
-          <div class="rbccm-maas-mata__mata-cap-content">
-            <svg class="rbccm-maas-mata__mata-cap-icon" viewBox="0 0 30 30" aria-hidden="true"><use href="#mata-cap-icon-futures"/></svg>
-            <h3 class="rbccm-maas-mata__mata-cap-title">Futures</h3>
-            <p class="rbccm-maas-mata__mata-cap-subtitle">Index, Commodity &amp; Rate Futures</p>
-            <p class="rbccm-maas-mata__mata-cap-body">Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures.</p>
+        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
+          <div class="rbccm-maas-mata__feature-content">
+            <div class="rbccm-maas-mata__feature-number">/01</div>
+            <h3 class="rbccm-maas-mata__feature-title">Model with depth</h3>
+            <p class="rbccm-maas-mata__feature-body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</p>
+          </div>
+        </article>
+        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
+          <div class="rbccm-maas-mata__feature-content">
+            <div class="rbccm-maas-mata__feature-number">/02</div>
+            <h3 class="rbccm-maas-mata__feature-title">Connect with ease</h3>
+            <p class="rbccm-maas-mata__feature-body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team.</p>
+          </div>
+        </article>
+        <article class="rbccm-maas-mata__feature" data-json-list-fallback>
+          <div class="rbccm-maas-mata__feature-content">
+            <div class="rbccm-maas-mata__feature-number">/03</div>
+            <h3 class="rbccm-maas-mata__feature-title">Optimize with experts</h3>
+            <p class="rbccm-maas-mata__feature-body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</p>
           </div>
         </article>
       </div>
-      <!-- Full-width "Index events" card sits below the three-card grid.
-           Uses the info glyph (circle + "i") from the sprite. -->
-      <article class="rbccm-maas-mata__mata-cap-wide" data-animate="fadeInUp">
-        <svg class="rbccm-maas-mata__mata-cap-icon" viewBox="0 0 30 30" aria-hidden="true"><use href="#mata-cap-icon-info"/></svg>
-        <div class="rbccm-maas-mata__mata-cap-wide-body">
-          <h3 class="rbccm-maas-mata__mata-cap-title" data-json="mataCapabilities.indexEvents.title">Index events</h3>
-          <p class="rbccm-maas-mata__mata-cap-subtitle" data-json="mataCapabilities.indexEvents.subtitle">120+ Global Indices</p>
-          <p class="rbccm-maas-mata__mata-cap-body" data-json="mataCapabilities.indexEvents.body">Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates.</p>
-        </div>
-      </article>
     </div>
   </section>
 
-
-  <!-- ===== MARKET INSIGHTS =====
-       Slick-style 3-card carousel bound to marketInsights.items[].
-       Arrows + dots wired up in the carousel init at the bottom of
-       the page. Cards share the .featured-card shell. -->
-  <section class="rbccm-maas-mata__market-insights">
-    <div class="rbccm-maas-mata__container">
-      <!-- Eyebrow "TRENDS SHAPING INSTITUTIONAL TRADING" - same
-           yellow-uppercase + 45x2 rule treatment as the platforms
-           and mata-cap eyebrows. -->
-      <div class="rbccm-maas-mata__market-insights-eyebrow" data-animate="fadeInUp" data-json="marketInsights.eyebrow">Trends shaping institutional trading</div>
-      <h2 class="rbccm-maas-mata__market-insights-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="marketInsights.heading">Market insights</h2>
-      <!-- 3-slide Slick-style carousel: real cards in markup (no
-           duplicated content for infinite illusion), scroll-snap
-           track under the hood, arrows + dots wired via JS below. -->
-      <div class="rbccm-maas-mata__featured-track" data-animate="fadeInUp" data-animate-delay="200" data-json-list="marketInsights.items" data-insights-track>
-        <template>
-          <div class="rbccm-maas-mata__featured-card">
-            <div class="rbccm-maas-mata__featured-body">
-              <h4 class="rbccm-maas-mata__featured-eyebrow" data-json="eyebrow">Insights</h4>
-              <div class="rbccm-maas-mata__featured-content">
-                <h3 class="rbccm-maas-mata__featured-title" data-json="title"></h3>
-                <p class="rbccm-maas-mata__featured-copy" data-json="body"></p>
-              </div>
-              <a class="rbccm-maas-mata__featured-cta" data-json-attr-href="cta.href">
-                <span data-json="cta.label">Read more</span>
-                <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z"/></svg>
-              </a>
-            </div>
-            <div class="rbccm-maas-mata__featured-illustration">
-              <img data-json-attr-src="image" alt="" loading="lazy" />
-            </div>
-          </div>
-        </template>
-        <!-- Fallback cards (rendered when JSON binding hasn't run
-             or the list is empty). Content identical across the 3
-             so the CMS placeholder read matches the Figma comp. -->
-        <div class="rbccm-maas-mata__featured-card" data-json-list-fallback>
-          <div class="rbccm-maas-mata__featured-body">
-            <h4 class="rbccm-maas-mata__featured-eyebrow">Insights</h4>
-            <div class="rbccm-maas-mata__featured-content">
-              <h3 class="rbccm-maas-mata__featured-title">Lorem ipsum dolor sit amet consectetur adipiscing elit</h3>
-              <p class="rbccm-maas-mata__featured-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</p>
-            </div>
-            <a class="rbccm-maas-mata__featured-cta" href="#">
-              <span>2 min read</span>
-              <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z"/></svg>
-            </a>
-          </div>
-          <div class="rbccm-maas-mata__featured-illustration">
-            <img src="./insights-featured-story.jpg" alt="" />
-          </div>
-        </div>
-        <div class="rbccm-maas-mata__featured-card" data-json-list-fallback>
-          <div class="rbccm-maas-mata__featured-body">
-            <h4 class="rbccm-maas-mata__featured-eyebrow">Insights</h4>
-            <div class="rbccm-maas-mata__featured-content">
-              <h3 class="rbccm-maas-mata__featured-title">Lorem ipsum dolor sit amet consectetur adipiscing elit</h3>
-              <p class="rbccm-maas-mata__featured-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</p>
-            </div>
-            <a class="rbccm-maas-mata__featured-cta" href="#">
-              <span>3 min read</span>
-              <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z"/></svg>
-            </a>
-          </div>
-          <div class="rbccm-maas-mata__featured-illustration">
-            <img src="./insights-featured-story.jpg" alt="" />
-          </div>
-        </div>
-        <div class="rbccm-maas-mata__featured-card" data-json-list-fallback>
-          <div class="rbccm-maas-mata__featured-body">
-            <h4 class="rbccm-maas-mata__featured-eyebrow">Insights</h4>
-            <div class="rbccm-maas-mata__featured-content">
-              <h3 class="rbccm-maas-mata__featured-title">Lorem ipsum dolor sit amet consectetur adipiscing elit</h3>
-              <p class="rbccm-maas-mata__featured-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</p>
-            </div>
-            <a class="rbccm-maas-mata__featured-cta" href="#">
-              <span>4 min read</span>
-              <svg class="rbccm-maas-mata__featured-cta-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z"/></svg>
-            </a>
-          </div>
-          <div class="rbccm-maas-mata__featured-illustration">
-            <img src="./insights-featured-story.jpg" alt="" />
-          </div>
-        </div>
-      </div>
-      <!-- Carousel controls: same arrow+dot pattern as the awards
-           carousel (mobile) but always shown here. JS below wires
-           scroll behaviour + active-index tracking. -->
-      <div class="rbccm-maas-mata__insights-controls" data-animate="zoomIn" data-animate-delay="350" data-insights-controls>
-        <button type="button" class="rbccm-maas-mata__awards-arrow" data-insights-prev aria-label="Previous insight">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
-            <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-        <div class="rbccm-maas-mata__awards-dots" data-insights-dots role="tablist" aria-label="Insight slides"></div>
-        <button type="button" class="rbccm-maas-mata__awards-arrow" data-insights-next aria-label="Next insight">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false">
-            <path d="M1 1L11.889 11.889L1 22.778" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </section>
+  <!-- ===== [REMOVED] MARKET INSIGHTS =====
+       Section removed per stakeholder feedback. Innovation-era moved
+       up into this slot. -->
+  <!-- (Section fully removed. JSON binding hooks retained inside an
+       inert &lt;template&gt; so the runtime's data-json lookups don't
+       log missing-key warnings while marketInsights.* still exists
+       in the JSON. Remove the template + JSON block together in a
+       later cleanup.) -->
 
   <!-- ===== DEMO CTA =====
        Eyebrow "See the platform", headline "Talk with an expert."
@@ -3871,7 +3819,7 @@
   },
   "platforms": {
     "eyebrow": "Two platforms, one unified ecosystem",
-    "heading": "Better insight for stronger execution",
+    "heading": "Stronger execution for sharper insights",
     "cards": [
       {
         "theme": "dark",

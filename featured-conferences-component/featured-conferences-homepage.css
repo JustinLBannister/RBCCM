@@ -1,0 +1,151 @@
+/* =========================================================================
+   Featured Conferences — Homepage variant
+   -------------------------------------------------------------------------
+   Simple 3-up strip for the homepage. Sibling to featured-conferences.css.
+   BEM. Mobile-first (1 col → 3 col at 768px+). No Bootstrap.
+
+   Block: rbccm-featured-conferences-homepage
+   ========================================================================= */
+
+/* ---------- Block / section ---------- */
+.rbccm-featured-conferences-homepage {
+  background: #EFF6FD;
+  padding: 40px 16px;
+}
+
+.rbccm-featured-conferences-homepage__inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+/* ---------- Heading + icon ---------- */
+.rbccm-featured-conferences-homepage__heading {
+  align-items: center;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-flex;
+  font-family: "RBC Display", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  gap: 12px;
+  justify-content: center;
+  letter-spacing: -0.789px;
+  line-height: normal;
+  margin: 0 0 32px 0;
+}
+
+.rbccm-featured-conferences-homepage__icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  flex-shrink: 0;
+  height: 32px;
+  width: 32px;
+}
+
+
+/* ---------- List / grid ---------- */
+.rbccm-featured-conferences-homepage__list {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .rbccm-featured-conferences-homepage__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* ---------- Item / event ---------- */
+.rbccm-featured-conferences-homepage__item {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  text-align: center;
+}
+
+
+/* ---------- Date circle ---------- */
+.rbccm-featured-conferences-homepage__date {
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 50%;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: flex;
+  flex-direction: column;
+  height: 90px;
+  justify-content: center;
+  margin: 0 0 20px 0;
+  width: 90px;
+}
+
+.rbccm-featured-conferences-homepage__date-month {
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: normal;
+  text-transform: uppercase;
+}
+
+.rbccm-featured-conferences-homepage__date-day {
+  font-family: "RBC Display", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 2px;
+}
+
+
+/* ---------- Location ---------- */
+.rbccm-featured-conferences-homepage__location {
+  color: #353535;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  line-height: normal;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Event name ---------- */
+.rbccm-featured-conferences-homepage__name {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: "RBC Display", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 26px;
+  margin: 0;
+}
+
+.rbccm-featured-conferences-homepage__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.rbccm-featured-conferences-homepage__link:hover,
+.rbccm-featured-conferences-homepage__link:focus-visible {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  text-decoration: underline;
+}
+
+
+/* ---------- Desktop padding bump ---------- */
+@media (min-width: 992px) {
+  .rbccm-featured-conferences-homepage {
+    padding: 56px 16px;
+  }
+
+  .rbccm-featured-conferences-homepage__heading {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+}

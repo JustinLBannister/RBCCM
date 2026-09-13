@@ -1,0 +1,205 @@
+<!--
+  RBCCM Leading Experts - Properties + Data
+  ==============================================================
+  Preset-driven three-card grid of expert profiles. Each card = a
+  DAM photo behind a top-to-bottom navy gradient, with an eyebrow
+  pill, name, role, and gold CTA overlaid. Fixed 3 slots; a slot
+  hides entirely when its NameText Datum is blank.
+
+  Presets:
+    strategy-and-economics-leading-experts
+      Light-blue section (matches S+E hero + expertise), navy card
+      tiles, warm-yellow eyebrow + gold CTA, RBC Display name.
+
+  Photo picker
+  ==============================================================
+  Each Expert{N}Photo is a Type="Image" Datum backed by TeamSite's
+  DAM picker. The nested <Image> skeleton with empty <Path/> and
+  <Description/> is REQUIRED because a previous cross-component
+  attempt hit "Datum ID=[...] Value is not a valid image" when the
+  skeleton was omitted (see icon-carousel-properties.xml for the
+  same note). Copy the skeleton verbatim for any new photo slot.
+
+  XSL reads two child nodes off each Photo Datum and emits a real
+  <img> element inside the card:
+    /Image/Path         becomes src on the <img>
+    /Image/Description  becomes alt on the <img> (falls back to
+                        NameText when blank so screen readers still
+                        announce the person the card represents)
+
+  Focal point (optional)
+  ==============================================================
+  Each Expert{N}FocalPoint is an optional String that overrides the
+  CSS default object-position (50% 20%) for that card's photo. Use
+  it to keep faces well-framed when a portrait's head sits higher
+  or lower than average in the source image. Values are standard
+  CSS object-position ("50% 15%", "60% 30%", "top center", etc.).
+  Leave blank to inherit the CSS default.
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every editable text field ships as a pair:
+    <Field>Text       String / Textarea with the copy itself
+    <Field>Tag        Enum picker: h1..h6, p, div, span
+  XSL emits the tag via xsl:element name="{tag}", guarded by the
+  pickTag allow-list.
+
+  CTA anchor tag is fixed at <a> (semantic requirement for links);
+  only the visible CTA copy + href are Datums.
+-->
+<Properties ComponentID="rbccm-leading-experts">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. Deploy-time plumbing.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-leading-experts-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">Leading experts</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-leading-experts.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - component has no runtime yet, leave blank)"></Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Strategy and Economics - Leading experts</Display>
+      <Value>strategy-and-economics-leading-experts</Value>
+    </Option>
+    strategy-and-economics-leading-experts
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header
+       ============================================================
+       What editors set here: the big headline at the top of the
+       section. The tag picker lets you promote the title to h2
+       for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-leading-experts__header-center modifier that centers
+       the section title. (Class name uses __ substitution for the
+       BEM modifier so this XML comment stays well-formed; emitted
+       markup uses the double-hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">Leading experts</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+
+
+  <!-- ============================================================
+       Expert slots (fixed 3)
+       ============================================================
+       This section renders 3 expert cards. Fill in each expert's
+       Name, Role, CTA, and Photo. Blank NameText hides the card
+       but skews the 3-up layout - keep all 3 populated.
+       .............................................................
+       Per expert:
+         Expert{N}Photo       DAM asset picker (Type="Image")
+         Expert{N}FocalPoint  optional CSS object-position override
+                              (e.g. "50% 15%"; blank = default)
+         Expert{N}EyebrowText pill label (usually the pillar name)
+         Expert{N}EyebrowTag  tag picker (default span)
+         Expert{N}NameText    expert's full name
+         Expert{N}NameTag     tag picker (default h3)
+         Expert{N}RoleText    role / title copy
+         Expert{N}RoleTag     tag picker (default p)
+         Expert{N}CtaText     gold link copy
+         Expert{N}CtaHref     link destination (relative or full URL)
+       ============================================================ -->
+
+  <!-- ==== Expert 1 ==== -->
+  <Datum ID="Expert1Photo" Type="Image" Name="Expert 1 : photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Expert1FocalPoint" Type="String" Name="Expert 1 : photo focal point - CSS object-position (optional - blank inherits default 50% 20%)"></Datum>
+  <Datum ID="Expert1EyebrowText" Type="String" Name="Expert 1 : eyebrow / category pill (optional - blank hides the pill)">Geopolitics</Datum>
+  <Datum ID="Expert1EyebrowTag" Type="String" Name="Expert 1 : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>span</Datum>
+  <Datum ID="Expert1NameText" Type="String" Name="Expert 1 : name (required - do not blank; blank hides the whole card)">Helima Croft</Datum>
+  <Datum ID="Expert1NameTag" Type="String" Name="Expert 1 : name tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Expert1RoleText" Type="Textarea" Name="Expert 1 : role / title (required - do not blank; HTML allowed)">Head of Global Commodity Strategy &amp; MENA Research</Datum>
+  <Datum ID="Expert1RoleTag" Type="String" Name="Expert 1 : role tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Expert1CtaText" Type="String" Name="Expert 1 : CTA copy (required - do not blank)">Explore Real-Time Geopolitics</Datum>
+  <Datum ID="Expert1CtaHref" Type="String" Name="Expert 1 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+  <!-- ==== Expert 2 ==== -->
+  <Datum ID="Expert2Photo" Type="Image" Name="Expert 2 : photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Expert2FocalPoint" Type="String" Name="Expert 2 : photo focal point - CSS object-position (optional - blank inherits default 50% 20%)"></Datum>
+  <Datum ID="Expert2EyebrowText" Type="String" Name="Expert 2 : eyebrow / category pill (optional - blank hides the pill)">Economics</Datum>
+  <Datum ID="Expert2EyebrowTag" Type="String" Name="Expert 2 : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>span</Datum>
+  <Datum ID="Expert2NameText" Type="String" Name="Expert 2 : name (required - do not blank; blank hides the whole card)">Frances Donald</Datum>
+  <Datum ID="Expert2NameTag" Type="String" Name="Expert 2 : name tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Expert2RoleText" Type="Textarea" Name="Expert 2 : role / title (required - do not blank; HTML allowed)">Global Chief Economist</Datum>
+  <Datum ID="Expert2RoleTag" Type="String" Name="Expert 2 : role tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Expert2CtaText" Type="String" Name="Expert 2 : CTA copy (required - do not blank)">Explore RBC Economics</Datum>
+  <Datum ID="Expert2CtaHref" Type="String" Name="Expert 2 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+  <!-- ==== Expert 3 ==== -->
+  <Datum ID="Expert3Photo" Type="Image" Name="Expert 3 : photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Expert3FocalPoint" Type="String" Name="Expert 3 : photo focal point - CSS object-position (optional - blank inherits default 50% 20%)"></Datum>
+  <Datum ID="Expert3EyebrowText" Type="String" Name="Expert 3 : eyebrow / category pill (optional - blank hides the pill)">Equity Markets</Datum>
+  <Datum ID="Expert3EyebrowTag" Type="String" Name="Expert 3 : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>span</Datum>
+  <Datum ID="Expert3NameText" Type="String" Name="Expert 3 : name (required - do not blank; blank hides the whole card)">Lori Calvasina</Datum>
+  <Datum ID="Expert3NameTag" Type="String" Name="Expert 3 : name tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Expert3RoleText" Type="Textarea" Name="Expert 3 : role / title (required - do not blank; HTML allowed)">Head of U.S. Equity Market Strategy</Datum>
+  <Datum ID="Expert3RoleTag" Type="String" Name="Expert 3 : role tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Expert3CtaText" Type="String" Name="Expert 3 : CTA copy (required - do not blank)">Explore Markets in Motion</Datum>
+  <Datum ID="Expert3CtaHref" Type="String" Name="Expert 3 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+</Data>

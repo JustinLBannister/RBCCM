@@ -126,6 +126,13 @@
     <xsl:variable name="JS_PATH"        select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
     <xsl:variable name="CACHE_VERSION"  select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
     <xsl:variable name="PRESET"         select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN">
+      <xsl:choose>
+        <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>
+        <xsl:otherwise>left</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
     <!-- ==================== Stylesheet hoist ==================== -->
     <xsl:if test="$CSS_PATH != ''">
@@ -221,7 +228,8 @@
           </xsl:choose>
         </xsl:variable>
 
-        <section class="rbccm-hero rbccm-hero--maas-mata">
+        <section>
+          <xsl:attribute name="class">rbccm-hero rbccm-hero--maas-mata<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-hero--header-center</xsl:if></xsl:attribute>
           <xsl:if test="$SECTION_ID != ''">
             <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
           </xsl:if>
@@ -335,16 +343,24 @@
         <xsl:variable name="SE_BG_PLAYER"        select="normalize-space(/Properties/Data/Datum[@ID='SeBgBrightcovePlayer']/text()[last()])"/>
         <xsl:variable name="SE_BG_VIDEO_ID"      select="normalize-space(/Properties/Data/Datum[@ID='SeBgBrightcoveVideoId']/text()[last()])"/>
 
-        <!-- Insight sourcing mode + hydrator config. These become
-             data attributes on the section so rbccm-hero.js can read
-             them at runtime and hydrate the insight card from the
-             XML feeds. Server-side XSL still renders the manual
-             SeInsight* Datums as the pre-hydration + no-JS fallback. -->
+        <!-- Insight sourcing mode + hydrator config. Three modes:
+               dcr-picker   card is server-rendered from the DCR record
+                            picked in SeInsightDcr (with non-blank
+                            SeInsight* Datums acting as per-field
+                            overrides). No client-side hydration.
+               auto-latest  hydrator data attrs below become authored by
+                            the XSL and rbccm-hero.js overwrites the
+                            pre-rendered SeInsight* fallback with the
+                            newest matching feed record at runtime.
+               manual       always uses the SeInsight* Datums; no client
+                            hydration.
+             Unknown values coerce to dcr-picker (matches Datum default). -->
         <xsl:variable name="SE_INSIGHT_SOURCE_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightSource']/text()[last()])"/>
         <xsl:variable name="SE_INSIGHT_SOURCE">
           <xsl:choose>
             <xsl:when test="$SE_INSIGHT_SOURCE_RAW = 'manual'">manual</xsl:when>
-            <xsl:otherwise>auto-latest</xsl:otherwise>
+            <xsl:when test="$SE_INSIGHT_SOURCE_RAW = 'auto-latest'">auto-latest</xsl:when>
+            <xsl:otherwise>dcr-picker</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="SE_FEED_URLS"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightFeedUrls']/text()[last()])"/>
@@ -376,6 +392,69 @@
         <xsl:variable name="SE_INS_LINK_LABEL"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkLabel']/text()[last()])"/>
         <xsl:variable name="SE_INS_LINK_HREF"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkHref']/text()[last()])"/>
         <xsl:variable name="SE_INS_LINK_ARIA"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkAriaLabel']/text()[last()])"/>
+
+        <!-- DCR-picker lookups. The SeInsightDcr picker allows several
+             DCR types (article/.*, rbccm/episode, rbccm/imagine2025,
+             rbccm/casestudy), so the DCR record wrapper element name
+             is not fixed. Wildcard the wrapper via DCR/*/{field} so
+             the same XPath works regardless of the picked type. Field
+             names (title/description/publish_date/link/url) mirror the
+             story-tiles-default convention. SeInsightDcrLink is the
+             sibling CTA URL Datum; blank = fall back to the DCR's own
+             link/url field. -->
+        <xsl:variable name="SE_DCR_ROOT"         select="/Properties/Data/Datum[@ID='SeInsightDcr']/DCR"/>
+        <xsl:variable name="SE_DCR_TITLE"        select="normalize-space($SE_DCR_ROOT/*/title)"/>
+        <xsl:variable name="SE_DCR_DESC"         select="$SE_DCR_ROOT/*/description"/>
+        <xsl:variable name="SE_DCR_PUB"          select="normalize-space($SE_DCR_ROOT/*/publish_date)"/>
+        <xsl:variable name="SE_DCR_LINK"         select="normalize-space($SE_DCR_ROOT/*/link)"/>
+        <xsl:variable name="SE_DCR_URL"          select="normalize-space($SE_DCR_ROOT/*/url)"/>
+        <xsl:variable name="SE_DCR_LINK_DATUM"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightDcrLink']/text()[last()])"/>
+
+        <!-- Effective card fields. In dcr-picker mode each SeInsight*
+             Datum acts as an author override: non-blank wins, blank
+             falls through to the DCR record's field. In auto-latest
+             and manual modes the effective values are just the
+             SeInsight* Datums unchanged (auto-latest hydration
+             overwrites the DOM at runtime). -->
+        <xsl:variable name="SE_EFF_TITLE">
+          <xsl:choose>
+            <xsl:when test="$SE_INSIGHT_SOURCE = 'dcr-picker' and $SE_INS_TITLE_TEXT = ''">
+              <xsl:value-of select="$SE_DCR_TITLE"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$SE_INS_TITLE_TEXT"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="SE_EFF_BODY">
+          <xsl:choose>
+            <xsl:when test="$SE_INSIGHT_SOURCE = 'dcr-picker' and normalize-space($SE_INS_BODY_TEXT) = ''">
+              <xsl:value-of select="$SE_DCR_DESC"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$SE_INS_BODY_TEXT"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="SE_EFF_DATE">
+          <xsl:choose>
+            <xsl:when test="$SE_INSIGHT_SOURCE = 'dcr-picker' and $SE_INS_DATE_TEXT = ''">
+              <xsl:call-template name="formatPublishDate">
+                <xsl:with-param name="raw" select="$SE_DCR_PUB"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$SE_INS_DATE_TEXT"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="SE_EFF_LINK_HREF">
+          <xsl:choose>
+            <xsl:when test="$SE_INSIGHT_SOURCE = 'dcr-picker'">
+              <xsl:choose>
+                <xsl:when test="$SE_DCR_LINK_DATUM != ''"><xsl:value-of select="$SE_DCR_LINK_DATUM"/></xsl:when>
+                <xsl:when test="$SE_DCR_LINK != ''"><xsl:value-of select="$SE_DCR_LINK"/></xsl:when>
+                <xsl:when test="$SE_DCR_URL != ''"><xsl:value-of select="$SE_DCR_URL"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$SE_INS_LINK_HREF"/></xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$SE_INS_LINK_HREF"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
         <!-- Tag guards. -->
         <xsl:variable name="SE_TITLE_TAG">
@@ -415,31 +494,53 @@
           </xsl:call-template>
         </xsl:variable>
 
-        <section class="rbccm-hero rbccm-hero--strategy-and-economics">
+        <section>
+          <xsl:attribute name="class">rbccm-hero rbccm-hero--strategy-and-economics<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-hero--header-center</xsl:if></xsl:attribute>
           <xsl:if test="$SECTION_ID != ''">
             <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
           </xsl:if>
           <xsl:if test="$SECTION_ARIA != ''">
             <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
           </xsl:if>
-          <!-- Hydrator config. rbccm-hero.js reads these to fetch
-               the feed URLs, filter records by URL substring, sort
-               by publishdate, and overwrite the manual pre-render
-               with the newest matching article. Only meaningful in
-               auto-latest mode; the JS no-ops otherwise. -->
+          <!-- Sourcing mode is always stamped so CSS or other JS can
+               branch on it. Hydrator config attrs are gated by mode:
+
+                 auto-latest   Emits data-hero-feed-urls, -tag-keywords,
+                               -pinned-url, -link-override, -locale.
+                               The JS runs the keyword scan (or pinned
+                               URL match) and overwrites the manual
+                               pre-render with the newest match.
+
+                 dcr-picker    Emits data-hero-feed-urls and
+                               -pinned-url ONLY when the author has
+                               populated the pinned URL Datum. The JS
+                               then runs a pinned-URL fallback lookup
+                               against the feed - a safety net for
+                               pages where DCR publishing is broken.
+                               Keyword scan / locale / link override
+                               are intentionally NOT emitted here;
+                               dcr-picker's fallback is pinned-URL only.
+
+                 manual        No hydrator hooks; fully server-rendered. -->
           <xsl:attribute name="data-hero-source"><xsl:value-of select="$SE_INSIGHT_SOURCE"/></xsl:attribute>
-          <xsl:attribute name="data-hero-locale"><xsl:value-of select="$SE_LOCALE"/></xsl:attribute>
-          <xsl:if test="$SE_FEED_URLS != ''">
-            <xsl:attribute name="data-hero-feed-urls"><xsl:value-of select="$SE_FEED_URLS"/></xsl:attribute>
+          <xsl:if test="$SE_INSIGHT_SOURCE = 'auto-latest'">
+            <xsl:attribute name="data-hero-locale"><xsl:value-of select="$SE_LOCALE"/></xsl:attribute>
+            <xsl:if test="$SE_TAG_KEYWORDS != ''">
+              <xsl:attribute name="data-hero-tag-keywords"><xsl:value-of select="$SE_TAG_KEYWORDS"/></xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$SE_AUTO_LINK_OVERRIDE != ''">
+              <xsl:attribute name="data-hero-link-override"><xsl:value-of select="$SE_AUTO_LINK_OVERRIDE"/></xsl:attribute>
+            </xsl:if>
           </xsl:if>
-          <xsl:if test="$SE_TAG_KEYWORDS != ''">
-            <xsl:attribute name="data-hero-tag-keywords"><xsl:value-of select="$SE_TAG_KEYWORDS"/></xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$SE_PINNED_URL != ''">
-            <xsl:attribute name="data-hero-pinned-url"><xsl:value-of select="$SE_PINNED_URL"/></xsl:attribute>
-          </xsl:if>
-          <xsl:if test="$SE_AUTO_LINK_OVERRIDE != ''">
-            <xsl:attribute name="data-hero-link-override"><xsl:value-of select="$SE_AUTO_LINK_OVERRIDE"/></xsl:attribute>
+          <!-- data-hero-feed-urls and data-hero-pinned-url apply to
+               both auto-latest and dcr-picker (the fallback path). -->
+          <xsl:if test="$SE_INSIGHT_SOURCE = 'auto-latest' or $SE_INSIGHT_SOURCE = 'dcr-picker'">
+            <xsl:if test="$SE_FEED_URLS != ''">
+              <xsl:attribute name="data-hero-feed-urls"><xsl:value-of select="$SE_FEED_URLS"/></xsl:attribute>
+            </xsl:if>
+            <xsl:if test="$SE_PINNED_URL != ''">
+              <xsl:attribute name="data-hero-pinned-url"><xsl:value-of select="$SE_PINNED_URL"/></xsl:attribute>
+            </xsl:if>
           </xsl:if>
 
           <!-- Optional background video slot. Only rendered when
@@ -493,33 +594,33 @@
                   </div>
                 </xsl:if>
 
-                <xsl:if test="$SE_INS_TITLE_TEXT != ''">
+                <xsl:if test="$SE_EFF_TITLE != ''">
                   <xsl:element name="{$SE_INS_TITLE_TAG}">
                     <xsl:attribute name="class">rbccm-hero__insight-title</xsl:attribute>
-                    <xsl:value-of select="$SE_INS_TITLE_TEXT"/>
+                    <xsl:value-of select="$SE_EFF_TITLE"/>
                   </xsl:element>
                 </xsl:if>
 
-                <xsl:if test="normalize-space($SE_INS_BODY_TEXT) != ''">
+                <xsl:if test="normalize-space($SE_EFF_BODY) != ''">
                   <xsl:element name="{$SE_INS_BODY_TAG}">
                     <xsl:attribute name="class">rbccm-hero__insight-body</xsl:attribute>
-                    <xsl:value-of select="$SE_INS_BODY_TEXT" disable-output-escaping="yes"/>
+                    <xsl:value-of select="$SE_EFF_BODY" disable-output-escaping="yes"/>
                   </xsl:element>
                 </xsl:if>
 
-                <xsl:if test="$SE_INS_DATE_TEXT != '' or $SE_INS_LINK_LABEL != ''">
+                <xsl:if test="$SE_EFF_DATE != '' or $SE_INS_LINK_LABEL != ''">
                   <footer class="rbccm-hero__insight-footer">
 
-                    <xsl:if test="$SE_INS_DATE_TEXT != ''">
+                    <xsl:if test="$SE_EFF_DATE != ''">
                       <xsl:element name="{$SE_INS_DATE_TAG}">
                         <xsl:attribute name="class">rbccm-hero__insight-date</xsl:attribute>
-                        <xsl:value-of select="$SE_INS_DATE_TEXT"/>
+                        <xsl:value-of select="$SE_EFF_DATE"/>
                       </xsl:element>
                     </xsl:if>
 
                     <xsl:if test="$SE_INS_LINK_LABEL != ''">
                       <a class="rbccm-hero__insight-link">
-                        <xsl:attribute name="href"><xsl:value-of select="$SE_INS_LINK_HREF"/></xsl:attribute>
+                        <xsl:attribute name="href"><xsl:value-of select="$SE_EFF_LINK_HREF"/></xsl:attribute>
                         <xsl:if test="$SE_INS_LINK_ARIA != ''">
                           <xsl:attribute name="aria-label"><xsl:value-of select="$SE_INS_LINK_ARIA"/></xsl:attribute>
                         </xsl:if>
@@ -540,9 +641,14 @@
           </div>
         </section>
 
-        <!-- Hydrator script. Only for S+E preset; skipped when
-             JsPath is blank or SeInsightSource=manual (no work to do). -->
-        <xsl:if test="$JS_PATH != '' and $SE_INSIGHT_SOURCE = 'auto-latest'">
+        <!-- Hydrator script. Only for S+E preset. Loaded when either:
+               * SeInsightSource = auto-latest (full hydrator flow), or
+               * SeInsightSource = dcr-picker AND SeInsightPinnedUrl is
+                 non-blank (pinned-URL fallback for pages where DCR
+                 publishing is broken).
+             Skipped for manual mode and for blank-pin dcr-picker (both
+             fully server-rendered, no work to do). -->
+        <xsl:if test="$JS_PATH != '' and ($SE_INSIGHT_SOURCE = 'auto-latest' or ($SE_INSIGHT_SOURCE = 'dcr-picker' and $SE_PINNED_URL != ''))">
           <script>
             <xsl:attribute name="src">
               <xsl:value-of select="$JS_PATH"/>

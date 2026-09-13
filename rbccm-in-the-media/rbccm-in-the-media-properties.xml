@@ -1,0 +1,166 @@
+<!--
+  RBCCM In the Media - Properties + Data
+  ==============================================================
+  Preset-driven section: title + featured video card + list of 3
+  most recent media appearances + "See all" link. All item content
+  is populated at runtime by the sidecar JS from the media/press
+  release feed (same feed the filtered-content ITM preset uses).
+
+  Presets:
+    strategy-and-economics-in-the-media
+      Light-gray section (F9F9F9 with E5E7EB border-bottom).
+      Desktop = 2-col grid (featured left, list right).
+      Mobile = stacked.
+
+  Feed hookup (runtime)
+  ==============================================================
+  FeedUrl is pushed to window.RBCCM_IN_THE_MEDIA_CONFIG.feedUrl by
+  the XSL. Sidecar JS fetches the XML, parses each &lt;news&gt; node,
+  sorts by &lt;date&gt; desc, and populates:
+    item[0]        -> featured card (image + eyebrow + title + expert)
+    item[1..N-1]   -> right-column list rows
+  N defaults to 4 (1 featured + 3 rows); override via ItemCount.
+
+  Title parsing (runtime)
+  ==============================================================
+  Feed titles arrive as one concatenated string (the feed schema
+  has no separate outlet/person fields), e.g.:
+    "RBC TV: Amy Wu Silverman on CNBC"
+    "RBC Radio: Frances Donald on Bloomberg (starts 01:30:25)"
+  Sidecar JS regex-splits into { kind, person, source, timecode }.
+  Row source shows the "on Network" tail; row Featured shows the
+  parsed person. Row title is capped at 115 characters + ellipsis
+  so long titles don't push list rows out of the 168px slot.
+
+  Hero poster (fallback)
+  ==============================================================
+  HeroPoster is a Type="Image" Datum whose /Image/Path is used as
+  the featured card's img src when the feed item has no thumbnail
+  (the current ITM feed leaves &lt;thumbnail/&gt; empty for every
+  item). If HeroPoster is also blank, the JS leaves the img src
+  empty and the CSS falls back to the navy card fill.
+-->
+<Properties ComponentID="rbccm-in-the-media">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. These are deploy-time
+       plumbing values (element IDs, asset paths). Editors should
+       leave them alone unless a developer says otherwise.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-in-the-media-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">In the media</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-in-the-media.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - set once at deploy, editors don't change)">/assets/rbccm/js/components/rbccm-in-the-media.js</Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Strategy and Economics - In the media</Display>
+      <Value>strategy-and-economics-in-the-media</Value>
+    </Option>
+    strategy-and-economics-in-the-media
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header
+       ============================================================
+       What editors set here: the big headline that sits at the top
+       of the section, plus an optional subhead beneath it. The tag
+       picker lets you promote the title to h2 for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-in-the-media__header-center modifier that centers the
+       title + subhead block. (Class name uses __ in place of the BEM
+       double-hyphen modifier so this XML comment stays well-formed;
+       emitted markup uses the double-hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">In the media</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+  <!-- Optional subheading beneath the section title. Mirrors the
+       Featured Insights / Platforms / Areas of expertise pattern:
+       leave blank in TeamSite and the XSL skips the &lt;p&gt; entirely
+       so no empty node reaches the DOM. -->
+  <Datum ID="SectionSubhead" Type="String" Name="Section subhead (optional - blank hides the subhead)"></Datum>
+
+
+  <!-- ============================================================
+       See-all link
+       ============================================================
+       What editors set here: the label and URL for the bottom-of-
+       section link that sends readers to the full media index.
+       ============================================================ -->
+  <Datum ID="SeeAllText" Type="String" Name="See-all link : label (required - do not blank)">See all media appearances</Datum>
+  <Datum ID="SeeAllHref" Type="String" Name="See-all link : URL (required - full URL or /en/ path)">https://www.rbccm.com/en/about-us/in-the-media</Datum>
+
+
+  <!-- ============================================================
+       Feed configuration
+       ============================================================
+       What editors set here: which feed the section pulls from and
+       how many rows to render. Change the feed URL if editorial
+       moves the ITM feed; keep item count at 4 unless the design
+       calls for a different row count.
+       ============================================================ -->
+  <Datum ID="FeedUrl" Type="String" Name="Media/press feed URL (required - fetched at runtime by sidecar JS)">/en/press-releases/data/press-releases.page</Datum>
+  <Datum ID="ItemCount" Type="String" Name="Total items to render : 1 featured + N-1 list rows (optional - blank defaults to 4)">4</Datum>
+
+
+  <!-- ============================================================
+       Featured card hero-poster fallback
+       ============================================================
+       What editors set here: the fallback poster image for the
+       featured card. Only used when the top feed item has no
+       thumbnail (the current ITM feed leaves &lt;thumbnail/&gt;
+       empty for every item). If this is also blank the CSS falls
+       back to a solid navy card fill.
+       .............................................................
+       Type="Image" DAM picker. Copy the <Image>/<Path/><Description/>
+       skeleton verbatim; omitting it hits "Datum ID=[...] Value is
+       not a valid image".
+       ============================================================ -->
+  <Datum ID="HeroPoster" Type="Image" Name="Featured card hero poster - pick from DAM (optional - blank falls back to solid navy card fill)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+
+</Data>

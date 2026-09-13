@@ -267,10 +267,25 @@
   width: 100%;
 }
 
-.rbccm-conference-insights-tiles__insight:hover,
-.rbccm-conference-insights-tiles__insight:focus-visible {
+/* Bootstrap 3 default `a:focus, a:hover { color:#23527c; text-decoration:
+   underline; }` (specificity 0,1,1) beats a plain class rule (0,1,0), so
+   we prefix with `a` to bump ours to (0,2,1) and cover every focus /
+   hover / visited combo. Without this, focused/hovered tiles get the
+   default blue-underline anchor treatment on the title + description.
+
+   outline-offset: 0 also resets Bootstrap's default -2px inset outline
+   offset so any focus ring lands flush with the card border instead of
+   inside it (avoids visual overlap with our 1px border). */
+a.rbccm-conference-insights-tiles__insight,
+a.rbccm-conference-insights-tiles__insight:link,
+a.rbccm-conference-insights-tiles__insight:visited,
+a.rbccm-conference-insights-tiles__insight:hover,
+a.rbccm-conference-insights-tiles__insight:focus,
+a.rbccm-conference-insights-tiles__insight:focus-visible,
+a.rbccm-conference-insights-tiles__insight:active {
   color: #000;
   text-decoration: none;
+  outline-offset: 0;
 }
 
 /* Hidden by load-more — kept out of layout. */

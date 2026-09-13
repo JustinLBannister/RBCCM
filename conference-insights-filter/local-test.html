@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conference Insights Filter — Local Test</title>
+
+  <!-- Tiles CSS (from sibling folder) -->
+  <link rel="stylesheet" href="../conference-insights-tiles/conference-insights-tiles.css">
+
+  <!-- Filter CSS -->
+  <link rel="stylesheet" href="conference-insights-filter.css">
+
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; }
+    .local-test-header { padding: 12px 16px; background: #e7edf1; border-bottom: 1px solid #d0d8df; font-size: 13px; color: #555; }
+  </style>
+</head>
+<body>
+
+  <div class="local-test-header">
+    Local test: conference-insights-filter → conference-insights-tiles integration. Pick a Month / Region or type in Search. Chips show active filters (click × to clear one). Reset clears all.
+  </div>
+
+
+  <!-- ============================================================
+       FILTER — sits above the tiles
+       ============================================================ -->
+  <section class="rbccm-conference-insights-filter"
+           data-target=".rbccm-conference-insights-tiles__item"
+           data-empty-target="#cif-empty"
+           aria-label="Filter conference insights">
+    <div class="rbccm-conference-insights-filter__inner">
+
+      <div class="rbccm-conference-insights-filter__row">
+
+        <div class="rbccm-conference-insights-filter__field rbccm-conference-insights-filter__field--month">
+          <label class="rbccm-conference-insights-filter__label" for="cif-month">Month</label>
+          <select id="cif-month" class="rbccm-conference-insights-filter__select" data-filter="month">
+            <option value="">All months</option>
+            <option value="2026-06">June 2026</option>
+            <option value="2026-05">May 2026</option>
+            <option value="2026-04">April 2026</option>
+            <option value="2026-03">March 2026</option>
+            <option value="2025-12">December 2025</option>
+          </select>
+        </div>
+
+        <div class="rbccm-conference-insights-filter__field rbccm-conference-insights-filter__field--region">
+          <label class="rbccm-conference-insights-filter__label" for="cif-region">Region</label>
+          <select id="cif-region" class="rbccm-conference-insights-filter__select" data-filter="region">
+            <option value="">All regions</option>
+            <option value="global">Global</option>
+            <option value="au">Australia</option>
+            <option value="be">Belgium</option>
+            <option value="ca">Canada</option>
+            <option value="hk">China / Hong Kong</option>
+            <option value="fr">France</option>
+            <option value="de">Germany</option>
+            <option value="it">Italy</option>
+            <option value="ie">Ireland</option>
+            <option value="lu">Luxembourg</option>
+            <option value="my">Malaysia</option>
+            <option value="sg">Singapore</option>
+            <option value="ch">Switzerland</option>
+            <option value="ae">United Arab Emirates</option>
+            <option value="gb">United Kingdom</option>
+          </select>
+        </div>
+
+        <div class="rbccm-conference-insights-filter__field rbccm-conference-insights-filter__field--search">
+          <label class="rbccm-conference-insights-filter__label" for="cif-search">Search</label>
+          <input id="cif-search" type="search" class="rbccm-conference-insights-filter__input" placeholder="Search title or keyword" data-filter="search">
+        </div>
+
+        <div class="rbccm-conference-insights-filter__field" style="flex: 0 0 auto;">
+          <label class="rbccm-conference-insights-filter__label" aria-hidden="true">&nbsp;</label>
+          <button type="button" class="rbccm-conference-insights-filter__reset">Clear filters</button>
+        </div>
+
+      </div>
+
+      <!-- Active filter chips (populated by JS) -->
+      <div class="rbccm-conference-insights-filter__chips" aria-live="polite"></div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       TILES — with data-attributes for filtering
+       ============================================================ -->
+  <section class="rbccm-conference-insights-tiles" id="rbccm-conference-insights-tiles">
+    <div class="rbccm-conference-insights-tiles__inner">
+
+      <ul class="rbccm-conference-insights-tiles__row">
+
+        <!-- Card 1 — Global, June 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-06"
+            data-region="global"
+            data-search-text="the future of ai in financial services anthropic chief commercial officer artificial intelligence banking capital markets insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">The Future of AI in Financial Services</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>2 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 2 — UK, May 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-05"
+            data-region="global gb"
+            data-search-text="breakthrough innovations in precision medicine biotech executives investment opportunities insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Breakthrough Innovations in Precision Medicine. 6 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Breakthrough Innovations in Precision Medicine</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Leading biotech executives explore how precision medicine is transforming patient outcomes and creating new investment opportunities.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>6 min listen</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 3 — Canada, June 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-06"
+            data-region="global ca"
+            data-search-text="financing the clean energy transition capital requirements investment strategies renewable energy infrastructure">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Financing the Clean Energy Transition. 5 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Financing the Clean Energy Transition</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">RBC Capital Markets analysts provide commentary on capital requirements and investment strategies for renewable energy infrastructure.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>5 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 4 — Australia, April 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-04"
+            data-region="au"
+            data-search-text="australian mining outlook resource sector iron ore lithium global commodity pricing insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Australian Mining Outlook. 4 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1518183261945-b0989c458ad0?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Australian Mining Outlook</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Deep dive on the Australian resource sector: iron ore, lithium, and how global commodity pricing shapes the year ahead.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>4 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 5 — Germany + France, March 2026 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2026-03"
+            data-region="de fr"
+            data-search-text="european banking consolidation cross-border deals eurozone regulatory landscape 2026 insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: European Banking Consolidation. 7 min read.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">European Banking Consolidation</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Cross-border deals across the eurozone are reshaping the regulatory landscape for 2026 and beyond.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>7 min read</span></p>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 6 — Singapore + Hong Kong, December 2025 -->
+        <li class="rbccm-conference-insights-tiles__item"
+            data-month="2025-12"
+            data-region="sg hk"
+            data-search-text="asia pacific fintech innovations digital assets cross-border payment infrastructure singapore hong kong insights">
+          <a class="rbccm-conference-insights-tiles__insight rbccm-conference-insights-tiles__insight--card" href="#" aria-label="Insights: Asia Pacific FinTech Innovations. 5 min listen.">
+            <div class="rbccm-conference-insights-tiles__insight-media">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-conference-insights-tiles__insight-body">
+              <div class="rbccm-conference-insights-tiles__insight-label">Insights</div>
+              <div class="rbccm-conference-insights-tiles__insight-divider" aria-hidden="true"></div>
+              <h2 class="rbccm-conference-insights-tiles__insight-title">Asia Pacific FinTech Innovations</h2>
+              <p class="rbccm-conference-insights-tiles__insight-desc">Digital assets and cross-border payment infrastructure reshaping Singapore and Hong Kong's financial sectors.</p>
+              <p class="rbccm-conference-insights-tiles__insight-meta"><span>5 min listen</span></p>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+
+      <!-- Empty-state (JS toggles .is-visible when the filter matches nothing) -->
+      <p id="cif-empty" class="rbccm-conference-insights-filter__empty"></p>
+
+    </div>
+  </section>
+
+  <script src="conference-insights-filter.js"></script>
+</body>
+</html>

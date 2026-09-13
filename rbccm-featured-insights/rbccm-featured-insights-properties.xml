@@ -1,0 +1,297 @@
+<!--
+  rbccm-featured-insights :: Properties.xml
+  ================================================================
+  Datum-driven "Featured insights" section. Editors author 4 tiles
+  (1 featured + 3 regular) by picking existing DCR insights and
+  filling in the display fields per tile. Preset Datum picks the
+  variant class the XSL stamps onto the section root.
+
+  Presets:
+    default
+      Base spacing, transparent bg.
+    strategy-and-economics-featured-insights
+      Pale-tint bg + spacing tuned for the S&E page. Class:
+      .rbccm-featured-insights__strategy-and-economics-featured-insights
+      (Class name uses __ in place of the BEM double-hyphen modifier
+      so this XML comment stays well-formed; emitted markup uses the
+      double-hyphen prefix.)
+-->
+
+<Properties>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="AssetVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Preset (variant picker)
+       ============================================================
+       Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored.
+       ============================================================ -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Default</Display>
+      <Value>default</Value>
+    </Option>
+    <Option Selected="true">
+      <Display>Strategy and Economics - Featured insights</Display>
+      <Value>strategy-and-economics-featured-insights</Value>
+    </Option>
+    default
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header
+       ============================================================
+       What editors set here: the big headline and short subhead
+       that sit at the top of the section. The tag picker lets you
+       promote the title to h2 for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-featured-insights__header-center modifier that centers
+       the title + subhead block. (Class name uses __ in place of the
+       BEM double-hyphen modifier so this XML comment stays well-
+       formed; emitted markup uses the double-hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitle" Type="String" Name="Section title (required - do not blank)">Featured insights</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)" Label="Heading level for the title">
+    <Option><Display>H2</Display><Value>h2</Value></Option>
+    <Option Selected="true"><Display>H3</Display><Value>h3</Value></Option>
+    <Option><Display>H4</Display><Value>h4</Value></Option>
+    h3
+  </Datum>
+  <Datum ID="SectionSubhead" Type="String" Name="Section subhead (optional - blank hides the subhead)">High-signal RBC research organized across key market pillars.</Datum>
+
+
+  <!-- ============================================================
+       Tile source (section-level dispatch)
+       ============================================================
+       Controls how all 4 tiles resolve their content. Three modes:
+
+         dcr-picker  (default) Editor picks each tile's article via
+                     the TeamSite DCR picker (Tile{N}Dcr). The XSL
+                     server-renders each tile from its DCR record.
+                     Non-blank Tile{N}* text Datums act as per-field
+                     overrides (manual override > DCR field). If a
+                     tile also has Tile{N}PinnedUrl set, the runtime
+                     hydrates that tile from the insights feed as a
+                     safety net when DCR publishing is broken or the
+                     picked DCR is empty. Matches the hero pattern.
+         pinned-url  Every tile is hydrated client-side from the
+                     insights feed at the URL pasted into
+                     Tile{N}PinnedUrl. Server-render uses the manual
+                     Tile{N}* text Datums as the pre-hydration
+                     fallback (and no-JS fallback).
+         manual      Fully server-rendered from the Tile{N}* text
+                     Datums; DCR is not read, no client hydration.
+
+       Priority chain per field per tile:
+         manual Tile{N}* Datum (if non-blank) wins over
+         DCR record field (dcr-picker mode) wins over
+         pre-hydration fallback / feed-hydrated value
+       ============================================================ -->
+  <Datum ID="TileSource" Type="String" Name="Tile source (required - pick one; controls how all 4 tiles are populated)" Label="Tile source mode">
+    <Option Selected="true">
+      <Display>DCR picker - editor picks each article via TeamSite (server-rendered)</Display>
+      <Value>dcr-picker</Value>
+    </Option>
+    <Option>
+      <Display>Pinned URL - hydrate each tile from an insights feed URL (client-hydrated)</Display>
+      <Value>pinned-url</Value>
+    </Option>
+    <Option>
+      <Display>Manual - always use the Tile{N}* text Datums (fully manual)</Display>
+      <Value>manual</Value>
+    </Option>
+    dcr-picker
+  </Datum>
+
+  <!-- Comma-separated list of insights XML feed URLs the JS runtime
+       walks when hydrating tiles from a pinned URL. Default covers
+       2024/2025/2026 - update once a year when a new year feed goes
+       live (or every year in bulk). Only read at runtime by the JS;
+       ignored entirely in manual mode. -->
+  <Datum ID="TileFeedUrls" Type="String" Name="Tile feed URLs (required in pinned-url mode; optional safety-net feed for dcr-picker; comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
+
+
+  <!-- ============================================================
+       Tile slots (exactly 4 - REQUIRED)
+       ============================================================
+       This section renders 4 tiles - Tile 1 spans the full featured
+       row on desktop; Tiles 2-4 sit in the 3-up row beneath it. Fill
+       in every tile's Title, Description, Href, and Image. Blank
+       titles hide the tile but skew the row layout - keep all 4
+       populated.
+       ============================================================ -->
+
+  <!-- ============================================================
+       Tile 1 : FEATURED (spans full row on desktop)
+       ============================================================ -->
+  <Datum ID="Tile1Eyebrow" Type="String" Name="Tile 1 : eyebrow (required - topic pillar)">Economics</Datum>
+  <Datum ID="Tile1Title"   Type="String" Name="Tile 1 : title (required in manual mode; optional override in dcr-picker / pinned-url modes)">Anthropic's CCO on the Future of AI in Financial Services</Datum>
+  <Datum ID="Tile1Desc"    Type="String" Name="Tile 1 : description (required in manual mode; optional override in dcr-picker / pinned-url modes)">Exclusive insights on how artificial intelligence is transforming risk management and customer experience in banking.</Datum>
+  <Datum ID="Tile1Meta"    Type="String" Name="Tile 1 : meta e.g. '6 min listen' (optional - blank hides the meta line)">6 min listen</Datum>
+  <Datum ID="Tile1Href"    Type="String" Name="Tile 1 : link URL (required in manual mode; optional override in dcr-picker / pinned-url modes)">/en/insights/2026/09/anthropics-cco-on-the-future-of-ai-in-financial-services</Datum>
+  <Datum ID="Tile1AriaLabel" Type="String" Name="Tile 1 : accessible name (optional - screen-reader label for the tile link)">Insights: Anthropic's CCO on the Future of AI in Financial Services. 6 min listen.</Datum>
+  <Datum ID="Tile1Image" Type="Image" Name="Tile 1 : image - pick from DAM (required in manual mode; optional override in dcr-picker / pinned-url modes)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/2026/anthropic-cco-th.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <!-- DCR picker for Tile 1. Only read when TileSource=dcr-picker.
+       Type="DCR" surfaces TeamSite's native article picker; the allowed
+       categories/types mirror the story-tiles picker and the hero's
+       SeInsightDcr Datum (any Insights article, plus rbccm/episode,
+       rbccm/imagine2025, rbccm/casestudy). Because multiple types are
+       allowed, the XSL wildcards the DCR wrapper via DCR/*/{field}. -->
+  <Datum ID="Tile1Dcr" Type="DCR" Name="Tile 1 : DCR - dcr-picker mode (required in dcr-picker mode; blank falls through to pinned URL / manual)">
+    <DCR Category="article" Type="insights"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+      <DCR-Type Name="imagine2025"/>
+      <DCR-Type Name="casestudy"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Tile1PinnedUrl" Type="String" Name="Tile 1 : pinned URL (optional - safety net when DCR is empty or broken; paste /en/... path)"></Datum>
+  <!-- Taxonomy stack (bottom-right of tile). Baseline CSS hides Topic
+       + Region and shows only Date; authored so downstream flips work. -->
+  <Datum ID="Tile1Topic"  Type="String" Name="Tile 1 : topic (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile1Region" Type="String" Name="Tile 1 : region (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile1Date"   Type="String" Name="Tile 1 : date e.g. 'Sep 2026' (optional - blank hides the date line)">Sep 2026</Datum>
+
+
+  <!-- ============================================================
+       Tile 2
+       ============================================================ -->
+  <Datum ID="Tile2Eyebrow" Type="String" Name="Tile 2 : eyebrow (required - topic pillar)">Geopolitics</Datum>
+  <Datum ID="Tile2Title"   Type="String" Name="Tile 2 : title (required in manual mode; optional override in dcr-picker / pinned-url modes)">ETF Innovators: T. Rowe Price on innovation-driven active ETFs</Datum>
+  <Datum ID="Tile2Desc"    Type="String" Name="Tile 2 : description (required in manual mode; optional override in dcr-picker / pinned-url modes)">From model portfolio adoption to a first-of-its-kind digital currency ETF, T. Rowe Price is redefining what active...</Datum>
+  <Datum ID="Tile2Meta"    Type="String" Name="Tile 2 : meta e.g. '12 min listen' (optional - blank hides the meta line)">12 min listen</Datum>
+  <Datum ID="Tile2Href"    Type="String" Name="Tile 2 : link URL (required in manual mode; optional override in dcr-picker / pinned-url modes)">/en/insights/2026/09/etf-innovators-t-rowe-price</Datum>
+  <Datum ID="Tile2AriaLabel" Type="String" Name="Tile 2 : accessible name (optional - screen-reader label for the tile link)">Insights: ETF Innovators: T. Rowe Price on innovation-driven active ETFs. 12 min listen.</Datum>
+  <Datum ID="Tile2Image" Type="Image" Name="Tile 2 : image - pick from DAM (required in manual mode; optional override in dcr-picker / pinned-url modes)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/2026/etf-innovators-t-rowe-price-th.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <!-- DCR picker for Tile 2. Only read when TileSource=dcr-picker. -->
+  <Datum ID="Tile2Dcr" Type="DCR" Name="Tile 2 : DCR - dcr-picker mode (required in dcr-picker mode; blank falls through to pinned URL / manual)">
+    <DCR Category="article" Type="insights"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+      <DCR-Type Name="imagine2025"/>
+      <DCR-Type Name="casestudy"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Tile2PinnedUrl" Type="String" Name="Tile 2 : pinned URL (optional - safety net when DCR is empty or broken; paste /en/... path)"></Datum>
+  <Datum ID="Tile2Topic"  Type="String" Name="Tile 2 : topic (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile2Region" Type="String" Name="Tile 2 : region (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile2Date"   Type="String" Name="Tile 2 : date e.g. 'Aug 2026' (optional - blank hides the date line)">Aug 2026</Datum>
+
+
+  <!-- ============================================================
+       Tile 3
+       ============================================================ -->
+  <Datum ID="Tile3Eyebrow" Type="String" Name="Tile 3 : eyebrow (required - topic pillar)">Equity Markets</Datum>
+  <Datum ID="Tile3Title"   Type="String" Name="Tile 3 : title (required in manual mode; optional override in dcr-picker / pinned-url modes)">From moonshot to market with a new model for climate intelligence</Datum>
+  <Datum ID="Tile3Desc"    Type="String" Name="Tile 3 : description (required in manual mode; optional override in dcr-picker / pinned-url modes)">Our latest Pathfinders interview features Rich Mazzola at Bellwether discussing AI prediction and climate...</Datum>
+  <Datum ID="Tile3Meta"    Type="String" Name="Tile 3 : meta e.g. '12 min listen' (optional - blank hides the meta line)">12 min listen</Datum>
+  <Datum ID="Tile3Href"    Type="String" Name="Tile 3 : link URL (required in manual mode; optional override in dcr-picker / pinned-url modes)">/en/insights/2026/09/from-moonshot-to-market</Datum>
+  <Datum ID="Tile3AriaLabel" Type="String" Name="Tile 3 : accessible name (optional - screen-reader label for the tile link)">Insights: From moonshot to market with a new model for climate intelligence. 12 min listen.</Datum>
+  <Datum ID="Tile3Image" Type="Image" Name="Tile 3 : image - pick from DAM (required in manual mode; optional override in dcr-picker / pinned-url modes)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/2026/from-moonshot-to-market-th.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <!-- DCR picker for Tile 3. Only read when TileSource=dcr-picker. -->
+  <Datum ID="Tile3Dcr" Type="DCR" Name="Tile 3 : DCR - dcr-picker mode (required in dcr-picker mode; blank falls through to pinned URL / manual)">
+    <DCR Category="article" Type="insights"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+      <DCR-Type Name="imagine2025"/>
+      <DCR-Type Name="casestudy"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Tile3PinnedUrl" Type="String" Name="Tile 3 : pinned URL (optional - safety net when DCR is empty or broken; paste /en/... path)"></Datum>
+  <Datum ID="Tile3Topic"  Type="String" Name="Tile 3 : topic (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile3Region" Type="String" Name="Tile 3 : region (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile3Date"   Type="String" Name="Tile 3 : date e.g. 'Aug 2026' (optional - blank hides the date line)">Aug 2026</Datum>
+
+
+  <!-- ============================================================
+       Tile 4
+       ============================================================ -->
+  <Datum ID="Tile4Eyebrow" Type="String" Name="Tile 4 : eyebrow (required - topic pillar)">Cross-Asset Strategy</Datum>
+  <Datum ID="Tile4Title"   Type="String" Name="Tile 4 : title (required in manual mode; optional override in dcr-picker / pinned-url modes)">The Tariff Fog: Canada's Export Calculus Is Changing</Datum>
+  <Datum ID="Tile4Desc"    Type="String" Name="Tile 4 : description (required in manual mode; optional override in dcr-picker / pinned-url modes)">With U.S. tariffs now covering 38% of Canadian exports, RBC economists model three divergent recovery paths...</Datum>
+  <Datum ID="Tile4Meta"    Type="String" Name="Tile 4 : meta e.g. '12 min listen' (optional - blank hides the meta line)">12 min listen</Datum>
+  <Datum ID="Tile4Href"    Type="String" Name="Tile 4 : link URL (required in manual mode; optional override in dcr-picker / pinned-url modes)">/en/insights/2026/09/the-tariff-fog-canadas-export-calculus-is-changing</Datum>
+  <Datum ID="Tile4AriaLabel" Type="String" Name="Tile 4 : accessible name (optional - screen-reader label for the tile link)">Insights: The Tariff Fog: Canada's Export Calculus Is Changing. 12 min listen.</Datum>
+  <Datum ID="Tile4Image" Type="Image" Name="Tile 4 : image - pick from DAM (required in manual mode; optional override in dcr-picker / pinned-url modes)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/2026/the-tariff-fog-th.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <!-- DCR picker for Tile 4. Only read when TileSource=dcr-picker. -->
+  <Datum ID="Tile4Dcr" Type="DCR" Name="Tile 4 : DCR - dcr-picker mode (required in dcr-picker mode; blank falls through to pinned URL / manual)">
+    <DCR Category="article" Type="insights"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+      <DCR-Type Name="imagine2025"/>
+      <DCR-Type Name="casestudy"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Tile4PinnedUrl" Type="String" Name="Tile 4 : pinned URL (optional - safety net when DCR is empty or broken; paste /en/... path)"></Datum>
+  <Datum ID="Tile4Topic"  Type="String" Name="Tile 4 : topic (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile4Region" Type="String" Name="Tile 4 : region (optional - hidden by default CSS)"></Datum>
+  <Datum ID="Tile4Date"   Type="String" Name="Tile 4 : date e.g. 'Jul 2026' (optional - blank hides the date line)">Jul 2026</Datum>
+
+
+  <!-- ============================================================
+       View all CTA (bottom-left)
+       ============================================================
+       What editors set here: the label and URL of the "View all"
+       link that closes the section.
+       ============================================================ -->
+  <Datum ID="ViewAllLabel"     Type="String" Name="View all : label (required - do not blank)">View all insights</Datum>
+  <Datum ID="ViewAllHref"      Type="String" Name="View all : URL (required - full URL or /en/ path)">/en/insights</Datum>
+  <Datum ID="ViewAllAriaLabel" Type="String" Name="View all : accessible name (optional - screen-reader label for the link)">View all insights</Datum>
+
+
+</Properties>
+
+<Data>
+</Data>

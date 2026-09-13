@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tabbed Panels — local preview</title>
+<link rel="stylesheet" href="tabbed-panels.css">
+<!-- Font Awesome 4 — used by the media-contact card's fa-phone icon.
+     RBCCM production site already loads FA4; this CDN link is for
+     the standalone preview only. -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  /* Preview-only card style so panels render with something visible.
+     Real consumers bring their own inner components. */
+  .preview-card {
+    border: 1px solid #D8D8D8;
+    padding: 20px;
+    background: #fff;
+  }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 767px) { .preview-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant A — default (light, with title + lede)
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant A — default (light, title + lede, 4 tabs)</div>
+
+<section class="rbccm-tabbed-panels" aria-label="Example content sections">
+  <h2 class="rbccm-tabbed-panels__title">How we think</h2>
+  <p class="rbccm-tabbed-panels__lede">Section-level intro copy that sits above the tab strip. Optional — omit the p element if not needed.</p>
+
+  <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="Content sections" style="--tp-tab-count: 3;">
+    <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="one" aria-expanded="true" aria-controls="tp-panel-one" aria-label="Section one, tab 1 of 3">Section one<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="two" aria-expanded="false" aria-controls="tp-panel-two" aria-label="Section two, tab 2 of 3">Section two<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="three" aria-expanded="false" aria-controls="tp-panel-three" aria-label="Section three, tab 3 of 3">Section three<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+
+    <div class="rbccm-tabbed-panels__panel is-active" id="tp-panel-one" data-panel="one" role="region" tabindex="0" aria-label="Section one">
+      <div class="preview-grid">
+        <div class="preview-card">Panel content is BYO — put any component here.</div>
+        <div class="preview-card">Panel content is BYO.</div>
+        <div class="preview-card">Panel content is BYO.</div>
+        <div class="preview-card">Panel content is BYO.</div>
+      </div>
+    </div>
+    <div class="rbccm-tabbed-panels__panel" id="tp-panel-two" data-panel="two" role="region" tabindex="0" aria-label="Section two">
+      <div class="preview-grid">
+        <div class="preview-card">Two.A</div>
+        <div class="preview-card">Two.B</div>
+      </div>
+    </div>
+    <div class="rbccm-tabbed-panels__panel" id="tp-panel-three" data-panel="three" role="region" tabindex="0" aria-label="Section three">
+      <div class="preview-grid">
+        <div class="preview-card">Three.A</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant B — --headless --compact
+     For consumers that already own the surrounding section
+     shell (e.g. In the Media contacts) — this drops the title/
+     lede and the outer padding so the tablist sits inline.
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant B — --headless --compact (used inside In the Media page)</div>
+
+<div style="padding: 40px 24px; background: #fff;">
+  <div class="rbccm-tabbed-panels rbccm-tabbed-panels--headless rbccm-tabbed-panels--compact">
+    <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="Media contact regions" style="--tp-tab-count: 4;">
+      <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="global" aria-expanded="true" aria-controls="tp-panel-global" aria-label="Global, tab 1 of 4">Global<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+      <button type="button" class="rbccm-tabbed-panels__tab" data-panel="canada" aria-expanded="false" aria-controls="tp-panel-canada" aria-label="Canada, tab 2 of 4">Canada<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+      <button type="button" class="rbccm-tabbed-panels__tab" data-panel="us" aria-expanded="false" aria-controls="tp-panel-us" aria-label="US, tab 3 of 4">US<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+      <button type="button" class="rbccm-tabbed-panels__tab" data-panel="emea" aria-expanded="false" aria-controls="tp-panel-emea" aria-label="Europe / Asia Pacific, tab 4 of 4">Europe / Asia Pacific<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+
+      <div class="rbccm-tabbed-panels__panel is-active" id="tp-panel-global" data-panel="global" role="region" tabindex="0"><div class="preview-grid"><div class="preview-card">One contact for Global</div></div></div>
+      <div class="rbccm-tabbed-panels__panel" id="tp-panel-canada" data-panel="canada" role="region" tabindex="0"><div class="preview-grid"><div class="preview-card">Contact 1</div><div class="preview-card">Contact 2</div><div class="preview-card">Contact 3</div><div class="preview-card">Contact 4</div></div></div>
+      <div class="rbccm-tabbed-panels__panel" id="tp-panel-us" data-panel="us" role="region" tabindex="0"><div class="preview-grid"><div class="preview-card">Contact 1</div><div class="preview-card">Contact 2</div><div class="preview-card">Contact 3</div></div></div>
+      <div class="rbccm-tabbed-panels__panel" id="tp-panel-emea" data-panel="emea" role="region" tabindex="0"><div class="preview-grid"><div class="preview-card">Contact 1</div><div class="preview-card">Contact 2</div><div class="preview-card">Contact 3</div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant C — --dark
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant C — --dark (future-facing)</div>
+
+<section class="rbccm-tabbed-panels rbccm-tabbed-panels--dark" aria-label="Dark example">
+  <h2 class="rbccm-tabbed-panels__title">Dark variant</h2>
+  <p class="rbccm-tabbed-panels__lede">Same pattern on a dark background — yellow underline replaces black on active.</p>
+  <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="Dark sections" style="--tp-tab-count: 2;">
+    <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="a" aria-expanded="true" aria-controls="tp-panel-a">One<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="b" aria-expanded="false" aria-controls="tp-panel-b">Two<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <div class="rbccm-tabbed-panels__panel is-active" id="tp-panel-a" data-panel="a" role="region" tabindex="0">Dark panel content one.</div>
+    <div class="rbccm-tabbed-panels__panel" id="tp-panel-b" data-panel="b" role="region" tabindex="0">Dark panel content two.</div>
+  </div>
+</section>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant D — media contacts (paste-in card pattern)
+     Same tabbed-panels shell, panel content authored as raw HTML
+     using the .rbccm-tabbed-panels__contact-* classes shipped
+     with the component. This is what the In the Media page's
+     "Media contacts" section becomes when it moves off its own
+     .rbccm-itm-contact CSS and onto the shared component.
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant D — media contacts (paste-in __contact-card pattern)</div>
+
+<section class="rbccm-tabbed-panels rbccm-tabbed-panels--align-left" aria-label="Media contacts">
+  <h2 class="rbccm-tabbed-panels__title">Media contacts</h2>
+  <p class="rbccm-tabbed-panels__lede">If you are not a member of the media and are looking for information or assistance, please visit the <a href="#our-offices">Our Offices</a> section for details on how to contact us.</p>
+
+  <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="Media contact regions" style="--tp-tab-count: 4;">
+
+    <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="global" aria-expanded="true" aria-controls="tp-media-global" aria-label="Global, tab 1 of 4">Global<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="canada" aria-expanded="false" aria-controls="tp-media-canada" aria-label="Canada, tab 2 of 4">Canada<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="us" aria-expanded="false" aria-controls="tp-media-us" aria-label="US, tab 3 of 4">US<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="emea" aria-expanded="false" aria-controls="tp-media-emea" aria-label="Europe / Asia Pacific, tab 4 of 4">Europe / Asia Pacific<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+
+    <div class="rbccm-tabbed-panels__panel is-active" id="tp-media-global" data-panel="global" role="region" tabindex="0" aria-label="Global">
+      <div class="rbccm-tabbed-panels__contact-grid">
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+12126185589" aria-label="Call Sanam Heidary at +1 212 618 5589">
+          <h3 class="rbccm-tabbed-panels__contact-name">Sanam Heidary</h3>
+          <p class="rbccm-tabbed-panels__contact-role">General Inquiries</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.212.618.5589</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="rbccm-tabbed-panels__panel" id="tp-media-canada" data-panel="canada" role="region" tabindex="0" aria-label="Canada">
+      <div class="rbccm-tabbed-panels__contact-grid">
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+14372432381" aria-label="Call Elyse Lalonde at +1 437 243 2381">
+          <h3 class="rbccm-tabbed-panels__contact-name">Elyse Lalonde</h3>
+          <p class="rbccm-tabbed-panels__contact-role">General Inquiries</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.437.243.2381</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+13658890965" aria-label="Call Maggie Cheung at +1 365 889 0965">
+          <h3 class="rbccm-tabbed-panels__contact-name">Maggie Cheung</h3>
+          <p class="rbccm-tabbed-panels__contact-role">Investment Banking</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.365.889.0965</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+14162769115" aria-label="Call Kyle English at +1 416 276 9115">
+          <h3 class="rbccm-tabbed-panels__contact-name">Kyle English</h3>
+          <p class="rbccm-tabbed-panels__contact-role">Global Markets, Equity Research, Macro Strategy</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.416.276.9115</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+14372315010" aria-label="Call Sophie Leadbetter at +1 437 231 5010">
+          <h3 class="rbccm-tabbed-panels__contact-name">Sophie Leadbetter</h3>
+          <p class="rbccm-tabbed-panels__contact-role">RBC Economics</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.437.231.5010</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="rbccm-tabbed-panels__panel" id="tp-media-us" data-panel="us" role="region" tabindex="0" aria-label="US">
+      <div class="rbccm-tabbed-panels__contact-grid">
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+19299897882" aria-label="Call Chloe Brooke at +1 929 989 7882">
+          <h3 class="rbccm-tabbed-panels__contact-name">Chloe Brooke</h3>
+          <p class="rbccm-tabbed-panels__contact-role">Research, Investment Banking, Municipal Finance, RBC Economics</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.929.989.7882</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+12128145096" aria-label="Call Emily Burnham at +1 212 814 5096">
+          <h3 class="rbccm-tabbed-panels__contact-name">Emily Burnham</h3>
+          <p class="rbccm-tabbed-panels__contact-role">Equities, Fixed Income, Currencies &amp; Commodities, Macro Strategy</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.212.814.5096</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+12126182057" aria-label="Call Elisa Barsotti at +1 212 618 2057">
+          <h3 class="rbccm-tabbed-panels__contact-name">Elisa Barsotti</h3>
+          <p class="rbccm-tabbed-panels__contact-role">General Inquiries</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+1.212.618.2057</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="rbccm-tabbed-panels__panel" id="tp-media-emea" data-panel="emea" role="region" tabindex="0" aria-label="Europe / Asia Pacific">
+      <div class="rbccm-tabbed-panels__contact-grid">
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+442070297821" aria-label="Call Louisa Fairman at +44 20 7029 7821">
+          <h3 class="rbccm-tabbed-panels__contact-name">Louisa Fairman</h3>
+          <p class="rbccm-tabbed-panels__contact-role">General Inquiries (Europe / Asia Pacific)</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+44.20.7029.7821</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+442076534978" aria-label="Call Adam Lister at +44 207 653 4978">
+          <h3 class="rbccm-tabbed-panels__contact-name">Adam Lister</h3>
+          <p class="rbccm-tabbed-panels__contact-role">General Inquiries (Europe), Global Investment Banking, ESG / Climate</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+44.207.653.4978</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+        <a class="rbccm-tabbed-panels__contact-card" href="tel:+442070290805" aria-label="Call Rebecca Smallridge at +44 207 029 0805">
+          <h3 class="rbccm-tabbed-panels__contact-name">Rebecca Smallridge</h3>
+          <p class="rbccm-tabbed-panels__contact-role">Global Markets (Europe), Equity Research, FICC &amp; Macro Strategy</p>
+          <p class="rbccm-tabbed-panels__contact-phone">+44.207.029.0805</p>
+          <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true"><i class="fa fa-phone"></i></span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant E — how-we-think preset (Insights / Newsroom / Conferences)
+     Mirrors the shape the XSL emits when $PRESET = 'how-we-think'.
+     Tiles carry data-hwt-url + .is-hydrated so the JS's post-load
+     reveal isn't required in the preview (CSS hides pre-hydration
+     shells via [data-hwt-url]:not(.is-hydrated)).
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant E — how-we-think preset (Insights / Newsroom / Conferences)</div>
+
+<section class="rbccm-tabbed-panels rbccm-tabbed-panels--how-we-think"
+         id="tp-how-we-think-1"
+         data-preset="how-we-think"
+         aria-label="How we think">
+  <h2 class="rbccm-tabbed-panels__title">How we think</h2>
+
+  <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="How we think content sections" style="--tp-tab-count: 3;">
+
+    <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="insights" aria-expanded="true" aria-controls="tp-how-we-think-1-panel-insights" aria-label="Insights, tab 1 of 3">Insights<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="newsroom" aria-expanded="false" aria-controls="tp-how-we-think-1-panel-newsroom" aria-label="Newsroom, tab 2 of 3">Newsroom<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="conferences" aria-expanded="false" aria-controls="tp-how-we-think-1-panel-conferences" aria-label="Conferences, tab 3 of 3">Conferences<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__tab-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg></button>
+
+    <!-- Insights panel — 3 tiles pre-hydrated with plausible RBC insight data. -->
+    <div class="rbccm-tabbed-panels__panel is-active" id="tp-how-we-think-1-panel-insights" data-panel="insights" role="region" tabindex="0" aria-label="Insights">
+      <p class="rbccm-tabbed-panels__panel-lede">Our latest thinking on the trends and moves reshaping capital markets.</p>
+
+      <div class="rbccm-tabbed-panels__tiles">
+
+        <a class="rbccm-tabbed-panels__tile is-hydrated" href="/en/insights/story.page?dcr=how-ai-infrastructure-and-ma-are-reshaping-corporate-finance" data-hwt-url="/en/insights/story.page?dcr=how-ai-infrastructure-and-ma-are-reshaping-corporate-finance">
+          <div class="rbccm-tabbed-panels__tile-img">
+            <img loading="lazy" src="https://placehold.co/400x225/002144/FFFFFF?text=AI+Infrastructure" alt="" />
+          </div>
+          <div class="rbccm-tabbed-panels__tile-body">
+            <p class="rbccm-tabbed-panels__tile-eyebrow">INSIGHTS</p>
+            <div class="rbccm-tabbed-panels__tile-divider" aria-hidden="true"></div>
+            <h3 class="rbccm-tabbed-panels__tile-title">How AI infrastructure and M&amp;A are reshaping corporate finance</h3>
+            <p class="rbccm-tabbed-panels__tile-copy">Hyperscaler capex, private-credit financing structures, and a rebound in strategic deal flow are converging on the CFO's desk.</p>
+            <span class="rbccm-tabbed-panels__tile-cta">6 min read</span>
+          </div>
+        </a>
+
+        <a class="rbccm-tabbed-panels__tile is-hydrated" href="/en/insights/story.page?dcr=global-energy-transition-capital-flows-2026" data-hwt-url="/en/insights/story.page?dcr=global-energy-transition-capital-flows-2026">
+          <div class="rbccm-tabbed-panels__tile-img">
+            <img loading="lazy" src="https://placehold.co/400x225/002144/FFFFFF?text=Energy+Transition" alt="" />
+          </div>
+          <div class="rbccm-tabbed-panels__tile-body">
+            <p class="rbccm-tabbed-panels__tile-eyebrow">INSIGHTS</p>
+            <div class="rbccm-tabbed-panels__tile-divider" aria-hidden="true"></div>
+            <h3 class="rbccm-tabbed-panels__tile-title">Global energy transition: where the next wave of capital is flowing</h3>
+            <p class="rbccm-tabbed-panels__tile-copy">Grid modernization, nuclear restarts, and carbon-capture tax credits are redirecting the 2026 investment map.</p>
+            <span class="rbccm-tabbed-panels__tile-cta">5 min read</span>
+          </div>
+        </a>
+
+        <a class="rbccm-tabbed-panels__tile is-hydrated" href="/en/insights/story.page?dcr=us-rates-outlook-what-a-steeper-curve-means" data-hwt-url="/en/insights/story.page?dcr=us-rates-outlook-what-a-steeper-curve-means">
+          <div class="rbccm-tabbed-panels__tile-img">
+            <img loading="lazy" src="https://placehold.co/400x225/002144/FFFFFF?text=US+Rates+Outlook" alt="" />
+          </div>
+          <div class="rbccm-tabbed-panels__tile-body">
+            <p class="rbccm-tabbed-panels__tile-eyebrow">MACRO</p>
+            <div class="rbccm-tabbed-panels__tile-divider" aria-hidden="true"></div>
+            <h3 class="rbccm-tabbed-panels__tile-title">US rates outlook: what a steeper curve means for issuers</h3>
+            <p class="rbccm-tabbed-panels__tile-copy">RBC Capital Markets strategists on the funding calendar, duration bets, and where the buy-side is leaning heading into year-end.</p>
+            <span class="rbccm-tabbed-panels__tile-cta">4 min read</span>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="rbccm-tabbed-panels__cta-wrap">
+        <a class="rbccm-tabbed-panels__cta" href="/en/insights/" title="More insights" aria-label="More insights from RBC Capital Markets">More insights</a>
+      </div>
+    </div>
+
+    <!-- Newsroom panel — 3 media-hit rows with date + link + summary. -->
+    <div class="rbccm-tabbed-panels__panel" id="tp-how-we-think-1-panel-newsroom" data-panel="newsroom" role="region" tabindex="0" aria-label="Newsroom">
+      <p class="rbccm-tabbed-panels__panel-lede">Where RBC Capital Markets voices are showing up in the press.</p>
+
+      <div class="rbccm-tabbed-panels__news">
+
+        <div class="rbccm-tabbed-panels__news-item">
+          <span class="rbccm-tabbed-panels__news-date">September 4, 2026</span>
+          <a class="rbccm-tabbed-panels__news-link" href="https://www.bloomberg.com/news/example" target="_blank" rel="noopener" aria-label="RBC's Elsa Lignos on the dollar's next leg (opens in new tab)">RBC's Elsa Lignos on the dollar's next leg</a>
+          <p class="rbccm-tabbed-panels__news-summary">Bloomberg Surveillance — RBC's Head of FX Strategy walks through positioning heading into the September Fed meeting.</p>
+        </div>
+
+        <div class="rbccm-tabbed-panels__news-item">
+          <span class="rbccm-tabbed-panels__news-date">August 27, 2026</span>
+          <a class="rbccm-tabbed-panels__news-link" href="https://www.cnbc.com/example" target="_blank" rel="noopener" aria-label="Lori Calvasina: Small caps still have room to run (opens in new tab)">Lori Calvasina: Small caps still have room to run</a>
+          <p class="rbccm-tabbed-panels__news-summary">CNBC Squawk on the Street — RBC's Head of US Equity Strategy on why the Russell 2000 rally has legs into Q4.</p>
+        </div>
+
+        <div class="rbccm-tabbed-panels__news-item">
+          <span class="rbccm-tabbed-panels__news-date">August 12, 2026</span>
+          <a class="rbccm-tabbed-panels__news-link" href="https://finance.yahoo.com/example" target="_blank" rel="noopener" aria-label="Michael Tran on OPEC+ and the crude balance (opens in new tab)">Michael Tran on OPEC+ and the crude balance</a>
+          <p class="rbccm-tabbed-panels__news-summary">Yahoo Finance Live — RBC's global energy strategist on production discipline, demand signals, and the year-end price band.</p>
+        </div>
+
+      </div>
+
+      <div class="rbccm-tabbed-panels__cta-wrap">
+        <a class="rbccm-tabbed-panels__cta" href="/en/insights/newsroom.page" title="Show more media hits" aria-label="Show more media hits">Show more media hits</a>
+      </div>
+    </div>
+
+    <!-- Conferences panel — 3 upcoming events (server-rendered from the DCR feed). -->
+    <div class="rbccm-tabbed-panels__panel" id="tp-how-we-think-1-panel-conferences" data-panel="conferences" role="region" tabindex="0" aria-label="Conferences">
+      <p class="rbccm-tabbed-panels__panel-lede">Where RBC Capital Markets is convening clients, sector leaders, and policymakers next.</p>
+
+      <div class="rbccm-tabbed-panels__conferences">
+
+        <a class="rbccm-tabbed-panels__conference" href="/en/conferences/biopharma-cdmo.page">
+          <div class="rbccm-tabbed-panels__conference-date">
+            <span class="rbccm-tabbed-panels__conference-month">Sep</span>
+            <span class="rbccm-tabbed-panels__conference-day">21</span>
+          </div>
+          <div>
+            <p class="rbccm-tabbed-panels__conference-location">New York</p>
+            <p class="rbccm-tabbed-panels__conference-name">Biopharma CDMO Conference</p>
+          </div>
+        </a>
+
+        <a class="rbccm-tabbed-panels__conference" href="/en/conferences/climate-week-ceo-summit.page">
+          <div class="rbccm-tabbed-panels__conference-date">
+            <span class="rbccm-tabbed-panels__conference-month">Sep</span>
+            <span class="rbccm-tabbed-panels__conference-day">24</span>
+          </div>
+          <div>
+            <p class="rbccm-tabbed-panels__conference-location">New York</p>
+            <p class="rbccm-tabbed-panels__conference-name">Climate Week CEO Summit</p>
+          </div>
+        </a>
+
+        <a class="rbccm-tabbed-panels__conference" href="/en/conferences/power-energy-corp-infra-fixed-income.page">
+          <div class="rbccm-tabbed-panels__conference-date">
+            <span class="rbccm-tabbed-panels__conference-month">Oct</span>
+            <span class="rbccm-tabbed-panels__conference-day">7-8</span>
+          </div>
+          <div>
+            <p class="rbccm-tabbed-panels__conference-location">Toronto</p>
+            <p class="rbccm-tabbed-panels__conference-name">Power, Energy &amp; Corporate Infrastructure Fixed Income Conference</p>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="rbccm-tabbed-panels__cta-wrap">
+        <a class="rbccm-tabbed-panels__cta" href="/en/conferences/" title="Review upcoming events" aria-label="Review upcoming events">Review upcoming events</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+     Variant F — conference-insights preset (nested tabs, dark bg, sliders)
+     Outer tabs = 3 conferences. Each outer panel contains an
+     __inner-wrap with Overview / Speakers / Insights inner tabs +
+     panels. Overview holds a Brightcove-shaped video facade (data-bc-src
+     present but non-functional in preview), Speakers holds a slider
+     of 3 speaker cards, Insights holds a slider row of 3 insight cards.
+     Only the first outer tab + its overview inner tab are marked
+     is-active; the JS will keep everything else exclusive.
+     ───────────────────────────────────────────────────────────── -->
+<div class="demo-note">Variant F — conference-insights preset (nested tabs, dark bg, sliders)</div>
+
+<section class="rbccm-tabbed-panels rbccm-tabbed-panels--conference-insights"
+         id="tp-conference-insights-1"
+         data-preset="conference-insights"
+         aria-label="Featured conferences">
+  <h2 class="rbccm-tabbed-panels__title">Featured conferences</h2>
+
+  <div class="rbccm-tabbed-panels__tablist" role="group" aria-label="Featured conferences" style="--tp-tab-count: 3;">
+
+    <!-- Outer conference tabs (chevron intentionally omitted — matches XSL). -->
+    <button type="button" class="rbccm-tabbed-panels__tab is-active" data-panel="conf-1" aria-expanded="true" aria-controls="tp-conference-insights-1-panel-conf-1" aria-label="Global Communications Infrastructure Conference, tab 1 of 3">Global Communications Infrastructure Conference</button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="conf-2" aria-expanded="false" aria-controls="tp-conference-insights-1-panel-conf-2" aria-label="Global Financial Institutions Conference, tab 2 of 3">Global Financial Institutions Conference</button>
+    <button type="button" class="rbccm-tabbed-panels__tab" data-panel="conf-3" aria-expanded="false" aria-controls="tp-conference-insights-1-panel-conf-3" aria-label="Energy Transition Summit, tab 3 of 3">Energy Transition Summit</button>
+
+    <!-- ============= Outer panel 1 — Global Communications Infrastructure ============= -->
+    <div class="rbccm-tabbed-panels__panel is-active" id="tp-conference-insights-1-panel-conf-1" data-panel="conf-1" role="region" tabindex="0" aria-label="Global Communications Infrastructure Conference">
+      <div class="rbccm-tabbed-panels__inner-wrap">
+
+        <!-- Overview inner tab + panel (active). -->
+        <button type="button" class="rbccm-tabbed-panels__inner-tab is-active" data-inner="conf-1-overview" aria-expanded="true">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Overview</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--overview is-active" data-inner="conf-1-overview">
+          <div class="rbccm-tabbed-panels__overview">
+
+            <div class="rbccm-tabbed-panels__video">
+              <div class="rbccm-tabbed-panels__video-frame">
+                <button type="button" class="rbccm-tabbed-panels__video-facade" aria-label="Play video" data-bc-src="//players.brightcove.net/6415718365001/default_default/index.html?videoId=6350000000001&amp;autoplay=1">
+                  <img class="rbccm-tabbed-panels__video-poster" alt="" loading="lazy" src="https://placehold.co/1280x720/002144/FFFFFF?text=Communications+Infra" />
+                  <span class="rbccm-tabbed-panels__video-play" aria-hidden="true">
+                    <svg class="rbccm-tabbed-panels__video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__info">
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Date</div>
+                <div class="rbccm-tabbed-panels__info-value">September 29-30, 2026</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Location</div>
+                <div class="rbccm-tabbed-panels__info-value">Chicago, IL</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item rbccm-tabbed-panels__info-item--full">
+                <div class="rbccm-tabbed-panels__info-label">Format</div>
+                <div class="rbccm-tabbed-panels__info-value">In-person</div>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__overview-body">
+              <h3 class="rbccm-tabbed-panels__overview-heading">The next decade of telecom and data-center capacity</h3>
+              <div class="rbccm-tabbed-panels__overview-text">
+                <p>Two days of client-only conversations with tower REITs, hyperscaler infrastructure teams, and fiber operators on how AI workloads, spectrum policy, and interconnect economics are reshaping capital allocation.</p>
+              </div>
+              <p class="rbccm-tabbed-panels__topics">
+                <strong>Key topics:</strong>
+                <span class="rbccm-tabbed-panels__topics-list">AI capacity build-out, edge compute, fiber M&amp;A, spectrum policy, tower economics</span>
+              </p>
+              <p class="rbccm-tabbed-panels__contact"><em>Contact: Jonathan Atkin, Managing Director, Communications Infrastructure Research</em></p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Speakers inner tab + panel. -->
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-1-speakers" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Speakers</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--speakers" data-inner="conf-1-speakers">
+          <h3 class="rbccm-tabbed-panels__speakers-heading">Featured speakers</h3>
+          <p class="rbccm-tabbed-panels__speakers-intro">Sector leaders and RBC analysts framing the two-day agenda.</p>
+
+          <div class="rbccm-tabbed-panels__speakers-slider" data-conf="conf-1" aria-label="Speakers carousel">
+            <div class="rbccm-tabbed-panels__speakers" id="rbccm-tp-ci-speakers-conf-1">
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=JA" alt="Jonathan Atkin" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Jonathan Atkin</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Communications Infrastructure Research</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=KP" alt="Kutgun Maral" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Kutgun Maral</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, US Telecom Services</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=MM" alt="Matthew McKellar" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Matthew McKellar</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Vice President, Communications Infrastructure Research</div>
+              </div>
+
+            </div>
+
+            <div class="rbccm-tabbed-panels__speakers-controls">
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-prev-conf-1" aria-label="Previous speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__speakers-dots" id="rbccm-tp-ci-speakers-dots-conf-1" aria-label="Speaker slide indicators"></div>
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-next-conf-1" aria-label="Next speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="rbccm-tabbed-panels__speakers-footnote">Additional speakers to be announced. Invited attendees only.</p>
+        </div>
+
+        <!-- Insights inner tab + panel. -->
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-1-insights" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Insights</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--insights" data-inner="conf-1-insights">
+
+          <div class="rbccm-tabbed-panels__insights-slider" data-conf="conf-1" aria-label="Insights carousel">
+            <div class="rbccm-tabbed-panels__insights" id="rbccm-tp-ci-insights-conf-1">
+              <div class="rbccm-tabbed-panels__insights-row">
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=towerco-consolidation-thesis">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Towers" alt="Tower REIT consolidation" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">INSIGHTS</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">The TowerCo consolidation thesis heading into 2027</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Why we think leaseback structures are set for a repricing as hyperscaler demand hardens.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>5 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=ai-datacenter-power-constraints">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Data+Centers" alt="AI data center power" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">RESEARCH</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">AI data center power constraints and what they mean for developers</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Grid interconnect queues, gas peakers, and behind-the-meter deals are reshaping the site-selection map.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>7 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=fiber-ma-outlook-2026">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Fiber+M%26A" alt="Fiber M&amp;A outlook" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">INSIGHTS</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">Fiber M&amp;A outlook: sponsors, strategics, and the middle mile</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Where the next round of consolidation lands as private-equity holders approach exit windows.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>6 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__insights-controls">
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-prev-conf-1" aria-label="Previous insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__insights-dots" id="rbccm-tp-ci-insights-dots-conf-1" aria-label="Insight slide indicators"></div>
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-next-conf-1" aria-label="Next insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="rbccm-tabbed-panels__insights-cta-wrap">
+            <a class="rbccm-tabbed-panels__insights-cta" href="/en/insights/?topic=communications-infrastructure" aria-label="View all Communications Infrastructure insights">View all insights</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============= Outer panel 2 — Global Financial Institutions ============= -->
+    <div class="rbccm-tabbed-panels__panel" id="tp-conference-insights-1-panel-conf-2" data-panel="conf-2" role="region" tabindex="0" aria-label="Global Financial Institutions Conference">
+      <div class="rbccm-tabbed-panels__inner-wrap">
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-2-overview" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Overview</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--overview" data-inner="conf-2-overview">
+          <div class="rbccm-tabbed-panels__overview">
+
+            <div class="rbccm-tabbed-panels__video">
+              <div class="rbccm-tabbed-panels__video-frame">
+                <button type="button" class="rbccm-tabbed-panels__video-facade" aria-label="Play video" data-bc-src="//players.brightcove.net/6415718365001/default_default/index.html?videoId=6350000000002&amp;autoplay=1">
+                  <img class="rbccm-tabbed-panels__video-poster" alt="" loading="lazy" src="https://placehold.co/1280x720/002144/FFFFFF?text=Financial+Institutions" />
+                  <span class="rbccm-tabbed-panels__video-play" aria-hidden="true">
+                    <svg class="rbccm-tabbed-panels__video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__info">
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Date</div>
+                <div class="rbccm-tabbed-panels__info-value">October 15-16, 2026</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Location</div>
+                <div class="rbccm-tabbed-panels__info-value">New York, NY</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item rbccm-tabbed-panels__info-item--full">
+                <div class="rbccm-tabbed-panels__info-label">Format</div>
+                <div class="rbccm-tabbed-panels__info-value">Hybrid</div>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__overview-body">
+              <h3 class="rbccm-tabbed-panels__overview-heading">Banking through a shifting regulatory backdrop</h3>
+              <div class="rbccm-tabbed-panels__overview-text">
+                <p>Bank CEOs, insurance CFOs, and regulators on capital rules, deposit trends, and the M&amp;A window opening across US regionals and European specialty lenders.</p>
+              </div>
+              <p class="rbccm-tabbed-panels__topics">
+                <strong>Key topics:</strong>
+                <span class="rbccm-tabbed-panels__topics-list">Basel III endgame, deposit betas, regional bank M&amp;A, insurance private-credit, capital return</span>
+              </p>
+              <p class="rbccm-tabbed-panels__contact"><em>Contact: Gerard Cassidy, Managing Director, Large-Cap Bank Research</em></p>
+            </div>
+
+          </div>
+        </div>
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-2-speakers" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Speakers</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--speakers" data-inner="conf-2-speakers">
+          <h3 class="rbccm-tabbed-panels__speakers-heading">Featured speakers</h3>
+          <p class="rbccm-tabbed-panels__speakers-intro">Global bank leadership and RBC's FIG research bench.</p>
+
+          <div class="rbccm-tabbed-panels__speakers-slider" data-conf="conf-2" aria-label="Speakers carousel">
+            <div class="rbccm-tabbed-panels__speakers" id="rbccm-tp-ci-speakers-conf-2">
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=GC" alt="Gerard Cassidy" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Gerard Cassidy</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Large-Cap Bank Research</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=JD" alt="Jon Arfstrom" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Jon Arfstrom</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Mid-Cap Bank Research</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=MG" alt="Mark Dwelle" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Mark Dwelle</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Insurance Research</div>
+              </div>
+
+            </div>
+
+            <div class="rbccm-tabbed-panels__speakers-controls">
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-prev-conf-2" aria-label="Previous speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__speakers-dots" id="rbccm-tp-ci-speakers-dots-conf-2" aria-label="Speaker slide indicators"></div>
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-next-conf-2" aria-label="Next speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="rbccm-tabbed-panels__speakers-footnote">Registered clients only. Additional participants announced closer to the event.</p>
+        </div>
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-2-insights" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Insights</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--insights" data-inner="conf-2-insights">
+
+          <div class="rbccm-tabbed-panels__insights-slider" data-conf="conf-2" aria-label="Insights carousel">
+            <div class="rbccm-tabbed-panels__insights" id="rbccm-tp-ci-insights-conf-2">
+              <div class="rbccm-tabbed-panels__insights-row">
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=basel-endgame-what-changes">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Basel+III" alt="Basel III endgame" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">RESEARCH</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">Basel III endgame: what actually changes for US banks</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">RWA density, trading-book RRs, and the practical implications for capital plans through 2028.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>8 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=regional-bank-consolidation">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Regional+Banks" alt="Regional bank consolidation" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">INSIGHTS</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">The US regional bank M&amp;A window is opening</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Book-value marks, AOCI recovery, and pending guidance are converging into a real deal environment.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>6 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=insurance-private-credit-shift">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Insurance" alt="Insurance private credit" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">RESEARCH</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">The insurance shift into private credit</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Asset-intensive reinsurance and rated-note structures are reshaping liability portfolios.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>5 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__insights-controls">
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-prev-conf-2" aria-label="Previous insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__insights-dots" id="rbccm-tp-ci-insights-dots-conf-2" aria-label="Insight slide indicators"></div>
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-next-conf-2" aria-label="Next insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="rbccm-tabbed-panels__insights-cta-wrap">
+            <a class="rbccm-tabbed-panels__insights-cta" href="/en/insights/?topic=financial-institutions" aria-label="View all Financial Institutions insights">View all insights</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============= Outer panel 3 — Energy Transition Summit ============= -->
+    <div class="rbccm-tabbed-panels__panel" id="tp-conference-insights-1-panel-conf-3" data-panel="conf-3" role="region" tabindex="0" aria-label="Energy Transition Summit">
+      <div class="rbccm-tabbed-panels__inner-wrap">
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-3-overview" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Overview</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--overview" data-inner="conf-3-overview">
+          <div class="rbccm-tabbed-panels__overview">
+
+            <div class="rbccm-tabbed-panels__video">
+              <div class="rbccm-tabbed-panels__video-frame">
+                <button type="button" class="rbccm-tabbed-panels__video-facade" aria-label="Play video" data-bc-src="//players.brightcove.net/6415718365001/default_default/index.html?videoId=6350000000003&amp;autoplay=1">
+                  <img class="rbccm-tabbed-panels__video-poster" alt="" loading="lazy" src="https://placehold.co/1280x720/002144/FFFFFF?text=Energy+Transition" />
+                  <span class="rbccm-tabbed-panels__video-play" aria-hidden="true">
+                    <svg class="rbccm-tabbed-panels__video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__info">
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Date</div>
+                <div class="rbccm-tabbed-panels__info-value">November 4-5, 2026</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item">
+                <div class="rbccm-tabbed-panels__info-label">Location</div>
+                <div class="rbccm-tabbed-panels__info-value">London, UK</div>
+              </div>
+              <div class="rbccm-tabbed-panels__info-item rbccm-tabbed-panels__info-item--full">
+                <div class="rbccm-tabbed-panels__info-label">Format</div>
+                <div class="rbccm-tabbed-panels__info-value">In-person</div>
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__overview-body">
+              <h3 class="rbccm-tabbed-panels__overview-heading">Clean energy investment across a fragmented policy map</h3>
+              <div class="rbccm-tabbed-panels__overview-text">
+                <p>Developers, sponsors, and offtakers on how tax-credit transferability, tariffs, and grid access are reshaping the pipeline for wind, solar, storage, and low-carbon fuels.</p>
+              </div>
+              <p class="rbccm-tabbed-panels__topics">
+                <strong>Key topics:</strong>
+                <span class="rbccm-tabbed-panels__topics-list">tax credit transfer, storage, offshore wind, low-carbon fuels, grid access, transition finance</span>
+              </p>
+              <p class="rbccm-tabbed-panels__contact"><em>Contact: Elizabeth May, Managing Director, Global Energy Transition Group</em></p>
+            </div>
+
+          </div>
+        </div>
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-3-speakers" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Speakers</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--speakers" data-inner="conf-3-speakers">
+          <h3 class="rbccm-tabbed-panels__speakers-heading">Featured speakers</h3>
+          <p class="rbccm-tabbed-panels__speakers-intro">Sector leaders, RBC bankers, and RBC Climate Action Institute voices.</p>
+
+          <div class="rbccm-tabbed-panels__speakers-slider" data-conf="conf-3" aria-label="Speakers carousel">
+            <div class="rbccm-tabbed-panels__speakers" id="rbccm-tp-ci-speakers-conf-3">
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=EM" alt="Elizabeth May" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Elizabeth May</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Global Energy Transition Group</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=CJ" alt="Colin Gruending" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Colin Gruending</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Power &amp; Utilities Research</div>
+              </div>
+
+              <div class="rbccm-tabbed-panels__speaker">
+                <div class="rbccm-tabbed-panels__speaker-avatar"><img loading="lazy" src="https://placehold.co/400x400/002144/FFFFFF?text=MT" alt="Michael Tran" /></div>
+                <div class="rbccm-tabbed-panels__speaker-name">Michael Tran</div>
+                <div class="rbccm-tabbed-panels__speaker-title">Managing Director, Global Energy Strategy</div>
+              </div>
+
+            </div>
+
+            <div class="rbccm-tabbed-panels__speakers-controls">
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-prev-conf-3" aria-label="Previous speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__speakers-dots" id="rbccm-tp-ci-speakers-dots-conf-3" aria-label="Speaker slide indicators"></div>
+              <button class="rbccm-tabbed-panels__speakers-btn" type="button" tabindex="0" id="rbccm-tp-ci-speakers-next-conf-3" aria-label="Next speaker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <p class="rbccm-tabbed-panels__speakers-footnote">Client-invite event. Additional speakers to be announced.</p>
+        </div>
+
+        <button type="button" class="rbccm-tabbed-panels__inner-tab" data-inner="conf-3-insights" aria-expanded="false">
+          <span class="rbccm-tabbed-panels__inner-tab-label">Insights</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-tabbed-panels__inner-chevron" width="24" height="25" viewBox="0 0 24 25" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16.59 15.555L12 10.9317L7.41 15.555L6 14.1316L12 8.07493L18 14.1316L16.59 15.555Z" fill="currentColor"/></svg>
+        </button>
+        <div role="tabpanel" class="rbccm-tabbed-panels__inner-panel rbccm-tabbed-panels__inner-panel--insights" data-inner="conf-3-insights">
+
+          <div class="rbccm-tabbed-panels__insights-slider" data-conf="conf-3" aria-label="Insights carousel">
+            <div class="rbccm-tabbed-panels__insights" id="rbccm-tp-ci-insights-conf-3">
+              <div class="rbccm-tabbed-panels__insights-row">
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=storage-repricing">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Storage" alt="Battery storage repricing" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">RESEARCH</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">Battery storage: revenue stacks and the coming repricing</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Ancillary services markets are saturating; capacity revenues will do more of the lifting.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>6 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=offshore-wind-reset">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Offshore+Wind" alt="Offshore wind reset" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">INSIGHTS</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">Offshore wind: reset returns and a smaller near-term pipeline</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">Where second-round leases and rebid contracts are penciling — and where they're not.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>7 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+                <a class="rbccm-tabbed-panels__insight rbccm-tabbed-panels__insight--card" href="/en/insights/story.page?dcr=low-carbon-fuels-2026">
+                  <div class="rbccm-tabbed-panels__insight-media"><img loading="lazy" src="https://placehold.co/600x400/002144/FFFFFF?text=Low+Carbon+Fuels" alt="Low carbon fuels" /></div>
+                  <div class="rbccm-tabbed-panels__insight-body">
+                    <div class="rbccm-tabbed-panels__insight-label">RESEARCH</div>
+                    <div class="rbccm-tabbed-panels__insight-divider" aria-hidden="true"></div>
+                    <h4 class="rbccm-tabbed-panels__insight-title">Low-carbon fuels: what actually gets financed in 2026</h4>
+                    <p class="rbccm-tabbed-panels__insight-desc">SAF, renewable diesel, and blue hydrogen — a project-by-project view on FIDs and offtake.</p>
+                    <p class="rbccm-tabbed-panels__insight-meta">
+                      <span>8 min read</span>
+                      <svg class="rbccm-tabbed-panels__insight-arrow" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>
+                    </p>
+                  </div>
+                </a>
+
+              </div>
+            </div>
+
+            <div class="rbccm-tabbed-panels__insights-controls">
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-prev-conf-3" aria-label="Previous insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-tabbed-panels__insights-dots" id="rbccm-tp-ci-insights-dots-conf-3" aria-label="Insight slide indicators"></div>
+              <button class="rbccm-tabbed-panels__insights-btn" type="button" tabindex="0" id="rbccm-tp-ci-insights-next-conf-3" aria-label="Next insight">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="rbccm-tabbed-panels__insights-cta-wrap">
+            <a class="rbccm-tabbed-panels__insights-cta" href="/en/insights/?topic=energy-transition" aria-label="View all Energy Transition insights">View all insights</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Shared runtime — same file that ships to production at
+     /assets/rbccm/js/components/tabbed-panels.js. Handles click,
+     keyboard nav, ARIA sync for every .rbccm-tabbed-panels on the page. -->
+<script src="tabbed-panels.js"></script>
+
+</body>
+</html>

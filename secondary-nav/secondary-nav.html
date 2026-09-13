@@ -1,0 +1,54 @@
+<!-- ============================================================
+     Secondary Nav — modern (BEM) markup
+     Static example. When rendered by TeamSite / dynamic templating,
+     the current page's <li> gets `active` and its <a> gets
+     `aria-current="page"` so the yellow triangle indicator surfaces.
+     ============================================================ -->
+<nav class="secondary-nav" aria-label="Secondary navigation">
+  <div class="secondary-nav__inner">
+    <button type="button" class="secondary-nav__arrow secondary-nav__arrow--prev is-not-needed" aria-controls="secondary-nav-wrapper" aria-label="Scroll secondary navigation left">
+      <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polyline points="8,2 3,6 8,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="secondary-nav__wrapper" id="secondary-nav-wrapper">
+    <ul class="secondary-nav__list">
+      <li class="secondary-nav__item active">
+        <a href="/en/expertise/global-investment-banking/industry-coverage" aria-current="page">
+          Industry Coverage
+        </a>
+      </li>
+      <li class="secondary-nav__item">
+        <a href="/en/expertise/global-investment-banking/mergers-acquisitions">
+          Mergers &amp; Acquisitions
+        </a>
+      </li>
+      <li class="secondary-nav__item">
+        <a href="/en/expertise/global-investment-banking/equity-capital-markets">
+          Equity Capital Markets
+        </a>
+      </li>
+      <li class="secondary-nav__item">
+        <a href="/en/expertise/global-investment-banking/debt-capital-markets">
+          Debt Capital Markets
+        </a>
+      </li>
+      <li class="secondary-nav__item">
+        <a href="/en/expertise/global-investment-banking/leveraged-finance">
+          Leveraged Finance
+        </a>
+      </li>
+      </ul>
+    </div>
+    <button type="button" class="secondary-nav__arrow secondary-nav__arrow--next is-not-needed" aria-controls="secondary-nav-wrapper" aria-label="Scroll secondary navigation right">
+      <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polyline points="4,2 9,6 4,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="secondary-nav__progress-bar" aria-hidden="true">
+    <div class="secondary-nav__progress-fill" id="secondary-nav-progress"></div>
+  </div>
+</nav>
+</content>
+</invoke>

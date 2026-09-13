@@ -1,0 +1,216 @@
+/* =========================================================================
+   Conference Insights Filter
+   -------------------------------------------------------------------------
+   BEM block. Sits above the conference-insights-tiles grid and drives a
+   client-side filter (month, region, keyword search). No dependencies —
+   vanilla JS. Ports the visual pattern from .rbccm-deal-filter (from
+   deals-transactions) but simplified.
+
+   Data contract: this filter targets any element matching the selector in
+   its `data-target` attribute (defaults to .rbccm-conference-insights-tiles__item).
+   Each targetable element must expose:
+     data-month        "YYYY-MM"
+     data-region       space-separated region codes (e.g. "global gb au")
+     data-search-text  lowercased haystack of searchable text
+
+   Block: rbccm-conference-insights-filter
+   ========================================================================= */
+
+.rbccm-conference-insights-filter {
+  background: #ffffff;
+  padding: 24px 16px;
+}
+
+.rbccm-conference-insights-filter__inner {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.rbccm-conference-insights-filter__row {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.rbccm-conference-insights-filter__field {
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rbccm-conference-insights-filter__field--search {
+  flex: 2 1 260px;
+}
+
+
+/* ---------- Label ---------- */
+.rbccm-conference-insights-filter__label {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  line-height: normal;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Select + input (shared) ---------- */
+.rbccm-conference-insights-filter__select,
+.rbccm-conference-insights-filter__input {
+  background: #ffffff;
+  border: 1px solid #A8A8A8;
+  color: #252525;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  height: 44px;
+  line-height: normal;
+  padding: 0 12px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.rbccm-conference-insights-filter__select:hover,
+.rbccm-conference-insights-filter__input:hover {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+}
+
+.rbccm-conference-insights-filter__select:focus,
+.rbccm-conference-insights-filter__input:focus {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  outline: none;
+}
+
+
+/* ---------- Select-specific chrome ---------- */
+.rbccm-conference-insights-filter__select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='none' stroke='%23003168' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 1l5 5 5-5'/></svg>");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  background-size: 12px 8px;
+  cursor: pointer;
+  padding-right: 40px;
+}
+
+
+/* ---------- Search-input-specific chrome ---------- */
+.rbccm-conference-insights-filter__input {
+  /* Native reset for search input clear button */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.rbccm-conference-insights-filter__input::placeholder {
+  color: #6f6f6f;
+  opacity: 1;
+}
+
+
+/* ---------- Reset button ---------- */
+.rbccm-conference-insights-filter__reset {
+  background: transparent;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 44px;
+  letter-spacing: 0.3px;
+  padding: 0 20px;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.rbccm-conference-insights-filter__reset:hover,
+.rbccm-conference-insights-filter__reset:focus-visible {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Active-filter chips row (populated by JS) ---------- */
+.rbccm-conference-insights-filter__chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0 0;
+  min-height: 0;
+}
+
+.rbccm-conference-insights-filter__chips:empty {
+  display: none;
+}
+
+.rbccm-conference-insights-filter__chips-label {
+  color: #6f6f6f;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+
+.rbccm-conference-insights-filter__chip {
+  align-items: center;
+  background: #EFF6FD;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+  color: var(--Blue-Dark-Blue, #003168);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px 0 12px;
+}
+
+.rbccm-conference-insights-filter__chip:hover,
+.rbccm-conference-insights-filter__chip:focus-visible {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  outline: none;
+}
+
+.rbccm-conference-insights-filter__chip-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+
+/* ---------- Empty-state message (populated by JS) ---------- */
+.rbccm-conference-insights-filter__empty {
+  color: #6f6f6f;
+  display: none;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.rbccm-conference-insights-filter__empty.is-visible {
+  display: block;
+}
+
+
+/* ---------- Desktop tweaks ---------- */
+@media (min-width: 768px) {
+  .rbccm-conference-insights-filter {
+    padding: 32px 16px;
+  }
+}

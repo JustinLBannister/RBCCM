@@ -1,0 +1,1161 @@
+<!doctype html>
+<!--
+  RBC Strategy & Economics — v0 shell
+  ------------------------------------------------------------------
+  First-pass HTML/CSS scaffold built from the screenshot reference.
+  Typography, exact spacing, and colour values will need refinement
+  once the Figma is shared — for now this uses reasonable RBC-brand
+  defaults so we can see the sections in place.
+
+  Class prefix: rbccm-se__* (matches MAAS+MATA's rbccm-mm/rbccm-maas-mata
+  pattern for future BEM consistency).
+
+  What's wired in already:
+    - animate.css CDN + the same opacity:0 → .rbccm-anim-ready reveal
+      pattern from MAAS+MATA (so animations play cleanly out of the box)
+    - data-json attributes on every editable element (so the same
+      rbccm-json-bind runtime can pick this page up later)
+    - Sticky "Subscribe to S&E Insights" bottom banner
+
+  Deferred until Figma:
+    - Exact typography (font families, sizes, letter-spacing)
+    - Colour tokens (using RBC navy + yellow defaults for now)
+    - Image / avatar assets
+    - Motion timing tweaks per design spec
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RBC Strategy &amp; Economics</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<style>
+  :root {
+    --navy: #002144;
+    --navy-mid: #003168;
+    --navy-deep: #061730;
+    --yellow: #FFC72C;
+    --yellow-dk: #E5B319;
+    --blue: #0051A5;
+    --ink: #333333;
+    --grey-100: #F3F4F5;
+    --grey-200: #E5E7EA;
+    --grey-300: #D9DBDE;
+    --grey-500: #8A8F97;
+    --grey-700: #4A4E55;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Roboto, Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.5;
+    background: var(--white);
+  }
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; max-width: 100%; }
+
+  /* ============================================================
+     Component root + shared container.
+     ============================================================ */
+  .rbccm-se {
+    color: var(--ink);
+  }
+  .rbccm-se__container {
+    width: 100%;
+    max-width: 1140px;
+    padding: 0 23px;
+    margin: 0 auto;
+  }
+
+  /* Animate.css hooks — same pattern as MAAS+MATA. */
+  [data-animate],
+  [data-animate-hero],
+  [data-stagger-parent] > * {
+    opacity: 0;
+  }
+  .rbccm-anim-ready [data-animate].animate__animated,
+  .rbccm-anim-ready [data-animate-hero].animate__animated,
+  .rbccm-anim-ready [data-stagger-parent] > .animate__animated {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate],
+    [data-animate-hero],
+    [data-stagger-parent] > * {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+
+  /* ============================================================
+     1. HERO — navy background with market-chart illustration in
+     the corners. Headline + body on the left, media placeholder
+     on the right (video / chart / image slot).
+     ============================================================ */
+  .rbccm-se__hero {
+    background: var(--navy-deep) linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+    color: var(--white);
+    padding: 80px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rbccm-se__hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 992px) {
+    .rbccm-se__hero-grid { grid-template-columns: 1fr 1fr; gap: 60px; }
+    .rbccm-se__hero { padding: 100px 0 120px; }
+  }
+  .rbccm-se__hero-eyebrow {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    margin: 0 0 24px;
+    font-weight: 500;
+  }
+  .rbccm-se__hero-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 44px;
+    line-height: 1.1;
+    font-weight: 300;
+    margin: 0 0 24px;
+  }
+  @media (min-width: 992px) {
+    .rbccm-se__hero-title { font-size: 60px; }
+  }
+  .rbccm-se__hero-body {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    max-width: 480px;
+  }
+  .rbccm-se__hero-media {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .rbccm-se__hero-media-play {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid var(--white);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+    transition: background 200ms ease, transform 200ms ease;
+  }
+  .rbccm-se__hero-media-play:hover {
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--navy-deep);
+    transform: scale(1.04);
+  }
+  /* Corner chart marks (decorative — placeholder for the actual
+     bar-chart art in the screenshot). */
+  .rbccm-se__hero::before,
+  .rbccm-se__hero::after {
+    content: "";
+    position: absolute;
+    top: 30px;
+    width: 60px;
+    height: 220px;
+    background: linear-gradient(to top, var(--yellow) 0%, transparent 100%);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .rbccm-se__hero::before { left: 20px; }
+  .rbccm-se__hero::after  { right: 20px; }
+
+  /* ============================================================
+     2. THE FEED | RBC BLOG — 3 recent posts.
+     ============================================================ */
+  .rbccm-se__feed {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 40px 0 80px;
+  }
+  .rbccm-se__feed-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .rbccm-se__feed-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0;
+  }
+  .rbccm-se__feed-title-mark {
+    color: var(--grey-500);
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    margin-left: 12px;
+  }
+  .rbccm-se__feed-view-all {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-weight: 500;
+  }
+  .rbccm-se__feed-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) { .rbccm-se__feed-grid { grid-template-columns: repeat(3, 1fr); } }
+  .rbccm-se__feed-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rbccm-se__feed-card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey-500);
+  }
+  .rbccm-se__feed-card-meta-tag { color: var(--yellow); font-weight: 500; }
+  .rbccm-se__feed-card-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .rbccm-se__feed-card-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+  .rbccm-se__feed-card-author {
+    font-size: 12px;
+    color: var(--yellow);
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-style: italic;
+  }
+
+  /* ============================================================
+     3. PILLAR PLATFORMS — "Our Areas of Expertise"
+     3 expert cards + Cross-Asset & Strategy chip row.
+     ============================================================ */
+  .rbccm-se__pillars {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 60px 0 80px;
+  }
+  .rbccm-se__pillars-eyebrow {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin: 0 0 12px;
+    font-weight: 500;
+  }
+  .rbccm-se__pillars-heading {
+    text-align: center;
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 36px;
+    font-weight: 300;
+    margin: 0 0 12px;
+  }
+  .rbccm-se__pillars-body {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin: 0 auto 48px;
+    max-width: 640px;
+  }
+  .rbccm-se__pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) { .rbccm-se__pillars-grid { grid-template-columns: repeat(3, 1fr); } }
+  .rbccm-se__expert-card {
+    background: linear-gradient(180deg, transparent 50%, rgba(0, 33, 68, 0.85) 100%), #1a2e4d;
+    border-radius: 10px;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    color: var(--white);
+    cursor: pointer;
+  }
+  .rbccm-se__expert-card-eyebrow {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    margin: 0 0 4px;
+    font-weight: 500;
+  }
+  .rbccm-se__expert-card-name {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin: 0 0 4px;
+  }
+  .rbccm-se__expert-card-role {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 20px;
+  }
+  .rbccm-se__expert-card-topic {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+  .rbccm-se__expert-card-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+  .rbccm-se__expert-card-cta {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+  }
+  /* Cross-Asset chip row */
+  .rbccm-se__chip-row {
+    margin-top: 24px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 100px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .rbccm-se__chip-row-label {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 14px;
+  }
+  .rbccm-se__chip-row-label small {
+    display: block;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: Roboto, sans-serif;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .rbccm-se__chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .rbccm-se__chip {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease;
+  }
+  .rbccm-se__chip:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.3); }
+  .rbccm-se__chip--cta {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    border-color: transparent;
+    font-weight: 600;
+  }
+
+  /* ============================================================
+     4. LATEST INSIGHTS — 4 image cards.
+     ============================================================ */
+  .rbccm-se__insights {
+    padding: 80px 0;
+    background: var(--white);
+  }
+  .rbccm-se__insights-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .rbccm-se__insights-heading {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0;
+    color: var(--navy-deep);
+  }
+  .rbccm-se__insights-view-all {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .rbccm-se__insights-sub {
+    color: var(--grey-700);
+    font-size: 14px;
+    margin: 0 0 40px;
+  }
+  .rbccm-se__insights-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) { .rbccm-se__insights-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .rbccm-se__insights-grid { grid-template-columns: repeat(4, 1fr); } }
+  .rbccm-se__insight-card {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  .rbccm-se__insight-card:hover {
+    box-shadow: 0 6px 20px 0 rgba(25, 33, 61, 0.12);
+    transform: translateY(-2px);
+  }
+  .rbccm-se__insight-card-image {
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-deep) 100%);
+  }
+  .rbccm-se__insight-card-body {
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .rbccm-se__insight-card-eyebrow {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow-dk);
+    font-weight: 500;
+    margin: 0;
+  }
+  .rbccm-se__insight-card-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--navy-deep);
+    margin: 0;
+  }
+  .rbccm-se__insight-card-body-copy {
+    font-size: 12px;
+    color: var(--grey-700);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .rbccm-se__insight-card-cta {
+    margin-top: auto;
+    padding-top: 8px;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--blue);
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     5. OUR PLATFORMS — 2x2 grid of platform tiles with imagery.
+     ============================================================ */
+  .rbccm-se__platforms {
+    background: var(--grey-100);
+    padding: 80px 0;
+  }
+  .rbccm-se__platforms-head {
+    text-align: center;
+    margin: 0 0 40px;
+  }
+  .rbccm-se__platforms-heading {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--navy-deep);
+    margin: 0 0 12px;
+  }
+  .rbccm-se__platforms-body {
+    color: var(--grey-700);
+    font-size: 14px;
+    margin: 0 auto;
+    max-width: 480px;
+  }
+  .rbccm-se__platforms-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) { .rbccm-se__platforms-grid { grid-template-columns: repeat(2, 1fr); } }
+  .rbccm-se__platform-tile {
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-deep) 100%);
+    color: var(--white);
+    border-radius: 10px;
+    padding: 32px;
+    aspect-ratio: 2 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: transform 200ms ease;
+  }
+  .rbccm-se__platform-tile:hover { transform: translateY(-2px); }
+  .rbccm-se__platform-tile-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0 0 8px;
+  }
+  .rbccm-se__platform-tile-body {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+  .rbccm-se__platform-tile-cta {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-weight: 500;
+    margin-top: 24px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ============================================================
+     6. IN THE PRESS — featured video interview + press mentions.
+     ============================================================ */
+  .rbccm-se__press {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 80px 0;
+  }
+  .rbccm-se__press-head {
+    margin: 0 0 32px;
+  }
+  .rbccm-se__press-heading {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0 0 8px;
+  }
+  .rbccm-se__press-body {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin: 0;
+  }
+  .rbccm-se__press-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 992px) { .rbccm-se__press-grid { grid-template-columns: 1fr 1fr; } }
+  .rbccm-se__press-featured {
+    background: linear-gradient(135deg, #0a3572 0%, var(--navy-deep) 100%);
+    border-radius: 10px;
+    aspect-ratio: 16 / 10;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    cursor: pointer;
+  }
+  .rbccm-se__press-featured-tag {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+  .rbccm-se__press-featured-play {
+    align-self: center;
+    margin: auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+  }
+  .rbccm-se__press-featured-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--white);
+  }
+  .rbccm-se__press-featured-eyebrow {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+  }
+  .rbccm-se__press-featured-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .rbccm-se__press-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .rbccm-se__press-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .rbccm-se__press-item-source {
+    color: var(--yellow);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 11px;
+    min-width: 100px;
+  }
+  .rbccm-se__press-item-title {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 14px;
+    font-weight: 400;
+    flex: 1;
+    margin: 0;
+    color: var(--white);
+  }
+  .rbccm-se__press-item-cta {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    font-weight: 500;
+  }
+
+  /* ============================================================
+     7. NEWSLETTER — reuse MAAS+MATA pattern (this section is
+     a copy target for the shared-newsletter refactor later).
+     ============================================================ */
+  .rbccm-se__newsletter {
+    background: var(--white);
+    padding: 80px 0;
+  }
+  .rbccm-se__newsletter-heading {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--navy-deep);
+    margin: 0 0 8px;
+  }
+  .rbccm-se__newsletter-body {
+    color: var(--grey-700);
+    font-size: 14px;
+    margin: 0 0 32px;
+    max-width: 480px;
+  }
+  .rbccm-se__newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+  }
+  .rbccm-se__newsletter-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 720px) {
+    .rbccm-se__newsletter-fields { grid-template-columns: repeat(3, 1fr); }
+  }
+  .rbccm-se__newsletter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rbccm-se__newsletter-label {
+    font-size: 11px;
+    color: var(--grey-700);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .rbccm-se__newsletter-input {
+    padding: 10px 12px;
+    border: 1px solid var(--grey-300);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 14px;
+  }
+  .rbccm-se__newsletter-linkedin {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #075D9F;
+    color: var(--white);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    align-self: flex-start;
+  }
+  .rbccm-se__newsletter-consent {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 12px;
+    color: var(--grey-700);
+  }
+  .rbccm-se__newsletter-privacy {
+    color: var(--blue);
+    text-decoration: underline;
+  }
+  .rbccm-se__newsletter-submit {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 12px 32px;
+    border: 0;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ============================================================
+     8. Sticky bottom banner — "Subscribe to S&E Insights"
+     ============================================================ */
+  .rbccm-se__sticky-cta {
+    position: sticky;
+    bottom: 0;
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 50;
+    border-top: 1px solid var(--yellow);
+    flex-wrap: wrap;
+  }
+  .rbccm-se__sticky-cta-label {
+    font-family: Georgia, "RBC Display", serif;
+    font-size: 14px;
+  }
+  .rbccm-se__sticky-cta-btn {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<main class="rbccm-se" id="rbccm-se-page">
+
+  <!-- ═══ 1. HERO ═══════════════════════════════════════════════ -->
+  <section class="rbccm-se__hero" aria-label="Hero">
+    <div class="rbccm-se__container">
+      <div class="rbccm-se__hero-grid">
+        <div>
+          <p class="rbccm-se__hero-eyebrow" data-animate-hero="fadeInDown" data-animate-delay="0" data-json="hero.eyebrow">RBC Capital Markets</p>
+          <h1 class="rbccm-se__hero-title" data-animate-hero="fadeInUp" data-animate-delay="150" data-json="hero.title">RBC Strategy<br>&amp; Economics</h1>
+          <p class="rbccm-se__hero-body" data-animate-hero="fadeInUp" data-animate-delay="300" data-json-html="hero.body">Turning macro complexity into market clarity across economics, geopolitics, and global markets — to drive better business and investment decisions.</p>
+        </div>
+        <div class="rbccm-se__hero-media" data-animate-hero="fadeIn" data-animate-delay="500">
+          <span style="position: absolute; top: 16px; left: 20px; text-transform: uppercase; font-size: 10px; letter-spacing: 2px; color: var(--yellow); font-weight: 500;" data-json="hero.mediaEyebrow">Latest Insight</span>
+          <button type="button" class="rbccm-se__hero-media-play" aria-label="Play featured video">
+            <svg width="20" height="20" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.68 28.48L22.93 36.42V20.54L36.68 28.48Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 2. THE FEED | RBC BLOG ═══════════════════════════════ -->
+  <section class="rbccm-se__feed" aria-label="Latest blog posts">
+    <div class="rbccm-se__container">
+      <div class="rbccm-se__feed-head" data-animate="fadeInUp">
+        <h2 class="rbccm-se__feed-title">
+          <span data-json="feed.title">The feed</span>
+          <span class="rbccm-se__feed-title-mark" data-json="feed.subtitle">RBC Blog</span>
+        </h2>
+        <a class="rbccm-se__feed-view-all" href="#" data-json="feed.viewAllLabel" data-json-attr-href="feed.viewAllHref">View all posts</a>
+      </div>
+      <div class="rbccm-se__feed-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="feed.items">
+        <article class="rbccm-se__feed-card">
+          <div class="rbccm-se__feed-card-meta">
+            <span class="rbccm-se__feed-card-meta-tag" data-json="eyebrow">Economics</span>
+            <span data-json="date">2h ago</span>
+          </div>
+          <h3 class="rbccm-se__feed-card-title" data-json="title">BoC Rate Decision Preview</h3>
+          <p class="rbccm-se__feed-card-body" data-json="body">Inflation tick-up reduces probability of a 50bps cut next week; 25bps remains baseline.</p>
+          <p class="rbccm-se__feed-card-author" data-json="author">Frances Donald</p>
+        </article>
+        <article class="rbccm-se__feed-card">
+          <div class="rbccm-se__feed-card-meta">
+            <span class="rbccm-se__feed-card-meta-tag">Geopolitics</span>
+            <span>3h ago</span>
+          </div>
+          <h3 class="rbccm-se__feed-card-title">Lorem ipsum title</h3>
+          <p class="rbccm-se__feed-card-body">Inflation tick-up reduces probability of a 50bps cut next week; 25bps remains baseline.</p>
+          <p class="rbccm-se__feed-card-author">Helima Croft</p>
+        </article>
+        <article class="rbccm-se__feed-card">
+          <div class="rbccm-se__feed-card-meta">
+            <span class="rbccm-se__feed-card-meta-tag">Markets in Motion</span>
+            <span>14h ago</span>
+          </div>
+          <h3 class="rbccm-se__feed-card-title">Lorem ipsum title</h3>
+          <p class="rbccm-se__feed-card-body">Inflation tick-up reduces probability of a 50bps cut next week; 25bps remains baseline.</p>
+          <p class="rbccm-se__feed-card-author">Lori Calvasina</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3. PILLAR PLATFORMS — Our Areas of Expertise ═══════ -->
+  <section class="rbccm-se__pillars" aria-label="Our Areas of Expertise">
+    <div class="rbccm-se__container">
+      <p class="rbccm-se__pillars-eyebrow" data-animate="fadeInUp" data-json="pillars.eyebrow">Pillar Platforms</p>
+      <h2 class="rbccm-se__pillars-heading" data-animate="fadeInUp" data-animate-delay="100" data-json="pillars.heading">Our Areas of Expertise</h2>
+      <p class="rbccm-se__pillars-body" data-animate="fadeInUp" data-animate-delay="200" data-json="pillars.body">Comprehensive macro intelligence led by world-class strategists across key market pillars.</p>
+
+      <div class="rbccm-se__pillars-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="pillars.experts">
+        <article class="rbccm-se__expert-card">
+          <p class="rbccm-se__expert-card-eyebrow" data-json="eyebrow">Helima Croft</p>
+          <p class="rbccm-se__expert-card-role" data-json="role">Head of Global Commodity Strategy &amp; MENA Research</p>
+          <h3 class="rbccm-se__expert-card-topic" data-json="topic">Geopolitics</h3>
+          <p class="rbccm-se__expert-card-desc" data-json="desc">Global political dynamics, energy, and their market impact.</p>
+          <a class="rbccm-se__expert-card-cta" href="#" data-json="ctaLabel" data-json-attr-href="ctaHref">Explore real-time geopolitics →</a>
+        </article>
+        <article class="rbccm-se__expert-card">
+          <p class="rbccm-se__expert-card-eyebrow">Frances Donald</p>
+          <p class="rbccm-se__expert-card-role">Global Chief Economist</p>
+          <h3 class="rbccm-se__expert-card-topic">Economics</h3>
+          <p class="rbccm-se__expert-card-desc">Growth, inflation, and policy dynamics across North America and global markets.</p>
+          <a class="rbccm-se__expert-card-cta" href="#">Explore RBC economics →</a>
+        </article>
+        <article class="rbccm-se__expert-card">
+          <p class="rbccm-se__expert-card-eyebrow">Lori Calvasina</p>
+          <p class="rbccm-se__expert-card-role">Head of US Equity Market Strategy</p>
+          <h3 class="rbccm-se__expert-card-topic">Markets in Motion</h3>
+          <p class="rbccm-se__expert-card-desc">How macro forces transmit across equities, rates, credit, and FX.</p>
+          <a class="rbccm-se__expert-card-cta" href="#">Listen to Markets in Motion →</a>
+        </article>
+      </div>
+
+      <div class="rbccm-se__chip-row" data-animate="fadeInUp" data-animate-delay="400">
+        <div class="rbccm-se__chip-row-label">
+          <span data-json="pillars.chipRowLabel">Cross-Asset &amp; Strategy</span>
+          <small data-json="pillars.chipRowSub">A deep bench spanning every asset class</small>
+        </div>
+        <div class="rbccm-se__chips" data-json-list="pillars.chipRowItems">
+          <a class="rbccm-se__chip" href="#" data-json="">Derivatives</a>
+          <a class="rbccm-se__chip" href="#">FX</a>
+          <a class="rbccm-se__chip" href="#">Credit</a>
+          <a class="rbccm-se__chip" href="#">Rates</a>
+          <a class="rbccm-se__chip rbccm-se__chip--cta" href="#" data-json="pillars.chipRowCtaLabel" data-json-attr-href="pillars.chipRowCtaHref">Explore Cross-Assets &amp; Signals</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 4. LATEST INSIGHTS ═══════════════════════════════════ -->
+  <section class="rbccm-se__insights" aria-label="Latest insights">
+    <div class="rbccm-se__container">
+      <div class="rbccm-se__insights-head" data-animate="fadeInUp">
+        <h2 class="rbccm-se__insights-heading" data-json="insights.heading">Latest Insights</h2>
+        <a class="rbccm-se__insights-view-all" href="#" data-json="insights.viewAllLabel" data-json-attr-href="insights.viewAllHref">View all insights →</a>
+      </div>
+      <p class="rbccm-se__insights-sub" data-animate="fadeInUp" data-animate-delay="100" data-json="insights.sub">High-signal RBC research organized across key market pillars.</p>
+
+      <div class="rbccm-se__insights-grid" data-stagger-parent="fadeInUp" data-stagger-step="100" data-json-list="insights.items">
+        <article class="rbccm-se__insight-card">
+          <div class="rbccm-se__insight-card-image" data-json-attr-style-background-image="image"></div>
+          <div class="rbccm-se__insight-card-body">
+            <p class="rbccm-se__insight-card-eyebrow" data-json="eyebrow">Insights</p>
+            <h3 class="rbccm-se__insight-card-title" data-json="title">Data centers become the new battleground in Iran</h3>
+            <p class="rbccm-se__insight-card-body-copy" data-json="body">Iranian attacks on Gulf-tech infrastructure expose vulnerabilities in U.S.-backed AI investments.</p>
+            <a class="rbccm-se__insight-card-cta" href="#" data-json="ctaLabel" data-json-attr-href="ctaHref">See all from economics →</a>
+          </div>
+        </article>
+        <article class="rbccm-se__insight-card">
+          <div class="rbccm-se__insight-card-image"></div>
+          <div class="rbccm-se__insight-card-body">
+            <p class="rbccm-se__insight-card-eyebrow">Insights</p>
+            <h3 class="rbccm-se__insight-card-title">ETF Innovators: T. Rowe Price on innovation-driven active ETFs</h3>
+            <p class="rbccm-se__insight-card-body-copy">From model portfolio adoption to a first-of-its-kind digital currency ETF, T. Rowe Price is redefining what active investing looks like.</p>
+            <a class="rbccm-se__insight-card-cta" href="#">See all from geopolitics →</a>
+          </div>
+        </article>
+        <article class="rbccm-se__insight-card">
+          <div class="rbccm-se__insight-card-image"></div>
+          <div class="rbccm-se__insight-card-body">
+            <p class="rbccm-se__insight-card-eyebrow">Insights</p>
+            <h3 class="rbccm-se__insight-card-title">From moonshot to market with a new model for climate intelligence</h3>
+            <p class="rbccm-se__insight-card-body-copy">Our latest PathFinders interview features Rich Mazzola at Bellwether discussing AI predictions &amp; climate intelligence.</p>
+            <a class="rbccm-se__insight-card-cta" href="#">See all from markets →</a>
+          </div>
+        </article>
+        <article class="rbccm-se__insight-card">
+          <div class="rbccm-se__insight-card-image"></div>
+          <div class="rbccm-se__insight-card-body">
+            <p class="rbccm-se__insight-card-eyebrow">Insights</p>
+            <h3 class="rbccm-se__insight-card-title">The Tariff Fog: Canada's Export Calculus Is Changing</h3>
+            <p class="rbccm-se__insight-card-body-copy">With U.S. tariffs now covering 38% of Canadian exports, RBC economists model three divergent recovery paths.</p>
+            <a class="rbccm-se__insight-card-cta" href="#">See all from cross-assets →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5. OUR PLATFORMS — 2x2 tile grid ═════════════════════ -->
+  <section class="rbccm-se__platforms" aria-label="Our Platforms">
+    <div class="rbccm-se__container">
+      <div class="rbccm-se__platforms-head" data-animate="fadeInUp">
+        <h2 class="rbccm-se__platforms-heading" data-json="platforms.heading">Our Platforms</h2>
+        <p class="rbccm-se__platforms-body" data-json="platforms.body">Macro and market analysis of global currency dynamics from industry-leading strategists.</p>
+      </div>
+      <div class="rbccm-se__platforms-grid" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="platforms.items">
+        <article class="rbccm-se__platform-tile">
+          <div>
+            <h3 class="rbccm-se__platform-tile-title" data-json="title">Geopolitics</h3>
+            <p class="rbccm-se__platform-tile-body" data-json="body">Perspectives for boards and management teams weighing their next strategic move.</p>
+          </div>
+          <a class="rbccm-se__platform-tile-cta" href="#" data-json="ctaLabel" data-json-attr-href="ctaHref">Explore →</a>
+        </article>
+        <article class="rbccm-se__platform-tile">
+          <div>
+            <h3 class="rbccm-se__platform-tile-title">Markets in Motion</h3>
+            <p class="rbccm-se__platform-tile-body">Timely reads on the macro and market forces moving U.S. capital markets today.</p>
+          </div>
+          <a class="rbccm-se__platform-tile-cta" href="#">Explore →</a>
+        </article>
+        <article class="rbccm-se__platform-tile">
+          <div>
+            <h3 class="rbccm-se__platform-tile-title">RBC Economics</h3>
+            <p class="rbccm-se__platform-tile-body">The macro backdrop and rates outlook behind every capital decision.</p>
+          </div>
+          <a class="rbccm-se__platform-tile-cta" href="#">Explore →</a>
+        </article>
+        <article class="rbccm-se__platform-tile">
+          <div>
+            <h3 class="rbccm-se__platform-tile-title">Cross-Asset &amp; Strategy</h3>
+            <p class="rbccm-se__platform-tile-body">Forward-looking research on the long-term trends reshaping industries.</p>
+          </div>
+          <a class="rbccm-se__platform-tile-cta" href="#">Explore →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. IN THE PRESS ═════════════════════════════════════ -->
+  <section class="rbccm-se__press" aria-label="In the Press">
+    <div class="rbccm-se__container">
+      <div class="rbccm-se__press-head" data-animate="fadeInUp">
+        <h2 class="rbccm-se__press-heading" data-json="press.heading">In the Press</h2>
+        <p class="rbccm-se__press-body" data-json="press.body">RBC's economists and strategists, as featured across leading global media.</p>
+      </div>
+      <div class="rbccm-se__press-grid">
+        <div class="rbccm-se__press-featured" data-animate="fadeIn" data-animate-delay="100" data-json="press.featured">
+          <span class="rbccm-se__press-featured-tag" data-json="press.featured.tag">Bloomberg</span>
+          <button type="button" class="rbccm-se__press-featured-play" aria-label="Play featured video">
+            <svg width="20" height="20" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.68 28.48L22.93 36.42V20.54L36.68 28.48Z"/></svg>
+          </button>
+          <div class="rbccm-se__press-featured-meta">
+            <span class="rbccm-se__press-featured-eyebrow" data-json="press.featured.eyebrow">Featured Video Interview — Jul 18, 2025</span>
+            <h3 class="rbccm-se__press-featured-title" data-json="press.featured.title">"RBC's Frances Donald Says Fed Has One More Hike Before Prolonged Pause"</h3>
+          </div>
+        </div>
+        <ul class="rbccm-se__press-list" data-json-list="press.items">
+          <li class="rbccm-se__press-item">
+            <span class="rbccm-se__press-item-source" data-json="source">CNBC</span>
+            <p class="rbccm-se__press-item-title" data-json="title">"Helima Croft on Middle East Security &amp; Gulf Oil Infrastructure"</p>
+            <a class="rbccm-se__press-item-cta" href="#" data-json="ctaLabel" data-json-attr-href="ctaHref">Watch / Listen →</a>
+          </li>
+          <li class="rbccm-se__press-item">
+            <span class="rbccm-se__press-item-source">Financial Times</span>
+            <p class="rbccm-se__press-item-title">"Canada Faces Drag From U.S. Tariff Escalation, RBC Models Show"</p>
+            <a class="rbccm-se__press-item-cta" href="#">Watch / Listen →</a>
+          </li>
+          <li class="rbccm-se__press-item">
+            <span class="rbccm-se__press-item-source">The Wall Street Journal</span>
+            <p class="rbccm-se__press-item-title">"S&amp;P 500 Vulnerable to Earnings Miss, RBC Equity Strategist Warns"</p>
+            <a class="rbccm-se__press-item-cta" href="#">Read →</a>
+          </li>
+          <li class="rbccm-se__press-item">
+            <span class="rbccm-se__press-item-source">Bloomberg</span>
+            <p class="rbccm-se__press-item-title">"Bank of Canada Should Hold, Not Cut Rate, RBC Economist Argues"</p>
+            <a class="rbccm-se__press-item-cta" href="#">Watch / Listen →</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 7. NEWSLETTER — shared pattern from MAAS+MATA ═══════ -->
+  <section class="rbccm-se__newsletter" aria-label="Stay informed">
+    <div class="rbccm-se__container">
+      <h2 class="rbccm-se__newsletter-heading" data-json="newsletter.heading">Stay informed</h2>
+      <p class="rbccm-se__newsletter-body" data-json="newsletter.body">Get the latest updates and insights from RBC Capital Markets delivered to your inbox.</p>
+      <form class="rbccm-se__newsletter-form">
+        <div class="rbccm-se__newsletter-fields">
+          <label class="rbccm-se__newsletter-field"><span class="rbccm-se__newsletter-label">First Name</span><input class="rbccm-se__newsletter-input" name="firstName" type="text"></label>
+          <label class="rbccm-se__newsletter-field"><span class="rbccm-se__newsletter-label">Last Name</span><input class="rbccm-se__newsletter-input" name="lastName" type="text"></label>
+          <label class="rbccm-se__newsletter-field"><span class="rbccm-se__newsletter-label">Title</span><input class="rbccm-se__newsletter-input" name="title" type="text"></label>
+          <label class="rbccm-se__newsletter-field"><span class="rbccm-se__newsletter-label">Company</span><input class="rbccm-se__newsletter-input" name="company" type="text"></label>
+          <label class="rbccm-se__newsletter-field"><span class="rbccm-se__newsletter-label">Business Email</span><input class="rbccm-se__newsletter-input" name="businessEmail" type="email"></label>
+        </div>
+        <a class="rbccm-se__newsletter-linkedin" href="#linkedin">Autofill with LinkedIn</a>
+        <label class="rbccm-se__newsletter-consent">
+          <input type="checkbox">
+          <span>Yes, you may use the information I provide on this form to send me future insights from RBC Capital Markets. <a class="rbccm-se__newsletter-privacy" href="/privacy-policy">View Privacy Policy</a></span>
+        </label>
+        <button type="submit" class="rbccm-se__newsletter-submit">Sign up</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══ 8. Sticky bottom banner — Subscribe to S&E Insights ══ -->
+<div class="rbccm-se__sticky-cta" role="complementary" aria-label="Subscribe">
+  <span class="rbccm-se__sticky-cta-label" data-json="stickyCta.label">Subscribe to S&amp;E Insights</span>
+  <a class="rbccm-se__sticky-cta-btn" href="#" data-json="stickyCta.ctaLabel" data-json-attr-href="stickyCta.ctaHref">Subscribe</a>
+</div>
+
+<script>
+  /* Same animate.css bootstrap as MAAS+MATA — mark body ready so
+     the opacity:0 gate lifts, then IntersectionObserver adds classes
+     when elements enter view. */
+  (function () {
+    document.body.classList.add('rbccm-anim-ready');
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var noanim  = /[?&]noanim=1/.test(window.location.search);
+
+    function apply(el, name, delay) {
+      if (delay) el.style.animationDelay = delay + 'ms';
+      el.classList.add('animate__animated', 'animate__' + name);
+    }
+    if (noanim || reduced) return;
+
+    document.querySelectorAll('[data-animate-hero]').forEach(function (el) {
+      apply(el, el.getAttribute('data-animate-hero') || 'fadeInUp',
+                parseInt(el.getAttribute('data-animate-delay') || '0', 10));
+    });
+
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('[data-animate], [data-stagger-parent] > *').forEach(function (el) {
+        apply(el, el.getAttribute('data-animate') || 'fadeInUp', 0);
+      });
+      return;
+    }
+
+    var singleIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        apply(el, el.getAttribute('data-animate') || 'fadeInUp',
+                  parseInt(el.getAttribute('data-animate-delay') || '0', 10));
+        singleIo.unobserve(el);
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('[data-animate]').forEach(function (el) { singleIo.observe(el); });
+
+    var staggerIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var parent = entry.target;
+        var name = parent.getAttribute('data-stagger-parent') || 'fadeInUp';
+        var step = parseInt(parent.getAttribute('data-stagger-step') || '120', 10);
+        parent.querySelectorAll(':scope > *').forEach(function (child, i) {
+          apply(child, name, i * step);
+        });
+        staggerIo.unobserve(parent);
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('[data-stagger-parent]').forEach(function (el) { staggerIo.observe(el); });
+  })();
+</script>
+
+</body>
+</html>

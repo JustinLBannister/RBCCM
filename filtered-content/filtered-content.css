@@ -124,6 +124,22 @@
 }
 
 
+/* ---------- Hide-filter modifier (opt-in per instance) --------------
+   Preset-agnostic modifier that removes a filter control from the row
+   without deleting its markup. Applied via `--hidden-*` classes on the
+   filter root, so bringing a control back is a one-word HTML change
+   rather than a DOM restore. `!important` beats the auto-populate
+   pass in the JS, which clears inline `display` on rebind. */
+.rbccm-filtered-content--hidden-month  .rbccm-filtered-content__select-wrapper[data-filter="month"],
+.rbccm-filtered-content--hidden-region .rbccm-filtered-content__select-wrapper[data-filter="region"],
+.rbccm-filtered-content--hidden-topic  .rbccm-filtered-content__select-wrapper[data-filter="topic"],
+.rbccm-filtered-content--hidden-type   .rbccm-filtered-content__select-wrapper[data-filter="type"],
+.rbccm-filtered-content--hidden-year   .rbccm-filtered-content__select-wrapper[data-filter="year"],
+.rbccm-filtered-content--hidden-search .rbccm-filtered-content__search {
+  display: none !important;
+}
+
+
 /* ---------- Select wrap (holds select + chevron SVG) ---------- */
 .rbccm-filtered-content__select-wrapper {
   display: block;
@@ -389,6 +405,99 @@
   background: var(--Blue-Bright-Blue, #0051A5);
   color: #ffffff;
   outline: none;
+}
+
+
+/* ---------- Active-filter chip row --------------------------------
+   Auto-injected row that appears BELOW the filter inputs when at
+   least one filter is set. Renders one chip per active dropdown /
+   search value; each chip carries a dismiss "X" that clears just
+   that filter. Hidden when no filters are active so the row
+   collapses out of layout (no empty gap). Modeled on AutoTrader's
+   active-filter row. */
+.rbccm-filtered-content__chip-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+.rbccm-filtered-content__chip-row[hidden] {
+  display: none !important;
+}
+
+/* Chip -- border-radius + colors mirror the .__empty-clear button
+   so the two "filter management" controls read as siblings visually.
+   Dim prefix ("Type:", "Year:") and the remove X share the same
+   navy tone as the border and label text. */
+.rbccm-filtered-content__chip {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 10px;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-flex;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 8px;
+  line-height: 1;
+  padding: 6px 8px 6px 14px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+/* Full-chip hover -- matches the .__empty-clear button's inverse
+   treatment (navy fill, everything inside goes white). Hovering the
+   chip anywhere, or focusing the inner remove button, triggers the
+   swap; the X button no longer needs its own separate hover state. */
+.rbccm-filtered-content__chip:hover,
+.rbccm-filtered-content__chip:has(.rbccm-filtered-content__chip-remove:focus-visible) {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+}
+
+/* Text label -- dim prefix and value inherit the chip's navy color. */
+.rbccm-filtered-content__chip-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+/* "dim" = "dimension" (Type, Year, Region, etc.). Matches the value's
+   color + weight so the prefix reads as one continuous label rather
+   than a faded meta tag. */
+.rbccm-filtered-content__chip-dim {
+  color: inherit;
+  font-weight: inherit;
+}
+
+/* X button. Colour inherits from the chip (navy). Hover / focus
+   flips to the .__empty-clear button's inverse treatment: navy fill
+   with white glyph. */
+.rbccm-filtered-content__chip-remove {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  height: 22px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+  width: 22px;
+}
+/* X button focus ring only -- background flip is owned by the chip's
+   :hover / :has() rule above, so the X inherits the white glyph
+   automatically when the chip goes navy. */
+.rbccm-filtered-content__chip-remove:focus-visible {
+  outline: none;
+}
+.rbccm-filtered-content__chip-remove svg {
+  display: block;
+  height: 10px;
+  width: 10px;
 }
 
 
@@ -1843,35 +1952,31 @@ a.rbccm-filtered-content__card:active {
    text and sweep in from the left on hover / keyboard focus. Anchor
    is inline-block so the pseudo spans only the title text width, not
    the full flex column. */
+/* Card-title link -- real text-decoration: underline that "grows" via
+   an animated text-decoration-thickness. Uses the real underline
+   property (not an ::after bar or a background gradient), so wrapped
+   titles get an underline on EVERY line. On hover / focus the
+   thickness transitions 0 -> 2px, which reads as the stroke growing
+   in per line. Color also fades in from transparent to currentColor
+   so the entrance feels intentional rather than a sudden pop. */
 .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a {
   color: inherit;
-  text-decoration: none;
-  position: relative;
-  display: inline-block;
-}
-.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.25s ease;
-  pointer-events: none;
-}
-.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a:hover::after,
-.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a:focus-visible::after {
-  transform: scaleX(1);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 0.25s ease,
+    text-decoration-thickness 0.25s ease;
 }
 .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a:hover,
 .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a:focus-visible {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto; /* browser default -- matches the "See all media appearances" link, which also relies on auto */
   outline: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a::after {
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__card-title a {
     transition: none;
   }
 }

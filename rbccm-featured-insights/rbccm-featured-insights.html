@@ -1,0 +1,218 @@
+<!doctype html>
+<!--
+  RBCCM Featured Insights -- component preview
+
+  Author-curated 4-tile "Featured insights" block. Structural pattern
+  mirrors rbccm-in-the-media (header + subhead top, content middle,
+  VIEW ALL bottom-LEFT), tile visuals ported from the live
+  conference-insights-tiles baseline with the interior classes
+  renamed to `__insight-tile*` for stand-alone deploy.
+
+  Variant class shown here:
+    .rbccm-featured-insights--strategy-and-economics-featured-insights
+      pale-tint bg + spacing tuned for the S&E page
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RBCCM Featured Insights -- preview</title>
+<link rel="stylesheet" href="rbccm-featured-insights.css">
+<style>
+  body { margin: 0; font-family: Roboto, Arial, sans-serif; background: #fff; color: #1B1F27; }
+  .rbccm-preview-note {
+    background: #f4f6f8; border-bottom: 1px solid #d0d8df;
+    padding: 10px 16px; font-size: 12px; color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="rbccm-preview-note">
+  <strong>rbccm-featured-insights</strong> -- S&amp;E variant preview. Author-curated 4 tiles (1 featured + 3 regular). VIEW ALL INSIGHTS pinned bottom-left.
+</div>
+
+<!--
+  Section-level hydration config. In production the XSL stamps these
+  attributes based on the TileSource / TileFeedUrls Datums. Here the
+  preview mimics the dcr-picker mode with a pinned URL on Tile 2 as a
+  demo of the safety-net flow.
+-->
+<section class="rbccm-featured-insights rbccm-featured-insights--strategy-and-economics-featured-insights"
+         aria-label="Featured insights"
+         data-tile-source="dcr-picker"
+         data-tile-feed-urls="https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights">
+  <div class="rbccm-featured-insights__inner">
+
+    <!-- ===== Section header ===== -->
+    <div class="rbccm-featured-insights__header">
+      <h2 class="rbccm-featured-insights__title">Featured insights</h2>
+      <p class="rbccm-featured-insights__subtitle">High-signal RBC research organized across key market pillars.</p>
+    </div>
+
+    <!-- Screen-reader-only live region for the slick a11y announcer. -->
+    <div class="rbccm-featured-insights__sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ===== Tile grid (4 author-curated tiles) ===== -->
+    <ul class="rbccm-insight-tiles__row">
+
+      <!-- ---------- Featured tile (spans full row on desktop) ---------- -->
+      <li class="rbccm-insight-tiles__item">
+        <a class="rbccm-insight-tiles__insight rbccm-insight-tiles__insight--featured"
+           href="/en/insights/2026/09/anthropics-cco-on-the-future-of-ai-in-financial-services"
+           aria-label="Insights: Anthropic's CCO on the Future of AI in Financial Services. 6 min listen.">
+          <div class="rbccm-insight-tiles__insight-media">
+            <img loading="lazy" alt=""
+                 src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23003168'/%3E%3Cstop offset='100%25' stop-color='%230051A5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' fill='%23FFC72C' font-family='Georgia,serif' font-size='42' font-weight='700' text-anchor='middle' dominant-baseline='middle'%3EAI in Financial Services%3C/text%3E%3C/svg%3E">
+          </div>
+          <div class="rbccm-insight-tiles__insight-body">
+            <div class="rbccm-insight-tiles__insight-label">Economics</div>
+            <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
+            <h2 class="rbccm-insight-tiles__insight-title">Anthropic's CCO on the Future of AI in Financial Services</h2>
+            <p class="rbccm-insight-tiles__insight-desc">Exclusive insights on how artificial intelligence is transforming risk management and customer experience in banking.</p>
+            <div class="rbccm-insight-tiles__insight-bottom">
+              <p class="rbccm-insight-tiles__insight-meta">
+                <span>6 min listen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-tiles__insight-arrow" viewBox="0 0 7 11" fill="none" aria-hidden="true" focusable="false"><path d="M0.5 0.5L5.5 5.5L0.5 10.5" stroke-linecap="round"/></svg>
+              </p>
+              <div class="rbccm-insight-tiles__insight-taxonomy">
+                <span class="rbccm-insight-tiles__insight-topic">Economics</span>
+                <span class="rbccm-insight-tiles__insight-region">Global</span>
+                <span class="rbccm-insight-tiles__insight-date">Sep 2026</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </li>
+
+      <!-- ---------- Regular tile 1 ---------- -->
+      <!--
+        Demo of the pinned-URL hydration path. data-tile-pinned-url marks
+        this tile as a hydration target; the JS looks up that URL in the
+        feeds and rewrites data-hydrate-title / -desc / -date + the anchor
+        href. The current textual content is the pre-hydration fallback
+        (shows when JS is off or the URL misses in the feed).
+      -->
+      <li class="rbccm-insight-tiles__item"
+          data-tile-pinned-url="/en/insights/2026/09/etf-innovators-t-rowe-price">
+        <a class="rbccm-insight-tiles__insight"
+           href="/en/insights/2026/09/etf-innovators-t-rowe-price"
+           aria-label="Insights: ETF Innovators: T. Rowe Price on innovation-driven active ETFs. 12 min listen.">
+          <div class="rbccm-insight-tiles__insight-media">
+            <img loading="lazy" alt=""
+                 src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230B2A56'/%3E%3Cstop offset='100%25' stop-color='%23003168'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' fill='%23FFC72C' font-family='Georgia,serif' font-size='42' font-weight='700' text-anchor='middle' dominant-baseline='middle'%3EETF Innovators%3C/text%3E%3C/svg%3E">
+          </div>
+          <div class="rbccm-insight-tiles__insight-body">
+            <div class="rbccm-insight-tiles__insight-label">Geopolitics</div>
+            <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
+            <h2 class="rbccm-insight-tiles__insight-title" data-hydrate-title>ETF Innovators: T. Rowe Price on innovation-driven active ETFs</h2>
+            <p class="rbccm-insight-tiles__insight-desc" data-hydrate-desc>From model portfolio adoption to a first-of-its-kind digital currency ETF, T. Rowe Price is redefining what active&hellip;</p>
+            <div class="rbccm-insight-tiles__insight-bottom">
+              <p class="rbccm-insight-tiles__insight-meta">
+                <span>12 min listen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-tiles__insight-arrow" viewBox="0 0 7 11" fill="none" aria-hidden="true" focusable="false"><path d="M0.5 0.5L5.5 5.5L0.5 10.5" stroke-linecap="round"/></svg>
+              </p>
+              <div class="rbccm-insight-tiles__insight-taxonomy">
+                <span class="rbccm-insight-tiles__insight-topic">Geopolitics</span>
+                <span class="rbccm-insight-tiles__insight-region">US</span>
+                <span class="rbccm-insight-tiles__insight-date" data-hydrate-date>Aug 2026</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </li>
+
+      <!-- ---------- Regular tile 2 ---------- -->
+      <li class="rbccm-insight-tiles__item">
+        <a class="rbccm-insight-tiles__insight"
+           href="/en/insights/2026/09/from-moonshot-to-market"
+           aria-label="Insights: From moonshot to market with a new model for climate intelligence. 12 min listen.">
+          <div class="rbccm-insight-tiles__insight-media">
+            <img loading="lazy" alt=""
+                 src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2302305C'/%3E%3Cstop offset='100%25' stop-color='%23005DBB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' fill='%23FFC72C' font-family='Georgia,serif' font-size='42' font-weight='700' text-anchor='middle' dominant-baseline='middle'%3EClimate Intelligence%3C/text%3E%3C/svg%3E">
+          </div>
+          <div class="rbccm-insight-tiles__insight-body">
+            <div class="rbccm-insight-tiles__insight-label">Equity Markets</div>
+            <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
+            <h2 class="rbccm-insight-tiles__insight-title">From moonshot to market with a new model for climate intelligence</h2>
+            <p class="rbccm-insight-tiles__insight-desc">Our latest Pathfinders interview features Rich Mazzola at Bellwether discussing AI prediction &amp; climate&hellip;</p>
+            <div class="rbccm-insight-tiles__insight-bottom">
+              <p class="rbccm-insight-tiles__insight-meta">
+                <span>12 min listen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-tiles__insight-arrow" viewBox="0 0 7 11" fill="none" aria-hidden="true" focusable="false"><path d="M0.5 0.5L5.5 5.5L0.5 10.5" stroke-linecap="round"/></svg>
+              </p>
+              <div class="rbccm-insight-tiles__insight-taxonomy">
+                <span class="rbccm-insight-tiles__insight-topic">Equity Markets</span>
+                <span class="rbccm-insight-tiles__insight-region">Global</span>
+                <span class="rbccm-insight-tiles__insight-date">Aug 2026</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </li>
+
+      <!-- ---------- Regular tile 3 ---------- -->
+      <li class="rbccm-insight-tiles__item">
+        <a class="rbccm-insight-tiles__insight"
+           href="/en/insights/2026/09/the-tariff-fog-canadas-export-calculus-is-changing"
+           aria-label="Insights: The Tariff Fog: Canada's Export Calculus Is Changing. 12 min listen.">
+          <div class="rbccm-insight-tiles__insight-media">
+            <img loading="lazy" alt=""
+                 src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2302264B'/%3E%3Cstop offset='100%25' stop-color='%230A3D82'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' fill='%23FFC72C' font-family='Georgia,serif' font-size='42' font-weight='700' text-anchor='middle' dominant-baseline='middle'%3ETariff Fog%3C/text%3E%3C/svg%3E">
+          </div>
+          <div class="rbccm-insight-tiles__insight-body">
+            <div class="rbccm-insight-tiles__insight-label">Cross-Asset Strategy</div>
+            <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
+            <h2 class="rbccm-insight-tiles__insight-title">The Tariff Fog: Canada's Export Calculus Is Changing</h2>
+            <p class="rbccm-insight-tiles__insight-desc">With U.S. tariffs now covering 38% of Canadian exports, RBC economists model three divergent recovery paths&hellip;</p>
+            <div class="rbccm-insight-tiles__insight-bottom">
+              <p class="rbccm-insight-tiles__insight-meta">
+                <span>12 min listen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-tiles__insight-arrow" viewBox="0 0 7 11" fill="none" aria-hidden="true" focusable="false"><path d="M0.5 0.5L5.5 5.5L0.5 10.5" stroke-linecap="round"/></svg>
+              </p>
+              <div class="rbccm-insight-tiles__insight-taxonomy">
+                <span class="rbccm-insight-tiles__insight-topic">Cross-Asset Strategy</span>
+                <span class="rbccm-insight-tiles__insight-region">Canada</span>
+                <span class="rbccm-insight-tiles__insight-date">Jul 2026</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </li>
+
+    </ul>
+
+    <!-- ===== Slick controls (only shown <992px) ===== -->
+    <div class="rbccm-featured-insights__controls">
+      <button class="rbccm-featured-insights__btn rbccm-featured-insights__btn--prev" type="button" aria-label="Previous insight">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="rbccm-featured-insights__dots"></div>
+      <button class="rbccm-featured-insights__btn rbccm-featured-insights__btn--next" type="button" aria-label="Next insight">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+          <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ===== VIEW ALL INSIGHTS (bottom-left) ===== -->
+    <div class="rbccm-featured-insights__cta-row">
+      <a class="rbccm-featured-insights__view-all"
+         href="/en/insights"
+         aria-label="View all insights">
+        <span>View all insights</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10H16 M16 10L10.5 4.5 M16 10L10.5 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="rbccm-featured-insights.js"></script>
+</body>
+</html>

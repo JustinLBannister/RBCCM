@@ -1,0 +1,715 @@
+/* =========================================================================
+   RBCCM Featured Insights
+   -------------------------------------------------------------------------
+   Section wrapper for the "Featured insights" block. Header + subhead
+   sit on top, tile grid in the middle, VIEW ALL INSIGHTS CTA pinned
+   bottom-LEFT.
+
+   Interior tiles use the peer block `.rbccm-insight-tiles` (see below)
+   -- a 1:1 port of the conference-insights-tiles baseline with a
+   generic block name so any component (featured-insights, in-the-
+   media, deals landing, etc.) can drop the same tile pattern in and
+   get the same visuals for free.
+
+   Block: rbccm-featured-insights   -- section wrapper
+   Block: rbccm-insight-tiles       -- reusable tile grid + card
+   Presets on rbccm-featured-insights:
+     .rbccm-featured-insights--strategy-and-economics-featured-insights
+       Tunes bg + spacing for the S&E page composed layout.
+   ========================================================================= */
+
+
+/* =========================================================================
+   PART 1 -- Section wrapper (.rbccm-featured-insights)
+   ========================================================================= */
+
+.rbccm-featured-insights {
+  --rbccm-featured-insights-blue-bright: #0051A5;
+  --rbccm-featured-insights-blue-dark:   #003168;
+  --rbccm-featured-insights-serif:       "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --rbccm-featured-insights-sans:        Roboto, Arial, sans-serif;
+
+  --rbccm-featured-insights-bg: transparent;
+
+  background: var(--rbccm-featured-insights-bg);
+  box-sizing: border-box;
+  padding: 60px 23px;
+  width: 100%;
+}
+.rbccm-featured-insights *,
+.rbccm-featured-insights *::before,
+.rbccm-featured-insights *::after { box-sizing: border-box; }
+
+.rbccm-featured-insights__inner {
+  margin: 0 auto;
+  max-width: 1100px;
+}
+
+.rbccm-featured-insights .rbccm-featured-insights__title {
+  font-family: var(--rbccm-featured-insights-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+h1.rbccm-featured-insights__title, h2.rbccm-featured-insights__title,
+h3.rbccm-featured-insights__title, h4.rbccm-featured-insights__title,
+h5.rbccm-featured-insights__title, h6.rbccm-featured-insights__title,
+p.rbccm-featured-insights__title,  div.rbccm-featured-insights__title,
+h1.rbccm-featured-insights__subtitle, h2.rbccm-featured-insights__subtitle,
+h3.rbccm-featured-insights__subtitle, h4.rbccm-featured-insights__subtitle,
+h5.rbccm-featured-insights__subtitle, h6.rbccm-featured-insights__subtitle,
+p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.rbccm-featured-insights__header {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 32px;
+}
+
+/* Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base header is flex-start (left); --header-center flips the
+   header block (title + subtitle) to center. */
+.rbccm-featured-insights--header-center .rbccm-featured-insights__header {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-featured-insights--header-center .rbccm-featured-insights__title,
+.rbccm-featured-insights--header-center .rbccm-featured-insights__subtitle {
+  text-align: center !important;
+}
+.rbccm-featured-insights .rbccm-featured-insights__title {
+  color: var(--rbccm-featured-insights-blue-dark) !important;
+  font-family: var(--rbccm-featured-insights-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.rbccm-featured-insights .rbccm-featured-insights__subtitle {
+  color: #494949 !important;
+  font-family: var(--rbccm-featured-insights-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  margin: 0 !important;
+  max-width: 720px;
+  padding: 0 !important;
+}
+
+/* CTA row -- pins the VIEW ALL link bottom-LEFT under the tile grid. */
+.rbccm-featured-insights__cta-row {
+  align-items: flex-start;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.rbccm-featured-insights__view-all {
+  align-items: center;
+  color: var(--rbccm-featured-insights-blue-bright);
+  display: inline-flex;
+  font-family: var(--rbccm-featured-insights-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  gap: 15px;
+  letter-spacing: 1px;
+  line-height: 16.5px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-transform: uppercase;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+  width: fit-content;
+}
+.rbccm-featured-insights__view-all:hover,
+.rbccm-featured-insights__view-all:focus-visible {
+  color: var(--rbccm-featured-insights-blue-bright);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-featured-insights__view-all:focus-visible {
+  outline: 2px solid var(--rbccm-featured-insights-blue-bright);
+  outline-offset: 3px;
+}
+.rbccm-featured-insights__view-all svg {
+  aspect-ratio: 1 / 1;
+  color: currentColor;
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+}
+.rbccm-featured-insights__view-all:hover svg,
+.rbccm-featured-insights__view-all:focus-visible svg {
+  animation: rbccm-fi-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-fi-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+@media (min-width: 992px) {
+  .rbccm-featured-insights {
+    padding: 80px 23px;
+  }
+}
+
+/* Variant: Strategy and Economics -- flips bg to white for the S&E
+   page. Padding/gap inherit from the base (matches In the media). */
+.rbccm-featured-insights--strategy-and-economics-featured-insights {
+  --rbccm-featured-insights-bg: #FFFFFF;
+}
+
+
+/* =========================================================================
+   Slick chrome + controls
+   -------------------------------------------------------------------------
+   Below 992 the tile row runs as a Slick carousel; controls (prev arrow,
+   dots, next arrow) live below the row. At >=992 the JS destroys Slick
+   and the controls row hides via the media query at the bottom of this
+   block. Dot pattern is a 1:1 port of the rbccm-expertise dots so the
+   two S&E carousels feel identical.
+   ========================================================================= */
+
+/* Slick internal chrome (only present once JS runs). */
+.rbccm-featured-insights .slick-list  { overflow: hidden; }
+.rbccm-featured-insights .slick-track { align-items: stretch; display: flex; }
+.rbccm-featured-insights .slick-slide { height: auto; }
+.rbccm-featured-insights .slick-slide > div,
+.rbccm-featured-insights .slick-slide > div > div { height: 100%; }
+/* Each slide's inner wrapper is stretched full-height so the tile
+   card's flex layout (min-height: 555px) equalizes across slides. */
+.rbccm-featured-insights .slick-slide > div,
+.rbccm-featured-insights .slick-slide > div > div,
+.rbccm-featured-insights .slick-slide .rbccm-insight-tiles__item {
+  height: 100%;
+}
+/* Add breathing room between adjacent slides. Uses padding rather than
+   Slick's slidesMargin so we don't fight Slick's own inline styles. */
+.rbccm-featured-insights .slick-slide > div {
+  margin: 0 12px;
+}
+.rbccm-featured-insights .slick-list {
+  margin: 0 -12px;
+}
+
+/* Screen-reader-only live region (matches expertise). */
+.rbccm-featured-insights__sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* Prev / dots / next row below the tile grid. Hidden at >=992 via the
+   media query at the bottom of this block. Sits ABOVE the VIEW ALL
+   CTA row so the tile carousel and its dots read as one unit. */
+.rbccm-featured-insights__controls {
+  align-items: center;
+  display: flex;
+  gap: 26px;
+  justify-content: center;
+  margin-top: 24px;
+  margin-bottom: 45px;
+  width: 100%;
+}
+.rbccm-featured-insights__btn {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rbccm-featured-insights-blue-dark);
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  width: 14px;
+}
+.rbccm-featured-insights__btn svg { display: block; height: 24px; width: 14px; }
+.rbccm-featured-insights__btn:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--rbccm-featured-insights-blue-bright);
+  outline-offset: 6px;
+}
+
+.rbccm-featured-insights__dots {
+  align-items: center;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+.rbccm-featured-insights .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: flex !important;
+  gap: 26px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  width: auto !important;
+}
+.rbccm-featured-insights .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex !important;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-featured-insights .slick-dots li.slick-active {
+  height: 11px !important;
+  width: 11px !important;
+}
+.rbccm-featured-insights .slick-dots button {
+  appearance: none;
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+}
+.rbccm-featured-insights .slick-dots li.slick-active button {
+  height: 11px !important;
+  width: 11px !important;
+}
+.rbccm-featured-insights .slick-dots li button:focus-visible { outline: none; }
+
+/* Inactive dot: outlined navy circle. */
+.rbccm-featured-insights .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  width: 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+/* Active / focus-visible / hover: filled navy + white gap + navy ring. */
+.rbccm-featured-insights .slick-dots li.slick-active button::before,
+.rbccm-featured-insights .slick-dots li button:focus-visible::before,
+.rbccm-featured-insights .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px var(--rbccm-featured-insights-blue-dark) !important;
+  height: 11px !important;
+  width: 11px !important;
+  outline: 0;
+}
+
+/* Hide controls entirely when only one tile is present. JS toggles
+   this modifier on the section root. */
+.rbccm-featured-insights--single .rbccm-featured-insights__controls {
+  display: none;
+}
+
+/* Desktop: Slick is destroyed, grid renders all 4 tiles. Hide the
+   controls row so the section reads as static. */
+@media (min-width: 992px) {
+  .rbccm-featured-insights__controls {
+    display: none;
+  }
+}
+
+
+/* =========================================================================
+   PART 2 -- Insight tile grid + card (.rbccm-insight-tiles)
+   -------------------------------------------------------------------------
+   1:1 port of the live-site conference-insights-tiles baseline with a
+   generic block name so any component can drop this pattern in.
+   Everything below this line is the interior tile pattern only.
+
+   Mobile-first:
+     - <768px:  1 column
+     - >=768:   2 columns
+     - >=992:   3 columns with the .__insight--featured spanning the
+                full row and flipping to horizontal (image left / text
+                right)
+   ========================================================================= */
+
+.rbccm-insight-tiles {
+  padding: 0;
+  background: transparent;
+}
+
+.rbccm-insight-tiles__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+/* ---------- Row / grid ----------
+   Below 992px the row is a Slick carousel (1-per-view <768, 2-per-view
+   768-991) so mobile users don't scroll through four 555px cards. At
+   >=992 Slick is destroyed and the DOM reverts to a 3-column CSS grid
+   with the featured card spanning the full first row. */
+.rbccm-insight-tiles__row {
+  display: block;
+  list-style: none;
+  margin: 0 0 32px 0;
+  padding: 0;
+}
+
+/* Each <li> is a Slick slide below desktop. `list-style: none` on the
+   ul strips the marker; the li stays a normal block child so Slick can
+   wrap it in .slick-track. At >=992 the li becomes a grid child. */
+.rbccm-insight-tiles__item {
+  display: block;
+  list-style: none;
+}
+.rbccm-insight-tiles__item[hidden] {
+  display: none !important;
+}
+
+@media (min-width: 992px) {
+  .rbccm-insight-tiles__row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px 30px;
+  }
+  /* Featured tile spans full row at desktop. Selector sits on the <li>
+     so we don't have to know which card is featured -- :has() matches
+     whichever wrapper contains the .__--featured card. */
+  .rbccm-insight-tiles__item:has(> .rbccm-insight-tiles__insight--featured) {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ---------- Card ---------- */
+.rbccm-insight-tiles__insight {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  min-height: 454px;
+  text-decoration: none !important;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  outline-offset: 0px !important;
+}
+.rbccm-insight-tiles__insight:hover,
+.rbccm-insight-tiles__insight:focus-visible {
+  color: #000;
+  text-decoration: none;
+}
+.rbccm-insight-tiles__insight[hidden] {
+  display: none !important;
+}
+
+
+/* ---------- Media ---------- */
+.rbccm-insight-tiles__insight-media {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: auto;
+  min-height: 188px;
+  max-height: 240px;
+  overflow: hidden;
+}
+.rbccm-insight-tiles__insight-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+
+
+/* ---------- Body ---------- */
+.rbccm-insight-tiles__insight-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: auto;
+  min-height: 264px;
+  padding: 20px;
+}
+
+
+/* ---------- Label (eyebrow) ---------- */
+.rbccm-insight-tiles__insight-label {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Divider ---------- */
+.rbccm-insight-tiles__insight-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+
+
+/* ---------- Title ----------
+   Rendered as an h2 in production. Defensive !important overrides
+   here beat unified.css tag-level h2 rules that would otherwise
+   stamp a larger margin / larger font on the tile title. */
+h1.rbccm-insight-tiles__insight-title, h2.rbccm-insight-tiles__insight-title,
+h3.rbccm-insight-tiles__insight-title, h4.rbccm-insight-tiles__insight-title,
+h5.rbccm-insight-tiles__insight-title, h6.rbccm-insight-tiles__insight-title,
+p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
+.rbccm-insight-tiles__insight-title {
+  color: #000 !important;
+  font-family: "Roboto Medium", Arial, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  line-height: 125% !important;
+  letter-spacing: normal !important;
+  margin: 10px 0 10px 0 !important;
+  padding: 0 !important;
+}
+
+
+/* ---------- Description ---------- */
+.rbccm-insight-tiles__insight-desc {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+}
+
+
+/* ---------- Meta ---------- */
+.rbccm-insight-tiles__insight-meta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+
+
+/* ---------- Bottom row (meta left, date right) ---------- */
+.rbccm-insight-tiles__insight-bottom {
+  align-items: flex-end;
+  align-items: last baseline;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: auto 0 0 0;
+  width: 100%;
+}
+.rbccm-insight-tiles__insight-bottom .rbccm-insight-tiles__insight-meta {
+  margin: 0;
+}
+
+
+/* ---------- Taxonomy stack ---------- */
+.rbccm-insight-tiles__insight-taxonomy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 2px;
+  text-align: right;
+}
+.rbccm-insight-tiles__insight-topic {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+.rbccm-insight-tiles__insight-region {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+.rbccm-insight-tiles__insight-date {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Baseline default: topic + region hidden, only date visible. Restore
+   by removing this block. */
+.rbccm-insight-tiles__insight-topic,
+.rbccm-insight-tiles__insight-region {
+  display: none;
+}
+
+
+/* ---------- Arrow ----------
+   Stroked chevron next to the meta text. Sized via CSS so the SVG
+   source only needs to carry its viewBox + path. */
+.rbccm-insight-tiles__insight-arrow {
+  aspect-ratio: 1 / 2;
+  flex-shrink: 0;
+  height: 10px;
+  stroke: #0051A5;
+  stroke-width: 1px;
+  width: 5px;
+}
+
+
+/* ---------- Hover / focus effects ---------- */
+@media (hover: hover) {
+  .rbccm-insight-tiles__insight:hover {
+    outline: none;
+  }
+  .rbccm-insight-tiles__insight:hover .rbccm-insight-tiles__insight-media img,
+  .rbccm-insight-tiles__insight:focus-visible .rbccm-insight-tiles__insight-media img {
+    transform: scale(1.08);
+  }
+  .rbccm-insight-tiles__insight:hover .rbccm-insight-tiles__insight-divider,
+  .rbccm-insight-tiles__insight:focus-visible .rbccm-insight-tiles__insight-divider {
+    width: 56px;
+  }
+  .rbccm-insight-tiles__insight:hover .rbccm-insight-tiles__insight-meta,
+  .rbccm-insight-tiles__insight:focus-visible .rbccm-insight-tiles__insight-meta {
+    border-bottom-color: currentColor;
+  }
+}
+
+
+/* ---------- Keyboard focus ring ---------- */
+.rbccm-insight-tiles__insight:focus {
+  outline-color: rgb(0, 106, 195);
+  outline-offset: -2px;
+  outline-width: 3px;
+}
+.rbccm-insight-tiles__insight:focus-visible {
+  outline-color: rgb(0, 106, 195);
+  outline-offset: -2px;
+  outline-width: 3px;
+}
+
+
+/* ---------- Featured card horizontal layout (>=992px) ---------- */
+@media (min-width: 992px) {
+  /* Regular tiles below the featured row: lock media to a shorter 188px
+     band so the three cards line up cleanly under the featured band. */
+  .rbccm-insight-tiles__insight .rbccm-insight-tiles__insight-media {
+    height: auto;
+    min-height: 188px;
+    max-height: 188px;
+  }
+  /* Featured tile: horizontal layout with image on the RIGHT and
+     copy on the LEFT (row-reverse), per Figma. */
+  .rbccm-insight-tiles__insight--featured {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    min-height: 0;
+    max-height: 280px;
+  }
+  /* Featured tile keeps its own taller media band (280px) so the
+     horizontal hero layout reads at hero scale. */
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-media {
+    flex: 0 0 50%;
+    height: auto;
+    min-height: 280px;
+    max-height: 280px;
+  }
+  /* Body content is vertically centered as a group -- label / divider /
+     title / desc / meta row all flow together so short and long copy
+     both read well without a large gap between the desc and the meta.
+     Override the base __insight-bottom `margin: auto 0 0 0` so the meta
+     stays with the rest of the content instead of pinning to the
+     bottom. */
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-body {
+    flex: 1 1 50%;
+    justify-content: center;
+    min-height: 0;
+    padding: 30px;
+  }
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-bottom {
+    margin-top: 12px;
+  }
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-title {
+    font-size: 24px;
+    line-height: 30px;
+    margin: 26px 0 12px 0;
+  }
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-desc {
+    margin: 0 0 26px 0;
+  }
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-meta {
+    margin: 0;
+  }
+}
+
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-insight-tiles__insight,
+  .rbccm-insight-tiles__insight-media img,
+  .rbccm-insight-tiles__insight-divider,
+  .rbccm-insight-tiles__insight-meta,
+  .rbccm-featured-insights__view-all {
+    transition: none !important;
+  }
+  .rbccm-insight-tiles__insight:hover .rbccm-insight-tiles__insight-media img,
+  .rbccm-insight-tiles__insight:focus-visible .rbccm-insight-tiles__insight-media img {
+    transform: none !important;
+  }
+  .rbccm-featured-insights__view-all:hover svg,
+  .rbccm-featured-insights__view-all:focus-visible svg {
+    animation: none !important;
+  }
+}

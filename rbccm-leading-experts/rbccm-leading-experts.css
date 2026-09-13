@@ -1,0 +1,442 @@
+/* =========================================================================
+   RBCCM Leading Experts - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-leading-experts.css
+
+   Purpose
+   =========================================================================
+   Three-up card grid of expert profiles. Each card is a tall tile with
+   the expert's photo sitting BEHIND the content -- a top-to-bottom navy
+   gradient fades the image into a solid navy floor, and the eyebrow /
+   name / role / gold CTA sit on top of that gradient.
+
+   Layout
+   =========================================================================
+   Mobile / tablet (<992px) : cards stack full-width.
+   Desktop (>=992px)        : 3-column CSS Grid, cards side-by-side.
+   No carousel at any breakpoint (per S+E brief).
+
+   Photo hookup
+   =========================================================================
+   Each card gets a real <img class="rbccm-leading-experts__photo">
+   sibling as its first child. Using an <img> element instead of a
+   background gives us:
+     - real alt text for a11y (fed from the DAM Description)
+     - browser image loading semantics (lazy, priority, LCP)
+     - object-position control per card for face-safe framing
+   Per-card focal point overrides via inline style:
+     style="--rbccm-leading-experts-focal: 50% 15%"
+   Falls back to a light-gray fill on the card itself if the img is
+   missing / errors out.
+
+   Consumers
+   =========================================================================
+     Strategy and Economics - Leading experts
+       .rbccm-leading-experts--strategy-and-economics-leading-experts
+   ========================================================================= */
+
+
+/* ---------- Base block --------------------------------------------------- */
+.rbccm-leading-experts {
+  --rbccm-leading-experts-navy:      #003168;
+  --rbccm-leading-experts-gold:      #FFC72C; /* Yellow / Warm Yellow */
+  --rbccm-leading-experts-white:     #FFFFFF;
+  --rbccm-leading-experts-gray:      #D7D7D7;
+  --rbccm-leading-experts-card-line: rgba(174, 174, 174, 0.32);
+  --rbccm-leading-experts-inner-line:rgba(255, 255, 255, 0.26);
+  --rbccm-leading-experts-serif:     RBCDisplay, Georgia, Times, serif;
+  --rbccm-leading-experts-sans:      Roboto, Arial, sans-serif;
+
+  /* Variant-swappable section background -- default transparent. */
+  --rbccm-leading-experts-bg-color:  transparent;
+
+  background: var(--rbccm-leading-experts-bg-color);
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0 23px 60px; /* no top padding: section butts up under
+                           rbccm-expertise per S+E brief. */
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 62px;
+}
+.rbccm-leading-experts *,
+.rbccm-leading-experts *::before,
+.rbccm-leading-experts *::after { box-sizing: border-box; }
+
+/* Font-family lock on tag-pickable text nodes. Defends against
+   unified.css tag-level rules that would suppress RBCDisplay on
+   h1..h6. */
+.rbccm-leading-experts .rbccm-leading-experts__title,
+.rbccm-leading-experts .rbccm-leading-experts__name {
+  font-family: var(--rbccm-leading-experts-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Tag-agnostic margin/padding reset on tag-pickable elements. */
+h1.rbccm-leading-experts__title, h2.rbccm-leading-experts__title,
+h3.rbccm-leading-experts__title, h4.rbccm-leading-experts__title,
+h5.rbccm-leading-experts__title, h6.rbccm-leading-experts__title,
+p.rbccm-leading-experts__title,  div.rbccm-leading-experts__title,
+h1.rbccm-leading-experts__name,  h2.rbccm-leading-experts__name,
+h3.rbccm-leading-experts__name,  h4.rbccm-leading-experts__name,
+h5.rbccm-leading-experts__name,  h6.rbccm-leading-experts__name,
+p.rbccm-leading-experts__name,   div.rbccm-leading-experts__name,
+h1.rbccm-leading-experts__role,  h2.rbccm-leading-experts__role,
+h3.rbccm-leading-experts__role,  h4.rbccm-leading-experts__role,
+h5.rbccm-leading-experts__role,  h6.rbccm-leading-experts__role,
+p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+/* ---------- Container ---------------------------------------------------- */
+.rbccm-leading-experts__inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+
+/* ---------- Section title ------------------------------------------------
+   Selector scoped to .rbccm-leading-experts so its specificity (0,2,0)
+   beats the tag-agnostic reset above (0,1,1 with !important). The
+   !important on margin-bottom is required because the reset also uses
+   !important; without it the mobile 32px gets stripped and the title
+   sits flush against the grid. */
+.rbccm-leading-experts .rbccm-leading-experts__title {
+  color: var(--rbccm-leading-experts-navy) !important;
+  font-family: var(--rbccm-leading-experts-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 0 32px 0 !important;
+  padding: 0 !important;
+}
+
+
+/* ---------- Grid --------------------------------------------------------- */
+.rbccm-leading-experts__grid {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+}
+
+
+/* ---------- Card --------------------------------------------------------- */
+/* Layer stack (bottom to top):
+     1. gray fallback     (background-color on the card itself)
+     2. photo             (.__photo -- real <img>, object-fit cover,
+                           scales on hover for the subtle zoom-in)
+     3. navy gradient     (.__card::after  -- overlays the photo,
+                           pointer-events: none so hover still hits the card)
+     4. card content      (positioned relative + z-index: 2 via .__card-inner)
+   Using a real <img> instead of a background pseudo lets us:
+     - ship real alt text
+     - hand the browser a proper image element for lazy loading / LCP
+     - control focal point per card via --rbccm-leading-experts-focal */
+.rbccm-leading-experts__card {
+  align-items: flex-start;
+  align-self: stretch;
+  background-color: #E1E1E1;
+  border: 1px solid var(--rbccm-leading-experts-card-line);
+  border-radius: 15px;
+  color: var(--rbccm-leading-experts-white);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  height: 436px;
+  justify-content: flex-end;
+  overflow: hidden; /* clips the photo scale so the zoom stays inside
+                       the rounded corners */
+  padding: 20px;
+  position: relative;
+  width: 100%;
+}
+
+/* Real <img> layer -- pinned to fill the card, cropped to cover.
+   Author may override the focal point per card with
+   style="--rbccm-leading-experts-focal: 50% 15%".
+   Default focal is 50% 20% -- keeps faces high in the frame under the
+   navy floor gradient. */
+.rbccm-leading-experts__photo {
+  display: block;
+  /* Match Figma bleed pattern: image spans FULL card width, capped
+     at ~80.5% of card height, anchored to the top. The card's own
+     navy background fills the bottom ~20%, and the .__card::after
+     gradient (rgba(0,49,104,0) 0% -> #003168 82.34%) fades the
+     image into that navy so cleanly you can't see the seam.
+     --rbccm-leading-experts-photo-height overrides per card if a
+     portrait needs a taller or shorter footprint. */
+  height: var(--rbccm-leading-experts-photo-height, 80.505%);
+  /* Cap the image width on mobile / tablet so a full-viewport-wide
+     card doesn't blow up the 1.5x-scaled portrait to comic-book
+     proportions. left/right + margin-inline: auto centers the
+     capped image inside the card. Desktop breakpoint (992+) below
+     releases the cap since 3-column grid already narrows each card
+     naturally. Tune per card via --...-max-width. */
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  max-width: var(--rbccm-leading-experts-max-width, 351px);
+  object-fit: cover;
+  object-position: var(--rbccm-leading-experts-focal, 50% 20%);
+  position: absolute;
+  top: 0;
+  /* Zoom-in on the portrait (1.5x from center) so the face reads
+     larger inside the card frame. Anchored center-center so the crop
+     stays symmetric on both sides. Per-card override via
+     --rbccm-leading-experts-scale. */
+  transform: scale(var(--rbccm-leading-experts-scale, 1));
+  transform-origin: center center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  z-index: 0;
+}
+
+.rbccm-leading-experts__card::after {
+  background: linear-gradient(180deg, rgba(0, 49, 104, 0.00) 0%, #003168 82.34%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* Zoom on hover / keyboard focus (8% bump -- matches the shared
+   image-hover convention across story-tiles-featured, upcoming-
+   conferences, conference-insights-tiles, tabbed-panels, and
+   how-we-think for cross-component consistency). Multiplies --scale
+   so hover stays proportional whether the rest scale is 1, 1.5, etc. */
+.rbccm-leading-experts__card:hover .rbccm-leading-experts__photo,
+.rbccm-leading-experts__card:focus-within .rbccm-leading-experts__photo {
+  transform: scale(calc(var(--rbccm-leading-experts-scale, 1) * 1.08));
+}
+
+/* Inner column: sits above photo + gradient. Eyebrow anchored to the
+   top, name/role/CTA anchored to the bottom via space-between on a
+   flex:1 wrapper. */
+.rbccm-leading-experts__card-inner {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+/* Eyebrow pill -- RBC warm-yellow with navy text. */
+.rbccm-leading-experts__eyebrow {
+  align-items: center;
+  background: var(--rbccm-leading-experts-gold);
+  border-radius: 100px;
+  color: var(--rbccm-leading-experts-navy);
+  display: inline-flex;
+  font-family: var(--rbccm-leading-experts-sans);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  letter-spacing: 1px;
+  line-height: 15px;
+  padding: 6px 10px;
+  text-transform: uppercase;
+}
+
+/* Card body: name+role group + CTA row, separated from the eyebrow
+   by a 1px translucent divider on top. */
+.rbccm-leading-experts__card-body {
+  align-items: flex-start;
+  align-self: stretch;
+  border-top: 1px solid var(--rbccm-leading-experts-inner-line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+/* Name + role sub-group. */
+.rbccm-leading-experts__name-role {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rbccm-leading-experts__name {
+  color: var(--rbccm-leading-experts-white) !important;
+  font-family: var(--rbccm-leading-experts-serif) !important;
+  font-size: 18px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 21.25px !important; /* 118.056% */
+  margin: 0 !important;
+}
+
+.rbccm-leading-experts__role {
+  color: var(--rbccm-leading-experts-gray) !important;
+  font-family: var(--rbccm-leading-experts-sans) !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 16.5px !important; /* 137.5% */
+  margin: 0 !important;
+}
+
+/* CTA row -- gold text left, gold arrow right, split via space-between.
+   Underline uses the same soft-fade pattern as the ITM card-title and
+   "See all media appearances" links: always present in the layout but
+   starts invisible (transparent color + 0 thickness) and fades to
+   currentColor + auto thickness on hover / focus over 250ms. */
+.rbccm-leading-experts__cta {
+  align-items: center;
+  align-self: stretch;
+  color: var(--rbccm-leading-experts-gold);
+  display: flex;
+  font-family: var(--rbccm-leading-experts-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  justify-content: space-between;
+  letter-spacing: 1px;
+  line-height: 16.5px; /* 150% */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+  text-transform: capitalize;
+}
+.rbccm-leading-experts__cta:hover,
+.rbccm-leading-experts__cta:focus-visible {
+  color: var(--rbccm-leading-experts-gold);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-leading-experts__cta svg {
+  color: currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+  height: 13px;
+  width: 13px;
+}
+
+/* Arrow right-bounce on hover / keyboard focus. Same 450ms translateX
+   nudge as the S&E hero's Read more (rbccm-hero-arrow-bounce) and the
+   accordion Read more (rbccm-acc-arrow-bounce) -- softer than the
+   old fly-by that ran the arrow off-screen and re-entered from the
+   left. Unique keyframe name keeps the leading-experts component
+   independently deployable. */
+.rbccm-leading-experts__cta:hover svg,
+.rbccm-leading-experts__cta:focus-visible svg {
+  animation: rbccm-le-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-le-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* -------- Tablet (>=768) : 2-column grid --------------------------------
+   Cards go from stack to 2-up so full-viewport-wide cards on tablet
+   don't render the 1.5x portrait at absurd sizes. Image still caps
+   at --max-width as belt-and-suspenders. */
+@media (min-width: 768px) {
+  .rbccm-leading-experts__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+
+/* -------- Desktop (>=992) -----------------------------------------------
+   Grid flips to 3-up. Title bumps to the desktop-spec 42/125% with a
+   40px bottom margin. Section bottom padding bumps 80px to match the
+   rbccm-expertise rhythm above it. Image max-width releases here
+   since each card is naturally narrower at 3 columns. */
+@media (min-width: 992px) {
+  .rbccm-leading-experts {
+    padding: 0 23px 80px;
+  }
+  .rbccm-leading-experts .rbccm-leading-experts__title {
+    font-size: 42px !important;
+    line-height: 125% !important; /* 52.5px */
+    margin-bottom: 40px !important;
+  }
+  .rbccm-leading-experts__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .rbccm-leading-experts__photo {
+    max-width: none;
+  }
+}
+
+
+/* =========================================================================
+   Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base is flex-start (left); --header-center centers the
+   inner column (which holds the section title) plus the title's
+   text alignment. Grid + card layout below is unaffected.
+   ========================================================================= */
+.rbccm-leading-experts--header-center .rbccm-leading-experts__inner {
+  align-items: center;
+}
+.rbccm-leading-experts--header-center .rbccm-leading-experts__title {
+  text-align: center !important;
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics - Leading experts
+   =========================================================================
+   Light-blue-gray section background matching rbccm-hero + rbccm-
+   expertise so the whole S+E page reads as one visual system.
+   ========================================================================= */
+.rbccm-leading-experts--strategy-and-economics-leading-experts {
+  --rbccm-leading-experts-bg-color: #E7EEF1; /* Blue / Light Blue */
+}
+
+
+/* =========================================================================
+   Reduced motion -- kill the CTA arrow fly-by animation.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-leading-experts__cta:hover svg,
+  .rbccm-leading-experts__cta:focus-visible svg {
+    animation: none !important;
+  }
+  /* Kill the underline fade for motion-sensitive users -- they still
+     get the visible underline on hover / focus, just no soft entrance. */
+  .rbccm-leading-experts__cta {
+    transition: none !important;
+  }
+  .rbccm-leading-experts__photo {
+    transition: none !important;
+  }
+  /* Keep the rest-state scale on hover so the photo doesn't jump
+     when a motion-sensitive user rolls over the card. */
+  .rbccm-leading-experts__card:hover .rbccm-leading-experts__photo,
+  .rbccm-leading-experts__card:focus-within .rbccm-leading-experts__photo {
+    transform: scale(var(--rbccm-leading-experts-scale, 1)) !important;
+  }
+}

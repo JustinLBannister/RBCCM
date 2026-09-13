@@ -1,0 +1,265 @@
+<!--
+  RBCCM Platforms - Properties + Data
+  ==============================================================
+  Preset-driven 4-card grid of platform tiles. Each card = a
+  DAM photo behind (source images carry the navy tone in pixels),
+  with a title + body + gold "Explore" link. Whole card is an
+  anchor. Fixed 4 slots; a slot hides when its TitleText is blank.
+
+  Presets:
+    strategy-and-economics-platforms
+      Light-blue section, 4 navy-tinted tiles in a 1-col mobile /
+      2-col tablet / 2-col desktop grid, per-card body max-width
+      caps at 992+.
+
+  Photo pickers (two per card)
+  ==============================================================
+  Two DAM pickers per card so editors can supply portrait-crop
+  mobile vs. wide-crop desktop art. The desktop picker is used at
+  >=992px and as the fallback <img> inside <picture>; the mobile
+  picker is served at <992px via a <source media="(max-width: 991px)">.
+  FocalPoint still applies to whichever image is visible at that
+  breakpoint.
+
+  Both Card{N}PhotoDesktop and Card{N}PhotoMobile are Type="Image"
+  Datums backed by TeamSite's DAM picker. The nested <Image>
+  skeleton with empty <Path/> and <Description/> is REQUIRED
+  because a previous cross-component attempt hit "Datum ID=[...]
+  Value is not a valid image" when the skeleton was omitted (see
+  icon-carousel-properties.xml for the same note). Copy the
+  skeleton verbatim for any new photo slot.
+
+  XSL reads path + description off each Photo Datum and emits a
+  <picture> element inside the card:
+    Card{N}PhotoDesktop/Image/Path         becomes src on the fallback <img>
+    Card{N}PhotoMobile/Image/Path          becomes srcset on the <source>
+    Card{N}PhotoDesktop/Image/Description  becomes alt on the <img>
+  Mobile Description is not read (decorative). When the desktop
+  Description is blank the alt falls through to Card{N}TitleText,
+  so the tile still has an accessible name.
+
+  Focal point (optional per card)
+  ==============================================================
+  Each Card{N}FocalPoint is an optional String that overrides the
+  CSS default object-position (50% 50%) for that card's photo.
+  Values are standard CSS object-position ("50% 30%", "70% 40%",
+  "top center", etc.). Leave blank to inherit the CSS default.
+
+  Body max-width (optional per card)
+  ==============================================================
+  Each Card{N}BodyMaxWidth is an optional String (e.g. "274px")
+  that caps the body copy width at desktop only. Kicks in at 992+
+  via the CSS custom property rbccm-platforms-body-max-width
+  (double-dash prefix at write time). Leave blank to inherit the
+  CSS default of 340px.
+
+  SEMANTIC TAG PICKER PATTERN
+  ==============================================================
+  Every editable text field ships as a pair:
+    <Field>Text       String / Textarea with the copy itself
+    <Field>Tag        Enum picker: h1..h6, p, div, span
+  XSL emits the tag via xsl:element name="{tag}", guarded by the
+  pickTag allow-list.
+
+  CTA anchor tag is fixed at the whole-card <a> (semantic requirement
+  for the entire tile being the link); only the visible CTA copy +
+  href are Datums.
+-->
+<Properties ComponentID="rbccm-platforms">
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Last updated
+       ============================================================
+       Bump this timestamp every time you save content changes to
+       this section. Format: YYYY-MM-DD-HHMM (24-hour clock).
+       - Serves as a human record of when the section was last
+         touched (visible at a glance to the next editor).
+       - Also appended to the sidecar CSS + JS URLs as ?v={...}
+         so browsers refetch the latest assets after a deploy.
+       Example: 2026-09-12-1934  =  Sep 12 2026 at 7:34 PM
+       ============================================================ -->
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
+  <!-- ============================================================
+       Section identity + shared meta
+       ============================================================
+       What editors set here: nothing. Deploy-time plumbing.
+       ============================================================ -->
+  <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy, editors don't change)">rbccm-platforms-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy, editors don't change)">Platforms</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="Sidecar CSS path (technical - set once at deploy, editors don't change)">/assets/rbccm/css/components/rbccm-platforms.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="Sidecar JS path (technical - component has no runtime, leave blank)"></Datum>
+
+  <!-- Once a preset is picked, only that variant's Datums render -
+       unused Datums for other presets are ignored. -->
+  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+    <Option>
+      <Display>Strategy and Economics - Platforms</Display>
+      <Value>strategy-and-economics-platforms</Value>
+    </Option>
+    strategy-and-economics-platforms
+  </Datum>
+
+
+  <!-- ============================================================
+       Section header
+       ============================================================
+       What editors set here: the big headline and short subtitle
+       that sit at the top of the section. The tag pickers let you
+       promote the title to h2 for SEO.
+       .............................................................
+       Header alignment. left = base (no modifier); center adds the
+       .rbccm-platforms__header-center modifier that centers the
+       title + subtitle block. The S+E preset previously hard-coded
+       center on the header; that override was removed so this Datum
+       drives the alignment. (Class name uses __ substitution for the
+       BEM modifier so this XML comment stays well-formed; emitted
+       markup uses the double-hyphen prefix.)
+       ============================================================ -->
+  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+    <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
+    <Option><Display>Center</Display><Value>center</Value></Option>
+    left
+  </Datum>
+
+  <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">Platforms</Datum>
+  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option>
+    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option><Display>h3</Display><Value>h3</Value></Option>
+    <Option><Display>h4</Display><Value>h4</Value></Option>
+    <Option><Display>h5</Display><Value>h5</Value></Option>
+    <Option><Display>h6</Display><Value>h6</Value></Option>
+    <Option><Display>p</Display><Value>p</Value></Option>
+    <Option><Display>div</Display><Value>div</Value></Option>
+    <Option><Display>span</Display><Value>span</Value></Option>
+    h2
+  </Datum>
+
+  <Datum ID="SectionSubtitleText" Type="Textarea" Name="Section subtitle (optional - blank hides the subtitle; HTML allowed)">Macro and market analysis of global currency dynamics from industry-leading strategists.</Datum>
+  <Datum ID="SectionSubtitleTag" Type="String" Name="Section subtitle tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+
+
+  <!-- ============================================================
+       Card slots (fixed 4)
+       ============================================================
+       This section renders 4 platform tiles. Fill in every card's
+       Title, Body, CTA copy + URL, and Photo. Blank titles hide
+       the tile but skew the 2-col layout - keep all 4 populated.
+       .............................................................
+       Per card:
+         Card{N}PhotoDesktop  DAM asset picker (Type="Image") - wide-crop art for >=992px
+         Card{N}PhotoMobile   DAM asset picker (Type="Image") - portrait-crop art for <992px
+         Card{N}FocalPoint    optional CSS object-position override
+                              (e.g. "50% 30%"; blank = default)
+         Card{N}TitleText     tile title
+         Card{N}TitleTag      tag picker (default h3)
+         Card{N}BodyText      body copy (HTML allowed via Textarea)
+         Card{N}BodyTag       tag picker (default p)
+         Card{N}BodyMaxWidth  optional desktop-only cap (e.g. "274px")
+         Card{N}CtaText       gold link copy (usually "Explore")
+         Card{N}CtaHref       link destination (whole card is anchored)
+       ============================================================ -->
+
+  <!-- ==== Card 1 : Real-Time Geopolitics ==== -->
+  <Datum ID="Card1PhotoDesktop" Type="Image" Name="Card 1 : desktop photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card1PhotoMobile" Type="Image" Name="Card 1 : mobile photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card1FocalPoint" Type="String" Name="Card 1 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
+  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (required - do not blank)">Real-Time Geopolitics</Datum>
+  <Datum ID="Card1TitleTag" Type="String" Name="Card 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body (required - do not blank; HTML allowed)">Perspectives for boards and management teams weighing their next strategic move.</Datum>
+  <Datum ID="Card1BodyTag" Type="String" Name="Card 1 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Card1BodyMaxWidth" Type="String" Name="Card 1 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
+  <Datum ID="Card1CtaText" Type="String" Name="Card 1 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+  <!-- ==== Card 2 : RBC Economics ==== -->
+  <Datum ID="Card2PhotoDesktop" Type="Image" Name="Card 2 : desktop photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card2PhotoMobile" Type="Image" Name="Card 2 : mobile photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card2FocalPoint" Type="String" Name="Card 2 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
+  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (required - do not blank)">RBC Economics</Datum>
+  <Datum ID="Card2TitleTag" Type="String" Name="Card 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body (required - do not blank; HTML allowed)">The macro backdrop and rates outlook behind every capital decision.</Datum>
+  <Datum ID="Card2BodyTag" Type="String" Name="Card 2 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Card2BodyMaxWidth" Type="String" Name="Card 2 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">274px</Datum>
+  <Datum ID="Card2CtaText" Type="String" Name="Card 2 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+  <!-- ==== Card 3 : Markets in Motion ==== -->
+  <Datum ID="Card3PhotoDesktop" Type="Image" Name="Card 3 : desktop photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card3PhotoMobile" Type="Image" Name="Card 3 : mobile photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card3FocalPoint" Type="String" Name="Card 3 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
+  <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title (required - do not blank)">Markets in Motion</Datum>
+  <Datum ID="Card3TitleTag" Type="String" Name="Card 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body (required - do not blank; HTML allowed)">Timely reads on the macro and market forces moving U.S. capital markets today.</Datum>
+  <Datum ID="Card3BodyTag" Type="String" Name="Card 3 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Card3BodyMaxWidth" Type="String" Name="Card 3 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">295px</Datum>
+  <Datum ID="Card3CtaText" Type="String" Name="Card 3 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+  <!-- ==== Card 4 : Macro Minutes ==== -->
+  <Datum ID="Card4PhotoDesktop" Type="Image" Name="Card 4 : desktop photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card4PhotoMobile" Type="Image" Name="Card 4 : mobile photo - pick from DAM (required - do not blank)">
+    <Image>
+      <Path/>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="Card4FocalPoint" Type="String" Name="Card 4 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
+  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title (required - do not blank)">Macro Minutes</Datum>
+  <Datum ID="Card4TitleTag" Type="String" Name="Card 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+  <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body (required - do not blank; HTML allowed)">Exploring the trends and turning points shaping today's macro and market landscape.</Datum>
+  <Datum ID="Card4BodyTag" Type="String" Name="Card 4 : body tag (optional - controls the HTML tag for SEO / a11y)">
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+  <Datum ID="Card4BodyMaxWidth" Type="String" Name="Card 4 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">227px</Datum>
+  <Datum ID="Card4CtaText" Type="String" Name="Card 4 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA URL (required - full URL or /en/ path)">#</Datum>
+
+</Data>

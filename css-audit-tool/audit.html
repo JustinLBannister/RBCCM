@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBCCM CSS/JS Asset Audit</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --panel: #ffffff;
+    --border: #d9dee5;
+    --ink: #1a2b45;
+    --ink-2: #556275;
+    --accent: #0051a5;
+    --ok: #16794c;
+    --warn: #a1620a;
+    --page-specific: #b83227;
+    --shared: #7a6a1f;
+    --universal: #16794c;
+    --row-alt: #fafbfd;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { padding: 20px 24px; background: #002144; color: #fff; }
+  header h1 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
+  header p  { margin: 0; color: #b8c4d6; font-size: 13px; }
+  main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600; color: var(--ink); }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  textarea { width: 100%; min-height: 180px; padding: 10px; font: 13px/1.4 ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid var(--border); border-radius: 4px; resize: vertical; color: var(--ink); background: #fff; }
+  button { padding: 8px 16px; font: inherit; font-weight: 600; color: #fff; background: var(--accent); border: 0; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #003b7a; }
+  button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  button.ghost:hover { background: var(--accent); color: #fff; }
+  button[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .status { font-size: 12px; color: var(--ink-2); }
+  .status.error { color: var(--page-specific); }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .stat { padding: 10px 12px; background: var(--row-alt); border: 1px solid var(--border); border-radius: 4px; }
+  .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink-2); font-weight: 600; }
+  .stat .value { font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+  .stat.universal .value { color: var(--universal); }
+  .stat.shared    .value { color: var(--shared); }
+  .stat.specific  .value { color: var(--page-specific); }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+  .legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .swatch.universal { background: var(--universal); }
+  .swatch.shared    { background: var(--shared); }
+  .swatch.specific  { background: var(--page-specific); }
+  .matrix-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  thead th { background: #eef2f6; position: sticky; top: 0; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  thead th.page { writing-mode: vertical-rl; transform: rotate(180deg); text-align: right; height: 180px; padding: 8px 4px; font-weight: 500; font-size: 11px; }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  tbody tr:hover { background: #eaf1fa; }
+  td.count { text-align: center; font-weight: 600; }
+  td.check { text-align: center; font-weight: 700; }
+  td.check.on  { color: var(--ok); }
+  td.check.off { color: #d0d5dd; }
+  td.asset { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; word-break: break-all; max-width: 500px; }
+  .tag { display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border-radius: 3px; color: #fff; margin-right: 4px; }
+  .tag.universal { background: var(--universal); }
+  .tag.shared    { background: var(--shared); }
+  .tag.specific  { background: var(--page-specific); }
+  .tag.css { background: #4a5f7a; }
+  .tag.js  { background: #8a5a2b; }
+  .filter-bar { display: flex; gap: 12px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+  .filter-bar label { display: inline; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink); margin: 0; }
+  .empty { padding: 40px; text-align: center; color: var(--ink-2); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RBCCM CSS / JS Asset Audit</h1>
+  <p>Paste page URLs. Tool fetches each, extracts every &lt;link rel="stylesheet"&gt; and &lt;script src&gt;, and shows what's universal vs. page-specific.</p>
+</header>
+
+<main>
+
+  <section>
+    <div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px">
+      <label style="display:inline"><input type="radio" name="mode" value="url" checked> Fetch URLs (uses CORS proxy)</label>
+      <label style="display:inline"><input type="radio" name="mode" value="paste"> Paste raw HTML (for when proxies are blocked)</label>
+    </div>
+
+    <div id="urlMode">
+      <label for="urls">Page URLs (one per line)</label>
+      <textarea id="urls" placeholder="https://www.rbccm.com/en/expertise&#10;https://www.rbccm.com/en/insights&#10;...">https://www.rbccm.com/en/expertise
+https://www.rbccm.com/en/insights/ai</textarea>
+    </div>
+
+    <div id="pasteMode" style="display:none">
+      <label for="pasteHtml">Paste page source blocks. Format: URL on its own line, then the full HTML, then a line with just <code>===</code> to separate pages.</label>
+      <textarea id="pasteHtml" style="min-height:280px" placeholder="https://www.rbccm.com/en/expertise&#10;<!DOCTYPE html><html>…full source…</html>&#10;===&#10;https://www.rbccm.com/en/insights/ai&#10;<!DOCTYPE html><html>…full source…</html>"></textarea>
+      <div class="status" style="margin-top:4px">Tip: in Chrome, right-click page → View page source → Cmd+A → Cmd+C, paste here, add URL above it, then <code>===</code> divider before the next page.</div>
+    </div>
+
+    <div class="actions">
+      <button id="run">Run audit</button>
+      <button class="ghost" id="clear">Clear results</button>
+      <button class="ghost" id="copyMatrix">Copy matrix as TSV</button>
+      <span class="status" id="status"></span>
+    </div>
+  </section>
+
+  <section id="resultsWrap" style="display:none">
+    <div id="diagnostics" style="margin-bottom:16px"></div>
+    <h2>Summary</h2>
+    <div class="summary" id="summary"></div>
+
+    <div class="legend">
+      <span><span class="swatch universal"></span>Universal (loaded on all pages)</span>
+      <span><span class="swatch shared"></span>Shared (loaded on some pages)</span>
+      <span><span class="swatch specific"></span>Page-specific (loaded on 1 page)</span>
+    </div>
+
+    <div class="filter-bar">
+      <label><input type="checkbox" id="showCss" checked> CSS</label>
+      <label><input type="checkbox" id="showJs"  checked> JS</label>
+      <label><input type="checkbox" id="showInline"> Inline &lt;style&gt; sizes</label>
+      <label><input type="checkbox" id="hideUniversal"> Hide universal rows (focus on differences)</label>
+    </div>
+
+    <div class="matrix-scroll">
+      <table id="matrix">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var runBtn      = document.getElementById('run');
+  var clearBtn    = document.getElementById('clear');
+  var copyBtn     = document.getElementById('copyMatrix');
+  var urlsEl      = document.getElementById('urls');
+  var pasteHtmlEl = document.getElementById('pasteHtml');
+  var urlModeEl   = document.getElementById('urlMode');
+  var pasteModeEl = document.getElementById('pasteMode');
+  var modeRadios  = document.querySelectorAll('input[name="mode"]');
+  modeRadios.forEach(function (r) {
+    r.addEventListener('change', function () {
+      var mode = document.querySelector('input[name="mode"]:checked').value;
+      urlModeEl.style.display   = mode === 'url'   ? '' : 'none';
+      pasteModeEl.style.display = mode === 'paste' ? '' : 'none';
+    });
+  });
+  var statusEl    = document.getElementById('status');
+  var summaryEl   = document.getElementById('summary');
+  var resultsWrap = document.getElementById('resultsWrap');
+  var matrixEl    = document.getElementById('matrix');
+  var showCss     = document.getElementById('showCss');
+  var showJs      = document.getElementById('showJs');
+  var showInline  = document.getElementById('showInline');
+  var hideUni     = document.getElementById('hideUniversal');
+
+  // CORS proxies (same fallback pattern used elsewhere in this repo).
+  // Tries in order; first success wins. If all fail, the page shows an error.
+  var PROXIES = [
+    function (u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+    function (u) { return 'https://corsproxy.io/?' + encodeURIComponent(u); },
+    function (u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); }
+  ];
+
+  var lastResult = null;   // { pages: [{url, assets:[{href,type,inline?}]}], allAssets:[href], ... }
+
+  function setStatus(msg, isErr) {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (isErr ? ' error' : '');
+  }
+
+  async function fetchViaProxy(url) {
+    var lastErr;
+    for (var i = 0; i < PROXIES.length; i++) {
+      try {
+        var res = await fetch(PROXIES[i](url), { method: 'GET' });
+        if (!res.ok) { lastErr = new Error('HTTP ' + res.status); continue; }
+        var text = await res.text();
+        if (text && text.length > 200) return text;
+        lastErr = new Error('Empty body');
+      } catch (e) { lastErr = e; }
+    }
+    throw lastErr || new Error('All proxies failed');
+  }
+
+  function parseAssets(html, baseUrl) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var assets = [];
+    // <link rel="stylesheet">
+    doc.querySelectorAll('link[rel~="stylesheet"][href]').forEach(function (el) {
+      var href = new URL(el.getAttribute('href'), baseUrl).href.split('?')[0];
+      assets.push({ href: href, type: 'css' });
+    });
+    // <script src>
+    doc.querySelectorAll('script[src]').forEach(function (el) {
+      var href = new URL(el.getAttribute('src'), baseUrl).href.split('?')[0];
+      assets.push({ href: href, type: 'js' });
+    });
+    // inline <style> byte counts
+    var inlineStyleBytes = 0, inlineStyleCount = 0;
+    doc.querySelectorAll('style').forEach(function (el) {
+      inlineStyleCount++;
+      inlineStyleBytes += (el.textContent || '').length;
+    });
+    return { assets: assets, inlineStyleBytes: inlineStyleBytes, inlineStyleCount: inlineStyleCount };
+  }
+
+  function shortenUrl(u) {
+    // trim protocol + host for readability; keep path
+    try {
+      var url = new URL(u);
+      return url.pathname + (url.search || '');
+    } catch (e) { return u; }
+  }
+
+  function shortenPage(u) {
+    try {
+      var url = new URL(u);
+      var p = url.pathname.replace(/\/$/, '');
+      return p || '/';
+    } catch (e) { return u; }
+  }
+
+  function classify(count, total) {
+    if (count === total) return 'universal';
+    if (count === 1)     return 'specific';
+    return 'shared';
+  }
+
+  function parsePasteBlocks(text) {
+    // Split on lines that are exactly === (optionally with whitespace).
+    var blocks = text.split(/^\s*===\s*$/m);
+    var pages = [];
+    blocks.forEach(function (block) {
+      block = block.replace(/^\s+/, '');
+      if (!block) return;
+      var nl = block.indexOf('\n');
+      if (nl < 0) return;
+      var firstLine = block.slice(0, nl).trim();
+      var rest = block.slice(nl + 1);
+      // First non-empty line is the URL
+      if (!/^https?:\/\//.test(firstLine)) return;
+      pages.push({ url: firstLine, html: rest });
+    });
+    return pages;
+  }
+
+  async function runAudit() {
+    var mode = document.querySelector('input[name="mode"]:checked').value;
+    var pages = [];
+
+    if (mode === 'paste') {
+      var blocks = parsePasteBlocks(pasteHtmlEl.value);
+      if (!blocks.length) { setStatus('Paste at least one URL + HTML block.', true); return; }
+      runBtn.disabled = true;
+      blocks.forEach(function (b) {
+        try {
+          var parsed = parseAssets(b.html, b.url);
+          pages.push({
+            url: b.url, ok: true, bytes: b.html.length,
+            assets: parsed.assets,
+            inlineStyleBytes: parsed.inlineStyleBytes,
+            inlineStyleCount: parsed.inlineStyleCount
+          });
+        } catch (e) {
+          pages.push({ url: b.url, ok: false, error: e.message, assets: [] });
+        }
+      });
+    } else {
+      var urls = urlsEl.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!urls.length) { setStatus('Add at least one URL.', true); return; }
+
+      runBtn.disabled = true;
+      setStatus('Fetching ' + urls.length + ' page' + (urls.length === 1 ? '' : 's') + '…');
+
+      for (var i = 0; i < urls.length; i++) {
+        setStatus('[' + (i + 1) + '/' + urls.length + '] ' + urls[i]);
+        try {
+          var html = await fetchViaProxy(urls[i]);
+          var parsed = parseAssets(html, urls[i]);
+          pages.push({
+            url: urls[i], ok: true, bytes: html.length,
+            assets: parsed.assets,
+            inlineStyleBytes: parsed.inlineStyleBytes,
+            inlineStyleCount: parsed.inlineStyleCount
+          });
+        } catch (e) {
+          pages.push({ url: urls[i], ok: false, error: e.message || String(e), assets: [] });
+        }
+      }
+    }
+
+    // Build set of unique assets across all pages
+    var assetMap = {};   // href -> { href, type, presenceByUrl: { url: true }, count }
+    pages.forEach(function (page) {
+      page.assets.forEach(function (a) {
+        if (!assetMap[a.href]) assetMap[a.href] = { href: a.href, type: a.type, presenceByUrl: {}, count: 0 };
+        if (!assetMap[a.href].presenceByUrl[page.url]) {
+          assetMap[a.href].presenceByUrl[page.url] = true;
+          assetMap[a.href].count++;
+        }
+      });
+    });
+
+    var allAssets = Object.values(assetMap);
+    var total = pages.filter(function (p) { return p.ok; }).length;
+    allAssets.forEach(function (a) { a.cls = classify(a.count, total); });
+
+    // Sort: universal first, then shared (by descending count), then specific
+    var order = { universal: 0, shared: 1, specific: 2 };
+    allAssets.sort(function (a, b) {
+      if (order[a.cls] !== order[b.cls]) return order[a.cls] - order[b.cls];
+      if (a.count !== b.count) return b.count - a.count;
+      if (a.type !== b.type) return a.type === 'css' ? -1 : 1;
+      return a.href.localeCompare(b.href);
+    });
+
+    lastResult = { pages: pages, allAssets: allAssets, total: total };
+    render();
+    runBtn.disabled = false;
+    var okCount = pages.filter(function (p) { return p.ok; }).length;
+    setStatus('Done. ' + okCount + '/' + urls.length + ' pages fetched.', okCount < urls.length);
+  }
+
+  function render() {
+    if (!lastResult) return;
+    resultsWrap.style.display = 'block';
+    renderSummary();
+    renderDiagnostics();
+    renderMatrix();
+  }
+
+  function renderDiagnostics() {
+    var el = document.getElementById('diagnostics');
+    if (!el) return;
+    var rows = lastResult.pages.map(function (p) {
+      var status = p.ok
+        ? (p.assets.length + ' assets found · ' + (p.bytes || 0) + ' bytes fetched')
+        : ('ERROR: ' + p.error);
+      var cls = p.ok
+        ? (p.assets.length === 0 ? 'warn' : 'ok')
+        : 'err';
+      var color = cls === 'ok' ? '#16794c' : (cls === 'warn' ? '#a1620a' : '#b83227');
+      return '<tr><td style="color:' + color + ';font-weight:600;width:70px">'
+        + (p.ok ? (p.assets.length === 0 ? 'EMPTY' : 'OK') : 'FAIL')
+        + '</td><td style="font-family:ui-monospace,menlo,monospace;font-size:11px">' + p.url + '</td>'
+        + '<td style="font-size:12px;color:#556275">' + status + '</td></tr>';
+    }).join('');
+    el.innerHTML = '<h2>Fetch diagnostics</h2><table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid #d9dee5">Status</th>'
+      + '<th style="text-align:left;padding:4px 8px;border-bottom:1px solid #d9dee5">URL</th>'
+      + '<th style="text-align:left;padding:4px 8px;border-bottom:1px solid #d9dee5">Detail</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody></table>';
+  }
+
+  function renderSummary() {
+    var css = lastResult.allAssets.filter(function (a) { return a.type === 'css'; });
+    var js  = lastResult.allAssets.filter(function (a) { return a.type === 'js'; });
+    var cssU = css.filter(function (a) { return a.cls === 'universal'; }).length;
+    var cssS = css.filter(function (a) { return a.cls === 'shared'; }).length;
+    var cssP = css.filter(function (a) { return a.cls === 'specific'; }).length;
+    var jsU  = js.filter(function (a)  { return a.cls === 'universal'; }).length;
+    var jsS  = js.filter(function (a)  { return a.cls === 'shared'; }).length;
+    var jsP  = js.filter(function (a)  { return a.cls === 'specific'; }).length;
+    summaryEl.innerHTML = ''
+      + stat('Pages audited', lastResult.total, '')
+      + stat('CSS: universal', cssU, 'universal')
+      + stat('CSS: shared',    cssS, 'shared')
+      + stat('CSS: page-specific', cssP, 'specific')
+      + stat('JS: universal',  jsU, 'universal')
+      + stat('JS: shared',     jsS, 'shared')
+      + stat('JS: page-specific', jsP, 'specific');
+  }
+
+  function stat(label, value, cls) {
+    return '<div class="stat ' + (cls || '') + '"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+  }
+
+  function renderMatrix() {
+    var pages = lastResult.pages.filter(function (p) { return p.ok; });
+    var assets = lastResult.allAssets.filter(function (a) {
+      if (a.type === 'css' && !showCss.checked) return false;
+      if (a.type === 'js'  && !showJs.checked)  return false;
+      if (hideUni.checked && a.cls === 'universal') return false;
+      return true;
+    });
+
+    var thead = '<tr>'
+      + '<th style="min-width:60px">Type</th>'
+      + '<th style="min-width:80px">Scope</th>'
+      + '<th style="min-width:400px">Asset URL</th>'
+      + '<th style="min-width:70px">Count</th>'
+      + pages.map(function (p) { return '<th class="page" title="' + p.url + '">' + shortenPage(p.url) + '</th>'; }).join('')
+      + '</tr>';
+
+    var rows = assets.map(function (a) {
+      var cells = pages.map(function (p) {
+        var on = !!a.presenceByUrl[p.url];
+        return '<td class="check ' + (on ? 'on' : 'off') + '">' + (on ? '✓' : '·') + '</td>';
+      }).join('');
+      return '<tr>'
+        + '<td><span class="tag ' + a.type + '">' + a.type.toUpperCase() + '</span></td>'
+        + '<td><span class="tag ' + a.cls + '">' + a.cls + '</span></td>'
+        + '<td class="asset" title="' + a.href + '">' + shortenUrl(a.href) + '</td>'
+        + '<td class="count">' + a.count + '/' + pages.length + '</td>'
+        + cells
+        + '</tr>';
+    }).join('');
+
+    // Inline <style> summary row per page
+    if (showInline.checked) {
+      var inlineRow = '<tr>'
+        + '<td><span class="tag css">CSS</span></td>'
+        + '<td><em style="color:#556275">inline</em></td>'
+        + '<td class="asset">&lt;style&gt; blocks (total bytes per page)</td>'
+        + '<td class="count">' + pages.length + '/' + pages.length + '</td>'
+        + pages.map(function (p) {
+            return '<td class="check on" style="font-family:ui-monospace,menlo,monospace;font-weight:400">' + (p.inlineStyleBytes || 0) + 'b<br><span style="font-size:10px;color:#556275">(' + (p.inlineStyleCount || 0) + ' blocks)</span></td>';
+          }).join('')
+        + '</tr>';
+      rows = inlineRow + rows;
+    }
+
+    matrixEl.querySelector('thead').innerHTML = thead;
+    matrixEl.querySelector('tbody').innerHTML = rows || '<tr><td colspan="' + (4 + pages.length) + '" class="empty">No assets to display (adjust filters).</td></tr>';
+  }
+
+  function copyMatrix() {
+    if (!lastResult) return setStatus('Nothing to copy yet.', true);
+    var pages = lastResult.pages.filter(function (p) { return p.ok; });
+    var lines = [];
+    lines.push(['Type', 'Scope', 'Asset', 'Count'].concat(pages.map(function (p) { return shortenPage(p.url); })).join('\t'));
+    lastResult.allAssets.forEach(function (a) {
+      lines.push([
+        a.type,
+        a.cls,
+        a.href,
+        a.count + '/' + pages.length
+      ].concat(pages.map(function (p) { return a.presenceByUrl[p.url] ? 'Y' : ''; })).join('\t'));
+    });
+    var text = lines.join('\n');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function () { setStatus('Matrix copied as TSV. Paste into Sheets/Excel.'); });
+    } else {
+      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      setStatus('Matrix copied as TSV.');
+    }
+  }
+
+  runBtn.addEventListener('click', runAudit);
+  clearBtn.addEventListener('click', function () {
+    lastResult = null;
+    resultsWrap.style.display = 'none';
+    setStatus('');
+  });
+  copyBtn.addEventListener('click', copyMatrix);
+  [showCss, showJs, showInline, hideUni].forEach(function (el) {
+    el.addEventListener('change', function () { if (lastResult) renderMatrix(); });
+  });
+})();
+</script>
+
+</body>
+</html>

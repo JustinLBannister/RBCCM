@@ -211,6 +211,23 @@
               <xsl:variable name="insightsCtaHref" select="normalize-space(Datum[@ID='InsightsCTAHref' or @Name='Insights CTA Href'])"/>
               <xsl:variable name="insightsIntro" select="Datum[@ID='InsightsIntro' or @Name='Insights Intro']"/>
 
+              <!-- Populated insight count (an insight counts when its Title OR
+                   Image is set). Drives the empty-state treatment, mirroring
+                   Speakers: when 0, the insights slider is hidden and a
+                   centered footnote shows instead. -->
+              <xsl:variable name="insightCount" select="
+                  number(normalize-space(Datum[@ID='Insight1Title']) != '' or normalize-space(Datum[@ID='Insight1Image']) != '')
+                + number(normalize-space(Datum[@ID='Insight2Title']) != '' or normalize-space(Datum[@ID='Insight2Image']) != '')
+                + number(normalize-space(Datum[@ID='Insight3Title']) != '' or normalize-space(Datum[@ID='Insight3Image']) != '')"/>
+              <xsl:variable name="insightsFootnote">
+                <xsl:choose>
+                  <xsl:when test="normalize-space(Datum[@ID='InsightsFootnote' or @Name='Insights Footnote']) != ''">
+                    <xsl:value-of select="normalize-space(Datum[@ID='InsightsFootnote' or @Name='Insights Footnote'])"/>
+                  </xsl:when>
+                  <xsl:otherwise>+ Additional insights to be announced</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
 
 
               <div class="rbccm-featured-conferences__panel" role="tabpanel">
@@ -440,6 +457,9 @@
                     <xsl:if test="$ariaInsightsCarouselLabel != ''">
                       <xsl:attribute name="aria-label"><xsl:value-of select="$ariaInsightsCarouselLabel"/></xsl:attribute>
                     </xsl:if>
+                    <xsl:if test="$insightCount = 0">
+                      <xsl:attribute name="style">display: none;</xsl:attribute>
+                    </xsl:if>
 
                     <div class="rbccm-featured-conferences__insights">
                       <xsl:attribute name="id">rbccm-fc-insights-<xsl:value-of select="$confKey"/></xsl:attribute>
@@ -512,6 +532,16 @@
                       </button>
                     </div>
                   </div>
+
+                  <!-- Empty insights: slider is hidden (above); show a centered
+                       footnote instead, mirroring the empty Speakers tab.
+                       Reuses __speakers-footnote styling (centered muted text,
+                       divider suppressed) so no new CSS is needed. -->
+                  <xsl:if test="$insightCount = 0">
+                    <p class="rbccm-featured-conferences__speakers-footnote" style="border-top: 0px;">
+                      <xsl:value-of select="$insightsFootnote" disable-output-escaping="yes"/>
+                    </p>
+                  </xsl:if>
 
 
 <!--HOTFIX-REMOVE LATER IF NEEDED-->

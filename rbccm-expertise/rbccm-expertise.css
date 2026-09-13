@@ -1,0 +1,628 @@
+/* =========================================================================
+   RBCCM Expertise - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-expertise.css
+
+   Purpose
+   =========================================================================
+   Shared pillar/column-list component. Section header + N pillars, each
+   with an icon, title, and short body. On desktop pillars sit in a row
+   separated by thin dividers; below 1245px the row collapses into a Slick
+   slider (one item per view <768px, two items 768-1244px). Follows the
+   same Preset architecture as rbccm-hero / rbccm-accordions.
+
+   Consumers
+   =========================================================================
+     Strategy and Economics - Areas of expertise
+       .rbccm-expertise--strategy-and-economics-expertise
+
+   Adding a new variant
+   =========================================================================
+   1. Author page markup with `.rbccm-expertise.rbccm-expertise--{page-slug}`
+   2. Add a modifier block at the bottom of this file with the variant's
+      palette / structural overrides
+   3. Add a new xsl:when branch in rbccm-expertise.xsl
+   4. Add an Option to the Preset Datum in Properties.xml
+   ========================================================================= */
+
+/* ---------- Base block --------------------------------------------------- */
+.rbccm-expertise {
+  --rbccm-expertise-navy:   #003168;
+  --rbccm-expertise-blue:   #0051A5;
+  --rbccm-expertise-ink:    #000;
+  --rbccm-expertise-gray:   #494949;
+  --rbccm-expertise-serif:  RBCDisplay, Georgia, Times, serif;
+  --rbccm-expertise-sans:   Roboto, Arial, sans-serif;
+
+  /* Variant-swappable bg. Default transparent so the section
+     inherits its parent's fill unless a variant sets it. */
+  --rbccm-expertise-bg-color: transparent;
+
+  /* Variant-swappable pillar divider. Default: 1px warm-gray
+     rgba (S&E). Reasons preset overrides to 2px bright blue. */
+  --rbccm-expertise-border-color: rgba(73, 73, 73, 0.39);
+  --rbccm-expertise-border-width: 1px;
+
+  background: var(--rbccm-expertise-bg-color);
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 60px 23px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.rbccm-expertise *,
+.rbccm-expertise *::before,
+.rbccm-expertise *::after { box-sizing: border-box; }
+
+/* Font-family lock on tag-pickable text nodes. Defends against
+   unified.css tag-level rules that would suppress RBCDisplay on
+   h1/h2/h3 and blank out our styling. */
+.rbccm-expertise .rbccm-expertise__title,
+.rbccm-expertise .rbccm-expertise__pillar-title {
+  font-family: var(--rbccm-expertise-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Tag-agnostic margin/padding reset for tag-pickable text elements. */
+h1.rbccm-expertise__title,        h2.rbccm-expertise__title,
+h3.rbccm-expertise__title,        h4.rbccm-expertise__title,
+h5.rbccm-expertise__title,        h6.rbccm-expertise__title,
+p.rbccm-expertise__title,         div.rbccm-expertise__title,
+h1.rbccm-expertise__description,  h2.rbccm-expertise__description,
+h3.rbccm-expertise__description,  h4.rbccm-expertise__description,
+h5.rbccm-expertise__description,  h6.rbccm-expertise__description,
+p.rbccm-expertise__description,   div.rbccm-expertise__description,
+h1.rbccm-expertise__pillar-title, h2.rbccm-expertise__pillar-title,
+h3.rbccm-expertise__pillar-title, h4.rbccm-expertise__pillar-title,
+h5.rbccm-expertise__pillar-title, h6.rbccm-expertise__pillar-title,
+p.rbccm-expertise__pillar-title,  div.rbccm-expertise__pillar-title,
+h1.rbccm-expertise__pillar-body,  h2.rbccm-expertise__pillar-body,
+h3.rbccm-expertise__pillar-body,  h4.rbccm-expertise__pillar-body,
+h5.rbccm-expertise__pillar-body,  h6.rbccm-expertise__pillar-body,
+p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Section padding owns the outer 23px gutter, so container has no
+   horizontal padding. Flex column, no parent gap - spacing between
+   header/track/controls is owned by margin on the header (50px
+   bottom) and margin on the controls (24px top). No max-width -
+   mobile-first, the container fills whatever the section gives it. */
+.rbccm-expertise__inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.rbccm-expertise__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  margin-bottom: 50px;
+}
+
+.rbccm-expertise__title {
+  color: var(--rbccm-expertise-navy);
+  margin: 0;
+}
+.rbccm-expertise__description {
+  color: var(--rbccm-expertise-gray);
+  margin: 0;
+}
+
+/* Mobile default: block stack (Slick converts it to a slider at
+   runtime). Desktop overrides to a 4-column grid at >=1245. */
+.rbccm-expertise__track {
+  display: block;
+  margin: 0;
+  align-self: stretch;
+}
+
+/* Pillar card. Flex column so children stack top-to-bottom.
+   height: 100% + align-items stretch chain up from the Slick
+   slide so cards equalize to the tallest sibling's height;
+   min-height is the floor for single-pillar cases.
+
+   Sibling-margin (not flex gap) drives the 16px between icon /
+   title / body because unified.css ships tag-level margin rules
+   on h1..h6 and p that use !important. A plain `gap` is fine
+   until one of those rules kicks in and steals visual space
+   between elements. The `> * + *` pattern targets every non-
+   first child with an !important 16px top margin so nothing
+   downstream can strip it. */
+.rbccm-expertise__pillar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  height: 100% !important;
+  min-height: 142px;
+  padding: 0 32px;
+  /* Pillars start borderless. Outer L+R come from the container
+     (.rbccm-expertise__track.slick-initialized). Inter-item
+     dividers come from paired half-borders: each of two adjacent
+     slick-active pillars contributes half a border-width on their
+     shared side, so the visible divider sums to one full stroke
+     (0.5px + 0.5px = 1px on the default preset). No doubling at
+     the outer edges because neither the leftmost nor the rightmost
+     visible pillar gets an outer half applied. */
+  border-left: 0;
+  border-right: 0;
+  align-self: stretch;
+}
+/* Compact shorthand for the half-border contribution. */
+.rbccm-expertise {
+  --rbccm-expertise-half-border: calc(var(--rbccm-expertise-border-width) / 2) solid var(--rbccm-expertise-border-color);
+}
+/* 16px sibling gap between pillar children. Selector duplicated
+   under the variant modifier (below) so its specificity matches
+   the variant's `margin: 0 !important` on the title/body classes -
+   without that scope match, the variant's margin: 0 wins the
+   cascade and the gap collapses. */
+.rbccm-expertise__pillar > * + *,
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__pillar > * + * {
+  margin-top: 16px !important;
+}
+
+.rbccm-expertise__pillar-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+  color: var(--rbccm-expertise-navy);
+  flex-shrink: 0;
+}
+.rbccm-expertise__pillar-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rbccm-expertise__pillar-title {
+  color: var(--rbccm-expertise-navy);
+  margin: 0;
+}
+.rbccm-expertise__pillar-body {
+  color: var(--rbccm-expertise-ink);
+  margin: 0;
+}
+
+/* Screen-reader-only live region for the a11y announcer. */
+.rbccm-expertise__sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* -------- Slick chrome + controls --------
+   Slick classes only show up when the JS runs on the section.
+   Default here so the slider layout is always correct. */
+.rbccm-expertise .slick-list  { overflow: hidden; }
+.rbccm-expertise .slick-track { align-items: stretch; display: flex; }
+.rbccm-expertise .slick-slide { height: auto; }
+.rbccm-expertise .slick-slide > div,
+.rbccm-expertise .slick-slide > div > div { height: 100%; }
+
+/* Prev/dots/next row below the slider. Hidden when only one
+   pillar exists (JS sets .__--single on the section). */
+.rbccm-expertise__controls {
+  align-items: center;
+  display: flex;
+  gap: 26px;
+  justify-content: center;
+  margin-top: 24px;
+  width: 100%;
+}
+.rbccm-expertise__btn {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rbccm-expertise-navy);
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  width: 14px;
+}
+.rbccm-expertise__btn svg { display: block; height: 24px; width: 14px; }
+.rbccm-expertise__btn:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--rbccm-expertise-blue);
+  outline-offset: 6px;
+}
+
+/* Dots pattern lifted from the leadership carousel. Same 11px
+   outlined circle at rest; active / hover / :focus-visible ALL
+   get the filled circle + 4px white gap + 1px navy ring via
+   box-shadow. Transitions on background-image / box-shadow /
+   border-radius so the state change is smooth. */
+.rbccm-expertise__dots {
+  align-items: center;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+.rbccm-expertise .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: flex !important;
+  gap: 26px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  width: auto !important;
+}
+.rbccm-expertise .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex !important;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-expertise .slick-dots li.slick-active {
+  height: 11px !important;
+  width: 11px !important;
+}
+.rbccm-expertise .slick-dots button {
+  appearance: none;
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+}
+.rbccm-expertise .slick-dots li.slick-active button {
+  height: 11px !important;
+  width: 11px !important;
+}
+.rbccm-expertise .slick-dots li button:focus-visible { outline: none; }
+
+/* Inactive dot: outlined navy circle. Transition covers the swap
+   to the filled/ringed active look. */
+.rbccm-expertise .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23003168' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  width: 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+
+/* Active / focus-visible / hover all share the filled-with-ring
+   treatment so keyboard + mouse users get consistent feedback. */
+.rbccm-expertise .slick-dots li.slick-active button::before,
+.rbccm-expertise .slick-dots li button:focus-visible::before,
+.rbccm-expertise .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23003168'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 5px var(--rbccm-expertise-navy) !important;
+  height: 11px !important;
+  width: 11px !important;
+  outline: 0;
+}
+
+.rbccm-expertise--single .rbccm-expertise__controls { display: none; }
+
+/* -------- Container-level outer edges --------
+   Outer L+R live on the container whenever Slick has wrapped the
+   pillars -- carousel modes at <1245 give the viewport a stable
+   framed look. At 1245+ (4-per-view desktop) both are stripped and
+   the row sits flush against the section. Pillar border-right
+   still handles inter-item dividers; on the rightmost visible slide
+   at pre-desktop widths it sits directly under the container's
+   border-right so they render as one line. */
+.rbccm-expertise__track.slick-initialized {
+  border-left:  var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
+  border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
+}
+
+/* -------- Tablet+ (>=640) : 2-per-view --------
+   Two visible pillars. One inter-item divider between them, formed
+   by two half-borders that sum to a full stroke. Leftmost visible
+   (.slick-current) contributes border-right; rightmost visible
+   (.slick-current + .slick-active) contributes border-left. */
+@media (min-width: 640px) {
+  .rbccm-expertise__pillar {
+    min-height: 170px;
+  }
+  .rbccm-expertise .slick-slide.slick-current .rbccm-expertise__pillar {
+    border-right: var(--rbccm-expertise-half-border);
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active .rbccm-expertise__pillar {
+    border-left: var(--rbccm-expertise-half-border);
+  }
+}
+
+/* -------- Small-desktop (>=992) : 3-per-view --------
+   Three visible pillars, two dividers. Middle pillar picks up
+   half on both sides; new rightmost (col-3) picks up left half.
+   Rules stack on top of the 640+ rules -- the middle pillar's
+   border-left is already set there. */
+@media (min-width: 992px) {
+  /* Desktop section rhythm: 80px top/bottom, keep 23 gutter. */
+  .rbccm-expertise {
+    padding: 80px 23px;
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active .rbccm-expertise__pillar {
+    border-right: var(--rbccm-expertise-half-border);
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active .rbccm-expertise__pillar {
+    border-left: var(--rbccm-expertise-half-border);
+  }
+}
+
+/* -------- Desktop (>=1245) : 4-per-view --------
+   Four visible pillars, three dividers. Container L+R strip out
+   entirely so the row sits flush against the section. Col-3 gains
+   a right half (last inner divider); col-4 gains a left half. */
+@media (min-width: 1245px) {
+  .rbccm-expertise__pillar {
+    min-height: 142px;
+    padding: 0 32px;
+  }
+  .rbccm-expertise__track.slick-initialized {
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active .rbccm-expertise__pillar {
+    border-right: var(--rbccm-expertise-half-border);
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active + .slick-active .rbccm-expertise__pillar {
+    border-left: var(--rbccm-expertise-half-border);
+  }
+  /* Col-1 flush-left / col-4 flush-right at 4-per-view. Removes
+     the base 32px outer padding on the outer edges so content
+     aligns with the section gutter; freed padding redistributes
+     naturally between the 3 inner joints. */
+  .rbccm-expertise .slick-slide.slick-current .rbccm-expertise__pillar {
+    padding-left: 0 !important;
+  }
+  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active + .slick-active .rbccm-expertise__pillar {
+    padding-right: 0 !important;
+  }
+  .rbccm-expertise__controls {
+    display: none;
+  }
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics - Areas of expertise
+   =========================================================================
+   Light-blue-gray section with dark-blue heading + icons and body copy
+   in warm gray. Sits directly under the S&E hero on the S&E page.
+   ========================================================================= */
+.rbccm-expertise--strategy-and-economics-expertise {
+  --rbccm-expertise-bg-color: #E7EEF1; /* Blue / Light Blue */
+}
+
+/* Section title -- RBC Display 36/500/120% dark blue.
+   !important because the tag picker lets authors pick any element. */
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__title {
+  color: #003168 !important;
+  font-family: var(--rbccm-expertise-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Section description -- Roboto 16/150% warm dark gray, ligatures off. */
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__description {
+  color: #3A3A3A !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Pillar icon lives above the title, blue color inherited by SVG
+   fill/stroke via currentColor. Fixed 30x30 box per Figma. */
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__pillar-icon {
+  color: #003168;
+  width: 30px;
+  height: 30px;
+}
+
+/* Pillar title -- Roboto 20/400/normal dark blue (not RBC Display
+   this time - per Figma spec). Tag-picker guarded. */
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__pillar-title {
+  color: #003168 !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 20px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Pillar body -- Roboto 16/120% dark gray. */
+.rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__pillar-body {
+  color: #494949 !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 120% !important; /* 19.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+/* =========================================================================
+   S&E variant -- desktop progressive-enhancement overrides. Must sit
+   AFTER the variant's base rules above so source-order wins the
+   !important tie against the mobile-first defaults.
+   ========================================================================= */
+@media (min-width: 992px) {
+  /* Desktop title: RBC Display 42 / 500 / 125% (52.5px line-height). */
+  .rbccm-expertise--strategy-and-economics-expertise .rbccm-expertise__title {
+    font-size: 42px !important;
+    line-height: 125% !important;
+  }
+}
+
+
+/* =========================================================================
+   Variant: Why RBC Capital Markets
+   =========================================================================
+   White (or transparent-on-white) section. Bright-blue pillar titles +
+   2px bright-blue dividers, black body copy. No icons and no section
+   description -- the pillar body is the whole story per pillar. Same
+   4-per-view -> 3 -> 2 -> 1 Slick behavior as the S&E variant.
+
+   IconName Datums are still accepted (shared Properties) but the icon
+   slot is hidden CSS-side so authors can flip presets without losing
+   their icon selections.
+   ========================================================================= */
+.rbccm-expertise--why-rbc-capital-markets {
+  --rbccm-expertise-bg-color: #FFFFFF;
+  --rbccm-expertise-border-color: #0051A5;
+  --rbccm-expertise-border-width: 2px;
+}
+
+/* Section title -- RBC Display 36/500/120% dark blue. */
+.rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__title {
+  color: #003168 !important;
+  font-family: var(--rbccm-expertise-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Description -- inherited base styling; almost always omitted here. */
+.rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__description {
+  color: #494949 !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Icon slot suppressed -- this preset ships title + body only. */
+.rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__pillar-icon {
+  display: none !important;
+}
+
+/* Pillar title -- Roboto 20/400 bright blue. */
+.rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__pillar-title {
+  color: #0051A5 !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 20px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Pillar body -- Roboto 16 black. */
+.rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__pillar-body {
+  color: #000000 !important;
+  font-family: var(--rbccm-expertise-sans) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 120% !important; /* 19.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Divider color + width come from --rbccm-expertise-border-* custom
+   properties set on the variant scope above -- inherited by the base
+   pillar rule + every defensive re-add rule, so col-3's outer edge
+   picks up the blue/2px too. */
+
+/* Desktop-only title bump for parity with the S&E preset. */
+@media (min-width: 992px) {
+  .rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__title {
+    font-size: 42px !important;
+    line-height: 125% !important;
+  }
+  /* Squeeze pillar titles at desktop so the middle two ("Balance
+     Sheet Strength" / "Innovation Leadership") wrap to two lines
+     and match the outer columns visually. */
+  .rbccm-expertise--why-rbc-capital-markets .rbccm-expertise__pillar-title {
+    padding-right: 20px !important;
+  }
+}
+
+/* =========================================================================
+   Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base header is flex-start (left); --header-center flips the
+   header block (title + description) to center. Wins the specificity
+   tie against the variant title/description !important rules by using
+   !important on text-align too.
+   ========================================================================= */
+.rbccm-expertise--header-center .rbccm-expertise__header {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-expertise--header-center .rbccm-expertise__title,
+.rbccm-expertise--header-center .rbccm-expertise__description {
+  text-align: center !important;
+}
+
+
+/* =========================================================================
+   Reduced motion -- kill Slick fade/slide easings (the runtime already
+   passes speed: 0 / linear ease when prefers-reduced-motion is set,
+   this is a defensive belt-and-suspenders).
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-expertise .slick-slide,
+  .rbccm-expertise__btn {
+    transition: none !important;
+  }
+}

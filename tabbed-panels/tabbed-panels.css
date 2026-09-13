@@ -1,0 +1,1730 @@
+/* ============================================================
+   Tabbed Panels — shared component
+   Deploy path: /assets/rbccm/css/components/tabbed-panels.css
+
+   Purpose
+   ─────────────────────────────────────────────────────────────
+   Reusable "tablist + panels" scaffold extracted from the
+   .rbccm-how-we-think pattern. The block owns the section shell,
+   the H2, the optional lede, the tablist/tab visuals, and the
+   panel show/hide behavior. It does NOT know about inner panel
+   content — consumers drop their own components inside a panel
+   (contact cards, insight tiles, event lists, custom grids).
+
+   Mobile-first accordion: tabs stack vertically with a chevron.
+   Desktop (≥992): tabs become a horizontal grid strip with a
+   3px black underline on the active tab; panels pin to row 2
+   spanning all columns.
+
+   Currently consumed by:
+     - In the Media (media contacts region tabs) — modifier: default
+   Migration candidates:
+     - How we think — this component is the abstracted version of
+       the same pattern; migrating is optional since how-we-think
+       already ships its own scoped CSS.
+
+   Modifiers
+   ─────────────────────────────────────────────────────────────
+     .rbccm-tabbed-panels                  → default (light bg)
+     .rbccm-tabbed-panels--compact         → drops the shell
+                                             padding, for use
+                                             inside another
+                                             section
+     .rbccm-tabbed-panels--headless        → hides the title/lede
+                                             (tabs-only, like a
+                                             region-picker inside
+                                             a wider component)
+     .rbccm-tabbed-panels--dark            → dark background
+                                             variant (future)
+
+   Data contract on tabs + panels
+   ─────────────────────────────────────────────────────────────
+     .__tab   data-panel="<slug>"  aria-expanded="true|false"
+                                   aria-controls="<panel-id>"
+     .__panel data-panel="<slug>"  id="<panel-id>" role="region"
+                                   tabindex="0"
+     JS toggles .is-active on the tab and matching panel.
+
+   Tokens (scoped to .rbccm-tabbed-panels so they don't leak)
+   ============================================================ */
+
+.rbccm-tabbed-panels {
+  --tp-navy: #003168;
+  --tp-navy-dark: #002144;
+  --tp-blue: #0051A5;
+  --tp-ink: #082043;
+  --tp-text: #494949;
+  --tp-muted: #6B7280;
+  --tp-hairline: #D8D8D8;
+  --tp-serif: "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --tp-sans: Roboto, Arial, sans-serif;
+
+  /* ---- Authoring hooks -------------------------------------------
+     Per-instance tuners. Override any of these inline via
+     `style="--tp-pt-d: 96px; --tp-border-top: 1px solid #D8D8D8;"`
+     when the page needs to bend the default spacing/borders without
+     touching this file:
+
+       --tp-pt-m / --tp-pb-m         mobile top/bottom padding (40px)
+       --tp-pt-d / --tp-pb-d         desktop top/bottom padding (64px)
+       --tp-border-top               border shorthand or 'none' (none)
+       --tp-border-bottom            border shorthand or 'none' (none)
+     Horizontal padding stays fixed by breakpoint (16 mobile / 24 tab /
+     170 wide) to keep alignment with sibling sections on the page. */
+
+  /* Section shell — matches .rbccm-how-we-think:
+       mobile: 40px 16px | ≥992: 64px 24px | ≥1440: 64px 170px
+     Block layout so children reliably fill width (flex + align-
+     items:center squashes width:100% children to content-width
+     in some cases). */
+  display: block;
+  padding: var(--tp-pt-m, 40px) 16px var(--tp-pb-m, 40px);
+  border-top:    var(--tp-border-top, none);
+  border-bottom: var(--tp-border-bottom, none);
+  background: #fff;
+  box-sizing: border-box;
+}
+.rbccm-tabbed-panels *,
+.rbccm-tabbed-panels *::before,
+.rbccm-tabbed-panels *::after { box-sizing: border-box; }
+
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels {
+    padding: var(--tp-pt-d, 64px) 24px var(--tp-pb-d, 64px);
+  }
+}
+@media (min-width: 1440px) {
+  .rbccm-tabbed-panels {
+    padding: var(--tp-pt-d, 64px) 170px var(--tp-pb-d, 64px);
+  }
+}
+
+/* ---- Background modifiers --------------------------------------
+   Bg tones for the section shell. --dark already exists further
+   down (full inverted color treatment); --on-ltblue is a subtle
+   light-blue tint used by the In the Media "Media contacts" tone.
+   Text colors stay default (--on-ltblue doesn't need inversion). */
+.rbccm-tabbed-panels--on-ltblue { background: #EFF6FD; }
+
+/* --compact — drops the outer padding, for use inside another
+   section (e.g. In the Media page where the surrounding page
+   already handles its own vertical rhythm). Consumers can still
+   override padding via `style="padding: ..."` if needed. */
+.rbccm-tabbed-panels--compact {
+  padding: 0;
+}
+@media (min-width: 992px)  { .rbccm-tabbed-panels--compact { padding: 0; } }
+@media (min-width: 1440px) { .rbccm-tabbed-panels--compact { padding: 0; } }
+
+/* ---------- Title (optional) ----------
+   Matches .rbccm-how-we-think__heading exactly.
+   Desktop: RBCDisplay 29/34.8 wt 500, letter-spacing 1px, #002144.
+   Mobile (<992): RBC Display 24/120% wt 500, letter-spacing 0. */
+.rbccm-tabbed-panels__title {
+  color: #002144;
+  font-family: var(--tp-serif);
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 34.8px;
+  letter-spacing: 1px;
+  text-align: center;
+  margin: 0 auto 32px;
+  max-width: 1140px;
+  width: 100%;
+}
+@media (max-width: 991px) {
+  .rbccm-tabbed-panels__title {
+    font-size: 24px;
+    line-height: 120%;
+    letter-spacing: 0;
+  }
+}
+
+/* ---------- Lede (optional) ----------
+   Matches .rbccm-how-we-think__panel-lede.
+   Desktop: Roboto 18/26 wt 400 #000. Mobile (<992): 16/120%. */
+.rbccm-tabbed-panels__lede {
+  text-align: center;
+  color: #000;
+  font-family: var(--tp-sans);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 auto 32px;
+  max-width: 1140px;
+  width: 100%;
+}
+@media (max-width: 991px) {
+  .rbccm-tabbed-panels__lede {
+    font-size: 16px;
+    line-height: 120%;
+  }
+}
+
+/* --headless: hide the title/lede when the component is used
+   as a region-picker inside a wider block that already owns
+   its own heading (e.g. In the Media contacts, where the H2 is
+   part of the surrounding page). */
+.rbccm-tabbed-panels--headless .rbccm-tabbed-panels__title,
+.rbccm-tabbed-panels--headless .rbccm-tabbed-panels__lede {
+  display: none;
+}
+
+/* Alignment modifiers.
+   Defaults (above) match how-we-think: title + lede center-aligned.
+   Consumers can opt into left-alignment for either the title,
+   the lede, or both, without touching the other. */
+.rbccm-tabbed-panels--title-left .rbccm-tabbed-panels__title { text-align: left; }
+.rbccm-tabbed-panels--lede-left  .rbccm-tabbed-panels__lede  { text-align: left; }
+/* Shortcut: both left-aligned. Equivalent to stacking the two
+   above modifiers, but reads more clearly on a section that just
+   wants the whole intro block flush-left. */
+.rbccm-tabbed-panels--align-left .rbccm-tabbed-panels__title,
+.rbccm-tabbed-panels--align-left .rbccm-tabbed-panels__lede { text-align: left; }
+
+/* ---------- Tablist wrapper ----------
+   Mobile: flex column so tabs + panels stack as accordion.
+   Desktop: grid — tabs occupy row 1, panels pin to row 2. */
+.rbccm-tabbed-panels__tablist {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--tp-hairline);
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/* ---------- Tab (mobile accordion header) ---------- */
+.rbccm-tabbed-panels__tab {
+  position: relative;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--tp-hairline);
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-family: "Roboto Medium", Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  gap: 12px;
+  justify-content: space-between;
+  line-height: 120%;
+  margin: 0;
+  padding: 18px 4px;
+  text-align: left;
+  transition: color 150ms ease;
+  width: 100%;
+}
+.rbccm-tabbed-panels__tab:hover      { color: var(--tp-ink); }
+.rbccm-tabbed-panels__tab.is-active  { color: #000; }
+.rbccm-tabbed-panels__tab:focus-visible { outline: 2px solid var(--tp-blue); outline-offset: -2px; }
+
+/* Chevron — SVG drawn UP-pointing. Default rotates 180° (points
+   DOWN, "expand"). Active rotates 0° (points UP, "collapse").
+   Hidden on desktop. */
+.rbccm-tabbed-panels__tab-chevron {
+  display: block;
+  width: 24px; height: 24px;
+  fill: currentColor;
+  flex-shrink: 0;
+  transform: rotate(180deg);
+  transition: transform 0.25s ease;
+}
+.rbccm-tabbed-panels__tab.is-active .rbccm-tabbed-panels__tab-chevron {
+  transform: rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-tabbed-panels__tab-chevron { transition: none; }
+}
+
+/* ---------- Panels ---------- */
+.rbccm-tabbed-panels__panel {
+  display: none;
+  padding: 32px 0;
+}
+.rbccm-tabbed-panels__panel.is-active { display: block; }
+.rbccm-tabbed-panels__panel:focus-visible {
+  outline: 2px solid var(--tp-blue);
+  outline-offset: -2px;
+}
+/* Mobile: close bottom of open accordion panel with a hairline. */
+@media (max-width: 991px) {
+  .rbccm-tabbed-panels__panel.is-active {
+    border-bottom: 1px solid var(--tp-hairline);
+  }
+}
+
+/* ---------- Desktop overrides (≥992) ---------- */
+@media (min-width: 992px) {
+  /* Explicit 4-column grid on desktop.
+     Component's data contract is Fixed 4 tabs (see Properties.xml
+     — Tab1..Tab4 slots). Using an explicit grid-template-columns
+     rather than grid-auto-columns is required for panel's
+     `grid-column: 1 / -1` to resolve correctly — `-1` refers to
+     the last line of the EXPLICIT grid, so without an explicit
+     column count the panel collapses to a single track and every
+     grid inside it (like __contact-grid's 4-up card layout) gets
+     the same tiny width. If a Tab{N}Label is left blank the XSL
+     doesn't render that tab OR its panel — the empty column stays
+     hidden because both children are absent. */
+  .rbccm-tabbed-panels__tablist {
+    display: grid;
+    grid-template-columns: repeat(var(--tp-tab-count, 4), 1fr);
+    grid-auto-rows: auto;
+    border-top: none;
+  }
+  .rbccm-tabbed-panels__tab {
+    grid-row: 1;
+    border-top: none;
+    border-bottom: 1px solid #000;
+    flex-direction: column;
+    font-family: Roboto, Arial, sans-serif;
+    font-weight: 500;
+    gap: 0;
+    justify-content: center;
+    line-height: 32px;
+    padding: 16px;
+    text-align: center;
+  }
+  /* Active tab: 3px black underline centred on the row-1 hairline. */
+  .rbccm-tabbed-panels__tab.is-active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -2px;
+    height: 3px;
+    background: #000;
+    pointer-events: none;
+  }
+  .rbccm-tabbed-panels__tab-chevron { display: none; }
+  .rbccm-tabbed-panels__panel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 32px 0 0 0;
+  }
+}
+
+/* ---------- --dark modifier (future) ----------
+   Overrides for dark backgrounds. Not currently consumed but
+   reserved so it's obvious how to wire when needed. */
+.rbccm-tabbed-panels--dark {
+  background: #002144;
+  color: #fff;
+}
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__title,
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__lede { color: #fff; }
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tab {
+  color: rgba(255,255,255,0.7);
+  border-bottom-color: rgba(255,255,255,0.3);
+}
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tab:hover,
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tab.is-active { color: #fff; }
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tab.is-active::after { background: #FFC72C; }
+.rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tablist { border-top-color: rgba(255,255,255,0.3); }
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels--dark .rbccm-tabbed-panels__tab { border-bottom-color: rgba(255,255,255,0.6); }
+}
+
+
+/* ============================================================
+   Media-contact card pattern — bundled preset
+   ------------------------------------------------------------
+   Standalone BEM classes an author can paste inside any panel's
+   Rich Text Datum. Nothing on the section modifier is required
+   — dropping the marked-up anchor cards into a __panel is
+   enough for them to render as the standard 4-up grid.
+
+   Extracted from the In the Media page's .rbccm-itm-contact*
+   pattern so consumers get the same visual + a11y treatment
+   without also loading the ITM page's CSS. Class names moved
+   to the __contact-* namespace to live cleanly with the block.
+
+   Author paste-in template (place inside a Rich Text panel):
+
+     <div class="rbccm-tabbed-panels__contact-grid">
+       <a class="rbccm-tabbed-panels__contact-card"
+          href="tel:+12126185589"
+          aria-label="Call Sanam Heidary at +1 212 618 5589">
+         <h3 class="rbccm-tabbed-panels__contact-name">Sanam Heidary</h3>
+         <p class="rbccm-tabbed-panels__contact-role">General Inquiries</p>
+         <p class="rbccm-tabbed-panels__contact-phone">+1.212.618.5589</p>
+         <span class="rbccm-tabbed-panels__contact-phone-icon" aria-hidden="true">
+           <i class="fa fa-phone"></i>
+         </span>
+       </a>
+       ...more cards...
+     </div>
+
+   Layout: mobile 1-up, desktop 4-up. When a panel has fewer
+   than 4 cards they take a quarter each and the extra tracks
+   stay empty rather than stretching cards to full width. */
+.rbccm-tabbed-panels__contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px 16px;
+}
+@media (min-width: 768px) {
+  .rbccm-tabbed-panels__contact-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.rbccm-tabbed-panels__contact-grid > .rbccm-tabbed-panels__contact-card { min-width: 0; }
+
+/* Contact card — leadership card pattern minus the photo slot
+   (media contacts have no headshots in the DCR). Layout: name
+   top-left, role below, phone below role, 44x44 phone icon
+   anchored bottom-right (same slot the leadership card puts
+   LinkedIn). The whole card is a tel: anchor. */
+.rbccm-tabbed-panels__contact-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 24px 84px;   /* extra bottom padding clears the icon */
+  min-height: 220px;
+  background: #fff;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.rbccm-tabbed-panels__contact-card:hover,
+.rbccm-tabbed-panels__contact-card:focus-visible {
+  border-color: var(--tp-blue, #0051A5);
+  outline: none;
+  text-decoration: none;
+}
+
+.rbccm-tabbed-panels__contact-name {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-transform: capitalize;
+  color: #000;
+  text-align: left;
+  margin: 0 0 8px;
+}
+.rbccm-tabbed-panels__contact-role {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19px;
+  text-transform: capitalize;
+  color: #454545;
+  text-align: left;
+  margin: 0 0 10px;
+}
+.rbccm-tabbed-panels__contact-phone {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19px;
+  color: #6B7280;
+  text-align: left;
+  margin: 0;
+}
+
+/* 44x44 circle around the Font Awesome 4 fa-phone glyph.
+   Anchored bottom-right, mirrors the leadership LinkedIn-icon
+   slot. Card owns the click; the icon itself is decorative. */
+.rbccm-tabbed-panels__contact-phone-icon {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--tp-blue, #0051A5);
+  color: var(--tp-blue, #0051A5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rbccm-tabbed-panels__contact-card:hover .rbccm-tabbed-panels__contact-phone-icon,
+.rbccm-tabbed-panels__contact-card:focus-visible .rbccm-tabbed-panels__contact-phone-icon {
+  background: var(--tp-blue, #0051A5);
+  color: #fff;
+}
+.rbccm-tabbed-panels__contact-phone-icon .fa { display: block; }
+
+
+/* ============================================================
+   HOW WE THINK preset
+   ------------------------------------------------------------
+   All rules scoped under .rbccm-tabbed-panels--how-we-think so
+   nothing here leaks into the generic / media-contacts / other
+   preset renderings. Content classes ported wholesale from
+   .rbccm-how-we-think__* into the shared .rbccm-tabbed-panels__*
+   namespace; shell classes (__tab, __tablist, __panel) already
+   exist above and are left untouched.
+
+   Consumed markup shape (emitted by the how-we-think branch of
+   tabbed-panels.xsl):
+     __panel-lede         per-panel lede paragraph
+     __tiles + __tile*    3-up insights tile grid (JS-hydrated)
+     __news + __news-*    3-item newsroom feed list
+     __conferences +      3-pill homepage-flagged event badges
+       __conference-*
+     __cta-wrap + __cta   panel-footer CTA button
+   ============================================================ */
+
+.rbccm-tabbed-panels--how-we-think {
+  /* Local yellow accent used by the tile divider + news rail
+     hover fill. Kept scoped so it doesn't leak globally. */
+  --tp-yellow:   #FFC72C;
+  --tp-conf-bg:  #EFF6FD;
+}
+
+/* Insights tiles are hydrated by JS. Hide unhydrated shells so
+   authors never see the placeholder eyebrow + empty title flash
+   before the feed lookup resolves. Tiles without data-hwt-url
+   (static demo shells) are unaffected. */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile[data-hwt-url]:not(.is-hydrated) {
+  visibility: hidden;
+}
+
+/* ---- Panel lede ---- */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__panel-lede {
+  text-align: center;
+  color: #000;
+  font-family: var(--tp-sans);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 32px;
+}
+@media (max-width: 991px) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__panel-lede {
+    font-size: 16px;
+    line-height: 120%;
+  }
+}
+
+/* ---- CTA button ---- */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__cta-wrap {
+  text-align: center;
+  margin-top: 32px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__cta {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  min-width: 200px;
+  height: 50px;
+  padding: 10px 24px;
+  box-sizing: border-box;
+  background: var(--tp-blue) !important;
+  color: #FFF !important;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-align: center;
+  text-decoration: none !important;
+  transition: background 150ms ease;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__cta:hover,
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__cta:focus-visible {
+  background: var(--tp-navy) !important;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__cta::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: -1px;
+}
+
+/* ---- Insights tiles ----
+   1-up mobile, 2-up ≥768, 3-up ≥992. Flat card, 1px #A8A8A8
+   border flipping to #0051A5 on hover. Yellow divider stretches
+   30.9→56 and image scales 1.08 on hover (hover:hover gated so
+   touch skips the transforms). */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tiles {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 30px;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  min-height: 555px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+/* Beat Bootstrap 3's a:focus, a:hover default (blue underline
+   inherits into title/desc otherwise). Type-prefix bumps
+   specificity so it wins. */
+a.rbccm-tabbed-panels__tile,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:link,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:visited,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:hover,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:focus,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:focus-visible,
+.rbccm-tabbed-panels--how-we-think a.rbccm-tabbed-panels__tile:active {
+  color: #000;
+  text-decoration: none;
+  outline-offset: 0;
+}
+
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-img {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 240px;
+  overflow: hidden;
+  background: #0b1830 center/cover no-repeat;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-img img {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 315px;
+  padding: 20px;
+}
+
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-eyebrow {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-title {
+  color: #000;
+  font-family: "Roboto Medium", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 125%;
+  letter-spacing: normal;
+  margin: 10px 0 10px 0;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-copy {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-cta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-cta::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+@media (hover: hover) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:hover {
+    border-color: #0051A5;
+    outline: none;
+  }
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:hover .rbccm-tabbed-panels__tile-img img,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus-visible .rbccm-tabbed-panels__tile-img img {
+    transform: scale(1.08);
+  }
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:hover .rbccm-tabbed-panels__tile-divider,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus-visible .rbccm-tabbed-panels__tile-divider {
+    width: 56px;
+  }
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:hover .rbccm-tabbed-panels__tile-cta,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus-visible .rbccm-tabbed-panels__tile-cta {
+    border-bottom-color: currentColor;
+  }
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus { outline: none; }
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus-visible {
+  border-color: #0051A5;
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-img img,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-divider,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile-cta {
+    transition: none !important;
+  }
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:hover .rbccm-tabbed-panels__tile-img img,
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__tile:focus-visible .rbccm-tabbed-panels__tile-img img {
+    transform: none !important;
+  }
+}
+
+/* ---- Newsroom ----
+   3px bright-blue (#006AC3) left rail that fills with warm-yellow
+   (#FFC72C) from bottom → top on the link's hover/focus only
+   (not the whole item region). Uses :has() to lift the anchor
+   state up to the item so ::before on .news-item catches it. */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 16px;
+  border-left: 3px solid #006AC3;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-item::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  bottom: 0;
+  width: 3px;
+  height: 0;
+  background: var(--tp-yellow);
+  transition: height 0.4s ease;
+  pointer-events: none;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-item:has(.rbccm-tabbed-panels__news-link:hover)::before,
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-item:has(.rbccm-tabbed-panels__news-link:focus-visible)::before {
+  height: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-item::before {
+    transition: none;
+  }
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-date {
+  color: var(--tp-muted);
+  font-family: var(--tp-sans);
+  font-size: 14px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-link {
+  color: #006AC3;
+  font-family: var(--tp-sans);
+  font-size: 18px;
+  font-weight: 500;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-link:hover,
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-link:focus-visible {
+  text-decoration: underline;
+  color: #003168;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__news-summary {
+  color: var(--tp-text);
+  font-family: var(--tp-sans);
+  font-size: 15px;
+  margin: 4px 0 0;
+}
+
+/* ---- Conferences ----
+   3-up pill row on desktop, single column ≤720. Circular date
+   badge + location caps + event name below. */
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conferences {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 32px 24px;
+  background: var(--tp-conf-bg);
+}
+@media (max-width: 720px) {
+  .rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conferences {
+    grid-template-columns: 1fr;
+  }
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference-date {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference-month {
+  color: var(--tp-ink);
+  font-family: var(--tp-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference-day {
+  color: var(--tp-ink);
+  font-family: var(--tp-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: 4px;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference-location {
+  color: var(--tp-ink);
+  font-family: var(--tp-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.rbccm-tabbed-panels--how-we-think .rbccm-tabbed-panels__conference-name {
+  color: var(--tp-text);
+  font-family: var(--tp-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 240px;
+}
+
+
+/* ============================================================
+   CONFERENCE INSIGHTS preset
+   ------------------------------------------------------------
+   Ported wholesale from featured-conferences.css. All rules
+   scoped under .rbccm-tabbed-panels--conference-insights so
+   nothing here leaks into other presets. Class names moved
+   from .rbccm-featured-conferences__* to the shared
+   .rbccm-tabbed-panels__* namespace.
+
+   Design intent: DARK navy background baked into the modifier
+   (matches the original featured-conferences look). Authors do
+   NOT need to add Placement=dark; picking Preset=conference-
+   insights is enough. If Placement=dark is also set, the two
+   colour treatments are compatible.
+
+   Shell overrides (scoped so the shell tab visuals switch to
+   the featured-conferences pill treatment):
+     - Outer tab pills (dark blue fill, white outline)
+     - Section shell → dark navy bg
+     - Title / lede → white text
+   ============================================================ */
+
+/* Root shell — dark navy, matches the source featured-conferences. */
+.rbccm-tabbed-panels--conference-insights {
+  background: #002144;
+  color: #FFFDFD;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__title,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__lede {
+  color: #FFFDFD;
+}
+
+/* Outer tablist — mobile: stacked, no shell hairline. Desktop:
+   3 equal pill tabs across. Overrides the shell's underline/grid. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tablist {
+  border-top: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Preserve the shell's horizontal auto-centering — the base rule
+     is `margin: 0 auto` at max-width: 1140px; overriding to
+     `margin: 0 0 28px 0` here left-anchored the tablist. */
+  margin: 0 auto 28px auto;
+}
+
+/* Outer tab — dark blue pill with white outline. Active tab
+   flips to white bg + dark blue text (matches source). */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab {
+  align-items: center;
+  align-self: stretch;
+  background: #003168;
+  border: 1.5px solid #FFF;
+  border-bottom: 1.5px solid #FFF;
+  border-radius: 10px;
+  color: #FFFDFD;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 12px;
+  justify-content: center;
+  line-height: 120%;
+  padding: 19px 0;
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab.is-active {
+  background-color: #FFFDFD;
+  color: #003168;
+}
+/* Kill the shell's black-underline active pseudo — pill design uses fill,
+   not an underline, to denote active. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab.is-active::after {
+  content: none;
+  display: none;
+}
+
+/* Outer panels — no shell padding, custom for this preset. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__panel {
+  padding: 0;
+}
+/* Mobile: drop the shell's hairline under an active accordion panel — the
+   inner-wrap owns its own borders. */
+@media (max-width: 991px) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__panel.is-active {
+    border-bottom: none;
+  }
+}
+
+@media (min-width: 992px) {
+  /* Desktop outer tabs: horizontal row of thirds (matches source). Shell
+     grid still applies from the base rule, but we override the row layout
+     so the pill treatment reads right. */
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tablist {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab {
+    grid-row: 1;
+    border-bottom: 1.5px solid #FFF;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__panel {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 0;
+  }
+}
+
+/* ============ Inner tabs (Overview / Speakers / Insights) ============
+   Nested tab BEM uses __inner-tab / __inner-panel so the shell JS +
+   CSS never confuses them with the outer tabs. Mobile behaviour is
+   accordion (multiple open OK); desktop is exclusive single-active. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-wrap {
+  border-top: 1px solid rgba(255, 199, 54, 0.5);
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 199, 54, 0.5);
+  color: #FFFDFD;
+  cursor: pointer;
+  display: flex;
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  justify-content: space-between;
+  padding: 18px 4px;
+  text-align: left;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-chevron {
+  flex-shrink: 0;
+  transform: rotate(180deg);
+  transition: transform 0.25s ease;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active .rbccm-tabbed-panels__inner-chevron {
+  transform: rotate(0deg);
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-panel {
+  display: none;
+  padding: 24px 0;
+}
+/* Mobile adjacent-sibling reveal — each inner-tab shows its own panel below. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active + .rbccm-tabbed-panels__inner-panel {
+  border-bottom: 1px solid rgba(255, 199, 54, 0.5);
+  display: block;
+}
+
+/* ============ Overview panel ============ */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 16:9 media frame. aspect-ratio locks the box natively; the padding-top
+   trick on __video-frame is belt-and-suspenders for legacy browsers. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video {
+  aspect-ratio: 16 / 9;
+  background: #000;
+  max-width: 1140px;
+  position: relative;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-frame {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  padding-top: 56.25%;
+  position: relative;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-frame iframe {
+  border: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-facade {
+  background: #000;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-facade:focus-visible {
+  outline: 3px solid #0051a5;
+  outline-offset: 2px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-poster {
+  display: block;
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-play {
+  align-items: center;
+  background: rgba(0, 49, 104, 0.85);
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 72px;
+  justify-content: center;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  width: 72px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-facade:hover .rbccm-tabbed-panels__video-play,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-facade:focus-visible .rbccm-tabbed-panels__video-play {
+  background: #003168;
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video-play-icon {
+  display: block;
+  height: 32px;
+  margin-left: 3px;
+  width: 32px;
+}
+
+/* Info card — Date / Location / Format. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info {
+  align-items: flex-start;
+  align-self: stretch;
+  background-color: #003168;
+  border-radius: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 24px 16px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-item {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 159px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-item--full {
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  grid-column: 1 / -1;
+  padding-top: 22px;
+  width: auto;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-label {
+  color: #FFC72C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  margin: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-value {
+  color: #FFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-item--full .rbccm-tabbed-panels__info-value {
+  font-size: 18px;
+  line-height: 27px;
+}
+
+/* Overview body */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 30px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-heading {
+  color: #FFFDFD;
+  font-family: "RBCDisplay", Georgia, Times, serif !important;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-text {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-text p {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-text p:last-child {
+  margin-bottom: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__topics {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__topics strong {
+  display: block;
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif !important;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__contact {
+  color: #FFFDFD;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__contact em {
+  opacity: 0.85;
+}
+
+/* ============ Speakers panel ============ */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-heading {
+  color: #FFFDFD;
+  font-family: "RBCDisplay", Georgia, Times, serif !important;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-intro {
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speaker {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  width: 194px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speaker-avatar {
+  align-items: flex-start;
+  align-self: stretch;
+  border: 2px solid #FFC72C;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 128px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  width: 128px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speaker-avatar img {
+  align-self: stretch;
+  display: block;
+  flex-shrink: 0;
+  height: 128px;
+  object-fit: cover;
+  object-position: top;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speaker-name {
+  color: #FFC72C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speaker-title {
+  color: #FFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-footnote {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFDFD;
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  margin: 32px 0 0 0;
+  padding-top: 24px;
+  text-align: center;
+}
+
+/* Speakers slider — transform-based carousel with n-clone teleport.
+   __speakers is a flex row of 194px cards + 32px gaps; JS steps the
+   translateX by 226px per nav. .has-overflow toggled by JS based on
+   measured slider width vs. row width — controls hide when the row
+   fits without scrolling. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-slider {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 24px 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers > .rbccm-tabbed-panels__speaker {
+  flex: 0 0 194px;
+  width: 194px;
+}
+
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-controls {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 0;
+  padding: 5px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-slider:not(.has-overflow) .rbccm-tabbed-panels__speakers-controls {
+  display: none;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #FFFDFD;
+  cursor: pointer;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  width: 24px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-btn:disabled,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-btn[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-dots {
+  align-items: center;
+  display: flex;
+  gap: 26px;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-dot {
+  background: transparent;
+  border: 1px solid #FFFDFD;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 10px;
+  padding: 0;
+  text-indent: -9999px;
+  width: 10px;
+}
+/* Source order matters: :focus rules BEFORE .is-active so .is-active wins. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-dot:focus { outline: none; }
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-dot:focus-visible {
+  outline: 1px solid #FFC72C;
+  outline-offset: 4px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-dot.is-active {
+  background: #FFFDFD;
+  border-radius: 50px;
+  outline: 1px solid #FFC72C;
+  outline-offset: 4px;
+}
+
+/* ============ Insights panel ============
+   Mobile: single column, cards flow. Tablet: 2-col. Desktop: 3-col
+   with any inline transform force-cleared (defeats the carousel's
+   translate-to-pin behaviour which is meaningless at desktop). */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-slider {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0;
+  position: relative;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-row {
+  display: contents;
+}
+/* Cloned cards from the carousel JS never render — grid layout shows
+   only the real cards. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight[data-clone] {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights {
+    grid-template-columns: repeat(3, 1fr);
+    /* Desktop grid mode: kill any inline transform the carousel IIFE
+       applied on init. Without this the 3-col grid renders with cards
+       pushed off-screen. */
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Individual insight card */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight {
+  align-items: flex-start;
+  background: #FFFDFD;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:hover,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:focus-visible {
+  color: #000;
+  text-decoration: none;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-media {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 240px;
+  overflow: hidden;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+@media (hover: hover) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:hover,
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:focus-visible {
+    outline: none;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:hover .rbccm-tabbed-panels__insight-media img,
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:focus-visible .rbccm-tabbed-panels__insight-media img {
+    transform: scale(1.08);
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:hover .rbccm-tabbed-panels__insight-divider,
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:focus-visible .rbccm-tabbed-panels__insight-divider {
+    width: 56px;
+  }
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-arrow {
+  fill: #0051A5;
+  flex-shrink: 0;
+  height: 10px;
+  width: 4px;
+}
+
+/* Insights carousel controls — hidden at every breakpoint under this
+   preset because the layout is a grid at every viewport (matches the
+   deprecation note in the source featured-conferences.css). */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-controls {
+  display: none !important;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #FFFDFD;
+  cursor: pointer;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  padding: 0;
+  transition: opacity 0.2s ease;
+  width: 24px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-btn:disabled,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-btn[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-dots {
+  align-items: center;
+  display: flex;
+  gap: 26px;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-dot {
+  background: transparent;
+  border: 1px solid #FFFDFD;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 10px;
+  padding: 0;
+  text-indent: -9999px;
+  width: 10px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-dot:focus { outline: none; }
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-dot:focus-visible {
+  outline: 1px solid #FFC72C;
+  outline-offset: 4px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-dot.is-active {
+  background: #FFFDFD;
+  border-radius: 50px;
+  outline: 1px solid #FFC72C;
+  outline-offset: 4px;
+}
+
+/* CTA — "View all conference insights" pinned to bottom of the panel. */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-cta-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 32px 0 0 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-cta {
+  background-color: #0051A5;
+  border: none;
+  color: #FFFDFD;
+  display: inline-flex;
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 28px;
+  text-decoration: none;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insights-cta:hover {
+  color: #FFFDFD;
+  opacity: 0.92;
+  text-decoration: none;
+}
+
+/* ============ Insight card typography ============
+   Matches the live RBCCM story-card tile pattern. Values pulled from
+   the live computed styles so cards align visually with the rest of
+   the site (homepage tiles, GIB insights). */
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-label {
+  color: #006AC3 !important;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-title {
+  color: #000;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 25px;
+  margin: 15px 0 10px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-desc {
+  color: #555;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  margin: 0 0 20px 0;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight-meta {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 7px;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:hover .rbccm-tabbed-panels__insight-meta,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__insight:focus-visible .rbccm-tabbed-panels__insight-meta {
+  border-bottom-color: currentColor;
+}
+
+/* ============ Desktop overrides (>=992) ============ */
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-heading,
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-heading {
+    font-size: 28px;
+  }
+
+  /* Inner tabs row + panels-below via CSS Grid. 3 tabs across, panels
+     pin to row 2 and show only when their tab is active. */
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-wrap {
+    border-top: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    padding-top: 30px;
+    position: relative;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #FFC72C;
+    color: #FFFDFD;
+    font-family: "Roboto Light", "Roboto", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    justify-content: center;
+    padding: 18px 0;
+    position: relative;
+    text-align: center;
+    transition: font-weight 0.2s ease;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active::after {
+    background: #FFC72C;
+    bottom: -2px;
+    content: "";
+    height: 3px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active {
+    font-family: "Roboto Medium", "Roboto", Arial, sans-serif;
+    font-weight: 500;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-chevron {
+    display: none;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-panel {
+    border-bottom: none !important;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 40px 0 0 0;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active + .rbccm-tabbed-panels__inner-panel {
+    border-bottom: none;
+    display: none;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-panel.is-active {
+    display: block !important;
+  }
+
+  /* Overview row: video + info side-by-side at 50/50, body wraps below. */
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview {
+    align-items: flex-start;
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__video {
+    box-sizing: border-box;
+    flex: 0 0 calc(50% - 16px);
+    max-width: calc(50% - 16px);
+    min-width: 0;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info {
+    align-content: center;
+    align-items: start;
+    align-self: stretch;
+    aspect-ratio: 16 / 9;
+    box-sizing: border-box;
+    display: grid;
+    flex: 0 0 calc(50% - 16px);
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    justify-content: center;
+    max-width: calc(50% - 16px);
+    min-width: 0;
+    padding: 32px;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__info-item {
+    width: auto;
+  }
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-body {
+    flex-basis: 100%;
+    padding-top: 0;
+  }
+}
+
+/* ============ Font-family lockdown ============
+   Outer stylesheets on the RBCCM site apply font-family via broad
+   universal + bare-tag selectors. Pinning per-element with !important
+   locks our typography in. Scoped to the preset so nothing leaks
+   outside the conference-insights root. */
+.rbccm-tabbed-panels--conference-insights,
+.rbccm-tabbed-panels--conference-insights * {
+  font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
+}
+.rbccm-tabbed-panels--conference-insights h2,
+.rbccm-tabbed-panels--conference-insights h3,
+.rbccm-tabbed-panels--conference-insights h4,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__title,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__overview-heading,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__speakers-heading {
+  font-family: "RBCDisplay", Georgia, Times, serif !important;
+}
+/* Medium-weight bits. Active outer tab, inner tabs (Medium by default
+   on mobile), and body strong. On desktop the inactive inner tabs drop
+   back to Light — the media query rule below overrides. */
+.rbccm-tabbed-panels--conference-insights strong,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab.is-active,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__tab.is-active *,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab *,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active,
+.rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab.is-active * {
+  font-family: "Roboto Medium", "Roboto", Arial, sans-serif !important;
+}
+@media (min-width: 992px) {
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab:not(.is-active),
+  .rbccm-tabbed-panels--conference-insights .rbccm-tabbed-panels__inner-tab:not(.is-active) * {
+    font-family: "Roboto Light", "Roboto", Arial, sans-serif !important;
+  }
+}

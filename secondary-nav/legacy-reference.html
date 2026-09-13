@@ -1,0 +1,52 @@
+<!-- ============================================================
+     LEGACY — original production markup we're replacing.
+     Kept here as a reference for the jQuery active-state logic
+     and the container/prev/next scroll button layout so we can
+     port the behavior into the modern secondary-nav.
+     Do NOT ship this — the modern secondary-nav.html supersedes it.
+     ============================================================ -->
+<div class="mobile-scroll-nav" style="border-bottom: 3px solid #c0c0c0;">
+  <!-- Prev Button -->
+  <button class="nav-btn prev" aria-label="Scroll left">❮</button>
+
+  <!-- Scroll Container -->
+  <div class="container gib-nav-wrap scroll-container" style="overflow-x: auto;">
+    <ul id="gib-secondary-nav" class="nav nav-justified gib-nav2">
+      <li class=""><a href="/en/expertise/global-investment-banking/industry-coverage">Industry Coverage</a></li>
+      <li class=""><a href="/en/expertise/global-investment-banking/mergers-acquisitions">Mergers &amp; Acquisitions</a></li>
+      <li class=""><a href="/en/expertise/global-investment-banking/equity-capital-markets">Equity Capital Markets</a></li>
+      <li class=""><a href="/en/expertise/global-investment-banking/debt-capital-markets">Debt Capital Markets</a></li>
+      <li class=""><a href="/en/expertise/global-investment-banking/leveraged-finance">Leveraged Finance</a></li>
+    </ul>
+  </div>
+
+  <!-- Next Button -->
+  <button class="nav-btn next" aria-label="Scroll right">❯</button>
+</div>
+
+<script>
+  jQuery(document).ready(function ($) {
+
+    if (window.location.href.indexOf("industry-coverage") !== -1) {
+      $("#gib-secondary-nav li:contains('Coverage')").addClass("active");
+    } else if (window.location.href.indexOf("mergers-acquisitions") !== -1) {
+      $("#gib-secondary-nav li:contains('Mergers')").addClass("active");
+    } else if (window.location.href.indexOf("equity-capital-markets") !== -1) {
+      $("#gib-secondary-nav li:contains('Equity')").addClass("active");
+    } else if (window.location.href.indexOf("debt-capital-markets") !== -1) {
+      $("#gib-secondary-nav li:contains('Debt')").addClass("active");
+    } else if (window.location.href.indexOf("leveraged-finance") !== -1) {
+      $("#gib-secondary-nav li:contains('Leveraged')").addClass("active");
+    } else {
+      $("#gib-secondary-nav li").removeClass();
+    }
+
+    if ($("#gib-secondary-nav .active").length > 0) {
+      var sLeft = $("#gib-secondary-nav .active").position().left;
+      $(".gib-nav-wrap").scrollLeft(sLeft);
+    }
+
+  });
+</script>
+</content>
+</invoke>

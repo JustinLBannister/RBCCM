@@ -1,0 +1,400 @@
+/*
+ * Sleep Course Gravity Forms cards
+ *
+ * Paste into Divi > Theme Options > Custom CSS, or enqueue it from a child theme.
+ * Scoped to the two Divi Code modules that wrap forms 16 and 17.
+ */
+
+#self-guided,
+#email {
+  --sleep-course-lime: #c9ee4d;
+  --sleep-course-teal: #1d6e7f;
+  --sleep-course-body: #74727f;
+  --sleep-course-line: #d9d9d9;
+  --sleep-course-button: #10b7b1;
+  --sleep-course-white: #ffffff;
+
+  max-width: 760px;
+  margin: 0 auto 58px;
+  padding: 0 18px;
+  color: var(--sleep-course-body);
+  font-family: "Avenir Next", Montserrat, Arial, sans-serif;
+}
+
+#self-guided .et_pb_code_inner,
+#email .et_pb_code_inner {
+  width: 100%;
+}
+
+#self-guided .gform_wrapper,
+#email .gform_wrapper {
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 88px;
+  background: var(--sleep-course-white);
+  box-shadow: none;
+}
+
+#self-guided .gform_heading,
+#email .gform_heading {
+  display: block !important;
+  margin: 0;
+  padding: 42px 48px 34px;
+  background: var(--sleep-course-lime);
+  text-align: center;
+}
+
+#self-guided .gform_title,
+#email .gform_title {
+  display: block !important;
+  margin: 0;
+  color: #156875 !important;
+  font-family: "Texta Light", Helvetica, Arial, Lucida, sans-serif;
+  font-size: 56px;
+  font-weight: 300;
+  line-height: 0.9em;
+  letter-spacing: 0;
+  opacity: 1 !important;
+  text-transform: uppercase;
+  visibility: visible !important;
+}
+
+#self-guided .gform_description,
+#email .gform_description {
+  display: block !important;
+  margin: 0;
+  color: var(--sleep-course-teal);
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#self-guided .gform_required_legend,
+#email .gform_required_legend,
+#self-guided .gfield_required,
+#email .gfield_required {
+  display: none;
+}
+
+#self-guided .gfield_label,
+#email .gfield_label {
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#self-guided .gform-body,
+#email .gform-body,
+#self-guided .gform_fields,
+#email .gform_fields,
+#self-guided .gfield,
+#email .gfield,
+#self-guided .ginput_container,
+#email .ginput_container,
+#self-guided .gfield_radio,
+#email .gfield_radio {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+#self-guided fieldset,
+#email fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#self-guided .gchoice,
+#email .gchoice {
+  display: flex;
+  min-height: 112px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 26px 42px 24px;
+  border-top: 1px solid var(--sleep-course-line);
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 180ms ease;
+}
+
+#self-guided .gchoice:first-child,
+#email .gchoice:first-child {
+  border-top: 0;
+}
+
+#self-guided .gfield-choice-input,
+#email .gfield-choice-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#self-guided .gform-field-label--type-inline,
+#email .gform-field-label--type-inline {
+  display: flex;
+  min-height: 76px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  margin: 0;
+  color: #156875 !important;
+  cursor: pointer;
+  font-family: "Texta Light", Helvetica, Arial, Lucida, sans-serif;
+  font-size: 46px;
+  font-weight: 300;
+  line-height: 0.9em;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#self-guided .gchoice:hover,
+#email .gchoice:hover,
+#self-guided .gchoice.sleep-course-choice-selected,
+#email .gchoice.sleep-course-choice-selected {
+  background: rgba(16, 183, 177, 0.1);
+}
+
+#self-guided .gchoice.sleep-course-choice-selected .gform-field-label--type-inline,
+#email .gchoice.sleep-course-choice-selected .gform-field-label--type-inline {
+  color: #0f6978;
+}
+
+#self-guided .gchoice.sleep-course-choice-selected .sleep-course-choice-value,
+#email .gchoice.sleep-course-choice-selected .sleep-course-choice-value {
+  color: #4f505a;
+}
+
+#self-guided .sleep-course-choice-value,
+#email .sleep-course-choice-value {
+  display: block;
+  margin-top: 4px;
+  color: var(--sleep-course-body);
+  font-family: Helvetica, Arial, Lucida, sans-serif;
+  font-size: 34px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#self-guided .gfield-choice-input:focus-visible + label,
+#email .gfield-choice-input:focus-visible + label {
+  outline: 0;
+}
+
+#email .gfield--type-email {
+  box-sizing: border-box;
+  width: calc(100% - 48px);
+  max-width: 476.41px;
+  margin: 42px auto 34px;
+  padding: 0;
+}
+
+#email .gfield--type-email .ginput_container_email {
+  width: 100%;
+}
+
+#email .gfield--type-email input[type="email"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 86px;
+  margin: 0;
+  padding: 14px 30px;
+  border: 1px solid #b8bbc2;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: none;
+  color: var(--sleep-course-body);
+  font-family: Helvetica, Arial, Lucida, sans-serif;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+#email .gfield--type-email input[type="email"]:focus {
+  border-color: var(--sleep-course-button);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(16, 183, 177, 0.14);
+}
+
+#self-guided .gform_wrapper.gravity-theme .gform_footer,
+#self-guided .gform_wrapper.gravity-theme .gform_page_footer,
+#email .gform_wrapper.gravity-theme .gform_footer,
+#email .gform_wrapper.gravity-theme .gform_page_footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 0;
+  padding: 16px 0 25px;
+}
+
+#self-guided .gform_button.button,
+#email .gform_button.button {
+  box-sizing: border-box;
+  width: auto;
+  min-height: 86px;
+  margin: 0;
+  padding: 14px 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sleep-course-button);
+  box-shadow: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+#self-guided .gform_button.button:hover,
+#email .gform_button.button:hover,
+#self-guided .gform_button.button:focus-visible,
+#email .gform_button.button:focus-visible {
+  background: #0aa9a4;
+  color: #ffffff;
+}
+
+#self-guided .gform_button.button:focus-visible,
+#email .gform_button.button:focus-visible {
+  outline: 0;
+}
+
+#self-guided .gform_validation_errors,
+#email .gform_validation_errors {
+  margin: 0 0 20px;
+  border-radius: 20px;
+}
+
+#self-guided .gfield_validation_message,
+#email .gfield_validation_message {
+  margin: 18px 42px 0;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  #self-guided,
+  #email {
+    margin-bottom: 48px;
+    padding: 0 16px;
+  }
+
+  #self-guided .gform_wrapper,
+  #email .gform_wrapper {
+    border-radius: 64px;
+  }
+
+  #self-guided .gform_heading,
+  #email .gform_heading {
+    padding: 34px 24px 28px;
+  }
+
+  #self-guided .gform_title,
+  #email .gform_title {
+    font-size: 40px;
+  }
+
+  #self-guided .gform_description,
+  #email .gform_description {
+    font-size: 17px;
+  }
+
+  #self-guided .gchoice,
+  #email .gchoice {
+    min-height: 98px;
+    padding: 22px 24px;
+  }
+
+  #self-guided .gform-field-label--type-inline,
+  #email .gform-field-label--type-inline {
+    font-size: 33px;
+  }
+
+  #self-guided .sleep-course-choice-value,
+  #email .sleep-course-choice-value {
+    font-size: 27px;
+  }
+
+  #self-guided .gform_wrapper.gravity-theme .gform_footer,
+  #self-guided .gform_wrapper.gravity-theme .gform_page_footer,
+  #email .gform_wrapper.gravity-theme .gform_footer,
+  #email .gform_wrapper.gravity-theme .gform_page_footer {
+    padding: 16px 0 25px !important;
+  }
+
+  #email .gfield--type-email {
+    margin: 42px auto 10px !important;
+  }
+
+  #email .gfield--type-email input[type="email"] {
+    min-height: 66px !important;
+    padding: 5px 20px !important;
+    font-size: 24px !important;
+  }
+
+  #self-guided .gform_button.button,
+  #email .gform_button.button {
+    min-height: 66px !important;
+    margin: 0 !important;
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  #self-guided .gform_wrapper,
+  #email .gform_wrapper {
+    border-radius: 44px;
+  }
+
+  #self-guided .gform_heading,
+  #email .gform_heading {
+    padding: 30px 20px 24px;
+  }
+
+  #self-guided .gform_title,
+  #email .gform_title {
+    font-size: 31px;
+  }
+
+  #self-guided .gform_description,
+  #email .gform_description {
+    font-size: 16px;
+  }
+
+  #self-guided .gform-field-label--type-inline,
+  #email .gform-field-label--type-inline {
+    font-size: 28px;
+  }
+
+  #self-guided .sleep-course-choice-value,
+  #email .sleep-course-choice-value {
+    font-size: 22px;
+  }
+
+  #self-guided .gform_button.button,
+  #email .gform_button.button {
+    min-height: 66px !important;
+    margin: 0 !important;
+    font-size: 24px !important;
+  }
+}

@@ -12,6 +12,43 @@
   var lmScroll = 0;
 
   /* ------------------------------------------------------------------ */
+  /*  User-facing strings (i18n hook)                                    */
+  /*                                                                     */
+  /*  Single source of truth for every visible string the filter         */
+  /*  produces at runtime. When the XSL component lands these will be    */
+  /*  sourced from Datums (Locale + per-string overrides) following the  */
+  /*  same pattern as the leadership carousel.                           */
+  /*                                                                     */
+  /*  Use fmt(template, vars) to substitute {placeholders}.              */
+  /* ------------------------------------------------------------------ */
+  var STRINGS = {
+    yearBtnDefault:        'Year',
+    typeBtnDefault:        'Transaction type',
+    allYears:              'All years',
+    allTypes:              'All types',
+    yearTagPrefix:         'Year: ',
+    typeTagPrefix:         'Transaction type: ',
+    amountTagPrefix:       'Amount: ',
+    activeFiltersLabel:    'Active filters:',
+    tagSeparator:          'and',
+    noDealsMatching:       'No deals matching filters',
+    dealCount:             '{n} Deal{plural}',
+    pageInfo:              '{from}–{to} of {total} deals',
+    pageBtnLabel:          'Page {n}',
+    pagePrevLabel:         'Previous page',
+    pageNextLabel:         'Next page',
+    removeFilterLabel:     'Remove {label} filter',
+    showingMostRecent:     'Showing 6 most recent deals',
+    showingForYear:        'Showing {count} deal{plural} from {year}'
+  };
+
+  function fmt(template, vars) {
+    return String(template).replace(/\{(\w+)\}/g, function (_, k) {
+      return (vars && vars[k] != null) ? vars[k] : '';
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   /*  Transaction Type taxonomy                                          */
   /*                                                                     */
   /*  Maps every raw <type> value from the deals feed onto one of the    */
@@ -623,7 +660,7 @@
             filterKoTilesByYear(self.activeYear());
           }
 
-          var filterBar = document.getElementById('yf-filter-bar');
+          var filterBar = document.getElementById('rbccm-deal-filter');
           if (filterBar) {
             var offset = $(filterBar).offset().top - 80;
             $(window).scrollTop(offset);
@@ -643,7 +680,7 @@
       if (self._filterBarInitialized) return;
       self._filterBarInitialized = true;
 
-      var filterBar = document.getElementById('yf-filter-bar');
+      var filterBar = document.getElementById('rbccm-deal-filter');
       if (!filterBar) return;
 
       if (!self._initialSnapshot.length) {
@@ -662,90 +699,12 @@
         return; // bail out early, will re-run once data arrives
       }
 
-      if (!document.getElementById('yf-filter-bar-styles')) {
-        var baseStyle = document.createElement('style');
-        baseStyle.id = 'yf-filter-bar-styles';
-        baseStyle.textContent = [
-          '#yf-filter-bar.container{margin-left:15px;margin-right:15px;}',
-          '@media (min-width:768px){#yf-filter-bar.container{margin-left:auto;margin-right:auto;max-width:720px;}}',
-          '@media (min-width:992px){#yf-filter-bar.container{max-width:940px;}}',
-          '@media (min-width:1200px){#yf-filter-bar.container{max-width:1140px;}}',
-          '@media (max-width:1199px){#yf-filter-bar.container.is-sticky{padding: 0 15px !important;}}'
-        ].join('');
-        document.head.appendChild(baseStyle);
-      }
-
-      var existingStyles = document.getElementById('yf-x-css');
-      if (existingStyles) {
-        existingStyles.remove();
-      }
-
-      var style = document.createElement('style');
-      style.id = 'yf-x-css';
-      style.textContent = [
-        '#yf-filter-bar .container{display:flex;align-items:center;flex-wrap:wrap;gap:0px !important;justify-content:flex-start;max-width: 1140px;}',
-        '#yf-filter-bar .container.is-sticky{padding: 0px !important; gap: 0 !important;}',
-        '@media (max-width:1199px){#yf-filter-bar.container.is-sticky{padding: 0 15px !important;}}',
-        '#yf-x-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:flex-start;padding:0;box-sizing:border-box;max-width:1164px;margin:0;width:auto; margin: 15px 10px 15px 0;}',
-        '#yf-x-filter-lbl{font-size:13px;font-weight:700;color:#333;white-space:nowrap;margin-right:2px;}',
-        '#yf-x-year-wrap,#yf-x-type-wrap{position:relative;display:inline-block;vertical-align:middle;}',
-        '#yf-x-year-btn,#yf-x-type-btn{display:inline-flex;align-items:center;padding:7px 12px;border:1px solid #0051A5;border-radius:4px;background:#fff;color:#0051A5;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;justify-content:space-between;gap:6px;}',
-        '#yf-x-year-btn{min-width:110px;}',
-        '#yf-x-type-btn{min-width:140px;}',
-        '#yf-x-year-btn:hover,#yf-x-type-btn:hover{background:#f0f6ff;}',
-        '#yf-x-year-btn .arrow,#yf-x-type-btn .arrow{font-size:10px;transition:transform .2s;}',
-        '#yf-x-year-lb,#yf-x-type-lb{display:none;position:absolute;left:0;top:calc(100% + 4px);background:#fff;border:1px solid #d3d3d3;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:700;max-height:280px;overflow-y:auto;padding:4px 0;margin:0;list-style:none;}',
-        '#yf-x-year-lb{min-width:180px;}',
-        '#yf-x-type-lb{min-width:240px;}',
-        '#yf-x-year-lb li,#yf-x-type-lb li{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;cursor:pointer;font-size:13px;color:#333;}',
-        '#yf-x-year-lb li[data-value=""],#yf-x-type-lb li[data-value=""]{display:none!important;}',
-        '#yf-x-year-lb li:hover,#yf-x-type-lb li:hover{background:#f0f6ff;}',
-        '#yf-x-year-lb li.active,#yf-x-type-lb li.active{background:#e8f0fb;color:#0051A5;font-weight:600;}',
-        '.ycnt,.tcnt{display:none!important;}',
-        '#yf-x-count{display:none;font-size:12px;color:#666;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;}',
-        '#yf-x-amt-wrap{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;display:none;}',
-        '#yf-x-amt-lbl{font-size:13px;font-weight:600;color:#333;white-space:nowrap;}',
-        '#yf-x-rng-wrap{position:relative;display:inline-block;width:160px;height:28px;}',
-        '#yf-x-rng-wrap input[type=range]{-webkit-appearance:none;appearance:none;position:absolute;width:100%;height:4px;background:transparent;outline:none;pointer-events:none;top:50%;transform:translateY(-50%);}',
-        '#yf-x-rng-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#0051A5;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;pointer-events:all;}',
-        '#yf-x-track{position:absolute;width:100%;height:4px;background:#d3d3d3;border-radius:2px;top:50%;transform:translateY(-50%);}',
-        '#yf-x-fill{position:absolute;height:4px;background:#0051A5;border-radius:2px;top:50%;transform:translateY(-50%);}',
-        '#yf-x-amt-v{font-size:12px;color:#555;font-weight:600;white-space:nowrap;min-width:110px;}',
-        '#yf-x-amt-clr{display:none;background:none;border:none;cursor:pointer;color:#0051A5;font-size:15px;padding:0;line-height:1;}',
-        '#yf-x-tags{max-width:1132px;display:none;font-size:12px;text-align:left;box-sizing:border-box;margin: 15px 0 15px 0;}',
-        '.yf-x-tag{display:inline-flex;align-items:center;gap:3px;background:#e8f0fb;color:#0051A5;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:5px;}',
-        '.yf-x-tag button{background:none;border:none;cursor:pointer;color:#0051A5;font-size:14px;line-height:1;padding:0 0 0 3px;}',
-        '#yf-x-pagination{display:none;text-align:center;padding:28px 0 12px;width:100%;clear:both;}',
-        '#yf-x-pagination button{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 10px;margin:0 3px;border:1px solid #d3d3d3;border-radius:4px;background:#fff;color:#333;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s;vertical-align:middle;}',
-        '#yf-x-pagination button:hover{background:#f0f6ff;border-color:#0051A5;color:#0051A5;}',
-        '#yf-x-pagination button.pg-active{background:#0051A5;border-color:#0051A5;color:#fff;}',
-        '#yf-x-pagination button:disabled{opacity:.35;cursor:default;pointer-events:none;}',
-        '#load-more{position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;}',
-        '#yf-x-pg-info{display:none;font-size:12px;color:#666;margin-left:14px;vertical-align:middle;}',
-        '.yf-x-tag-or{display:inline-flex;align-items:center;font-size:12px;color:#777;margin-right:4px;}'
-      ].join('');
-      document.head.appendChild(style);
-
-      filterBar.classList.add('container');
-      filterBar.style.cssText = 'background:#fff;border:1px solid #d3d3d3;margin-bottom:20px;padding:5px 0;';
-
-      var dropWrap = document.getElementById('yf-drop-wrap');
-      var yearLabel = filterBar.querySelector('label');
-      var clearButton = document.getElementById('yf-clear-btn');
-      var badge = document.getElementById('yf-count-badge');
-
-      if (dropWrap) dropWrap.style.display = 'none';
-      if (yearLabel) yearLabel.style.display = 'none';
-      if (clearButton) clearButton.style.display = 'none';
-      if (badge) badge.style.display = 'none';
-
-      var inner = filterBar.firstElementChild;
+      /* Styles now live in deal-filter.css. Markup now lives in the
+         host page / XSL component. JS no longer constructs DOM or
+         injects <style> blocks — it just queries the static markup
+         and attaches behaviour. */
+      var inner = filterBar.querySelector('.rbccm-deal-filter__inner');
       if (!inner) return;
-
-      ['yf-x-row', 'yf-x-tags', 'yf-x-pagination'].forEach(function (id) {
-        var existing = document.getElementById(id);
-        if (existing) existing.remove();
-      });
 
       var activeFilterYear = null;
       var activeType = null;
@@ -834,136 +793,79 @@
       var AMT_MAX = range.max;
       var AMT_STEP = range.step;
 
-      var row = document.createElement('div');
-      row.id = 'yf-x-row';
+      /* ── Element queries (static markup, no construction) ──
+         All elements live in the host page (or XSL component output).
+         The IDs/classes match the rbccm-deal-filter BEM block. */
+      var row          = filterBar.querySelector('.rbccm-deal-filter__row');
+      var yearWrap     = filterBar.querySelector('.rbccm-deal-filter__dropdown--year');
+      var yearButton   = document.getElementById('rbccm-deal-filter-year-btn');
+      var yearBtnLabel = document.getElementById('rbccm-deal-filter-year-btn-label');
+      var yearList     = document.getElementById('rbccm-deal-filter-year-list');
+      var typeWrap     = filterBar.querySelector('.rbccm-deal-filter__dropdown--type');
+      var typeButton   = document.getElementById('rbccm-deal-filter-type-btn');
+      var typeBtnLabel = document.getElementById('rbccm-deal-filter-type-btn-label');
+      var typeList     = document.getElementById('rbccm-deal-filter-type-list');
+      var minSlider    = document.getElementById('rbccm-deal-filter-amount-min');
+      var maxSlider    = document.getElementById('rbccm-deal-filter-amount-max');
+      var fill         = filterBar.querySelector('.rbccm-deal-filter__amount-fill');
+      var amountValue  = filterBar.querySelector('.rbccm-deal-filter__amount-value');
+      var amountClear  = filterBar.querySelector('.rbccm-deal-filter__amount-clear');
+      var count        = document.getElementById('rbccm-deal-filter-count');
+      var tagsRow      = document.getElementById('rbccm-deal-filter-tags');
+      var pagination   = document.getElementById('rbccm-deal-filter-pagination');
 
-      var filterLabel = document.createElement('span');
-      filterLabel.id = 'yf-x-filter-lbl';
-      filterLabel.textContent = 'Filter by:';
-      row.appendChild(filterLabel);
+      /* Initialise slider attrs from the computed range. The static
+         markup ships generic min/max — JS sets the real values from
+         the data feed. */
+      if (minSlider) {
+        minSlider.min = AMT_MIN; minSlider.max = AMT_MAX;
+        minSlider.step = AMT_STEP; minSlider.value = AMT_MIN;
+      }
+      if (maxSlider) {
+        maxSlider.min = AMT_MIN; maxSlider.max = AMT_MAX;
+        maxSlider.step = AMT_STEP; maxSlider.value = AMT_MAX;
+      }
 
-      var yearWrap = document.createElement('div');
-      yearWrap.id = 'yf-x-year-wrap';
+      /* If pagination element wasn't placed by the host page, drop it
+         after the KO container as the original behaviour did. */
+      if (pagination && !pagination.parentNode) {
+        var koContainer = getKoContainer();
+        if (koContainer && koContainer.parentNode) {
+          koContainer.parentNode.insertBefore(pagination, koContainer.nextSibling);
+        }
+      }
 
-      var yearButton = document.createElement('button');
-      yearButton.id = 'yf-x-year-btn';
-      yearButton.type = 'button';
-      yearButton.innerHTML = 'Year <span class="arrow">&#9660;</span>';
+      function makeOption(value, count, isActive, optionIdPrefix) {
+        var li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        li.setAttribute('data-value', value);
+        li.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        li.className = 'rbccm-deal-filter__dropdown-item' +
+                       (isActive ? ' rbccm-deal-filter__dropdown-item--active' : '');
+        li.id = optionIdPrefix + '-' + value.toString().toLowerCase().replace(/\s+/g, '-');
 
-      var yearList = document.createElement('ul');
-      yearList.id = 'yf-x-year-lb';
-      yearList.innerHTML = '<li data-value=""><span style="font-style:italic;color:#555;">All years</span></li>';
+        var label = document.createElement('span');
+        label.textContent = value;
 
-      yearWrap.appendChild(yearButton);
-      yearWrap.appendChild(yearList);
-      row.appendChild(yearWrap);
+        var countEl = document.createElement('span');
+        countEl.className = 'rbccm-deal-filter__dropdown-item-count';
+        countEl.textContent = count;
 
-      var typeWrap = document.createElement('div');
-      typeWrap.id = 'yf-x-type-wrap';
-
-      var typeButton = document.createElement('button');
-      typeButton.id = 'yf-x-type-btn';
-      typeButton.type = 'button';
-      typeButton.innerHTML = 'Transaction type <span class="arrow">&#9660;</span>';
-
-      var typeList = document.createElement('ul');
-      typeList.id = 'yf-x-type-lb';
-      typeList.innerHTML = '<li data-value=""><span style="font-style:italic;color:#555;">All types</span></li>';
-
-      typeWrap.appendChild(typeButton);
-      typeWrap.appendChild(typeList);
-      row.appendChild(typeWrap);
-
-      var amountWrap = document.createElement('div');
-      amountWrap.id = 'yf-x-amt-wrap';
-
-      var amountLabel = document.createElement('span');
-      amountLabel.id = 'yf-x-amt-lbl';
-      amountLabel.textContent = 'Amount:';
-      amountWrap.appendChild(amountLabel);
-
-      var rangeWrap = document.createElement('div');
-      rangeWrap.id = 'yf-x-rng-wrap';
-
-      var track = document.createElement('div');
-      track.id = 'yf-x-track';
-
-      var fill = document.createElement('div');
-      fill.id = 'yf-x-fill';
-
-      var minSlider = document.createElement('input');
-      minSlider.type = 'range';
-      minSlider.id = 'yf-x-smin';
-      minSlider.min = AMT_MIN;
-      minSlider.max = AMT_MAX;
-      minSlider.step = AMT_STEP;
-      minSlider.value = AMT_MIN;
-
-      var maxSlider = document.createElement('input');
-      maxSlider.type = 'range';
-      maxSlider.id = 'yf-x-smax';
-      maxSlider.min = AMT_MIN;
-      maxSlider.max = AMT_MAX;
-      maxSlider.step = AMT_STEP;
-      maxSlider.value = AMT_MAX;
-
-      rangeWrap.appendChild(track);
-      rangeWrap.appendChild(fill);
-      rangeWrap.appendChild(minSlider);
-      rangeWrap.appendChild(maxSlider);
-      amountWrap.appendChild(rangeWrap);
-
-      var amountValue = document.createElement('span');
-      amountValue.id = 'yf-x-amt-v';
-      amountWrap.appendChild(amountValue);
-
-      var amountClear = document.createElement('button');
-      amountClear.id = 'yf-x-amt-clr';
-      amountClear.type = 'button';
-      amountClear.textContent = '✕';
-      amountClear.title = 'Clear amount filter';
-      amountWrap.appendChild(amountClear);
-
-      row.appendChild(amountWrap);
-
-      var count = document.createElement('span');
-      count.id = 'yf-x-count';
-      row.appendChild(count);
-
-      inner.appendChild(row);
-
-      var tagsRow = document.createElement('div');
-      tagsRow.id = 'yf-x-tags';
-      inner.appendChild(tagsRow);
-
-      var pagination = document.createElement('div');
-      pagination.id = 'yf-x-pagination';
-
-      var koContainer = getKoContainer();
-      if (koContainer && koContainer.parentNode) {
-        koContainer.parentNode.insertBefore(pagination, koContainer.nextSibling);
+        li.appendChild(label);
+        li.appendChild(countEl);
+        return li;
       }
 
       function rebuildYearList() {
         while (yearList.children.length > 1) {
           yearList.removeChild(yearList.lastChild);
         }
-
         getYearOptions().forEach(function (option) {
-          var li = document.createElement('li');
-          li.setAttribute('data-value', option.value);
-          li.className = activeFilterYear === option.value ? 'active' : '';
-
-          var label = document.createElement('span');
-          label.textContent = option.value;
-
-          var countEl = document.createElement('span');
-          countEl.className = 'ycnt';
-          countEl.textContent = option.count;
-
-          li.appendChild(label);
-          li.appendChild(countEl);
-          yearList.appendChild(li);
+          yearList.appendChild(makeOption(
+            option.value, option.count,
+            activeFilterYear === option.value,
+            'rbccm-deal-filter-year-opt'
+          ));
         });
       }
 
@@ -971,22 +873,12 @@
         while (typeList.children.length > 1) {
           typeList.removeChild(typeList.lastChild);
         }
-
         getTypeOptions().forEach(function (option) {
-          var li = document.createElement('li');
-          li.setAttribute('data-value', option.value);
-          li.className = activeType === option.value ? 'active' : '';
-
-          var label = document.createElement('span');
-          label.textContent = option.value;
-
-          var countEl = document.createElement('span');
-          countEl.className = 'tcnt';
-          countEl.textContent = option.count;
-
-          li.appendChild(label);
-          li.appendChild(countEl);
-          typeList.appendChild(li);
+          typeList.appendChild(makeOption(
+            option.value, option.count,
+            activeType === option.value,
+            'rbccm-deal-filter-type-opt'
+          ));
         });
       }
 
@@ -1013,8 +905,8 @@
           hasTags = true;
 
           var label = document.createElement('span');
-          label.style.cssText = 'color:#777;margin-right:4px;font-size:12px;';
-          label.textContent = 'Active filters:';
+          label.className = 'rbccm-deal-filter__tags-label';
+          label.textContent = STRINGS.activeFiltersLabel;
           tagsRow.appendChild(label);
         }
 
@@ -1022,12 +914,14 @@
           addLabel();
 
           var tag = document.createElement('span');
-          tag.className = 'yf-x-tag';
+          tag.className = 'rbccm-deal-filter__tag';
           tag.textContent = text + ' ';
 
           var clear = document.createElement('button');
           clear.type = 'button';
-          clear.textContent = '×';
+          clear.className = 'rbccm-deal-filter__tag-remove';
+          clear.textContent = '×'; // ×
+          clear.setAttribute('aria-label', fmt(STRINGS.removeFilterLabel, { label: text }));
           clear.onclick = onClear;
 
           tag.appendChild(clear);
@@ -1053,13 +947,13 @@
         var activeTags = [];
 
         if (activeFilterYear) {
-          activeTags.push({ text: 'Year: ' + activeFilterYear, onClear: function () {
+          activeTags.push({ text: STRINGS.yearTagPrefix + activeFilterYear, onClear: function () {
             activeFilterYear = null;
-            yearButton.innerHTML = 'Year <span class="arrow">&#9660;</span>';
+            yearBtnLabel.textContent = STRINGS.yearBtnDefault;
             applyFilters();
-            var bar = document.getElementById('yf-filter-bar');
+            var bar = document.getElementById('rbccm-deal-filter');
             if (bar) {
-              if (bar.classList.contains('sticky')) {
+              if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                   var ko = document.querySelector('.insights-stories.ko');
                   if (ko) {
                       window.scrollTo({
@@ -1078,13 +972,13 @@
         }
 
         if (activeType) {
-          activeTags.push({ text: 'Transaction type: ' + activeType, onClear: function () {
+          activeTags.push({ text: STRINGS.typeTagPrefix + activeType, onClear: function () {
             activeType = null;
-            typeButton.innerHTML = 'Transaction type <span class="arrow">&#9660;</span>';
+            typeBtnLabel.textContent = STRINGS.typeBtnDefault;
             applyFilters();
-            var bar = document.getElementById('yf-filter-bar');
+            var bar = document.getElementById('rbccm-deal-filter');
             if (bar) {
-              if (bar.classList.contains('sticky')) {
+              if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                   var ko = document.querySelector('.insights-stories.ko');
                   if (ko) {
                       window.scrollTo({
@@ -1106,8 +1000,8 @@
           if (index > 0) {
             addLabel();
             var or = document.createElement('span');
-            or.className = 'yf-x-tag-or';
-            or.textContent = 'and';
+            or.className = 'rbccm-deal-filter__tag-separator';
+            or.textContent = STRINGS.tagSeparator;
             tagsRow.appendChild(or);
           }
           addTag(tagDef.text, tagDef.onClear);
@@ -1118,15 +1012,15 @@
 
         if (min > AMT_MIN || max < AMT_MAX) {
           addTag(
-            'Amount: ' + formatAmount(min) + ' – ' + (max >= AMT_MAX ? formatAmount(max) + '+' : formatAmount(max)),
+            STRINGS.amountTagPrefix + formatAmount(min) + ' – ' + (max >= AMT_MAX ? formatAmount(max) + '+' : formatAmount(max)),
             function () {
               minSlider.value = AMT_MIN;
               maxSlider.value = AMT_MAX;
               updateFill();
               applyFilters();
-              var bar = document.getElementById('yf-filter-bar');
+              var bar = document.getElementById('rbccm-deal-filter');
               if (bar) {
-                if (bar.classList.contains('sticky')) {
+                if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                     var ko = document.querySelector('.insights-stories.ko');
                     if (ko) {
                         window.scrollTo({
@@ -1145,7 +1039,7 @@
           );
         }
 
-        tagsRow.style.display = hasTags ? 'block' : 'none';
+        tagsRow.classList.toggle('is-visible', hasTags);
       }
 
       function showPage(page) {
@@ -1162,17 +1056,20 @@
 
         var pages = Math.ceil(total / PAGE_SIZE);
         if (pages <= 1) {
-          pagination.style.display = 'none';
+          pagination.classList.remove('is-visible');
           return;
         }
 
-        pagination.style.display = 'block';
+        pagination.classList.add('is-visible');
 
-        function makeButton(label, target, isActive, disabled) {
+        function makeButton(label, target, isActive, disabled, ariaLabel) {
           var button = document.createElement('button');
+          button.type = 'button';
           button.innerHTML = label;
-
-          if (isActive) button.classList.add('pg-active');
+          button.className = 'rbccm-deal-filter__page-btn' +
+                             (isActive ? ' rbccm-deal-filter__page-btn--active' : '');
+          if (isActive) button.setAttribute('aria-current', 'page');
+          if (ariaLabel) button.setAttribute('aria-label', ariaLabel);
           if (disabled) button.disabled = true;
 
           button.addEventListener('click', function (event) {
@@ -1183,9 +1080,9 @@
             showPage(currentPage);
             renderPagination(total, currentPage);
 
-            var bar = document.getElementById('yf-filter-bar');
+            var bar = document.getElementById('rbccm-deal-filter');
             if (bar) {
-                if (bar.classList.contains('sticky')) {
+                if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                     var ko = document.querySelector('.insights-stories.ko');
                     if (ko) {
                         window.scrollTo({
@@ -1205,7 +1102,7 @@
           return button;
         }
 
-        pagination.appendChild(makeButton('&#8592;', page - 1, false, page === 1));
+        pagination.appendChild(makeButton('&#8592;', page - 1, false, page === 1, STRINGS.pagePrevLabel));
 
         var numbers = [];
         var i;
@@ -1235,20 +1132,27 @@
         numbers.forEach(function (value) {
           if (value === '…') {
             var ellipsis = document.createElement('span');
+            ellipsis.className = 'rbccm-deal-filter__page-ellipsis';
+            ellipsis.setAttribute('aria-hidden', 'true');
             ellipsis.textContent = '…';
-            ellipsis.style.cssText = 'display:inline-block;padding:0 6px;line-height:36px;color:#999;font-size:13px;vertical-align:middle;';
             pagination.appendChild(ellipsis);
             return;
           }
-
-          pagination.appendChild(makeButton(value, value, value === page, false));
+          pagination.appendChild(makeButton(
+            value, value, value === page, false,
+            fmt(STRINGS.pageBtnLabel, { n: value })
+          ));
         });
 
-        pagination.appendChild(makeButton('&#8594;', page + 1, false, page === pages));
+        pagination.appendChild(makeButton('&#8594;', page + 1, false, page === pages, STRINGS.pageNextLabel));
 
         var info = document.createElement('span');
-        info.id = 'yf-x-pg-info';
-        info.textContent = ((page - 1) * PAGE_SIZE + 1) + '–' + Math.min(page * PAGE_SIZE, total) + ' of ' + total + ' deals';
+        info.className = 'rbccm-deal-filter__page-info';
+        info.textContent = fmt(STRINGS.pageInfo, {
+          from:  (page - 1) * PAGE_SIZE + 1,
+          to:    Math.min(page * PAGE_SIZE, total),
+          total: total
+        });
         pagination.appendChild(info);
       }
 
@@ -1272,8 +1176,9 @@
           if (koListContainer) koListContainer.style.display = 'none';
           if (loadMore) loadMore.style.removeProperty('display');
 
-          pagination.style.display = 'none';
-          count.style.display = 'none';
+          pagination.classList.remove('is-visible');
+          count.classList.remove('rbccm-deal-filter__count--empty');
+          count.textContent = '';
           updateTags();
           return;
         }
@@ -1363,11 +1268,15 @@
           showPage(1);
           renderPagination(matchedTiles.length, 1);
           if (matchedTiles.length === 0) {
-            count.textContent = 'No deals matching filters';
-            count.style.cssText = 'display:block;font-size:12px;color:#c00;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
+            count.textContent = STRINGS.noDealsMatching;
+            count.classList.add('rbccm-deal-filter__count--empty');
           } else {
-            count.textContent = matchedTiles.length + ' Deal' + (matchedTiles.length !== 1 ? 's' : '');
-            count.style.cssText = 'display:none;font-size:12px;color:#666;margin-left:auto;white-space:nowrap;padding-right:5px;text-align:left;margin:0;';
+            // Visible count text used by SR; CSS hides it visually unless empty.
+            count.textContent = fmt(STRINGS.dealCount, {
+              n: matchedTiles.length,
+              plural: matchedTiles.length !== 1 ? 's' : ''
+            });
+            count.classList.remove('rbccm-deal-filter__count--empty');
           }
           stripKoMarginTop();
           updateTags();
@@ -1375,26 +1284,22 @@
       }
 
       function openDropdown(list, button) {
-        list.style.display = 'block';
-        var arrow = button.querySelector('.arrow');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
+        list.classList.add('is-open');
+        button.setAttribute('aria-expanded', 'true');
       }
-
       function closeDropdown(list, button) {
-        list.style.display = 'none';
-        var arrow = button.querySelector('.arrow');
-        if (arrow) arrow.style.transform = '';
+        list.classList.remove('is-open');
+        button.setAttribute('aria-expanded', 'false');
+      }
+      function isDropdownOpen(list) {
+        return list.classList.contains('is-open');
       }
 
       yearButton.addEventListener('click', function (event) {
         event.stopPropagation();
         rebuildYearList();
-
-        if (yearList.style.display === 'none' || !yearList.style.display) {
-          openDropdown(yearList, yearButton);
-        } else {
-          closeDropdown(yearList, yearButton);
-        }
+        if (isDropdownOpen(yearList)) closeDropdown(yearList, yearButton);
+        else                          openDropdown(yearList, yearButton);
       });
 
       yearList.addEventListener('click', function (event) {
@@ -1404,17 +1309,17 @@
         var value = item.getAttribute('data-value') || null;
         activeFilterYear = value || null;
 
-        yearButton.innerHTML = (value
-          ? '<span style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;">' + value + '</span>'
-          : 'Year') + ' <span class="arrow">&#9660;</span>';
+        // Update the visible label text only — the arrow span stays in
+        // the markup permanently and is purely cosmetic.
+        yearBtnLabel.textContent = value || STRINGS.yearBtnDefault;
 
         closeDropdown(yearList, yearButton);
         applyFilters();
         // var storiesEl = document.querySelector('.insights-stories');
         // if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        var bar = document.getElementById('yf-filter-bar');
+        var bar = document.getElementById('rbccm-deal-filter');
         if (bar) {
-              if (bar.classList.contains('sticky')) {
+              if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                   var ko = document.querySelector('.insights-stories.ko');
                   if (ko) {
                       window.scrollTo({
@@ -1434,12 +1339,8 @@
       typeButton.addEventListener('click', function (event) {
         event.stopPropagation();
         rebuildTypeList();
-
-        if (typeList.style.display === 'none' || !typeList.style.display) {
-          openDropdown(typeList, typeButton);
-        } else {
-          closeDropdown(typeList, typeButton);
-        }
+        if (isDropdownOpen(typeList)) closeDropdown(typeList, typeButton);
+        else                          openDropdown(typeList, typeButton);
       });
 
       typeList.addEventListener('click', function (event) {
@@ -1448,18 +1349,15 @@
 
         var value = item.getAttribute('data-value') || null;
         activeType = value || null;
-
-        typeButton.innerHTML = (value
-          ? '<span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;">' + value + '</span>'
-          : 'Transaction type') + ' <span class="arrow">&#9660;</span>';
+        typeBtnLabel.textContent = value || STRINGS.typeBtnDefault;
 
         closeDropdown(typeList, typeButton);
         applyFilters();
         // var storiesEl = document.querySelector('.insights-stories');
         // if (storiesEl) { storiesEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        var bar = document.getElementById('yf-filter-bar');
+        var bar = document.getElementById('rbccm-deal-filter');
         if (bar) {
-              if (bar.classList.contains('sticky')) {
+              if (bar.classList.contains('rbccm-deal-filter--sticky')) {
                   var ko = document.querySelector('.insights-stories.ko');
                   if (ko) {
                       window.scrollTo({
@@ -1489,6 +1387,99 @@
         },
         true
       );
+
+      /* ─────────────────────────────────────────────────────────
+         Keyboard navigation for the two listbox dropdowns.
+         Implements the WAI-ARIA listbox pattern:
+           ArrowDown / ArrowUp → move highlight, scroll into view
+           Home / End          → first / last option
+           Enter / Space       → select current option
+           Escape              → close + return focus to button
+         Highlight is tracked via aria-activedescendant on the
+         listbox and an .is-keyboard-focused class on the option.
+         ───────────────────────────────────────────────────────── */
+      function getOptions(list) {
+        return Array.prototype.filter.call(
+          list.querySelectorAll('[role="option"]'),
+          function (li) { return li.getAttribute('data-value') !== ''; }
+        );
+      }
+
+      function highlightOption(list, idx) {
+        var options = getOptions(list);
+        if (!options.length) return;
+        idx = ((idx % options.length) + options.length) % options.length;
+        options.forEach(function (li) { li.classList.remove('is-keyboard-focused'); });
+        var target = options[idx];
+        target.classList.add('is-keyboard-focused');
+        list.setAttribute('aria-activedescendant', target.id);
+        target.scrollIntoView({ block: 'nearest' });
+      }
+
+      function currentHighlightIdx(list) {
+        var options = getOptions(list);
+        for (var i = 0; i < options.length; i++) {
+          if (options[i].classList.contains('is-keyboard-focused')) return i;
+        }
+        return -1;
+      }
+
+      function bindKeyboardNav(button, list, rebuildFn) {
+        function ensureOpen() {
+          if (!isDropdownOpen(list)) {
+            rebuildFn();
+            openDropdown(list, button);
+          }
+        }
+
+        button.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            ensureOpen();
+            var idx = event.key === 'ArrowDown' ? 0 : getOptions(list).length - 1;
+            highlightOption(list, idx);
+            list.focus();
+          } else if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (isDropdownOpen(list)) closeDropdown(list, button);
+            else                      ensureOpen();
+          }
+        });
+
+        list.addEventListener('keydown', function (event) {
+          var options = getOptions(list);
+          if (!options.length) return;
+          var idx = currentHighlightIdx(list);
+
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            highlightOption(list, idx < 0 ? 0 : idx + 1);
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            highlightOption(list, idx < 0 ? options.length - 1 : idx - 1);
+          } else if (event.key === 'Home') {
+            event.preventDefault();
+            highlightOption(list, 0);
+          } else if (event.key === 'End') {
+            event.preventDefault();
+            highlightOption(list, options.length - 1);
+          } else if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (idx >= 0) options[idx].click();
+            button.focus();
+          } else if (event.key === 'Escape') {
+            event.preventDefault();
+            closeDropdown(list, button);
+            button.focus();
+          } else if (event.key === 'Tab') {
+            closeDropdown(list, button);
+            // Let Tab propagate normally so focus moves to the next control.
+          }
+        });
+      }
+
+      bindKeyboardNav(yearButton, yearList, rebuildYearList);
+      bindKeyboardNav(typeButton, typeList, rebuildTypeList);
 
       minSlider.addEventListener('input', function () {
         if (+minSlider.value > +maxSlider.value) {
@@ -1537,24 +1528,17 @@
       function makeSticky() {
         if (isSticky) return;
         isSticky = true;
-
         filterBar.classList.remove('container');
-        filterBar.style.cssText =
-          'background:#fff;border-bottom:1px solid #d3d3d3;margin:0;padding: 0;position:fixed;top:' +
-          STICKY_TOP +
-          'px;left:0;right:0;z-index:500;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:0;';
-
-          inner.classList.add('is-sticky'); // 👈 add this
+        filterBar.classList.add('rbccm-deal-filter--sticky');
+        inner.classList.add('rbccm-deal-filter--sticky');
       }
 
       function makeNormal() {
         if (!isSticky) return;
         isSticky = false;
-
         filterBar.classList.add('container');
-        filterBar.style.cssText = 'background:#fff;border:1px solid #d3d3d3;margin-bottom:20px;padding:0;';
-
-        inner.classList.remove('is-sticky'); // 👈 add this
+        filterBar.classList.remove('rbccm-deal-filter--sticky');
+        inner.classList.remove('rbccm-deal-filter--sticky');
       }
 
       function onScroll() {
@@ -1694,7 +1678,19 @@
       : 0;
 
     var model = new FormViewModel(Number.isFinite(page) ? page : 0);
-    ko.applyBindings(model);
+
+    // Scope bindings to our KO container only — host pages may already
+    // have their own ko.applyBindings running on the document, which
+    // would otherwise throw "cannot apply bindings multiple times".
+    var koEl = document.querySelector('.insights-stories.ko');
+    if (koEl) {
+      try { ko.cleanNode(koEl); } catch (e) {}
+      ko.applyBindings(model, koEl);
+    } else {
+      // No filter container on this page — bind to document for back-compat
+      // (matches original behaviour on pages that have no other KO instance).
+      try { ko.applyBindings(model); } catch (e) {}
+    }
 
     if (!window.location.hash) {
       if (getQueryValue('author')) {
@@ -1707,12 +1703,8 @@
     model.initFilterBar();
     model.updateYearUI();
 
-    var filterLabel = document.querySelector('#yf-filter-bar label[for="yf-drop-btn"]') ||
-      document.querySelector('#yf-filter-bar label');
-
-    if (filterLabel) {
-      filterLabel.textContent = 'Filter by:';
-    }
+    // (Legacy "Filter by:" label rewrite removed — the static markup
+    // now ships that text directly, no DOM patching needed.)
 
     var topics = getUrlParameter('t');
     if (topics !== undefined && topics !== false && topics !== null) {

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secondary Nav — local test</title>
+
+  <link rel="stylesheet" href="secondary-nav.css">
+
+  <style>
+    body {
+      font-family: "Roboto", Arial, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+    .demo-strip {
+      background: #003168;
+      color: #fff;
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+    .demo-strip a {
+      color: #FFC72C;
+      text-decoration: underline;
+      margin-left: 8px;
+    }
+    .page-hero {
+      background: #002144;
+      color: #fff;
+      padding: 32px 16px 40px;
+    }
+    .page-hero h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 500;
+    }
+    .page-body {
+      max-width: 1140px;
+      margin: 32px auto;
+      padding: 0 16px;
+      color: #454545;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-strip">
+    <strong>Secondary Nav test bed.</strong>
+    Resize the browser to check mobile (&lt;1200px) vs desktop (1200px+) treatments.
+    Change which <code>&lt;li&gt;</code> carries <code>active</code> + <code>aria-current="page"</code> to test the yellow triangle.
+  </div>
+
+  <div class="page-hero">
+    <h1>Global Investment Banking</h1>
+  </div>
+
+  <!-- ============================================================
+       Secondary Nav
+       ============================================================ -->
+  <nav class="secondary-nav" aria-label="Secondary navigation">
+    <div class="secondary-nav__inner">
+      <button type="button" class="secondary-nav__arrow secondary-nav__arrow--prev is-not-needed" id="secondary-nav-prev" aria-controls="secondary-nav-wrapper" aria-label="Scroll secondary navigation left">
+        <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polyline points="8,2 3,6 8,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="secondary-nav__wrapper" id="secondary-nav-wrapper">
+        <ul class="secondary-nav__list">
+          <li class="secondary-nav__item active">
+            <a href="/en/expertise/global-investment-banking/industry-coverage" aria-current="page">
+              Industry Coverage
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/mergers-acquisitions">
+              Mergers &amp; Acquisitions
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/equity-capital-markets">
+              Equity Capital Markets
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/debt-capital-markets">
+              Debt Capital Markets
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/leveraged-finance">
+              Leveraged Finance
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/restructuring-advisory">
+              Restructuring &amp; Advisory
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/public-sector-finance">
+              Public Sector Finance
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/real-estate">
+              Real Estate &amp; Lodging
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/financial-sponsors">
+              Financial Sponsors
+            </a>
+          </li>
+          <li class="secondary-nav__item">
+            <a href="/en/expertise/global-investment-banking/emerging-markets">
+              Emerging Markets
+            </a>
+          </li>
+        </ul>
+      </div>
+      <button type="button" class="secondary-nav__arrow secondary-nav__arrow--next is-not-needed" id="secondary-nav-next" aria-controls="secondary-nav-wrapper" aria-label="Scroll secondary navigation right">
+        <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polyline points="4,2 9,6 4,10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="secondary-nav__progress-bar" aria-hidden="true">
+      <div class="secondary-nav__progress-fill" id="secondary-nav-progress"></div>
+    </div>
+  </nav>
+
+  <div class="page-body">
+    <p>Placeholder body content beneath the nav. Scroll left/right on the nav to see the progress bar update.</p>
+  </div>
+
+  <script>
+    /* ------------------------------------------------------------
+       Secondary nav — arrow visibility, scroll behavior, and
+       progress bar.
+
+       Arrows are display:none via `.is-not-needed` when the list
+       fits inside the wrapper (no overflow). When it overflows:
+         - both arrows remain visible for consistent affordance
+         - the arrow at the end that can't scroll further gets the
+           `disabled` attribute → muted gray, unclickable
+         - clicking either arrow scrolls the wrapper by ~80% of its
+           visible width (a "page" of new items with a bit of overlap)
+       The blue progress bar tracks scroll position 0-100%.
+       ------------------------------------------------------------ */
+    (function () {
+      var nav = document.querySelector('.secondary-nav');
+      var wrap = document.getElementById('secondary-nav-wrapper');
+      var prev = document.getElementById('secondary-nav-prev');
+      var next = document.getElementById('secondary-nav-next');
+      var fill = document.getElementById('secondary-nav-progress');
+      if (!nav || !wrap || !prev || !next || !fill) return;
+
+      var EPS = 2;
+
+      /* Honor the user's OS-level reduced-motion setting for our
+         programmatic scrolls. `matchMedia` is re-checked on each
+         call so users who toggle the setting mid-session get the
+         updated behavior without a page reload. */
+      function scrollBehaviorPref() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      }
+
+      function refresh() {
+        var canScroll = wrap.scrollWidth - wrap.clientWidth > EPS;
+
+        /* Flip the list to flex-start when overflowing so items line
+           up against the wrapper's left edge and don't get pushed
+           under the prev arrow by the centering math. */
+        nav.classList.toggle('is-overflowing', canScroll);
+
+        if (!canScroll) {
+          prev.classList.add('is-not-needed');
+          next.classList.add('is-not-needed');
+          prev.disabled = false;
+          next.disabled = false;
+          fill.style.width = '0%';
+          return;
+        }
+        prev.classList.remove('is-not-needed');
+        next.classList.remove('is-not-needed');
+
+        var atStart = wrap.scrollLeft <= EPS;
+        var atEnd = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - EPS;
+        prev.disabled = atStart;
+        next.disabled = atEnd;
+
+        var max = wrap.scrollWidth - wrap.clientWidth;
+        var pct = max > 0 ? (wrap.scrollLeft / max) * 100 : 0;
+        fill.style.width = pct + '%';
+      }
+
+      /* Scroll to reveal the first item that's currently clipped by
+         the arrow's edge (partially or fully off-screen in the
+         click direction). Feels more predictable than scrolling by
+         a fixed viewport percentage — the item you were "almost"
+         seeing gets pulled fully into view. Falls back to a
+         viewport-percentage nudge if no clipped item exists. */
+      function scrollByPage(direction) {
+        var items = wrap.querySelectorAll('.secondary-nav__item');
+        var visibleLeft = wrap.scrollLeft;
+        var visibleRight = wrap.scrollLeft + wrap.clientWidth;
+
+        if (direction > 0) {
+          for (var i = 0; i < items.length; i++) {
+            var itemRight = items[i].offsetLeft + items[i].offsetWidth;
+            if (itemRight > visibleRight + EPS) {
+              wrap.scrollTo({ left: items[i].offsetLeft, behavior: scrollBehaviorPref() });
+              return;
+            }
+          }
+        } else {
+          for (var j = items.length - 1; j >= 0; j--) {
+            var itemLeft = items[j].offsetLeft;
+            if (itemLeft < visibleLeft - EPS) {
+              var target = items[j].offsetLeft + items[j].offsetWidth - wrap.clientWidth;
+              wrap.scrollTo({ left: Math.max(0, target), behavior: scrollBehaviorPref() });
+              return;
+            }
+          }
+        }
+        /* Fallback: no clipped item found (shouldn't happen when the
+           arrow is enabled) — nudge by 80% of viewport. */
+        wrap.scrollBy({ left: wrap.clientWidth * 0.8 * direction, behavior: scrollBehaviorPref() });
+      }
+
+      /* Center the currently-active item in the wrapper on load.
+         Only runs when there's overflow (fits case = list already
+         centered by flex). Falls back to scrollLeft = 0 if no
+         current item is marked. Uses `behavior: 'auto'` so the
+         initial position lands instantly with no visible wobble;
+         subsequent user-driven scrolls still get the smooth
+         behavior from the CSS. */
+      function scrollToInitial() {
+        var canScroll = wrap.scrollWidth - wrap.clientWidth > EPS;
+        if (!canScroll) return;
+        var current = wrap.querySelector('.secondary-nav__item.active, .secondary-nav__item a[aria-current="page"]');
+        if (!current) {
+          wrap.scrollTo({ left: 0, behavior: 'auto' });
+          return;
+        }
+        var itemEl = current.closest('.secondary-nav__item') || current;
+        var targetLeft = itemEl.offsetLeft + (itemEl.offsetWidth / 2) - (wrap.clientWidth / 2);
+        wrap.scrollTo({ left: Math.max(0, targetLeft), behavior: 'auto' });
+      }
+
+      prev.addEventListener('click', function () { scrollByPage(-1); });
+      next.addEventListener('click', function () { scrollByPage(1); });
+      wrap.addEventListener('scroll', refresh);
+      window.addEventListener('resize', function () { refresh(); });
+      /* Run refresh FIRST so the is-overflowing class is set (which
+         flips to flex-start), then scrollToInitial reads the
+         correct post-layout offsetLeft values. */
+      refresh();
+      scrollToInitial();
+    })();
+  </script>
+
+</body>
+</html>
+</content>
+</invoke>

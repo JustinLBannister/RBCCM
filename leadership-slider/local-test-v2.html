@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 
-  <!-- The component CSS — same file deployed to /assets/rbccm/css/sub/test/ -->
+  <!-- Prod path: /assets/rbccm/css/components/leadership-carousel.css -->
   <link rel="stylesheet" href="./leadership-carousel.css"/>
 
   <style>
@@ -59,7 +59,16 @@
           </svg>
         </button>
 
-        <div class="rbccm-leadership__slider-track" role="region" aria-label="Leadership cards" aria-describedby="rbccm-lead-instructions">
+        <!-- Per-breakpoint carousel thresholds. Prod XSL emits these only
+             when the matching Datum is set; JS presets are desktop 5,
+             tablet 3, mobile 2. -->
+        <div class="rbccm-leadership__slider-track"
+             role="region"
+             aria-label="Leadership cards"
+             aria-describedby="rbccm-lead-instructions"
+             data-carousel-min-desktop="5"
+             data-carousel-min-tablet="3"
+             data-carousel-min-mobile="2">
 
           <!-- CARD 1 -->
           <div class="rbccm-leadership__card">
@@ -255,30 +264,101 @@
 
       var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+      // Per-breakpoint carousel threshold. Below the threshold we swap
+      // slick settings to a static block (no infinite/swipe/dots) instead
+      // of unslicking, so no destroy/rebuild flicker on bucket boundaries.
+      // Overrides via data-carousel-min-<bucket> on the track.
+      var PRESETS  = { desktop: 5, tablet: 3, mobile: 2 };
+      var trackEl  = $track[0];
+      var cardCount = $track.find('.rbccm-leadership__card').length;
+
+      function threshold(bucket) {
+        var perBucket = trackEl && trackEl.getAttribute('data-carousel-min-' + bucket);
+        if (perBucket && !isNaN(parseInt(perBucket, 10))) return parseInt(perBucket, 10);
+        var fallback  = trackEl && trackEl.getAttribute('data-carousel-min');
+        if (fallback && !isNaN(parseInt(fallback, 10)))  return parseInt(fallback, 10);
+        return PRESETS[bucket];
+      }
+      function isCarouselAt(bucket) { return cardCount >= threshold(bucket); }
+
+      // centerMode stays false everywhere — cards render left-aligned.
+      var STATIC_SETTINGS = {
+        centerMode: false, centerPadding: '0px', variableWidth: true,
+        infinite: false, slidesToScroll: 1,
+        swipe: false, touchMove: false, draggable: false,
+        arrows: false, dots: false
+      };
+      var CAROUSEL_SETTINGS = {
+        centerMode: false, centerPadding: '0px', variableWidth: true,
+        infinite: true, slidesToScroll: 1,
+        swipe: true, touchMove: true, draggable: true,
+        arrows: false, dots: true
+      };
+      function settingsForBucket(bucket) {
+        return isCarouselAt(bucket) ? CAROUSEL_SETTINGS : STATIC_SETTINGS;
+      }
+
+      // Hide outer arrows + dots wrap when current bucket is static.
+      function currentBucket() {
+        var w = window.innerWidth;
+        if (w >= 1300) return 'desktop';
+        if (w >= 640)  return 'tablet';
+        return 'mobile';
+      }
+      function syncControlsVisibility() {
+        section.classList.toggle('rbccm-leadership--no-controls', !isCarouselAt(currentBucket()));
+      }
+
       function initCarousel() {
-        $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
+        $track.one('init', function () {
+          setTimeout(function () {
+            applyA11y();
+            syncArrows();
+            syncControlsVisibility();
+          }, 0);
+        });
+
+        // Base config = desktop bucket; responsive[] overrides for smaller ones.
+        var base = settingsForBucket('desktop');
         $track.slick({
-          slidesToShow: 1, slidesToScroll: 1, variableWidth: true, infinite: true, initialSlide: 0,
-          arrows: false, dots: true, dotsClass: 'slick-dots', appendDots: $dots,
+          slidesToShow: 1, slidesToScroll: 1, initialSlide: 0,
+          appendDots: $dots, dotsClass: 'slick-dots',
           speed: reducedMotion ? 0 : 350,
           cssEase: reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
           easing: 'linear', useCSS: true, useTransform: true, fade: false,
-          centerMode: true, centerPadding: '0px', adaptiveHeight: false, rows: 1, slidesPerRow: 1,
-          vertical: false, verticalSwiping: false, rtl: false, draggable: false, swipe: true,
-          swipeToSlide: false, touchMove: true, touchThreshold: 5, edgeFriction: 0.35,
-          autoplay: false, autoplaySpeed: 3000, accessibility: false, pauseOnHover: true,
-          pauseOnFocus: true, pauseOnDotsHover: false, respondTo: 'window', mobileFirst: false,
+          adaptiveHeight: false, rows: 1, slidesPerRow: 1,
+          vertical: false, verticalSwiping: false, rtl: false,
+          swipeToSlide: false, touchThreshold: 5, edgeFriction: 0.35,
+          autoplay: false, autoplaySpeed: 3000, accessibility: false,
+          pauseOnHover: true, pauseOnFocus: true, pauseOnDotsHover: false,
+          respondTo: 'window', mobileFirst: false,
+          centerMode:     base.centerMode,
+          centerPadding:  base.centerPadding,
+          variableWidth:  base.variableWidth,
+          infinite:       base.infinite,
+          swipe:          base.swipe,
+          touchMove:      base.touchMove,
+          draggable:      base.draggable,
+          arrows:         base.arrows,
+          dots:           base.dots,
           responsive: [
-            { breakpoint: 99999, settings: { centerMode:false, centerPadding:'0px', draggable:false, infinite:true,  slidesToScroll:1, swipe:false, touchMove:false, variableWidth:true } },
-            { breakpoint: 1300,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
-            { breakpoint: 1025,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
-            { breakpoint: 640,   settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
+            { breakpoint: 99999, settings: settingsForBucket('desktop') },
+            { breakpoint: 1300,  settings: settingsForBucket('desktop') },
+            { breakpoint: 1025,  settings: settingsForBucket('tablet')  },
+            { breakpoint: 640,   settings: settingsForBucket('mobile')  }
           ],
           asNavFor: null, waitForAnimate: true, zIndex: 1000
         });
       }
 
       if (typeof $.fn.slick !== 'undefined') { initCarousel(); }
+
+      // Debounced resize handler — flips the --no-controls class on bucket change.
+      var __bucketTimer;
+      $(window).on('resize.rbccmBucket', function () {
+        clearTimeout(__bucketTimer);
+        __bucketTimer = setTimeout(syncControlsVisibility, 60);
+      });
 
       // ── Roving tabindex on slide content. DOM order = desired tab order,
       // ── so no Tab interceptor is needed; we just keep tabindex correct.
@@ -294,11 +374,86 @@
         return slideW > 0 && (visWidth / slideW) >= 0.9;
       }
 
+      // SR labels. "Current" language goes in the label text — NVDA
+      // doesn't reliably announce aria-current on plain dot buttons.
+      var LABELS = {
+        dotAriaTpl:         'Go to slide {n} of {total}',
+        dotAriaCurrentTpl:  'Current slide: {name}, slide {n} of {total}',
+        dotAriaCurrentTplNoName: 'Current slide {n} of {total}',
+        slideAriaTpl:       'Slide {n} of {total}',
+        slideAriaNameTpl:   '{name}, {role}, slide {n} of {total}',
+        slideAriaNameOnlyTpl: '{name}, slide {n} of {total}',
+        slideRoleDesc:      'slide',
+        announceTpl:        'Slide {n} of {total}',
+        announceNameTpl:    '{name}, slide {n} of {total}',
+        dotsListLabel:      'Slide selection'
+      };
+
+      function fmtLabel(tpl, vars) {
+        return String(tpl).replace(/\{(\w+)\}/g, function (_, k) {
+          return (vars && vars[k] != null && vars[k] !== '') ? vars[k] : '';
+        }).replace(/\s+,/g, ',').replace(/,\s*,/g, ',').replace(/\s+/g, ' ').trim();
+      }
+
+      // Name/role cache indexed 0..slideCount-1. Clones share indices
+      // via (data-slick-index % slideCount) and hit the same entry.
+      var SLIDE_INFO = [];
+      function buildSlideInfoCache() {
+        SLIDE_INFO = [];
+        $track.find('.slick-slide').not('.slick-cloned').each(function (i) {
+          var nameEl = this.querySelector('.rbccm-leadership__card-name');
+          var roleEl = this.querySelector('.rbccm-leadership__card-role');
+          SLIDE_INFO[i] = {
+            name: nameEl ? (nameEl.textContent || '').trim() : '',
+            role: roleEl ? (roleEl.textContent || '').trim() : ''
+          };
+        });
+      }
+      function slideInfoFor(index) {
+        return SLIDE_INFO[index] || { name: '', role: '' };
+      }
+
+      // Give the dots UL an aria-label so SR says "Slide selection,
+      // list with N items" instead of just "list with N items".
+      function labelDotsList() {
+        var ul = $dots.find('ul.slick-dots')[0];
+        if (ul) {
+          ul.setAttribute('aria-label', LABELS.dotsListLabel);
+        }
+      }
+
       function applyA11y() {
+        var slick      = $track.slick('getSlick');
+        var slideCount = slick ? slick.slideCount : 0;
+        var current    = slick ? slick.currentSlide : 0;
+
+        if (!SLIDE_INFO.length) buildSlideInfoCache();
+
         $track.find('.slick-slide').each(function () {
           var inView = isSlideInView(this);
           if (inView) { this.removeAttribute('aria-hidden'); }
           else        { this.setAttribute('aria-hidden', 'true'); }
+
+          // data-slick-index goes negative on pre-clones, normalise to 0..N-1.
+          var raw = parseInt(this.getAttribute('data-slick-index'), 10);
+          if (!isNaN(raw) && slideCount > 0) {
+            var idx = ((raw % slideCount) + slideCount) % slideCount;
+            var n   = idx + 1;
+            var info = slideInfoFor(idx);
+            var label = info.name
+              ? (info.role
+                  ? fmtLabel(LABELS.slideAriaNameTpl,     { name: info.name, role: info.role, n: n, total: slideCount })
+                  : fmtLabel(LABELS.slideAriaNameOnlyTpl, { name: info.name, n: n, total: slideCount }))
+              : fmtLabel(LABELS.slideAriaTpl, { n: n, total: slideCount });
+
+            this.setAttribute('role', 'group');
+            this.setAttribute('aria-roledescription', LABELS.slideRoleDesc);
+            this.setAttribute('aria-label', label);
+
+            // Applies to the visible original + its off-canvas clones sharing idx.
+            if (idx === current) this.setAttribute('aria-current', 'true');
+            else                 this.removeAttribute('aria-current');
+          }
 
           var kids = this.querySelectorAll(FOCUSABLE);
           for (var i = 0; i < kids.length; i++) kids[i].setAttribute('tabindex', '-1');
@@ -311,13 +466,31 @@
           if (action)    action.setAttribute('tabindex', '0');
           else if (card) card.setAttribute('tabindex', '0');
         });
+
+        labelDotsList();
+        $dots.find('button').each(function (i) {
+          var isActive = (i === current);
+          if (isActive) this.setAttribute('aria-current', 'true');
+          else          this.removeAttribute('aria-current');
+          var info = slideInfoFor(i);
+          var label = isActive
+            ? (info.name
+                ? fmtLabel(LABELS.dotAriaCurrentTpl,       { name: info.name, n: i + 1, total: slideCount })
+                : fmtLabel(LABELS.dotAriaCurrentTplNoName, { n: i + 1, total: slideCount }))
+            : fmtLabel(LABELS.dotAriaTpl, { n: i + 1, total: slideCount });
+          this.setAttribute('aria-label', label);
+        });
       }
 
       $track.on('afterChange', function (e, slick, currentSlide) {
         applyA11y();
         syncArrows();
         if (typeof currentSlide !== 'undefined' && slick) {
-          $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+          var info = slideInfoFor(currentSlide);
+          var msg  = info.name
+            ? fmtLabel(LABELS.announceNameTpl, { name: info.name, n: currentSlide + 1, total: slick.slideCount })
+            : fmtLabel(LABELS.announceTpl,     { n: currentSlide + 1, total: slick.slideCount });
+          $('#rbccm-lead-announce').text(msg);
         }
       });
 

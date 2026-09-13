@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leadership Carousel — Local Test</title>
+
+  <!-- jQuery + Slick + Bootstrap (modal) from CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+
+  <!-- The component CSS — same file deployed to /assets/rbccm/css/sub/test/ -->
+  <link rel="stylesheet" href="./leadership-carousel.css"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #f4f4f4; font-family: Roboto, Arial, sans-serif; }
+    /* Toggle helper for the demo */
+    .demo-toggle { padding: 12px 16px; background:#003168; color:#fff; font-size:14px; }
+    .demo-toggle a { color:#FFC72C; text-decoration:underline; margin-left:8px; }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toggle">
+    Demo mode: <strong>LinkedIn</strong> (data-link-type="linkedin").
+    Switch to Biography mode by editing <code>data-link-type</code> on the &lt;section&gt;.
+  </div>
+
+  <!-- ====================================================
+       Rendered output of <section class="rbccm-leadership">
+       (what the XSL emits — biography mode, 6 sample authors)
+       ==================================================== -->
+  <section class="rbccm-leadership" id="rbccm-leadership" aria-label="European leadership team carousel" data-link-type="linkedin">
+    <div class="rbccm-leadership__inner">
+
+      <div class="container">
+        <h2 class="rbccm-leadership__heading">European leadership</h2>
+      </div>
+
+      <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
+      <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only">Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</p>
+
+      <div class="rbccm-leadership__slider-track" role="region" aria-label="Leadership cards" aria-describedby="rbccm-lead-instructions">
+
+        <!-- CARD 1 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Sian Hurrell" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Sian Hurrell</h3>
+            <p class="rbccm-leadership__card-role">Co-CEO Europe &amp; Head, Capital Markets Europe</p>
+            <a class="rbccm-leadership__card-action rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/sian-hurrell-77512022/" aria-label="Sian Hurrell on LinkedIn, opens in new tab" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-default" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-hover" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Dominic Hudson" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Dominic Hudson</h3>
+            <p class="rbccm-leadership__card-role">Head, Investment Banking, Europe and APAC</p>
+            <a class="rbccm-leadership__card-action rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/dominic-hudson-bb139715/" aria-label="Dominic Hudson on LinkedIn, opens in new tab" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-default" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-hover" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Ayesha Patel" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Ayesha Patel</h3>
+            <p class="rbccm-leadership__card-role">President, RBC Europe</p>
+            <!-- DEMO: this card intentionally has no action — verifies the card itself receives focus -->
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Edward Dickinson" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Edward Dickinson</h3>
+            <p class="rbccm-leadership__card-role">Head, Corporate Banking, Europe</p>
+            <a class="rbccm-leadership__card-action rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/edward-dickinson-b7164130" aria-label="Edward Dickinson on LinkedIn, opens in new tab" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-default" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-hover" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 5 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Graeme Pearson" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Graeme Pearson</h3>
+            <p class="rbccm-leadership__card-role">Global Co-Head, Research</p>
+            <a class="rbccm-leadership__card-action rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/graeme-pearson-3abab7391/" aria-label="Graeme Pearson on LinkedIn, opens in new tab" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-default" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-hover" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="rbccm-leadership__card">
+          <div class="rbccm-leadership__card-image">
+            <img loading="lazy" alt="Christophe Coutte" src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=80" onerror="this.src='https://fpoimg.com/276x263?text=Team%20Member&amp;text_color=8F8F8F&amp;bg_color=e6e6e6'"/>
+            <div class="rbccm-leadership__fpo" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="28" r="16" stroke="#003168" stroke-width="2.5"/><path d="M8 72c0-17.673 14.327-32 32-32s32 14.327 32 32" stroke="#003168" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="rbccm-leadership__card-body">
+            <h3 class="rbccm-leadership__card-name">Christophe Coutte</h3>
+            <p class="rbccm-leadership__card-role">Head, Trading, Global Markets, Europe</p>
+            <a class="rbccm-leadership__card-action rbccm-leadership__card-linkedin" target="_blank" rel="noopener noreferrer" href="https://uk.linkedin.com/in/christophe-c-79809017" aria-label="Christophe Coutte on LinkedIn, opens in new tab" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-default" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M37.8553 37.2923C26.5589 49.042 6.66437 44.7004 1.28498 29.3755C-4.58997 12.6383 10.6242 -3.77121 27.7414 0.765476C43.8478 5.03332 49.4409 25.2402 37.8553 37.2923ZM20.237 1.79323C6.52717 2.75097 -2.04867 17.5997 3.41284 30.14C9.35592 43.7846 27.8151 46.5916 37.4754 35.1855C49.2449 21.2898 38.3826 0.525573 20.237 1.79323Z" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623V18.7546H23.0554Z" fill="#0051A5"/><path d="M15.3943 15.5C15.3943 16.6 14.5 17.5 13.4 17.5C12.3 17.5 11.4 16.6 11.4 15.5C11.4 14.4 12.3 13.5 13.4 13.5C14.5 13.5 15.3943 14.4 15.3943 15.5Z" fill="#0051A5"/><path d="M15.1 18.75H11.7V31.92H15.1V18.75Z" fill="#0051A5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="li-hover" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#0051A5"/><path d="M23.0554 18.7546V20.5282L23.7582 19.6908C25.3429 18.3718 28.7278 18.3942 30.3657 19.6115C31.4465 20.4143 31.8319 22.088 31.9206 23.3771C32.111 26.1486 31.7806 29.1255 31.9215 31.9175H28.0018V24.5897C28.0018 23.9363 27.5809 22.7881 27.0452 22.3727C26.2827 21.78 24.6578 21.8976 23.9682 22.5827C23.7022 22.8469 23.2421 23.9615 23.2421 24.3106V31.9184H19.4623L19.3428 31.7784V18.6631H22.7288C22.7792 18.6631 22.936 18.8078 23.0554 18.7564V18.7546Z" fill="white"/><path d="M16.7098 18.7544H12.1357V31.9164H16.7098V18.7544Z" fill="white"/><path d="M16.0235 12.7206C18.2661 14.8536 14.8615 18.258 12.73 16.0149C10.5984 13.7717 13.8685 10.6707 16.0235 12.7206Z" fill="white"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mobile controls -->
+      <div class="rbccm-leadership__controls">
+        <button id="rbccm-lead-prev" class="rbccm-leadership__btn" aria-label="Previous slide" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div id="rbccm-lead-dots" class="rbccm-leadership__dots-wrap"></div>
+        <button id="rbccm-lead-next" class="rbccm-leadership__btn" aria-label="Next slide" tabindex="0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="#003168" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <!-- Desktop arrows -->
+      <div class="rbccm-leadership__arrows-desktop">
+        <button id="rbccm-lead-prev-desk" class="rbccm-leadership__btn-desk" aria-label="Previous slide" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="21" stroke="#003168" stroke-width="2"/><path d="M25 31L16 21.5L25 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="rbccm-lead-next-desk" class="rbccm-leadership__btn-desk" aria-label="Next slide" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="-1" y="1" width="42" height="42" rx="21" transform="matrix(-1 0 0 1 42 0)" stroke="#003168" stroke-width="2"/><path d="M18 31L27 21.5L18 12" stroke="#003168" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Bio Modal -->
+    <div class="modal fade" id="rbccm-lead-modal" tabindex="-1" role="dialog" aria-labelledby="rbccm-lead-modal-name" aria-hidden="true">
+      <div class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;" role="document">
+        <div class="modal-content">
+          <div>
+            <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+              <button class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" aria-label="Close">&#215;</button>
+            </div>
+            <div class="modal-body" style="padding: 0px;">
+              <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+                <div style="margin-bottom: 20px;">
+                  <h2 class="rbccm-leadership__modal-name" id="rbccm-lead-modal-name" style="font-size: 20px;"></h2>
+                  <p class="rbccm-leadership__modal-role" style="margin: 4px 0 16px 0; color: #4a4a4a;"></p>
+                  <div class="rbccm-leadership__modal-body"></div>
+                  <p class="rbccm-leadership__modal-footer" style="margin-top: 20px;">
+                    <a class="rbccm-leadership__modal-linkedin" target="_blank" rel="noopener noreferrer" hidden="hidden">View LinkedIn profile</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ====================================================
+       Fake section below the carousel — used to verify
+       that forward-Tab exits the carousel into this section,
+       and Shift+Tab from here re-enters the carousel at Next.
+       ==================================================== -->
+  <section id="fake-next-section" style="padding:32px 24px; background:#fff; border-top:2px dashed #003168;">
+    <h2 style="margin:0 0 12px 0; font-size:18px; color:#003168;">Fake next section (Tab target)</h2>
+    <p style="margin:0 0 12px 0;">Use this to verify Tab exits the carousel forward and Shift+Tab re-enters it.</p>
+    <a href="#" id="fake-link-1" style="margin-right:12px;">Fake link 1</a>
+    <button type="button" id="fake-button-1" style="margin-right:12px;">Fake button 1</button>
+    <a href="#" id="fake-link-2">Fake link 2</a>
+  </section>
+
+  <!-- ── Component JS (same as the XSL inline <script>) ── -->
+  <script>
+    jQuery(document).ready(function ($) {
+      var $track    = $('.rbccm-leadership__slider-track');
+      var $dots     = $('#rbccm-lead-dots');
+      var section   = document.getElementById('rbccm-leadership');
+      var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
+      // ── DEBUG: log every Tab / Shift+Tab and where focus lands ──
+      function describe(el) {
+        if (!el || el === document.body) return '(body)';
+        var tag  = el.tagName.toLowerCase();
+        var id   = el.id ? '#' + el.id : '';
+        var cls  = el.className && typeof el.className === 'string'
+                   ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : '';
+        var name = el.getAttribute('aria-label')
+                   || (el.textContent || '').trim().slice(0, 40);
+        var ti   = el.getAttribute('tabindex');
+        var inCarousel = section.contains(el) ? ' [in carousel]' : ' [OUTSIDE]';
+        return tag + id + cls + ' "' + name + '"' + (ti !== null ? ' tabindex=' + ti : '') + inCarousel;
+      }
+      $(document).on('keydown.rbccmDebug', function (e) {
+        if (e.key === 'Tab') {
+          console.log('%c[TAB ' + (e.shiftKey ? '⇧←' : '→') + ']',
+            'color:#fff;background:#003168;padding:2px 6px;border-radius:3px;',
+            'from:', describe(document.activeElement));
+        }
+      });
+      document.addEventListener('focusin', function (e) {
+        console.log('%c[FOCUS]',
+          'color:#003168;background:#FFC72C;padding:2px 6px;border-radius:3px;',
+          describe(e.target));
+      });
+
+      $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk').attr('tabindex', '0');
+
+      // Prev / Next advance the carousel
+      $('#rbccm-lead-prev, #rbccm-lead-prev-desk').on('click', function () {
+        if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');
+      });
+      $('#rbccm-lead-next, #rbccm-lead-next-desk').on('click', function () {
+        if ($track.hasClass('slick-initialized')) $track.slick('slickNext');
+      });
+
+      function syncArrows() {
+        var slick      = $track.slick('getSlick');
+        var current    = slick.currentSlide;
+        var total      = slick.slideCount;
+        var isInfinite = slick.options.infinite;
+
+        if (isInfinite) {
+          $('#rbccm-lead-prev, #rbccm-lead-prev-desk, #rbccm-lead-next, #rbccm-lead-next-desk')
+            .prop('disabled', false).attr('aria-disabled', 'false').css('opacity', 1);
+          return;
+        }
+
+        var cardWidth    = $('.rbccm-leadership__card').first().outerWidth(true);
+        var trackWidth   = $track.width();
+        var visibleCards = Math.ceil(trackWidth / cardWidth);
+        var maxIndex     = total - visibleCards;
+
+        var atStart = current <= 0;
+        var atEnd   = current >= maxIndex;
+
+        $('#rbccm-lead-prev, #rbccm-lead-prev-desk')
+          .prop('disabled', atStart).attr('aria-disabled', atStart ? 'true' : 'false').css('opacity', atStart ? 0.3 : 1);
+        $('#rbccm-lead-next, #rbccm-lead-next-desk')
+          .prop('disabled', atEnd).attr('aria-disabled', atEnd ? 'true' : 'false').css('opacity', atEnd ? 0.3 : 1);
+      }
+
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function initCarousel() {
+        // Once slick has built + measured the slides, set the initial a11y state.
+        $track.one('init', function () { setTimeout(function () { applyA11y(); syncArrows(); }, 0); });
+        $track.slick({
+          slidesToShow: 1, slidesToScroll: 1, variableWidth: true, infinite: true, initialSlide: 0,
+          arrows: false, dots: true, dotsClass: 'slick-dots', appendDots: $dots,
+          speed: reducedMotion ? 0 : 350,
+          cssEase: reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)',
+          easing: 'linear', useCSS: true, useTransform: true, fade: false,
+          centerMode: true, centerPadding: '0px', adaptiveHeight: false, rows: 1, slidesPerRow: 1,
+          vertical: false, verticalSwiping: false, rtl: false, draggable: false, swipe: true,
+          swipeToSlide: false, touchMove: true, touchThreshold: 5, edgeFriction: 0.35,
+          autoplay: false, autoplaySpeed: 3000, accessibility: false, pauseOnHover: true,
+          pauseOnFocus: true, pauseOnDotsHover: false, respondTo: 'window', mobileFirst: false,
+          responsive: [
+            { breakpoint: 99999, settings: { centerMode:false, centerPadding:'0px', draggable:false, infinite:true,  slidesToScroll:1, swipe:false, touchMove:false, variableWidth:true } },
+            { breakpoint: 1245,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+            { breakpoint: 1025,  settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } },
+            { breakpoint: 640,   settings: { centerMode:true,  centerPadding:'0px', draggable:true,  infinite:true,  slidesToScroll:1, swipe:true,  touchMove:true,  variableWidth:true } }
+          ],
+          asNavFor: null, waitForAnimate: true, zIndex: 1000
+        });
+      }
+
+      if (typeof $.fn.slick !== 'undefined') { initCarousel(); }
+
+      // ─────────────────────────────────────────────────────────────
+      // Accessibility: roving tabindex + logical Tab order.
+      // Order = Prev -> visible slides -> Next. Off-canvas + cloned
+      // slides (and their focusable children) are removed from the tab
+      // sequence and hidden from assistive tech.
+      // ─────────────────────────────────────────────────────────────
+
+      // True for ANY slide (original OR cloned) that is essentially fully in view.
+      // We don't reject clones up front — with slick's infinite-loop wrap, the
+      // DOM node currently rendered at the centre can be the clone while the
+      // original sits off-canvas. Pure geometry decides: whichever copy is on
+      // screen passes the 90% visibility threshold; the off-screen copy fails.
+      // Peek neighbours in centerMode (typically 30–50% visible) are excluded.
+      function isSlideInView(slideEl) {
+        var list = $track.find('.slick-list')[0];
+        if (!list) return false;
+        var lr = list.getBoundingClientRect();
+        var sr = slideEl.getBoundingClientRect();
+        var visLeft   = Math.max(sr.left, lr.left);
+        var visRight  = Math.min(sr.right, lr.right);
+        var visWidth  = Math.max(0, visRight - visLeft);
+        var slideW    = sr.right - sr.left;
+        return slideW > 0 && (visWidth / slideW) >= 0.9;
+      }
+
+      // The prev/next button visible at the current breakpoint.
+      function activeArrow(deskId, mobId) {
+        var desk = document.getElementById(deskId);
+        if (desk && desk.offsetParent !== null) return desk;
+        return document.getElementById(mobId);
+      }
+
+      // Ordered focus ring: [Prev, ...visible card stops, Next]
+      // A "card stop" is the card's action element when present, OR the card
+      // itself when no action exists — so actionless cards still get a tab stop.
+      function getRing() {
+        var ring = [];
+        var prevBtn = activeArrow('rbccm-lead-prev-desk', 'rbccm-lead-prev');
+        var nextBtn = activeArrow('rbccm-lead-next-desk', 'rbccm-lead-next');
+        if (prevBtn) ring.push(prevBtn);
+        $track.find('.slick-slide').each(function () {
+          if (isSlideInView(this)) {
+            var a = this.querySelector('.rbccm-leadership__card-action');
+            if (a) { ring.push(a); return; }
+            var card = this.querySelector('.rbccm-leadership__card');
+            if (card) ring.push(card);
+          }
+        });
+        if (nextBtn) ring.push(nextBtn);
+        return ring;
+      }
+
+      // Roving tabindex + aria-hidden across all slides, then enable the ring.
+      function applyA11y() {
+        $track.find('.slick-slide').each(function () {
+          if (isSlideInView(this)) { this.removeAttribute('aria-hidden'); }
+          else                     { this.setAttribute('aria-hidden', 'true'); }
+          var kids = this.querySelectorAll(FOCUSABLE);
+          for (var i = 0; i < kids.length; i++) kids[i].setAttribute('tabindex', '-1');
+          // Reset the card itself; set to 0 below only if it's in the ring.
+          var card = this.querySelector('.rbccm-leadership__card');
+          if (card) card.setAttribute('tabindex', '-1');
+        });
+        var ring = getRing();
+        for (var j = 0; j < ring.length; j++) ring[j].setAttribute('tabindex', '0');
+      }
+
+      // Move focus to the tabbable element just outside the section. Used to
+      // exit backward from Prev, which sits AFTER the slides in the DOM.
+      function focusOutside(backward) {
+        var nodes = Array.prototype.slice.call(document.querySelectorAll(FOCUSABLE))
+          .filter(function (el) { return el.tabIndex >= 0 && !el.disabled && el.offsetParent !== null; });
+        var firstIn = -1, lastIn = -1;
+        for (var i = 0; i < nodes.length; i++) {
+          if (section.contains(nodes[i])) { if (firstIn === -1) firstIn = i; lastIn = i; }
+        }
+        if (backward) { if (firstIn > 0) nodes[firstIn - 1].focus(); }
+        else          { if (lastIn !== -1 && lastIn < nodes.length - 1) nodes[lastIn + 1].focus(); }
+      }
+
+      // Re-evaluate after every settle.
+      $track.on('afterChange', function (e, slick, currentSlide) {
+        applyA11y();
+        syncArrows();
+        if (typeof currentSlide !== 'undefined' && slick) {
+          $('#rbccm-lead-announce').text('Slide ' + (currentSlide + 1) + ' of ' + slick.slideCount);
+        }
+      });
+
+      // ── Tab: enforce Prev -> slides -> Next, exit cleanly at the ends ──
+      var lastTabShift = null;
+      $(document).on('mousedown.rbccmA11y', function () { lastTabShift = null; });
+      $(document).on('keydown.rbccmA11y', function (e) {
+        if (e.key !== 'Tab') { lastTabShift = null; return; }
+        lastTabShift = e.shiftKey;
+        if (!section.contains(document.activeElement)) return; // entry handled in focusin
+        var ring = getRing();
+        if (!ring.length) return;
+        var idx = ring.indexOf(document.activeElement);
+        if (idx === -1) return; // e.g. a dot button -> default behaviour
+        if (e.shiftKey) {
+          e.preventDefault();
+          if (idx === 0) { focusOutside(true); }                 // on Prev -> leave widget backward
+          else           { ring[idx - 1].focus({ preventScroll: true }); }
+        } else {
+          if (idx === ring.length - 1) return;                   // on Next -> leave widget forward (natural)
+          e.preventDefault();
+          ring[idx + 1].focus({ preventScroll: true });
+        }
+      });
+
+      // ── Entry: forward-tab in -> Prev, shift-tab in -> Next ──
+      section.addEventListener('focusin', function (e) {
+        if (lastTabShift === null) return;                                // not via Tab (click etc.)
+        if (e.relatedTarget && section.contains(e.relatedTarget)) return; // internal move
+        var ring = getRing();
+        if (!ring.length) return;
+        var target = lastTabShift ? ring[ring.length - 1] : ring[0];
+        if (target && e.target !== target) target.focus({ preventScroll: true });
+      });
+
+      var resizeTimer;
+      $(window).on('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          if ($track.hasClass('slick-initialized')) { $track.slick('setPosition'); syncArrows(); applyA11y(); }
+        }, 50);
+      });
+
+      // Biography modal
+      var $modal     = $('#rbccm-lead-modal');
+      var $modalName = $modal.find('.rbccm-leadership__modal-name');
+      var $modalRole = $modal.find('.rbccm-leadership__modal-role');
+      var $modalBody = $modal.find('.rbccm-leadership__modal-body');
+      var $modalLi   = $modal.find('.rbccm-leadership__modal-linkedin');
+
+      $(document).on('click', '.rbccm-leadership__card-bio', function (e) {
+        e.preventDefault();
+        var $src = $('#' + $(this).attr('data-bio-target'));
+        if (!$src.length) return;
+        $modalName.text($src.attr('data-name') || '');
+        $modalRole.text($src.attr('data-role') || '');
+        $modalBody.html($src.html());
+        var li = $src.attr('data-linkedin') || '';
+        if (li) { $modalLi.attr('href', li).removeAttr('hidden'); }
+        else    { $modalLi.attr('hidden', 'hidden'); }
+        $modal.modal('show');
+      });
+
+    });
+  </script>
+
+</body>
+</html>

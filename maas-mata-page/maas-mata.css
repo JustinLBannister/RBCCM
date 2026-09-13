@@ -578,7 +578,26 @@
      rhythm; zero bottom padding — the platforms band below has its own
      80px top/bottom and its gradient blends seamlessly out of the flat
      #09254A of this strip. */
-  .rbccm-maas-mata__dark-strip { background: #09254A; color: #fff; padding: 222px 0 0; }
+  /* Dark strip — now carries new-standard + awards + platforms +
+     mata-cap ("Sharper insight. Smarter trades."). Gradient stops
+     tuned so:
+       - Top: soft brighter navy (hero overlap area)
+       - Middle: settled dark navy through the platform cards
+       - Bottom (around mata-cap): mid-dark, then a subtle lift back
+         toward a slightly lighter navy so the transition into the
+         light innovation-era below reads intentional rather than
+         hitting a hard cliff. */
+  .rbccm-maas-mata__dark-strip {
+    background: linear-gradient(
+      180deg,
+      #0B2A56 0%,
+      #09254A 35%,
+      #082043 70%,
+      #0A2A55 100%
+    );
+    color: #fff;
+    padding: 222px 0 0;
+  }
 
   /* Awards — Figma: 40px top/bottom, 170px sides, flex-column, gap 32,
      center-aligned. On desktop the 1440px container ⇒ 1100 inner. Kept
@@ -874,6 +893,11 @@
      Both share display flex column, centered, stretch. Background
      gradient is our own addition (Figma just shows the dark navy;
      the subtle gradient reads better on tall viewports). */
+  /* Platforms — was carrying its OWN #09254A → #05152A gradient that
+     ended DARKER than dark-strip's own gradient at the same point,
+     which created a visible seam right before the mata-cap heading.
+     Dropped the local gradient so dark-strip's shared gradient runs
+     unbroken across new-standard + awards + platforms + mata-cap. */
   .rbccm-maas-mata__platforms {
     display: flex;
     flex-direction: column;
@@ -882,7 +906,7 @@
     align-self: stretch;
     gap: 32px;
     padding: 100px 0 60px 0;
-    background: linear-gradient(180deg, #09254A 0%, #05152A 100%);
+    background: transparent;
     text-align: center;
   }
   /* Padding swap aligned to the card-row breakpoint (988) so we
@@ -963,7 +987,7 @@
     height: 2px;
     background: #FFC72C;
   }
-  /* Section H2 "Better insight for stronger execution"
+  /* Section H2 "Stronger execution for sharper insights"
      Mobile  (title-small-mobile): RBC Display 36/43.2 weight 500,
      stretch full-width. Desktop (title-desktop): 42/52.5 weight 500,
      natural width. White, centered at both breakpoints. */
@@ -1215,6 +1239,10 @@
        Desktop: padding 80/170, gap 10
      Swap at 988 to align with the rest of the page's tablet
      breakpoint (platforms section, feature cards, etc.). */
+  /* Innovation-era lives INSIDE the deep-band wrapper (took over the
+     old market-insights slot), but retains its light #F1F5FB card
+     identity — it reads as a bright island inside the deep-band's
+     dark gradient. Text stays dark (light-mode treatment below). */
   .rbccm-maas-mata__innovation-era {
     display: flex;
     flex-direction: column;
@@ -1585,8 +1613,22 @@
      top down to #061730 at the bottom, so the three sections read as
      one continuous surface with no seams between them. Each of the
      three sections goes transparent so the wrapper's gradient shows. */
+  /* Deep-band gradient — starts a touch brighter than the dark-strip's
+     end (#082043) at the very top so the eye reads a soft "lift" into
+     the mata-cap ("Sharper insight. Smarter trades.") section rather
+     than a hard boundary. The bright top sits ABOVE mata-cap, plateaus
+     at #082043 as mata-cap begins (~18%), then keeps darkening slowly
+     all the way through innovation-era + demo. The result: gradient
+     is visible right through the mata-cap section and beyond, no seam. */
   .rbccm-maas-mata__deep-band {
-    background: linear-gradient(180deg, #082043 0%, #061730 100%);
+    background: linear-gradient(
+      180deg,
+      #0D2E5C 0%,
+      #0A2648 8%,
+      #082043 18%,
+      #071A38 55%,
+      #061730 100%
+    );
     color: #fff;
   }
 
@@ -2195,7 +2237,13 @@
     font-size: 13px !important;
     font-weight: normal !important;
   }
-  .rbccm-maas-mata__newsletter { background: #E7EEF1; padding: 51px 0; }
+  /* Newsletter — soft light gradient washes into the footer so the
+     handoff from the deep-band's dark gradient reads intentional
+     rather than a hard flat block. */
+  .rbccm-maas-mata__newsletter {
+    background: linear-gradient(180deg, #EEF3F6 0%, #E7EEF1 60%, #DDE6EC 100%);
+    padding: 51px 0;
+  }
   .rbccm-maas-mata__newsletter-heading {
     font-family: 'RBC Display', var(--sans);
     font-size: 24px;
