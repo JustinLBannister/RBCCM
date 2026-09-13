@@ -194,10 +194,13 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   height: 44px;
   justify-content: center;
   line-height: 1;
+  opacity: 1 !important; /* beat site-wide `footer a { opacity: 0.98 }` from unified.css:2764 */
   overflow: hidden; /* clip the fly-by arrow */
   padding: 12px 24px;
   position: relative;
-  text-decoration: none;
+  text-decoration: none !important; /* beat site-wide `footer a { text-decoration: underline }` */
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -207,15 +210,16 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    the right and returns from the left. `isolation: isolate` +
    overflow-hidden clip the pseudo to the pill shape. */
 .rbccm-cta-band__btn--primary {
-  background: var(--rbccm-cta-band-gold);
-  color: var(--rbccm-cta-band-navy);
+  background: var(--rbccm-cta-band-gold) !important;
+  color: var(--rbccm-cta-band-navy) !important;
   isolation: isolate;
 }
 .rbccm-cta-band__btn--primary:hover,
 .rbccm-cta-band__btn--primary:focus-visible {
-  background: #E5B325; /* one shade deeper than the base gold */
+  background: #E5B325 !important; /* one shade deeper than the base gold */
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  color: var(--rbccm-cta-band-navy);
+  color: var(--rbccm-cta-band-navy) !important;
+  opacity: 1 !important;
 }
 /* Shine-sweep pseudo: soft white diagonal band at rest sits at
    left: -60% (off-screen); animates across on hover / focus. */
@@ -250,15 +254,16 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 /* Secondary: outlined ghost on dark bg. */
 .rbccm-cta-band__btn--secondary {
-  background: transparent;
+  background: transparent !important;
   border-color: var(--rbccm-cta-band-white);
-  color: var(--rbccm-cta-band-white);
+  color: var(--rbccm-cta-band-white) !important;
 }
 .rbccm-cta-band__btn--secondary:hover,
 .rbccm-cta-band__btn--secondary:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08) !important;
   border-color: var(--rbccm-cta-band-white);
-  color: var(--rbccm-cta-band-white);
+  color: var(--rbccm-cta-band-white) !important;
+  opacity: 1 !important;
 }
 
 /* Icon inside a button. currentColor lets the SVG pick up the
@@ -448,10 +453,10 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    another button style later without a layout shift. Icon fills
    navy #061730 to match. */
 .rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary {
-  background: #FFC72C;
+  background: #FFC72C !important;
   border: 1px solid transparent;
   border-radius: 100px;
-  color: #061730;
+  color: #061730 !important;
   font-family: Roboto, Arial, sans-serif;
   font-size: 19.507px;
   font-weight: 500;
@@ -590,14 +595,15 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 /* Primary "Log in to RBC insights": warm-yellow fill, #061730 text.
    Icon inherits currentColor via fill on the SVG path. */
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary {
-  background: #FFC72C;
+  background: #FFC72C !important;
   border-color: transparent;
-  color: #061730;
+  color: #061730 !important;
 }
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary:hover,
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary:focus-visible {
-  background: #E5B325;
-  color: #061730;
+  background: #E5B325 !important;
+  color: #061730 !important;
+  opacity: 1 !important;
 }
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
   fill: #061730;
@@ -610,15 +616,16 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    -- same color language as the accordions "Expand all" pill and the
    primary CTA on this band. Pure color transitions, no flash. */
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary {
-  background: transparent;
+  background: transparent !important;
   border-color: #FFF;
-  color: #FFF;
+  color: #FFF !important;
 }
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary:hover,
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary:focus-visible {
-  background: #FFC72C;            /* RBC gold */
+  background: #FFC72C !important;            /* RBC gold */
   border-color: #FFC72C;
-  color: #003168;                 /* RBC deep navy */
+  color: #003168 !important;                 /* RBC deep navy */
+  opacity: 1 !important;
 }
 
 /* Section padding: 90px vertical mobile / tablet, 60px vertical
