@@ -286,19 +286,25 @@
                 <xsl:element name="{$TITLE_TAG}">
                   <xsl:attribute name="class">rbccm-platforms__title</xsl:attribute>
                   <xsl:attribute name="id"><xsl:value-of select="$TITLE_ID"/></xsl:attribute>
+                  <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
                   <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
                 </xsl:element>
               </xsl:if>
               <xsl:if test="$SUBTITLE_TEXT != ''">
                 <xsl:element name="{$SUBTITLE_TAG}">
                   <xsl:attribute name="class">rbccm-platforms__subtitle</xsl:attribute>
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                  <xsl:attribute name="data-animate-delay">250</xsl:attribute>
                   <xsl:value-of select="$SUBTITLE_TEXT" disable-output-escaping="yes"/>
                 </xsl:element>
               </xsl:if>
             </div>
           </xsl:if>
 
-          <div class="rbccm-platforms__grid">
+          <!-- data-stagger-parent lets rbccm-animate.js reveal each
+               .rbccm-platforms__card in sequence as the grid appears. -->
+          <div class="rbccm-platforms__grid" data-stagger-parent="fadeInUp" data-stagger-step="200">
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>

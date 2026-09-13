@@ -375,25 +375,27 @@
         <div class="rbccm-featured-insights__header">
           <xsl:choose>
             <xsl:when test="$SECTION_TITLE_TAG = 'h2'">
-              <h2 class="rbccm-featured-insights__title"><xsl:value-of select="$SECTION_TITLE"/></h2>
+              <h2 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h2>
             </xsl:when>
             <xsl:when test="$SECTION_TITLE_TAG = 'h4'">
-              <h4 class="rbccm-featured-insights__title"><xsl:value-of select="$SECTION_TITLE"/></h4>
+              <h4 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h4>
             </xsl:when>
             <xsl:otherwise>
-              <h3 class="rbccm-featured-insights__title"><xsl:value-of select="$SECTION_TITLE"/></h3>
+              <h3 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h3>
             </xsl:otherwise>
           </xsl:choose>
           <xsl:if test="normalize-space($SECTION_SUBHEAD) != ''">
-            <p class="rbccm-featured-insights__subtitle"><xsl:value-of select="$SECTION_SUBHEAD" disable-output-escaping="yes"/></p>
+            <p class="rbccm-featured-insights__subtitle" data-animate="fadeInUp" data-animate-delay="250"><xsl:value-of select="$SECTION_SUBHEAD" disable-output-escaping="yes"/></p>
           </xsl:if>
         </div>
 
         <!-- Screen-reader-only live region for the Slick a11y announcer. -->
         <div class="rbccm-featured-insights__sr-only" aria-live="polite" aria-atomic="true"></div>
 
-        <!-- ===== Tile grid ===== -->
-        <ul class="rbccm-insight-tiles__row">
+        <!-- ===== Tile grid =====
+             data-stagger-parent lets rbccm-animate/rbccm-animate.js reveal
+             each tile in sequence as the row enters the viewport. -->
+        <ul class="rbccm-insight-tiles__row" data-stagger-parent="fadeInUp" data-stagger-step="200">
 
           <xsl:call-template name="renderTile">
             <xsl:with-param name="featured"   select="'yes'"/>

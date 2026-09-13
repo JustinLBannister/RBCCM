@@ -1,33 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  RBCCM Expertise - XSL skin
+  RBCCM Expertise :: strategy-and-economics-expertise (single-skin build)
   ==============================================================
-  Renders a Preset-driven pillar/column-list section. Section
-  header + 4 pillar slots, each with a preset icon, title, and
-  short body. Icon library is inline SVG dispatched by name via
-  xsl:choose in the iconSvg template; adding a new icon means
-  adding another xsl:when branch there and a new Option in the
-  Pillar{N}IconName Datum.
+  Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
+  the "Strategy and Economics" preset of rbccm-expertise. No
+  Preset branching -- the variant class is hardcoded below.
 
-  Presets
-  ==============================================================
-  The $VARIANT_CLASS map inside the root template resolves the
-  Preset Datum to a BEM modifier class on the .rbccm-expertise
-  section. Everything else (structure, tag pickers, pillar slot
-  rendering) is shared. Adding a preset:
-    1. Add a <xsl:when> branch to the VARIANT_CLASS variable
-    2. Add a modifier scope in rbccm-expertise.css with the
-       preset's palette overrides (bg / border / colors)
-    3. Add a matching <Option> to the Preset Datum in
-       rbccm-expertise-properties.xml
+  Structure: header (title + description) -> 4-pillar track ->
+  arrow controls + dot pager. Each pillar reveals with a
+  0/150/300/450ms fadeInUp cascade.
 
-  Current presets:
-    strategy-and-economics-expertise    (S+E page)
-    why-rbc-capital-markets             (Why RBCCM section)
-
-  Semantic tag picker guarded via pickTag allow-list. Blank
-  Pillar{N}TitleText hides the slot entirely so shorter lists
-  need no XSL edits.
+  Companion skin: rbccm-expertise--why-rbc-capital-markets.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -45,10 +28,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Icon library. Each SVG uses currentColor + a 32x32 viewBox so
-       the variant CSS drives color via `.__pillar-icon { color: ... }`.
-       Extend by adding another xsl:when branch here and adding the
-       matching Option to the Pillar{N}IconName Datum. -->
+  <!-- Icon library. Extend by adding another xsl:when here. -->
   <xsl:template name="iconSvg">
     <xsl:param name="name"/>
     <xsl:choose>
@@ -64,7 +44,7 @@
       </xsl:when>
       <xsl:when test="$name = 'chart'">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 30" fill="none" fill-rule="evenodd" aria-hidden="true">
-          <g clip-path="url(#clip0_rbccm_expertise_chart)" fill-rule="evenodd">
+          <g clip-path="url(#clip0_rbccm_expertise_chart_sae)" fill-rule="evenodd">
             <path d="M31.9491 0.200487C31.832 0.09921 31.5412 0 31.358 0L29.2814 0.0199798C29.0934 0.0220467 28.9197 0.0978321 28.7923 0.233557C28.6621 0.372038 28.5939 0.558745 28.6035 0.746142C28.6228 1.10371 28.9066 1.37378 29.278 1.38894L29.7844 1.40961L26.5532 4.56917C23.2324 7.81692 19.2378 10.3047 14.6803 11.9651C10.395 13.5263 5.73285 14.3179 0.823331 14.3179H0.756502C0.523634 14.3179 0.318324 14.3985 0.179844 14.5446C0.0544532 14.6769 -0.00893092 14.856 0.0007145 15.0489C0.0206943 15.4368 0.325214 15.6972 0.758569 15.6972C5.85066 15.6938 10.6747 14.8801 15.0965 13.279C19.8131 11.5711 23.9572 9.00262 27.4137 5.64395L30.7875 2.36588L30.8054 2.91705C30.8178 3.30218 31.112 3.59292 31.4895 3.59292C31.5026 3.59292 31.5157 3.59292 31.5281 3.59154C31.8354 3.57569 32.1689 3.31251 32.1737 2.91498L32.1978 0.841218C32.1999 0.646932 32.0917 0.324499 31.9477 0.200487H31.9491ZM32.0373 2.9136C32.0338 3.22088 31.7762 3.44135 31.5219 3.45444C31.2105 3.47097 30.9549 3.24706 30.9439 2.91292L30.9156 2.05103L27.3186 5.54611C20.1837 12.4791 10.5914 15.5532 0.759257 15.5601C0.398243 15.5601 0.154352 15.3569 0.138506 15.042C0.120593 14.7024 0.374819 14.4557 0.75788 14.4564C10.331 14.4702 19.7263 11.4381 26.6496 4.66838L30.1089 1.2856L29.2835 1.25184C28.97 1.23875 28.7565 1.0169 28.7413 0.739252C28.7255 0.449201 28.948 0.161905 29.2828 0.15846L31.3593 0.138481C31.5026 0.137103 31.7644 0.223911 31.8588 0.305209C31.9636 0.396151 32.0628 0.672423 32.0614 0.840529L32.0373 2.91429V2.9136Z" fill="currentColor"/>
             <path d="M31.8596 0.305192C31.7652 0.223206 31.5034 0.136397 31.3601 0.138464L29.2836 0.158444C28.9494 0.161889 28.7269 0.449184 28.7421 0.739235C28.7572 1.01757 28.9708 1.23942 29.2843 1.25182L30.1096 1.28558L26.6504 4.66836C19.727 11.4374 10.3317 14.4702 0.757958 14.4564C0.374898 14.4564 0.120672 14.703 0.138585 15.042C0.15512 15.3562 0.398322 15.5601 0.759336 15.5601C10.5915 15.5532 20.1838 12.4791 27.3187 5.5461L30.9157 2.05101L30.944 2.9129C30.955 3.24704 31.2106 3.47095 31.522 3.45442C31.7755 3.44133 32.0332 3.22086 32.0374 2.91359L32.0615 0.839823C32.0635 0.671718 31.9643 0.395445 31.8589 0.304503L31.8596 0.305192Z" fill="currentColor"/>
             <path d="M30.9363 19.2778C30.9232 19.2778 30.9108 19.2778 30.8977 19.2792C30.5835 19.2971 30.2501 19.5437 30.2501 19.9661L30.2487 27.6548C30.2487 27.8822 30.0606 28.0737 29.8381 28.0737H28.7371C28.5063 28.073 28.3251 27.8863 28.3251 27.648V11.175C28.3251 10.9373 28.5063 10.7506 28.7371 10.7499L29.8388 10.7485C30.0606 10.7485 30.2487 10.9386 30.2487 11.1632L30.2521 15.0118C30.2521 15.4389 30.6028 15.6945 30.9411 15.6945C30.9535 15.6945 30.9659 15.6945 30.9783 15.6938C31.2897 15.6773 31.6259 15.4114 31.6252 15.0125V11.1577C31.6238 10.1746 30.826 9.37402 29.8443 9.37402L28.7309 9.3754C27.7319 9.37609 26.95 10.1636 26.95 11.1681V27.6555C26.95 28.66 27.7326 29.4475 28.7316 29.4482H29.8463C30.8274 29.4482 31.6252 28.6469 31.6252 27.661V19.9654C31.6252 19.5355 31.2759 19.2778 30.937 19.2778H30.9363ZM31.4867 27.661C31.4867 28.5856 30.7468 29.3118 29.8443 29.3111H28.7309C27.8256 29.3097 27.0871 28.5891 27.0871 27.6555V11.1681C27.0871 10.2352 27.8256 9.51388 28.7302 9.51319L29.8436 9.51182C30.7482 9.51113 31.4854 10.2435 31.4854 11.1577V15.0125C31.4867 15.3259 31.2242 15.543 30.9693 15.5567C30.6751 15.5726 30.3885 15.3507 30.3885 15.0125L30.3851 11.1639C30.3851 10.8622 30.1343 10.6107 29.8367 10.6114L28.7357 10.6128C28.4388 10.6128 28.1859 10.8505 28.1859 11.1756V27.6486C28.1859 27.9725 28.4381 28.2108 28.7357 28.2108H29.8367C30.1322 28.2122 30.3858 27.9649 30.3858 27.6548L30.3872 19.9661C30.3872 19.6402 30.6441 19.4314 30.9046 19.417C31.1932 19.4004 31.4861 19.6181 31.4861 19.9654V27.661H31.4867Z" fill="currentColor"/>
@@ -85,7 +65,7 @@
             <path d="M30.9048 16.6652C30.6457 16.679 30.3894 16.8967 30.3901 17.206L30.3915 17.7654C30.3915 18.0713 30.6361 18.2891 30.9062 18.3056C31.1204 18.3187 31.4422 18.1733 31.467 17.8619C31.4856 17.6283 31.4897 17.4099 31.487 17.2088C31.4821 16.8691 31.2017 16.6493 30.9055 16.6645L30.9048 16.6652Z" fill="currentColor"/>
           </g>
           <defs>
-            <clipPath id="clip0_rbccm_expertise_chart">
+            <clipPath id="clip0_rbccm_expertise_chart_sae">
               <rect width="32.1992" height="30" fill="white"/>
             </clipPath>
           </defs>
@@ -100,11 +80,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Render one pillar. animateDelay drives the scroll-triggered stagger.
-       We tag each pillar individually (not the parent .__track) because
-       Slick wraps the pillars in extra DOM at runtime, so a
-       data-stagger-parent on the track would target the wrong children
-       once the carousel initializes. -->
+  <!-- Render one pillar. -->
   <xsl:template name="renderPillar">
     <xsl:param name="iconName"/>
     <xsl:param name="titleText"/>
@@ -139,7 +115,7 @@
     </div>
   </xsl:template>
 
-  <!-- Per-slot lookup + renderPillar dispatcher (reads Pillar{N}FieldName). -->
+  <!-- Per-slot lookup + renderPillar dispatcher. -->
   <xsl:template name="renderSlot">
     <xsl:param name="n"/>
     <xsl:variable name="title" select="normalize-space(/Properties/Data/Datum[@ID=concat('Pillar', $n, 'TitleText')]/text()[last()])"/>
@@ -168,7 +144,6 @@
         <xsl:with-param name="titleTag" select="$titleTag"/>
         <xsl:with-param name="bodyText" select="$body"/>
         <xsl:with-param name="bodyTag" select="$bodyTag"/>
-        <!-- Stagger step: 0 / 150 / 300 / 450 for slots 1-4. -->
         <xsl:with-param name="animateDelay" select="($n - 1) * 150"/>
       </xsl:call-template>
     </xsl:if>
@@ -182,7 +157,6 @@
     <xsl:variable name="CSS_PATH"      select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
     <xsl:variable name="JS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
     <xsl:variable name="CACHE_VERSION" select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"        select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
 
     <xsl:variable name="TITLE_TEXT"    select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleText']/text()[last()])"/>
     <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleTag']/text()[last()])"/>
@@ -219,83 +193,68 @@
       </link>
     </xsl:if>
 
-    <!-- Preset-to-variant-class map. Extend by adding another
-         xsl:when here + a matching CSS scope + Properties Option. -->
-    <xsl:variable name="VARIANT_CLASS">
-      <xsl:choose>
-        <xsl:when test="$PRESET = 'strategy-and-economics-expertise'">rbccm-expertise--strategy-and-economics-expertise</xsl:when>
-        <xsl:when test="$PRESET = 'why-rbc-capital-markets'">rbccm-expertise--why-rbc-capital-markets</xsl:when>
-        <xsl:otherwise/>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:if test="$VARIANT_CLASS != ''">
-
-      <section>
-        <xsl:attribute name="class">rbccm-expertise <xsl:value-of select="$VARIANT_CLASS"/><xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-expertise--header-center</xsl:if></xsl:attribute>
-        <xsl:if test="$SECTION_ID != ''">
-          <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
-        </xsl:if>
-        <xsl:if test="$SECTION_ARIA != ''">
-          <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
-        </xsl:if>
-
-        <div class="container rbccm-expertise__inner">
-
-          <div class="rbccm-expertise__header">
-            <xsl:if test="$TITLE_TEXT != ''">
-              <xsl:element name="{$TITLE_TAG}">
-                <xsl:attribute name="class">rbccm-expertise__title</xsl:attribute>
-                <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
-                <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
-                <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
-              </xsl:element>
-            </xsl:if>
-            <xsl:if test="normalize-space($DESC_TEXT) != ''">
-              <xsl:element name="{$DESC_TAG}">
-                <xsl:attribute name="class">rbccm-expertise__description</xsl:attribute>
-                <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
-                <xsl:attribute name="data-animate-delay">250</xsl:attribute>
-                <xsl:value-of select="$DESC_TEXT" disable-output-escaping="yes"/>
-              </xsl:element>
-            </xsl:if>
-          </div>
-
-          <div class="rbccm-expertise__sr-only" aria-live="polite" aria-atomic="true"></div>
-
-          <div class="rbccm-expertise__track">
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
-          </div>
-
-          <div class="rbccm-expertise__controls">
-            <button class="rbccm-expertise__btn rbccm-expertise__btn--prev" type="button" aria-label="Previous item">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
-                <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <div class="rbccm-expertise__dots"></div>
-            <button class="rbccm-expertise__btn rbccm-expertise__btn--next" type="button" aria-label="Next item">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
-                <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-      <xsl:if test="$JS_PATH != ''">
-        <script>
-          <xsl:attribute name="src">
-            <xsl:value-of select="$JS_PATH"/>
-            <xsl:if test="$CACHE_VERSION != ''">?v=<xsl:value-of select="$CACHE_VERSION"/></xsl:if>
-          </xsl:attribute>
-        </script>
+    <section>
+      <xsl:attribute name="class">rbccm-expertise rbccm-expertise--strategy-and-economics-expertise<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-expertise--header-center</xsl:if></xsl:attribute>
+      <xsl:if test="$SECTION_ID != ''">
+        <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$SECTION_ARIA != ''">
+        <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
       </xsl:if>
 
+      <div class="container rbccm-expertise__inner">
+
+        <div class="rbccm-expertise__header">
+          <xsl:if test="$TITLE_TEXT != ''">
+            <xsl:element name="{$TITLE_TAG}">
+              <xsl:attribute name="class">rbccm-expertise__title</xsl:attribute>
+              <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+              <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
+            </xsl:element>
+          </xsl:if>
+          <xsl:if test="normalize-space($DESC_TEXT) != ''">
+            <xsl:element name="{$DESC_TAG}">
+              <xsl:attribute name="class">rbccm-expertise__description</xsl:attribute>
+              <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+              <xsl:attribute name="data-animate-delay">250</xsl:attribute>
+              <xsl:value-of select="$DESC_TEXT" disable-output-escaping="yes"/>
+            </xsl:element>
+          </xsl:if>
+        </div>
+
+        <div class="rbccm-expertise__sr-only" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="rbccm-expertise__track">
+          <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
+          <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
+          <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
+          <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
+        </div>
+
+        <div class="rbccm-expertise__controls">
+          <button class="rbccm-expertise__btn rbccm-expertise__btn--prev" type="button" aria-label="Previous item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+              <path d="M12.3032 1L1.41422 11.889L12.3032 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="rbccm-expertise__dots"></div>
+          <button class="rbccm-expertise__btn rbccm-expertise__btn--next" type="button" aria-label="Next item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+              <path d="M1.69678 1L12.5858 11.889L1.69678 22.778" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <xsl:if test="$JS_PATH != ''">
+      <script>
+        <xsl:attribute name="src">
+          <xsl:value-of select="$JS_PATH"/>
+          <xsl:if test="$CACHE_VERSION != ''">?v=<xsl:value-of select="$CACHE_VERSION"/></xsl:if>
+        </xsl:attribute>
+      </script>
     </xsl:if>
 
   </xsl:template>

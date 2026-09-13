@@ -100,6 +100,15 @@ p.rbccm-in-the-media__featured-title,  div.rbccm-in-the-media__featured-title {
   margin: 0 0 18px 0 !important;
   padding: 0 !important;
 }
+/* Default (Figma) has no subhead -- baseline 18px bottom-margin on the
+   title is correct. When the editor DOES fill in SectionSubhead, the
+   subtitle sits right beneath the title and owns the spacing to the
+   content below; collapse the title's bottom margin so the pair hugs
+   as a unit. :has() lets us key off the sibling without a modifier
+   class. */
+.rbccm-in-the-media .rbccm-in-the-media__title:has(+ .rbccm-in-the-media__subtitle) {
+  margin-bottom: 0 !important;
+}
 
 /* ---------- Section subhead (optional) -----------------------------------
    Only rendered when the SectionSubhead Datum is non-empty. Tag-agnostic
@@ -116,7 +125,7 @@ p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
   font-style: normal !important;
   font-weight: 400 !important;
   line-height: 150% !important; /* 24px */
-  margin: -6px 0 24px 0 !important; /* tighten to the title, breathe below */
+  margin: 0px 0 50px 0 !important; /* 50px bottom breathing room to the content below */
   max-width: 720px;
   padding: 0 !important;
 }
@@ -593,6 +602,11 @@ p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
     font-size: 42px !important;
     line-height: 125% !important; /* 52.5px */
     margin: 0 0 33px 0 !important; /* +15 over mobile's 18 */
+  }
+  /* Desktop: same subhead-present hug as mobile -- title bottom-margin
+     collapses to 0 so the subhead owns spacing to the content below. */
+  .rbccm-in-the-media .rbccm-in-the-media__title:has(+ .rbccm-in-the-media__subtitle) {
+    margin-bottom: 0 !important;
   }
 
   /* Desktop -- featured content pane gets uniform 32px padding

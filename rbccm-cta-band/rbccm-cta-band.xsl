@@ -46,12 +46,18 @@
     </svg>
   </xsl:template>
 
-  <!-- Render one button. Kind param: 'primary' or 'secondary'. -->
+  <!-- Render one button. Kind param: 'primary' or 'secondary'.
+       Optional animateDelay: when non-empty, stamps
+       data-animate="fadeInUp" + data-animate-delay="{ms}" so each
+       button can stagger independently on scroll-in (matches the
+       research-portal variant's cascade -- primary at 500, secondary
+       at 650). Blank = no animation attrs emitted. -->
   <xsl:template name="renderButton">
     <xsl:param name="kind"/>
     <xsl:param name="text"/>
     <xsl:param name="href"/>
     <xsl:param name="newTab"/>
+    <xsl:param name="animateDelay"/>
 
     <xsl:if test="$text != ''">
       <a>
@@ -65,6 +71,10 @@
         <xsl:if test="$newTab = 'yes'">
           <xsl:attribute name="target">_blank</xsl:attribute>
           <xsl:attribute name="rel">noopener</xsl:attribute>
+        </xsl:if>
+        <xsl:if test="$animateDelay != ''">
+          <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+          <xsl:attribute name="data-animate-delay"><xsl:value-of select="$animateDelay"/></xsl:attribute>
         </xsl:if>
         <span><xsl:value-of select="$text"/></span>
         <xsl:if test="$kind = 'primary'">
@@ -155,12 +165,16 @@
 
           <xsl:choose>
 
-            <!-- ==== talk-with-an-expert: flat DOM (eyebrow + heading + body + actions) ==== -->
+            <!-- ==== talk-with-an-expert: flat DOM (eyebrow + heading + body + actions) ====
+                 Animation cascade mirrors the live MAAS+MATA "See the
+                 platform" band: eyebrow / heading / body / primary CTA
+                 fade up in sequence at 0 / 100 / 200 / 300 ms. -->
             <xsl:when test="$PRESET = 'talk-with-an-expert'">
 
               <xsl:if test="$EYEBROW_TEXT != ''">
                 <xsl:element name="{$EYEBROW_TAG}">
                   <xsl:attribute name="class">rbccm-cta-band__eyebrow</xsl:attribute>
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
                   <xsl:value-of select="$EYEBROW_TEXT"/>
                 </xsl:element>
               </xsl:if>
@@ -168,6 +182,8 @@
               <xsl:if test="normalize-space($HEADING_TEXT) != ''">
                 <xsl:element name="{$HEADING_TAG}">
                   <xsl:attribute name="class">rbccm-cta-band__heading</xsl:attribute>
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                  <xsl:attribute name="data-animate-delay">100</xsl:attribute>
                   <xsl:value-of select="$HEADING_TEXT" disable-output-escaping="yes"/>
                 </xsl:element>
               </xsl:if>
@@ -175,6 +191,8 @@
               <xsl:if test="normalize-space($BODY_TEXT) != ''">
                 <xsl:element name="{$BODY_TAG}">
                   <xsl:attribute name="class">rbccm-cta-band__body</xsl:attribute>
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                  <xsl:attribute name="data-animate-delay">200</xsl:attribute>
                   <xsl:value-of select="$BODY_TEXT" disable-output-escaping="yes"/>
                 </xsl:element>
               </xsl:if>
@@ -186,19 +204,26 @@
                     <xsl:with-param name="text" select="$PRIMARY_TEXT"/>
                     <xsl:with-param name="href" select="$PRIMARY_HREF"/>
                     <xsl:with-param name="newTab" select="$PRIMARY_NEWTAB"/>
+                    <xsl:with-param name="animateDelay" select="'300'"/>
                   </xsl:call-template>
                   <xsl:call-template name="renderButton">
                     <xsl:with-param name="kind" select="'secondary'"/>
                     <xsl:with-param name="text" select="$SECONDARY_TEXT"/>
                     <xsl:with-param name="href" select="$SECONDARY_HREF"/>
                     <xsl:with-param name="newTab" select="$SECONDARY_NEWTAB"/>
+                    <xsl:with-param name="animateDelay" select="'400'"/>
                   </xsl:call-template>
                 </div>
               </xsl:if>
 
             </xsl:when>
 
-            <!-- ==== research-portal: nested intro wrapper for tight heading+body gap ==== -->
+            <!-- ==== research-portal: nested intro wrapper for tight heading+body gap ====
+                 Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js.
+                 Both variants animate: talk-with-an-expert cascades
+                 eyebrow/heading/body/CTA at 0/100/200/300 (matching the
+                 live MAAS+MATA "See the platform" band); research-portal
+                 cascades heading/body/primary/secondary at 0/250/500/650. -->
             <xsl:when test="$PRESET = 'research-portal'">
 
               <xsl:if test="normalize-space($HEADING_TEXT) != '' or normalize-space($BODY_TEXT) != ''">
@@ -206,12 +231,15 @@
                   <xsl:if test="normalize-space($HEADING_TEXT) != ''">
                     <xsl:element name="{$HEADING_TAG}">
                       <xsl:attribute name="class">rbccm-cta-band__heading</xsl:attribute>
+                      <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
                       <xsl:value-of select="$HEADING_TEXT" disable-output-escaping="yes"/>
                     </xsl:element>
                   </xsl:if>
                   <xsl:if test="normalize-space($BODY_TEXT) != ''">
                     <xsl:element name="{$BODY_TAG}">
                       <xsl:attribute name="class">rbccm-cta-band__body</xsl:attribute>
+                      <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                      <xsl:attribute name="data-animate-delay">250</xsl:attribute>
                       <xsl:value-of select="$BODY_TEXT" disable-output-escaping="yes"/>
                     </xsl:element>
                   </xsl:if>
@@ -219,18 +247,24 @@
               </xsl:if>
 
               <xsl:if test="$PRIMARY_TEXT != '' or $SECONDARY_TEXT != ''">
+                <!-- Actions row: no parent-level data-animate. Each
+                     button carries its own delay (primary 500, secondary
+                     650) so the second lands slightly after the first
+                     instead of both fading in together. -->
                 <div class="rbccm-cta-band__actions">
                   <xsl:call-template name="renderButton">
                     <xsl:with-param name="kind" select="'primary'"/>
                     <xsl:with-param name="text" select="$PRIMARY_TEXT"/>
                     <xsl:with-param name="href" select="$PRIMARY_HREF"/>
                     <xsl:with-param name="newTab" select="$PRIMARY_NEWTAB"/>
+                    <xsl:with-param name="animateDelay" select="'500'"/>
                   </xsl:call-template>
                   <xsl:call-template name="renderButton">
                     <xsl:with-param name="kind" select="'secondary'"/>
                     <xsl:with-param name="text" select="$SECONDARY_TEXT"/>
                     <xsl:with-param name="href" select="$SECONDARY_HREF"/>
                     <xsl:with-param name="newTab" select="$SECONDARY_NEWTAB"/>
+                    <xsl:with-param name="animateDelay" select="'650'"/>
                   </xsl:call-template>
                 </div>
               </xsl:if>

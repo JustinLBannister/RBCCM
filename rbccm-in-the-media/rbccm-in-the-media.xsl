@@ -162,6 +162,8 @@
             <xsl:element name="{$TITLE_TAG}">
               <xsl:attribute name="class">rbccm-in-the-media__title</xsl:attribute>
               <xsl:attribute name="id"><xsl:value-of select="$TITLE_ID"/></xsl:attribute>
+              <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
+              <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
               <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
             </xsl:element>
           </xsl:if>
@@ -169,14 +171,15 @@
           <!-- Optional subhead. Skipped entirely when the Datum is blank
                in TeamSite so no empty &lt;p&gt; ships to the DOM. -->
           <xsl:if test="$SUBHEAD_TEXT != ''">
-            <p class="rbccm-in-the-media__subtitle"><xsl:value-of select="$SUBHEAD_TEXT" disable-output-escaping="yes"/></p>
+            <p class="rbccm-in-the-media__subtitle" data-animate="fadeInUp" data-animate-delay="100"><xsl:value-of select="$SUBHEAD_TEXT" disable-output-escaping="yes"/></p>
           </xsl:if>
 
           <div class="rbccm-in-the-media__content">
 
             <!-- Featured card shell. Empty by default; JS populates
-                 from item[0] of the feed. -->
-            <article class="rbccm-in-the-media__featured" data-rbccm-in-the-media-featured="true">
+                 from item[0] of the feed. Scroll-triggered reveal via
+                 rbccm-animate/rbccm-animate.js. -->
+            <article class="rbccm-in-the-media__featured" data-rbccm-in-the-media-featured="true" data-animate="fadeInUp" data-animate-delay="200">
               <!-- Static aria-label so the anchor has an accessible
                    name even if the sidecar JS never runs (WCAG 4.1.2
                    graceful-degradation). JS overrides this with the
@@ -200,8 +203,12 @@
             </article>
 
             <!-- Media-appearance list shell. Empty rows by default;
-                 JS populates from items 1..itemCount-1 of the feed. -->
-            <ul class="rbccm-in-the-media__list" data-rbccm-in-the-media-list="true"></ul>
+                 JS populates from items 1..itemCount-1 of the feed.
+                 data-stagger-parent lets rbccm-animate.js reveal each
+                 populated row in sequence. fadeInRight (not fadeInUp)
+                 differentiates the list from the featured card that
+                 already fades up from below. -->
+            <ul class="rbccm-in-the-media__list" data-rbccm-in-the-media-list="true" data-stagger-parent="fadeInRight" data-stagger-step="200"></ul>
 
           </div>
 

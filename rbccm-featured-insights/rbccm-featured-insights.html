@@ -18,6 +18,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RBCCM Featured Insights -- preview</title>
 <link rel="stylesheet" href="rbccm-featured-insights.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
 <style>
   body { margin: 0; font-family: Roboto, Arial, sans-serif; background: #fff; color: #1B1F27; }
   .rbccm-preview-note {
@@ -46,15 +48,15 @@
 
     <!-- ===== Section header ===== -->
     <div class="rbccm-featured-insights__header">
-      <h2 class="rbccm-featured-insights__title">Featured insights</h2>
-      <p class="rbccm-featured-insights__subtitle">High-signal RBC research organized across key market pillars.</p>
+      <h2 class="rbccm-featured-insights__title" data-animate="fadeInUp">Featured insights</h2>
+      <p class="rbccm-featured-insights__subtitle" data-animate="fadeInUp" data-animate-delay="250">High-signal RBC research organized across key market pillars.</p>
     </div>
 
     <!-- Screen-reader-only live region for the slick a11y announcer. -->
     <div class="rbccm-featured-insights__sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <!-- ===== Tile grid (4 author-curated tiles) ===== -->
-    <ul class="rbccm-insight-tiles__row">
+    <ul class="rbccm-insight-tiles__row" data-stagger-parent="fadeInUp" data-stagger-step="200">
 
       <!-- ---------- Featured tile (spans full row on desktop) ---------- -->
       <li class="rbccm-insight-tiles__item">

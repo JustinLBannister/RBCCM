@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RBCCM Accordions -- local preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <link rel="stylesheet" href="rbccm-accordions.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
 <style>
   body { margin: 0; background: #0a0f1a; font-family: Roboto, Arial, sans-serif; }
   .demo-note {
@@ -24,14 +26,14 @@
     <!-- Header: title + description + Expand all -->
     <div class="rbccm-accordions__header">
       <div class="rbccm-accordions__header-lede">
-        <h2 class="rbccm-accordions__title">S&amp;E Notes</h2>
-        <p class="rbccm-accordions__description">Timely, short-form commentary from our economists and strategists.</p>
+        <h2 class="rbccm-accordions__title" data-animate="fadeInUp">S&amp;E Notes</h2>
+        <p class="rbccm-accordions__description" data-animate="fadeInUp" data-animate-delay="250">Timely, short-form commentary from our economists and strategists.</p>
       </div>
-      <button class="rbccm-accordions__expand-all" type="button" data-accordions-expand-all aria-expanded="false">Expand all</button>
+      <button class="rbccm-accordions__expand-all" type="button" data-accordions-expand-all aria-expanded="false" data-animate="fadeIn" data-animate-delay="500">Expand all</button>
     </div>
 
     <!-- List of notes -->
-    <div class="rbccm-accordions__list">
+    <div class="rbccm-accordions__list" data-stagger-parent="fadeInUp" data-stagger-step="160">
 
       <!-- Item 1 -- collapsed -->
       <article class="rbccm-accordions__item">

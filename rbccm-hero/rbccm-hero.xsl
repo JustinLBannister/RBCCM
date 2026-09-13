@@ -239,10 +239,14 @@
 
           <div class="rbccm-hero__container">
 
-            <!-- Eyebrow -->
+            <!-- Eyebrow. Hero on-load cascade begins here at 0ms
+                 (matches the live MAAS+MATA page's 0/150/300/450
+                 rhythm: eyebrow / title / subtitle / actions). -->
             <xsl:if test="$MM_EYEBROW_TEXT != ''">
               <xsl:element name="{$MM_EYEBROW_TAG}">
                 <xsl:attribute name="class">rbccm-hero__eyebrow</xsl:attribute>
+                <xsl:attribute name="data-animate-hero">fadeInDown</xsl:attribute>
+                <xsl:attribute name="data-animate-delay">0</xsl:attribute>
                 <xsl:value-of select="$MM_EYEBROW_TEXT"/>
               </xsl:element>
             </xsl:if>
@@ -252,6 +256,8 @@
             <xsl:if test="$MM_TITLE_L1 != '' or $MM_TITLE_L2 != ''">
               <xsl:element name="{$MM_TITLE_TAG}">
                 <xsl:attribute name="class">rbccm-hero__title</xsl:attribute>
+                <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+                <xsl:attribute name="data-animate-delay">150</xsl:attribute>
                 <xsl:if test="$MM_TITLE_L1 != ''">
                   <span class="rbccm-hero__title-line"><xsl:value-of select="$MM_TITLE_L1"/></span>
                 </xsl:if>
@@ -266,13 +272,15 @@
             <xsl:if test="normalize-space($MM_SUBTITLE_TEXT) != ''">
               <xsl:element name="{$MM_SUBTITLE_TAG}">
                 <xsl:attribute name="class">rbccm-hero__subtitle</xsl:attribute>
+                <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+                <xsl:attribute name="data-animate-delay">300</xsl:attribute>
                 <xsl:value-of select="$MM_SUBTITLE_TEXT" disable-output-escaping="yes"/>
               </xsl:element>
             </xsl:if>
 
             <!-- CTA row. Skips entirely when neither button has a label. -->
             <xsl:if test="$MM_CTA1_LABEL != '' or $MM_CTA2_LABEL != ''">
-              <div class="rbccm-hero__actions">
+              <div class="rbccm-hero__actions" data-animate-hero="fadeInUp" data-animate-delay="450">
 
                 <xsl:if test="$MM_CTA1_LABEL != ''">
                   <a>
@@ -567,6 +575,10 @@
                 <xsl:if test="$SE_TITLE_TEXT != ''">
                   <xsl:element name="{$SE_TITLE_TAG}">
                     <xsl:attribute name="class">rbccm-hero__title</xsl:attribute>
+                    <!-- Above-the-fold reveal driven by rbccm-animate/rbccm-animate.js.
+                         data-animate-hero fires immediately on page load (no scroll
+                         wait) so the hero copy pops in as the page first paints. -->
+                    <xsl:attribute name="data-animate-hero">fadeInDown</xsl:attribute>
                     <xsl:value-of select="$SE_TITLE_TEXT"/>
                   </xsl:element>
                 </xsl:if>
@@ -574,6 +586,8 @@
                 <xsl:if test="normalize-space($SE_BODY_TEXT) != ''">
                   <xsl:element name="{$SE_BODY_TAG}">
                     <xsl:attribute name="class">rbccm-hero__body</xsl:attribute>
+                    <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+                    <xsl:attribute name="data-animate-delay">150</xsl:attribute>
                     <xsl:value-of select="$SE_BODY_TEXT" disable-output-escaping="yes"/>
                   </xsl:element>
                 </xsl:if>
@@ -581,7 +595,7 @@
               </div>
 
               <!-- Right column: dark-navy insight card -->
-              <article class="rbccm-hero__insight-card">
+              <article class="rbccm-hero__insight-card" data-animate-hero="fadeIn" data-animate-delay="325">
 
                 <xsl:if test="$SE_INS_EYE_TEXT != ''">
                   <div class="rbccm-hero__insight-eyebrow-row">

@@ -38,7 +38,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Toggle icon -- a single plus SVG whose fill inherits from the
+  <!-- Toggle icon: a single plus SVG whose fill inherits from the
        button's currentColor. CSS rotates it 45deg clockwise on
        .is-open (a symmetric plus becomes an X visually) and swaps
        the button's color from warm yellow to bright blue. One SVG,
@@ -217,18 +217,24 @@
                 <xsl:if test="$TITLE_TEXT != ''">
                   <xsl:element name="{$TITLE_TAG}">
                     <xsl:attribute name="class">rbccm-accordions__title</xsl:attribute>
+                    <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js.
+                         Runtime injects opacity:0 pre-state; IntersectionObserver plays
+                         the animate.css class when the element enters the viewport. -->
+                    <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
                     <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
                   </xsl:element>
                 </xsl:if>
                 <xsl:if test="normalize-space($DESC_TEXT) != ''">
                   <xsl:element name="{$DESC_TAG}">
                     <xsl:attribute name="class">rbccm-accordions__description</xsl:attribute>
+                    <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                    <xsl:attribute name="data-animate-delay">250</xsl:attribute>
                     <xsl:value-of select="$DESC_TEXT" disable-output-escaping="yes"/>
                   </xsl:element>
                 </xsl:if>
               </div>
               <xsl:if test="$EXPAND_LABEL != ''">
-                <button type="button" class="rbccm-accordions__expand-all" data-accordions-expand-all="" aria-expanded="false">
+                <button type="button" class="rbccm-accordions__expand-all" data-accordions-expand-all="" aria-expanded="false" data-animate="fadeIn" data-animate-delay="500">
                   <xsl:attribute name="data-label-expand"><xsl:value-of select="$EXPAND_LABEL"/></xsl:attribute>
                   <xsl:if test="$COLLAPSE_LABEL != ''">
                     <xsl:attribute name="data-label-collapse"><xsl:value-of select="$COLLAPSE_LABEL"/></xsl:attribute>
@@ -238,8 +244,9 @@
               </xsl:if>
             </div>
 
-            <!-- Note list -->
-            <div class="rbccm-accordions__list">
+            <!-- Note list. data-stagger-parent lets rbccm-animate.js reveal
+                 direct children one after another with a fixed step. -->
+            <div class="rbccm-accordions__list" data-stagger-parent="fadeInUp" data-stagger-step="160">
 
               <!-- Loop over 8 slots. Each slot's Datums are read fresh
                    inside a call-template; xsl:call-template with

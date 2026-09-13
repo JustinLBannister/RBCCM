@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RBCCM Expertise -- local preview</title>
 <link rel="stylesheet" href="rbccm-expertise.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
 <style>
   body { margin: 0; background: #fff; font-family: Roboto, Arial, sans-serif; }
   .demo-note {
@@ -22,15 +24,15 @@
   <div class="container rbccm-expertise__inner">
 
     <div class="rbccm-expertise__header">
-      <h2 class="rbccm-expertise__title">Areas of expertise</h2>
-      <p class="rbccm-expertise__description">Comprehensive macro intelligence led by world-class strategists across key market pillars.</p>
+      <h2 class="rbccm-expertise__title" data-animate="fadeInUp">Areas of expertise</h2>
+      <p class="rbccm-expertise__description" data-animate="fadeInUp" data-animate-delay="250">Comprehensive macro intelligence led by world-class strategists across key market pillars.</p>
     </div>
 
     <div class="rbccm-expertise__sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <div class="rbccm-expertise__track">
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="0">
         <span class="rbccm-expertise__pillar-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none" aria-hidden="true">
             <path d="M30 15C30 11.0218 28.4196 7.20644 25.6066 4.3934C22.7936 1.58035 18.9782 0 15 0C11.0218 0 7.20644 1.58035 4.3934 4.3934C1.58035 7.20644 0 11.0218 0 15C0 18.9782 1.58035 22.7936 4.3934 25.6066C7.20644 28.4196 11.0218 30 15 30C18.9782 30 22.7936 28.4196 25.6066 25.6066C28.4196 22.7936 30 18.9782 30 15ZM15.9375 2.01938C17.1938 2.40188 18.4406 3.55687 19.4756 5.4975C19.7444 6.00125 19.9913 6.54625 20.2163 7.1325C18.8944 7.42687 17.4563 7.61438 15.9375 7.67063V2.01938ZM22.0331 6.63562C21.7656 5.91437 21.465 5.24062 21.1313 4.61438C20.8049 4.0026 20.4306 3.41764 20.0119 2.865C21.6084 3.52606 23.0586 4.49586 24.2794 5.71875C23.5994 6.065 22.8506 6.36937 22.0331 6.63562ZM23.4206 14.0625C23.3531 12.0562 23.0681 10.1494 22.6031 8.4225C23.6185 8.09921 24.6011 7.68047 25.5375 7.17188C27.0312 9.17671 27.9176 11.5684 28.0912 14.0625H23.4206ZM20.7956 8.92312C21.2383 10.6025 21.4899 12.3266 21.5456 14.0625H15.9375V9.54562C17.6438 9.48938 19.2806 9.27375 20.7956 8.92312ZM14.0625 9.54375V14.0625H8.45625C8.51132 12.3267 8.76229 10.6026 9.20438 8.92312C10.7194 9.27375 12.3563 9.48563 14.0625 9.54375ZM21.5437 15.9375C21.4781 17.7881 21.2137 19.5263 20.7956 21.0769C19.1999 20.7146 17.573 20.5068 15.9375 20.4562V15.9375H21.5437ZM14.0625 15.9375V20.4544C12.3563 20.5106 10.7194 20.7263 9.20438 21.0769C8.78625 19.5263 8.52187 17.7881 8.45437 15.9375H14.0625ZM20.2163 22.8675C19.9913 23.4538 19.7444 23.9988 19.4756 24.5025C18.4406 26.4431 17.1919 27.5963 15.9375 27.9806V22.3312C17.4563 22.3875 18.8944 22.5731 20.2163 22.8675ZM20.01 27.135C20.4294 26.5824 20.8043 25.9975 21.1313 25.3856C21.4759 24.7317 21.7771 24.0559 22.0331 23.3625C22.8044 23.6105 23.5554 23.9177 24.2794 24.2812C23.0586 25.5041 21.6065 26.4739 20.01 27.135ZM22.6031 21.5775C23.0893 19.7347 23.3642 17.8425 23.4225 15.9375H28.0912C27.9176 18.4316 27.0312 20.8233 25.5375 22.8281C24.6562 22.3444 23.6719 21.9244 22.6031 21.5775ZM9.98812 27.135C8.39247 26.4743 6.9429 25.5051 5.7225 24.2831C6.4459 23.9196 7.19625 23.6125 7.96688 23.3644C8.22294 24.0571 8.52422 24.7323 8.86875 25.3856C9.19508 25.9974 9.56938 26.5824 9.98812 27.135ZM14.0625 22.3294V27.9806C12.8062 27.5981 11.5594 26.4431 10.5244 24.5025C10.2544 23.9988 10.0075 23.4538 9.78375 22.8675C11.1907 22.5587 12.6229 22.3773 14.0625 22.3294ZM7.39687 21.5775C6.32812 21.9244 5.34375 22.3444 4.4625 22.8281C2.96877 20.8233 2.08237 18.4316 1.90875 15.9375H6.5775C6.63583 17.8425 6.91072 19.7347 7.39687 21.5775ZM1.90875 14.0625C2.08237 11.5684 2.96877 9.17671 4.4625 7.17188C5.34375 7.65562 6.32812 8.07563 7.39687 8.4225C6.93187 10.1475 6.64688 12.0562 6.5775 14.0625H1.90875ZM8.86875 4.61438C8.53625 5.24188 8.235 5.91562 7.965 6.63562C7.19501 6.38742 6.4453 6.08026 5.7225 5.71688C6.94306 4.49554 8.39262 3.52704 9.98812 2.86688C9.57937 3.3975 9.20437 3.98625 8.86875 4.61438ZM9.78375 7.1325C9.99777 6.5732 10.2451 6.02723 10.5244 5.4975C11.5594 3.55687 12.8062 2.40375 14.0625 2.01938V7.66875C12.5438 7.6125 11.1056 7.42687 9.78375 7.1325Z" fill="currentColor"/>
@@ -40,7 +42,7 @@
         <p class="rbccm-expertise__pillar-body">Global political developments, energy, and their market impact.</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="150">
         <span class="rbccm-expertise__pillar-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none" aria-hidden="true">
             <path d="M15 0L2.60652 5.625H0.937811C0.689175 5.625 0.450724 5.72377 0.274912 5.89959C0.0991001 6.0754 0.000333786 6.31386 0.000333786 6.5625V10.3125C0.000333786 10.5611 0.0991001 10.7996 0.274912 10.9754C0.450724 11.1512 0.689175 11.25 0.937811 11.25H1.87529V24.375C1.66592 24.3752 1.46264 24.4454 1.29783 24.5745C1.13302 24.7037 1.01618 24.8842 0.965935 25.0875L0.0284557 28.8375C-0.00644112 28.9756 -0.00927925 29.1199 0.0201569 29.2592C0.0495949 29.3986 0.110525 29.5294 0.198288 29.6416C0.286051 29.7538 0.398319 29.8444 0.526499 29.9065C0.654678 29.9686 0.795372 30.0006 0.937811 30H29.0622C29.2046 30.0006 29.3453 29.9686 29.4735 29.9065C29.6017 29.8444 29.7139 29.7538 29.8017 29.6416C29.8895 29.5294 29.9504 29.3986 29.9798 29.2592C30.0093 29.1199 30.0064 28.9756 29.9715 28.8375L29.0341 25.0875C28.9838 24.8842 28.867 24.7037 28.7022 24.5745C28.5374 24.4454 28.3341 24.3752 28.1247 24.375V11.25H29.0622C29.3108 11.25 29.5493 11.1512 29.7251 10.9754C29.9009 10.7996 29.9997 10.5611 29.9997 10.3125V6.5625C29.9997 6.31386 29.9009 6.0754 29.7251 5.89959C29.5493 5.72377 29.3108 5.625 29.0622 5.625H27.3935L15 0ZM22.918 5.625H7.08018L15 1.875L22.918 5.625ZM26.2498 11.25V24.375H24.3748V11.25H26.2498ZM22.4998 11.25V24.375H17.8124V11.25H22.4998ZM15.9375 11.25V24.375H14.0625V11.25H15.9375ZM12.1876 11.25V24.375H7.50017V11.25H12.1876ZM5.62521 11.25V24.375H3.75025V11.25H5.62521ZM1.87529 9.375V7.5H28.1247V9.375H1.87529ZM2.60652 26.25H27.3935L27.8622 28.125H2.13778L2.60652 26.25Z" fill="currentColor"/>
@@ -50,7 +52,7 @@
         <p class="rbccm-expertise__pillar-body">Growth, inflation, and policy dynamics across North America and global markets.</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="300">
         <span class="rbccm-expertise__pillar-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 30" fill="none" fill-rule="evenodd" aria-hidden="true">
             <g clip-path="url(#clip0_rbccm_expertise_chart_html)" fill-rule="evenodd">
@@ -84,7 +86,7 @@
         <p class="rbccm-expertise__pillar-body">How macro forces transmit across equities, rates, credit and FX.</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="450">
         <span class="rbccm-expertise__pillar-icon" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none" aria-hidden="true">
             <path d="M7.98289 19.3935C6.16741 16.9158 5.35427 13.8439 5.70616 10.7923C6.05805 7.74072 7.54901 4.93455 9.88077 2.9352C12.2125 0.93585 15.2131 -0.109228 18.2822 0.00904609C21.3513 0.12732 24.2626 1.40022 26.4336 3.5731C28.6046 5.74597 29.8752 8.65856 29.9913 11.7282C30.1073 14.7978 29.0603 17.798 27.0595 20.1287C25.0588 22.4593 22.252 23.9485 19.2006 24.2983C16.1492 24.648 13.0782 23.8326 10.6022 22.015H10.604C10.549 22.0901 10.4878 22.1619 10.4203 22.2307L3.20182 29.4502C2.85026 29.8021 2.37334 29.9998 1.87597 30C1.37861 30.0002 0.90155 29.8027 0.549736 29.4511C0.197924 29.0995 0.000177383 28.6225 0 28.1251C-0.000175476 27.6277 0.197235 27.1505 0.5488 26.7987L7.76728 19.5792C7.83428 19.5113 7.90636 19.4505 7.98289 19.3935ZM7.49916 12.1853C7.49916 13.5397 7.76589 14.8808 8.28412 16.1321C8.80236 17.3834 9.56194 18.5204 10.5195 19.4781C11.4771 20.4358 12.6139 21.1955 13.865 21.7138C15.1161 22.2321 16.4571 22.4988 17.8113 22.4988C19.1655 22.4988 20.5064 22.2321 21.7575 21.7138C23.0087 21.1955 24.1455 20.4358 25.103 19.4781C26.0606 18.5204 26.8202 17.3834 27.3384 16.1321C27.8567 14.8808 28.1234 13.5397 28.1234 12.1853C28.1234 9.44996 27.0369 6.82666 25.103 4.89249C23.1691 2.95832 20.5462 1.87172 17.8113 1.87172C15.0763 1.87172 12.4534 2.95832 10.5195 4.89249C8.58561 6.82666 7.49916 9.44996 7.49916 12.1853Z" fill="currentColor"/>
@@ -119,29 +121,29 @@
   <div class="container rbccm-expertise__inner">
 
     <div class="rbccm-expertise__header">
-      <h2 class="rbccm-expertise__title">Why RBC Capital Markets</h2>
+      <h2 class="rbccm-expertise__title" data-animate="fadeInUp">Why RBC Capital Markets</h2>
     </div>
 
     <div class="rbccm-expertise__sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <div class="rbccm-expertise__track">
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="0">
         <h3 class="rbccm-expertise__pillar-title">Global Scale</h3>
         <p class="rbccm-expertise__pillar-body">700+ trading and risk specialists across 4 continents</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="150">
         <h3 class="rbccm-expertise__pillar-title">Balance Sheet Strength</h3>
         <p class="rbccm-expertise__pillar-body">$1 trillion+ in RBC balance-sheet capacity</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="300">
         <h3 class="rbccm-expertise__pillar-title">Innovation Leadership</h3>
         <p class="rbccm-expertise__pillar-body">Award winning AI-driven trading powered by THOR and Aiden&#174;</p>
       </div>
 
-      <div class="rbccm-expertise__pillar">
+      <div class="rbccm-expertise__pillar" data-animate="fadeInUp" data-animate-delay="450">
         <h3 class="rbccm-expertise__pillar-title">Client Partnership</h3>
         <p class="rbccm-expertise__pillar-body">Trusted relationships built on stability and expertise</p>
       </div>
