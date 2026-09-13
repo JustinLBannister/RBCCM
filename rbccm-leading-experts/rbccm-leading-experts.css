@@ -307,7 +307,15 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
 .rbccm-leading-experts__cta {
   align-items: center;
   align-self: stretch;
-  color: var(--rbccm-leading-experts-gold);
+  /* !important on color + text-decoration + background + opacity to
+     beat the site-wide `a:link, footer a:link { color: ... }` cascade
+     from unified.css. Base state was rendering as the site blue
+     because the a:link pseudo-class rule outranks a plain class
+     selector; hover looked right only because the site had no
+     matching :hover rule. */
+  color: var(--rbccm-leading-experts-gold) !important;
+  background: transparent !important;
+  opacity: 1 !important;
   display: flex;
   font-family: var(--rbccm-leading-experts-sans);
   font-size: 11px;
@@ -316,9 +324,9 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
   justify-content: space-between;
   letter-spacing: 1px;
   line-height: 16.5px; /* 150% */
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 0;
+  text-decoration: underline !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
   text-underline-offset: 3px;
   transition:
     text-decoration-color 250ms ease,
@@ -327,9 +335,10 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
 }
 .rbccm-leading-experts__cta:hover,
 .rbccm-leading-experts__cta:focus-visible {
-  color: var(--rbccm-leading-experts-gold);
-  text-decoration-color: currentColor;
-  text-decoration-thickness: auto;
+  color: var(--rbccm-leading-experts-gold) !important;
+  opacity: 1 !important;
+  text-decoration-color: currentColor !important;
+  text-decoration-thickness: auto !important;
 }
 .rbccm-leading-experts__cta svg {
   color: currentColor;
