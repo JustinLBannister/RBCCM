@@ -34,7 +34,7 @@
   'use strict';
 
   var CONFIG = window.RBCCM_IN_THE_MEDIA_CONFIG || {};
-  var DEFAULT_FEED_URL = '/en/press-releases/data/press-releases.page';
+  var DEFAULT_FEED_URL = '/en/about-us/data/2026';
   var DEFAULT_ITEM_COUNT = 4;
   var FEATURED_TITLE_MAX = 98;  /* rendered chars including surrounding quotes */
   var ROW_TITLE_MAX      = 115;
