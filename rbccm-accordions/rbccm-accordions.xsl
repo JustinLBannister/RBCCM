@@ -150,21 +150,21 @@
   <xsl:template match="/">
 
     <!-- Shared -->
-    <xsl:variable name="SECTION_ID"    select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"  select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"      select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION" select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"        select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"  select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="PRESET"        select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
 
     <!-- Section header -->
-    <xsl:variable name="TITLE_TEXT"   select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleText']/text()[last()])"/>
-    <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleTag']/text()[last()])"/>
-    <xsl:variable name="DESC_TEXT"    select="/Properties/Data/Datum[@ID='SectionDescriptionText']"/>
-    <xsl:variable name="DESC_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SectionDescriptionTag']/text()[last()])"/>
-    <xsl:variable name="EXPAND_LABEL"   select="normalize-space(/Properties/Data/Datum[@ID='ExpandAllLabel']/text()[last()])"/>
-    <xsl:variable name="COLLAPSE_LABEL" select="normalize-space(/Properties/Data/Datum[@ID='CollapseAllLabel']/text()[last()])"/>
-    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="TITLE_TEXT"   select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
+    <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
+    <xsl:variable name="DESC_TEXT"    select="//Datum[@ID='SectionDescriptionText']"/>
+    <xsl:variable name="DESC_TAG_RAW" select="normalize-space(//Datum[@ID='SectionDescriptionTag']/text()[last()])"/>
+    <xsl:variable name="EXPAND_LABEL"   select="normalize-space(//Datum[@ID='ExpandAllLabel']/text()[last()])"/>
+    <xsl:variable name="COLLAPSE_LABEL" select="normalize-space(//Datum[@ID='CollapseAllLabel']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
         <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>
@@ -285,19 +285,19 @@
   <xsl:template name="renderSlot">
     <xsl:param name="n"/>
     <xsl:param name="sid"/>
-    <xsl:variable name="cat"      select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'CategoryText')]/text()[last()])"/>
+    <xsl:variable name="cat"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'CategoryText')]/text()[last()])"/>
     <xsl:if test="$cat != ''">
-      <xsl:variable name="catTagRaw"     select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'CategoryTag')]/text()[last()])"/>
-      <xsl:variable name="author"        select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'Author')]/text()[last()])"/>
-      <xsl:variable name="date"          select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'Date')]/text()[last()])"/>
-      <xsl:variable name="titleText"     select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'TitleText')]/text()[last()])"/>
-      <xsl:variable name="titleTagRaw"   select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'TitleTag')]/text()[last()])"/>
-      <xsl:variable name="summaryText"   select="/Properties/Data/Datum[@ID=concat('Item', $n, 'SummaryText')]"/>
-      <xsl:variable name="summaryTagRaw" select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'SummaryTag')]/text()[last()])"/>
-      <xsl:variable name="bodyHtml"      select="/Properties/Data/Datum[@ID=concat('Item', $n, 'BodyHtml')]"/>
-      <xsl:variable name="rmLabel"       select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'ReadMoreLabel')]/text()[last()])"/>
-      <xsl:variable name="rmHref"        select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'ReadMoreHref')]/text()[last()])"/>
-      <xsl:variable name="rmAria"        select="normalize-space(/Properties/Data/Datum[@ID=concat('Item', $n, 'ReadMoreAria')]/text()[last()])"/>
+      <xsl:variable name="catTagRaw"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'CategoryTag')]/text()[last()])"/>
+      <xsl:variable name="author"        select="normalize-space(//Datum[@ID=concat('Item', $n, 'Author')]/text()[last()])"/>
+      <xsl:variable name="date"          select="normalize-space(//Datum[@ID=concat('Item', $n, 'Date')]/text()[last()])"/>
+      <xsl:variable name="titleText"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'TitleText')]/text()[last()])"/>
+      <xsl:variable name="titleTagRaw"   select="normalize-space(//Datum[@ID=concat('Item', $n, 'TitleTag')]/text()[last()])"/>
+      <xsl:variable name="summaryText"   select="//Datum[@ID=concat('Item', $n, 'SummaryText')]"/>
+      <xsl:variable name="summaryTagRaw" select="normalize-space(//Datum[@ID=concat('Item', $n, 'SummaryTag')]/text()[last()])"/>
+      <xsl:variable name="bodyHtml"      select="//Datum[@ID=concat('Item', $n, 'BodyHtml')]"/>
+      <xsl:variable name="rmLabel"       select="normalize-space(//Datum[@ID=concat('Item', $n, 'ReadMoreLabel')]/text()[last()])"/>
+      <xsl:variable name="rmHref"        select="normalize-space(//Datum[@ID=concat('Item', $n, 'ReadMoreHref')]/text()[last()])"/>
+      <xsl:variable name="rmAria"        select="normalize-space(//Datum[@ID=concat('Item', $n, 'ReadMoreAria')]/text()[last()])"/>
 
       <xsl:variable name="catTag">
         <xsl:call-template name="pickTag">

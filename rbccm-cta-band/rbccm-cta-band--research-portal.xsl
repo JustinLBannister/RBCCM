@@ -73,26 +73,26 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"    select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"  select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"      select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION" select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="BG_TRANSPARENT" select="normalize-space(/Properties/Data/Datum[@ID='BgTransparent']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"  select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="BG_TRANSPARENT" select="normalize-space(//Datum[@ID='BgTransparent']/text()[last()])"/>
 
-    <xsl:variable name="HEADING_TEXT"  select="/Properties/Data/Datum[@ID='HeadingText']"/>
-    <xsl:variable name="HEADING_TAG_R" select="normalize-space(/Properties/Data/Datum[@ID='HeadingTag']/text()[last()])"/>
+    <xsl:variable name="HEADING_TEXT"  select="//Datum[@ID='HeadingText']"/>
+    <xsl:variable name="HEADING_TAG_R" select="normalize-space(//Datum[@ID='HeadingTag']/text()[last()])"/>
 
-    <xsl:variable name="BODY_TEXT"     select="/Properties/Data/Datum[@ID='BodyText']"/>
-    <xsl:variable name="BODY_TAG_R"    select="normalize-space(/Properties/Data/Datum[@ID='BodyTag']/text()[last()])"/>
+    <xsl:variable name="BODY_TEXT"     select="//Datum[@ID='BodyText']"/>
+    <xsl:variable name="BODY_TAG_R"    select="normalize-space(//Datum[@ID='BodyTag']/text()[last()])"/>
 
-    <xsl:variable name="PRIMARY_TEXT"     select="normalize-space(/Properties/Data/Datum[@ID='PrimaryCtaText']/text()[last()])"/>
-    <xsl:variable name="PRIMARY_HREF"     select="normalize-space(/Properties/Data/Datum[@ID='PrimaryCtaHref']/text()[last()])"/>
-    <xsl:variable name="PRIMARY_NEWTAB"   select="normalize-space(/Properties/Data/Datum[@ID='PrimaryCtaNewTab']/text()[last()])"/>
+    <xsl:variable name="PRIMARY_TEXT"     select="normalize-space(//Datum[@ID='PrimaryCtaText']/text()[last()])"/>
+    <xsl:variable name="PRIMARY_HREF"     select="normalize-space(//Datum[@ID='PrimaryCtaHref']/text()[last()])"/>
+    <xsl:variable name="PRIMARY_NEWTAB"   select="normalize-space(//Datum[@ID='PrimaryCtaNewTab']/text()[last()])"/>
 
-    <xsl:variable name="SECONDARY_TEXT"   select="normalize-space(/Properties/Data/Datum[@ID='SecondaryCtaText']/text()[last()])"/>
-    <xsl:variable name="SECONDARY_HREF"   select="normalize-space(/Properties/Data/Datum[@ID='SecondaryCtaHref']/text()[last()])"/>
-    <xsl:variable name="SECONDARY_NEWTAB" select="normalize-space(/Properties/Data/Datum[@ID='SecondaryCtaNewTab']/text()[last()])"/>
+    <xsl:variable name="SECONDARY_TEXT"   select="normalize-space(//Datum[@ID='SecondaryCtaText']/text()[last()])"/>
+    <xsl:variable name="SECONDARY_HREF"   select="normalize-space(//Datum[@ID='SecondaryCtaHref']/text()[last()])"/>
+    <xsl:variable name="SECONDARY_NEWTAB" select="normalize-space(//Datum[@ID='SecondaryCtaNewTab']/text()[last()])"/>
 
     <xsl:variable name="HEADING_TAG">
       <xsl:call-template name="pickTag">

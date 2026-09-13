@@ -71,17 +71,17 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"       select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"     select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"         select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"          select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION"    select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"           select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"       select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"     select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"         select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH"          select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION"    select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="PRESET"           select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
 
-    <xsl:variable name="TITLE_TEXT"       select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleText']/text()[last()])"/>
-    <xsl:variable name="TITLE_TAG_RAW"    select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleTag']/text()[last()])"/>
-    <xsl:variable name="SUBHEAD_TEXT"     select="normalize-space(/Properties/Data/Datum[@ID='SectionSubhead']/text()[last()])"/>
-    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="TITLE_TEXT"       select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
+    <xsl:variable name="TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
+    <xsl:variable name="SUBHEAD_TEXT"     select="normalize-space(//Datum[@ID='SectionSubhead']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
         <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>
@@ -89,13 +89,13 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="SEE_ALL_TEXT"     select="normalize-space(/Properties/Data/Datum[@ID='SeeAllText']/text()[last()])"/>
-    <xsl:variable name="SEE_ALL_HREF"     select="normalize-space(/Properties/Data/Datum[@ID='SeeAllHref']/text()[last()])"/>
+    <xsl:variable name="SEE_ALL_TEXT"     select="normalize-space(//Datum[@ID='SeeAllText']/text()[last()])"/>
+    <xsl:variable name="SEE_ALL_HREF"     select="normalize-space(//Datum[@ID='SeeAllHref']/text()[last()])"/>
 
-    <xsl:variable name="FEED_URL"         select="normalize-space(/Properties/Data/Datum[@ID='FeedUrl']/text()[last()])"/>
-    <xsl:variable name="ITEM_COUNT"       select="normalize-space(/Properties/Data/Datum[@ID='ItemCount']/text()[last()])"/>
+    <xsl:variable name="FEED_URL"         select="normalize-space(//Datum[@ID='FeedUrl']/text()[last()])"/>
+    <xsl:variable name="ITEM_COUNT"       select="normalize-space(//Datum[@ID='ItemCount']/text()[last()])"/>
 
-    <xsl:variable name="HERO_POSTER"      select="normalize-space(/Properties/Data/Datum[@ID='HeroPoster']/Image/Path)"/>
+    <xsl:variable name="HERO_POSTER"      select="normalize-space(//Datum[@ID='HeroPoster']/Image/Path)"/>
 
     <xsl:variable name="TITLE_TAG">
       <xsl:call-template name="pickTag">

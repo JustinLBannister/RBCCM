@@ -136,18 +136,18 @@
   <!-- Per-slot lookup + renderExpert dispatcher (reads Expert{N}FieldName). -->
   <xsl:template name="renderSlot">
     <xsl:param name="n"/>
-    <xsl:variable name="name" select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'NameText')]/text()[last()])"/>
+    <xsl:variable name="name" select="normalize-space(//Datum[@ID=concat('Expert', $n, 'NameText')]/text()[last()])"/>
     <xsl:if test="$name != ''">
-      <xsl:variable name="photo"        select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'Photo')]/Image/Path)"/>
-      <xsl:variable name="photoAlt"     select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'Photo')]/Image/Description)"/>
-      <xsl:variable name="focalPoint"   select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'FocalPoint')]/text()[last()])"/>
-      <xsl:variable name="eyebrow"      select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'EyebrowText')]/text()[last()])"/>
-      <xsl:variable name="eyebrowTagRaw" select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'EyebrowTag')]/text()[last()])"/>
-      <xsl:variable name="nameTagRaw"    select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'NameTag')]/text()[last()])"/>
-      <xsl:variable name="role"         select="/Properties/Data/Datum[@ID=concat('Expert', $n, 'RoleText')]"/>
-      <xsl:variable name="roleTagRaw"    select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'RoleTag')]/text()[last()])"/>
-      <xsl:variable name="ctaText"      select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'CtaText')]/text()[last()])"/>
-      <xsl:variable name="ctaHref"      select="normalize-space(/Properties/Data/Datum[@ID=concat('Expert', $n, 'CtaHref')]/text()[last()])"/>
+      <xsl:variable name="photo"        select="normalize-space(//Datum[@ID=concat('Expert', $n, 'Photo')]/Image/Path)"/>
+      <xsl:variable name="photoAlt"     select="normalize-space(//Datum[@ID=concat('Expert', $n, 'Photo')]/Image/Description)"/>
+      <xsl:variable name="focalPoint"   select="normalize-space(//Datum[@ID=concat('Expert', $n, 'FocalPoint')]/text()[last()])"/>
+      <xsl:variable name="eyebrow"      select="normalize-space(//Datum[@ID=concat('Expert', $n, 'EyebrowText')]/text()[last()])"/>
+      <xsl:variable name="eyebrowTagRaw" select="normalize-space(//Datum[@ID=concat('Expert', $n, 'EyebrowTag')]/text()[last()])"/>
+      <xsl:variable name="nameTagRaw"    select="normalize-space(//Datum[@ID=concat('Expert', $n, 'NameTag')]/text()[last()])"/>
+      <xsl:variable name="role"         select="//Datum[@ID=concat('Expert', $n, 'RoleText')]"/>
+      <xsl:variable name="roleTagRaw"    select="normalize-space(//Datum[@ID=concat('Expert', $n, 'RoleTag')]/text()[last()])"/>
+      <xsl:variable name="ctaText"      select="normalize-space(//Datum[@ID=concat('Expert', $n, 'CtaText')]/text()[last()])"/>
+      <xsl:variable name="ctaHref"      select="normalize-space(//Datum[@ID=concat('Expert', $n, 'CtaHref')]/text()[last()])"/>
 
       <xsl:variable name="eyebrowTag">
         <xsl:call-template name="pickTag">
@@ -187,16 +187,16 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"    select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"  select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"      select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION" select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"        select="normalize-space(/Properties/Data/Datum[@ID='Preset']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"  select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="PRESET"        select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
 
-    <xsl:variable name="TITLE_TEXT"    select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleText']/text()[last()])"/>
-    <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SectionTitleTag']/text()[last()])"/>
-    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="TITLE_TEXT"    select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
+    <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
         <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>

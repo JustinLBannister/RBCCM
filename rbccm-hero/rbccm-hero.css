@@ -420,16 +420,24 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 
 /* -------- Insight card -------- */
 /* Dark navy card. 30/20 padding, 10px radius, subtle grey border,
-   soft box shadow. */
+   soft box shadow.
+   ..............................................................
+   !important on padding + background is defensive: this is a
+   semantic <article> element, and the RBCCM site-wide CSS
+   applies a bare `footer { ... }` rule at unified2.css:2970 --
+   assume similar bare `article { ... }` rules could land next
+   and paint over the card. Hardening now prevents a future
+   drive-by regression. */
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-card {
   display: flex;
-  padding: 30px 20px;
+  padding: 30px 20px !important;
+  margin: 0 !important;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
   border-radius: 10px;
   border: 1px solid #D7D7D7;
-  background: #051B38;
+  background: #051B38 !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
@@ -509,10 +517,20 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 
 /* Divider row: date left, read-more right. Top hairline in warm
-   light grey at 77% alpha. */
+   light grey at 77% alpha.
+   ..............................................................
+   !important on padding + background is defensive against RBCCM's
+   site-wide `footer { padding: 30px 0; background-color: #003168; }`
+   rule (unified2.css). Our footer here is a semantic <footer> tag
+   inside the insight card, so bare element selectors from the
+   site cascade override anything we set without !important. Same
+   pattern applied to margin so a site `footer { margin: ... }`
+   rule can't push us out of the card. */
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-footer {
   display: flex;
-  padding-top: 10px;
+  padding: 10px 0 0 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
   justify-content: space-between;
   align-items: center;
   align-self: stretch;
