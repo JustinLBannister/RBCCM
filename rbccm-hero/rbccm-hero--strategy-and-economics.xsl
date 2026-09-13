@@ -79,12 +79,12 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"     select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"   select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"        select="normalize-space(/Properties/Data/Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION"  select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"   select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"       select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH"        select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION"  select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
         <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>
@@ -93,11 +93,11 @@
     </xsl:variable>
 
     <!-- Datum lookups (Se* prefix) -->
-    <xsl:variable name="SE_BG_ACCT"          select="normalize-space(/Properties/Data/Datum[@ID='SeBgBrightcoveAccount']/text()[last()])"/>
-    <xsl:variable name="SE_BG_PLAYER"        select="normalize-space(/Properties/Data/Datum[@ID='SeBgBrightcovePlayer']/text()[last()])"/>
-    <xsl:variable name="SE_BG_VIDEO_ID"      select="normalize-space(/Properties/Data/Datum[@ID='SeBgBrightcoveVideoId']/text()[last()])"/>
+    <xsl:variable name="SE_BG_ACCT"          select="normalize-space(//Datum[@ID='SeBgBrightcoveAccount']/text()[last()])"/>
+    <xsl:variable name="SE_BG_PLAYER"        select="normalize-space(//Datum[@ID='SeBgBrightcovePlayer']/text()[last()])"/>
+    <xsl:variable name="SE_BG_VIDEO_ID"      select="normalize-space(//Datum[@ID='SeBgBrightcoveVideoId']/text()[last()])"/>
 
-    <xsl:variable name="SE_INSIGHT_SOURCE_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightSource']/text()[last()])"/>
+    <xsl:variable name="SE_INSIGHT_SOURCE_RAW" select="normalize-space(//Datum[@ID='SeInsightSource']/text()[last()])"/>
     <xsl:variable name="SE_INSIGHT_SOURCE">
       <xsl:choose>
         <xsl:when test="$SE_INSIGHT_SOURCE_RAW = 'manual'">manual</xsl:when>
@@ -105,44 +105,44 @@
         <xsl:otherwise>dcr-picker</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="SE_FEED_URLS"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightFeedUrls']/text()[last()])"/>
-    <xsl:variable name="SE_TAG_KEYWORDS" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightTagKeywords']/text()[last()])"/>
-    <xsl:variable name="SE_PINNED_URL"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightPinnedUrl']/text()[last()])"/>
-    <xsl:variable name="SE_LOCALE_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeLocale']/text()[last()])"/>
+    <xsl:variable name="SE_FEED_URLS"    select="normalize-space(//Datum[@ID='SeInsightFeedUrls']/text()[last()])"/>
+    <xsl:variable name="SE_TAG_KEYWORDS" select="normalize-space(//Datum[@ID='SeInsightTagKeywords']/text()[last()])"/>
+    <xsl:variable name="SE_PINNED_URL"   select="normalize-space(//Datum[@ID='SeInsightPinnedUrl']/text()[last()])"/>
+    <xsl:variable name="SE_LOCALE_RAW" select="normalize-space(//Datum[@ID='SeLocale']/text()[last()])"/>
     <xsl:variable name="SE_LOCALE">
       <xsl:choose>
         <xsl:when test="$SE_LOCALE_RAW = 'fr'">fr</xsl:when>
         <xsl:otherwise>en</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="SE_AUTO_LINK_OVERRIDE" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightAutoLinkOverride']/text()[last()])"/>
+    <xsl:variable name="SE_AUTO_LINK_OVERRIDE" select="normalize-space(//Datum[@ID='SeInsightAutoLinkOverride']/text()[last()])"/>
 
-    <xsl:variable name="SE_TITLE_TEXT"       select="normalize-space(/Properties/Data/Datum[@ID='SeTitleText']/text()[last()])"/>
-    <xsl:variable name="SE_TITLE_TAG_RAW"    select="normalize-space(/Properties/Data/Datum[@ID='SeTitleTag']/text()[last()])"/>
-    <xsl:variable name="SE_BODY_TEXT"        select="/Properties/Data/Datum[@ID='SeBodyText']"/>
-    <xsl:variable name="SE_BODY_TAG_RAW"     select="normalize-space(/Properties/Data/Datum[@ID='SeBodyTag']/text()[last()])"/>
+    <xsl:variable name="SE_TITLE_TEXT"       select="normalize-space(//Datum[@ID='SeTitleText']/text()[last()])"/>
+    <xsl:variable name="SE_TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SeTitleTag']/text()[last()])"/>
+    <xsl:variable name="SE_BODY_TEXT"        select="//Datum[@ID='SeBodyText']"/>
+    <xsl:variable name="SE_BODY_TAG_RAW"     select="normalize-space(//Datum[@ID='SeBodyTag']/text()[last()])"/>
 
-    <xsl:variable name="SE_INS_EYE_TEXT"     select="normalize-space(/Properties/Data/Datum[@ID='SeInsightEyebrowText']/text()[last()])"/>
-    <xsl:variable name="SE_INS_EYE_TAG_RAW"  select="normalize-space(/Properties/Data/Datum[@ID='SeInsightEyebrowTag']/text()[last()])"/>
-    <xsl:variable name="SE_INS_TITLE_TEXT"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightTitleText']/text()[last()])"/>
-    <xsl:variable name="SE_INS_TITLE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightTitleTag']/text()[last()])"/>
-    <xsl:variable name="SE_INS_BODY_TEXT"    select="/Properties/Data/Datum[@ID='SeInsightBodyText']"/>
-    <xsl:variable name="SE_INS_BODY_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightBodyTag']/text()[last()])"/>
-    <xsl:variable name="SE_INS_DATE_TEXT"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightDateText']/text()[last()])"/>
-    <xsl:variable name="SE_INS_DATE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='SeInsightDateTag']/text()[last()])"/>
+    <xsl:variable name="SE_INS_EYE_TEXT"     select="normalize-space(//Datum[@ID='SeInsightEyebrowText']/text()[last()])"/>
+    <xsl:variable name="SE_INS_EYE_TAG_RAW"  select="normalize-space(//Datum[@ID='SeInsightEyebrowTag']/text()[last()])"/>
+    <xsl:variable name="SE_INS_TITLE_TEXT"   select="normalize-space(//Datum[@ID='SeInsightTitleText']/text()[last()])"/>
+    <xsl:variable name="SE_INS_TITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SeInsightTitleTag']/text()[last()])"/>
+    <xsl:variable name="SE_INS_BODY_TEXT"    select="//Datum[@ID='SeInsightBodyText']"/>
+    <xsl:variable name="SE_INS_BODY_TAG_RAW" select="normalize-space(//Datum[@ID='SeInsightBodyTag']/text()[last()])"/>
+    <xsl:variable name="SE_INS_DATE_TEXT"    select="normalize-space(//Datum[@ID='SeInsightDateText']/text()[last()])"/>
+    <xsl:variable name="SE_INS_DATE_TAG_RAW" select="normalize-space(//Datum[@ID='SeInsightDateTag']/text()[last()])"/>
 
-    <xsl:variable name="SE_INS_LINK_LABEL"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkLabel']/text()[last()])"/>
-    <xsl:variable name="SE_INS_LINK_HREF"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkHref']/text()[last()])"/>
-    <xsl:variable name="SE_INS_LINK_ARIA"    select="normalize-space(/Properties/Data/Datum[@ID='SeInsightLinkAriaLabel']/text()[last()])"/>
+    <xsl:variable name="SE_INS_LINK_LABEL"   select="normalize-space(//Datum[@ID='SeInsightLinkLabel']/text()[last()])"/>
+    <xsl:variable name="SE_INS_LINK_HREF"    select="normalize-space(//Datum[@ID='SeInsightLinkHref']/text()[last()])"/>
+    <xsl:variable name="SE_INS_LINK_ARIA"    select="normalize-space(//Datum[@ID='SeInsightLinkAriaLabel']/text()[last()])"/>
 
     <!-- DCR-picker lookups. -->
-    <xsl:variable name="SE_DCR_ROOT"         select="/Properties/Data/Datum[@ID='SeInsightDcr']/DCR"/>
+    <xsl:variable name="SE_DCR_ROOT"         select="//Datum[@ID='SeInsightDcr']/DCR"/>
     <xsl:variable name="SE_DCR_TITLE"        select="normalize-space($SE_DCR_ROOT/*/title)"/>
     <xsl:variable name="SE_DCR_DESC"         select="$SE_DCR_ROOT/*/description"/>
     <xsl:variable name="SE_DCR_PUB"          select="normalize-space($SE_DCR_ROOT/*/publish_date)"/>
     <xsl:variable name="SE_DCR_LINK"         select="normalize-space($SE_DCR_ROOT/*/link)"/>
     <xsl:variable name="SE_DCR_URL"          select="normalize-space($SE_DCR_ROOT/*/url)"/>
-    <xsl:variable name="SE_DCR_LINK_DATUM"   select="normalize-space(/Properties/Data/Datum[@ID='SeInsightDcrLink']/text()[last()])"/>
+    <xsl:variable name="SE_DCR_LINK_DATUM"   select="normalize-space(//Datum[@ID='SeInsightDcrLink']/text()[last()])"/>
 
     <!-- Effective card fields. -->
     <xsl:variable name="SE_EFF_TITLE">

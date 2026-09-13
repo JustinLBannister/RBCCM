@@ -31,12 +31,12 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"     select="normalize-space(/Properties/Data/Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"   select="normalize-space(/Properties/Data/Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"       select="normalize-space(/Properties/Data/Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="BUTTON_CSS"     select="normalize-space(/Properties/Data/Datum[@ID='ButtonCssPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION"  select="normalize-space(/Properties/Data/Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(/Properties/Data/Datum[@ID='HeaderAlignment']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
+    <xsl:variable name="SECTION_ARIA"   select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH"       select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="BUTTON_CSS"     select="normalize-space(//Datum[@ID='ButtonCssPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_VERSION"  select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
         <xsl:when test="$HEADER_ALIGN_RAW = 'center'">center</xsl:when>
@@ -45,29 +45,29 @@
     </xsl:variable>
 
     <!-- Datum lookups (Mm* prefix) -->
-    <xsl:variable name="MM_EYEBROW_TEXT"     select="normalize-space(/Properties/Data/Datum[@ID='MmEyebrowText']/text()[last()])"/>
-    <xsl:variable name="MM_EYEBROW_TAG_RAW"  select="normalize-space(/Properties/Data/Datum[@ID='MmEyebrowTag']/text()[last()])"/>
-    <xsl:variable name="MM_TITLE_L1"         select="normalize-space(/Properties/Data/Datum[@ID='MmTitleLine1Text']/text()[last()])"/>
-    <xsl:variable name="MM_TITLE_L2"         select="normalize-space(/Properties/Data/Datum[@ID='MmTitleLine2Text']/text()[last()])"/>
-    <xsl:variable name="MM_TITLE_TAG_RAW"    select="normalize-space(/Properties/Data/Datum[@ID='MmTitleTag']/text()[last()])"/>
-    <xsl:variable name="MM_SUBTITLE_TEXT"    select="/Properties/Data/Datum[@ID='MmSubtitleText']"/>
-    <xsl:variable name="MM_SUBTITLE_TAG_RAW" select="normalize-space(/Properties/Data/Datum[@ID='MmSubtitleTag']/text()[last()])"/>
+    <xsl:variable name="MM_EYEBROW_TEXT"     select="normalize-space(//Datum[@ID='MmEyebrowText']/text()[last()])"/>
+    <xsl:variable name="MM_EYEBROW_TAG_RAW"  select="normalize-space(//Datum[@ID='MmEyebrowTag']/text()[last()])"/>
+    <xsl:variable name="MM_TITLE_L1"         select="normalize-space(//Datum[@ID='MmTitleLine1Text']/text()[last()])"/>
+    <xsl:variable name="MM_TITLE_L2"         select="normalize-space(//Datum[@ID='MmTitleLine2Text']/text()[last()])"/>
+    <xsl:variable name="MM_TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='MmTitleTag']/text()[last()])"/>
+    <xsl:variable name="MM_SUBTITLE_TEXT"    select="//Datum[@ID='MmSubtitleText']"/>
+    <xsl:variable name="MM_SUBTITLE_TAG_RAW" select="normalize-space(//Datum[@ID='MmSubtitleTag']/text()[last()])"/>
 
-    <xsl:variable name="MM_CTA1_LABEL"       select="normalize-space(/Properties/Data/Datum[@ID='MmCta1Label']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_HREF"        select="normalize-space(/Properties/Data/Datum[@ID='MmCta1Href']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_ARIA"        select="normalize-space(/Properties/Data/Datum[@ID='MmCta1AriaLabel']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_TITLE"       select="normalize-space(/Properties/Data/Datum[@ID='MmCta1Title']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_STYLE_RAW"   select="normalize-space(/Properties/Data/Datum[@ID='MmCta1Style']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_ICON_D"      select="normalize-space(/Properties/Data/Datum[@ID='MmCta1IconPath']/text()[last()])"/>
-    <xsl:variable name="MM_CTA1_ICON_VB"     select="normalize-space(/Properties/Data/Datum[@ID='MmCta1IconViewBox']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_LABEL"       select="normalize-space(//Datum[@ID='MmCta1Label']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_HREF"        select="normalize-space(//Datum[@ID='MmCta1Href']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_ARIA"        select="normalize-space(//Datum[@ID='MmCta1AriaLabel']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_TITLE"       select="normalize-space(//Datum[@ID='MmCta1Title']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_STYLE_RAW"   select="normalize-space(//Datum[@ID='MmCta1Style']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_ICON_D"      select="normalize-space(//Datum[@ID='MmCta1IconPath']/text()[last()])"/>
+    <xsl:variable name="MM_CTA1_ICON_VB"     select="normalize-space(//Datum[@ID='MmCta1IconViewBox']/text()[last()])"/>
 
-    <xsl:variable name="MM_CTA2_LABEL"       select="normalize-space(/Properties/Data/Datum[@ID='MmCta2Label']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_HREF"        select="normalize-space(/Properties/Data/Datum[@ID='MmCta2Href']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_ARIA"        select="normalize-space(/Properties/Data/Datum[@ID='MmCta2AriaLabel']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_TITLE"       select="normalize-space(/Properties/Data/Datum[@ID='MmCta2Title']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_STYLE_RAW"   select="normalize-space(/Properties/Data/Datum[@ID='MmCta2Style']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_ICON_D"      select="normalize-space(/Properties/Data/Datum[@ID='MmCta2IconPath']/text()[last()])"/>
-    <xsl:variable name="MM_CTA2_ICON_VB"     select="normalize-space(/Properties/Data/Datum[@ID='MmCta2IconViewBox']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_LABEL"       select="normalize-space(//Datum[@ID='MmCta2Label']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_HREF"        select="normalize-space(//Datum[@ID='MmCta2Href']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_ARIA"        select="normalize-space(//Datum[@ID='MmCta2AriaLabel']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_TITLE"       select="normalize-space(//Datum[@ID='MmCta2Title']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_STYLE_RAW"   select="normalize-space(//Datum[@ID='MmCta2Style']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_ICON_D"      select="normalize-space(//Datum[@ID='MmCta2IconPath']/text()[last()])"/>
+    <xsl:variable name="MM_CTA2_ICON_VB"     select="normalize-space(//Datum[@ID='MmCta2IconViewBox']/text()[last()])"/>
 
     <!-- Tag guards. -->
     <xsl:variable name="MM_EYEBROW_TAG">
