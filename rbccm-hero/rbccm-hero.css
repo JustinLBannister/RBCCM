@@ -339,6 +339,12 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   object-fit: cover;
   border: 0;
   display: block;
+  /* Figma doesn't ship a spec for the video opacity so we set it
+     here. Chosen to let the video read as a subtle motion backdrop
+     without competing with the H1 lede + insight card in the
+     foreground. Bump toward 1.0 for a more prominent video; drop
+     toward 0.25 for a barely-there ambient feel. */
+  opacity: 0.3;
 }
 
 /* Content column lifted above the video. Base container already

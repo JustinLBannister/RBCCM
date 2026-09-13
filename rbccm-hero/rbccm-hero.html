@@ -65,13 +65,19 @@
   <!-- Optional background video slot. Production swaps in a Brightcove
        Player iframe with autoplay+muted+loop+playsinline+controls=off:
        <iframe src="https://players.brightcove.net/{account}/{player}_default/index.html?videoId={id}&autoplay=true&muted=true&loop=true&playsinline=true&controls=false" allow="autoplay"></iframe>
-       For the local preview we drop in a stable public MP4 (Google's
-       Big Buck Bunny sample) so the layer visibly works without needing
-       Brightcove credentials. Author omits this whole block if they
-       want the solid #E7EEF1 bg to show through. -->
+       For the local preview we drop in a stable public MP4 (W3Schools'
+       Big Buck Bunny mirror -- Google's original bucket started
+       returning AccessDenied) so the layer visibly works without
+       needing Brightcove credentials. Author omits this whole block
+       if they want the solid #E7EEF1 bg to show through. -->
   <div class="rbccm-hero__bg-video" aria-hidden="true">
     <video autoplay muted loop playsinline preload="auto">
-      <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+      <!-- Local RBC-branded hero loop (drop hero-bg-light.mp4 into this
+           folder). Falls back to a public sample if the local file is
+           missing so the layer still visibly works for anyone cloning
+           the repo fresh. -->
+      <source src="hero-bg-light.mp4" type="video/mp4">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
     </video>
   </div>
 
