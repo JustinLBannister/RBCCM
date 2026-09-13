@@ -556,7 +556,13 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--rbccm-hero-yellow);
+  /* !important on color to beat the site-wide `a { color: #003168 }`
+     style RBCCM applies globally. Same reason for text-decoration --
+     the site paints an underline on every anchor and we want the
+     soft-fade pattern instead. Background pinned to transparent so
+     no bare `a { background }` rule can turn the link into a block. */
+  color: var(--rbccm-hero-yellow) !important;
+  background: transparent !important;
   leading-trim: both;
   text-edge: cap;
   font-family: var(--rbccm-hero-sans);
@@ -565,9 +571,9 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   font-weight: 700;
   line-height: 16.5px; /* 150% */
   letter-spacing: 1px;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 0;
+  text-decoration: underline !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
   text-underline-offset: 3px;
   transition:
     opacity 0.15s ease,
@@ -576,9 +582,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover,
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible {
+  color: var(--rbccm-hero-yellow) !important;
   opacity: 0.85;
-  text-decoration-color: currentColor;
-  text-decoration-thickness: auto;
+  text-decoration-color: currentColor !important;
+  text-decoration-thickness: auto !important;
 }
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link-icon {
   width: 13px;
