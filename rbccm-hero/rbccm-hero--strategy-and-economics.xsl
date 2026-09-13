@@ -4,7 +4,7 @@
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
   the Strategy & Economics variant of rbccm-hero. No Preset
-  branching -- the variant class is hardcoded below.
+  branching - the variant class is hardcoded below.
 
   Structure: split 2-column grid, optional Brightcove video
   backdrop + blur ellipse, dark-navy "Latest insight" card on
@@ -18,7 +18,7 @@
                  with the newest matching feed record.
     manual       Fully server-rendered from SeInsight* Datums.
 
-  Companion skin: rbccm-hero--maas-mata.xsl
+  Companion skin: rbccm-hero-maas-mata.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 

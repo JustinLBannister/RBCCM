@@ -4,14 +4,14 @@
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
   the "Research portal" variant of rbccm-cta-band. No Preset
-  branching -- everything below unconditionally emits the nested
+  branching - everything below unconditionally emits the nested
   __intro wrapper (heading + body inside .__intro, then actions
   row) that keeps the tight heading/body gap.
 
   Animation cascade: heading / body / primary CTA / secondary CTA
   at 0 / 250 / 500 / 650 ms.
 
-  Companion skin: rbccm-cta-band--talk-with-an-expert.xsl
+  Companion skin: rbccm-cta-band-talk-with-an-expert.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 

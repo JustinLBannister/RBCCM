@@ -4,14 +4,14 @@
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
   the "Talk with an expert" variant of rbccm-cta-band. No Preset
-  branching -- everything below unconditionally emits the flat
+  branching - everything below unconditionally emits the flat
   DOM (eyebrow + heading + body + actions) that ships with the
   MAAS+MATA "See the platform" band.
 
   Animation cascade: eyebrow / heading / body / primary CTA at
   0 / 100 / 200 / 300 ms (matches the live page).
 
-  Companion skin: rbccm-cta-band--research-portal.xsl
+  Companion skin: rbccm-cta-band-research-portal.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 

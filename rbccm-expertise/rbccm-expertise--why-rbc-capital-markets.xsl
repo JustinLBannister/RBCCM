@@ -4,14 +4,14 @@
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
   the "Why RBC Capital Markets" preset of rbccm-expertise. No
-  Preset branching -- the variant class is hardcoded below.
+  Preset branching - the variant class is hardcoded below.
 
   Structure: header (title only, no description in this variant)
   -> 4-pillar track (no icons - title + body only) -> arrow
   controls + dot pager. Each pillar reveals with a 0/150/300/450ms
   fadeInUp cascade.
 
-  Companion skin: rbccm-expertise--strategy-and-economics-expertise.xsl
+  Companion skin: rbccm-expertise-strategy-and-economics-expertise.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 

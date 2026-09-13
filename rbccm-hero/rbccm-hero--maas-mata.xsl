@@ -3,14 +3,14 @@
   RBCCM Hero :: maas-mata (single-skin build)
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
-  the MAAS+MATA variant of rbccm-hero. No Preset branching --
+  the MAAS+MATA variant of rbccm-hero. No Preset branching -
   the variant class is hardcoded below.
 
   Structure: eyebrow / two-line title / subtitle / dual-CTA row,
   centred, glow halo background. Above-the-fold animation cascade
   fires immediately on page load at 0 / 150 / 300 / 450 ms.
 
-  Companion skin: rbccm-hero--strategy-and-economics.xsl
+  Companion skin: rbccm-hero-strategy-and-economics.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 

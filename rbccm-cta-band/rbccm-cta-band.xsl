@@ -50,7 +50,7 @@
        Optional animateDelay: when non-empty, stamps
        data-animate="fadeInUp" + data-animate-delay="{ms}" so each
        button can stagger independently on scroll-in (matches the
-       research-portal variant's cascade -- primary at 500, secondary
+       research-portal variant's cascade - primary at 500, secondary
        at 650). Blank = no animation attrs emitted. -->
   <xsl:template name="renderButton">
     <xsl:param name="kind"/>

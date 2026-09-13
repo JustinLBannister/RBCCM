@@ -4,13 +4,13 @@
   ==============================================================
   Standalone XSL skin for TeamSite's Skin dropdown. Renders ONLY
   the "Strategy and Economics" preset of rbccm-expertise. No
-  Preset branching -- the variant class is hardcoded below.
+  Preset branching - the variant class is hardcoded below.
 
   Structure: header (title + description) -> 4-pillar track ->
   arrow controls + dot pager. Each pillar reveals with a
   0/150/300/450ms fadeInUp cascade.
 
-  Companion skin: rbccm-expertise--why-rbc-capital-markets.xsl
+  Companion skin: rbccm-expertise-why-rbc-capital-markets.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
