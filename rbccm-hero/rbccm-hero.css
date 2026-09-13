@@ -583,7 +583,9 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover,
 .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible {
   color: var(--rbccm-hero-yellow) !important;
-  opacity: 0.85;
+  /* Keep the link + arrow at full opacity on hover -- underline
+     fade and arrow bounce do the interaction lift on their own. */
+  opacity: 1 !important;
   text-decoration-color: currentColor !important;
   text-decoration-thickness: auto !important;
 }
