@@ -147,8 +147,9 @@
 
   <!-- Eyebrow. In production maas-mata authors this as an H1 for
        SEO; the visual "title" below stays a paragraph. -->
-  <Datum ID="MmEyebrowText" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : eyebrow text (required - do not blank)">Multi-Asset Agency Solutions</Datum>
-  <Datum ID="MmEyebrowTag" ShowIf="Preset='maas-mata'" Type="SelectSingle" Name="MAAS+MATA : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+  <Group Name="MAAS + MATA content">
+  <Datum ID="MmEyebrowText" Type="String" Name="MAAS+MATA : eyebrow text (required - do not blank)">Multi-Asset Agency Solutions</Datum>
+  <Datum ID="MmEyebrowTag" Type="SelectSingle" Name="MAAS+MATA : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -163,9 +164,9 @@
 
   <!-- Title outer wrapper. Inner lines are always <span>s (visual
        line breaks). Tag picker controls only the wrapper element. -->
-  <Datum ID="MmTitleLine1Text" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : title line 1 - dark navy (required - do not blank)">Trade with clarity.</Datum>
-  <Datum ID="MmTitleLine2Text" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : title line 2 - bright blue (required - do not blank)">Execute with control.</Datum>
-  <Datum ID="MmTitleTag" ShowIf="Preset='maas-mata'" Type="SelectSingle" Name="MAAS+MATA : title wrapper tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="MmTitleLine1Text" Type="String" Name="MAAS+MATA : title line 1 - dark navy (required - do not blank)">Trade with clarity.</Datum>
+  <Datum ID="MmTitleLine2Text" Type="String" Name="MAAS+MATA : title line 2 - bright blue (required - do not blank)">Execute with control.</Datum>
+  <Datum ID="MmTitleTag" Type="SelectSingle" Name="MAAS+MATA : title wrapper tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -181,8 +182,8 @@
   <!-- Subtitle. Supports inline HTML (strong, em, br) so authors
        can emphasise a phrase. XSL uses disable-output-escaping so
        markup survives. -->
-  <Datum ID="MmSubtitleText" ShowIf="Preset='maas-mata'" Type="Textarea" Name="MAAS+MATA : subtitle (optional - blank hides the subtitle; HTML allowed)">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
-  <Datum ID="MmSubtitleTag" ShowIf="Preset='maas-mata'" Type="SelectSingle" Name="MAAS+MATA : subtitle tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="MmSubtitleText" Type="Textarea" Name="MAAS+MATA : subtitle (optional - blank hides the subtitle; HTML allowed)">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
+  <Datum ID="MmSubtitleTag" Type="SelectSingle" Name="MAAS+MATA : subtitle tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -199,34 +200,35 @@
        one of the rbccm-button variants. Icon slot is a raw SVG
        path payload (author pastes the "d" attribute contents),
        so any Figma icon can drop in without editing the XSL. -->
-  <Datum ID="MmCta1Label" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 label (optional - blank hides the button)">Request a demo</Datum>
-  <Datum ID="MmCta1Href" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
-  <Datum ID="MmCta1AriaLabel" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 accessible name (optional - screen-reader label for the button)"></Datum>
-  <Datum ID="MmCta1Title" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
-  <Datum ID="MmCta1Style" ShowIf="Preset='maas-mata'" Type="SelectSingle" Name="MAAS+MATA : CTA 1 style (optional - controls the button variant)">
+  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA : CTA 1 label (optional - blank hides the button)">Request a demo</Datum>
+  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : CTA 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA : CTA 1 accessible name (optional - screen-reader label for the button)"></Datum>
+  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA : CTA 1 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
+  <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : CTA 1 style (optional - controls the button variant)">
     <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
     <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
     <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
     primary
   </Datum>
-  <Datum ID="MmCta1IconPath" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 SVG path 'd' payload (optional - blank skips the icon slot)">M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z</Datum>
-  <Datum ID="MmCta1IconViewBox" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 1 SVG viewBox (optional - blank defaults to '0 0 24 24')">0 0 24 24</Datum>
+  <Datum ID="MmCta1IconPath" Type="String" Name="MAAS+MATA : CTA 1 SVG path 'd' payload (optional - blank skips the icon slot)">M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z</Datum>
+  <Datum ID="MmCta1IconViewBox" Type="String" Name="MAAS+MATA : CTA 1 SVG viewBox (optional - blank defaults to '0 0 24 24')">0 0 24 24</Datum>
 
   <!-- CTA 2. Same shape as CTA 1. Blank Label hides the button. -->
-  <Datum ID="MmCta2Label" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 label (optional - blank hides the button)">Watch the video</Datum>
-  <Datum ID="MmCta2Href" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 URL (required if label is set - full URL or /en/ path)">#</Datum>
-  <Datum ID="MmCta2AriaLabel" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 accessible name (optional - screen-reader label for the button)"></Datum>
-  <Datum ID="MmCta2Title" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
-  <Datum ID="MmCta2Style" ShowIf="Preset='maas-mata'" Type="SelectSingle" Name="MAAS+MATA : CTA 2 style (optional - controls the button variant)">
+  <Datum ID="MmCta2Label" Type="String" Name="MAAS+MATA : CTA 2 label (optional - blank hides the button)">Watch the video</Datum>
+  <Datum ID="MmCta2Href" Type="String" Name="MAAS+MATA : CTA 2 URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="MmCta2AriaLabel" Type="String" Name="MAAS+MATA : CTA 2 accessible name (optional - screen-reader label for the button)"></Datum>
+  <Datum ID="MmCta2Title" Type="String" Name="MAAS+MATA : CTA 2 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
+  <Datum ID="MmCta2Style" Type="SelectSingle" Name="MAAS+MATA : CTA 2 style (optional - controls the button variant)">
     <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
     <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
     <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
     secondary
   </Datum>
-  <Datum ID="MmCta2IconPath" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 SVG path 'd' payload (optional - blank skips the icon slot)">M8 5v14l11-7z</Datum>
-  <Datum ID="MmCta2IconViewBox" ShowIf="Preset='maas-mata'" Type="String" Name="MAAS+MATA : CTA 2 SVG viewBox (optional - blank defaults to '0 0 24 24')">0 0 24 24</Datum>
+  <Datum ID="MmCta2IconPath" Type="String" Name="MAAS+MATA : CTA 2 SVG path 'd' payload (optional - blank skips the icon slot)">M8 5v14l11-7z</Datum>
+  <Datum ID="MmCta2IconViewBox" Type="String" Name="MAAS+MATA : CTA 2 SVG viewBox (optional - blank defaults to '0 0 24 24')">0 0 24 24</Datum>
+  </Group>
 
 
   <!-- ============================================================
@@ -276,8 +278,9 @@
        ============================================================ -->
 
   <!-- Left column: title + body. -->
-  <Datum ID="SeTitleText" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : title (required - do not blank)">Macro economics &amp; market strategy insights</Datum>
-  <Datum ID="SeTitleTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Group Name="Strategy and Economics content">
+  <Datum ID="SeTitleText" Type="String" Name="S+E : title (required - do not blank)">Macro economics &amp; market strategy insights</Datum>
+  <Datum ID="SeTitleTag" Type="SelectSingle" Name="S+E : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -290,8 +293,8 @@
     h1
   </Datum>
 
-  <Datum ID="SeBodyText" ShowIf="Preset='strategy-and-economics'" Type="Textarea" Name="S+E : body copy (required - do not blank; HTML allowed)">Turning macro complexity into market clarity across economics, geopolitics, and global markets - to drive better business and investment decisions.</Datum>
-  <Datum ID="SeBodyTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeBodyText" Type="Textarea" Name="S+E : body copy (required - do not blank; HTML allowed)">Turning macro complexity into market clarity across economics, geopolitics, and global markets - to drive better business and investment decisions.</Datum>
+  <Datum ID="SeBodyTag" Type="SelectSingle" Name="S+E : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -305,8 +308,8 @@
   </Datum>
 
   <!-- Insight card: pill eyebrow + title + body + footer (date + link). -->
-  <Datum ID="SeInsightEyebrowText" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card eyebrow / pill label (required - do not blank)">Latest Insight</Datum>
-  <Datum ID="SeInsightEyebrowTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : insight eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightEyebrowText" Type="String" Name="S+E : insight card eyebrow / pill label (required - do not blank)">Latest Insight</Datum>
+  <Datum ID="SeInsightEyebrowTag" Type="SelectSingle" Name="S+E : insight eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -319,8 +322,8 @@
     p
   </Datum>
 
-  <Datum ID="SeInsightTitleText" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card title (required - do not blank; used as fallback in auto-latest mode)">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
-  <Datum ID="SeInsightTitleTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : insight card title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightTitleText" Type="String" Name="S+E : insight card title (required - do not blank; used as fallback in auto-latest mode)">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
+  <Datum ID="SeInsightTitleTag" Type="SelectSingle" Name="S+E : insight card title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -333,8 +336,8 @@
     h3
   </Datum>
 
-  <Datum ID="SeInsightBodyText" ShowIf="Preset='strategy-and-economics'" Type="Textarea" Name="S+E : insight card body (required - do not blank; HTML allowed; used as fallback in auto-latest mode)">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
-  <Datum ID="SeInsightBodyTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : insight card body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightBodyText" Type="Textarea" Name="S+E : insight card body (required - do not blank; HTML allowed; used as fallback in auto-latest mode)">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
+  <Datum ID="SeInsightBodyTag" Type="SelectSingle" Name="S+E : insight card body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -347,8 +350,8 @@
     p
   </Datum>
 
-  <Datum ID="SeInsightDateText" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card date (optional - blank hides the date; overridden in auto-latest mode)">July 14, 2025</Datum>
-  <Datum ID="SeInsightDateTag" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : insight card date tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightDateText" Type="String" Name="S+E : insight card date (optional - blank hides the date; overridden in auto-latest mode)">July 14, 2025</Datum>
+  <Datum ID="SeInsightDateTag" Type="SelectSingle" Name="S+E : insight card date tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -366,9 +369,9 @@
        In auto-latest mode the LinkLabel is still used (label text
        stays constant across articles); LinkHref is overridden by
        the feed record's URL unless SeInsightAutoLinkOverride is set. -->
-  <Datum ID="SeInsightLinkLabel" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card link label (required - do not blank)">Read more</Datum>
-  <Datum ID="SeInsightLinkHref" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card link URL - manual mode only (optional - full URL or /en/ path; auto-latest overrides this)">#</Datum>
-  <Datum ID="SeInsightLinkAriaLabel" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card link accessible name (optional - screen-reader label for the link)"></Datum>
+  <Datum ID="SeInsightLinkLabel" Type="String" Name="S+E : insight card link label (required - do not blank)">Read more</Datum>
+  <Datum ID="SeInsightLinkHref" Type="String" Name="S+E : insight card link URL - manual mode only (optional - full URL or /en/ path; auto-latest overrides this)">#</Datum>
+  <Datum ID="SeInsightLinkAriaLabel" Type="String" Name="S+E : insight card link accessible name (optional - screen-reader label for the link)"></Datum>
 
 
   <!-- ============================================================
@@ -386,9 +389,9 @@
   <!-- Optional Brightcove backdrop. Same account+player constants
        as every other RBC video. Blank VideoId leaves the section on
        its solid #E7EEF1 fill. -->
-  <Datum ID="SeBgBrightcoveAccount" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : Brightcove account ID (technical - RBC-wide constant, set once at deploy)">6021289101001</Datum>
-  <Datum ID="SeBgBrightcovePlayer" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : Brightcove player ID (technical - RBC-wide constant, set once at deploy)">VyvCc9BZx</Datum>
-  <Datum ID="SeBgBrightcoveVideoId" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : Brightcove video ID (optional - blank leaves the section on its solid fill)"></Datum>
+  <Datum ID="SeBgBrightcoveAccount" Type="String" Name="S+E : Brightcove account ID (technical - RBC-wide constant, set once at deploy)">6021289101001</Datum>
+  <Datum ID="SeBgBrightcovePlayer" Type="String" Name="S+E : Brightcove player ID (technical - RBC-wide constant, set once at deploy)">VyvCc9BZx</Datum>
+  <Datum ID="SeBgBrightcoveVideoId" Type="String" Name="S+E : Brightcove video ID (optional - blank leaves the section on its solid fill)"></Datum>
 
   <!-- Insight card source. Three modes:
          dcr-picker   editor picks the insights article via TeamSite's
@@ -408,7 +411,7 @@
                       loads (and as the no-JS fallback).
          manual       always uses the SeInsight* Datums above; fully
                       server-rendered, no client hydration. -->
-  <Datum ID="SeInsightSource" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : insight card source (required - pick one; controls how the card is populated)">
+  <Datum ID="SeInsightSource" Type="SelectSingle" Name="S+E : insight card source (required - pick one; controls how the card is populated)">
     <Option Selected="true">
       <Display>DCR picker - editor picks the article via TeamSite (server-rendered)</Display>
       <Value>dcr-picker</Value>
@@ -437,7 +440,7 @@
        picked DCR (mirrors the story-tiles pattern where Link is a
        sibling Datum, not a field on the DCR record). Blank = the
        XSL falls back to the DCR record's own link/url field. -->
-  <Datum ID="SeInsightDcr" ShowIf="Preset='strategy-and-economics'" Type="DCR" Name="S+E : insight card DCR - dcr-picker mode only (required if mode is DCR picker)">
+  <Datum ID="SeInsightDcr" Type="DCR" Name="S+E : insight card DCR - dcr-picker mode only (required if mode is DCR picker)">
     <DCR Category="article" Type="insights"/>
     <DCR-Category Name="article">
       <DCR-Type Name=".*"/>
@@ -448,12 +451,12 @@
       <DCR-Type Name="casestudy"/>
     </DCR-Category>
   </Datum>
-  <Datum ID="SeInsightDcrLink" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : insight card CTA URL - dcr-picker mode (optional - blank derives from the picked DCR)"></Datum>
+  <Datum ID="SeInsightDcrLink" Type="String" Name="S+E : insight card CTA URL - dcr-picker mode (optional - blank derives from the picked DCR)"></Datum>
 
   <!-- Locale hint passed to the hydrator via data-hero-locale. Only
        'en' and 'fr' are recognized; unknown values coerce to 'en'.
        Reserved for future localisation of the insight card copy. -->
-  <Datum ID="SeLocale" ShowIf="Preset='strategy-and-economics'" Type="SelectSingle" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
+  <Datum ID="SeLocale" Type="SelectSingle" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
     <Option><Display>English (en)</Display><Value>en</Value></Option>
     <Option><Display>French (fr)</Display><Value>fr</Value></Option>
     en
@@ -462,7 +465,7 @@
   <!-- Comma-separated list of insights XML feed URLs the hydrator
        walks. Default covers 2024/2025/2026 - update once a year
        when a new year feed goes live (or every year in bulk). -->
-  <Datum ID="SeInsightFeedUrls" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : feed URLs (required in auto-latest mode; comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
+  <Datum ID="SeInsightFeedUrls" Type="String" Name="S+E : feed URLs (required in auto-latest mode; comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
 
   <!-- Comma-separated list of tag keywords. rbccm-hero.js checks each
        feed record's &lt;tags&gt; field for a case-insensitive substring
@@ -472,7 +475,7 @@
        category, so this keyword set is how we hand-carve the topic
        out of the general Insights firehose. Tune as taxonomy evolves.
        Ignored when SeInsightPinnedUrl is set. -->
-  <Datum ID="SeInsightTagKeywords" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : tag keywords - any-match (optional in auto-latest mode; comma-separated; ignored when a pinned URL is set)">economic,strategy,macro,geopolitics,monetary,inflation</Datum>
+  <Datum ID="SeInsightTagKeywords" Type="String" Name="S+E : tag keywords - any-match (optional in auto-latest mode; comma-separated; ignored when a pinned URL is set)">economic,strategy,macro,geopolitics,monetary,inflation</Datum>
 
   <!-- Pin-by-URL. Paste a specific article URL (either the full
        https URL or the /en/ path) and the hydrator will look up
@@ -499,12 +502,13 @@
        In both modes the URL is matched against feed records by
        final slug, so the full https URL and the /en/ path are
        treated as the same article. -->
-  <Datum ID="SeInsightPinnedUrl" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : pin a specific article URL (optional - full URL or /en/ path; auto-latest override + dcr-picker fallback)"></Datum>
+  <Datum ID="SeInsightPinnedUrl" Type="String" Name="S+E : pin a specific article URL (optional - full URL or /en/ path; auto-latest override + dcr-picker fallback)"></Datum>
 
   <!-- Optional CTA link override for auto-latest mode. Blank uses
        the feed record's own article URL. Editorial sometimes wants
        "Read more" to point at a hub page instead of the article. -->
-  <Datum ID="SeInsightAutoLinkOverride" ShowIf="Preset='strategy-and-economics'" Type="String" Name="S+E : auto-mode link override (optional - blank uses the feed URL)"></Datum>
+  <Datum ID="SeInsightAutoLinkOverride" Type="String" Name="S+E : auto-mode link override (optional - blank uses the feed URL)"></Datum>
+  </Group>
 
 </Data>
 
