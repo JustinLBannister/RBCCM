@@ -351,7 +351,7 @@
 
     <!-- Stylesheet link (append AssetVersion for cache-busting) -->
     <link rel="stylesheet">
-      <xsl:attribute name="href">/assets/rbccm/css/pages/rbccm-featured-insights.css?v=<xsl:value-of select="$ASSET_VERSION"/></xsl:attribute>
+      <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-featured-insights.css?v=<xsl:value-of select="$ASSET_VERSION"/></xsl:attribute>
     </link>
 
     <section aria-label="Featured insights">
