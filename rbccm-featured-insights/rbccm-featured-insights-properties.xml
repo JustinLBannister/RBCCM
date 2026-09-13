@@ -38,7 +38,7 @@
        Once a preset is picked, only that variant's Datums render -
        unused Datums for other presets are ignored.
        ============================================================ -->
-  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
     <Option>
       <Display>Default</Display>
       <Value>default</Value>
@@ -64,14 +64,14 @@
        BEM double-hyphen modifier so this XML comment stays well-
        formed; emitted markup uses the double-hyphen prefix.)
        ============================================================ -->
-  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+  <Datum ID="HeaderAlignment" Type="SelectSingle" Name="Header alignment (optional - controls how the title block is aligned)">
     <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
     <Option><Display>Center</Display><Value>center</Value></Option>
     left
   </Datum>
 
   <Datum ID="SectionTitle" Type="String" Name="Section title (required - do not blank)">Featured insights</Datum>
-  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)" Label="Heading level for the title">
+  <Datum ID="SectionTitleTag" Type="SelectSingle" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>H2</Display><Value>h2</Value></Option>
     <Option Selected="true"><Display>H3</Display><Value>h3</Value></Option>
     <Option><Display>H4</Display><Value>h4</Value></Option>
@@ -107,7 +107,7 @@
          DCR record field (dcr-picker mode) wins over
          pre-hydration fallback / feed-hydrated value
        ============================================================ -->
-  <Datum ID="TileSource" Type="String" Name="Tile source (required - pick one; controls how all 4 tiles are populated)" Label="Tile source mode">
+  <Datum ID="TileSource" Type="SelectSingle" Name="Tile source (required - pick one; controls how all 4 tiles are populated)">
     <Option Selected="true">
       <Display>DCR picker - editor picks each article via TeamSite (server-rendered)</Display>
       <Value>dcr-picker</Value>

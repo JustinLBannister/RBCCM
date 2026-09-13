@@ -35,7 +35,6 @@
   buster.
 -->
 <Properties ComponentID="rbccm-hero">
-</Properties>
 
 <Data>
 
@@ -86,7 +85,7 @@
     render - unused Datums for other presets are ignored. Bare text
     after the closing Option is the default.
   -->
-  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
     <Option>
       <Display>MAAS + MATA (centred, glow halo, 2-line title, dual CTA)</Display>
       <Value>maas-mata</Value>
@@ -110,7 +109,7 @@
        inherent center layout untouched. (Class name uses __ in place
        of the BEM double-hyphen modifier so this XML comment stays
        well-formed; emitted markup uses the double-hyphen prefix.) -->
-  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the hero content stack is aligned)">
+  <Datum ID="HeaderAlignment" Type="SelectSingle" Name="Header alignment (optional - controls how the hero content stack is aligned)">
     <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
     <Option><Display>Center</Display><Value>center</Value></Option>
     left
@@ -148,7 +147,7 @@
   <!-- Eyebrow. In production maas-mata authors this as an H1 for
        SEO; the visual "title" below stays a paragraph. -->
   <Datum ID="MmEyebrowText" Type="String" Name="MAAS+MATA : eyebrow text (required - do not blank)">Multi-Asset Agency Solutions</Datum>
-  <Datum ID="MmEyebrowTag" Type="String" Name="MAAS+MATA : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="MmEyebrowTag" Type="SelectSingle" Name="MAAS+MATA : eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -165,7 +164,7 @@
        line breaks). Tag picker controls only the wrapper element. -->
   <Datum ID="MmTitleLine1Text" Type="String" Name="MAAS+MATA : title line 1 - dark navy (required - do not blank)">Trade with clarity.</Datum>
   <Datum ID="MmTitleLine2Text" Type="String" Name="MAAS+MATA : title line 2 - bright blue (required - do not blank)">Execute with control.</Datum>
-  <Datum ID="MmTitleTag" Type="String" Name="MAAS+MATA : title wrapper tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="MmTitleTag" Type="SelectSingle" Name="MAAS+MATA : title wrapper tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -182,7 +181,7 @@
        can emphasise a phrase. XSL uses disable-output-escaping so
        markup survives. -->
   <Datum ID="MmSubtitleText" Type="Textarea" Name="MAAS+MATA : subtitle (optional - blank hides the subtitle; HTML allowed)">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
-  <Datum ID="MmSubtitleTag" Type="String" Name="MAAS+MATA : subtitle tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="MmSubtitleTag" Type="SelectSingle" Name="MAAS+MATA : subtitle tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -203,7 +202,7 @@
   <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : CTA 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA : CTA 1 accessible name (optional - screen-reader label for the button)"></Datum>
   <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA : CTA 1 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
-  <Datum ID="MmCta1Style" Type="String" Name="MAAS+MATA : CTA 1 style (optional - controls the button variant)">
+  <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : CTA 1 style (optional - controls the button variant)">
     <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
     <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
@@ -218,7 +217,7 @@
   <Datum ID="MmCta2Href" Type="String" Name="MAAS+MATA : CTA 2 URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="MmCta2AriaLabel" Type="String" Name="MAAS+MATA : CTA 2 accessible name (optional - screen-reader label for the button)"></Datum>
   <Datum ID="MmCta2Title" Type="String" Name="MAAS+MATA : CTA 2 title attribute / tooltip (optional - blank hides the tooltip)"></Datum>
-  <Datum ID="MmCta2Style" Type="String" Name="MAAS+MATA : CTA 2 style (optional - controls the button variant)">
+  <Datum ID="MmCta2Style" Type="SelectSingle" Name="MAAS+MATA : CTA 2 style (optional - controls the button variant)">
     <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
     <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
@@ -277,7 +276,7 @@
 
   <!-- Left column: title + body. -->
   <Datum ID="SeTitleText" Type="String" Name="S+E : title (required - do not blank)">Macro economics &amp; market strategy insights</Datum>
-  <Datum ID="SeTitleTag" Type="String" Name="S+E : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeTitleTag" Type="SelectSingle" Name="S+E : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -291,7 +290,7 @@
   </Datum>
 
   <Datum ID="SeBodyText" Type="Textarea" Name="S+E : body copy (required - do not blank; HTML allowed)">Turning macro complexity into market clarity across economics, geopolitics, and global markets - to drive better business and investment decisions.</Datum>
-  <Datum ID="SeBodyTag" Type="String" Name="S+E : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeBodyTag" Type="SelectSingle" Name="S+E : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -306,7 +305,7 @@
 
   <!-- Insight card: pill eyebrow + title + body + footer (date + link). -->
   <Datum ID="SeInsightEyebrowText" Type="String" Name="S+E : insight card eyebrow / pill label (required - do not blank)">Latest Insight</Datum>
-  <Datum ID="SeInsightEyebrowTag" Type="String" Name="S+E : insight eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightEyebrowTag" Type="SelectSingle" Name="S+E : insight eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -320,7 +319,7 @@
   </Datum>
 
   <Datum ID="SeInsightTitleText" Type="String" Name="S+E : insight card title (required - do not blank; used as fallback in auto-latest mode)">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
-  <Datum ID="SeInsightTitleTag" Type="String" Name="S+E : insight card title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightTitleTag" Type="SelectSingle" Name="S+E : insight card title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -334,7 +333,7 @@
   </Datum>
 
   <Datum ID="SeInsightBodyText" Type="Textarea" Name="S+E : insight card body (required - do not blank; HTML allowed; used as fallback in auto-latest mode)">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
-  <Datum ID="SeInsightBodyTag" Type="String" Name="S+E : insight card body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightBodyTag" Type="SelectSingle" Name="S+E : insight card body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -348,7 +347,7 @@
   </Datum>
 
   <Datum ID="SeInsightDateText" Type="String" Name="S+E : insight card date (optional - blank hides the date; overridden in auto-latest mode)">July 14, 2025</Datum>
-  <Datum ID="SeInsightDateTag" Type="String" Name="S+E : insight card date tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SeInsightDateTag" Type="SelectSingle" Name="S+E : insight card date tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -408,7 +407,7 @@
                       loads (and as the no-JS fallback).
          manual       always uses the SeInsight* Datums above; fully
                       server-rendered, no client hydration. -->
-  <Datum ID="SeInsightSource" Type="String" Name="S+E : insight card source (required - pick one; controls how the card is populated)">
+  <Datum ID="SeInsightSource" Type="SelectSingle" Name="S+E : insight card source (required - pick one; controls how the card is populated)">
     <Option Selected="true">
       <Display>DCR picker - editor picks the article via TeamSite (server-rendered)</Display>
       <Value>dcr-picker</Value>
@@ -453,7 +452,7 @@
   <!-- Locale hint passed to the hydrator via data-hero-locale. Only
        'en' and 'fr' are recognized; unknown values coerce to 'en'.
        Reserved for future localisation of the insight card copy. -->
-  <Datum ID="SeLocale" Type="String" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
+  <Datum ID="SeLocale" Type="SelectSingle" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
     <Option><Display>English (en)</Display><Value>en</Value></Option>
     <Option><Display>French (fr)</Display><Value>fr</Value></Option>
     en
@@ -506,6 +505,7 @@
        "Read more" to point at a hub page instead of the article. -->
   <Datum ID="SeInsightAutoLinkOverride" Type="String" Name="S+E : auto-mode link override (optional - blank uses the feed URL)"></Datum>
 
-
-
 </Data>
+
+</Properties>
+

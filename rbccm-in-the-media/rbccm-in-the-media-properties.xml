@@ -73,7 +73,7 @@
 
   <!-- Once a preset is picked, only that variant's Datums render -
        unused Datums for other presets are ignored. -->
-  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
     <Option>
       <Display>Strategy and Economics - In the media</Display>
       <Value>strategy-and-economics-in-the-media</Value>
@@ -95,14 +95,14 @@
        double-hyphen modifier so this XML comment stays well-formed;
        emitted markup uses the double-hyphen prefix.)
        ============================================================ -->
-  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+  <Datum ID="HeaderAlignment" Type="SelectSingle" Name="Header alignment (optional - controls how the title block is aligned)">
     <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
     <Option><Display>Center</Display><Value>center</Value></Option>
     left
   </Datum>
 
   <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">In the media</Datum>
-  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SectionTitleTag" Type="SelectSingle" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>

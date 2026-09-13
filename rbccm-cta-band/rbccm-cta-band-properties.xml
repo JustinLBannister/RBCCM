@@ -68,7 +68,7 @@
 
   <!-- Once a preset is picked, only that variant's Datums render -
        unused Datums for other presets are ignored. -->
-  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
     <Option>
       <Display>Talk with an expert (deep navy, single yellow CTA)</Display>
       <Value>talk-with-an-expert</Value>
@@ -88,7 +88,7 @@
        (Class name uses __ substitution for the BEM modifier so this
        XML comment stays well-formed; emitted markup uses the
        double-hyphen prefix.) -->
-  <Datum ID="BgTransparent" Type="String" Name="Background : transparent (optional - use only when a parent wrapper already paints a bg)">
+  <Datum ID="BgTransparent" Type="SelectSingle" Name="Background : transparent (optional - use only when a parent wrapper already paints a bg)">
     <Option><Display>No (use the variant's own bg)</Display><Value>no</Value></Option>
     <Option><Display>Yes (transparent, parent bg shows through)</Display><Value>yes</Value></Option>
     no
@@ -111,7 +111,7 @@
        research-portal ignores it either way.
        ============================================================ -->
   <Datum ID="EyebrowText" Type="String" Name="Eyebrow text (optional - blank hides the eyebrow line)">See the platform</Datum>
-  <Datum ID="EyebrowTag" Type="String" Name="Eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="EyebrowTag" Type="SelectSingle" Name="Eyebrow tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -134,7 +134,7 @@
        to yellow-accent one word in the talk-with-an-expert preset.
        ============================================================ -->
   <Datum ID="HeadingText" Type="Textarea" Name="Heading text (required - do not blank; HTML allowed)">Research portal</Datum>
-  <Datum ID="HeadingTag" Type="String" Name="Heading tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="HeadingTag" Type="SelectSingle" Name="Heading tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -155,7 +155,7 @@
        HTML allowed. Leave blank to hide.
        ============================================================ -->
   <Datum ID="BodyText" Type="Textarea" Name="Body copy (optional - blank hides the paragraph; HTML allowed)">Access market research, commentary and more through our online portal, RBC Insight. It is also accessible via our iPad app.</Datum>
-  <Datum ID="BodyTag" Type="String" Name="Body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="BodyTag" Type="SelectSingle" Name="Body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -178,7 +178,7 @@
        ============================================================ -->
   <Datum ID="PrimaryCtaText" Type="String" Name="Primary CTA : label (optional - blank hides the button)">Log in to RBC Insights</Datum>
   <Datum ID="PrimaryCtaHref" Type="String" Name="Primary CTA : URL (required if label is set - full URL or /en/ path)">https://www.rbcinsightresearch.com</Datum>
-  <Datum ID="PrimaryCtaNewTab" Type="String" Name="Primary CTA : open in new tab? (optional - controls target=_blank)">
+  <Datum ID="PrimaryCtaNewTab" Type="SelectSingle" Name="Primary CTA : open in new tab? (optional - controls target=_blank)">
     <Option><Display>Yes (target=_blank)</Display><Value>yes</Value></Option>
     <Option><Display>No (same tab)</Display><Value>no</Value></Option>
     yes
@@ -194,7 +194,7 @@
        ============================================================ -->
   <Datum ID="SecondaryCtaText" Type="String" Name="Secondary CTA : label (optional - blank hides the button)">Learn more</Datum>
   <Datum ID="SecondaryCtaHref" Type="String" Name="Secondary CTA : URL (required if label is set - full URL or /en/ path)">/en/insights/rbc-research</Datum>
-  <Datum ID="SecondaryCtaNewTab" Type="String" Name="Secondary CTA : open in new tab? (optional - controls target=_blank)">
+  <Datum ID="SecondaryCtaNewTab" Type="SelectSingle" Name="Secondary CTA : open in new tab? (optional - controls target=_blank)">
     <Option><Display>Yes (target=_blank)</Display><Value>yes</Value></Option>
     <Option><Display>No (same tab)</Display><Value>no</Value></Option>
     no

@@ -96,7 +96,7 @@
 
   <!-- Once a preset is picked, only that variant's Datums render -
        unused Datums for other presets are ignored. -->
-  <Datum ID="Preset" Type="String" Name="Preset - component variant (required - pick one)" Label="Component variant">
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
     <Option>
       <Display>Strategy and Economics - Platforms</Display>
       <Value>strategy-and-economics-platforms</Value>
@@ -120,14 +120,14 @@
        BEM modifier so this XML comment stays well-formed; emitted
        markup uses the double-hyphen prefix.)
        ============================================================ -->
-  <Datum ID="HeaderAlignment" Type="String" Name="Header alignment (optional - controls how the title block is aligned)">
+  <Datum ID="HeaderAlignment" Type="SelectSingle" Name="Header alignment (optional - controls how the title block is aligned)">
     <Option Selected="true"><Display>Left</Display><Value>left</Value></Option>
     <Option><Display>Center</Display><Value>center</Value></Option>
     left
   </Datum>
 
   <Datum ID="SectionTitleText" Type="String" Name="Section title (required - do not blank)">Platforms</Datum>
-  <Datum ID="SectionTitleTag" Type="String" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SectionTitleTag" Type="SelectSingle" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
@@ -141,7 +141,7 @@
   </Datum>
 
   <Datum ID="SectionSubtitleText" Type="Textarea" Name="Section subtitle (optional - blank hides the subtitle; HTML allowed)">Macro and market analysis of global currency dynamics from industry-leading strategists.</Datum>
-  <Datum ID="SectionSubtitleTag" Type="String" Name="Section subtitle tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="SectionSubtitleTag" Type="SelectSingle" Name="Section subtitle tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
 
@@ -181,10 +181,10 @@
   </Datum>
   <Datum ID="Card1FocalPoint" Type="String" Name="Card 1 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
   <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (required - do not blank)">Real-Time Geopolitics</Datum>
-  <Datum ID="Card1TitleTag" Type="String" Name="Card 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card1TitleTag" Type="SelectSingle" Name="Card 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
   <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body (required - do not blank; HTML allowed)">Perspectives for boards and management teams weighing their next strategic move.</Datum>
-  <Datum ID="Card1BodyTag" Type="String" Name="Card 1 : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card1BodyTag" Type="SelectSingle" Name="Card 1 : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Card1BodyMaxWidth" Type="String" Name="Card 1 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
   <Datum ID="Card1CtaText" Type="String" Name="Card 1 : CTA copy (required - do not blank)">Explore</Datum>
@@ -205,10 +205,10 @@
   </Datum>
   <Datum ID="Card2FocalPoint" Type="String" Name="Card 2 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
   <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (required - do not blank)">RBC Economics</Datum>
-  <Datum ID="Card2TitleTag" Type="String" Name="Card 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card2TitleTag" Type="SelectSingle" Name="Card 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
   <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body (required - do not blank; HTML allowed)">The macro backdrop and rates outlook behind every capital decision.</Datum>
-  <Datum ID="Card2BodyTag" Type="String" Name="Card 2 : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card2BodyTag" Type="SelectSingle" Name="Card 2 : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Card2BodyMaxWidth" Type="String" Name="Card 2 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">274px</Datum>
   <Datum ID="Card2CtaText" Type="String" Name="Card 2 : CTA copy (required - do not blank)">Explore</Datum>
@@ -229,10 +229,10 @@
   </Datum>
   <Datum ID="Card3FocalPoint" Type="String" Name="Card 3 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
   <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title (required - do not blank)">Markets in Motion</Datum>
-  <Datum ID="Card3TitleTag" Type="String" Name="Card 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card3TitleTag" Type="SelectSingle" Name="Card 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
   <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body (required - do not blank; HTML allowed)">Timely reads on the macro and market forces moving U.S. capital markets today.</Datum>
-  <Datum ID="Card3BodyTag" Type="String" Name="Card 3 : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card3BodyTag" Type="SelectSingle" Name="Card 3 : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Card3BodyMaxWidth" Type="String" Name="Card 3 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">295px</Datum>
   <Datum ID="Card3CtaText" Type="String" Name="Card 3 : CTA copy (required - do not blank)">Explore</Datum>
@@ -253,10 +253,10 @@
   </Datum>
   <Datum ID="Card4FocalPoint" Type="String" Name="Card 4 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
   <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title (required - do not blank)">Macro Minutes</Datum>
-  <Datum ID="Card4TitleTag" Type="String" Name="Card 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card4TitleTag" Type="SelectSingle" Name="Card 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
   <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body (required - do not blank; HTML allowed)">Exploring the trends and turning points shaping today's macro and market landscape.</Datum>
-  <Datum ID="Card4BodyTag" Type="String" Name="Card 4 : body tag (optional - controls the HTML tag for SEO / a11y)">
+  <Datum ID="Card4BodyTag" Type="SelectSingle" Name="Card 4 : body tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Card4BodyMaxWidth" Type="String" Name="Card 4 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">227px</Datum>
   <Datum ID="Card4CtaText" Type="String" Name="Card 4 : CTA copy (required - do not blank)">Explore</Datum>
