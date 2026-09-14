@@ -262,7 +262,7 @@
          when wiring keyboard nav + slide indexing. Switching to div
          broke Slick on the S+E page. axe will report "li must be
          direct child of ul/ol" once Slick wraps each <li> in
-         <div class="slick-slide"> -- that's a known library
+         <div class="slick-slide"> == that's a known library
          limitation, not a component bug; document it as an accepted
          exception in accessibility QA. -->
     <li class="rbccm-insight-tiles__item">
@@ -406,7 +406,7 @@
         <!-- ===== Tile grid =====
              data-stagger-parent lets rbccm-animate/rbccm-animate.js reveal
              each tile in sequence as the row enters the viewport. -->
-        <!-- Semantic <ul> kept for Slick compatibility -- accessible-slick
+        <!-- Semantic <ul> kept for Slick compatibility; accessible-slick
              breaks when the row is a div. axe will flag the <li> children
              once Slick wraps them in <div class="slick-slide">; that's a
              documented library limitation. -->
