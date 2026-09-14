@@ -296,11 +296,11 @@ p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
 .rbccm-in-the-media__play svg {
   display: block;
   /* SVG carries only the triangle glyph inside a 72 viewBox (ring lives
-     in CSS). 39px display size renders the triangle at Figma-matched
-     visual weight against the 72 button ring -- larger renders read as
-     too dominant. */
-  height: 39px;
-  width: 39px;
+     in CSS). 72px display size fills the 72 button ring so the triangle
+     path renders at its native path coordinates -- matches maas/mata's
+     chart-image-play pattern (SVG == button size). */
+  height: 72px;
+  width: 72px;
   transition: opacity 250ms ease;
 }
 .rbccm-in-the-media__play.is-launching svg {
