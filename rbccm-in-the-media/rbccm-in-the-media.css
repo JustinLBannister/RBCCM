@@ -237,6 +237,10 @@ p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
    via the .is-launching class the JS adds on click) that expands
    the ring outward while everything fades to transparent -- reads
    as the play button dissolving into the video underneath. */
+/* Play button wrapper. Ring / backdrop-filter / border live here in
+   CSS (not in the SVG) because <foreignObject> + backdrop-filter
+   inside <svg> renders inconsistently across browsers. SVG carries
+   only the triangle glyph. */
 .rbccm-in-the-media__play {
   align-items: center;
   background: rgba(255, 255, 255, 0.20);
@@ -291,8 +295,12 @@ p.rbccm-in-the-media__subtitle,  div.rbccm-in-the-media__subtitle {
 }
 .rbccm-in-the-media__play svg {
   display: block;
-  height: 24px;
-  width: 24px;
+  /* SVG carries only the triangle glyph inside a 72 viewBox (ring lives
+     in CSS). 39px display size renders the triangle at Figma-matched
+     visual weight against the 72 button ring -- larger renders read as
+     too dominant. */
+  height: 39px;
+  width: 39px;
   transition: opacity 250ms ease;
 }
 .rbccm-in-the-media__play.is-launching svg {

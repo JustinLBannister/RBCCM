@@ -278,7 +278,7 @@
           </xsl:when>
         </xsl:choose>
 
-        <div class="container rbccm-platforms__inner">
+        <div class="rbccm-platforms__inner">
 
           <xsl:if test="$TITLE_TEXT != '' or $SUBTITLE_TEXT != ''">
             <div class="rbccm-platforms__header">

@@ -257,7 +257,7 @@
           </xsl:when>
         </xsl:choose>
 
-        <div class="container rbccm-leading-experts__inner">
+        <div class="rbccm-leading-experts__inner">
 
           <xsl:if test="$TITLE_TEXT != ''">
             <xsl:element name="{$TITLE_TAG}">

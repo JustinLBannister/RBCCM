@@ -61,10 +61,16 @@
     </svg>
   </xsl:template>
 
-  <!-- Play-triangle SVG (decorative overlay). -->
+  <!-- Play triangle SVG (decorative overlay).
+       Ring, frosted-glass blur and border live on the .__play span in
+       CSS -- browsers render <foreignObject> + backdrop-filter inside
+       <svg> inconsistently, so the Figma export of "everything baked
+       into the SVG" was dropping the ring in Chrome. Path here is the
+       Figma triangle geometry inside a 72 viewBox so it visually
+       matches the ring. -->
   <xsl:template name="playTriangle">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M8 5v14l11-7z" fill="currentColor"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" fill="none">
+      <path d="M47.1719 36.6207L29.4822 46.8339L29.4822 26.4076L47.1719 36.6207Z" fill="white"/>
     </svg>
   </xsl:template>
 
@@ -156,7 +162,7 @@
         </xsl:choose>
         <xsl:attribute name="data-rbccm-in-the-media-root">true</xsl:attribute>
 
-        <div class="container rbccm-in-the-media__inner">
+        <div class="rbccm-in-the-media__inner">
 
           <xsl:if test="$TITLE_TEXT != ''">
             <xsl:element name="{$TITLE_TAG}">

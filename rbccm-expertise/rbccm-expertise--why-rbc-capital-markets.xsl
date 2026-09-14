@@ -142,7 +142,7 @@
         <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
       </xsl:if>
 
-      <div class="container rbccm-expertise__inner">
+      <div class="rbccm-expertise__inner">
 
         <div class="rbccm-expertise__header">
           <xsl:if test="$TITLE_TEXT != ''">

@@ -135,7 +135,7 @@
         <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
       </xsl:if>
 
-      <div class="container rbccm-cta-band__inner">
+      <div class="rbccm-cta-band__inner">
 
         <xsl:if test="$EYEBROW_TEXT != ''">
           <xsl:element name="{$EYEBROW_TAG}">
