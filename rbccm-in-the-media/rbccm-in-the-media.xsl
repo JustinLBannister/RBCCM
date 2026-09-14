@@ -63,7 +63,7 @@
 
   <!-- Play triangle SVG (decorative overlay).
        Ring, frosted-glass blur and border live on the .__play span in
-       CSS -- browsers render <foreignObject> + backdrop-filter inside
+       CSS; browsers render <foreignObject> + backdrop-filter inside
        <svg> inconsistently, so the Figma export of "everything baked
        into the SVG" was dropping the ring in Chrome. Path here is the
        Figma triangle geometry inside a 72 viewBox so it visually
