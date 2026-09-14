@@ -85,8 +85,9 @@
   <xsl:variable name="MC_INDEX_BODY"       select="/Properties/Datum[@ID='IndexEventsBody']" />
 
   <!-- Market Insights -->
-  <xsl:variable name="MK_EYEBROW"          select="/Properties/Datum[@ID='MarketInsightsEyebrow']" />
-  <xsl:variable name="MK_HEADING"          select="/Properties/Datum[@ID='MarketInsightsHeading']" />
+  <!-- Market Insights section removed from the page; MK_* variables
+       stripped along with it. -->
+
 
   <!-- Demo CTA -->
   <xsl:variable name="DEMO_EYEBROW"        select="/Properties/Datum[@ID='DemoEyebrow']" />
@@ -97,17 +98,10 @@
   <xsl:variable name="DEMO_CTA_HREF"       select="/Properties/Datum[@ID='DemoCtaHref']" />
 
   <!-- Newsletter -->
-  <xsl:variable name="NL_HEADING"          select="/Properties/Datum[@ID='NewsletterHeading']" />
-  <xsl:variable name="NL_BODY"             select="/Properties/Datum[@ID='NewsletterBody']" />
-  <xsl:variable name="NL_MARKETO_BASE"     select="normalize-space(/Properties/Datum[@ID='NewsletterMarketoBaseUrl'])" />
-  <xsl:variable name="NL_MARKETO_MUNCHKIN" select="normalize-space(/Properties/Datum[@ID='NewsletterMarketoMunchkinId'])" />
-  <xsl:variable name="NL_MARKETO_FORM"     select="normalize-space(/Properties/Datum[@ID='NewsletterMarketoFormId'])" />
-  <xsl:variable name="NL_LINKEDIN_LABEL"   select="/Properties/Datum[@ID='NewsletterLinkedinLabel']" />
-  <xsl:variable name="NL_LINKEDIN_HREF"    select="/Properties/Datum[@ID='NewsletterLinkedinHref']" />
-  <xsl:variable name="NL_CONSENT"          select="/Properties/Datum[@ID='NewsletterConsent']" />
-  <xsl:variable name="NL_PRIVACY_LABEL"    select="/Properties/Datum[@ID='NewsletterPrivacyLabel']" />
-  <xsl:variable name="NL_PRIVACY_HREF"     select="/Properties/Datum[@ID='NewsletterPrivacyHref']" />
-  <xsl:variable name="NL_SUBMIT_LABEL"     select="/Properties/Datum[@ID='NewsletterSubmitLabel']" />
+  <!-- Newsletter section removed from the component; the site-wide
+       Marketo component is dropped on the page separately. NL_*
+       variables stripped along with it. -->
+
 
   <!-- Appearance -->
   <xsl:variable name="COLOR_SCHEME">
@@ -182,27 +176,8 @@
   <xsl:variable name="C3_BODY"     select="/Properties/Datum[@ID='Card3Body']"     />
 
   <!-- Market insight (1 fixed slot) -->
-  <xsl:variable name="INS1_EYEBROW"   select="/Properties/Datum[@ID='Insight1Eyebrow']" />
-  <xsl:variable name="INS1_TITLE"     select="/Properties/Datum[@ID='Insight1Title']" />
-  <xsl:variable name="INS1_BODY"      select="/Properties/Datum[@ID='Insight1Body']" />
-  <xsl:variable name="INS1_CTA_LABEL" select="/Properties/Datum[@ID='Insight1CtaLabel']" />
-  <xsl:variable name="INS1_CTA_HREF"  select="/Properties/Datum[@ID='Insight1CtaHref']" />
-  <xsl:variable name="INS1_IMAGE"     select="/Properties/Datum[@ID='Insight1Image']" />
-  <xsl:variable name="INS1_IMAGE_ALT" select="/Properties/Datum[@ID='Insight1ImageAlt']" />
-  <xsl:variable name="INS2_EYEBROW"   select="/Properties/Datum[@ID='Insight2Eyebrow']" />
-  <xsl:variable name="INS2_TITLE"     select="/Properties/Datum[@ID='Insight2Title']" />
-  <xsl:variable name="INS2_BODY"      select="/Properties/Datum[@ID='Insight2Body']" />
-  <xsl:variable name="INS2_CTA_LABEL" select="/Properties/Datum[@ID='Insight2CtaLabel']" />
-  <xsl:variable name="INS2_CTA_HREF"  select="/Properties/Datum[@ID='Insight2CtaHref']" />
-  <xsl:variable name="INS2_IMAGE"     select="/Properties/Datum[@ID='Insight2Image']" />
-  <xsl:variable name="INS2_IMAGE_ALT" select="/Properties/Datum[@ID='Insight2ImageAlt']" />
-  <xsl:variable name="INS3_EYEBROW"   select="/Properties/Datum[@ID='Insight3Eyebrow']" />
-  <xsl:variable name="INS3_TITLE"     select="/Properties/Datum[@ID='Insight3Title']" />
-  <xsl:variable name="INS3_BODY"      select="/Properties/Datum[@ID='Insight3Body']" />
-  <xsl:variable name="INS3_CTA_LABEL" select="/Properties/Datum[@ID='Insight3CtaLabel']" />
-  <xsl:variable name="INS3_CTA_HREF"  select="/Properties/Datum[@ID='Insight3CtaHref']" />
-  <xsl:variable name="INS3_IMAGE"     select="/Properties/Datum[@ID='Insight3Image']" />
-  <xsl:variable name="INS3_IMAGE_ALT" select="/Properties/Datum[@ID='Insight3ImageAlt']" />
+  <!-- Market Insights cards removed with the section; INSn_* stripped. -->
+
 
   <!-- Newsletter form fields (5 fixed slots) -->
   <xsl:variable name="FLD1_LABEL" select="/Properties/Datum[@ID='Field1Label']" />
