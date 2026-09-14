@@ -391,7 +391,16 @@
        its solid #E7EEF1 fill. -->
   <Datum ID="SeBgBrightcoveAccount" Type="String" Name="S+E : Brightcove account ID (technical - RBC-wide constant, set once at deploy)">6021289101001</Datum>
   <Datum ID="SeBgBrightcovePlayer" Type="String" Name="S+E : Brightcove player ID (technical - RBC-wide constant, set once at deploy)">VyvCc9BZx</Datum>
-  <Datum ID="SeBgBrightcoveVideoId" Type="String" Name="S+E : Brightcove video ID (optional - blank leaves the section on its solid fill)"></Datum>
+  <Datum ID="SeBgBrightcoveVideoId" Type="String" Name="S+E : Brightcove video ID (optional - blank leaves the section on its solid fill; MP4 path below wins if both are set)"></Datum>
+
+  <!-- Direct MP4 fallback / override. Paste a DAM path or full URL to an
+       MP4 file (e.g. /assets/rbccm/videos/strategy-economics/hero-bg.mp4).
+       When set, renders a native <video> element instead of the Brightcove
+       iframe - lighter weight, no player chrome, respects the video's own
+       muted/loop behaviour. If both this and SeBgBrightcoveVideoId are
+       set, MP4 wins. Leave blank to use Brightcove (or blank both for
+       the solid #E7EEF1 fill). -->
+  <Datum ID="SeBgVideoMp4" Type="String" Name="S+E : hero background MP4 URL (optional - if set, overrides the Brightcove video)"></Datum>
 
   <!-- Insight card source. Three modes:
          dcr-picker   editor picks the insights article via TeamSite's

@@ -350,6 +350,7 @@
         <xsl:variable name="SE_BG_ACCT"          select="normalize-space(//Datum[@ID='SeBgBrightcoveAccount']/text()[last()])"/>
         <xsl:variable name="SE_BG_PLAYER"        select="normalize-space(//Datum[@ID='SeBgBrightcovePlayer']/text()[last()])"/>
         <xsl:variable name="SE_BG_VIDEO_ID"      select="normalize-space(//Datum[@ID='SeBgBrightcoveVideoId']/text()[last()])"/>
+        <xsl:variable name="SE_BG_MP4"           select="normalize-space(//Datum[@ID='SeBgVideoMp4']/text()[last()])"/>
 
         <!-- Insight sourcing mode + hydrator config. Three modes:
                dcr-picker   card is server-rendered from the DCR record
@@ -551,17 +552,29 @@
             </xsl:if>
           </xsl:if>
 
-          <!-- Optional background video slot. Only rendered when
-               the author provides a VideoId. Uses the standard
-               Brightcove iframe embed contract (autoplay + muted
-               + loop + playsinline + controls disabled). -->
-          <xsl:if test="$SE_BG_VIDEO_ID != ''">
-            <div class="rbccm-hero__bg-video" aria-hidden="true">
-              <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen">
-                <xsl:attribute name="src">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.html?videoId=<xsl:value-of select="$SE_BG_VIDEO_ID"/>&amp;autoplay=true&amp;muted=true&amp;loop=true&amp;playsinline=true&amp;controls=false</xsl:attribute>
-              </iframe>
-            </div>
-          </xsl:if>
+          <!-- Optional background video slot. MP4 path wins when set
+               and renders a native <video> element (lighter, no
+               player chrome). Otherwise falls back to the Brightcove
+               iframe embed contract (autoplay + muted + loop +
+               playsinline + controls disabled). Blank both = solid fill. -->
+          <xsl:choose>
+            <xsl:when test="$SE_BG_MP4 != ''">
+              <div class="rbccm-hero__bg-video" aria-hidden="true">
+                <video autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline" preload="auto">
+                  <source type="video/mp4">
+                    <xsl:attribute name="src"><xsl:value-of select="$SE_BG_MP4"/></xsl:attribute>
+                  </source>
+                </video>
+              </div>
+            </xsl:when>
+            <xsl:when test="$SE_BG_VIDEO_ID != ''">
+              <div class="rbccm-hero__bg-video" aria-hidden="true">
+                <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen">
+                  <xsl:attribute name="src">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.html?videoId=<xsl:value-of select="$SE_BG_VIDEO_ID"/>&amp;autoplay=true&amp;muted=true&amp;loop=true&amp;playsinline=true&amp;controls=false</xsl:attribute>
+                </iframe>
+              </div>
+            </xsl:when>
+          </xsl:choose>
 
           <!-- Decorative blur ellipse (desktop only, per CSS). -->
           <div class="rbccm-hero__blur" aria-hidden="true"></div>
