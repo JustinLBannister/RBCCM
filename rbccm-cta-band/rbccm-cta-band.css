@@ -58,6 +58,33 @@
 .rbccm-cta-band *::before,
 .rbccm-cta-band *::after { box-sizing: border-box; }
 
+/* Pre-hide any element that opts in to a scroll-triggered animation.
+   Duplicates the rule that rbccm-animate.js injects at runtime, but
+   ships in this render-blocking stylesheet so it applies before the
+   browser paints the section. Without this, the buttons briefly flash
+   at full opacity between initial paint and rbccm-animate.js class
+   injection -- the "jump" the eye sees on scroll-in. Once
+   .rbccm-anim-ready lands on <body> and animate__animated lands on
+   the element, opacity flips back to 1 and animate.css takes over. */
+.rbccm-cta-band [data-animate],
+.rbccm-cta-band [data-animate-hero],
+.rbccm-cta-band [data-stagger-parent] > * {
+  opacity: 0;
+}
+.rbccm-anim-ready .rbccm-cta-band [data-animate].animate__animated,
+.rbccm-anim-ready .rbccm-cta-band [data-animate-hero].animate__animated,
+.rbccm-anim-ready .rbccm-cta-band [data-stagger-parent] > .animate__animated {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-cta-band [data-animate],
+  .rbccm-cta-band [data-animate-hero],
+  .rbccm-cta-band [data-stagger-parent] > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
+
 /* Font-family lock on tag-pickable heading. Defends against
    unified.css tag-level rules stripping RBCDisplay on h1..h6. */
 .rbccm-cta-band .rbccm-cta-band__heading {
@@ -194,7 +221,11 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   height: 44px;
   justify-content: center;
   line-height: 1;
-  opacity: 1 !important; /* beat site-wide `footer a { opacity: 0.98 }` from unified.css:2764 */
+  /* opacity intentionally NOT !important here -- animate.css's
+     fadeInUp keyframe needs to own opacity while the reveal runs.
+     `footer a { opacity: 0.98 }` bleed from unified.css:2764 lands
+     at 0.98 which is imperceptible; if it ever matters, escalate via
+     a heavier selector chain rather than !important. */
   overflow: hidden; /* clip the fly-by arrow */
   padding: 12px 24px;
   position: relative;
@@ -219,7 +250,6 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   background: #E5B325 !important; /* one shade deeper than the base gold */
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   color: var(--rbccm-cta-band-navy) !important;
-  opacity: 1 !important;
 }
 /* Shine-sweep pseudo: soft white diagonal band at rest sits at
    left: -60% (off-screen); animates across on hover / focus. */
@@ -263,7 +293,6 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: var(--rbccm-cta-band-white);
   color: var(--rbccm-cta-band-white) !important;
-  opacity: 1 !important;
 }
 
 /* Icon inside a button. currentColor lets the SVG pick up the
@@ -603,7 +632,6 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary:focus-visible {
   background: #E5B325 !important;
   color: #061730 !important;
-  opacity: 1 !important;
 }
 .rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
   fill: #061730;
@@ -625,7 +653,6 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   background: #FFC72C !important;            /* RBC gold */
   border-color: #FFC72C;
   color: #003168 !important;                 /* RBC deep navy */
-  opacity: 1 !important;
 }
 
 /* Section padding: 90px vertical mobile / tablet, 60px vertical
