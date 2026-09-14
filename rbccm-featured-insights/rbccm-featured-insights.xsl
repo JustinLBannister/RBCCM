@@ -257,7 +257,12 @@
          Manual mode = never. -->
     <xsl:variable name="hydrateThisTile" select="($tileSource = 'pinned-url' or $tileSource = 'dcr-picker') and normalize-space($pinnedUrl) != ''"/>
 
-    <li class="rbccm-insight-tiles__item">
+    <!-- Wrapper is a <div role="listitem"> instead of a real <li> because
+         Slick moves each item into <div class="slick-slide"> at init,
+         which breaks the "li must be a child of ul/ol" a11y rule.
+         Keeping ARIA roles preserves the "list, N items" announcement
+         for screen readers without depending on the DOM parent. -->
+    <div class="rbccm-insight-tiles__item" role="listitem">
       <xsl:if test="$hydrateThisTile">
         <xsl:attribute name="data-tile-pinned-url"><xsl:value-of select="$pinnedUrl"/></xsl:attribute>
       </xsl:if>
@@ -334,7 +339,7 @@
           </div>
         </div>
       </a>
-    </li>
+    </div>
   </xsl:template>
 
 
@@ -398,7 +403,12 @@
         <!-- ===== Tile grid =====
              data-stagger-parent lets rbccm-animate/rbccm-animate.js reveal
              each tile in sequence as the row enters the viewport. -->
-        <ul class="rbccm-insight-tiles__row" data-stagger-parent="fadeInUp" data-stagger-step="200">
+        <!-- Row container is a <div role="list"> so screen readers still
+             hear "list, 4 items" even after Slick reparents each child
+             into <div class="slick-slide">. Using semantic <ul>/<li>
+             would trip axe's "li must be direct child of ul/ol" check
+             once Slick moves the items. -->
+        <div class="rbccm-insight-tiles__row" role="list" data-stagger-parent="fadeInUp" data-stagger-step="200">
 
           <xsl:call-template name="renderTile">
             <xsl:with-param name="featured"   select="'yes'"/>
@@ -472,7 +482,7 @@
             <xsl:with-param name="date"       select="$T4_DATE"/>
           </xsl:call-template>
 
-        </ul>
+        </div>
 
         <!-- ===== Slick controls (only shown &lt;992px via CSS) ===== -->
         <div class="rbccm-featured-insights__controls">

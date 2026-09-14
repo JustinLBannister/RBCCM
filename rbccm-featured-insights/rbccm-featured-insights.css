@@ -165,6 +165,22 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
   .rbccm-featured-insights {
     padding: 80px 23px;
   }
+
+  /* Section heading bumps to 42 / 125% at desktop to match the sibling
+     S&E section headings (Leading Experts, Area of Expertise, Platforms).
+     Tag-qualified h1..h6 chain increases specificity so site-wide h2
+     rules from unified.css don't override us. Same values as
+     .rbccm-leading-experts .__title desktop rule. */
+  h1.rbccm-featured-insights__title, h2.rbccm-featured-insights__title,
+  h3.rbccm-featured-insights__title, h4.rbccm-featured-insights__title,
+  h5.rbccm-featured-insights__title, h6.rbccm-featured-insights__title,
+  p.rbccm-featured-insights__title,  div.rbccm-featured-insights__title,
+  .rbccm-featured-insights .rbccm-featured-insights__title {
+    font-size: 42px !important;
+    font-weight: 500 !important;
+    line-height: 125% !important;
+    margin-bottom: 40px !important;
+  }
 }
 
 /* Variant: Strategy and Economics -- flips bg to white for the S&E
@@ -376,6 +392,10 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
    768-991) so mobile users don't scroll through four 555px cards. At
    >=992 Slick is destroyed and the DOM reverts to a 3-column CSS grid
    with the featured card spanning the full first row. */
+/* Row is a <div role="list"> (not a <ul>) so Slick's <div class="slick-slide">
+   wrapping doesn't trip axe's "li must be direct child of ul/ol" check.
+   list-style + padding-inline-start reset kept defensively in case a
+   future skin swaps this back to a real list. */
 .rbccm-insight-tiles__row {
   display: block;
   list-style: none;
@@ -383,9 +403,8 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
   padding: 0;
 }
 
-/* Each <li> is a Slick slide below desktop. `list-style: none` on the
-   ul strips the marker; the li stays a normal block child so Slick can
-   wrap it in .slick-track. At >=992 the li becomes a grid child. */
+/* Each item is a <div role="listitem"> — see row comment above. Below
+   desktop it becomes a Slick slide; at >=992 it becomes a grid child. */
 .rbccm-insight-tiles__item {
   display: block;
   list-style: none;
