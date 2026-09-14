@@ -132,9 +132,17 @@
           <xsl:if test="$readMoreLabel != ''">
             <a class="rbccm-accordions__item-readmore">
               <xsl:attribute name="href"><xsl:value-of select="$readMoreHref"/></xsl:attribute>
-              <xsl:if test="$readMoreAria != ''">
-                <xsl:attribute name="aria-label"><xsl:value-of select="$readMoreAria"/></xsl:attribute>
-              </xsl:if>
+              <!-- aria-label ALWAYS emitted so bare "Read more" links announce
+                   what they lead to. Prefer the explicit Datum override; fall
+                   back to composing "{label}: {note title}" so screen readers
+                   hear "Read more: Fiscal outlook 2026" not just "Read more". -->
+              <xsl:attribute name="aria-label">
+                <xsl:choose>
+                  <xsl:when test="$readMoreAria != ''"><xsl:value-of select="$readMoreAria"/></xsl:when>
+                  <xsl:when test="$titleText != ''"><xsl:value-of select="$readMoreLabel"/>: <xsl:value-of select="$titleText"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$readMoreLabel"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
               <xsl:value-of select="$readMoreLabel"/>
               <xsl:call-template name="readMoreArrow"/>
             </a>

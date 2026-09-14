@@ -37,13 +37,21 @@
     </svg>
   </xsl:template>
 
-  <!-- Render one button. Kind param: 'primary' or 'secondary'. -->
+  <!-- Render one button. Kind param: 'primary' or 'secondary'.
+       ariaLabel: explicit override from Datum (preferred).
+       ariaContext: fallback compose target (usually the heading text)
+                    used to build "{text}: {ariaContext}" when the
+                    explicit label is blank. This ensures bare CTAs
+                    like "Learn more" always announce what they lead
+                    to (e.g. "Learn more: Research portal"). -->
   <xsl:template name="renderButton">
     <xsl:param name="kind"/>
     <xsl:param name="text"/>
     <xsl:param name="href"/>
     <xsl:param name="newTab"/>
     <xsl:param name="animateDelay"/>
+    <xsl:param name="ariaLabel"/>
+    <xsl:param name="ariaContext"/>
 
     <xsl:if test="$text != ''">
       <a>
@@ -52,6 +60,16 @@
           <xsl:choose>
             <xsl:when test="$href != ''"><xsl:value-of select="$href"/></xsl:when>
             <xsl:otherwise>#</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <!-- aria-label: explicit override, else compose "{text}: {context}",
+             else just repeat text. Emitted on every button so screen
+             readers always get a purposeful announcement. -->
+        <xsl:attribute name="aria-label">
+          <xsl:choose>
+            <xsl:when test="$ariaLabel != ''"><xsl:value-of select="$ariaLabel"/></xsl:when>
+            <xsl:when test="normalize-space($ariaContext) != ''"><xsl:value-of select="$text"/>: <xsl:value-of select="normalize-space($ariaContext)"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
         <xsl:if test="$newTab = 'yes'">
@@ -89,10 +107,12 @@
     <xsl:variable name="PRIMARY_TEXT"     select="normalize-space(//Datum[@ID='PrimaryCtaText']/text()[last()])"/>
     <xsl:variable name="PRIMARY_HREF"     select="normalize-space(//Datum[@ID='PrimaryCtaHref']/text()[last()])"/>
     <xsl:variable name="PRIMARY_NEWTAB"   select="normalize-space(//Datum[@ID='PrimaryCtaNewTab']/text()[last()])"/>
+    <xsl:variable name="PRIMARY_ARIA"     select="normalize-space(//Datum[@ID='PrimaryCtaAriaLabel']/text()[last()])"/>
 
     <xsl:variable name="SECONDARY_TEXT"   select="normalize-space(//Datum[@ID='SecondaryCtaText']/text()[last()])"/>
     <xsl:variable name="SECONDARY_HREF"   select="normalize-space(//Datum[@ID='SecondaryCtaHref']/text()[last()])"/>
     <xsl:variable name="SECONDARY_NEWTAB" select="normalize-space(//Datum[@ID='SecondaryCtaNewTab']/text()[last()])"/>
+    <xsl:variable name="SECONDARY_ARIA"   select="normalize-space(//Datum[@ID='SecondaryCtaAriaLabel']/text()[last()])"/>
 
     <xsl:variable name="HEADING_TAG">
       <xsl:call-template name="pickTag">
@@ -160,6 +180,8 @@
               <xsl:with-param name="href" select="$PRIMARY_HREF"/>
               <xsl:with-param name="newTab" select="$PRIMARY_NEWTAB"/>
               <xsl:with-param name="animateDelay" select="'500'"/>
+              <xsl:with-param name="ariaLabel" select="$PRIMARY_ARIA"/>
+              <xsl:with-param name="ariaContext" select="$HEADING_TEXT"/>
             </xsl:call-template>
             <xsl:call-template name="renderButton">
               <xsl:with-param name="kind" select="'secondary'"/>
@@ -167,6 +189,8 @@
               <xsl:with-param name="href" select="$SECONDARY_HREF"/>
               <xsl:with-param name="newTab" select="$SECONDARY_NEWTAB"/>
               <xsl:with-param name="animateDelay" select="'650'"/>
+              <xsl:with-param name="ariaLabel" select="$SECONDARY_ARIA"/>
+              <xsl:with-param name="ariaContext" select="$HEADING_TEXT"/>
             </xsl:call-template>
           </div>
         </xsl:if>

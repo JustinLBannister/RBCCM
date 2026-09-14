@@ -269,9 +269,12 @@
           </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name="href"><xsl:value-of select="$effHref"/></xsl:attribute>
-        <xsl:if test="normalize-space($aria) != ''">
-          <xsl:attribute name="aria-label"><xsl:value-of select="$aria"/></xsl:attribute>
-        </xsl:if>
+        <!-- NO aria-label on the tile anchor. Screen readers should read the
+             full card content (eyebrow, title, description, meta) as the
+             accessible name of the link. An aria-label on the <a> would
+             override all that with a single flat string. Matches the home
+             page implementation. AriaLabel Datum is intentionally kept in
+             Properties.xml as an author-facing note but no longer emitted. -->
 
         <div class="rbccm-insight-tiles__insight-media">
           <img loading="lazy">

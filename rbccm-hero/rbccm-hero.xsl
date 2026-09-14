@@ -635,9 +635,14 @@
                     <xsl:if test="$SE_INS_LINK_LABEL != ''">
                       <a class="rbccm-hero__insight-link">
                         <xsl:attribute name="href"><xsl:value-of select="$SE_EFF_LINK_HREF"/></xsl:attribute>
-                        <xsl:if test="$SE_INS_LINK_ARIA != ''">
-                          <xsl:attribute name="aria-label"><xsl:value-of select="$SE_INS_LINK_ARIA"/></xsl:attribute>
-                        </xsl:if>
+                        <!-- aria-label ALWAYS emitted; see sibling S&E skin for full rationale. -->
+                        <xsl:attribute name="aria-label">
+                          <xsl:choose>
+                            <xsl:when test="$SE_INS_LINK_ARIA != ''"><xsl:value-of select="$SE_INS_LINK_ARIA"/></xsl:when>
+                            <xsl:when test="$SE_EFF_TITLE != ''"><xsl:value-of select="$SE_INS_LINK_LABEL"/>: <xsl:value-of select="$SE_EFF_TITLE"/></xsl:when>
+                            <xsl:otherwise><xsl:value-of select="$SE_INS_LINK_LABEL"/></xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:attribute>
                         <xsl:value-of select="$SE_INS_LINK_LABEL"/>
                         <svg class="rbccm-hero__insight-link-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
                           <path d="M2.70801 6.5H10.2913" stroke="#FFC72C" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>

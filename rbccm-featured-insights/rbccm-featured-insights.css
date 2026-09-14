@@ -628,14 +628,20 @@ p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
 }
 
 
-/* ---------- Keyboard focus ring ---------- */
+/* ---------- Keyboard focus ring ----------
+   outline-style is explicitly set to `solid` on both rules so the
+   ring reads as a clean border, not a browser-default dotted
+   pattern (Firefox's default is dotted; some Chromium builds
+   inherit dashed when only outline-color/offset/width are set). */
 .rbccm-insight-tiles__insight:focus {
   outline-color: rgb(0, 106, 195);
+  outline-style: solid;
   outline-offset: -2px;
   outline-width: 3px;
 }
 .rbccm-insight-tiles__insight:focus-visible {
   outline-color: rgb(0, 106, 195);
+  outline-style: solid;
   outline-offset: -2px;
   outline-width: 3px;
 }
