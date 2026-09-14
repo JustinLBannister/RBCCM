@@ -5,56 +5,6 @@
    ticker. RBCCMBind bootstrap at the bottom runs only when the runtime
    is present (preview builds). Otherwise Datums render server-side. */
 
-  // ---- Neutralize bootstrap-accessibility-plugin nav focus hijack ----
-  // The RBCCM site chrome loads bootstrap-accessibility-plugin (a legacy
-  // PayPal Bootstrap-3 a11y patch). On this page it makes the top nav
-  // tabbing jump around: the plugin adds keydown handlers on `.nav`
-  // and drops `tabindex="-1"` on sibling nav items so arrow keys
-  // control traversal — but that fights the site's natural Tab flow.
-  //
-  // We can't unload the plugin script (site chrome owns it), so instead
-  // we strip its two known nav side-effects once the DOM is ready:
-  //   1) namespaced keydown handlers registered on document / body /
-  //      the nav itself (`.bs.dropdown`, `.bs.tab`, `.a11y-plugin`)
-  //   2) `tabindex="-1"` attributes the plugin sprinkles on nav <a>s
-  //
-  // Belt-and-suspenders: run at DOMContentLoaded (plugin has bound by
-  // then) AND on window.load (in case some site chrome initializes
-  // after DCL). Second pass is a no-op if the first one already
-  // cleaned up.
-  (function () {
-    function stripPluginA11yHooks() {
-      var $ = window.jQuery;
-      if (!$ || !$.fn) return;
-      var $doc = $(document);
-      // Bootstrap plugin's known focus/keyboard handler namespaces.
-      // Off with no selector removes handlers attached to `document`.
-      $doc.off('keydown.bs.dropdown')
-          .off('keydown.bs.tab')
-          .off('keydown.bs.collapse')
-          .off('focusin.bs.modal')
-          .off('focusout.bs.modal')
-          .off('.a11y-plugin');
-      // Nav-scoped: unbind any keydown / focus handlers the plugin
-      // attached directly to nav/navbar containers.
-      $('.navbar-nav, .nav, [role="menubar"], [role="tablist"]')
-        .off('keydown').off('keydown.bs')
-        .off('focus').off('focus.bs');
-      // Restore natural tab order: the plugin sets tabindex="-1" on
-      // non-active nav siblings so only one item is Tab-reachable
-      // (with arrow keys expected to move between siblings). Remove
-      // the -1 override so every nav <a> is naturally focusable.
-      $('.navbar-nav [tabindex="-1"], .nav [tabindex="-1"], header [tabindex="-1"]')
-        .removeAttr('tabindex');
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', stripPluginA11yHooks);
-    } else {
-      stripPluginA11yHooks();
-    }
-    window.addEventListener('load', stripPluginA11yHooks);
-  })();
-
 
   // ---- Video modal (Bootstrap-managed) ------------------------
   // The modal itself (#herovideo) uses Bootstrap's standard modal
@@ -102,11 +52,10 @@
       iframe.setAttribute('src', '');
     }
 
-    // Focus management, per RBCCM Bootstrap 3.4.1 modal a11y spec:
-    // remember the trigger on open, move focus to the close button once
-    // the modal is visible, and return focus to the trigger on close.
-    // The focus-guard <span> after the iframe catches Tab escapes and
-    // loops focus back to the close button.
+    // Focus management: remember the trigger on open, move focus to the
+    // close button once the modal is visible, and return focus to the
+    // trigger on close. The focus-guard <span> after the iframe catches
+    // Tab escapes and loops focus back to the close button.
     var trigger = null;
     var closeBtn = modal.querySelector('.close');
     var guard    = modal.querySelector('[data-focus-guard="herovideo"]');
