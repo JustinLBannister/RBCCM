@@ -166,20 +166,18 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
     padding: 80px 23px;
   }
 
-  /* Section heading bumps to 42 / 125% at desktop to match the sibling
-     S&E section headings (Leading Experts, Area of Expertise, Platforms).
+  /* Section heading bumps to 42 at desktop to match the sibling S&E
+     section headings (Leading Experts, Area of Expertise, Platforms).
      Tag-qualified h1..h6 chain increases specificity so site-wide h2
-     rules from unified.css don't override us. Same values as
-     .rbccm-leading-experts .__title desktop rule. */
+     rules from unified.css don't override us. Font-weight / margin /
+     other properties inherit from the base rule -- only the size
+     changes at this breakpoint. */
   h1.rbccm-featured-insights__title, h2.rbccm-featured-insights__title,
   h3.rbccm-featured-insights__title, h4.rbccm-featured-insights__title,
   h5.rbccm-featured-insights__title, h6.rbccm-featured-insights__title,
   p.rbccm-featured-insights__title,  div.rbccm-featured-insights__title,
   .rbccm-featured-insights .rbccm-featured-insights__title {
     font-size: 42px !important;
-    font-weight: 500 !important;
-    line-height: 125% !important;
-    margin-bottom: 40px !important;
   }
 }
 
@@ -202,6 +200,17 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
 
 /* Slick internal chrome (only present once JS runs). */
 .rbccm-featured-insights .slick-list  { overflow: hidden; }
+
+/* Force .slick-list visible after Slick init. rbccm-animate.js injects
+   [data-stagger-parent] > * { opacity: 0 } as a pre-hide rule, and once
+   Slick moves the tile children into .slick-list, .slick-list becomes
+   the direct child of the row and inherits that opacity: 0 — hiding the
+   whole carousel. The row's data-stagger-parent still animates the
+   *original* children before Slick's DOM shuffle, so revealing
+   .slick-list after init doesn't skip the intended stagger. */
+.rbccm-featured-insights .rbccm-insight-tiles__row.slick-initialized > .slick-list {
+  opacity: 1 !important;
+}
 .rbccm-featured-insights .slick-track { align-items: stretch; display: flex; }
 .rbccm-featured-insights .slick-slide { height: auto; }
 .rbccm-featured-insights .slick-slide > div,
@@ -432,7 +441,7 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
 .rbccm-insight-tiles__insight {
   align-items: flex-start;
   background: #FFF;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #D0D0D0; /* matches story-tile border colour used across the site */
   color: #000;
   display: flex;
   flex-direction: column;

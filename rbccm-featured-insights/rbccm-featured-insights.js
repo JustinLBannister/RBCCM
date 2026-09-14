@@ -253,6 +253,26 @@ jQuery(document).ready(function ($) {
     $section.toggleClass('rbccm-featured-insights--single', $items.length <= 1);
     if ($items.length <= 1) return;
 
+    /* Prevent re-fade on Slick re-init at resize.
+       ----------------------------------------------------------------
+       Slick's destroy + init toggles display: none/block on the tile
+       items as it wraps/unwraps them in <div class="slick-slide">.
+       Chrome + Safari treat that display change as a fresh render
+       context and re-trigger any CSS animations on the element -- so
+       animate__fadeInUp keeps replaying on every resize past the 992
+       breakpoint. Once the initial stagger has played, strip the
+       animate.css classes off each tile and drop data-stagger-parent
+       from the row so nothing is left to re-trigger. Delay is stagger
+       step * items + a 1.5s cushion for the fade-in duration. */
+    var stripTime = (parseInt($row.attr('data-stagger-step') || '100', 10) * $items.length) + 1500;
+    window.setTimeout(function () {
+      $items.each(function () {
+        this.style.opacity = 1;
+        this.classList.remove('animate__animated', 'animate__fadeInUp');
+      });
+      $row.removeAttr('data-stagger-parent');
+    }, stripTime);
+
     function updateAnnounce(currentSlide) {
       if (!$announce.length) return;
       $announce.text('Item ' + (currentSlide + 1) + ' of ' + $items.length);

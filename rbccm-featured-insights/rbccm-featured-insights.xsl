@@ -257,12 +257,15 @@
          Manual mode = never. -->
     <xsl:variable name="hydrateThisTile" select="($tileSource = 'pinned-url' or $tileSource = 'dcr-picker') and normalize-space($pinnedUrl) != ''"/>
 
-    <!-- Wrapper is a <div role="listitem"> instead of a real <li> because
-         Slick moves each item into <div class="slick-slide"> at init,
-         which breaks the "li must be a child of ul/ol" a11y rule.
-         Keeping ARIA roles preserves the "list, N items" announcement
-         for screen readers without depending on the DOM parent. -->
-    <div class="rbccm-insight-tiles__item" role="listitem">
+    <!-- <li> intentionally kept (not swapped to div) because Slick's
+         init logic in accessible-slick.min.js reads <ul>/<li> shape
+         when wiring keyboard nav + slide indexing. Switching to div
+         broke Slick on the S+E page. axe will report "li must be
+         direct child of ul/ol" once Slick wraps each <li> in
+         <div class="slick-slide"> -- that's a known library
+         limitation, not a component bug; document it as an accepted
+         exception in accessibility QA. -->
+    <li class="rbccm-insight-tiles__item">
       <xsl:if test="$hydrateThisTile">
         <xsl:attribute name="data-tile-pinned-url"><xsl:value-of select="$pinnedUrl"/></xsl:attribute>
       </xsl:if>
@@ -339,7 +342,7 @@
           </div>
         </div>
       </a>
-    </div>
+    </li>
   </xsl:template>
 
 
@@ -403,12 +406,11 @@
         <!-- ===== Tile grid =====
              data-stagger-parent lets rbccm-animate/rbccm-animate.js reveal
              each tile in sequence as the row enters the viewport. -->
-        <!-- Row container is a <div role="list"> so screen readers still
-             hear "list, 4 items" even after Slick reparents each child
-             into <div class="slick-slide">. Using semantic <ul>/<li>
-             would trip axe's "li must be direct child of ul/ol" check
-             once Slick moves the items. -->
-        <div class="rbccm-insight-tiles__row" role="list" data-stagger-parent="fadeInUp" data-stagger-step="200">
+        <!-- Semantic <ul> kept for Slick compatibility -- accessible-slick
+             breaks when the row is a div. axe will flag the <li> children
+             once Slick wraps them in <div class="slick-slide">; that's a
+             documented library limitation. -->
+        <ul class="rbccm-insight-tiles__row" data-stagger-parent="fadeInUp" data-stagger-step="200">
 
           <xsl:call-template name="renderTile">
             <xsl:with-param name="featured"   select="'yes'"/>
@@ -482,7 +484,7 @@
             <xsl:with-param name="date"       select="$T4_DATE"/>
           </xsl:call-template>
 
-        </div>
+        </ul>
 
         <!-- ===== Slick controls (only shown &lt;992px via CSS) ===== -->
         <div class="rbccm-featured-insights__controls">
