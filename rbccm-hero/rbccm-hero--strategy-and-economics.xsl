@@ -310,14 +310,9 @@
                 <!-- Optional desktop max-width for widow control. When the
                      SeBodyMaxWidth Datum is non-blank, its value is passed
                      through as a CSS custom property that the desktop rule
-                     in rbccm-hero.css picks up (blank == default 100%).
-                     The two leading hyphens of the CSS custom property are
-                     emitted via character references so TeamSite's XSL
-                     parser doesn't choke on a literal `[dash][dash]`
-                     sequence in element text (its parser flags it even
-                     when the sequence sits outside an XML comment). */-->
+                     in rbccm-hero.css picks up (blank == default 100%). -->
                 <xsl:if test="$SE_BODY_MAX_WIDTH != ''">
-                  <xsl:attribute name="style">&#x2D;&#x2D;rbccm-hero-se-body-max-width: <xsl:value-of select="$SE_BODY_MAX_WIDTH"/>;</xsl:attribute>
+                  <xsl:attribute name="style">--rbccm-hero-se-body-max-width: <xsl:value-of select="$SE_BODY_MAX_WIDTH"/>;</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="$SE_BODY_TEXT" disable-output-escaping="yes"/>
               </xsl:element>
