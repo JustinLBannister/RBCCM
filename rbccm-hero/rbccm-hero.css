@@ -822,11 +822,13 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 /* Selector notes:
    - `.ls-canvas:has(.rbccm-hero--strategy-and-economics)` scopes the
      override to S+E pages only.
-   - `.ls-row.content-section-pull-up:not(:has(.iw_component))` matches
-     the pull-up rail only when no wrapped component (`.iw_component`)
-     exists inside. This is more forgiving than `:has(.ls-area-body:empty)`
-     since TeamSite may emit whitespace text nodes inside the area-body,
-     which would defeat the CSS `:empty` pseudo-class. */
-.ls-canvas:has(.rbccm-hero--strategy-and-economics) .ls-row.content-section-pull-up:not(:has(.iw_component)) {
+   - `#content.content-section-pull-up` targets the specific rail
+     unconditionally on S+E pages. Simpler + more specific than a
+     conditional `:has()` inner check -- the S+E page never populates
+     this rail, so we don't need empty-detection to avoid a false
+     positive. Wins the specificity fight against site-wide unified.css
+     rules that set `margin-top: 40px` and other spacing on
+     `.content-section-pull-up`. */
+.ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up {
   display: none !important;
 }
