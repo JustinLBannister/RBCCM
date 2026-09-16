@@ -79,6 +79,10 @@ h1.rbccm-leading-experts__title, h2.rbccm-leading-experts__title,
 h3.rbccm-leading-experts__title, h4.rbccm-leading-experts__title,
 h5.rbccm-leading-experts__title, h6.rbccm-leading-experts__title,
 p.rbccm-leading-experts__title,  div.rbccm-leading-experts__title,
+h1.rbccm-leading-experts__subtitle, h2.rbccm-leading-experts__subtitle,
+h3.rbccm-leading-experts__subtitle, h4.rbccm-leading-experts__subtitle,
+h5.rbccm-leading-experts__subtitle, h6.rbccm-leading-experts__subtitle,
+p.rbccm-leading-experts__subtitle,  div.rbccm-leading-experts__subtitle,
 h1.rbccm-leading-experts__name,  h2.rbccm-leading-experts__name,
 h3.rbccm-leading-experts__name,  h4.rbccm-leading-experts__name,
 h5.rbccm-leading-experts__name,  h6.rbccm-leading-experts__name,
@@ -112,6 +116,18 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
    !important on margin-bottom is required because the reset also uses
    !important; without it the mobile 32px gets stripped and the title
    sits flush against the grid. */
+/* Header wrapper -- mirrors .rbccm-expertise__header so both sections
+   share one layout system: title + subtitle stack as flex-column rows,
+   10px gap between them, 50px breathing room to the grid below. */
+.rbccm-leading-experts__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  margin-bottom: 50px;
+}
+
 .rbccm-leading-experts .rbccm-leading-experts__title {
   color: var(--rbccm-leading-experts-navy) !important;
   font-family: var(--rbccm-leading-experts-serif) !important;
@@ -119,7 +135,22 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
   font-style: normal !important;
   font-weight: 500 !important;
   line-height: 120% !important; /* 43.2px */
-  margin: 0 0 32px 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Subtitle -- Roboto 16/150% warm dark gray. Sits directly under the
+   title via the __header flex gap (no per-element margin). */
+.rbccm-leading-experts .rbccm-leading-experts__subtitle {
+  color: #383838 !important;
+  font-family: var(--rbccm-leading-experts-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  align-self: stretch !important;
+  margin: 0 !important;
   padding: 0 !important;
 }
 
@@ -390,7 +421,6 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
   .rbccm-leading-experts .rbccm-leading-experts__title {
     font-size: 42px !important;
     line-height: 125% !important; /* 52.5px */
-    margin-bottom: 40px !important;
   }
   .rbccm-leading-experts__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -407,11 +437,14 @@ p.rbccm-leading-experts__role,   div.rbccm-leading-experts__role {
    inner column (which holds the section title) plus the title's
    text alignment. Grid + card layout below is unaffected.
    ========================================================================= */
-.rbccm-leading-experts--header-center .rbccm-leading-experts__inner {
+.rbccm-leading-experts--header-center .rbccm-leading-experts__header {
   align-items: center;
+  text-align: center;
 }
-.rbccm-leading-experts--header-center .rbccm-leading-experts__title {
+.rbccm-leading-experts--header-center .rbccm-leading-experts__title,
+.rbccm-leading-experts--header-center .rbccm-leading-experts__subtitle {
   text-align: center !important;
+  align-self: center !important;
 }
 
 

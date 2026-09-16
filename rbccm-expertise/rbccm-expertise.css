@@ -150,16 +150,18 @@ p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
   height: 100% !important;
   min-height: 142px;
   padding: 0 32px;
-  /* Pillars start borderless. Outer L+R come from the container
-     (.rbccm-expertise__track.slick-initialized). Inter-item
-     dividers come from paired half-borders: each of two adjacent
-     slick-active pillars contributes half a border-width on their
-     shared side, so the visible divider sums to one full stroke
-     (0.5px + 0.5px = 1px on the default preset). No doubling at
-     the outer edges because neither the leftmost nor the rightmost
-     visible pillar gets an outer half applied. */
+  /* Divider between adjacent pillars: every pillar carries its own
+     right-side border. Adjacent pillars sum to one visible stroke
+     between them regardless of which slide is `.slick-current` /
+     `.slick-active` -- important because Slick clones (added when
+     `infinite: true`) don't always pick up the active-state classes
+     the sibling chain used to depend on, which left cloned pillars
+     bare. Container `border-left` on `.__track.slick-initialized`
+     closes the outer-left edge; the rightmost visible pillar's own
+     `border-right` serves as the outer-right edge (container's
+     `border-right` was redundant and is stripped below). */
   border-left: 0;
-  border-right: 0;
+  border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
   align-self: stretch;
 }
 /* Compact shorthand for the half-border contribution. */
@@ -352,45 +354,57 @@ p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
   border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
 }
 
-/* -------- Tablet+ (>=640) : 2-per-view --------
-   Two visible pillars. One inter-item divider between them, formed
-   by two half-borders that sum to a full stroke. Leftmost visible
-   (.slick-current) contributes border-right; rightmost visible
-   (.slick-current + .slick-active) contributes border-left. */
+/* -------- Mobile (<640) : 1-per-view --------
+   Only one pillar visible at a time -- no inter-item divider needed.
+   Strip every pillar's border-right so it doesn't stack against the
+   container's border-right (which frames the single visible card).
+   Applied universally so cloned slides (from `infinite: true`) match
+   originals during the loop transition. */
+.rbccm-expertise .rbccm-expertise__pillar {
+  border-right-width: 0;
+}
+
+/* -------- Tablet+ (>=640) : 2-per-view -------- */
 @media (min-width: 640px) {
   .rbccm-expertise__pillar {
     min-height: 170px;
   }
-  .rbccm-expertise .slick-slide.slick-current .rbccm-expertise__pillar {
-    border-right: var(--rbccm-expertise-half-border);
+  /* Restore the divider between the pair. Every pillar gets a full-
+     width border-right (works for clones too since the rule doesn't
+     depend on Slick's active-state chain). */
+  .rbccm-expertise .rbccm-expertise__pillar {
+    border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
   }
+  /* Strip on the rightmost visible pillar so it doesn't stack against
+     the container's border-right. */
   .rbccm-expertise .slick-slide.slick-current + .slick-active .rbccm-expertise__pillar {
-    border-left: var(--rbccm-expertise-half-border);
+    border-right-width: 0;
   }
 }
 
-/* -------- Small-desktop (>=992) : 3-per-view --------
-   Three visible pillars, two dividers. Middle pillar picks up
-   half on both sides; new rightmost (col-3) picks up left half.
-   Rules stack on top of the 640+ rules -- the middle pillar's
-   border-left is already set there. */
+/* -------- Small-desktop (>=992) : 3-per-view -------- */
 @media (min-width: 992px) {
   /* Desktop section rhythm: 80px top/bottom, keep 23 gutter. */
   .rbccm-expertise {
     padding: 80px 23px;
   }
+  /* Restore border-right on the pillar that was the "rightmost" at
+     2-per-view (now the middle at 3-per-view) so it draws the middle
+     divider. */
   .rbccm-expertise .slick-slide.slick-current + .slick-active .rbccm-expertise__pillar {
-    border-right: var(--rbccm-expertise-half-border);
+    border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
   }
+  /* Strip on the new rightmost visible pillar (col-3). */
   .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active .rbccm-expertise__pillar {
-    border-left: var(--rbccm-expertise-half-border);
+    border-right-width: 0;
   }
 }
 
 /* -------- Desktop (>=1245) : 4-per-view --------
-   Four visible pillars, three dividers. Container L+R strip out
-   entirely so the row sits flush against the section. Col-3 gains
-   a right half (last inner divider); col-4 gains a left half. */
+   Four visible pillars, three dividers. Container L strips out so
+   the row sits flush against the section; the last visible pillar
+   (col-4) also strips its border-right so nothing sticks out on
+   the right edge. */
 @media (min-width: 1245px) {
   .rbccm-expertise__pillar {
     min-height: 142px;
@@ -400,16 +414,16 @@ p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
     border-left-width: 0;
     border-right-width: 0;
   }
-  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active .rbccm-expertise__pillar {
-    border-right: var(--rbccm-expertise-half-border);
-  }
+  /* Strip the border-right on the 4th (last) visible pillar so the
+     row doesn't end with a dangling divider on the right edge. At
+     4-per-view all originals are visible with no clones in-between,
+     so the active-chain reliably identifies the 4th slide. */
   .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active + .slick-active .rbccm-expertise__pillar {
-    border-left: var(--rbccm-expertise-half-border);
+    border-right: 0;
   }
   /* Col-1 flush-left / col-4 flush-right at 4-per-view. Removes
      the base 32px outer padding on the outer edges so content
-     aligns with the section gutter; freed padding redistributes
-     naturally between the 3 inner joints. */
+     aligns with the section gutter. */
   .rbccm-expertise .slick-slide.slick-current .rbccm-expertise__pillar {
     padding-left: 0 !important;
   }

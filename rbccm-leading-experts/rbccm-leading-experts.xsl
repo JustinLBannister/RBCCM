@@ -194,8 +194,10 @@
     <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
     <xsl:variable name="PRESET"        select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
 
-    <xsl:variable name="TITLE_TEXT"    select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
-    <xsl:variable name="TITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
+    <xsl:variable name="TITLE_TEXT"       select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
+    <xsl:variable name="TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
+    <xsl:variable name="SUBTITLE_TEXT"    select="normalize-space(//Datum[@ID='SectionSubtitleText']/text()[last()])"/>
+    <xsl:variable name="SUBTITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SectionSubtitleTag']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
@@ -208,6 +210,12 @@
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$TITLE_TAG_RAW"/>
         <xsl:with-param name="default" select="'h2'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SUBTITLE_TAG">
+      <xsl:call-template name="pickTag">
+        <xsl:with-param name="raw" select="$SUBTITLE_TAG_RAW"/>
+        <xsl:with-param name="default" select="'p'"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -259,14 +267,26 @@
 
         <div class="rbccm-leading-experts__inner">
 
-          <xsl:if test="$TITLE_TEXT != ''">
-            <xsl:element name="{$TITLE_TAG}">
-              <xsl:attribute name="class">rbccm-leading-experts__title</xsl:attribute>
-              <xsl:attribute name="id"><xsl:value-of select="$TITLE_ID"/></xsl:attribute>
-              <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
-              <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
-              <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
-            </xsl:element>
+          <xsl:if test="$TITLE_TEXT != '' or $SUBTITLE_TEXT != ''">
+            <div class="rbccm-leading-experts__header">
+              <xsl:if test="$TITLE_TEXT != ''">
+                <xsl:element name="{$TITLE_TAG}">
+                  <xsl:attribute name="class">rbccm-leading-experts__title</xsl:attribute>
+                  <xsl:attribute name="id"><xsl:value-of select="$TITLE_ID"/></xsl:attribute>
+                  <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                  <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
+                </xsl:element>
+              </xsl:if>
+              <xsl:if test="$SUBTITLE_TEXT != ''">
+                <xsl:element name="{$SUBTITLE_TAG}">
+                  <xsl:attribute name="class">rbccm-leading-experts__subtitle</xsl:attribute>
+                  <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
+                  <xsl:attribute name="data-animate-delay">250</xsl:attribute>
+                  <xsl:value-of select="$SUBTITLE_TEXT" disable-output-escaping="yes"/>
+                </xsl:element>
+              </xsl:if>
+            </div>
           </xsl:if>
 
           <!-- data-stagger-parent lets rbccm-animate.js reveal each
