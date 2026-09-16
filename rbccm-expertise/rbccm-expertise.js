@@ -111,14 +111,31 @@ jQuery(document).ready(function ($) {
         $(this).attr('tabindex', '0').attr('aria-label', 'Go to slide ' + (idx + 1));
       });
     }
+    /* Per a11y QA: pillar cards are static content (icon + title + body,
+       no anchor / button / interactive child), so keyboard focus should
+       skip them entirely. Slick's default `accessibility: true` runs its
+       `initADA()` on every slide change and adds `tabindex="0"` to the
+       currently-visible `.slick-slide` wrappers so its own keyboard
+       nav can shuttle focus between panels. Strip those tabindexes
+       (and the aria-describedby that pairs with the tabpanel role)
+       right after Slick sets them; Slick's arrow-key handler still
+       works when a dot button has focus, so keyboard nav is unchanged
+       for keyboard users -- they just don't have to Tab through four
+       empty "panels" to reach the next content section. */
+    function stripSlideTabindex() {
+      $track.find('.slick-slide').each(function () {
+        this.removeAttribute('tabindex');
+      });
+    }
 
     function initSlider() {
       if ($pillars.length <= 1 || $track.hasClass('slick-initialized')) return;
       $track.off('.rbccmExpertise');
-      $track.on('init.rbccmExpertise afterChange.rbccmExpertise', function (event, slick, currentSlide) {
-        var active = typeof currentSlide === 'number' ? currentSlide : slick.currentSlide;
+      $track.on('init.rbccmExpertise afterChange.rbccmExpertise setPosition.rbccmExpertise breakpoint.rbccmExpertise', function (event, slick, currentSlide) {
+        var active = typeof currentSlide === 'number' ? currentSlide : (slick && typeof slick.currentSlide === 'number' ? slick.currentSlide : 0);
         updateAnnounce(active);
         syncDots();
+        stripSlideTabindex();
       });
       $track.on('destroy.rbccmExpertise', function () {
         $dots.empty();
@@ -156,6 +173,7 @@ jQuery(document).ready(function ($) {
         ]
       });
       syncDots();
+      stripSlideTabindex();
 
       $section.find('.rbccm-expertise__btn--prev').off('click.rbccmExpertise').on('click.rbccmExpertise', function () {
         if ($track.hasClass('slick-initialized')) $track.slick('slickPrev');

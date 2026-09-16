@@ -89,13 +89,15 @@
           <xsl:otherwise>#</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      <!-- Whole-card anchor: pin the accessible name to just the
-           tile title. Without this, the anchor's name defaults to
-           the concatenation of every text descendant (title + body
-           + "Explore"), which is long and reads awkwardly (WCAG 2.4.4). -->
-      <xsl:if test="$titleText != ''">
-        <xsl:attribute name="aria-label"><xsl:value-of select="$titleText"/></xsl:attribute>
-      </xsl:if>
+      <!-- No aria-label on the whole-card anchor. Per accessibility QA
+           the entire card text should be read out (title + body + CTA)
+           so screen-reader users get the full context of where the link
+           leads. An aria-label here would replace all descendant text
+           with just the title, which QA noted "doesn't make sense". -->
+
+      <!-- aria-label emission on the anchor was intentionally removed per
+           the accessibility QA note above. If you're re-adding one, the
+           $titleText Datum is still populated. -->
 
       <!-- Optional per-card inline style: focal point + body cap.
            Concatenated into one style attr when either is set. -->
