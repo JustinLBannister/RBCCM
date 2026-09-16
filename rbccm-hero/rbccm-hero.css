@@ -303,7 +303,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
      .rbccm-hero block sets 95px top on mobile to clear the fixed
      nav, but the shorthand below would clobber it, so we add the
      95 back in (95 + 106 = 201px total). Bottom stays at 106px. */
-  padding: 201px 23px 106px;
+  padding: 171px 23px 106px;
   height: auto;
   display: flex;
   justify-content: center;
@@ -389,7 +389,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 24px;
+  gap: 13px;
   align-self: stretch;
 }
 
@@ -647,10 +647,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
        Top padding also carries the shared nav compensation: the base
        .rbccm-hero block sets 130px top on desktop to clear the fixed
        nav, but the shorthand below would clobber it, so we add the
-       130 back in (130 + 116 = 246px total). Bottom stays at 116px.
+       130 back in (130 + 86 = 216px total). Bottom stays at 116px.
        Section owns the outer horizontal gutter (23px, same as mobile);
        container underneath sits at padding:0 and just centres the row. */
-    padding: 246px 23px 116px;
+    padding: 216px 23px 116px;
     align-items: center;
     align-self: stretch;
     justify-content: center;
@@ -696,7 +696,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 32px;
+    gap: 10px;
   }
 
   /* H1: RBC Display 65 / 100% / weight 500 / -1.08px tracking. */
@@ -710,6 +710,11 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   .rbccm-hero--strategy-and-economics .rbccm-hero__body {
     font-size: 21px;
     line-height: 27.2px; /* 129.524% */
+    /* Optional desktop max-width for widow control. XSL emits
+       `--rbccm-hero-se-body-max-width: {value}` from the
+       SeBodyMaxWidth Datum on the __body element; blank Datum falls
+       back to 100% (no cap). Mobile / tablet always render at 100%. */
+    max-width: var(--rbccm-hero-se-body-max-width, 100%);
   }
 
   /* Right column: 482px base, grows to fill remaining space up to
@@ -814,6 +819,14 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    because the S+E hero is the marker for "this is the S+E page" -- and
    the hero's CSS is unconditionally included on every S+E page.
    ========================================================================= */
-.ls-canvas:has(.rbccm-hero--strategy-and-economics) .ls-row.content-section-pull-up:has(.ls-area-body:empty) {
+/* Selector notes:
+   - `.ls-canvas:has(.rbccm-hero--strategy-and-economics)` scopes the
+     override to S+E pages only.
+   - `.ls-row.content-section-pull-up:not(:has(.iw_component))` matches
+     the pull-up rail only when no wrapped component (`.iw_component`)
+     exists inside. This is more forgiving than `:has(.ls-area-body:empty)`
+     since TeamSite may emit whitespace text nodes inside the area-body,
+     which would defeat the CSS `:empty` pseudo-class. */
+.ls-canvas:has(.rbccm-hero--strategy-and-economics) .ls-row.content-section-pull-up:not(:has(.iw_component)) {
   display: none !important;
 }

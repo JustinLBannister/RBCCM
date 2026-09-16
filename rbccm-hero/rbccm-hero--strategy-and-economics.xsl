@@ -122,6 +122,7 @@
     <xsl:variable name="SE_TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SeTitleTag']/text()[last()])"/>
     <xsl:variable name="SE_BODY_TEXT"        select="//Datum[@ID='SeBodyText']"/>
     <xsl:variable name="SE_BODY_TAG_RAW"     select="normalize-space(//Datum[@ID='SeBodyTag']/text()[last()])"/>
+    <xsl:variable name="SE_BODY_MAX_WIDTH"   select="normalize-space(//Datum[@ID='SeBodyMaxWidth']/text()[last()])"/>
 
     <xsl:variable name="SE_INS_EYE_TEXT"     select="normalize-space(//Datum[@ID='SeInsightEyebrowText']/text()[last()])"/>
     <xsl:variable name="SE_INS_EYE_TAG_RAW"  select="normalize-space(//Datum[@ID='SeInsightEyebrowTag']/text()[last()])"/>
@@ -306,6 +307,13 @@
                 <xsl:attribute name="class">rbccm-hero__body</xsl:attribute>
                 <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
                 <xsl:attribute name="data-animate-delay">150</xsl:attribute>
+                <!-- Optional desktop max-width for widow control. When the
+                     SeBodyMaxWidth Datum is non-blank, its value is passed
+                     through as a CSS custom property that the desktop rule
+                     in rbccm-hero.css picks up (blank == default 100%). -->
+                <xsl:if test="$SE_BODY_MAX_WIDTH != ''">
+                  <xsl:attribute name="style">--rbccm-hero-se-body-max-width: <xsl:value-of select="$SE_BODY_MAX_WIDTH"/>;</xsl:attribute>
+                </xsl:if>
                 <xsl:value-of select="$SE_BODY_TEXT" disable-output-escaping="yes"/>
               </xsl:element>
             </xsl:if>
