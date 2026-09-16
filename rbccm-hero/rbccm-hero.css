@@ -822,13 +822,17 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 /* Selector notes:
    - `.ls-canvas:has(.rbccm-hero--strategy-and-economics)` scopes the
      override to S+E pages only.
-   - `#content.content-section-pull-up` targets the specific rail
-     unconditionally on S+E pages. Simpler + more specific than a
-     conditional `:has()` inner check -- the S+E page never populates
-     this rail, so we don't need empty-detection to avoid a false
-     positive. Wins the specificity fight against site-wide unified.css
-     rules that set `margin-top: 40px` and other spacing on
-     `.content-section-pull-up`. */
+   - `#content.content-section-pull-up` targets the specific main-content
+     rail. Site-wide unified2.css applies `margin-top: 40px` to
+     `.content-section-pull-up` (a group selector shared with team-
+     profiles arrows + page-banner breadcrumbs); on the S+E page the
+     hero already carries its own bottom padding, so that 40px reads
+     as unintentional whitespace between the hero and the first
+     content component below. Zero it out.
+   - Not hiding the rail here (an earlier version did that on the
+     assumption the rail would be empty). The rail is where TeamSite
+     drops the page's actual content components -- if the whole
+     stack was moved into this rail, hiding it would nuke the page. */
 .ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up {
-  display: none !important;
+  margin-top: 0 !important;
 }
