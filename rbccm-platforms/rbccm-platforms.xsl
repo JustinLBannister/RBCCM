@@ -212,8 +212,9 @@
 
     <xsl:variable name="TITLE_TEXT"       select="normalize-space(//Datum[@ID='SectionTitleText']/text()[last()])"/>
     <xsl:variable name="TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SectionTitleTag']/text()[last()])"/>
-    <xsl:variable name="SUBTITLE_TEXT"    select="normalize-space(//Datum[@ID='SectionSubtitleText']/text()[last()])"/>
-    <xsl:variable name="SUBTITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SectionSubtitleTag']/text()[last()])"/>
+    <xsl:variable name="SUBTITLE_TEXT"       select="normalize-space(//Datum[@ID='SectionSubtitleText']/text()[last()])"/>
+    <xsl:variable name="SUBTITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SectionSubtitleTag']/text()[last()])"/>
+    <xsl:variable name="SECTION_BG_COLOR"    select="normalize-space(//Datum[@ID='SectionBgColor']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
@@ -279,6 +280,12 @@
             <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
           </xsl:when>
         </xsl:choose>
+        <!-- Optional section background colour override. Sets the CSS
+             custom property the base rule reads. Blank Datum == the
+             preset default (e.g. transparent for base, #E7EEF1 for S+E). -->
+        <xsl:if test="$SECTION_BG_COLOR != ''">
+          <xsl:attribute name="style">--rbccm-platforms-bg-color: <xsl:value-of select="$SECTION_BG_COLOR"/>;</xsl:attribute>
+        </xsl:if>
 
         <div class="rbccm-platforms__inner">
 
