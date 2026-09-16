@@ -1,34 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ============================================================
-  RBCCM JSON Schema (JSON-LD structured data)  |  Properties
-  ============================================================
-  Standalone component for injecting Google-readable JSON-LD
-  structured data into any page. Drop-in replacement for the
-  SeoJsonLd Datum that used to live inside maas-mata.
+<!-- ============================================================
+     RBCCM JSON Schema (JSON-LD structured data)  |  Properties
+     ============================================================
+     Standalone component for injecting Google-readable JSON-LD
+     structured data into any page. Drop-in replacement for the
+     SeoJsonLd Datum that used to live inside maas-mata.
 
-  How editors use it
-  ============================================================
-  1. Add this component to any TeamSite page/section.
-  2. Get the finished @graph block from SEO (Joon or whoever
-     owns structured data).
-  3. Paste the entire JSON block between the CDATA markers on
-     the SeoJsonLd Datum below. Do NOT edit anything else.
-  4. Publish. Validate at Google's Rich Results Test:
-     https://search.google.com/test/rich-results
+     How editors use it
+     ============================================================
+     1. Add this component to any TeamSite page/section.
+     2. Get the finished @graph block from SEO (Joon or whoever
+        owns structured data).
+     3. Paste ONLY the JSON object between the CDATA markers on
+        the SeoJsonLd Datum below. Do NOT include the &lt;script&gt;
+        tags or any surrounding HTML comment; the component emits
+        the &lt;script&gt; wrapper for you.
+     4. Publish. Validate at Google's Rich Results Test:
+        https://search.google.com/test/rich-results
 
-  What ships to the page
-  ============================================================
-  &lt;script type="application/ld+json"&gt;
-    { "@context": "https://schema.org", "@graph": [ ... ] }
-  &lt;/script&gt;
+     What ships to the page
+     ============================================================
+     &lt;script type="application/ld+json"&gt;
+       { "@context": "https://schema.org", "@graph": [ ... ] }
+     &lt;/script&gt;
 
-  Guard: when the Datum is empty the component emits nothing,
-  so an unfilled placeholder never ships a broken empty stub.
-  ============================================================ -->
-<ComponentData>
-
-<Properties>
+     Guard: when the Datum is empty the component emits nothing,
+     so an unfilled placeholder never ships a broken empty stub.
+     ============================================================ -->
+<Properties ComponentID="rbccm-json-schema-v1">
 
   <!-- ============================================================
        SEO / JSON-LD structured data
@@ -56,5 +54,3 @@
      TeamSite's component schema expects it to be present. -->
 <Data>
 </Data>
-
-</ComponentData>
