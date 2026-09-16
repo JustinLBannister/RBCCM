@@ -401,7 +401,7 @@ p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
 }
 
 /* -------- Desktop (>=1245) : 4-per-view --------
-   Four visible pillars, three dividers. Container L strips out so
+   Four visible pillars, three dividers. Container L+R strip out so
    the row sits flush against the section; the last visible pillar
    (col-4) also strips its border-right so nothing sticks out on
    the right edge. */
@@ -413,6 +413,12 @@ p.rbccm-expertise__pillar-body,   div.rbccm-expertise__pillar-body {
   .rbccm-expertise__track.slick-initialized {
     border-left-width: 0;
     border-right-width: 0;
+  }
+  /* Restore col-3's border-right. It was stripped at @992 as the
+     then-rightmost visible pillar; at 4-per-view it's the middle
+     joint and needs its divider back (3rd/last inner stroke). */
+  .rbccm-expertise .slick-slide.slick-current + .slick-active + .slick-active .rbccm-expertise__pillar {
+    border-right: var(--rbccm-expertise-border-width) solid var(--rbccm-expertise-border-color);
   }
   /* Strip the border-right on the 4th (last) visible pillar so the
      row doesn't end with a dangling divider on the right edge. At
