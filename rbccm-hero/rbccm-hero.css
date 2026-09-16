@@ -789,3 +789,31 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .rbccm-hero--strategy-and-economics.rbccm-hero--header-center .rbccm-hero__body {
   text-align: center;
 }
+
+
+/* =========================================================================
+   Strategy and Economics -- page-shell adjustment
+   -------------------------------------------------------------------------
+   TeamSite emits a `<div class="ls-row content-section-pull-up" id="content">`
+   as the default main-content rail on every page. On S+E the whole page
+   is composed of dedicated section components (accordions, expertise,
+   leading-experts, featured-insights, cta-band, platforms, in-the-media),
+   so this rail sits empty between the ITM section and the Marketo
+   subscribe footer -- and its default `.content-section-pull-up` padding
+   / margin (from site-wide unified.css) inflates a ~40px+ gap that reads
+   as unintentional whitespace.
+
+   Fix: when the S+E hero is present on the page, auto-hide any
+   `.content-section-pull-up` rail whose `.ls-area-body` has no children.
+   The `:has(.rbccm-hero--strategy-and-economics)` scope on `.ls-canvas`
+   restricts this rule to S+E; the inner `:has(.ls-area-body:empty)`
+   check leaves it untouched on any page that actually drops a
+   component into the rail.
+
+   Placed here (in rbccm-hero.css) instead of a stand-alone stylesheet
+   because the S+E hero is the marker for "this is the S+E page" -- and
+   the hero's CSS is unconditionally included on every S+E page.
+   ========================================================================= */
+.ls-canvas:has(.rbccm-hero--strategy-and-economics) .ls-row.content-section-pull-up:has(.ls-area-body:empty) {
+  display: none !important;
+}
