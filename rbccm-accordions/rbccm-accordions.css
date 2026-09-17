@@ -252,8 +252,10 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
   width: 100%;
 }
 
-/* Expanded content -- hidden until .is-open. On desktop this becomes a
-   two-column layout (per Figma); mobile keeps it single column. */
+/* Expanded content -- hidden until .is-open. Single column at every
+   breakpoint (per 2026-09-17 feedback): body copy spans the full width
+   of the accordion card so the paragraph measure matches the card
+   rather than sitting in a narrower inner column. */
 .rbccm-accordions__item-expanded {
   display: none;
   flex-direction: column;
@@ -500,12 +502,12 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
 
 /* Expanded block gets a hairline divider at its top separating the
    dark-blue title/lede pair above from the body copy below. Parent
-   gap 20px covers the space above the divider; padding-top 18px
-   covers the space between the divider and the body content. */
+   gap 18px matches padding-top 18px so vertical rhythm above and
+   below the divider is symmetric. */
 .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded {
   border-top: 1px solid rgba(112, 112, 112, 0.20);
   padding-top: 18px;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* Body copy: warm dark gray, Roboto 14/16.8. Paragraphs inside
@@ -537,7 +539,7 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
   padding: 0 !important;
 }
 .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 
 /* Read-more link lives in the open (light-blue) state, so its
@@ -602,42 +604,12 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
     align-self: stretch;
   }
 
-  /* Two-column layout on desktop. The GRID lives on __item-expanded
-     (not on __item-expanded-copy) so the read-more link can share
-     the same track system as the paragraphs. __item-expanded-copy
-     is promoted to display: contents so its <p> children participate
-     in the parent grid directly -- read-more becomes a peer grid
-     item and can pin to the right column's left edge.
-
-     Auto-flow with 2 paragraphs + read-more:
-       p1 -> col 1, row 1
-       p2 -> col 2, row 1
-       read-more (grid-column: 2) -> col 2, row 2 (left-aligned)
-     With 3 paragraphs:
-       p3 -> col 1, row 2 ; read-more forces col 2, row 2. */
-  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 32px;
-    row-gap: 20px;
-    align-content: start;
-  }
-  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy {
-    display: contents;
-  }
-  /* Grid gap handles inter-paragraph spacing, so kill the 20px
-     bottom-margin the mobile rule sets on paragraphs. */
-  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p {
-    margin: 0;
-  }
-
-  /* Read-more sits in the right column, aligned to that column's
-     left edge (matches the right-column paragraph's alignment).
-     align-self: end pushes it to the bottom of its row so it
-     visually terminates the body block. */
-  .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item-readmore {
-    grid-column: 2;
-    justify-self: start;
-    align-self: end;
-  }
+  /* Single-column layout on desktop (per feedback pass 2026-09-17).
+     Body copy spans the full width of the accordion card at every
+     breakpoint. The earlier two-column grid was creating a narrow
+     ~534px measure inside a wider card, which read as inconsistent
+     with the rest of the section. Now __item-expanded stays as the
+     default flex column (see base rule at line 257) so paragraphs
+     and the read-more link stack in one column and hug the card
+     edges. */
 }
