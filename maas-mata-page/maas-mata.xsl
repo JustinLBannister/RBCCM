@@ -140,6 +140,7 @@
   <xsl:variable name="PLT1_B3"      select="/Properties/Datum[@ID='Platform1Bullet3']" />
   <xsl:variable name="PLT1_B4"      select="/Properties/Datum[@ID='Platform1Bullet4']" />
   <xsl:variable name="PLT1_B5"      select="/Properties/Datum[@ID='Platform1Bullet5']" />
+  <xsl:variable name="PLT1_B6"      select="/Properties/Datum[@ID='Platform1Bullet6']" />
   <xsl:variable name="PLT2_THEME"   select="/Properties/Datum[@ID='Platform2Theme']/Option[@Selected='true']/Value" />
   <xsl:variable name="PLT2_EYEBROW" select="/Properties/Datum[@ID='Platform2Eyebrow']" />
   <xsl:variable name="PLT2_TITLE"   select="/Properties/Datum[@ID='Platform2Title']" />
@@ -149,6 +150,7 @@
   <xsl:variable name="PLT2_B3"      select="/Properties/Datum[@ID='Platform2Bullet3']" />
   <xsl:variable name="PLT2_B4"      select="/Properties/Datum[@ID='Platform2Bullet4']" />
   <xsl:variable name="PLT2_B5"      select="/Properties/Datum[@ID='Platform2Bullet5']" />
+  <xsl:variable name="PLT2_B6"      select="/Properties/Datum[@ID='Platform2Bullet6']" />
 
   <!-- Innovation features (3 fixed slots) -->
   <xsl:variable name="F1_NUM"   select="/Properties/Datum[@ID='Feature1Number']" />
@@ -315,8 +317,15 @@
         <section class="rbccm-maas-mata__new-standard" aria-label="A new standard for multi-asset trading">
           <div class="rbccm-maas-mata__container">
             <h2 class="rbccm-maas-mata__new-standard-heading" data-animate="fadeInUp">
-              <span class="rbccm-maas-mata__new-standard-heading-lead" data-json="newStandard.headingLead"><xsl:value-of select="$NS_LEAD" /></span>
-              <span class="rbccm-maas-mata__new-standard-heading-highlight"><span data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span><xsl:text>&#160;</xsl:text><span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span>.</span>
+              <!-- data-json-html so the &lt;br&gt; in NewStandardHeadingLead
+                   renders; disable-output-escaping keeps the &lt;br&gt; markup.
+                   The Lead Datum value should include a space BEFORE the
+                   &lt;br&gt; so words stay separated when 600+ hides it. -->
+              <span class="rbccm-maas-mata__new-standard-heading-lead" data-json-html="newStandard.headingLead"><xsl:value-of select="$NS_LEAD" disable-output-escaping="yes" /></span>
+              <!-- Text-node space between highlight and br so words stay
+                   separated when the br is hidden. Period lives inside the
+                   Accent Datum so it inherits yellow. -->
+              <span class="rbccm-maas-mata__new-standard-heading-highlight"><span data-json="newStandard.headingHighlight"><xsl:value-of select="$NS_HIGHLIGHT" /></span><xsl:text> </xsl:text><br /><span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent"><xsl:value-of select="$NS_ACCENT" /></span></span>
             </h2>
             <div class="rbccm-maas-mata__new-standard-body" data-animate="fadeInUp" data-animate-delay="150" data-json-list="newStandard.body">
               <template><p data-json=""></p></template>
@@ -331,47 +340,26 @@
           </div>
         </section>
 
-        <!-- 4. AWARDS -->
-        <section class="rbccm-maas-mata__awards" aria-label="Awards">
-          <div class="rbccm-maas-mata__awards-eyebrow" data-animate="fadeInUp" data-json="awards.eyebrow">
-            <xsl:value-of select="$AWD_EYEBROW" />
-          </div>
+        <!-- 4. AWARDS  (extracted 2026-09-16)
+             ============================================================
+             The awards row now ships from the standalone rbccm-awards
+             component (see /rbccm-awards/). TeamSite pages using this
+             MAAS+MATA skin should drop rbccm-awards as a separate
+             component into the page layout between MAAS+MATA and the
+             next section. That gives editors independent control over
+             award copy without republishing the MAAS+MATA skin, and
+             makes the same pattern reusable on Credentials, product
+             landing pages, etc.
 
-          <div class="rbccm-maas-mata__awards-grid rbccm-maas-mata__awards-grid--3" data-awards-track="" data-stagger-parent="fadeInUp" data-stagger-step="120" data-json-list="awards.items">
-            <template>
-              <article class="rbccm-maas-mata__award-card">
-                <div class="rbccm-maas-mata__award-year" data-json="year"></div>
-                <h6 class="rbccm-maas-mata__award-title" data-json="title"></h6>
-                <div class="rbccm-maas-mata__award-issuer" data-json="issuer"></div>
-              </article>
-            </template>
-            <article class="rbccm-maas-mata__award-card">
-              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD1_YEAR" /></span>
-              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD1_TITLE" /></h3>
-              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD1_ISSUER" /></p>
-            </article>
-            <article class="rbccm-maas-mata__award-card">
-              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD2_YEAR" /></span>
-              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD2_TITLE" /></h3>
-              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD2_ISSUER" /></p>
-            </article>
-            <article class="rbccm-maas-mata__award-card">
-              <span class="rbccm-maas-mata__award-year"><xsl:value-of select="$AWD3_YEAR" /></span>
-              <h3 class="rbccm-maas-mata__award-title"><xsl:value-of select="$AWD3_TITLE" /></h3>
-              <p class="rbccm-maas-mata__award-issuer"><xsl:value-of select="$AWD3_ISSUER" /></p>
-            </article>
-          </div>
+             The MAAS+MATA CSS block (.rbccm-maas-mata__awards*) is
+             kept in place for now as dormant code and can be pruned
+             in a follow-up once no page references it.
 
-          <div class="rbccm-maas-mata__awards-controls" data-animate="zoomIn" data-animate-delay="350" data-awards-controls="" hidden="hidden">
-            <button type="button" class="rbccm-maas-mata__awards-arrow" data-awards-prev="" aria-label="Previous award">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 1L2 12L12 23" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <div class="rbccm-maas-mata__awards-dots" data-awards-dots="" role="tablist" aria-label="Award slides"></div>
-            <button type="button" class="rbccm-maas-mata__awards-arrow" data-awards-next="" aria-label="Next award">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 1L12 12L2 23" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-          </div>
-        </section>
+             Original inline block removed; no replacement markup is
+             emitted here so the platforms band can flow directly
+             beneath new-standard while the awards component sits in
+             its own slot in the page layout.
+             ============================================================ -->
 
         <!-- 5. PLATFORMS -->
         <section class="rbccm-maas-mata__platforms" id="platform" aria-label="Two platforms, one unified ecosystem">
@@ -401,6 +389,7 @@
                   <xsl:if test="normalize-space($PLT1_B3) != ''"><li><xsl:value-of select="$PLT1_B3" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B4) != ''"><li><xsl:value-of select="$PLT1_B4" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT1_B5) != ''"><li><xsl:value-of select="$PLT1_B5" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT1_B6) != ''"><li><xsl:value-of select="$PLT1_B6" /></li></xsl:if>
                 </ul></div>
               </article>
               <article>
@@ -416,6 +405,7 @@
                   <xsl:if test="normalize-space($PLT2_B3) != ''"><li><xsl:value-of select="$PLT2_B3" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B4) != ''"><li><xsl:value-of select="$PLT2_B4" /></li></xsl:if>
                   <xsl:if test="normalize-space($PLT2_B5) != ''"><li><xsl:value-of select="$PLT2_B5" /></li></xsl:if>
+                  <xsl:if test="normalize-space($PLT2_B6) != ''"><li><xsl:value-of select="$PLT2_B6" /></li></xsl:if>
                 </ul></div>
               </article>
             </div>
@@ -429,7 +419,10 @@
              transition to the light innovation-era below now reads
              intentionally. -->
         <section class="rbccm-maas-mata__mata-cap" aria-label="MATA capabilities">
-          <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow"><xsl:value-of select="$MC_EYEBROW" /></div>
+          <!-- Eyebrow is optional. Empty MataCapEyebrow Datum -> no div. -->
+          <xsl:if test="normalize-space($MC_EYEBROW) != ''">
+            <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow"><xsl:value-of select="$MC_EYEBROW" /></div>
+          </xsl:if>
           <div class="rbccm-maas-mata__mata-cap-header" data-animate="fadeInUp" data-animate-delay="100">
             <h2 class="rbccm-maas-mata__mata-cap-heading" data-json="mataCapabilities.heading"><xsl:value-of select="$MC_HEADING" /></h2>
             <p class="rbccm-maas-mata__mata-cap-sub" data-json-html="mataCapabilities.subheading"><xsl:value-of select="$MC_SUBHEADING" disable-output-escaping="yes" /></p>
