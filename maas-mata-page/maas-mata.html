@@ -994,7 +994,9 @@
     .rbccm-maas-mata__platforms-grid {
       flex-direction: row;
       justify-content: center;
-      align-items: flex-start;
+      /* stretch so both cards match the tallest of the pair — keeps
+         them level even when one has more bullets than the other. */
+      align-items: stretch;
     }
   }
   /* Platform card — Figma: 425 fixed, flex-column, padding 40 30,
@@ -1149,7 +1151,6 @@
     line-height: 150%;
     font-feature-settings: 'liga' off, 'clig' off;
     margin: 0;
-    flex: 1;
   }
   .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-body { color: #ECECEC; }
   /* Bullet list inside a platform card — Figma: Roboto 14/150%
@@ -2403,7 +2404,21 @@
     .rbccm-maas-mata__new-standard-heading {
       font-size: 75px;
       line-height: 110%;   /* 82.5px */
-      max-width: 872px;
+      max-width: 1100px;
+    }
+  }
+  /* Tablet + desktop: hide the forced <br>s inside the heading so the
+     copy can flow full-width and wrap naturally. Also lift the 331px
+     mobile-first max-width cap at 600+ so the longer "electronic
+     trading" phrase isn't clipped on wider phones / tablets. */
+  @media (min-width: 600px) {
+    .rbccm-maas-mata__new-standard-heading br {
+      display: none;
+    }
+  }
+  @media (min-width: 600px) and (max-width: 991px) {
+    .rbccm-maas-mata__new-standard-heading {
+      max-width: 100%;
     }
   }
   .rbccm-maas-mata__new-standard-heading-lead { display: block; }
@@ -3271,9 +3286,17 @@
     <section class="rbccm-maas-mata__new-standard" aria-label="A new standard for multi-asset trading">
       <div class="rbccm-maas-mata__container">
         <h2 class="rbccm-maas-mata__new-standard-heading" data-animate="fadeInUp">
-          <span class="rbccm-maas-mata__new-standard-heading-lead" data-json="newStandard.headingLead">A new standard for</span>
+          <!-- data-json-html so the <br> in the JSON value renders (data-json
+               writes textContent and would strip it). Note the space BEFORE
+               the <br> — when tablet/desktop CSS hides the br, that space
+               is what keeps the words separated ("A new standard for"). -->
+          <span class="rbccm-maas-mata__new-standard-heading-lead" data-json-html="newStandard.headingLead">A new <br>standard for</span>
           <span class="rbccm-maas-mata__new-standard-heading-highlight">
-            <span data-json="newStandard.headingHighlight">multi-asset </span><span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent">trading</span>.
+            <!-- Text-node space between </span> and <br> plays the same role
+                 as the space above: separates "multi-asset" and "electronic
+                 trading" when the br is hidden on tablet+. The period lives
+                 inside the accent JSON string so it inherits yellow. -->
+            <span data-json="newStandard.headingHighlight">multi-asset</span> <br><span class="rbccm-maas-mata__new-standard-heading-accent" data-json="newStandard.headingHighlightAccent">electronic trading.</span>
           </span>
         </h2>
         <div class="rbccm-maas-mata__new-standard-body" data-animate="fadeInUp" data-animate-delay="150" data-json-list="newStandard.body">
@@ -3382,6 +3405,7 @@
               <li>Route orders intelligently to help minimize market impact</li>
               <li>Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</li>
               <li>Benchmark performance against pre-trade expectations</li>
+              <li>Adapt in real time as market microstructure and liquidity conditions shift</li>
             </ul>
           </div>
         </article>
@@ -3394,7 +3418,9 @@
          surface as new-standard + awards + platforms; the transition
          to the light innovation-era below now reads intentionally. -->
     <section class="rbccm-maas-mata__mata-cap" aria-label="MATA capabilities">
-      <div class="rbccm-maas-mata__mata-cap-eyebrow" data-animate="fadeInUp" data-json="mataCapabilities.eyebrow">MATA capabilities</div>
+      <!-- Eyebrow intentionally omitted for this variation. Bring it back
+           by re-adding the div OR (in TeamSite) by filling the
+           MataCapEyebrow Datum; the XSL emits it only when non-empty. -->
       <div class="rbccm-maas-mata__mata-cap-header" data-animate="fadeInUp" data-animate-delay="100">
         <h2 class="rbccm-maas-mata__mata-cap-heading" data-json="mataCapabilities.heading">Sharper insight. Smarter trades.</h2>
         <p class="rbccm-maas-mata__mata-cap-sub" data-json="mataCapabilities.subheading">

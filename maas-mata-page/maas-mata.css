@@ -1192,7 +1192,6 @@
     line-height: 150%;
     font-feature-settings: 'liga' off, 'clig' off;
     margin: 0;
-    flex: 1;
   }
   .rbccm-maas-mata__platform-card--dark .rbccm-maas-mata__platform-body { color: #ECECEC; }
   /* Bullet list inside a platform card — Figma: Roboto 14/150%
@@ -2489,7 +2488,21 @@
     .rbccm-maas-mata__new-standard-heading {
       font-size: 75px;
       line-height: 110%;   /* 82.5px */
-      max-width: 872px;
+      max-width: 1100px;
+    }
+  }
+  /* Tablet + desktop: hide the forced <br>s inside the heading so the
+     copy can flow full-width and wrap naturally. Also lift the 331px
+     mobile-first max-width cap at 600+ so the longer "electronic
+     trading" phrase isn't clipped on wider phones / tablets. */
+  @media (min-width: 600px) {
+    .rbccm-maas-mata__new-standard-heading br {
+      display: none;
+    }
+  }
+  @media (min-width: 600px) and (max-width: 991px) {
+    .rbccm-maas-mata__new-standard-heading {
+      max-width: 100%;
     }
   }
   .rbccm-maas-mata__new-standard-heading-lead { display: block; }

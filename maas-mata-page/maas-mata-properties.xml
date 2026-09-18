@@ -78,9 +78,16 @@
          Accent   yellow  "trading"
        Body is 3 fixed paragraph Datums (see NewStandardParagraph1..3
        below). -->
-  <Datum ID="NewStandardHeadingLead" Type="String" Name="New-standard headline — lead (grey)">A new standard for</Datum>
+  <!-- Lead accepts &lt;br&gt; to force the mobile 2-line break
+       ("A new" / "standard for"). At 600+ the br is CSS-hidden so
+       the copy flows full-width — the space BEFORE the br is what
+       keeps the words separated in that flowed layout. Emitted via
+       data-json-html + XSL disable-output-escaping so the tag
+       survives to the DOM. -->
+  <Datum ID="NewStandardHeadingLead" Type="String" Name="New-standard headline — lead (grey; include a space before &lt;br&gt;)">A new &lt;br&gt;standard for</Datum>
   <Datum ID="NewStandardHeadingHighlight" Type="String" Name="New-standard headline — highlight (white)">multi-asset</Datum>
-  <Datum ID="NewStandardHeadingAccent" Type="String" Name="New-standard headline — accent (yellow)">trading</Datum>
+  <!-- Accent includes the closing period so it inherits the yellow. -->
+  <Datum ID="NewStandardHeadingAccent" Type="String" Name="New-standard headline — accent (yellow; include closing punctuation)">electronic trading.</Datum>
   <Datum ID="NewStandardCtaLabel" Type="String" Name="New-standard CTA label">See MAAS in action</Datum>
   <Datum ID="NewStandardCtaHref" Type="String" Name="New-standard CTA URL">#platform</Datum>
 
@@ -104,7 +111,9 @@
        3-card grid + one wider "Index events" info card. The
        3 grid cards live below as fixed slot Datums. Index Events
        is authored here as a fixed card. -->
-  <Datum ID="MataCapEyebrow" Type="String" Name="MATA capabilities eyebrow">MATA capabilities</Datum>
+  <!-- Optional eyebrow. Leave blank to hide the row entirely; the XSL
+       skips the div when this Datum is empty. -->
+  <Datum ID="MataCapEyebrow" Type="String" Name="MATA capabilities eyebrow (leave blank to hide)"></Datum>
   <Datum ID="MataCapHeading" Type="String" Name="MATA capabilities heading">Sharper insight. Smarter trades.</Datum>
   <Datum ID="MataCapSubheading" Type="Textarea" Name="MATA capabilities subheading">Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.</Datum>
 
@@ -185,6 +194,10 @@
   <Datum ID="Platform1Bullet3" Type="String" Name="Platform 1 — bullet 3">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
   <Datum ID="Platform1Bullet4" Type="String" Name="Platform 1 — bullet 4">Monitor market conditions and portfolio exposures</Datum>
   <Datum ID="Platform1Bullet5" Type="String" Name="Platform 1 — bullet 5">Model scenarios across asset classes</Datum>
+  <!-- Optional 6th slot. Leave blank to hide. Card heights equalize
+       across the row (align-items: stretch on __platforms-grid) so
+       adding a 6th bullet to one card just makes both cards taller. -->
+  <Datum ID="Platform1Bullet6" Type="String" Name="Platform 1 — bullet 6 (optional; leave blank to hide)"></Datum>
 
   <Datum ID="Platform2Theme" Type="SelectSingle" Name="Platform 2 — theme">
     <Option><Display>Dark (navy card)</Display><Value>dark</Value></Option>
@@ -198,6 +211,8 @@
   <Datum ID="Platform2Bullet3" Type="String" Name="Platform 2 — bullet 3">Route orders intelligently to help minimize market impact</Datum>
   <Datum ID="Platform2Bullet4" Type="String" Name="Platform 2 — bullet 4">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</Datum>
   <Datum ID="Platform2Bullet5" Type="String" Name="Platform 2 — bullet 5">Benchmark performance against pre-trade expectations</Datum>
+  <!-- Optional 6th slot. Leave blank to hide. -->
+  <Datum ID="Platform2Bullet6" Type="String" Name="Platform 2 — bullet 6 (optional; leave blank to hide)"></Datum>
 
 
   <!-- ═══ 6b. INNOVATION FEATURES (3 fixed slots) ════════════ -->

@@ -824,7 +824,7 @@
             title: { type: 'text', label: 'Title', figmaRef: 'Card headline ("Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
             acronym: { type: 'text', label: 'Acronym', figmaRef: 'leave blank.' },
             body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card ("Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
-            bullets: { type: 'stringArray', label: 'Bullets', min: 5, max: 5, figmaRef: 'Exactly 5 bullet points below the body copy — required so both cards line up at the same height without CSS overrides. Each row is one bullet. MAAS — "Access adaptive algorithms built for live market conditions", "Select AI-powered strategies tailored to execution objectives", etc.' },
+            bullets: { type: 'stringArray', label: 'Bullets', min: 3, max: 8, figmaRef: 'Bullet points below the body copy. Cards equalize height via CSS (align-items: stretch on the row + flex on __platform-body), so counts can differ between cards — the shorter card just gets whitespace absorbed. 5 is the Figma baseline; 6+ is fine.' },
             cta: { type: 'cta', label: 'CTA', figmaRef: 'leave blank.' }
           }
         }
