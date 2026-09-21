@@ -45,13 +45,12 @@
     .rbccm-leadership__inner {
       box-sizing: border-box;
       margin: 0 auto;
-      max-width: 1200px;
+      max-width: 1140px;
       padding: 0 16px;
       position: relative;
     }
     @media (min-width: 1170px) {
       .rbccm-leadership__inner {
-        max-width: 1140px;
         padding: 0;
       }
     }
@@ -70,16 +69,12 @@
       line-height: normal;
       margin: 0 auto 35px auto;
       max-width: 1140px;
-      padding: 0 16px;
-    }
-    @media (min-width: 1170px) {
-      .rbccm-leadership__heading { padding: 0; }
+      padding: 0;
     }
 
     /* -- Slider wrapper -- */
-    .rbccm-leadership__slider-track { margin: 0 -8px; }
     @media (min-width: 1300px) {
-      .rbccm-leadership__slider-track { margin: 0; overflow: hidden;}
+      .rbccm-leadership__slider-track { overflow: hidden; }
     }
     /* Override slick's default 30px bottom margin on a dotted slider */
     #rbccm-leadership .rbccm-leadership__slider-track.slick-dotted.slick-slider {
@@ -558,10 +553,7 @@
       line-height: 24px;
       margin: 0 auto 35px auto;
       max-width: 1140px;
-      padding: 0 16px;
-    }
-    @media (min-width: 1170px) {
-      .rbccm-leadership__subheading { padding: 0; }
+      padding: 0;
     }
 
     /* -- Heading spacing when a subheading follows -- pull the H2 close
@@ -747,4 +739,25 @@
     /* No carousel = no keyboard-nav instructions worth announcing. */
     #rbccm-leadership.rbccm-leadership--no-controls #rbccm-lead-instructions {
       display: none;
+    }
+
+    /* Pure-CSS fallback for the JS `--no-controls` toggle above.
+       When the XSL emits data-card-count on the section, hide the
+       arrows + dots at desktop for any deck of 4 or fewer cards
+       without needing the JS bucket-threshold logic to have run. */
+    @media (min-width: 1300px) {
+      #rbccm-leadership[data-card-count="1"] .rbccm-leadership__btn,
+      #rbccm-leadership[data-card-count="2"] .rbccm-leadership__btn,
+      #rbccm-leadership[data-card-count="3"] .rbccm-leadership__btn,
+      #rbccm-leadership[data-card-count="4"] .rbccm-leadership__btn,
+      #rbccm-leadership[data-card-count="1"] .rbccm-leadership__dots-wrap,
+      #rbccm-leadership[data-card-count="2"] .rbccm-leadership__dots-wrap,
+      #rbccm-leadership[data-card-count="3"] .rbccm-leadership__dots-wrap,
+      #rbccm-leadership[data-card-count="4"] .rbccm-leadership__dots-wrap,
+      #rbccm-leadership[data-card-count="1"] .slick-dots,
+      #rbccm-leadership[data-card-count="2"] .slick-dots,
+      #rbccm-leadership[data-card-count="3"] .slick-dots,
+      #rbccm-leadership[data-card-count="4"] .slick-dots {
+        display: none !important;
+      }
     }
