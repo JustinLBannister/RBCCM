@@ -218,6 +218,20 @@
     <link rel="stylesheet">
       <xsl:attribute name="href">/assets/rbccm/css/pages/maas-mata.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
     </link>
+    <!-- Standalone rbccm-awards component styling — the awards row
+         inside MAAS/MATA (section 4 below) uses this component's
+         BEM classes so the skin ships without needing a separate
+         TeamSite component drop. -->
+    <link rel="stylesheet">
+      <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-awards.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </link>
+    <!-- Standalone cta-band component styling — the demo section
+         (below the innovation-era block) uses the shared cta-band
+         markup so the deep-band gradient is uninterrupted. Hoist
+         its CSS from the skin so no separate page drop is needed. -->
+    <link rel="stylesheet">
+      <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-cta-band.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </link>
 
     <!-- JSON-LD structured data. Whole @graph block lives in
          the SeoJsonLd Datum. When SEO delivers a new schema, paste
@@ -310,10 +324,11 @@
              preview. The Brightcove attrs are set from Datums when
              filled; when empty, the modal opens with an empty iframe
              (useful for design review, not for a live launch). -->
-        <!-- Play button — uses the site-standard Bootstrap modal
-             (#herovideo below). data-toggle/data-target are handled
-             by the page-shell's Bootstrap JS; nothing custom here. -->
-        <button type="button" class="rbccm-maas-mata__chart-image-play" data-toggle="modal" data-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
+        <!-- Play button — uses the site-standard Bootstrap 5 modal
+             (#herovideo below). data-bs-toggle/data-bs-target are
+             handled by the page-shell's Bootstrap 5 JS; nothing
+             custom here. -->
+        <button type="button" class="rbccm-maas-mata__chart-image-play" data-bs-toggle="modal" data-bs-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
           <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
         </button>
       </div>
@@ -349,26 +364,51 @@
           </div>
         </section>
 
-        <!-- 4. AWARDS  (extracted 2026-09-16)
+        <!-- 4. AWARDS  (restored inline 2026-09-21)
              ============================================================
-             The awards row now ships from the standalone rbccm-awards
-             component (see /rbccm-awards/). TeamSite pages using this
-             MAAS+MATA skin should drop rbccm-awards as a separate
-             component into the page layout between MAAS+MATA and the
-             next section. That gives editors independent control over
-             award copy without republishing the MAAS+MATA skin, and
-             makes the same pattern reusable on Credentials, product
-             landing pages, etc.
-
-             The MAAS+MATA CSS block (.rbccm-maas-mata__awards*) is
-             kept in place for now as dormant code and can be pruned
-             in a follow-up once no page references it.
-
-             Original inline block removed; no replacement markup is
-             emitted here so the platforms band can flow directly
-             beneath new-standard while the awards component sits in
-             its own slot in the page layout.
+             Uses the standalone rbccm-awards component's BEM classes,
+             sidecar CSS hoisted at the top of the template, sidecar JS
+             hoisted at the bottom. Base 3-up variant (MATA canon) —
+             the __inner wrapper carries the 1440 rail, __eyebrow +
+             __grid live inside, and each card is a static <article>.
+             Datums (AwardsEyebrow, Award{1..3}Year/Title/Issuer) stay
+             in Properties.xml so editor UX is unchanged.
              ============================================================ -->
+        <section class="rbccm-awards rbccm-awards--3" aria-label="Awards and recognition">
+          <div class="rbccm-awards__inner">
+            <xsl:if test="normalize-space($AWD_EYEBROW) != ''">
+              <p class="rbccm-awards__eyebrow" data-animate="fadeInUp" data-json="awardsEyebrow"><xsl:value-of select="$AWD_EYEBROW" disable-output-escaping="yes" /></p>
+            </xsl:if>
+            <div class="rbccm-awards__grid rbccm-awards__grid--3" data-stagger-parent="fadeInUp" data-stagger-step="120">
+              <article class="rbccm-awards__card">
+                <span class="rbccm-awards__year" data-json="awards[0].year"><xsl:value-of select="$AWD1_YEAR" /></span>
+                <h3 class="rbccm-awards__title" data-json="awards[0].title"><xsl:value-of select="$AWD1_TITLE" /></h3>
+                <p class="rbccm-awards__issuer" data-json="awards[0].issuer"><xsl:value-of select="$AWD1_ISSUER" /></p>
+              </article>
+              <article class="rbccm-awards__card">
+                <span class="rbccm-awards__year" data-json="awards[1].year"><xsl:value-of select="$AWD2_YEAR" /></span>
+                <h3 class="rbccm-awards__title" data-json="awards[1].title"><xsl:value-of select="$AWD2_TITLE" /></h3>
+                <p class="rbccm-awards__issuer" data-json="awards[1].issuer"><xsl:value-of select="$AWD2_ISSUER" /></p>
+              </article>
+              <article class="rbccm-awards__card">
+                <span class="rbccm-awards__year" data-json="awards[2].year"><xsl:value-of select="$AWD3_YEAR" /></span>
+                <h3 class="rbccm-awards__title" data-json="awards[2].title"><xsl:value-of select="$AWD3_TITLE" /></h3>
+                <p class="rbccm-awards__issuer" data-json="awards[2].issuer"><xsl:value-of select="$AWD3_ISSUER" /></p>
+              </article>
+            </div>
+            <!-- Mobile carousel controls — hidden by CSS above 871px,
+                 wired by rbccm-awards.js when Slick initializes. -->
+            <div class="rbccm-awards__controls">
+              <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+              <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
 
         <!-- 5. PLATFORMS -->
         <section class="rbccm-maas-mata__platforms" id="platform" aria-label="Two platforms, one unified ecosystem">
@@ -532,20 +572,27 @@
 
 
         <!-- 9. DEMO CTA -->
-        <section class="rbccm-maas-mata__demo" id="demo" aria-label="See the platform">
-          <div class="rbccm-maas-mata__container">
-            <div class="rbccm-maas-mata__demo-eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow"><xsl:value-of select="$DEMO_EYEBROW" /></div>
-            <h2 class="rbccm-maas-mata__demo-heading" data-animate="fadeInUp" data-animate-delay="100">
-              <span data-json="demoCta.headlinePrefix"><xsl:value-of select="$DEMO_PREFIX" /></span><xsl:text>&#160;</xsl:text><span class="rbccm-maas-mata__demo-heading-highlight" data-json="demoCta.headlineHighlight"><xsl:value-of select="$DEMO_HIGHLIGHT" /></span>.
+        <!-- Now emitted through the shared cta-band component
+             (maas-mata variant + --bg-transparent because
+             this instance lives inside .rbccm-maas-mata__deep-band,
+             which owns the continuous navy gradient across siblings).
+             Same Datums drive eyebrow / heading / body / CTA. -->
+        <section class="rbccm-cta-band rbccm-cta-band--maas-mata rbccm-cta-band--bg-transparent" id="demo" aria-label="See the platform">
+          <div class="rbccm-cta-band__inner">
+            <p class="rbccm-cta-band__eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow"><xsl:value-of select="$DEMO_EYEBROW" /></p>
+            <h2 class="rbccm-cta-band__heading" data-animate="fadeInUp" data-animate-delay="100">
+              <span data-json="demoCta.headlinePrefix"><xsl:value-of select="$DEMO_PREFIX" /></span><xsl:text>&#160;</xsl:text><span class="rbccm-cta-band__heading-highlight" data-json="demoCta.headlineHighlight"><xsl:value-of select="$DEMO_HIGHLIGHT" /></span>.
             </h2>
-            <p class="rbccm-maas-mata__demo-body" data-animate="fadeInUp" data-animate-delay="200" data-json-html="demoCta.body"><xsl:value-of select="$DEMO_BODY" disable-output-escaping="yes" /></p>
-            <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--yellow" data-animate="fadeInUp" data-animate-delay="300" data-json-attr-href="demoCta.cta.href">
-              <xsl:attribute name="href"><xsl:value-of select="$DEMO_CTA_HREF" /></xsl:attribute>
-              <span data-json="demoCta.cta.label"><xsl:value-of select="$DEMO_CTA_LABEL" /></span>
-              <svg class="rbccm-maas-mata__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.4999C1.4375 11.3093 1.51323 11.1265 1.64802 10.9917C1.78281 10.8569 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25881C14.4499 6.12384 14.3741 5.9408 14.3741 5.74993C14.3741 5.55907 14.4499 5.37602 14.5849 5.24106C14.7198 5.10609 14.9029 5.03027 15.0938 5.03027C15.2846 5.03027 15.4677 5.10609 15.6026 5.24106L21.3526 10.9911C21.4196 11.0578 21.4727 11.1371 21.5089 11.2245C21.5451 11.3118 21.5638 11.4054 21.5638 11.4999C21.5638 11.5945 21.5451 11.6881 21.5089 11.7754C21.4727 11.8627 21.4196 11.942 21.3526 12.0088L15.6026 17.7588C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7588C14.4499 17.6238 14.3741 17.4408 14.3741 17.2499C14.3741 17.0591 14.4499 16.876 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.4999Z" fill="currentColor"/>
-              </svg>
-            </a>
+            <p class="rbccm-cta-band__body" data-animate="fadeInUp" data-animate-delay="200" data-json-html="demoCta.body"><xsl:value-of select="$DEMO_BODY" disable-output-escaping="yes" /></p>
+            <div class="rbccm-cta-band__actions">
+              <a class="rbccm-cta-band__btn rbccm-cta-band__btn--primary" data-animate="fadeInUp" data-animate-delay="300" data-json-attr-href="demoCta.cta.href">
+                <xsl:attribute name="href"><xsl:value-of select="$DEMO_CTA_HREF" /></xsl:attribute>
+                <span data-json="demoCta.cta.label"><xsl:value-of select="$DEMO_CTA_LABEL" /></span>
+                <svg class="rbccm-cta-band__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.4999C1.4375 11.3093 1.51323 11.1265 1.64802 10.9917C1.78281 10.8569 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25881C14.4499 6.12384 14.3741 5.9408 14.3741 5.74993C14.3741 5.55907 14.4499 5.37602 14.5849 5.24106C14.7198 5.10609 14.9029 5.03027 15.0938 5.03027C15.2846 5.03027 15.4677 5.10609 15.6026 5.24106L21.3526 10.9911C21.4196 11.0578 21.4727 11.1371 21.5089 11.2245C21.5451 11.3118 21.5638 11.4054 21.5638 11.4999C21.5638 11.5945 21.5451 11.6881 21.5089 11.7754C21.4727 11.8627 21.4196 11.942 21.3526 12.0088L15.6026 17.7588C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7588C14.4499 17.6238 14.3741 17.4408 14.3741 17.2499C14.3741 17.0591 14.4499 16.876 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.4999Z" fill="currentColor"/>
+                </svg>
+              </a>
+            </div>
           </div>
         </section>
 
@@ -561,16 +608,16 @@
     </div><!-- /.rbccm-maas-mata -->
 
     <!-- Site-standard Bootstrap video modal (matches the pattern used
-         on the home page and elsewhere). Bootstrap owns open/close via
-         data-toggle="modal" on the trigger + data-dismiss="modal" on
-         the button; no custom JS needed. Brightcove player is embedded
+         on the home page and elsewhere). Bootstrap 5 owns open/close via
+         data-bs-toggle="modal" on the trigger + data-bs-dismiss="modal"
+         on the button; no custom JS needed. Brightcove player is embedded
          directly in the iframe src. -->
     <div role="dialog" class="modal fade" tabindex="-1" id="herovideo" aria-label="Video" aria-describedby="herovideo-desc">
       <div role="document" class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;">
         <div class="modal-content">
           <div>
             <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
-              <button aria-label="Close Modal" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal">×</button>
+              <button aria-label="Close Modal" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-bs-dismiss="modal">×</button>
             </div>
             <div class="modal-body" style="padding: 0px;">
               <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
@@ -606,6 +653,13 @@
     </script>
     <script>
       <xsl:attribute name="src">/assets/rbccm/js/pages/maas-mata.js?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </script>
+    <!-- Standalone rbccm-awards runtime — drives the mobile Slick
+         carousel on the awards row (below 872px). Ships alongside
+         the sidecar CSS hoisted at the top of the template. Requires
+         jQuery, which the MAAS/MATA host page already loads globally. -->
+    <script>
+      <xsl:attribute name="src">/assets/rbccm/js/components/rbccm-awards.js?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
     </script>
 
   </xsl:template>

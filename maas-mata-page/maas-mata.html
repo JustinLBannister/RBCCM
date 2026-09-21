@@ -27,6 +27,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MAAS + MATA · RBC Capital Markets</title>
 
+<!-- Demo CTA band styles now live in the shared cta-band component.
+     Link before the inline <style> so the component's !important
+     rules can still be beaten by anything the page needs to override,
+     while its base rules land first in the cascade. -->
+<link rel="stylesheet" href="../rbccm-cta-band/rbccm-cta-band.css">
+
 <style>
   :root {
     --navy-900: #001E3C; --navy-800: #002144; --navy-700: #003168; --navy-600: #0051A5;
@@ -143,31 +149,9 @@
     isolation: isolate;
     transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
   }
-  /* Mobile size override for the demo CTA. Figma spec: 40px tall,
-     14/29.26 Roboto, tighter side padding, 10px icon gap. */
-  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
-    height: 40px;
-    padding: 20px 35px;
-    font-size: 14px;
-    line-height: 29.26px;
-    gap: 10px;
-  }
-  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
-    width: 18px;
-    height: 18px;
-    aspect-ratio: 1 / 1;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
-      height: 50px;
-      padding: 12px 35px;
-      font-size: 19.507px;
-    }
-    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
-      width: 23px;
-      height: 23px;
-    }
-  }
+  /* NOTE: Demo-scoped .__btn--yellow overrides removed — the demo
+     band renders through the shared rbccm-cta-band component now. */
+
   /* Shine-sweep: a soft white diagonal band travels across the
      button on hover. Zero-width at rest so it doesn't tint the
      button. Sits above the yellow fill but below text/icon via
@@ -348,8 +332,7 @@
   .rbccm-maas-mata__awards-eyebrow,
   .rbccm-maas-mata__platforms-eyebrow,
   .rbccm-maas-mata__mata-cap-eyebrow,
-  .rbccm-maas-mata__market-insights-eyebrow,
-  .rbccm-maas-mata__demo-eyebrow {
+  .rbccm-maas-mata__market-insights-eyebrow {
     margin: 0;
     padding: 0;
     font-weight: 400;
@@ -2041,116 +2024,11 @@
     margin: 0 auto;
   }
 
-  /* Demo CTA */
-  /* Demo section — Figma: flex-column, padding 100 0, justify/align
-     center, gap 10. Transparent bg (deep-band gradient shows through). */
-  .rbccm-maas-mata__demo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    padding: 50px 0;
-    /* Transparent bg so the .deep-band parent's gradient
-       (#082043 → #061730) reads continuously up from
-       market-insights above. */
-    background: transparent;
-    color: #fff;
-    text-align: center;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo { padding: 90px 0 100px; }
-  }
-  /* Inner content stack — Figma: 686 fixed wide, flex-column, gap 41,
-     centre-aligned. Holds eyebrow + heading + body. */
-  .rbccm-maas-mata__demo > .rbccm-maas-mata__container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 41px;
-    width: 100%;
-    max-width: 690px;
-    padding: 0 23px;
-    box-sizing: border-box;
-  }
-  /* Eyebrow "See the platform" — mirrors the platforms eyebrow
-     (Roboto 14/16.8 wt 400, letter-spacing 3, sentence case,
-     warm-yellow, 45×2 yellow underline via ::after with 15px
-     gap). */
-  .rbccm-maas-mata__demo-eyebrow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 0 35px;
-    margin: 0;
-    color: #FFC72C;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 120%;
-    letter-spacing: 3px;
-  }
-  @media (min-width: 992px) {
-    /* Desktop: 5 more on bottom so the eyebrow's yellow rule sits
-       a touch further from the heading beneath it. */
-    .rbccm-maas-mata__demo-eyebrow { margin-bottom: 5px; }
-  }
-  .rbccm-maas-mata__demo-eyebrow::after {
-    content: '';
-    display: block;
-    width: 45px;
-    height: 2px;
-    background: #FFC72C;
-  }
-  /* Heading "Trade with total clarity." — Figma: RBC Display 75/82.5
-     wt 500, centred. "Trade with total" white, "clarity." warm-yellow. */
-  /* Demo heading "Talk with an expert." - same responsive type
-     ramp as .new-standard-heading: mobile 50/100%, desktop 75/110%.
-     "Talk with an" prefix is white (not the newStandard 40%-white);
-     "expert" span is yellow #FFC72C. 100% width - no max-width cap. */
-  .rbccm-maas-mata__demo-heading {
-    color: #FFFFFF;
-    text-align: center;
-    font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
-    font-size: 50px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 100%;
-    margin: 0;
-    width: 100%;
-    max-width: 100%;
-    /* Mobile: allow the highlight span to wrap to its own line
-       so 50px "expert." doesn't push past the viewport (it was
-       causing horizontal overflow on the whole page). Tablet+
-       has room to keep both parts on one line. */
-    white-space: normal;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo-heading {
-      font-size: 75px;
-      line-height: 110%;   /* 82.5px */
-      white-space: nowrap;
-    }
-  }
-  .rbccm-maas-mata__demo-heading-highlight { color: #FFC72C; font-style: normal; }
-  /* Body — Figma description/desktop: Roboto 16/24 wt 400, white,
-     centred. */
-  .rbccm-maas-mata__demo-body {
-    color: #fff;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 150%;
-    text-align: center;
-    /* Negative top margin pulls the body up toward the heading so
-       the pair sits tighter than the 41 gap the parent flex owns
-       (parent gap governs eyebrow → heading → body → CTA otherwise). */
-    margin: -27px 0 0;
-    width: 100%;
-    align-self: stretch;
-  }
+  /* Demo CTA — Extracted.
+     The demo band renders through the shared rbccm-cta-band component
+     (maas-mata variant + --bg-transparent so the .deep-band
+     wrapper's gradient reads through). Styles live in
+   ../rbccm-cta-band/rbccm-cta-band.css — linked in the <head> above. */
 
   /* Newsletter (simplified — Marketo owns the form fields) */
   /* Newsletter — soft light gradient washes into the footer so the
@@ -3698,21 +3576,26 @@
        later cleanup.) -->
 
   <!-- ===== DEMO CTA =====
-       Eyebrow "See the platform", headline "Talk with an expert."
-       (expert in yellow), single body line, CTA "Request a demo". -->
-  <section class="rbccm-maas-mata__demo">
-    <div class="rbccm-maas-mata__container">
-      <div class="rbccm-maas-mata__demo-eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow">See the platform</div>
-      <h2 class="rbccm-maas-mata__demo-heading" data-animate="fadeInUp" data-animate-delay="100">
-        <span data-json="demoCta.headlinePrefix">Talk with an </span><span class="rbccm-maas-mata__demo-heading-highlight" data-json="demoCta.headlineHighlight">expert</span>.
+       Now uses the shared cta-band component (maas-mata
+       variant + --bg-transparent since this instance lives inside
+       the .rbccm-maas-mata__deep-band wrapper that owns the
+       continuous navy gradient across siblings). Data bindings kept
+       so the CMS/JSON layer still drives eyebrow/heading/body/CTA. -->
+  <section class="rbccm-cta-band rbccm-cta-band--maas-mata rbccm-cta-band--bg-transparent">
+    <div class="rbccm-cta-band__inner">
+      <p class="rbccm-cta-band__eyebrow" data-animate="fadeInUp" data-json="demoCta.eyebrow">See the platform</p>
+      <h2 class="rbccm-cta-band__heading" data-animate="fadeInUp" data-animate-delay="100">
+        <span data-json="demoCta.headlinePrefix">Talk with an </span><span class="rbccm-cta-band__heading-highlight" data-json="demoCta.headlineHighlight">expert</span>.
       </h2>
-      <p class="rbccm-maas-mata__demo-body" data-animate="fadeInUp" data-animate-delay="200" data-json="demoCta.body">
+      <p class="rbccm-cta-band__body" data-animate="fadeInUp" data-animate-delay="200" data-json="demoCta.body">
         Connect with our product teams to arrange a custom demo.
       </p>
-      <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--yellow" data-animate="fadeInUp" data-animate-delay="300" href="/request-demo" data-json-attr-href="demoCta.cta.href">
-        <span data-json="demoCta.cta.label">Request a demo</span>
-        <svg class="rbccm-maas-mata__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.4999C1.4375 11.3093 1.51323 11.1265 1.64802 10.9917C1.78281 10.8569 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25881C14.4499 6.12384 14.3741 5.9408 14.3741 5.74993C14.3741 5.55907 14.4499 5.37602 14.5849 5.24106C14.7198 5.10609 14.9029 5.03027 15.0938 5.03027C15.2846 5.03027 15.4677 5.10609 15.6026 5.24106L21.3526 10.9911C21.4196 11.0578 21.4727 11.1371 21.5089 11.2245C21.5451 11.3118 21.5638 11.4054 21.5638 11.4999C21.5638 11.5945 21.5451 11.6881 21.5089 11.7754C21.4727 11.8627 21.4196 11.942 21.3526 12.0088L15.6026 17.7588C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7588C14.4499 17.6238 14.3741 17.4408 14.3741 17.2499C14.3741 17.0591 14.4499 16.876 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.4999Z" fill="currentColor"/></svg>
-      </a>
+      <div class="rbccm-cta-band__actions">
+        <a class="rbccm-cta-band__btn rbccm-cta-band__btn--primary" data-animate="fadeInUp" data-animate-delay="300" href="/request-demo" data-json-attr-href="demoCta.cta.href">
+          <span data-json="demoCta.cta.label">Request a demo</span>
+          <svg class="rbccm-cta-band__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.4999C1.4375 11.3093 1.51323 11.1265 1.64802 10.9917C1.78281 10.8569 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25881C14.4499 6.12384 14.3741 5.9408 14.3741 5.74993C14.3741 5.55907 14.4499 5.37602 14.5849 5.24106C14.7198 5.10609 14.9029 5.03027 15.0938 5.03027C15.2846 5.03027 15.4677 5.10609 15.6026 5.24106L21.3526 10.9911C21.4196 11.0578 21.4727 11.1371 21.5089 11.2245C21.5451 11.3118 21.5638 11.4054 21.5638 11.4999C21.5638 11.5945 21.5451 11.6881 21.5089 11.7754C21.4727 11.8627 21.4196 11.942 21.3526 12.0088L15.6026 17.7588C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7588C14.4499 17.6238 14.3741 17.4408 14.3741 17.2499C14.3741 17.0591 14.4499 16.876 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.4999Z" fill="currentColor"/></svg>
+        </a>
+      </div>
     </div>
   </section>
 

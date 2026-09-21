@@ -836,3 +836,150 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up {
   margin-top: 0 !important;
 }
+
+
+/* =========================================================================
+   Variant: US Credentials
+   -------------------------------------------------------------------------
+   Blend of the two existing variants:
+     - MAAS+MATA-style CENTERED text stack (2-line title with accent
+       colour on line 2 + subtitle) — no CTA row.
+     - S+E-style optional bg VIDEO backdrop (native <video> or
+       Brightcove iframe), rendered under a solid navy fallback so
+       the section reads even before video paints.
+   Dark navy surface throughout. Yellow warm-yellow accent on the
+   second title line matches the design comp.
+   ========================================================================= */
+.rbccm-hero--us-credentials {
+  background: #001E3C;
+  color: #fff;
+  /* Padding = Figma spec + fixed-nav clearance on the top edge:
+       Mobile  Figma  80 / 0 / 60 / 0
+               +nav   65 top
+               total  145 / 0 / 60 / 0
+       Desktop Figma  130 / 0 / 80 / 0
+               +nav   98 top
+               total  228 / 0 / 80 / 0
+     Horizontal 0 on the section; inner .__container carries its
+     own 23px gutter so copy never touches the viewport edge. */
+  padding: 145px 0 60px;
+  overflow: hidden;
+  text-align: center;
+  /* position: relative inherited from the shared block base — keeps
+     the bg-video slot anchored to this section. */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials { padding: 218px 0 80px; }
+}
+
+/* Bg-video slot — identical mechanics to the S+E variant so the
+   Datum shape carries over (Uc*BgVideoMp4 or Uc*BgBrightcove*).
+   The wrapper fills the section as an absolute-cover backdrop; the
+   #001E3C fallback stays visible until the media paints, and if the
+   source ever fails. aria-hidden on the wrapper (XSL side) keeps
+   assistive tech from announcing decorative motion. Opacity kept
+   at 0.4 — higher than S+E (0.1) because US Creds uses the video
+   as a decorative "constellation" backdrop that should register
+   visually, not just ambient motion. Tune per art direction. */
+.rbccm-hero--us-credentials .rbccm-hero__bg-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rbccm-hero--us-credentials .rbccm-hero__bg-video video,
+.rbccm-hero--us-credentials .rbccm-hero__bg-video iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  border: 0;
+  display: block;
+  opacity: 0.4;
+}
+
+/* Content sits above the video. Base shared block already assigns
+   z-index: 1 to `> *`, so `position: relative` here is a re-affirm.
+   Container is a flex column so eyebrow / title / subtitle stack
+   with a single `gap` rule — each child gets its own bottom margin
+   zeroed. */
+.rbccm-hero--us-credentials .rbccm-hero__container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 1180px;
+  padding: 0 23px;
+  margin: 0 auto;
+  gap: 40px;
+  box-sizing: border-box;
+}
+
+/* Optional eyebrow — mirrors MAAS+MATA but on dark bg so colour
+   flips to warm-yellow. Only renders if the Datum is non-empty. */
+.rbccm-hero--us-credentials .rbccm-hero__eyebrow {
+  color: var(--rbccm-hero-yellow);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 120%;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 40px;
+}
+.rbccm-hero--us-credentials .rbccm-hero__eyebrow::after {
+  content: "";
+  display: block;
+  width: 45px;
+  height: 2px;
+  background: var(--rbccm-hero-yellow);
+  margin: 15px auto 0;
+}
+
+/* Title — 2 lines, RBCDisplay serif. Line 1 white; line 2 accent
+   warm-yellow via :last-child. Mobile 50/desktop 75 matches the
+   MAAS+MATA type ramp. Bottom margin is 0 — parent container's
+   flex `gap: 48px` owns the title→subtitle spacing. */
+.rbccm-hero--us-credentials .rbccm-hero__title {
+  font-family: var(--rbccm-hero-serif);
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 100%;
+  color: #fff;
+  max-width: 100%;
+  margin: 0 auto;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__title {
+    font-size: 75px;
+    line-height: 110%;
+  }
+}
+.rbccm-hero--us-credentials .rbccm-hero__title-line { display: block; }
+.rbccm-hero--us-credentials .rbccm-hero__title-line:last-child {
+  color: var(--rbccm-hero-yellow);
+}
+
+/* Subtitle — Roboto, centered white. Desktop caps at 558 per the
+   design spec so the paragraph wraps to ~2-3 lines. */
+.rbccm-hero--us-credentials .rbccm-hero__subtitle {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  width: 100%;
+  max-width: 558px;
+  margin: 0 auto;
+}
+.rbccm-hero--us-credentials .rbccm-hero__subtitle strong { font-weight: 700; }
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    font-size: 18px;
+  }
+}

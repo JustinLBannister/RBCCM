@@ -1,0 +1,132 @@
+<!-- ============================================================
+     RBCCM Two-Up Cards  |  Properties + Data
+     ============================================================
+     Reusable 2-up card row for multiple content patterns.
+
+     Presets
+     ============================================================
+       features        MAAS+MATA parity. Dark section. Each card:
+                       eyebrow tag + title + body + 5-slot bullets.
+                       Cards can be individually themed as dark or
+                       light for the duotone MAAS+MATA look.
+
+       video-callouts  "Find conviction" parity. Light section.
+                       Each card: media zone (image + play button)
+                       + title + optional subtitle + body + CTA.
+                       Clicking the play button opens a video modal.
+
+     Datum labelling convention
+     ============================================================
+     Each Datum's Name flags which preset it applies to. Fields
+     that are ignored under the current preset can be left blank
+     without affecting output (or filled in for future preset
+     switches).
+
+     Card 2 slots (Card2*) exist even when the section is used
+     with a single card, but the grid is optimised for 2 cards
+     and 1-card usage will render the single card at half-width.
+     For a hero-scale single card, use a different component.
+     ============================================================ -->
+<Properties ComponentID="rbccm-two-up-cards-v1">
+
+  <!-- ============================================================
+       Preset  (determines layout + which Datums are read)
+       ============================================================ -->
+  <Datum ID="Preset" Type="String" Name="Layout preset">
+    <Option Value="features" Selected="true">Features (dark section + bullets, MAAS+MATA style)</Option>
+    <Option Value="video-callouts">Video callouts (light section + media + CTA, Find conviction style)</Option>
+  </Datum>
+
+  <!-- ============================================================
+       Deploy plumbing
+       ============================================================ -->
+  <Datum ID="CssPath" Type="String" Name="CSS path (absolute URL)">/assets/rbccm/css/components/rbccm-two-up-cards.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="JS path (absolute URL - only loaded for video-callouts preset)">/assets/rbccm/js/components/rbccm-two-up-cards.js</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Cache version (format YYYY-MM-DD-HHMM)">2026-09-17-1200</Datum>
+  <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-two-up-cards-1</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to heading text)"></Datum>
+
+  <!-- Optional section background colour override. Blank inherits
+       the preset default (features = navy, video-callouts = white). -->
+  <Datum ID="SectionBgColor" Type="String" Name="Section background colour e.g. '#041e42' (optional - blank inherits preset default)"></Datum>
+
+  <!-- ============================================================
+       Section header  (all optional)
+       ============================================================
+       Eyebrow renders as small uppercase yellow caption above the
+       heading. Heading is the section H2 (tag configurable via
+       SectionHeadingTag). Description is a supporting paragraph
+       below the heading. -->
+  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - small yellow caption above heading)">Two platforms, one connected workflow</Datum>
+  <Datum ID="SectionHeadingText" Type="String" Name="Section heading (optional)">Better insight for stronger execution</Datum>
+  <Datum ID="SectionHeadingTag" Type="String" Name="Section heading tag (h1-h6 - default h2)">h2</Datum>
+  <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - paragraph below heading)"></Datum>
+
+  <!-- ============================================================
+       Card 1
+       ============================================================
+       Card{N}Theme                dark or light (features preset only)
+       Card{N}EyebrowText          small eyebrow tag on the card (features preset only)
+       Card{N}TitleText            card headline (blank hides the card)
+       Card{N}BodyText             card paragraph copy
+       Card{N}SubtitleText         optional subtitle between title and body (video-callouts only)
+       Card{N}MediaImagePath       image URL for the media zone (video-callouts only)
+       Card{N}MediaImageAlt        alt text for the media image (video-callouts only)
+       Card{N}VideoUrl             video URL that opens in modal on play-button click (video-callouts only)
+       Card{N}CtaLabel             visible CTA label e.g. 'Watch the video' (video-callouts only)
+       Card{N}CtaHref              CTA link target (video-callouts only - used only when VideoUrl is blank)
+       Card{N}Bullet1Text-Bullet5Text  5-slot bullet list (features only - blank slots skip)
+       ============================================================ -->
+
+  <Datum ID="Card1Theme" Type="String" Name="Card 1 : theme (features preset only)">
+    <Option Value="dark" Selected="true">Dark (5% white on navy)</Option>
+    <Option Value="light">Light (white bg with navy text)</Option>
+  </Datum>
+  <Datum ID="Card1EyebrowText" Type="String" Name="Card 1 : eyebrow (features preset only - e.g. 'MATA - Analytics')">MATA - Analytics</Datum>
+  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (blank hides the card)">Transform data into trading intelligence</Datum>
+  <Datum ID="Card1SubtitleText" Type="String" Name="Card 1 : subtitle (video-callouts only - optional line between title and body)"></Datum>
+  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body copy">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate execution decisions before you move.</Datum>
+
+  <Datum ID="Card1MediaImagePath" Type="String" Name="Card 1 : media image path (video-callouts only)"></Datum>
+  <Datum ID="Card1MediaImageAlt" Type="String" Name="Card 1 : media image alt (video-callouts only)"></Datum>
+  <Datum ID="Card1VideoUrl" Type="String" Name="Card 1 : video URL (video-callouts only - opens in modal)"></Datum>
+  <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label (video-callouts only - e.g. 'Watch the video')"></Datum>
+  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA href (video-callouts only - used when VideoUrl blank)"></Datum>
+
+  <Datum ID="Card1Bullet1Text" Type="String" Name="Card 1 : bullet 1 (features only)">Quantify expected execution costs before commitment</Datum>
+  <Datum ID="Card1Bullet2Text" Type="String" Name="Card 1 : bullet 2 (features only)">Compare strategies side by side to evaluate potential outcomes</Datum>
+  <Datum ID="Card1Bullet3Text" Type="String" Name="Card 1 : bullet 3 (features only)">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
+  <Datum ID="Card1Bullet4Text" Type="String" Name="Card 1 : bullet 4 (features only)">Monitor market conditions and portfolio exposures</Datum>
+  <Datum ID="Card1Bullet5Text" Type="String" Name="Card 1 : bullet 5 (features only)">Model scenarios across asset classes</Datum>
+
+  <!-- ============================================================
+       Card 2
+       ============================================================ -->
+  <Datum ID="Card2Theme" Type="String" Name="Card 2 : theme (features preset only)">
+    <Option Value="dark">Dark (5% white on navy)</Option>
+    <Option Value="light" Selected="true">Light (white bg with navy text)</Option>
+  </Datum>
+  <Datum ID="Card2EyebrowText" Type="String" Name="Card 2 : eyebrow (features preset only - e.g. 'MAAS - Execution')">MAAS - Execution</Datum>
+  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (blank hides the card)">Drive stronger performance outcomes</Datum>
+  <Datum ID="Card2SubtitleText" Type="String" Name="Card 2 : subtitle (video-callouts only - optional line between title and body)"></Datum>
+  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body copy">Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.</Datum>
+
+  <Datum ID="Card2MediaImagePath" Type="String" Name="Card 2 : media image path (video-callouts only)"></Datum>
+  <Datum ID="Card2MediaImageAlt" Type="String" Name="Card 2 : media image alt (video-callouts only)"></Datum>
+  <Datum ID="Card2VideoUrl" Type="String" Name="Card 2 : video URL (video-callouts only - opens in modal)"></Datum>
+  <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label (video-callouts only)"></Datum>
+  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA href (video-callouts only - used when VideoUrl blank)"></Datum>
+
+  <Datum ID="Card2Bullet1Text" Type="String" Name="Card 2 : bullet 1 (features only)">Access adaptive algorithms built for live market conditions</Datum>
+  <Datum ID="Card2Bullet2Text" Type="String" Name="Card 2 : bullet 2 (features only)">Select AI-powered strategies tailored to execution objectives</Datum>
+  <Datum ID="Card2Bullet3Text" Type="String" Name="Card 2 : bullet 3 (features only)">Route orders intelligently to help minimize market impact</Datum>
+  <Datum ID="Card2Bullet4Text" Type="String" Name="Card 2 : bullet 4 (features only)">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</Datum>
+  <Datum ID="Card2Bullet5Text" Type="String" Name="Card 2 : bullet 5 (features only)">Benchmark performance against pre-trade expectations</Datum>
+
+</Properties>
+
+<!-- No repeater Groups in this component; every content field lives
+     in Properties above. Empty Data block kept because TeamSite's
+     component schema expects it to be present. -->
+<Data>
+</Data>

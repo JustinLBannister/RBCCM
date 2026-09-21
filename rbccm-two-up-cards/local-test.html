@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBCCM Two-Up Cards — local test</title>
+  <link rel="stylesheet" href="rbccm-two-up-cards.css">
+  <style>
+    body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
+    .demo-label {
+      display: block; max-width: 1180px; margin: 60px auto 0; padding: 0 23px;
+      color: #041e42; font: 700 11px/1.4 Roboto, sans-serif;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .demo-caption {
+      display: block; max-width: 1180px; margin: 4px auto 20px; padding: 0 23px;
+      color: #4a5f7d; font: 400 13px/1.5 Roboto, sans-serif;
+    }
+    .demo-caption code {
+      background: rgba(4,30,66,0.08); padding: 1px 6px; border-radius: 3px;
+      color: #0066CC; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
+    }
+    /* Illustration placeholders — inline SVG data URI so no image files needed. */
+    :root {
+      --bar-chart-svg: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450"><rect width="800" height="450" fill="%23041e42"/><g stroke="%234a5f7d" stroke-dasharray="3,4" opacity="0.3"><line x1="60" y1="120" x2="780" y2="120"/><line x1="60" y1="200" x2="780" y2="200"/><line x1="60" y1="280" x2="780" y2="280"/></g><g fill="url(%23g1)"><rect x="90" y="270" width="60" height="120"/><rect x="180" y="220" width="60" height="170"/><rect x="270" y="280" width="60" height="110"/><rect x="360" y="140" width="60" height="250"/><rect x="450" y="230" width="60" height="160"/><rect x="540" y="100" width="60" height="290"/><rect x="630" y="130" width="60" height="260"/><rect x="720" y="60" width="60" height="330"/></g><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%23FFD86E"/><stop offset="1" stop-color="%23FFC72C"/></linearGradient></defs><polyline points="120,300 210,230 300,290 390,150 480,240 570,110 660,140 750,70" stroke="white" stroke-width="1.5" fill="none" stroke-dasharray="2,4"/></svg>');
+      --wave-chart-svg: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450"><rect width="800" height="450" fill="%23041e42"/><path d="M0 200 Q100 180 200 195 T400 190 T600 200 T800 195 L800 450 L0 450 Z" fill="%230a2d5c"/><path d="M0 260 Q100 240 200 250 T400 245 T600 255 T800 250 L800 450 L0 450 Z" fill="%23133a70"/><g fill="%23FFC72C" opacity="0.9"><rect x="80" y="270" width="4" height="60"/><rect x="130" y="290" width="4" height="45"/><rect x="180" y="260" width="4" height="70"/><rect x="230" y="285" width="4" height="55"/><rect x="330" y="275" width="4" height="65"/><rect x="380" y="290" width="4" height="45"/><rect x="480" y="280" width="4" height="55"/><rect x="580" y="275" width="4" height="60"/><rect x="680" y="285" width="4" height="55"/></g><g fill="%2340C4B0" opacity="0.9"><rect x="105" y="290" width="4" height="60"/><rect x="155" y="270" width="4" height="80"/><rect x="205" y="285" width="4" height="65"/><rect x="255" y="275" width="4" height="70"/><rect x="305" y="290" width="4" height="55"/><rect x="355" y="270" width="4" height="80"/><rect x="405" y="280" width="4" height="70"/><rect x="455" y="285" width="4" height="65"/><rect x="505" y="270" width="4" height="80"/><rect x="555" y="285" width="4" height="65"/><rect x="605" y="275" width="4" height="70"/><rect x="655" y="290" width="4" height="55"/><rect x="705" y="270" width="4" height="80"/></g><path d="M0 190 Q100 170 200 185 T400 180 T600 190 T800 185" stroke="%23FFC72C" stroke-width="1.5" fill="none"/></svg>');
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       VARIANT 1: Preset = features   (MAAS+MATA parity)
+       ============================================================ -->
+  <span class="demo-label">Preset: features</span>
+  <span class="demo-caption">MAAS+MATA parity. Dark section, one <code>--dark</code> card + one <code>--light</code> card, 5-slot bullet list per card.</span>
+  <section class="rbccm-two-up-cards rbccm-two-up-cards--features" aria-label="Two platforms, one connected workflow">
+    <div class="rbccm-two-up-cards__header">
+      <p class="rbccm-two-up-cards__eyebrow" data-animate="fadeInUp">TWO PLATFORMS, ONE CONNECTED WORKFLOW</p>
+      <h2 class="rbccm-two-up-cards__heading" data-animate="fadeInUp" data-animate-delay="120">Better insight for stronger execution</h2>
+    </div>
+    <div class="rbccm-two-up-cards__grid" data-stagger-parent="fadeInUp" data-stagger-step="150">
+      <article class="rbccm-two-up-cards__card rbccm-two-up-cards__card--dark">
+        <div class="rbccm-two-up-cards__card-eyebrow">MATA - Analytics</div>
+        <h3 class="rbccm-two-up-cards__card-title">Transform data into trading intelligence</h3>
+        <p class="rbccm-two-up-cards__card-body">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate execution decisions before you move.</p>
+        <ul class="rbccm-two-up-cards__card-bullets">
+          <li class="rbccm-two-up-cards__card-bullet-item">Quantify expected execution costs before commitment</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Compare strategies side by side to evaluate potential outcomes</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Monitor market conditions and portfolio exposures</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Model scenarios across asset classes</li>
+        </ul>
+      </article>
+      <article class="rbccm-two-up-cards__card rbccm-two-up-cards__card--light">
+        <div class="rbccm-two-up-cards__card-eyebrow">MAAS - Execution</div>
+        <h3 class="rbccm-two-up-cards__card-title">Drive stronger performance outcomes</h3>
+        <p class="rbccm-two-up-cards__card-body">Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.</p>
+        <ul class="rbccm-two-up-cards__card-bullets">
+          <li class="rbccm-two-up-cards__card-bullet-item">Access adaptive algorithms built for live market conditions</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Select AI-powered strategies tailored to execution objectives</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Route orders intelligently to help minimize market impact</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</li>
+          <li class="rbccm-two-up-cards__card-bullet-item">Benchmark performance against pre-trade expectations</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VARIANT 2: Preset = video-callouts   (Find conviction parity)
+       ============================================================ -->
+  <span class="demo-label">Preset: video-callouts</span>
+  <span class="demo-caption">Find conviction parity. Light section, per-card media zone with play button, click opens a modal.</span>
+  <section class="rbccm-two-up-cards rbccm-two-up-cards--video-callouts" aria-label="Find conviction through complexity">
+    <div class="rbccm-two-up-cards__header">
+      <h2 class="rbccm-two-up-cards__heading" data-animate="fadeInUp">Find conviction through complexity</h2>
+      <p class="rbccm-two-up-cards__description" data-animate="fadeInUp" data-animate-delay="120">Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.</p>
+    </div>
+    <div class="rbccm-two-up-cards__grid" data-stagger-parent="fadeInUp" data-stagger-step="150">
+      <article class="rbccm-two-up-cards__card">
+        <button type="button" class="rbccm-two-up-cards__card-media" data-video-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" aria-label="Play video: Corporates &amp; Sponsors">
+          <img src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%23041e42%22/%3E%3Cg stroke=%22%234a5f7d%22 stroke-dasharray=%223,4%22 opacity=%220.3%22%3E%3Cline x1=%2260%22 y1=%22120%22 x2=%22780%22 y2=%22120%22/%3E%3Cline x1=%2260%22 y1=%22200%22 x2=%22780%22 y2=%22200%22/%3E%3Cline x1=%2260%22 y1=%22280%22 x2=%22780%22 y2=%22280%22/%3E%3C/g%3E%3Cg fill=%22url(%23g1)%22%3E%3Crect x=%2290%22 y=%22270%22 width=%2260%22 height=%22120%22/%3E%3Crect x=%22180%22 y=%22220%22 width=%2260%22 height=%22170%22/%3E%3Crect x=%22270%22 y=%22280%22 width=%2260%22 height=%22110%22/%3E%3Crect x=%22360%22 y=%22140%22 width=%2260%22 height=%22250%22/%3E%3Crect x=%22450%22 y=%22230%22 width=%2260%22 height=%22160%22/%3E%3Crect x=%22540%22 y=%22100%22 width=%2260%22 height=%22290%22/%3E%3Crect x=%22630%22 y=%22130%22 width=%2260%22 height=%22260%22/%3E%3Crect x=%22720%22 y=%2260%22 width=%2260%22 height=%22330%22/%3E%3C/g%3E%3Cdefs%3E%3ClinearGradient id=%22g1%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFD86E%22/%3E%3Cstop offset=%221%22 stop-color=%22%23FFC72C%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolyline points=%22120,300 210,230 300,290 390,150 480,240 570,110 660,140 750,70%22 stroke=%22white%22 stroke-width=%221.5%22 fill=%22none%22 stroke-dasharray=%222,4%22/%3E%3C/svg%3E" alt="Bar chart with ascending trend" loading="lazy" decoding="async">
+          <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/></svg>
+          </span>
+        </button>
+        <div class="rbccm-two-up-cards__card-content">
+          <div class="rbccm-two-up-cards__card-text">
+            <div class="rbccm-two-up-cards__card-headline">
+              <h3 class="rbccm-two-up-cards__card-title">Corporates &amp; Sponsors</h3>
+              <p class="rbccm-two-up-cards__card-subtitle">The market is asking a different question</p>
+            </div>
+            <p class="rbccm-two-up-cards__card-body">Capital is available, but timing, structure, and investor selectivity are raising the stakes. RBC's senior experts discuss what corporations and private equity firms are navigating now, and how early advisory dialogue opens more paths to act with confidence.</p>
+          </div>
+          <a class="rbccm-two-up-cards__card-cta" href="#">
+            <span>Watch the video</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </article>
+      <article class="rbccm-two-up-cards__card">
+        <button type="button" class="rbccm-two-up-cards__card-media" data-video-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" aria-label="Play video: Institutional Investors">
+          <img src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%23041e42%22/%3E%3Cpath d=%22M0 200 Q100 180 200 195 T400 190 T600 200 T800 195 L800 450 L0 450 Z%22 fill=%22%230a2d5c%22/%3E%3Cpath d=%22M0 260 Q100 240 200 250 T400 245 T600 255 T800 250 L800 450 L0 450 Z%22 fill=%22%23133a70%22/%3E%3Cg fill=%22%23FFC72C%22 opacity=%220.9%22%3E%3Crect x=%2280%22 y=%22270%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22130%22 y=%22290%22 width=%224%22 height=%2245%22/%3E%3Crect x=%22180%22 y=%22260%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22230%22 y=%22285%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22330%22 y=%22275%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22380%22 y=%22290%22 width=%224%22 height=%2245%22/%3E%3Crect x=%22480%22 y=%22280%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22580%22 y=%22275%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22680%22 y=%22285%22 width=%224%22 height=%2255%22/%3E%3C/g%3E%3Cg fill=%22%2340C4B0%22 opacity=%220.9%22%3E%3Crect x=%22105%22 y=%22290%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22155%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22205%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22255%22 y=%22275%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22305%22 y=%22290%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22355%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22405%22 y=%22280%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22455%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22505%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22555%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22605%22 y=%22275%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22655%22 y=%22290%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22705%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3C/g%3E%3Cpath d=%22M0 190 Q100 170 200 185 T400 180 T600 190 T800 185%22 stroke=%22%23FFC72C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E" alt="Wave chart with volatility bars" loading="lazy" decoding="async">
+          <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/></svg>
+          </span>
+        </button>
+        <div class="rbccm-two-up-cards__card-content">
+          <div class="rbccm-two-up-cards__card-text">
+            <div class="rbccm-two-up-cards__card-headline">
+              <h3 class="rbccm-two-up-cards__card-title">Institutional Investors</h3>
+              <p class="rbccm-two-up-cards__card-subtitle">The investment equation is getting more complex</p>
+            </div>
+            <p class="rbccm-two-up-cards__card-body">Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC's senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.</p>
+          </div>
+          <a class="rbccm-two-up-cards__card-cta" href="#">
+            <span>Watch the video</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div style="height: 80px;"></div>
+
+  <script src="rbccm-two-up-cards.js"></script>
+</body>
+</html>

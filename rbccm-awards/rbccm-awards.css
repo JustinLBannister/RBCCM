@@ -1,0 +1,493 @@
+/* =========================================================================
+   RBCCM Awards - standalone component
+   Deploy path: /assets/rbccm/css/components/rbccm-awards.css
+
+   Design notes
+   =========================================================================
+   Extracted from the MAAS+MATA landing page's __awards block. Renders a
+   row of award cards on a dark navy background, with:
+     - optional eyebrow line above the cards (Roboto 16/19.2, tracked 1.92)
+     - grid of 3 or 4 cards (via .rbccm-awards--3 / .rbccm-awards--4)
+     - each card: year (yellow), title (white), issuer (light grey)
+     - subtle yellow gradient hairline across the top of each card
+
+   Variants
+   =========================================================================
+     .rbccm-awards--3   3-up grid (MAAS+MATA original)
+     .rbccm-awards--4   4-up grid (US Credentials mockup)
+
+   At <=871 both variants stack single-column so long titles stay readable
+   on phones.
+
+   Removed vs. the MAAS+MATA source
+   =========================================================================
+     - Mobile scroll-snap carousel (arrows + dots + slick controls). Static
+       stack on mobile is simpler for a section that lives above the fold
+       and doesn't need slider behaviour. Add it back per-page if a design
+       ever calls for it.
+   ========================================================================= */
+
+/* =========================================================================
+   BASELINE  =  MAAS/MATA verbatim
+   =========================================================================
+   Base .rbccm-awards IS the MAAS/MATA __awards spec. Every value here
+   is 1:1 with maas-mata.css. Any variant modifier (--4, future presets)
+   overrides only where it diverges from this baseline. Adding a new
+   variant should touch as few properties as possible.
+   ========================================================================= */
+
+/* Section shell — outer / inner split.
+   -------------------------------------------------------------------------
+   The <section> is the full-viewport surface that paints the background
+   colour, so a wide monitor doesn't leave the page's underlying colour
+   showing in gutters beyond the content rail.
+   The .rbccm-awards__inner wrapper carries the 1440px content rail, the
+   flex-column layout, the vertical rhythm, and the side padding.
+   Padding matches the live Figma spec: 40 23 0 base, 3 23 40 desktop,
+   36 0 0 mobile so the carousel can bleed edge-to-edge. */
+.rbccm-awards {
+  background: var(--rbccm-awards-bg, #041e42);
+  color: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+.rbccm-awards__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Eyebrow -- Figma: Roboto 16/19.2 weight 500, letter-spacing 1.92,
+   colour #C3C3C3, sentence case, centred. Mobile caps at 329px per
+   the Figma-mobile widget; desktop lets it stretch. */
+.rbccm-awards__eyebrow {
+  color: #C3C3C3;
+  text-align: center;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;      /* 19.2px */
+  letter-spacing: 1.92px;
+  margin: 0 auto;
+  max-width: 329px;
+  align-self: center;
+}
+@media (min-width: 992px) {
+  .rbccm-awards__eyebrow {
+    max-width: none;
+  }
+}
+
+/* Cards row -- Figma: flex, max-width 1024, justify/align-items center,
+   gap 16 at every breakpoint. */
+.rbccm-awards__grid {
+  display: flex;
+  width: 100%;
+  max-width: 1024px;
+  justify-content: center;
+  align-items: stretch;
+  gap: 16px;
+  text-align: left;
+  margin: 0 auto;
+}
+
+/* Card -- Figma: 264px wide at every breakpoint (Hug 264), padding
+   15/20, gap 10, radius 10, 0.5px inner top border (::before gradient
+   hairline), 5% white fill. */
+.rbccm-awards__card {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px 20px;
+  flex: 0 0 264px;
+  width: 264px;
+  max-width: 264px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  position: relative;
+  height: 100%;
+  min-height: 127px;   /* 3-up MAAS/MATA baseline — --4 bumps to 148 below */
+  box-sizing: border-box;
+}
+
+/* =========================================================================
+   Slick styling — applies at every breakpoint.
+   =========================================================================
+   Slick is always initialized (rbccm-awards.js runs at page load and
+   stays alive; only `slidesToShow` swaps at 872 via Slick's own
+   responsive config). Layout mechanics — DOM shape, track flex-ify,
+   card sizing, equal-height rig — are identical at mobile and desktop.
+
+   DOM shape:
+     .rbccm-awards__grid.slick-initialized
+       > .slick-list
+         > .slick-track
+           > .slick-slide            (each direct child of the grid)
+             > div                   (Slick's own wrapper — NOT the card)
+               > .rbccm-awards__card
+
+   The intermediate <div> between .slick-slide and .rbccm-awards__card
+   is inserted by Slick. Selectors that used the child combinator
+   (`.slick-slide > .rbccm-awards__card`) never match — always reach
+   through with descendant. */
+
+/* Kill slick-theme's default 30px margin-bottom on dotted sliders. */
+.rbccm-awards__grid.slick-dotted.slick-slider {
+  margin-bottom: 0;
+}
+
+/* Grid + list fill the __inner rail so Slick has the full content
+   width to lay out slides in. `.slick-list` keeps Slick's default
+   `overflow: hidden` — that's what clips the infinite-mode clones
+   so only the 4 real cards show in the row at desktop, and gives
+   the mobile peek pattern naturally (current card + start of next
+   are visible in the list; everything else clips at the list edge). */
+.rbccm-awards__grid.slick-initialized {
+  display: block;
+  padding: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.rbccm-awards__grid.slick-initialized .slick-track {
+  max-width: 100%;
+  width: auto;                        /* Slick sets its own inline width */
+  display: flex;
+  align-items: stretch;               /* equal-height cards across the row */
+  gap: 16px;                          /* inter-card rhythm at every breakpoint */
+}
+
+/* Slides: `flex: none` (0 0 auto) respects Slick's variableWidth-
+   computed card width (250 --4 / 264 base) AND prevents flex from
+   shrinking slides when the track is wider than the list (infinite
+   mode adds clones — total track can be 2-3x the list width; without
+   flex-shrink:0 every slide gets squeezed to a fraction of its
+   authored width). `height: auto` lets each slide size naturally,
+   then align-items:stretch on the track pulls shorter slides up to
+   the tallest sibling's height. */
+.rbccm-awards__grid.slick-initialized .slick-slide {
+  height: auto;
+  flex: none;
+}
+
+/* Slick's own wrapper div — passes the stretched slide height
+   through to the card. */
+.rbccm-awards__grid.slick-initialized .slick-slide > div {
+  height: 100%;
+  display: flex;
+}
+
+/* Card fills its slide wrapper's height. `height: 100%` resolves
+   cleanly here because every parent up to the flex-stretched slide
+   has a definite height. `align-self: stretch` is defensive. */
+.rbccm-awards__grid.slick-initialized .slick-slide .rbccm-awards__card {
+  flex: initial;
+  height: 100%;
+  align-self: stretch;
+}
+
+/* Controls-hide media query lives at the top of the file, scoped
+   to 1100+ per component spec. All other Slick styling above is
+   breakpoint-agnostic. */
+
+/* =========================================================================
+   VARIANT: US Credentials  (--4)
+   =========================================================================
+   Diff vs. baseline:
+     - Section bg #051B38 (darker navy)
+     - Desktop side padding 170 (wider than baseline's 23)
+     - 4 cards @ 250 wide (vs. 3 cards @ 264 in baseline)
+   Everything else inherits from baseline unchanged. */
+/* US Credentials navy — the preset default. The section paints the
+   full-width bg; authors can override via the SectionBgColor Datum
+   (which lands here as an inline --rbccm-awards-bg custom property
+   on the section). */
+.rbccm-awards--4 {
+  background: var(--rbccm-awards-bg, #051B38);
+}
+
+/* ---- Section overflow clips — one per variant ----------------------- */
+/* --4 (US Creds, 250px cards):
+     4 × 250 + 3 × 16 = 1048  →  + 23 × 2 inset = 1146.
+     Below 1146 the row doesn't fit statically, so Slick's carousel
+     behavior takes over — clip its bleed at the viewport. */
+@media (max-width: 1145px) {
+  .rbccm-awards--4 {
+    overflow: hidden;
+  }
+}
+/* --3 (MAAS/MATA canon, 264px cards):
+     3 × 264 + 2 × 16 = 824  →  + 23 × 2 inset = 870.
+     Below 870 same story — Slick takes over, clip peek at viewport. */
+@media (max-width: 869px) {
+  .rbccm-awards--3 {
+    overflow: hidden;
+  }
+}
+/* Card width override: 250 instead of 264 at every breakpoint. Height
+   stays content-driven — cards equalize to the tallest sibling via
+   the flex-track `align-items: stretch` rig (and the base card's
+   `height: 100%` which now has a definite parent height to resolve
+   against). `!important` on all three width axes so nothing inside
+   Slick (per-slide inline `width: X px`, wrapper divs, etc.) can
+   sneak past. */
+.rbccm-awards--4 .rbccm-awards__card {
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+}
+/* Grid max-width bumps to fit 4x250 + 3x16 = 1048 (vs. baseline 1024).
+   Mobile-first: left-inset the whole grid by 23px so the first card
+   sits ~23px from the viewport edge (mirrors the eyebrow inset).
+   At 1146+ we zero the padding so the 1048 row centers cleanly
+   inside the rail (matches the "controls hide" breakpoint since
+   both changes describe the same desktop static-row state). */
+.rbccm-awards--4 .rbccm-awards__grid {
+  max-width: 1048px;
+  padding: 0 0 0 23px;
+  box-sizing: content-box;
+}
+@media (min-width: 1146px) {
+  .rbccm-awards--4 .rbccm-awards__grid {
+    padding: 0;
+  }
+}
+
+/* --3 variant grid: 3×264 + 2×16 = 824 max-width. Same left-inset
+   pattern as --4, dropped at the --3 breakpoint (870) so the row
+   centers cleanly inside the rail. */
+.rbccm-awards--3 .rbccm-awards__grid {
+  max-width: 824px;
+  padding: 0 0 0 23px;
+  box-sizing: content-box;
+}
+@media (min-width: 870px) {
+  .rbccm-awards--3 .rbccm-awards__grid {
+    padding: 0;
+  }
+}
+
+/* Controls row — arrows flanking the dot pagination. Mobile-first
+   visible; hidden at each variant's own "row fits statically"
+   breakpoint (mirrors the section-overflow rules in the shell —
+   below the breakpoint, Slick is paging; at/above it, there's
+   nothing to page through). Cascade order matters here: media
+   queries MUST come after the base so they win at desktop. */
+.rbccm-awards__controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+}
+@media (min-width: 870px) {
+  .rbccm-awards--3 .rbccm-awards__controls {
+    display: none;
+  }
+}
+@media (min-width: 1146px) {
+  .rbccm-awards--4 .rbccm-awards__controls {
+    display: none;
+  }
+}
+/* Prev/next chevron buttons. */
+.rbccm-awards__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.rbccm-awards__btn svg {
+  display: block;
+  width: 14px;
+  height: 24px;
+}
+.rbccm-awards__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.rbccm-awards__btn:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* =====================================================
+   DOTS  ported from leadership-carousel/case-studies
+   pattern: default Slick dots + SVG data URI ::before,
+   box-shadow ring on active/hover/focus-visible.
+   Adapted for the dark navy Awards background:
+     - Rest: white stroked outline circle
+     - Active: white filled circle + yellow ring
+   ===================================================== */
+.rbccm-awards__dots {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+.rbccm-awards .rbccm-awards__dots .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: flex !important;
+  gap: 12px 26px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  width: auto !important;
+  flex-wrap: wrap;
+}
+.rbccm-awards .rbccm-awards__dots .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex !important;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-awards .rbccm-awards__dots .slick-dots li button {
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+  color: transparent !important;
+}
+/* Inactive dot: white outlined circle. */
+.rbccm-awards .rbccm-awards__dots .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  width: 11px !important;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+}
+/* Active dot: filled white circle with a 4px navy "gap" + 1px yellow ring.
+   Using the section bg colour (not transparent) as the inner shadow so
+   the yellow ring reads as 1px thin instead of a solid 5px halo. */
+.rbccm-awards .rbccm-awards__dots .slick-dots li.slick-active button::before,
+.rbccm-awards .rbccm-awards__dots .slick-dots li button:focus-visible::before,
+.rbccm-awards .rbccm-awards__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px var(--rbccm-awards-bg, #041e42), 0 0 0 5px #FFC72C !important;
+  height: 11px !important;
+  width: 11px !important;
+  outline: 0;
+}
+.rbccm-awards .rbccm-awards__dots .slick-dots li button:focus-visible { outline: none; }
+/* accessible-slick specifics: <span class="slick-dot-icon"> inside each
+   button plus a default ::before border/::after. Suppress both. */
+.rbccm-awards .rbccm-awards__dots .slick-dots li button .slick-dot-icon,
+.rbccm-awards .rbccm-awards__dots .slick-dots li button .slick-dot-icon::before {
+  display: none !important;
+}
+.rbccm-awards .rbccm-awards__dots .slick-dots li button::after {
+  border: 0 !important;
+  display: none !important;
+}
+
+/* Yellow gradient hairline across the top of each card. Pseudo-
+   element sits at the top edge inside the rounded corners; the
+   card's radius clips the ends so nothing spills. */
+.rbccm-awards__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, rgba(255,199,44,0) 0%, #FFC72C 50%, rgba(255,199,44,0) 100%);
+  border-radius: 10px 10px 0 0;
+  pointer-events: none;
+}
+
+/* Year - yellow accent. Roboto 12/13.8 weight 500. */
+.rbccm-awards__year {
+  display: block;
+  color: #FFC72C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 115%;
+  background: none;
+  padding: 0;
+  margin: 0;
+  letter-spacing: 0;
+  border-radius: 0;
+}
+
+/* Award title - white. Roboto 18/20.7 weight 500. */
+.rbccm-awards__title {
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 115%;
+  margin: 0;
+}
+
+/* Issuer - light grey. Inter 14/21 weight 400, falls back to Roboto.
+   margin-top: auto pins the issuer to the bottom of the card
+   regardless of how long the title above wraps, so all cards line up
+   their issuer text at the same baseline. */
+.rbccm-awards__issuer {
+  color: #D1D1D1;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: Inter, Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;      /* 21px */
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+/* Reduced motion - kill the scroll-triggered fade/stagger the section
+   inherits from rbccm-animate.js. rbccm-animate.js itself checks for
+   prefers-reduced-motion and no-ops the observer path, but this
+   selector belts-and-braces any inline animate.css classes an editor
+   might paste in on top of it. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-awards [data-animate],
+  .rbccm-awards [data-stagger-parent] > * {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

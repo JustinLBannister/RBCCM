@@ -1,28 +1,43 @@
 /* =========================================================================
-   RBCCM CTA Band - shared component
+   RBCCM CTA Band — shared component
    Deploy path: /assets/rbccm/css/components/rbccm-cta-band.css
 
    Purpose
    =========================================================================
-   A reusable CTA banner section. Section-level dark bg or a dark card
-   inside a light section, with an optional eyebrow, a heading (with
-   an optional highlighted span), body copy, and 1-2 buttons.
+   Reusable CTA banner section. Section-level dark bg (or a dark card
+   inside a light section) with an optional eyebrow, a heading (with an
+   optional highlighted span), body copy, and 1–2 buttons.
 
-   Presets
+   Variants
    =========================================================================
-     talk-with-an-expert
-       Full-width dark navy section. Yellow eyebrow with underline,
-       big serif heading with a yellow-highlight last word, single
-       yellow "Request a demo" style button. Ported from
-       rbccm-maas-mata__demo.
+     .rbccm-cta-band--maas-mata
+       Full-bleed dark navy band (own gradient). Yellow eyebrow with
+       centered gold underline, big serif heading with a yellow-highlight
+       last word, single "Request a demo" yellow pill. PIXEL-FAITHFUL PORT
+       of MAAS+MATA .rbccm-maas-mata__demo — same type ramp, same tight
+       body margin, same shine sweep + arrow flyby.
 
-     research-portal
-       Light section wraps a dark navy card (rounded corners). No
-       eyebrow, medium serif heading, body copy, two buttons: primary
-       yellow + secondary outlined ghost.
+     .rbccm-cta-band--us-credentials
+       Same big serif heading treatment as above, but heading WRAPS at
+       desktop (longer copy, no CMS char cap), NO eyebrow slot, wider
+       inner (758px), single primary CTA. Solid navy #001E3C matches the
+       flat treatment used across the US Credentials page.
 
-   Palette + typography live on the base block via custom properties
-   so variants only swap the tokens they need.
+     .rbccm-cta-band--strategy-and-economics
+       Deep-navy band on its own, small serif heading (28px), body copy,
+       two buttons (primary yellow + secondary outlined ghost). Used on
+       S&E's "Explore RBC insights" band.
+
+   Modifier
+   =========================================================================
+     .rbccm-cta-band--bg-transparent
+       Add alongside a variant when the band sits inside a wrapper that
+       already paints its own bg / gradient (e.g. MAAS+MATA's .deep-band
+       runs a continuous gradient across three siblings). Kills the
+       variant's own background so the wrapper reads through unbroken.
+
+   Palette + typography live on the base block via custom properties so
+   variants only swap the tokens they need.
    ========================================================================= */
 
 
@@ -63,7 +78,7 @@
    ships in this render-blocking stylesheet so it applies before the
    browser paints the section. Without this, the buttons briefly flash
    at full opacity between initial paint and rbccm-animate.js class
-   injection -- the "jump" the eye sees on scroll-in. Once
+   injection — the "jump" the eye sees on scroll-in. Once
    .rbccm-anim-ready lands on <body> and animate__animated lands on
    the element, opacity flips back to 1 and animate.css takes over. */
 .rbccm-cta-band [data-animate],
@@ -111,9 +126,9 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 
 /* ---------- Container / card -------------------------------------------- */
-/* Inner acts as either a plain container (talk-with-an-expert) or a
-   full dark card (research-portal), driven by the variant custom
-   properties above. */
+/* Inner acts as either a plain container (maas-mata /
+   us-credentials) or a full dark card (strategy-and-economics), driven by
+   the variant custom properties above. */
 .rbccm-cta-band__inner {
   align-items: center;
   align-self: stretch;
@@ -132,7 +147,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 /* Optional heading + body grouping. Nested inside .__inner when a
    variant needs tighter spacing between heading and body than the
-   inner's own gap (research-portal: gap 12 here, gap 32 on inner). */
+   inner's own gap (strategy-and-economics: gap 12 here, gap 32 on inner). */
 .rbccm-cta-band__intro {
   align-items: center;
   align-self: stretch;
@@ -143,7 +158,9 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 
 /* ---------- Eyebrow ----------------------------------------------------- */
-/* Small gold uppercase label with a short centered underline via ::after. */
+/* Small gold uppercase label with a short centered underline via ::after.
+   Base treatment; maas-mata variant overrides for the MAAS/MATA
+   spec (sentence-case, letter-spacing 3, gap-15 underline). */
 .rbccm-cta-band__eyebrow {
   color: var(--rbccm-cta-band-gold) !important;
   font-family: var(--rbccm-cta-band-sans) !important;
@@ -222,7 +239,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   height: 44px;
   justify-content: center;
   line-height: 1;
-  /* opacity intentionally NOT !important here -- animate.css's
+  /* opacity intentionally NOT !important here — animate.css's
      fadeInUp keyframe needs to own opacity while the reveal runs.
      `footer a { opacity: 0.98 }` bleed from unified.css:2764 lands
      at 0.98 which is imperceptible; if it ever matters, escalate via
@@ -237,7 +254,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 }
 
 /* Primary: warm-yellow fill, navy text. Ported hover behavior from
-   .rbccm-maas-mata__btn--yellow -- shine-sweep pseudo-element pass
+   .rbccm-maas-mata__btn--yellow — shine-sweep pseudo-element passes
    diagonally across the button while the arrow icon flies out to
    the right and returns from the left. `isolation: isolate` +
    overflow-hidden clip the pseudo to the pill shape. */
@@ -355,15 +372,18 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    heading via negative top margin, single yellow pill button with
    shine-sweep + arrow-flyby on hover.
    ========================================================================= */
-.rbccm-cta-band--talk-with-an-expert {
+.rbccm-cta-band--maas-mata {
   /* MAAS+MATA's .__demo runs inside a .deep-band wrapper with a
      top-to-bottom navy gradient (#082043 -> #061730) that also
      covers assets + market-insights above; standalone we paint the
-     same gradient directly on the section so it reads identically. */
+     same gradient directly on the section so it reads identically.
+     When the CTA band sits INSIDE a wrapper that owns the gradient
+     (e.g. .deep-band), add .rbccm-cta-band--bg-transparent so the
+     wrapper shows through. */
   --rbccm-cta-band-heading-color: var(--rbccm-cta-band-white);
   --rbccm-cta-band-body-color:    var(--rbccm-cta-band-white);
 
-  /* Section: Figma spec -- flex column, centered, gap 10, 50/0 mobile.
+  /* Section: Figma spec — flex column, centered, gap 10, 50/0 mobile.
      Overrides the base --bg-color custom-prop path with a direct
      `background` so the gradient sticks. */
   align-items: center;
@@ -375,14 +395,14 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   text-align: center;
 }
 @media (min-width: 992px) {
-  .rbccm-cta-band--talk-with-an-expert {
+  .rbccm-cta-band--maas-mata {
     padding: 100px 0;
   }
 }
 
 /* Inner content stack: Figma 690 max wide, gap 41 between children,
    23px horizontal gutter (page-safe on narrow viewports). */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__inner {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__inner {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -395,7 +415,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 /* Eyebrow: gold Roboto 14 / letter-spacing 3, followed by a 45x2
    gold underline set 15px below the text via a flex-column + ::after. */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__eyebrow {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__eyebrow {
   align-items: center !important;
   color: #FFC72C !important;
   display: flex !important;
@@ -410,7 +430,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   padding: 0 35px !important;
   text-transform: none !important; /* MAAS+MATA emits sentence-case */
 }
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__eyebrow::after {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__eyebrow::after {
   background: #FFC72C;
   content: "";
   display: block;
@@ -421,7 +441,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 @media (min-width: 992px) {
   /* +5 bottom margin so the eyebrow rule sits a touch further from
      the heading below. Matches MAAS+MATA. */
-  .rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__eyebrow {
+  .rbccm-cta-band--maas-mata .rbccm-cta-band__eyebrow {
     margin-bottom: 5px !important;
   }
 }
@@ -429,7 +449,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 /* Heading: RBCDisplay 50/100% mobile -> 75/110% desktop, weight 500,
    white, centered. Wraps on whitespace at mobile; forces nowrap at
    desktop (MAAS+MATA caps the CMS at ~25 chars so a single line fits). */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__heading {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__heading {
   color: #FFFFFF !important;
   font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
   font-size: 50px !important;
@@ -445,13 +465,13 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   word-break: normal;
 }
 @media (min-width: 992px) {
-  .rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__heading {
+  .rbccm-cta-band--maas-mata .rbccm-cta-band__heading {
     font-size: 75px !important;
     line-height: 110% !important; /* 82.5px */
     white-space: nowrap;
   }
 }
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__heading-highlight {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__heading-highlight {
   color: #FFC72C;
   font-style: normal;
 }
@@ -459,7 +479,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 /* Body: Roboto 16/150% weight 400, white, centered. Negative top
    margin pulls it up under the heading so the pair reads tighter
    than the parent's 41 gap. */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__body {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__body {
   align-self: stretch;
   color: #fff !important;
   font-family: Roboto, Arial, sans-serif !important;
@@ -472,7 +492,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   width: 100%;
 }
 
-/* Actions row: MAAS+MATA doesn't stack -- there's only one button --
+/* Actions row: MAAS+MATA doesn't stack — there's only one button —
    so no gap overrides needed. Keep default action layout. */
 
 /* Primary "Request a demo" button: MAAS+MATA production spec.
@@ -482,7 +502,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    Border 1px transparent so the yellow fill can transition to
    another button style later without a layout shift. Icon fills
    navy #061730 to match. */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__btn--primary {
   background: #FFC72C !important;
   border: 1px solid transparent;
   border-radius: 100px;
@@ -499,7 +519,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   position: relative;
   transition: background 200ms ease, box-shadow 200ms ease;
 }
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
   aspect-ratio: 1 / 1;
   fill: #061730;
   height: 18px;
@@ -507,11 +527,11 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   width: 18px;
 }
 @media (min-width: 992px) {
-  .rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary {
+  .rbccm-cta-band--maas-mata .rbccm-cta-band__btn--primary {
     height: 50px;
     padding: 12px 35px;
   }
-  .rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
+  .rbccm-cta-band--maas-mata .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
     height: 23px;
     width: 23px;
   }
@@ -521,7 +541,157 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    the shared .rbccm-cta-band__btn--primary rule above. This variant
    only needs to add the MAAS+MATA-style yellow focus ring for
    accessibility parity on the dark strip. */
-.rbccm-cta-band--talk-with-an-expert .rbccm-cta-band__btn--primary:focus-visible {
+.rbccm-cta-band--maas-mata .rbccm-cta-band__btn--primary:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 3px;
+}
+
+
+/* =========================================================================
+   Variant: US Credentials
+   =========================================================================
+   Shares MAAS+MATA's demo-band typography (big serif heading, yellow
+   highlight span, tight body pull) but tuned for the US Credentials
+   page's longer, non-CMS-capped copy:
+
+     • Heading uses display: flex + flex-direction: column at desktop
+       so each <span> child renders on its own line (yellow highlight
+       always drops beneath the white lead). Mobile flows naturally.
+     • NO eyebrow slot — the page's rhythm doesn't call for one.
+     • Wider inner (900) + larger gap (50) + narrower body (432) match
+       the visual weight of the page's other centered bands.
+     • Same navy gradient as maas-mata (--linear-grad token
+       with a hardcoded fallback) so both bands share one dark-band
+       vocabulary across the site.
+
+   Button + shine-sweep + arrow-flyby all inherit from base + the
+   maas-mata spec — we borrow that variant's button rules
+   through a selector list so the two bands look identical below the
+   heading.
+   ========================================================================= */
+.rbccm-cta-band--us-credentials {
+  --rbccm-cta-band-heading-color: var(--rbccm-cta-band-white);
+  --rbccm-cta-band-body-color:    var(--rbccm-cta-band-white);
+
+  align-items: center;
+  background: var(--linear-grad, linear-gradient(180deg, #082043 0%, #061730 100%));
+  color: #fff;
+  gap: 10px;
+  justify-content: center;
+  padding: 60px 0;
+  text-align: center;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--us-credentials {
+    padding: 100px 0;
+  }
+}
+
+/* Inner: wider than maas-mata (690) — 900px chosen for
+   visual balance around the big serif heading. Body max-width
+   (432px) sits on its own rule below so widening the inner doesn't
+   stretch the paragraph. Heading's own flex-column layout at
+   desktop (see .__heading rule below) owns the lead/highlight
+   line-break, so inner max-width no longer drives the wrap.
+   Inter-child gap 50 vs maas-mata's 41. */
+.rbccm-cta-band--us-credentials .rbccm-cta-band__inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  justify-content: center;
+  max-width: 900px;
+  padding: 0 23px;
+  width: 100%;
+}
+
+/* Heading: same big serif ramp as maas-mata (50 mobile /
+   75 desktop). Mobile flows naturally — inline spans, natural
+   whitespace-based wrap decided by container width. Desktop switches
+   to display: flex + flex-direction: column so each <span> child
+   renders on its own line (yellow highlight always drops beneath
+   the white lead line) — no max-width wrap trick, no &nbsp;, no
+   display: block hack. */
+.rbccm-cta-band--us-credentials .rbccm-cta-band__heading {
+  color: #FFFFFF !important;
+  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
+  font-size: 50px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 100% !important;
+  margin: 0 !important;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  text-align: center !important;
+  white-space: normal;
+  width: 100%;
+  word-break: normal;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--us-credentials .rbccm-cta-band__heading {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    font-size: 75px !important;
+    line-height: 110% !important; /* 82.5px */
+  }
+}
+.rbccm-cta-band--us-credentials .rbccm-cta-band__heading-highlight {
+  color: #FFC72C;
+  font-style: normal;
+}
+
+/* Body: MAAS+MATA type spec (16/150), same -27px pull to sit tight
+   under the heading, capped at 432px so the paragraph reads more
+   like a subtitle than a wall. */
+.rbccm-cta-band--us-credentials .rbccm-cta-band__body {
+  color: #fff !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  margin: -27px auto 0 !important;
+  max-width: 432px;
+  text-align: center !important;
+  width: 100%;
+}
+
+/* Primary button — reuse the maas-mata spec verbatim. */
+.rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary {
+  background: #FFC72C !important;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  color: #061730 !important;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 19.507px;
+  font-weight: 500;
+  gap: 10px;
+  height: 40px;
+  isolation: isolate;
+  line-height: 29.26px;
+  overflow: hidden;
+  padding: 20px 35px;
+  position: relative;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
+  aspect-ratio: 1 / 1;
+  fill: #061730;
+  height: 18px;
+  transition: transform 200ms ease, opacity 200ms ease;
+  width: 18px;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary {
+    height: 50px;
+    padding: 12px 35px;
+  }
+  .rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
+    height: 23px;
+    width: 23px;
+  }
+}
+.rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary:focus-visible {
   outline: 2px solid #FFC72C;
   outline-offset: 3px;
 }
@@ -530,89 +700,68 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 /* =========================================================================
    Variant: Research portal
    =========================================================================
-   Light-blue section wraps a deep-navy CARD. Card has 32/23 inner
-   padding, gap 32 between the heading-group and the button row, and
-   a subtle upward box-shadow. Heading + body live in a nested
-   .__intro wrapper (gap 12). Two buttons: primary yellow +
-   secondary outlined ghost.
+   Deep-navy section on its own (no card treatment). Small serif
+   heading (28px), body copy, two buttons: primary yellow + secondary
+   outlined ghost. Heading + body live in a nested .__intro wrapper
+   (gap 12) for tighter rhythm inside the .__inner's own gap-32.
    ========================================================================= */
-.rbccm-cta-band--research-portal {
-  /* Deep-navy section bg sits on the variant class itself (not the
-     inner) -- inner stays transparent so the whole band reads as
-     one flush dark surface. */
+.rbccm-cta-band--strategy-and-economics {
   --rbccm-cta-band-bg-color:      #092044;
   --rbccm-cta-band-card-bg:       transparent;
   --rbccm-cta-band-card-radius:   0;
-  --rbccm-cta-band-card-padding:  0; /* section already owns 90/23 padding */
+  --rbccm-cta-band-card-padding:  0;
   --rbccm-cta-band-heading-color: var(--rbccm-cta-band-white);
   --rbccm-cta-band-body-color:    #F1F1F1;
 
-  /* 90px vertical mobile / tablet, 60px vertical desktop -- matches
-     neighbouring section rhythm (Leading Experts / Platforms). The
-     inner carries a 32px gap between intro + actions rows on top. */
   padding: 90px 23px;
 }
 @media (min-width: 992px) {
-  .rbccm-cta-band--research-portal {
+  .rbccm-cta-band--strategy-and-economics {
     padding: 60px 23px;
   }
 }
 
-/* Inner layout overrides (no bg, no shadow -- surface lives on the
-   section class above). Content sizes itself; no min-height clamp.
-   Caps at 632px wide + auto-centered by the base margin: 0 auto. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__inner {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__inner {
   gap: 32px;
   justify-content: center;
   max-width: 632px;
 }
 
-/* Heading: RBC Display 28 / weight 400 / 100% line-height, white.
-   Text alignment inherits center from the base __inner -- both
-   research-portal and talk-with-an-expert render as centered hero
-   bands so no per-variant alignment override lives here. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__heading {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__heading {
   color: #FFFFFF !important;
   font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
   font-size: 28px !important;
   font-style: normal !important;
   font-weight: 400 !important;
-  line-height: 28px !important; /* 100% */
+  line-height: 28px !important;
   margin: 0 !important;
 }
 
-/* Body: Roboto 16 / 150% weight 400, warm-white with ligatures off. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__body {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__body {
   color: #F1F1F1 !important;
   font-family: Roboto, Arial, sans-serif !important;
   font-feature-settings: 'liga' off, 'clig' off !important;
   font-size: 16px !important;
   font-style: normal !important;
   font-weight: 400 !important;
-  line-height: 150% !important; /* 24px */
+  line-height: 150% !important;
   margin: 0 !important;
   max-width: 100%;
   width: 100%;
 }
 
-/* Actions: vertical stack on mobile, flips to a horizontal row at
-   >=678. Breakpoint is calibrated to this variant's own content
-   fit: 632 inner + 23 padding-left + 23 padding-right = 678. Above
-   that, the section is wide enough for the buttons to sit side-by-
-   side without wrapping; below, they stack. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__actions {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__actions {
   flex-direction: column;
   gap: 12px;
 }
 @media (min-width: 678px) {
-  .rbccm-cta-band--research-portal .rbccm-cta-band__actions {
+  .rbccm-cta-band--strategy-and-economics .rbccm-cta-band__actions {
     flex-direction: row;
     gap: 16px;
   }
 }
 
-/* Button shell overrides (both primary + secondary share sizing). */
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn {
   font-family: Roboto, Arial, sans-serif;
   font-size: 19.507px;
   font-weight: 500;
@@ -622,55 +771,46 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   padding: 15px 35px;
 }
 
-/* Primary "Log in to RBC insights": warm-yellow fill, #061730 text.
-   Icon inherits currentColor via fill on the SVG path. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--primary {
   background: #FFC72C !important;
   border-color: transparent;
   color: #061730 !important;
 }
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary:hover,
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary:focus-visible {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--primary:hover,
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--primary:focus-visible {
   background: #E5B325 !important;
   color: #061730 !important;
 }
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--primary .rbccm-cta-band__btn-icon {
   fill: #061730;
   height: 23px;
   width: 23px;
 }
 
-/* Secondary "Learn more": 1px white border, white text on the dark
-   card. Hover / focus fades into a filled gold pill with navy text
-   -- same color language as the accordions "Expand all" pill and the
-   primary CTA on this band. Pure color transitions, no flash. */
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary {
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--secondary {
   background: transparent !important;
   border-color: #FFF;
   color: #FFF !important;
 }
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary:hover,
-.rbccm-cta-band--research-portal .rbccm-cta-band__btn--secondary:focus-visible {
-  background: #FFC72C !important;            /* RBC gold */
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--secondary:hover,
+.rbccm-cta-band--strategy-and-economics .rbccm-cta-band__btn--secondary:focus-visible {
+  background: #FFC72C !important;
   border-color: #FFC72C;
-  color: #003168 !important;                 /* RBC deep navy */
+  color: #003168 !important;
 }
-
-/* Section padding: 90px vertical mobile / tablet, 60px vertical
-   desktop (via the media query in the base block above); horizontal
-   stays at 23px. Inner keeps its 632px cap. */
 
 
 /* =========================================================================
    Modifier: transparent background
    =========================================================================
    Author-toggleable override. Wire on the section (in addition to the
-   preset class) when the CTA band is dropped inside a parent wrapper
-   that already paints its own bg / gradient -- e.g. MAAS+MATA's
-   .deep-band wrapper. Kills both the variant bg and any solid fill so
-   the parent surface reads through unbroken. !important scoped to this
-   modifier only so it wins the specificity tie against the variant
-   scope's own bg / gradient.
+   variant class) when the CTA band is dropped inside a parent wrapper
+   that already paints its own bg / gradient — e.g. MAAS+MATA's
+   .deep-band wrapper runs a continuous gradient across three siblings.
+   Kills both the variant bg and any solid fill so the parent surface
+   reads through unbroken. !important scoped to this modifier only so
+   it wins the specificity tie against the variant scope's own bg /
+   gradient.
    ========================================================================= */
 .rbccm-cta-band--bg-transparent,
 .rbccm-cta-band.rbccm-cta-band--bg-transparent {
@@ -680,9 +820,9 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 
 /* =========================================================================
-   Reduced motion -- kill button transitions, shine-sweep pseudo,
-   and arrow fly-by. Both variants share the same primary button
-   selector so one guard covers both.
+   Reduced motion — kill button transitions, shine-sweep pseudo, and
+   arrow fly-by. All variants share the primary button selector so one
+   guard covers all.
    ========================================================================= */
 @media (prefers-reduced-motion: reduce) {
   .rbccm-cta-band__btn {

@@ -154,31 +154,11 @@
     outline-offset: 3px;
   }
 
-  /* Mobile size override for the demo CTA. Figma spec: 40px tall,
-     14/29.26 Roboto, tighter side padding, 10px icon gap. */
-  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
-    height: 40px;
-    padding: 20px 35px;
-    font-size: 14px;
-    line-height: 29.26px;
-    gap: 10px;
-  }
-  .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
-    width: 18px;
-    height: 18px;
-    aspect-ratio: 1 / 1;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow {
-      height: 50px;
-      padding: 12px 35px;
-      font-size: 14px;
-    }
-    .rbccm-maas-mata__demo .rbccm-maas-mata__btn--yellow .rbccm-maas-mata__btn-icon {
-      width: 23px;
-      height: 23px;
-    }
-  }
+  /* NOTE: Demo-scoped .__btn--yellow overrides removed — the demo
+     band is now emitted through the shared rbccm-cta-band component
+     (maas-mata variant) which carries the 40h mobile /
+     50h desktop pill spec directly. */
+
   /* Shine-sweep: a soft white diagonal band travels across the
      button on hover. Zero-width at rest so it doesn't tint the
      button. Sits above the yellow fill but below text/icon via
@@ -363,8 +343,7 @@
   .rbccm-maas-mata__awards-eyebrow,
   .rbccm-maas-mata__platforms-eyebrow,
   .rbccm-maas-mata__mata-cap-eyebrow,
-  .rbccm-maas-mata__market-insights-eyebrow,
-  .rbccm-maas-mata__demo-eyebrow {
+  .rbccm-maas-mata__market-insights-eyebrow {
     margin: 0;
     padding: 0;
     font-weight: 400;
@@ -420,9 +399,6 @@
   .rbccm-maas-mata .rbccm-maas-mata__innovation-era-heading,
   .rbccm-maas-mata .rbccm-maas-mata__mata-cap-heading,
   .rbccm-maas-mata .rbccm-maas-mata__market-insights-heading,
-  .rbccm-maas-mata .rbccm-maas-mata__demo-heading,
-  .rbccm-maas-mata .rbccm-maas-mata__demo-heading > span,
-  .rbccm-maas-mata .rbccm-maas-mata__demo-heading-highlight,
   .rbccm-maas-mata .rbccm-maas-mata__newsletter-heading,
   .rbccm-maas-mata .rbccm-maas-mata__feature-title {
     font-family: RBCDisplay, Georgia, Times, serif !important;
@@ -2092,121 +2068,15 @@
     margin: 0 auto;
   }
 
-  /* Demo CTA */
-  /* Demo section — Figma: flex-column, padding 100 0, justify/align
-     center, gap 10. Transparent bg (deep-band gradient shows through). */
-  .rbccm-maas-mata__demo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    padding: 50px 0;
-    /* Transparent bg so the .deep-band parent's gradient
-       (#082043 → #061730) reads continuously up from
-       market-insights above. */
-    background: transparent;
-    color: #fff;
-    text-align: center;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo { padding: 100px 0; }
-  }
-  /* Inner content stack — Figma: 686 fixed wide, flex-column, gap 41,
-     centre-aligned. Holds eyebrow + heading + body. */
-  .rbccm-maas-mata__demo > .rbccm-maas-mata__container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 41px;
-    width: 100%;
-    max-width: 690px;
-    padding: 0 23px;
-    box-sizing: border-box;
-  }
-  /* Eyebrow "See the platform" — mirrors the platforms eyebrow
-     (Roboto 14/16.8 wt 400, letter-spacing 3, sentence case,
-     warm-yellow, 45×2 yellow underline via ::after with 15px
-     gap). */
-  .rbccm-maas-mata__demo-eyebrow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 0 35px;
-    margin: 0;
-    color: #FFC72C;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 120%;
-    letter-spacing: 3px;
-  }
-  @media (min-width: 992px) {
-    /* Desktop: 5 more on bottom so the eyebrow's yellow rule sits
-       a touch further from the heading beneath it. */
-    .rbccm-maas-mata__demo-eyebrow { margin-bottom: 5px; }
-  }
-  .rbccm-maas-mata__demo-eyebrow::after {
-    content: '';
-    display: block;
-    width: 45px;
-    height: 2px;
-    background: #FFC72C;
-  }
-  /* Heading "Trade with total clarity." — Figma: RBC Display 75/82.5
-     wt 500, centred. "Trade with total" white, "clarity." warm-yellow. */
-  /* Demo heading "Talk with an expert." - same responsive type
-     ramp as .new-standard-heading: mobile 50/100%, desktop 75/110%.
-     "Talk with an" prefix is white (not the newStandard 40%-white);
-     "expert" span is yellow #FFC72C. 100% width - no max-width cap. */
-  .rbccm-maas-mata__demo-heading {
-    color: #FFFFFF;
-    text-align: center;
-    font-family: RBCDisplay, Georgia, Times, serif;
-    font-size: 50px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 100%;
-    margin: 0;
-    width: 100%;
-    max-width: 100%;
-    /* Wrap on regular whitespace, and break inside a single long
-       unbroken string (e.g. someone pastes "supercalifragilistic…"
-       into the highlight span) instead of overflowing the section.
-       Applies at every breakpoint — desktop no longer forces
-       nowrap. */
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: normal;
-  }
-  @media (min-width: 992px) {
-    .rbccm-maas-mata__demo-heading {
-      font-size: 75px;
-      line-height: 110%;   /* 82.5px */
-      /* Text is capped at ~25/20 chars by the CMS so it always fits
-         on one line at desktop — no wrap. */
-      white-space: nowrap;
-    }
-  }
-  .rbccm-maas-mata__demo-heading-highlight { color: #FFC72C; font-style: normal; }
-  /* Body — Figma description/desktop: Roboto 16/24 wt 400, white,
-     centred. */
-  .rbccm-maas-mata__demo-body {
-    color: #fff;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 150%;
-    text-align: center;
-    /* Negative top margin pulls the body up toward the heading so
-       the pair sits tighter than the 41 gap the parent flex owns
-       (parent gap governs eyebrow → heading → body → CTA otherwise). */
-    margin: -27px 0 0;
-    width: 100%;
-    align-self: stretch;
-  }
+  /* Demo CTA — Extracted.
+     -----------------------------------------------------------------
+     The demo band is now emitted through the shared rbccm-cta-band
+     component (maas-mata variant + --bg-transparent so the
+     .deep-band wrapper's gradient reads through). All the .__demo /
+     .__demo-eyebrow / .__demo-heading / .__demo-heading-highlight /
+     .__demo-body rules that used to live here have moved into
+     /rbccm-cta-band/rbccm-cta-band.css. Pull that stylesheet in alongside
+     maas-mata.css to render the band. */
 
   /* Newsletter (simplified — Marketo owns the form fields) */
   /* -------------------------------------------------------------
@@ -2778,6 +2648,29 @@
          shrink, basis 0 - three cards share the row evenly. */
       width: auto;
       flex: 1 0 0;
+      align-self: stretch;
+    }
+  }
+
+  /* Tablet — iPad range (768-1024): 2×2 grid.
+     Overrides the 992+ flex-row rig above (both media queries match
+     in the 992-1024 overlap; this block comes later so it wins).
+     With 3 cards, the 3rd sits alone in row 2 (left-aligned) — same
+     behavior applies to the standalone rbccm-capability-cards
+     component for parity with US Credentials. */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .rbccm-maas-mata__mata-cap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      flex-direction: initial;
+      gap: 16px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .rbccm-maas-mata__mata-cap-card {
+      width: 100%;
+      flex: initial;
       align-self: stretch;
     }
   }

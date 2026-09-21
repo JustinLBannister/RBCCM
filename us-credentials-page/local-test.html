@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBCCM US Credentials — local page preview</title>
+<!--
+  Assembles the US Credentials-specific components / variants we've
+  built into one page so authors + stakeholders can see the whole
+  stack side-by-side:
+
+    1. rbccm-hero              → .rbccm-hero--us-credentials    (dark navy, bg video, 2-line title, no CTA)
+    2. rbccm-awards            → .rbccm-awards--4                ("Trusted solutions for clients worldwide" — 4 accolades)
+    3. rbccm-two-up-cards      → .rbccm-two-up-cards--video-callouts  ("Find conviction through complexity" — 2 video cards)
+    4. rbccm-capability-cards  → .rbccm-capability-cards--4      ("Explore our capabilities" — 4 icon cards, dark navy)
+    5. rbccm-platforms         → .rbccm-platforms--strategy-and-economics-platforms  ("Featured platforms" — 4-card grid, reused 1:1 from S+E)
+    6. cta-band                → .rbccm-cta-band--us-credentials ("Ready to turn insights into results?" — US Creds variant)
+
+  Each section links to its own component's sidecar CSS so any
+  future component update flows through here automatically.
+-->
+<link rel="stylesheet" href="../rbccm-button/rbccm-button.css">
+<link rel="stylesheet" href="../rbccm-hero/rbccm-hero.css">
+<link rel="stylesheet" href="../rbccm-awards/rbccm-awards.css">
+<link rel="stylesheet" href="../rbccm-capability-cards/rbccm-capability-cards.css">
+<link rel="stylesheet" href="../rbccm-two-up-cards/rbccm-two-up-cards.css">
+<link rel="stylesheet" href="../rbccm-platforms/rbccm-platforms.css">
+<link rel="stylesheet" href="../rbccm-cta-band/rbccm-cta-band.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
+<style>
+  body { margin: 0; background: #001E3C; font-family: Roboto, Arial, sans-serif; }
+  /* Fake fixed nav — mirrors production RBCCM nav dimensions so
+     hero top-padding clearance can be verified at both breakpoints. */
+  .demo-fake-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 65px;
+    background: #fff;
+    border-bottom: 1px solid #D9DBDE;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #4A4E55;
+    z-index: 9999;
+    box-sizing: border-box;
+  }
+  .demo-fake-nav::after {
+    content: "FAKE NAV (test) — 65 mobile / 98 desktop";
+    opacity: 0.65;
+  }
+  @media (min-width: 992px) { .demo-fake-nav { height: 98px; } }
+</style>
+</head>
+<body>
+
+<div class="demo-fake-nav" aria-hidden="true"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     1. HERO  ·  rbccm-hero--us-credentials
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero">
+  <div class="rbccm-hero__bg-video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="../rbccm-hero/hero-background-animation-4k-loop.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="rbccm-hero__container">
+    <p class="rbccm-hero__title" data-animate-hero="fadeInUp" data-animate-delay="150">
+      <span class="rbccm-hero__title-line">Your capital needs strategy.</span>
+      <span class="rbccm-hero__title-line">Our insights deliver results.</span>
+    </p>
+    <p class="rbccm-hero__subtitle" data-animate-hero="fadeInUp" data-animate-delay="300">
+      Advisory expertise, market-leading insights, and exceptional execution from one of the world's largest and safest banks.
+    </p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     2. AWARDS  ·  rbccm-awards--4  ("Trusted solutions for clients worldwide")
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-awards rbccm-awards--4" aria-label="Trusted solutions">
+  <div class="rbccm-awards__inner">
+    <p class="rbccm-awards__eyebrow" data-animate="fadeInUp">Trusted solutions for clients worldwide</p>
+    <div class="rbccm-awards__grid rbccm-awards__grid--4" data-stagger-parent="fadeInUp" data-stagger-step="120">
+    <article class="rbccm-awards__card">
+      <span class="rbccm-awards__year">2026</span>
+      <h3 class="rbccm-awards__title">Top 10 Global Investment Bank</h3>
+      <p class="rbccm-awards__issuer">by Market Cap (U.S. $267B)</p>
+    </article>
+    <article class="rbccm-awards__card">
+      <span class="rbccm-awards__year">2026</span>
+      <h3 class="rbccm-awards__title">#1 Safest Bank in North America</h3>
+      <p class="rbccm-awards__issuer">Euromoney</p>
+    </article>
+    <article class="rbccm-awards__card">
+      <span class="rbccm-awards__year">2026</span>
+      <h3 class="rbccm-awards__title">North America's Best Bank</h3>
+      <p class="rbccm-awards__issuer">Euromoney</p>
+    </article>
+    <article class="rbccm-awards__card">
+      <span class="rbccm-awards__year">2026</span>
+      <h3 class="rbccm-awards__title">#3 Globally for AI Maturity</h3>
+      <p class="rbccm-awards__issuer">Evident AI Index</p>
+    </article>
+  </div>
+    <div class="rbccm-awards__controls">
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     3. VIDEO CALLOUTS  ·  rbccm-two-up-cards--video-callouts  ("Find conviction through complexity")
+     -----------------------------------------------------------------
+     Reused 1:1 from /rbccm-two-up-cards/local-test.html preset
+     `video-callouts`. Light section, centered heading + description,
+     two cards with a media zone (bar-chart illustration + play
+     button) and per-card title/subtitle/body/"Watch the video →"
+     CTA. Play button opens a modal via the component JS wired at
+     the bottom of the page.
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-two-up-cards rbccm-two-up-cards--video-callouts" aria-label="Find conviction through complexity">
+  <div class="rbccm-two-up-cards__header">
+    <h2 class="rbccm-two-up-cards__heading" data-animate="fadeInUp">Find conviction through complexity</h2>
+    <p class="rbccm-two-up-cards__description" data-animate="fadeInUp" data-animate-delay="120">Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.</p>
+  </div>
+  <div class="rbccm-two-up-cards__grid" data-stagger-parent="fadeInUp" data-stagger-step="150">
+    <article class="rbccm-two-up-cards__card">
+      <!-- Video anchor lives on data-video-url. Any URL works — a
+           Brightcove player embed (like the MAAS/MATA hero example
+           below), a direct .mp4 file, a YouTube/Vimeo link, or an
+           arbitrary embed page. The JS auto-detects the URL type
+           and swaps <iframe> ↔ native <video> as needed. -->
+      <button type="button" class="rbccm-two-up-cards__card-media" data-video-url="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112" aria-label="Play video: Corporates &amp; Sponsors">
+        <img src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%23041e42%22/%3E%3Cg stroke=%22%234a5f7d%22 stroke-dasharray=%223,4%22 opacity=%220.3%22%3E%3Cline x1=%2260%22 y1=%22120%22 x2=%22780%22 y2=%22120%22/%3E%3Cline x1=%2260%22 y1=%22200%22 x2=%22780%22 y2=%22200%22/%3E%3Cline x1=%2260%22 y1=%22280%22 x2=%22780%22 y2=%22280%22/%3E%3C/g%3E%3Cg fill=%22url(%23g1)%22%3E%3Crect x=%2290%22 y=%22270%22 width=%2260%22 height=%22120%22/%3E%3Crect x=%22180%22 y=%22220%22 width=%2260%22 height=%22170%22/%3E%3Crect x=%22270%22 y=%22280%22 width=%2260%22 height=%22110%22/%3E%3Crect x=%22360%22 y=%22140%22 width=%2260%22 height=%22250%22/%3E%3Crect x=%22450%22 y=%22230%22 width=%2260%22 height=%22160%22/%3E%3Crect x=%22540%22 y=%22100%22 width=%2260%22 height=%22290%22/%3E%3Crect x=%22630%22 y=%22130%22 width=%2260%22 height=%22260%22/%3E%3Crect x=%22720%22 y=%2260%22 width=%2260%22 height=%22330%22/%3E%3C/g%3E%3Cdefs%3E%3ClinearGradient id=%22g1%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFD86E%22/%3E%3Cstop offset=%221%22 stop-color=%22%23FFC72C%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolyline points=%22120,300 210,230 300,290 390,150 480,240 570,110 660,140 750,70%22 stroke=%22white%22 stroke-width=%221.5%22 fill=%22none%22 stroke-dasharray=%222,4%22/%3E%3C/svg%3E" alt="Bar chart with ascending trend" loading="lazy" decoding="async">
+        <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/></svg>
+        </span>
+      </button>
+      <div class="rbccm-two-up-cards__card-content">
+        <div class="rbccm-two-up-cards__card-text">
+          <div class="rbccm-two-up-cards__card-headline">
+            <h3 class="rbccm-two-up-cards__card-title">Corporates &amp; Sponsors</h3>
+            <p class="rbccm-two-up-cards__card-subtitle">The market is asking a different question</p>
+          </div>
+          <p class="rbccm-two-up-cards__card-body">Capital is available, but timing, structure, and investor selectivity are raising the stakes. RBC's senior experts discuss what corporations and private equity firms are navigating now, and how early advisory dialogue opens more paths to act with confidence.</p>
+        </div>
+        <a class="rbccm-two-up-cards__card-cta" href="#">
+          <span>Watch the video</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </article>
+    <article class="rbccm-two-up-cards__card">
+      <!-- Second card also uses Brightcove format — swap the videoId
+           for the Institutional Investors piece when the DAM URL is
+           ready. Same auto-detection: no code change needed. -->
+      <button type="button" class="rbccm-two-up-cards__card-media" data-video-url="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112" aria-label="Play video: Institutional Investors">
+        <img src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 450%22%3E%3Crect width=%22800%22 height=%22450%22 fill=%22%23041e42%22/%3E%3Cpath d=%22M0 200 Q100 180 200 195 T400 190 T600 200 T800 195 L800 450 L0 450 Z%22 fill=%22%230a2d5c%22/%3E%3Cpath d=%22M0 260 Q100 240 200 250 T400 245 T600 255 T800 250 L800 450 L0 450 Z%22 fill=%22%23133a70%22/%3E%3Cg fill=%22%23FFC72C%22 opacity=%220.9%22%3E%3Crect x=%2280%22 y=%22270%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22130%22 y=%22290%22 width=%224%22 height=%2245%22/%3E%3Crect x=%22180%22 y=%22260%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22230%22 y=%22285%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22330%22 y=%22275%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22380%22 y=%22290%22 width=%224%22 height=%2245%22/%3E%3Crect x=%22480%22 y=%22280%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22580%22 y=%22275%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22680%22 y=%22285%22 width=%224%22 height=%2255%22/%3E%3C/g%3E%3Cg fill=%22%2340C4B0%22 opacity=%220.9%22%3E%3Crect x=%22105%22 y=%22290%22 width=%224%22 height=%2260%22/%3E%3Crect x=%22155%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22205%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22255%22 y=%22275%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22305%22 y=%22290%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22355%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22405%22 y=%22280%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22455%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22505%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3Crect x=%22555%22 y=%22285%22 width=%224%22 height=%2265%22/%3E%3Crect x=%22605%22 y=%22275%22 width=%224%22 height=%2270%22/%3E%3Crect x=%22655%22 y=%22290%22 width=%224%22 height=%2255%22/%3E%3Crect x=%22705%22 y=%22270%22 width=%224%22 height=%2280%22/%3E%3C/g%3E%3Cpath d=%22M0 190 Q100 170 200 185 T400 180 T600 190 T800 185%22 stroke=%22%23FFC72C%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E" alt="Wave chart with volatility bars" loading="lazy" decoding="async">
+        <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true"><path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/></svg>
+        </span>
+      </button>
+      <div class="rbccm-two-up-cards__card-content">
+        <div class="rbccm-two-up-cards__card-text">
+          <div class="rbccm-two-up-cards__card-headline">
+            <h3 class="rbccm-two-up-cards__card-title">Institutional Investors</h3>
+            <p class="rbccm-two-up-cards__card-subtitle">The investment equation is getting more complex</p>
+          </div>
+          <p class="rbccm-two-up-cards__card-body">Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC's senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.</p>
+        </div>
+        <a class="rbccm-two-up-cards__card-cta" href="#">
+          <span>Watch the video</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </article>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     4. CAPABILITIES  ·  rbccm-capability-cards--4  ("Explore our capabilities")
+     -----------------------------------------------------------------
+     Reused 1:1 from /rbccm-capability-cards/local-test.html preset
+     `capabilities-4`. Dark navy section, yellow eyebrow with a
+     centered gold rule, big serif heading, four icon cards with a
+     "Learn more →" CTA. Below 1245 the slick carousel takes over
+     (prev/next arrows + dots). JS init lives in
+     ../rbccm-capability-cards/rbccm-capability-cards.js — wired at
+     the bottom of the page.
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-capability-cards rbccm-capability-cards--4" style="--rbccm-capability-cards-max-width: 1140px;" aria-label="Explore our capabilities">
+
+  <!-- Icon sprite. Paths verbatim from the design handoff. `fill`
+       lives on each path so the icon shows up even without the
+       __icon wrapper's `color: #FFC72C`. Symbol viewBox matches the
+       source artwork's aspect ratio. -->
+  <svg width="0" height="0" style="position:absolute;overflow:hidden;" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="capability-icon-gib" viewBox="0 0 33 30">
+        <g clip-path="url(#capability-icon-gib-clip)">
+          <path d="M31.9491 0.200487C31.832 0.09921 31.5412 0 31.358 0L29.2814 0.0199798C29.0934 0.0220467 28.9197 0.0978321 28.7923 0.233557C28.6621 0.372038 28.5939 0.558745 28.6035 0.746142C28.6228 1.10371 28.9066 1.37378 29.278 1.38894L29.7844 1.40961L26.5532 4.56917C23.2324 7.81692 19.2378 10.3047 14.6803 11.9651C10.395 13.5263 5.73285 14.3179 0.823331 14.3179H0.756502C0.523634 14.3179 0.318324 14.3985 0.179844 14.5446C0.0544532 14.6769 -0.00893092 14.856 0.0007145 15.0489C0.0206943 15.4368 0.325214 15.6972 0.758569 15.6972C5.85066 15.6938 10.6747 14.8801 15.0965 13.279C19.8131 11.5711 23.9572 9.00262 27.4137 5.64395L30.7875 2.36588L30.8054 2.91705C30.8178 3.30218 31.112 3.59292 31.4895 3.59292C31.5026 3.59292 31.5157 3.59292 31.5281 3.59154C31.8354 3.57569 32.1689 3.31251 32.1737 2.91498L32.1978 0.841218C32.1999 0.646932 32.0917 0.324499 31.9477 0.200487H31.9491Z" fill="#FFC72C"/>
+          <path d="M30.9363 19.2777C30.9232 19.2777 30.9108 19.2777 30.8977 19.2791C30.5835 19.297 30.2501 19.5437 30.2501 19.966L30.2487 27.6548C30.2487 27.8821 30.0606 28.0737 29.8381 28.0737H28.7371C28.5063 28.073 28.3251 27.8863 28.3251 27.6479V11.1749C28.3251 10.9372 28.5063 10.7505 28.7371 10.7498L29.8388 10.7484C30.0606 10.7484 30.2487 10.9386 30.2487 11.1632L30.2521 15.0117C30.2521 15.4389 30.6028 15.6945 30.9411 15.6945C30.9535 15.6945 30.9659 15.6945 30.9783 15.6938C31.2897 15.6772 31.6259 15.4113 31.6252 15.0124V11.1577C31.6238 10.1745 30.826 9.37396 29.8443 9.37396L28.7309 9.37534C27.7319 9.37603 26.95 10.1635 26.95 11.168V27.6555C26.95 28.66 27.7326 29.4474 28.7316 29.4481H29.8463C30.8274 29.4481 31.6252 28.6469 31.6252 27.661V19.9653C31.6252 19.5354 31.2759 19.2777 30.937 19.2777H30.9363Z" fill="#FFC72C"/>
+          <path d="M23.2366 14.4626H22.135C21.8381 14.4626 21.5852 14.703 21.5852 15.0234V28.1997C21.5852 28.5229 21.8381 28.7578 22.135 28.7592L23.2704 28.7661C23.5653 28.7116 23.7857 28.5112 23.7857 28.1991V15.0234C23.7857 14.7024 23.5322 14.4619 23.2366 14.4619V14.4626Z" fill="#FFC72C"/>
+          <path d="M23.2427 13.2252H22.1293C21.1304 13.2252 20.3484 14.012 20.3484 15.0165V28.2073C20.3484 29.2125 21.1276 29.9993 22.1218 29.9993L23.2868 29.9938C24.2451 29.989 25.0243 29.1877 25.0243 28.2073V15.0172C25.0243 14.0127 24.2424 13.2259 23.2434 13.2259L23.2427 13.2252Z" fill="#FFC72C"/>
+          <path d="M16.6356 17.7627H15.534C15.237 17.7627 14.9849 18.0059 14.9849 18.3214V28.2025C14.9849 28.5201 15.2377 28.7578 15.5347 28.7598L16.6701 28.766C16.9642 28.7144 17.1854 28.507 17.1854 28.2018V18.3214C17.1854 18.0052 16.9319 17.7627 16.6363 17.7627H16.6356Z" fill="#FFC72C"/>
+          <path d="M16.6418 16.5261H15.5278C14.546 16.5261 13.7468 17.3287 13.7468 18.3153V28.2101C13.7468 29.1967 14.5419 30 15.5195 30L16.6845 29.9945C17.6422 29.9897 18.4221 29.1891 18.4221 28.2108V18.316C18.4221 17.8323 18.2368 17.3811 17.8992 17.0448C17.5643 16.7107 17.1172 16.5268 16.6418 16.5268V16.5261Z" fill="#FFC72C"/>
+          <path d="M10.0348 21.0635H8.93313C8.63619 21.0635 8.38403 21.3101 8.38403 21.6188V28.2066C8.38403 28.5173 8.63688 28.7592 8.93313 28.7605L10.0692 28.766C10.3627 28.7171 10.5839 28.5022 10.5839 28.2052V21.6181C10.5839 21.3088 10.3303 21.0628 10.0348 21.0628V21.0635Z" fill="#FFC72C"/>
+          <path d="M10.041 19.8262H8.927C8.45162 19.8262 8.00517 20.0108 7.66965 20.3456C7.33206 20.6825 7.14673 21.1317 7.14673 21.612V28.2129C7.14673 29.1981 7.94179 29.9993 8.91942 29.9993L10.0844 29.9938C11.0421 29.989 11.8213 29.1905 11.8213 28.2136V21.6126C11.8213 20.6281 11.0228 19.8269 10.041 19.8269V19.8262Z" fill="#FFC72C"/>
+          <path d="M3.43997 23.1263H2.32592C1.34416 23.1263 0.545654 23.9255 0.545654 24.9079V28.217C0.545654 29.2001 1.34071 29.9993 2.31834 29.9993L3.48337 29.9938C4.44102 29.989 5.21955 29.1926 5.22024 28.2177V24.9086C5.22024 24.4319 5.03491 23.9847 4.69801 23.6478C4.36179 23.3116 3.91535 23.127 3.44066 23.127L3.43997 23.1263Z" fill="#FFC72C"/>
+          <path d="M3.43395 24.3636H2.3323C2.03605 24.3636 1.7832 24.6144 1.7832 24.9148V28.2107C1.7832 28.5132 2.03605 28.7598 2.3323 28.7605L3.4684 28.7654C3.76051 28.7199 3.98305 28.496 3.98305 28.2094V24.9141C3.98305 24.613 3.72951 24.3629 3.43395 24.3629V24.3636Z" fill="#FFC72C"/>
+          <path d="M30.9343 16.5267C30.9219 16.5267 30.9102 16.5267 30.8978 16.5274C30.587 16.544 30.2515 16.8078 30.2522 17.2067L30.2536 17.7662C30.2543 18.1237 30.5374 18.4214 30.8978 18.4434C30.9095 18.4441 30.9219 18.4448 30.9336 18.4448C31.2409 18.4448 31.5757 18.2312 31.6039 17.8736C31.6212 17.6594 31.6274 17.441 31.6239 17.2074C31.6184 16.8257 31.3153 16.5267 30.9343 16.5267Z" fill="#FFC72C"/>
+        </g>
+        <defs>
+          <clipPath id="capability-icon-gib-clip">
+            <rect width="32.1992" height="30" fill="white"/>
+          </clipPath>
+        </defs>
+      </symbol>
+      <symbol id="capability-icon-cb" viewBox="0 0 30 30">
+        <path d="M15 0L2.60652 5.625H0.937811C0.689175 5.625 0.450724 5.72377 0.274912 5.89959C0.0991001 6.0754 0.000333786 6.31386 0.000333786 6.5625V10.3125C0.000333786 10.5611 0.0991001 10.7996 0.274912 10.9754C0.450724 11.1512 0.689175 11.25 0.937811 11.25H1.87529V24.375C1.66592 24.3752 1.46264 24.4454 1.29783 24.5745C1.13302 24.7037 1.01618 24.8842 0.965935 25.0875L0.0284557 28.8375C-0.00644112 28.9756 -0.00927925 29.1199 0.0201569 29.2592C0.0495949 29.3986 0.110525 29.5294 0.198288 29.6416C0.286051 29.7538 0.398319 29.8444 0.526499 29.9065C0.654678 29.9686 0.795372 30.0006 0.937811 30H29.0622C29.2046 30.0006 29.3453 29.9686 29.4735 29.9065C29.6017 29.8444 29.7139 29.7538 29.8017 29.6416C29.8895 29.5294 29.9504 29.3986 29.9798 29.2592C30.0093 29.1199 30.0064 28.9756 29.9715 28.8375L29.0341 25.0875C28.9838 24.8842 28.867 24.7037 28.7022 24.5745C28.5374 24.4454 28.3341 24.3752 28.1247 24.375V11.25H29.0622C29.3108 11.25 29.5493 11.1512 29.7251 10.9754C29.9009 10.7996 29.9997 10.5611 29.9997 10.3125V6.5625C29.9997 6.31386 29.9009 6.0754 29.7251 5.89959C29.5493 5.72377 29.3108 5.625 29.0622 5.625H27.3935L15 0ZM22.918 5.625H7.08018L15 1.875L22.918 5.625ZM26.2498 11.25V24.375H24.3748V11.25H26.2498ZM22.4998 11.25V24.375H17.8124V11.25H22.4998ZM15.9375 11.25V24.375H14.0625V11.25H15.9375ZM12.1876 11.25V24.375H7.50017V11.25H12.1876ZM5.62521 11.25V24.375H3.75025V11.25H5.62521ZM1.87529 9.375V7.5H28.1247V9.375H1.87529ZM2.60652 26.25H27.3935L27.8622 28.125H2.13778L2.60652 26.25Z" fill="#FFC72C"/>
+      </symbol>
+      <symbol id="capability-icon-gm" viewBox="0 0 30 30">
+        <path d="M30 15C30 11.0218 28.4196 7.20644 25.6066 4.3934C22.7936 1.58035 18.9782 0 15 0C11.0218 0 7.20644 1.58035 4.3934 4.3934C1.58035 7.20644 0 11.0218 0 15C0 18.9782 1.58035 22.7936 4.3934 25.6066C7.20644 28.4196 11.0218 30 15 30C18.9782 30 22.7936 28.4196 25.6066 25.6066C28.4196 22.7936 30 18.9782 30 15ZM15.9375 2.01938C17.1938 2.40188 18.4406 3.55687 19.4756 5.4975C19.7444 6.00125 19.9913 6.54625 20.2163 7.1325C18.8944 7.42687 17.4563 7.61438 15.9375 7.67063V2.01938ZM22.0331 6.63562C21.7656 5.91437 21.465 5.24062 21.1313 4.61438C20.8049 4.0026 20.4306 3.41764 20.0119 2.865C21.6084 3.52606 23.0586 4.49586 24.2794 5.71875C23.5994 6.065 22.8506 6.36938 22.0331 6.63562ZM23.4206 14.0625C23.3531 12.0562 23.0681 10.1494 22.6031 8.4225C23.6185 8.09921 24.6011 7.68047 25.5375 7.17188C27.0312 9.17671 27.9176 11.5684 28.0912 14.0625H23.4206ZM20.7956 8.92312C21.2383 10.6025 21.4899 12.3266 21.5456 14.0625H15.9375V9.54562C17.6438 9.48938 19.2806 9.27375 20.7956 8.92312ZM14.0625 9.54375V14.0625H8.45625C8.51132 12.3267 8.76229 10.6026 9.20438 8.92312C10.7194 9.27375 12.3563 9.48563 14.0625 9.54375ZM21.5437 15.9375C21.4781 17.7881 21.2137 19.5263 20.7956 21.0769C19.1999 20.7146 17.573 20.5068 15.9375 20.4562V15.9375H21.5437ZM14.0625 15.9375V20.4544C12.3563 20.5106 10.7194 20.7262 9.20438 21.0769C8.78625 19.5263 8.52188 17.7881 8.45437 15.9375H14.0625ZM20.2163 22.8675C19.9913 23.4538 19.7444 23.9987 19.4756 24.5025C18.4406 26.4431 17.1919 27.5963 15.9375 27.9806V22.3312C17.4563 22.3875 18.8944 22.5731 20.2163 22.8675ZM20.01 27.135C20.4294 26.5824 20.8043 25.9975 21.1313 25.3856C21.4759 24.7317 21.7771 24.0559 22.0331 23.3625C22.8044 23.6105 23.5554 23.9177 24.2794 24.2812C23.0586 25.5041 21.6065 26.4739 20.01 27.135ZM22.6031 21.5775C23.0893 19.7347 23.3642 17.8425 23.4225 15.9375H28.0912C27.9176 18.4316 27.0312 20.8233 25.5375 22.8281C24.6562 22.3444 23.6719 21.9244 22.6031 21.5775ZM9.98812 27.135C8.39247 26.4743 6.9429 25.5051 5.7225 24.2831C6.4459 23.9196 7.19625 23.6125 7.96688 23.3644C8.22294 24.0571 8.52422 24.7323 8.86875 25.3856C9.19508 25.9974 9.56938 26.5824 9.98812 27.135ZM14.0625 22.3294V27.9806C12.8062 27.5981 11.5594 26.4431 10.5244 24.5025C10.2544 23.9987 10.0075 23.4538 9.78375 22.8675C11.1907 22.5587 12.6229 22.3773 14.0625 22.3294ZM7.39687 21.5775C6.32812 21.9244 5.34375 22.3444 4.4625 22.8281C2.96877 20.8233 2.08237 18.4316 1.90875 15.9375H6.5775C6.63583 17.8425 6.91072 19.7347 7.39687 21.5775ZM1.90875 14.0625C2.08237 11.5684 2.96877 9.17671 4.4625 7.17188C5.34375 7.65562 6.32812 8.07563 7.39687 8.4225C6.93188 10.1475 6.64688 12.0562 6.5775 14.0625H1.90875ZM8.86875 4.61438C8.53625 5.24188 8.235 5.91563 7.965 6.63562C7.19501 6.38742 6.4453 6.08026 5.7225 5.71688C6.94306 4.49554 8.39262 3.52704 9.98812 2.86688C9.57937 3.3975 9.20437 3.98625 8.86875 4.61438ZM9.78375 7.1325C9.99777 6.5732 10.2451 6.02723 10.5244 5.4975C11.5594 3.55687 12.8062 2.40375 14.0625 2.01938V7.66875C12.5438 7.6125 11.1056 7.42687 9.78375 7.1325Z" fill="#FFC72C"/>
+      </symbol>
+      <symbol id="capability-icon-gr" viewBox="0 0 30 30">
+        <path d="M7.98289 19.3935C6.16741 16.9158 5.35427 13.8439 5.70616 10.7923C6.05805 7.74072 7.54901 4.93455 9.88077 2.9352C12.2125 0.93585 15.2131 -0.109228 18.2822 0.00904609C21.3513 0.12732 24.2626 1.40022 26.4336 3.5731C28.6046 5.74597 29.8752 8.65856 29.9913 11.7282C30.1073 14.7978 29.0603 17.798 27.0595 20.1287C25.0588 22.4593 22.252 23.9485 19.2006 24.2983C16.1492 24.648 13.0782 23.8326 10.6022 22.015H10.604C10.549 22.0901 10.4878 22.1619 10.4203 22.2307L3.20182 29.4502C2.85026 29.8021 2.37334 29.9998 1.87597 30C1.37861 30.0002 0.90155 29.8027 0.549736 29.4511C0.197924 29.0995 0.000177383 28.6225 0 28.1251C-0.000175476 27.6277 0.197235 27.1505 0.5488 26.7987L7.76728 19.5792C7.83428 19.5113 7.90636 19.4505 7.98289 19.3935ZM7.49916 12.1853C7.49916 13.5397 7.76589 14.8808 8.28412 16.1321C8.80236 17.3834 9.56194 18.5204 10.5195 19.4781C11.4771 20.4358 12.6139 21.1955 13.865 21.7138C15.1161 22.2321 16.4571 22.4988 17.8113 22.4988C19.1655 22.4988 20.5064 22.2321 21.7575 21.7138C23.0087 21.1955 24.1455 20.4358 25.103 19.4781C26.0606 18.5204 26.8202 17.3834 27.3384 16.1321C27.8567 14.8808 28.1234 13.5397 28.1234 12.1853C28.1234 9.44996 27.0369 6.82666 25.103 4.89249C23.1691 2.95832 20.5462 1.87172 17.8113 1.87172C15.0763 1.87172 12.4534 2.95832 10.5195 4.89249C8.58561 6.82666 7.49916 9.44996 7.49916 12.1853Z" fill="#FFC72C"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Eyebrow and heading sit at section level — mirrors MATA's
+       DOM shape (section > eyebrow, section > header, section >
+       cards). Section-level gap 40 gives 40px between eyebrow,
+       heading, and cards row. No __header wrapper here since we
+       have no __sub. -->
+  <p class="rbccm-capability-cards__eyebrow" data-animate="fadeInUp">An integrated global platform</p>
+  <h2 class="rbccm-capability-cards__heading" data-animate="fadeInUp" data-animate-delay="120">Explore our capabilities</h2>
+
+  <!-- Cards wrapper (max-width 1100 desktop) holds the grid. If a
+       __wide "Index events" card ever gets added below, it lives
+       here too so the two share the same rail. -->
+  <div class="rbccm-capability-cards__cards">
+    <div class="rbccm-capability-cards__grid" data-stagger-parent="fadeInUp" data-stagger-step="120">
+
+      <!-- All four cards ship with a CTA href, so each renders as an
+           <a>. The __cta chip below __body is presentational — the
+           whole card is the click target. -->
+      <a class="rbccm-capability-cards__card animate__animated animate__fadeInUp" href="#" aria-label="Global Investment Banking — Learn more">
+        <div class="rbccm-capability-cards__content">
+          <svg class="rbccm-capability-cards__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 30" aria-hidden="true" focusable="false"><use href="#capability-icon-gib"/></svg>
+          <h3 class="rbccm-capability-cards__title">Global Investment Banking</h3>
+          <p class="rbccm-capability-cards__body">Cross-border advisory and financing capabilities with industry-specific expertise, supporting clients across M&amp;A, capital raising and strategic transactions.</p>
+          <span class="rbccm-capability-cards__cta">
+            <span>Learn more</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="rbccm-capability-cards__card animate__animated animate__fadeInUp" href="#" aria-label="Corporate Banking — Learn more">
+        <div class="rbccm-capability-cards__content">
+          <svg class="rbccm-capability-cards__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use href="#capability-icon-cb"/></svg>
+          <h3 class="rbccm-capability-cards__title">Corporate Banking</h3>
+          <p class="rbccm-capability-cards__body">Corporate and institutional lending capabilities across the credit spectrum, supporting clients with acquisition financing, revolving and term loans, letters of credit and other tailored credit solutions.</p>
+          <span class="rbccm-capability-cards__cta">
+            <span>Learn more</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="rbccm-capability-cards__card animate__animated animate__fadeInUp" href="#" aria-label="Global Markets — Learn more">
+        <div class="rbccm-capability-cards__content">
+          <svg class="rbccm-capability-cards__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use href="#capability-icon-gm"/></svg>
+          <h3 class="rbccm-capability-cards__title">Global Markets</h3>
+          <p class="rbccm-capability-cards__body">Connecting insight, execution, and capital across Equities and FICC markets through integrated sales and trading, financing, and structuring capabilities.</p>
+          <span class="rbccm-capability-cards__cta">
+            <span>Learn more</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <a class="rbccm-capability-cards__card animate__animated animate__fadeInUp" href="#" aria-label="Global Research — Learn more">
+        <div class="rbccm-capability-cards__content">
+          <svg class="rbccm-capability-cards__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" aria-hidden="true" focusable="false"><use href="#capability-icon-gr"/></svg>
+          <h3 class="rbccm-capability-cards__title">Global Research</h3>
+          <p class="rbccm-capability-cards__body">Macroeconomic, geopolitical and market insights across asset classes, industries and over 1,500 stocks, delivered by a deep bench of analysts combining data science, quantitative tools and sector expertise.</p>
+          <span class="rbccm-capability-cards__cta">
+            <span>Learn more</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+          </span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     5. PLATFORMS  ·  rbccm-platforms--strategy-and-economics-platforms
+     -----------------------------------------------------------------
+     Reused 1:1 from S+E. Same 4-card grid, same photo/title/body/CTA
+     shape, same responsive rules. Photos referenced via ../rbccm-platforms/
+     so the component's DAM assets are the single source of truth.
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-platforms rbccm-platforms--strategy-and-economics-platforms" aria-labelledby="us-creds-platforms-title">
+  <div class="rbccm-platforms__inner">
+
+    <div class="rbccm-platforms__header">
+      <h2 class="rbccm-platforms__title" id="us-creds-platforms-title" data-animate="fadeInUp">Featured platforms</h2>
+      <p class="rbccm-platforms__subtitle" data-animate="fadeInUp" data-animate-delay="250">Perspectives shaped at the intersection of market intelligence and capital decision-making.</p>
+    </div>
+
+    <div class="rbccm-platforms__grid" data-stagger-parent="fadeInUp" data-stagger-step="200">
+
+      <!-- Row 1, card 1: Strategic Alternatives (no photo asset yet — swap src when DAM path lands). -->
+      <a class="rbccm-platforms__card" href="#" aria-label="Strategic Alternatives">
+        <img class="rbccm-platforms__photo" src="../rbccm-platforms/photos/strategic-alternatives.webp" alt="" loading="lazy" decoding="async">
+        <div class="rbccm-platforms__card-content">
+          <h3 class="rbccm-platforms__card-title">Strategic Alternatives</h3>
+          <p class="rbccm-platforms__card-body">Uncover new ways to drive growth and create value with insights from our capital markets experts.</p>
+        </div>
+        <span class="rbccm-platforms__card-cta">
+          <span>Explore</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+        </span>
+      </a>
+
+      <!-- Row 1, card 2: Markets in Motion (existing photo asset). -->
+      <a class="rbccm-platforms__card" href="#" aria-label="Markets in Motion" style="--rbccm-platforms-body-max-width: 295px;">
+        <img class="rbccm-platforms__photo" src="../rbccm-platforms/photos/markets-in-motion.webp" alt="" loading="lazy" decoding="async">
+        <div class="rbccm-platforms__card-content">
+          <h3 class="rbccm-platforms__card-title">Markets in Motion</h3>
+          <p class="rbccm-platforms__card-body">Timely reads on the macro and market forces moving U.S. capital markets today.</p>
+        </div>
+        <span class="rbccm-platforms__card-cta">
+          <span>Explore</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+        </span>
+      </a>
+
+      <!-- Row 2, card 1: RBC Economics (existing photo asset). -->
+      <a class="rbccm-platforms__card" href="#" aria-label="RBC Economics" style="--rbccm-platforms-body-max-width: 274px;">
+        <img class="rbccm-platforms__photo" src="../rbccm-platforms/photos/rbc-economics.webp" alt="" loading="lazy" decoding="async">
+        <div class="rbccm-platforms__card-content">
+          <h3 class="rbccm-platforms__card-title">RBC Economics</h3>
+          <p class="rbccm-platforms__card-body">The macro backdrop and rates outlook behind every capital decision.</p>
+        </div>
+        <span class="rbccm-platforms__card-cta">
+          <span>Explore</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+        </span>
+      </a>
+
+      <!-- Row 2, card 2: RBC Imagine (no photo asset yet — swap src when DAM path lands). -->
+      <a class="rbccm-platforms__card" href="#" aria-label="RBC Imagine">
+        <img class="rbccm-platforms__photo" src="../rbccm-platforms/photos/rbc-imagine.webp" alt="" loading="lazy" decoding="async">
+        <div class="rbccm-platforms__card-content">
+          <h3 class="rbccm-platforms__card-title">RBC Imagine</h3>
+          <p class="rbccm-platforms__card-body">Forward-looking insights into the disruptive forces redefining business and society.</p>
+        </div>
+        <span class="rbccm-platforms__card-cta">
+          <span>Explore</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00014C1.5 7.86753 1.55268 7.74036 1.64645 7.64659C1.74021 7.55282 1.86739 7.50014 2 7.50014H13.793L10.646 4.35414C10.5521 4.26026 10.4994 4.13292 10.4994 4.00014C10.4994 3.86737 10.5521 3.74003 10.646 3.64614C10.7399 3.55226 10.8672 3.49951 11 3.49951C11.1328 3.49951 11.2601 3.55226 11.354 3.64614L15.354 7.64614C15.4006 7.69259 15.4375 7.74776 15.4627 7.80851C15.4879 7.86926 15.5009 7.93438 15.5009 8.00014C15.5009 8.06591 15.4879 8.13103 15.4627 8.19178C15.4375 8.25252 15.4006 8.3077 15.354 8.35414L11.354 12.3541C11.2601 12.448 11.1328 12.5008 11 12.5008C10.8672 12.5008 10.7399 12.448 10.646 12.3541C10.5521 12.2603 10.4994 12.1329 10.4994 12.0001C10.4994 11.8674 10.5521 11.74 10.646 11.6461L13.793 8.50014H2C1.86739 8.50014 1.74021 8.44746 1.64645 8.3537C1.55268 8.25993 1.5 8.13275 1.5 8.00014Z" fill="currentColor"/></svg>
+        </span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     6. CTA BAND  ·  US Credentials variant of the shared component
+     -----------------------------------------------------------------
+     Component: /cta-band/  (rbccm-cta-band). The --us-credentials
+     variant carries all US-specific tuning: solid navy #001E3C,
+     wider inner (758), larger gap (50), narrower body (432), heading
+     wraps at desktop, no eyebrow slot. Button + shine-sweep + arrow-
+     flyby all match the MAAS+MATA .__demo band (via the shared
+     component base + variant scope).
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="rbccm-cta-band rbccm-cta-band--us-credentials">
+  <div class="rbccm-cta-band__inner">
+    <h2 class="rbccm-cta-band__heading animate__animated animate__fadeInUp" data-animate="fadeInUp" data-animate-delay="100">
+      <span>Ready to turn insights</span>
+      <span class="rbccm-cta-band__heading-highlight">into results?</span>
+    </h2>
+    <p class="rbccm-cta-band__body animate__animated animate__fadeInUp" data-animate="fadeInUp" data-animate-delay="200">
+      Explore how RBC Capital Markets helps clients navigate complex decisions and move forward with confidence.
+    </p>
+    <div class="rbccm-cta-band__actions">
+      <a class="rbccm-cta-band__btn rbccm-cta-band__btn--primary animate__animated animate__fadeInUp" data-animate="fadeInUp" data-animate-delay="300" href="#">
+        <span>Learn more</span>
+        <svg class="rbccm-cta-band__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.4999C1.4375 11.3093 1.51323 11.1265 1.64802 10.9917C1.78281 10.8569 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25881C14.4499 6.12384 14.3741 5.9408 14.3741 5.74993C14.3741 5.55907 14.4499 5.37602 14.5849 5.24106C14.7198 5.10609 14.9029 5.03027 15.0938 5.03027C15.2846 5.03027 15.4677 5.10609 15.6026 5.24106L21.3526 10.9911C21.4196 11.0578 21.4727 11.1371 21.5089 11.2245C21.5451 11.3118 21.5638 11.4054 21.5638 11.4999C21.5638 11.5945 21.5451 11.6881 21.5089 11.7754C21.4727 11.8627 21.4196 11.942 21.3526 12.0088L15.6026 17.7588C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7588C14.4499 17.6238 14.3741 17.4408 14.3741 17.2499C14.3741 17.0591 14.4499 16.876 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.4999Z" fill="currentColor"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Awards' JS lives in its own component; wire it here so the
+     mobile carousel initializes on this preview too. -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+<script src="../rbccm-awards/rbccm-awards.js"></script>
+<script src="../rbccm-capability-cards/rbccm-capability-cards.js"></script>
+<script src="../rbccm-two-up-cards/rbccm-two-up-cards.js"></script>
+
+</body>
+</html>

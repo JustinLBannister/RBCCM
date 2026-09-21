@@ -209,7 +209,7 @@
     <xsl:variable name="SE_INS_TITLE_TAG">
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$SE_INS_TITLE_TAG_RAW"/>
-        <xsl:with-param name="default" select="'h3'"/>
+        <xsl:with-param name="default" select="'h2'"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="SE_INS_BODY_TAG">

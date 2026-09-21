@@ -74,7 +74,27 @@
     }
     if (guard) guard.addEventListener('focus', onGuardFocus);
 
-    if ($modal && $modal.on) {
+    // Detect which Bootstrap version is loaded so we can bind to the
+    // right event system.
+    //   BS5: global `window.bootstrap.Modal`. Lifecycle events
+    //        (show.bs.modal / shown.bs.modal / hidden.bs.modal) are
+    //        dispatched as NATIVE CustomEvents on the modal element,
+    //        so plain `addEventListener` catches them.
+    //   BS3/4: relies on jQuery + `$.fn.modal`. Lifecycle events go
+    //        through jQuery's event bus, so we use $modal.on(...).
+    //   Neither: vanilla fallback below opens/closes the modal
+    //        ourselves and the MutationObserver drives play/stop.
+    var hasBS5    = !!(window.bootstrap && window.bootstrap.Modal);
+    var hasBS3or4 = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.modal);
+
+    if (hasBS5) {
+      modal.addEventListener('show.bs.modal', function (e) {
+        trigger = (e && e.relatedTarget) || document.activeElement;
+        play();
+      });
+      modal.addEventListener('shown.bs.modal',  focusClose);
+      modal.addEventListener('hidden.bs.modal', function () { stop(); focusTrigger(); });
+    } else if (hasBS3or4 && $modal && $modal.on) {
       $modal.on('show.bs.modal', function (e) {
         trigger = (e && e.relatedTarget) || document.activeElement;
         play();
@@ -82,13 +102,81 @@
       $modal.on('shown.bs.modal',  focusClose);
       $modal.on('hidden.bs.modal', function () { stop(); focusTrigger(); });
     } else {
-      // Fallback for anywhere Bootstrap jQuery isn't loaded — watch
-      // for the display change ourselves.
+      // ---- Vanilla fallback: open + close the modal ourselves. -----
+      // Runs when no Bootstrap modal plugin is loaded. We manually
+      // toggle .show / display:block (BS5 uses .show; BS3/4 used .in
+      // — we go with .show since that's the modern spec).
+
+      // Open on any modal-toggle trigger that points at us. Accept
+      // both BS5 (data-bs-toggle) and BS3/4 (data-toggle) attribute
+      // shapes so this works regardless of which version the markup
+      // was authored against.
+      var triggerSelector =
+        '[data-bs-toggle="modal"][data-bs-target="#' + modal.id + '"],' +
+        '[data-toggle="modal"][data-target="#'      + modal.id + '"]';
+      var triggers = document.querySelectorAll(triggerSelector);
+      Array.prototype.forEach.call(triggers, function (btn) {
+        btn.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          trigger = btn;
+          openModal();
+        });
+      });
+
+      // Close on any dismiss control inside the modal (both shapes).
+      var dismissers = modal.querySelectorAll(
+        '[data-bs-dismiss="modal"], [data-dismiss="modal"]'
+      );
+      Array.prototype.forEach.call(dismissers, function (btn) {
+        btn.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          closeModal();
+        });
+      });
+
+      // Click on the modal backdrop closes it (Bootstrap parity).
+      modal.addEventListener('click', function (ev) {
+        if (ev.target === modal) closeModal();
+      });
+
+      // ESC closes the modal (Bootstrap parity).
+      document.addEventListener('keydown', function (ev) {
+        if ((ev.key === 'Escape' || ev.keyCode === 27) && isShown()) {
+          closeModal();
+        }
+      });
+
+      function isShown() {
+        return modal.classList.contains('show') ||
+               modal.classList.contains('in') ||
+               modal.style.display === 'block';
+      }
+      function openModal() {
+        modal.style.display = 'block';
+        // Force a reflow before adding .show so the fade transition runs.
+        void modal.offsetWidth;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+      }
+      function closeModal() {
+        modal.classList.remove('show');
+        modal.classList.remove('in');
+        modal.setAttribute('aria-hidden', 'true');
+        // Give the fade-out transition a beat before hiding.
+        setTimeout(function () {
+          modal.style.display = 'none';
+          document.body.classList.remove('modal-open');
+        }, 150);
+      }
+
+      // MutationObserver still fires the iframe src swap + focus mgmt
+      // when open/close state changes — same behavior as before.
       var wasShown = false;
       var mo = new MutationObserver(function () {
-        var shown = modal.classList.contains('in') || modal.style.display === 'block';
+        var shown = isShown();
         if (shown && !wasShown) {
-          trigger = document.activeElement;
+          if (!trigger) trigger = document.activeElement;
           play();
           setTimeout(focusClose, 0);
         } else if (!shown && wasShown) {

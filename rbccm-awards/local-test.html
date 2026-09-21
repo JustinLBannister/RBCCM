@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBCCM Awards — local test</title>
+  <link rel="stylesheet" href="rbccm-awards.css?v=slick-16">
+  <style>
+    body {
+      margin: 0;
+      background: #08132a;
+      font-family: Roboto, Arial, sans-serif;
+    }
+    .demo-label {
+      display: block;
+      max-width: 1180px;
+      margin: 60px auto 0;
+      padding: 0 23px;
+      color: #FFC72C;
+      font: 500 11px/1.4 Roboto, Arial, sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .demo-caption {
+      display: block;
+      max-width: 1180px;
+      margin: 4px auto 20px;
+      padding: 0 23px;
+      color: #C3C3C3;
+      font: 400 13px/1.5 Roboto, Arial, sans-serif;
+    }
+    .demo-caption code {
+      background: rgba(255,255,255,0.08);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: #FFC72C;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       3-COLUMN VARIANT  (awards-3 · MAAS+MATA canon)
+       ══════════════════════════════════════════════════════════════
+       Two visual options for the same variant grouped together:
+         a) with eyebrow (default)
+         b) without eyebrow
+       -->
+
+  <!-- 3-column · WITH eyebrow ------------------------------------ -->
+  <span class="demo-label">Preset: awards-3</span>
+  <span class="demo-caption">Extracted from MAAS+MATA. Eyebrow via <code>SectionEyebrowText</code>, three cards, default navy background.</span>
+  <section class="rbccm-awards rbccm-awards--3" aria-label="Awards">
+    <div class="rbccm-awards__inner">
+    <div class="rbccm-awards__eyebrow" data-animate="fadeInUp">See why the world's top institutions choose MAAS</div>
+    <div class="rbccm-awards__grid rbccm-awards__grid--3" data-stagger-parent="fadeInUp" data-stagger-step="120">
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">Best Trading Analytics Platform</h3>
+        <p class="rbccm-awards__issuer">TradingTech Insights Awards USA</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2025</span>
+        <h3 class="rbccm-awards__title">Overall Best Provider, Algorithmic Trading</h3>
+        <p class="rbccm-awards__issuer">The Trade</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2025</span>
+        <h3 class="rbccm-awards__title">Best Provider, Multi-User Clients</h3>
+        <p class="rbccm-awards__issuer">The Trade</p>
+      </article>
+    </div>
+    <div class="rbccm-awards__controls">
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    </div>
+  </section>
+
+  <!-- 3-column · NO eyebrow -------------------------------------- -->
+  <span class="demo-label">Preset: awards-3 &nbsp;+&nbsp; no eyebrow</span>
+  <span class="demo-caption">Blank <code>SectionEyebrowText</code> hides the caption row (just cards, no header).</span>
+  <section class="rbccm-awards rbccm-awards--3" aria-label="Awards, no eyebrow">
+    <div class="rbccm-awards__inner">
+    <div class="rbccm-awards__grid rbccm-awards__grid--3" data-stagger-parent="fadeInUp" data-stagger-step="120">
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">Best Trading Analytics Platform</h3>
+        <p class="rbccm-awards__issuer">TradingTech Insights Awards USA</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2025</span>
+        <h3 class="rbccm-awards__title">Overall Best Provider, Algorithmic Trading</h3>
+        <p class="rbccm-awards__issuer">The Trade</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2025</span>
+        <h3 class="rbccm-awards__title">Best Provider, Multi-User Clients</h3>
+        <p class="rbccm-awards__issuer">The Trade</p>
+      </article>
+    </div>
+    <div class="rbccm-awards__controls">
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       4-COLUMN VARIANT  (awards-4 · US Credentials)
+       ══════════════════════════════════════════════════════════════
+       Two visual options for the same variant grouped together:
+         a) default navy background
+         b) editor-set SectionBgColor override
+       -->
+
+  <!-- 4-column · default background ------------------------------ -->
+  <span class="demo-label">Preset: awards-4</span>
+  <span class="demo-caption">US Credentials. Uppercase eyebrow (author-controlled — the component doesn't force-case; editors paste sentence-case or all-caps as-is).</span>
+  <section class="rbccm-awards rbccm-awards--4" aria-label="Trusted solutions">
+    <div class="rbccm-awards__inner">
+    <div class="rbccm-awards__eyebrow" data-animate="fadeInUp">Trusted solutions for clients worldwide</div>
+    <div class="rbccm-awards__grid rbccm-awards__grid--4" data-stagger-parent="fadeInUp" data-stagger-step="120">
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">Top 10 Global Investment Bank</h3>
+        <p class="rbccm-awards__issuer">by Market Cap (U.S. $267B)</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">#1 Safest Bank in North America</h3>
+        <p class="rbccm-awards__issuer">Euromoney</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">North America's Best Bank</h3>
+        <p class="rbccm-awards__issuer">Euromoney</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">#3 Globally for AI Maturity</h3>
+        <p class="rbccm-awards__issuer">Evident AI Index</p>
+      </article>
+    </div>
+    <div class="rbccm-awards__controls">
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    </div>
+  </section>
+
+  <!-- 4-column · SectionBgColor override -------------------------- -->
+  <!-- Shows how the SectionBgColor Datum overrides the base navy.
+       In TeamSite this emits inline style="--rbccm-awards-bg: #XXX;"
+       on the section root. -->
+  <span class="demo-label">Preset: awards-4 &nbsp;+&nbsp; SectionBgColor override</span>
+  <span class="demo-caption">Editor sets <code>SectionBgColor</code> to <code>#0a2540</code> (a lighter navy) — inline style beats the base fill.</span>
+  <section class="rbccm-awards rbccm-awards--4" aria-label="Awards on lighter navy" style="--rbccm-awards-bg: #0a2540;">
+    <div class="rbccm-awards__inner">
+    <div class="rbccm-awards__eyebrow" data-animate="fadeInUp">Trusted solutions for clients worldwide</div>
+    <div class="rbccm-awards__grid rbccm-awards__grid--4" data-stagger-parent="fadeInUp" data-stagger-step="120">
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">Top 10 Global Investment Bank</h3>
+        <p class="rbccm-awards__issuer">by Market Cap (U.S. $267B)</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">#1 Safest Bank in North America</h3>
+        <p class="rbccm-awards__issuer">Euromoney</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">North America's Best Bank</h3>
+        <p class="rbccm-awards__issuer">Euromoney</p>
+      </article>
+      <article class="rbccm-awards__card">
+        <span class="rbccm-awards__year">2026</span>
+        <h3 class="rbccm-awards__title">#3 Globally for AI Maturity</h3>
+        <p class="rbccm-awards__issuer">Evident AI Index</p>
+      </article>
+    </div>
+    <div class="rbccm-awards__controls">
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+      <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    </div>
+  </section>
+
+  <div style="height: 80px;"></div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+  <script src="rbccm-awards.js?v=slick-16"></script>
+</body>
+</html>

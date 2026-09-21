@@ -294,7 +294,7 @@
         <div class="rbccm-insight-tiles__insight-body">
           <div class="rbccm-insight-tiles__insight-label"><xsl:value-of select="$eyebrow"/></div>
           <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
-          <h2 class="rbccm-insight-tiles__insight-title">
+          <h3 class="rbccm-insight-tiles__insight-title">
             <xsl:if test="$hydrateThisTile">
               <xsl:attribute name="data-hydrate-title"></xsl:attribute>
             </xsl:if>
@@ -392,7 +392,7 @@
               <h4 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h4>
             </xsl:when>
             <xsl:otherwise>
-              <h3 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h3>
+              <h2 class="rbccm-featured-insights__title" data-animate="fadeInUp"><xsl:value-of select="$SECTION_TITLE"/></h2>
             </xsl:otherwise>
           </xsl:choose>
           <xsl:if test="normalize-space($SECTION_SUBHEAD) != ''">

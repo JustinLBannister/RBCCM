@@ -15,9 +15,43 @@
     padding: 12px 24px; font-size: 13px;
     letter-spacing: 0.04em; text-transform: uppercase;
   }
+  /* Fake fixed nav for local testing. Mirrors the production RBCCM
+     nav dimensions so each hero variant's top-padding clearance can
+     be visually verified at both breakpoints:
+       Mobile   65px tall
+       Desktop  98px tall  (min-width: 992px)
+     Anchored top:0 with position:fixed so it overlays every hero
+     variant as you scroll. High z-index keeps it above bg-videos,
+     glow halos, etc. */
+  .demo-fake-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 65px;
+    background: #fff;
+    border-bottom: 1px solid #D9DBDE;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4A4E55;
+    z-index: 9999;
+    box-sizing: border-box;
+  }
+  .demo-fake-nav::after {
+    content: "FAKE NAV (test) — 65 mobile / 98 desktop";
+    opacity: 0.65;
+  }
+  @media (min-width: 992px) {
+    .demo-fake-nav { height: 98px; }
+  }
 </style>
 </head>
 <body>
+
+<div class="demo-fake-nav" aria-hidden="true"></div>
 
 <!-- =============================================================
      Variant A -- MAAS + MATA (centred, glow halo, 2-line title)
@@ -104,7 +138,7 @@
             <p class="rbccm-hero__insight-eyebrow">Latest Insight</p>
           </div>
         </div>
-        <h3 class="rbccm-hero__insight-title">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</h3>
+        <h2 class="rbccm-hero__insight-title">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</h2>
         <p class="rbccm-hero__insight-body">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</p>
         <footer class="rbccm-hero__insight-footer">
           <span class="rbccm-hero__insight-date">July 14, 2025</span>
@@ -119,6 +153,26 @@
       </article>
 
     </div>
+  </div>
+</section>
+
+
+<div class="demo-note">Variant C -- .rbccm-hero--us-credentials (centred, dark navy, bg video, no CTA)</div>
+
+<section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero">
+  <div class="rbccm-hero__bg-video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="hero-background-animation-4k-loop.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="rbccm-hero__container">
+    <p class="rbccm-hero__title" data-animate-hero="fadeInUp" data-animate-delay="150">
+      <span class="rbccm-hero__title-line">Your capital needs strategy.</span>
+      <span class="rbccm-hero__title-line">Our insights deliver results.</span>
+    </p>
+    <p class="rbccm-hero__subtitle" data-animate-hero="fadeInUp" data-animate-delay="300">
+      Advisory expertise, market-leading insights, and exceptional execution from one of the world's largest and safest banks.
+    </p>
   </div>
 </section>
 
