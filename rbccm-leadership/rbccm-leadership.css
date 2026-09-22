@@ -449,6 +449,8 @@
       align-items: center;
       bottom: auto !important;
       display: flex !important;
+      flex-wrap: wrap;
+      row-gap: 12px;
       gap: 26px;
       justify-content: center;
       list-style: none;
@@ -456,6 +458,14 @@
       padding: 0;
       position: static !important;
       width: auto !important;
+    }
+    /* Tighten inter-dot gap on narrow viewports so a long dot strip
+       (10+ cards) doesn't clip on iPhone SE-class screens. Wrap above
+       covers overflow beyond that. */
+    @media (max-width: 559px) {
+      #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots {
+        gap: 16px;
+      }
     }
     #rbccm-leadership .rbccm-leadership__dots-wrap .slick-dots li {
       align-items: center;
