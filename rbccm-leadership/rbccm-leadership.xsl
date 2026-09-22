@@ -400,9 +400,8 @@
         <xsl:if test="$subheading != ''"><xsl:text> rbccm-leadership__heading--with-subhead</xsl:text></xsl:if>
       </xsl:variable>
 
-      <xsl:variable name="headingStyle">
-        <xsl:if test="$subheading != ''"><xsl:text>margin-bottom: 25px;</xsl:text></xsl:if>
-      </xsl:variable>
+      <!-- $headingStyle removed — old inline `margin-bottom: 25px` on the H2
+           is now owned by the __header flex `gap` in rbccm-leadership.css. -->
 
       <section id="rbccm-leadership">
         <xsl:attribute name="class"><xsl:value-of select="$sectionClass"/></xsl:attribute>
