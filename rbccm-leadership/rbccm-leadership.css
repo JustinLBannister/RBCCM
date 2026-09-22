@@ -147,13 +147,22 @@
       box-sizing: border-box;
       display: flex !important;
       flex-direction: column !important;
-      margin: 0 8px;
+      margin: 0 23px 0 0;
       width: 343px !important;
     }
     @media (min-width: 560px) {
       .rbccm-leadership__card {
-        margin: 0 23px 0 0;
         width: 270px !important;
+      }
+    }
+    /* At 1300+ the desktop arrow chevrons swap in (see the __btn-icon
+       swap at min-width: 1300 below). Tighten the inter-card gutter
+       from 23 → 20 at that breakpoint to match the arrow spacing.
+       Below 1300, 23 keeps a little more breathing room from the
+       container edge while the row scrolls under the mobile chevrons. */
+    @media (min-width: 1300px) {
+      .rbccm-leadership__card {
+        margin: 0 20px 0 0;
       }
     }
     /* Active-card border. `.slick-center` was the marker while the
