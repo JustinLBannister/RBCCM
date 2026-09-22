@@ -2,8 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!--
     Skin: Leadership Carousel — DCR-driven, LinkedIn OR Biography modal.
-    CSS: /assets/rbccm/css/components/leadership-carousel.css
-    JS:  /assets/rbccm/js/components/leadership-carousel.js
+    CSS: /assets/rbccm/css/components/rbccm-leadership.css
+    JS:  /assets/rbccm/js/components/rbccm-leadership.js
 
     i18n templates emit as data-i18n-* on #rbccm-leadership for the
     external JS to read. Per-breakpoint carousel thresholds emit as
@@ -300,7 +300,7 @@
       </xsl:variable>
 
       <!-- Name-enriched a11y templates. {name}/{role}/{n}/{total} are
-           substituted in leadership-carousel.js. -->
+           substituted in rbccm-leadership.js. -->
 
       <xsl:variable name="slideAriaNameOnlyTpl">
         <xsl:choose>
@@ -378,7 +378,7 @@
       <xsl:variable name="placeholderUrl" select="concat('https://fpoimg.com/276x263?text=', $placeholderText, '&amp;text_color=8F8F8F&amp;bg_color=e6e6e6')"/>
 
       <link rel="stylesheet">
-        <xsl:attribute name="href">/assets/rbccm/css/components/leadership-carousel.css?v=<xsl:value-of select="$assetVersion"/></xsl:attribute>
+        <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-leadership.css?v=<xsl:value-of select="$assetVersion"/></xsl:attribute>
       </link>
 
       <!-- Precomputed class + style strings. Keeps xsl:attribute calls simple. -->
@@ -409,7 +409,7 @@
         <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
         <xsl:attribute name="data-link-type"><xsl:value-of select="$linkType"/></xsl:attribute>
         <xsl:attribute name="style"><xsl:value-of select="normalize-space($sectionStyle)"/></xsl:attribute>
-        <!-- i18n templates consumed by /assets/rbccm/js/components/leadership-carousel.js.
+        <!-- i18n templates consumed by /assets/rbccm/js/components/rbccm-leadership.js.
              English fallbacks are baked into the JS so omitted attributes are safe. -->
         <xsl:attribute name="data-i18n-slide-role"><xsl:value-of select="$slideRoleDesc"/></xsl:attribute>
         <xsl:attribute name="data-i18n-slide-aria-tpl"><xsl:value-of select="$slideAriaTpl"/></xsl:attribute>
@@ -439,7 +439,7 @@
 
           <!-- ── Carousel: DOM order is Prev → slides → Next → dots (slick-default).
                   Visual layout reshuffles via CSS grid template-areas in
-                  leadership-carousel.css. ── -->
+                  rbccm-leadership.css. ── -->
           <div class="rbccm-leadership__carousel">
 
             <button id="rbccm-lead-prev" class="rbccm-leadership__btn" tabindex="0">
@@ -657,7 +657,7 @@
       <!-- External component JS. All runtime behavior lives here; the XSL
            only emits markup + i18n data-attributes on the section. -->
       <script>
-        <xsl:attribute name="src">/assets/rbccm/js/components/leadership-carousel.js?v=<xsl:value-of select="$assetVersion"/></xsl:attribute>
+        <xsl:attribute name="src">/assets/rbccm/js/components/rbccm-leadership.js?v=<xsl:value-of select="$assetVersion"/></xsl:attribute>
       </script>
 
     </xsl:if>

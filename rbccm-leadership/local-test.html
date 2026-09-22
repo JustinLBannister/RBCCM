@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 
-  <!-- Prod path: /assets/rbccm/css/components/leadership-carousel.css -->
-  <link rel="stylesheet" href="./leadership-carousel.css"/>
+  <!-- Prod path: /assets/rbccm/css/components/rbccm-leadership.css -->
+  <link rel="stylesheet" href="./rbccm-leadership.css"/>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -36,13 +36,76 @@
       font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
       color: rgba(255,255,255,0.7); margin-right: 4px;
     }
+    /* Styled to match .rbccm-cta-band__btn shape (pill, 44px, 15px/500,
+       gap 12). Inactive = ghost/secondary on dark. Active = primary gold
+       with shine-sweep on hover. No arrow icon inside. */
     .variant-picker__btn {
-      background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3);
-      padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
-      font-family: inherit; transition: background 0.15s, border-color 0.15s;
+      align-items: center;
+      background: transparent;
+      border: 1px solid #ffffff;
+      border-radius: 100px;
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      gap: 12px;
+      height: 44px;
+      justify-content: center;
+      line-height: 1;
+      padding: 0 20px;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
     }
-    .variant-picker__btn:hover { border-color: #FFC72C; }
-    .variant-picker__btn--active { background: #FFC72C; color: #003168; border-color: #FFC72C; font-weight: 600; }
+    .variant-picker__btn:hover,
+    .variant-picker__btn:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #ffffff;
+      color: #ffffff;
+      outline: none;
+    }
+    /* Active = primary gold pill (matches .rbccm-cta-band__btn--primary). */
+    .variant-picker__btn--active {
+      background: #FFC72C;
+      border-color: #FFC72C;
+      color: #003168;
+      isolation: isolate;
+    }
+    .variant-picker__btn--active:hover,
+    .variant-picker__btn--active:focus-visible {
+      background: #E5B325;
+      border-color: #E5B325;
+      color: #003168;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+    /* Shine sweep on the active pill (mirrors the primary CTA button). */
+    .variant-picker__btn--active::before {
+      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+      bottom: 0;
+      content: "";
+      left: -60%;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      transform: skewX(-18deg);
+      width: 40%;
+      z-index: 0;
+    }
+    .variant-picker__btn > * { position: relative; z-index: 1; }
+    .variant-picker__btn--active:hover::before,
+    .variant-picker__btn--active:focus-visible::before {
+      animation: rbccm-picker-shine 600ms ease-out;
+    }
+    @keyframes rbccm-picker-shine {
+      0%   { left: -60%; opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { left: 120%; opacity: 0; }
+    }
     .variant-picker__note {
       font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 8px;
     }
