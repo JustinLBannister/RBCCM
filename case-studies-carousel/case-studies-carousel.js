@@ -299,11 +299,11 @@
 
     if (!$track.length || !$track.children().length) return;
     if ($track.hasClass('slick-initialized')) return;
-    root.setAttribute(BOUND_FLAG, 'true');
 
     var cfgSpeed = intAttr(root, 'data-speed', 350);
     var $heading = $root.find('.rbccm-case-studies__heading').first();
-    var headingText = $heading.length ? $.trim($heading.text()) : '';
+    // jQuery 4 removed $.trim(); use native String.prototype.trim.
+    var headingText = $heading.length ? $heading.text().trim() : '';
     var regionLabel = attrOr(root, 'data-region-label', headingText || 'carousel');
     var instructionsText = attrOr(root, 'data-instructions', '');
     var transition = attrOr(root, 'data-transition', 'slide');
@@ -325,6 +325,10 @@
     if (instructionsText) opts.instructionsText = instructionsText;
 
     $track.slick(opts);
+    // Set the bound flag only AFTER slick starts, so a mid-init throw
+    // (jQuery-4 removed API, missing dep, etc.) doesn't leave the root
+    // marked as bound and block a retry via RBCCMCaseStudiesCarousel.init().
+    root.setAttribute(BOUND_FLAG, 'true');
   }
 
   function initAllSlick(ctx) {
