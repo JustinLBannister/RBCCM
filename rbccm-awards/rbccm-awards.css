@@ -159,6 +159,18 @@
   max-width: 100%;
   width: 100%;
 }
+/* Set the clip here instead of relying on slick.css being on the
+   page. Without it (page loads the Slick JS but not its CSS, or a
+   site rule overrides it) the infinite-mode clones spill out past
+   the row at desktop: extra cards on both sides of the 3/4 real
+   ones. Same values as slick.css, so no change where it's loaded. */
+.rbccm-awards__grid.slick-initialized .slick-list {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
 .rbccm-awards__grid.slick-initialized .slick-track {
   max-width: 100%;
   width: auto;                        /* Slick sets its own inline width */
