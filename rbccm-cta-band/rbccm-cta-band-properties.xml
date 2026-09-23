@@ -1,39 +1,20 @@
 <!-- ============================================================
-     CTA Band — Properties + Data
+     RBCCM CTA Band  |  Properties + Data
      ============================================================
-     Shared component. Three visual presets pick the surface,
-     typography, and button layout; individual Datums fill in the
-     copy for whichever preset is selected.
+     One Properties file shared by three skins; the skin picked in
+     TeamSite's Skin dropdown decides the variant (no preset field):
 
-     Variants (Preset Datum)
-     ───────────────────────────────────────────────────────────
-       maas-mata   Big serif heading (up to 75px) with a
-                             yellow-highlight last span, single
-                             yellow pill CTA, own navy gradient.
-                             Pattern from MAAS+MATA "Talk with an
-                             expert."
+       rbccm-cta-band (double-dash) maas-mata.xsl
+         "Talk with an expert." Big serif + yellow highlight + 1
+         yellow CTA. Set BgTransparent = yes inside the MAAS+MATA
+         dark-strip wrapper.
+       rbccm-cta-band (double-dash) strategy-and-economics.xsl
+         Small serif heading + body + 2 buttons (primary +
+         outlined secondary).
+       rbccm-cta-band (double-dash) us-credentials.xsl
+         Big serif; yellow highlight on its own line; 1 yellow CTA.
 
-       strategy-and-economics       Small serif heading (28px), body copy,
-                             TWO buttons (primary yellow + secondary
-                             outlined ghost). Deep-navy bg. Pattern
-                             from S&E "Log in to RBC insights".
-
-       us-credentials        Same big serif ramp as talk-with-an-
-                             expert but the heading uses flex-column
-                             at desktop so the yellow highlight
-                             always drops beneath the white lead
-                             regardless of copy length. No eyebrow
-                             slot on this variant. Pattern from US
-                             Credentials "Ready to turn insights
-                             into results?"
-
-     Modifier (BgTransparent Datum)
-     ───────────────────────────────────────────────────────────
-       yes → adds the bg-transparent modifier class, which zeros
-             the section's own background so a parent wrapper (like
-             MAAS+MATA's .rbccm-maas-mata__deep-band) can paint a
-             continuous gradient through the band. Leave "no" for
-             standalone use.
+     Every text field is optional; blank ones don't render.
 
      Deploy alongside:
        /assets/rbccm/css/components/rbccm-cta-band.css
@@ -44,16 +25,15 @@
        Appearance tab: settings, paths, layout, tags, colours
        ============================================================ -->
 
-  <Datum ID="Preset" Type="Enum" Name="Variant" Default="maas-mata">
-    <Option Value="maas-mata">Talk with an expert (big serif + 1 yellow CTA)</Option>
-    <Option Value="strategy-and-economics">Research portal (small serif + 2 buttons)</Option>
-    <Option Value="us-credentials">US Credentials (big serif, wrapping heading, 1 yellow CTA)</Option>
-  </Datum>
 
-  <Datum ID="BgTransparent" Type="Enum" Name="Transparent background (use inside a wrapper that owns the gradient)" Default="no">
-    <Option Value="no">No — paint the variant's own background</Option>
-    <Option Value="yes">Yes — inherit the parent wrapper's background</Option>
-  </Datum>
+  <!-- Transparent background: type yes or no. yes = no section
+       background, so a parent wrapper's gradient shows through
+       (MAAS+MATA inside its dark-strip). -->
+  <Datum ID="BgTransparent" Type="String" Name="Transparent background - type yes or no (yes inside a wrapper that paints the gradient, e.g. MAAS+MATA dark-strip)">no</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-cta-band.css</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-23-1200</Datum>
 
   <Datum ID="SectionId"        Type="String" Name="Section id (optional — for anchor links)"></Datum>
 
@@ -71,7 +51,7 @@
        blank to omit it entirely. Only rendered when non-empty
        (production variants: maas-mata uses it,
        us-credentials + strategy-and-economics typically leave it blank). -->
-  <Datum ID="Eyebrow" Type="String" Name="Eyebrow (optional — leave blank to omit)"></Datum>
+  <Datum ID="Eyebrow" Type="String" Name="Eyebrow (optional — leave blank to omit; usually MAAS+MATA only)"></Datum>
 
   <!-- Heading — split into a lead (white) and an optional
        highlight (yellow). If Highlight is blank, only the lead
@@ -98,8 +78,8 @@
 
   <Datum ID="Cta1Href"  Type="String" Name="Primary button — URL">#demo</Datum>
 
-  <Datum ID="Cta2Label" Type="String" Name="Secondary button — label (strategy-and-economics only; leave blank to omit)"></Datum>
+  <Datum ID="Cta2Label" Type="String" Name="Secondary button — label (S+E skin only; leave blank to omit)"></Datum>
 
-  <Datum ID="Cta2Href"  Type="String" Name="Secondary button — URL"></Datum>
+  <Datum ID="Cta2Href"  Type="String" Name="Secondary button — URL (S+E skin only)"></Datum>
 
 </Data>
