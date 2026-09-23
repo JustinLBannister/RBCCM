@@ -1,28 +1,26 @@
 <!-- ============================================================
      RBCCM Capability Cards  |  Properties + Data
      ============================================================
-     Row of 3-6 identical capability cards on a dark navy section.
-     Each card: icon + yellow title + optional italic subtitle +
-     body copy + optional "Learn more" text CTA.
+     Always 4 cards (Card1-Card4). One Properties file shared by
+     two skins; the skin decides the layout (no preset field):
 
-     Layout (no preset field)
-     ============================================================
-     The number of cards with a title sets the desktop columns:
-     3, 4, 5 or 6. Fill Card1-Card4 for the US Credentials 4-up
-     (the default), blank Card4 for 3-up, fill Card5/6 for 5/6-up.
+       rbccm-capability-cards (double-dash) us-credentials.xsl
+         4 cards in a row on navy. Each card links when its URL is
+         set, with a "Learn more" chip from its CTA label.
 
-     Responsive behaviour
-     ============================================================
-     Below 1245px: Slick carousel drives the card row (one card per
-     view). Above 1245: static N-column grid. Handled by the JS
-     runtime; no editor input needed.
+       rbccm-capability-cards (double-dash) maas-mata.xsl
+         Cards 1-3 in a row + card 4 full-width underneath, on a
+         transparent section (page gradient shows through). Cards
+         never link; CTA fields are ignored.
 
-     Icon system
-     ============================================================
-     Card{N}IconType: type the name of a built-in icon (plain text,
-     not a dropdown; unknown or blank = chart-trend):
-       chart-trend  (default)  building  globe  search
-       exchange     layers     info
+     Each card: icon (type its name) + title + optional italic
+     subtitle + body. A blank title hides the card.
+
+     Icons (plain text, case-insensitive; blank = default):
+       investment-banking  corporate-banking  markets  research  info
+
+     Responsive: below 1245px the JS turns the row into a Slick
+     carousel; no editor input needed.
      ============================================================ -->
 <Properties ComponentID="rbccm-capability-cards-v1">
 
@@ -41,9 +39,9 @@
 
   <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to heading text)"></Datum>
 
-  <Datum ID="SectionBgColor" Type="String" Name="Section background colour e.g. '#041e42' (optional - blank inherits base navy)"></Datum>
+  <Datum ID="SectionBgColor" Type="String" Name="Background colour override (optional - blank = navy on US Creds, transparent on MAAS+MATA)"></Datum>
 
-  <Datum ID="SectionMaxWidth" Type="String" Name="Content max width in px (optional - typically 1100, 1140, etc; blank uses 1100)"></Datum>
+  <Datum ID="SectionMaxWidth" Type="String" Name="Content max width in px (optional - blank = 1140 on US Creds, 1100 on MAAS+MATA)"></Datum>
 
   <Datum ID="SectionHeadingTag" Type="String" Name="Section heading tag (h1-h6 - default h2)">h2</Datum>
 
@@ -61,7 +59,7 @@
 
   <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - paragraph below heading)"></Datum>
 
-  <Datum ID="Card1IconType" Type="String" Name="Card 1 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">chart-trend</Datum>
+  <Datum ID="Card1IconType" Type="String" Name="Card 1 : icon - type one of: investment-banking, corporate-banking, markets, research, info">investment-banking</Datum>
 
   <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (blank hides the card)">Global Investment Banking</Datum>
 
@@ -69,11 +67,11 @@
 
   <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body copy">Cross-border advisory and financing capabilities with industry-specific expertise, supporting clients across M&amp;A, capital raising and strategic transactions.</Datum>
 
-  <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label (optional)">Learn more</Datum>
+  <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label e.g. Learn more (US Creds skin only)">Learn more</Datum>
 
-  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA href (optional - when set, whole card becomes anchor)">#</Datum>
+  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : link URL - makes the whole card a link (US Creds skin only)">#</Datum>
 
-  <Datum ID="Card2IconType" Type="String" Name="Card 2 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">building</Datum>
+  <Datum ID="Card2IconType" Type="String" Name="Card 2 : icon - type one of: investment-banking, corporate-banking, markets, research, info">corporate-banking</Datum>
 
   <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title">Corporate Banking</Datum>
 
@@ -81,11 +79,11 @@
 
   <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body copy">Corporate and institutional lending capabilities across the credit spectrum, supporting clients with acquisition financing, revolving and term loans, letters of credit and other tailored credit solutions.</Datum>
 
-  <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label (optional)">Learn more</Datum>
+  <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label e.g. Learn more (US Creds skin only)">Learn more</Datum>
 
-  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA href (optional)">#</Datum>
+  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : link URL - makes the whole card a link (US Creds skin only)">#</Datum>
 
-  <Datum ID="Card3IconType" Type="String" Name="Card 3 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">globe</Datum>
+  <Datum ID="Card3IconType" Type="String" Name="Card 3 : icon - type one of: investment-banking, corporate-banking, markets, research, info">markets</Datum>
 
   <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title">Global Markets</Datum>
 
@@ -93,44 +91,25 @@
 
   <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body copy">Connecting insight, execution, and capital across Equities and FICC markets through integrated sales and trading, financing, and structuring capabilities.</Datum>
 
-  <Datum ID="Card3CtaLabel" Type="String" Name="Card 3 : CTA label (optional)">Learn more</Datum>
+  <Datum ID="Card3CtaLabel" Type="String" Name="Card 3 : CTA label e.g. Learn more (US Creds skin only)">Learn more</Datum>
 
-  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA href (optional)">#</Datum>
+  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : link URL - makes the whole card a link (US Creds skin only)">#</Datum>
 
-  <Datum ID="Card4IconType" Type="String" Name="Card 4 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">search</Datum>
+  <Datum ID="Card4IconType" Type="String" Name="Card 4 : icon - type one of: investment-banking, corporate-banking, markets, research, info">research</Datum>
 
-  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title">Global Research</Datum>
+  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title (US Creds: 4th card in the row; MAAS+MATA: full-width card under the row)">Global Research</Datum>
 
   <Datum ID="Card4SubtitleText" Type="String" Name="Card 4 : subtitle (optional)"></Datum>
 
   <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body copy">Macroeconomic, geopolitical and market insights across asset classes, industries and over 1,500 stocks, delivered by a deep bench of analysts combining data science, quantitative tools and sector expertise.</Datum>
 
-  <Datum ID="Card4CtaLabel" Type="String" Name="Card 4 : CTA label (optional)">Learn more</Datum>
+  <Datum ID="Card4CtaLabel" Type="String" Name="Card 4 : CTA label e.g. Learn more (US Creds skin only)">Learn more</Datum>
 
-  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA href (optional)">#</Datum>
+  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : link URL - makes the whole card a link (US Creds skin only)">#</Datum>
 
-  <Datum ID="Card5IconType" Type="String" Name="Card 5 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">exchange</Datum>
 
-  <Datum ID="Card5TitleText" Type="String" Name="Card 5 : title"></Datum>
 
-  <Datum ID="Card5SubtitleText" Type="String" Name="Card 5 : subtitle (optional)"></Datum>
 
-  <Datum ID="Card5BodyText" Type="Textarea" Name="Card 5 : body copy"></Datum>
 
-  <Datum ID="Card5CtaLabel" Type="String" Name="Card 5 : CTA label (optional)"></Datum>
-
-  <Datum ID="Card5CtaHref" Type="String" Name="Card 5 : CTA href (optional)"></Datum>
-
-  <Datum ID="Card6IconType" Type="String" Name="Card 6 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">layers</Datum>
-
-  <Datum ID="Card6TitleText" Type="String" Name="Card 6 : title"></Datum>
-
-  <Datum ID="Card6SubtitleText" Type="String" Name="Card 6 : subtitle (optional)"></Datum>
-
-  <Datum ID="Card6BodyText" Type="Textarea" Name="Card 6 : body copy"></Datum>
-
-  <Datum ID="Card6CtaLabel" Type="String" Name="Card 6 : CTA label (optional)"></Datum>
-
-  <Datum ID="Card6CtaHref" Type="String" Name="Card 6 : CTA href (optional)"></Datum>
 
 </Data>
