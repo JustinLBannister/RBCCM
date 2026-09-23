@@ -9,6 +9,7 @@
        4 cards   4-up grid, US Credentials navy (#051B38)
      A card with a blank title is skipped. Only the first 4 cards
      with a title render (the grid is designed for 3 or 4).
+     The file ships one card; editors add the rest in TeamSite.
 
      Same structure as icon-carousel / case-studies-carousel:
      section settings live in Properties, the cards are a
@@ -40,8 +41,12 @@
 <Data>
 
   <!-- ============================================================
-       Award cards (repeatable - add 3 or 4)
+       Award card (repeatable - add 3 or 4)
        ============================================================
+       ONE Group only. IDs must be unique in this file (TeamSite
+       validates them as XML IDs), so the card is defined once and
+       editors add cards with the repeater's + button. Same as
+       icon-carousel / case-studies-carousel.
        Year (optional, e.g. 2026) / Title (blank hides the card) /
        Issuer (optional). Datum Names are kept short and equal to
        the IDs on purpose: saved Group data can carry the Name only,
@@ -56,22 +61,5 @@
     <Datum ID="Issuer" Type="String" Name="Issuer">TradingTech Insights Awards USA</Datum>
   </Group>
 
-  <Group ID="AwardCard"
-         Name="Award Card"
-         Replicatable="true"
-         CloneGroupID="rbccm-awards-card">
-    <Datum ID="Year" Type="String" Name="Year">2025</Datum>
-    <Datum ID="Title" Type="String" Name="Title">Overall Best Provider, Algorithmic Trading</Datum>
-    <Datum ID="Issuer" Type="String" Name="Issuer">The Trade</Datum>
-  </Group>
-
-  <Group ID="AwardCard"
-         Name="Award Card"
-         Replicatable="true"
-         CloneGroupID="rbccm-awards-card">
-    <Datum ID="Year" Type="String" Name="Year">2025</Datum>
-    <Datum ID="Title" Type="String" Name="Title">Best Provider, Multi-User Clients</Datum>
-    <Datum ID="Issuer" Type="String" Name="Issuer">The Trade</Datum>
-  </Group>
 
 </Data>
