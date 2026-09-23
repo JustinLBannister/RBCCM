@@ -57,7 +57,7 @@ const ANIMATE_JS = /rbccm-animate\.js/;
 
 /* ---------- path rewriting ---------------------------------------------- */
 function rebase(url, dir) {
-  if (!url || /^(?:[a-z]+:|\/\/|\/|#|data:|\{)/i.test(url)) return url;
+  if (!url || /^(?:[a-z]+:|\/\/|\/|#|%23|data:|\{)/i.test(url)) return url; // %23 = '#' inside SVG data URIs
   const m = url.match(/^([^?#]*)(.*)$/);
   const abs = path.posix.normalize(path.posix.join(dir, m[1]));
   return '../' + abs + m[2];
