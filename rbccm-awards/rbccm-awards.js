@@ -123,9 +123,27 @@ jQuery(document).ready(function ($) {
          left. Only fires on the upward cross; downward transitions
          leave whatever slide is active alone. `true` on slickGoTo
          suppresses the animation for an instant snap. */
+      /* Desktop (controls hidden, all cards visible): no swipe or
+         mouse-drag, so the row can't be nudged sideways with nothing
+         on screen to bring it back. Slick reads these options on each
+         touch / drag, so flipping them live is enough. Set directly on
+         the instance rather than via slickSetOption, which relies on
+         $.type (removed in jQuery 4). */
+      function syncSwipe() {
+        var slick = $grid.slick('getSlick');
+        if (!slick || !slick.options) return;
+        var allow = !mqDesktop.matches;
+        slick.options.swipe = allow;
+        slick.options.draggable = allow;
+        slick.options.touchMove = allow;
+        $grid.find('.slick-list').toggleClass('draggable', allow);
+      }
+      syncSwipe();
+
       function onBreakpointChange() {
-        if (!mqDesktop.matches) return;
         if (!$grid.hasClass('slick-initialized')) return;
+        syncSwipe();
+        if (!mqDesktop.matches) return;
         $grid.slick('slickGoTo', 0, true);
       }
       if (typeof mqDesktop.addEventListener === 'function') {
