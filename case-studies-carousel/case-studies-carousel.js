@@ -175,9 +175,10 @@
     var eyebrow  = overrides.eyebrow  || record.eyebrow;
     var readtime = overrides.readtime || record.readtime;
     /* Some feed records already include the word "read" (e.g. "3 min read"),
-       others don't ("3 min"). Only append " read" when it's missing. */
+       others don't ("3 min"). Only append " read" when it's missing, and
+       only in English: French reads "Temps de lecture : 3 minutes" as is. */
     var ctaText  = readtime
-      ? (readtime.toLowerCase().indexOf('read') !== -1 ? readtime : readtime + ' read')
+      ? (overrides.french || readtime.toLowerCase().indexOf('read') !== -1 ? readtime : readtime + ' read')
       : '';
     var cta = ctaText
       ? '<span class="rbccm-case-studies__cta">' + escapeAttr(ctaText) + ' ' + CTA_CHEVRON + '</span>'
@@ -200,6 +201,19 @@
   }
 
   /* ---------- Hydrate a single root's shells -------------------------- */
+  /* French if the section (or page) says so, or the read-time text is
+     French ("Temps de lecture ..."). Checked per shell so a stray English
+     record on a French page still reads correctly. The French pages live
+     under /en/ URLs, so the URL can't be used. */
+  function isFrench(root, readtime) {
+    var locale = (root.getAttribute('data-locale') || '').toLowerCase();
+    if (locale) return locale.indexOf('fr') === 0;
+    var langEl = root.closest ? root.closest('[lang]') : null;
+    var lang = (langEl ? langEl.getAttribute('lang') : '').toLowerCase();
+    if (lang.indexOf('fr') === 0) return true;
+    return /lecture/i.test(readtime || '');
+  }
+
   function hydrateRoot(root, lookup) {
     var track = root.querySelector('.rbccm-case-studies__track');
     if (!track) return;
@@ -215,9 +229,11 @@
         shell.parentNode.removeChild(shell);
         continue;
       }
+      var readtime = shell.getAttribute('data-cs-readtime') || '';
       shell.innerHTML = buildSlideHTML(rec, {
         eyebrow:  shell.getAttribute('data-cs-eyebrow')  || '',
-        readtime: shell.getAttribute('data-cs-readtime') || ''
+        readtime: readtime,
+        french:   isFrench(root, readtime || rec.readtime)
       });
     }
   }
