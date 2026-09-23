@@ -18,9 +18,17 @@
 
      Each field's label says which skin uses it; the other skin
      ignores it. Blank card title hides that card.
+
+     Where fields live (TeamSite tabs)
+     ============================================================
+       Properties  ->  Appearance tab: paths, IDs, background
+                       colour, heading tag, card themes.
+       Data        ->  Content tab: section header copy and all
+                       card content.
+     The skins read every field with //Datum[@ID=...], so they
+     work in either block.
      ============================================================ -->
 <Properties ComponentID="rbccm-two-up-cards-v1">
-
 
   <!-- ============================================================
        Deploy plumbing
@@ -31,50 +39,59 @@
   <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-two-up-cards-1</Datum>
   <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to heading text)"></Datum>
 
-  <!-- Optional section background colour override. Blank uses
-       the skin default (features = navy, video-callouts = white). -->
+  <!-- ============================================================
+       Look
+       ============================================================
+       Background colour: blank uses the skin default (features =
+       navy, video-callouts = white). Heading tag: h1-h6, default
+       h2. Card themes: features skin only. -->
   <Datum ID="SectionBgColor" Type="String" Name="Section background colour e.g. '#041e42' (optional - blank uses the skin default)"></Datum>
+  <Datum ID="SectionHeadingTag" Type="String" Name="Section heading tag (h1-h6 - default h2)">h2</Datum>
+  <Datum ID="Card1Theme" Type="String" Name="Card 1 : theme - type dark or light (features skin)">dark</Datum>
+  <Datum ID="Card2Theme" Type="String" Name="Card 2 : theme - type dark or light (features skin)">light</Datum>
+
+</Properties>
+
+<Data>
 
   <!-- ============================================================
        Section header  (all optional)
        ============================================================
-       Eyebrow renders as small uppercase yellow caption above the
-       heading. Heading is the section H2 (tag configurable via
-       SectionHeadingTag). Description is a supporting paragraph
-       below the heading. -->
+       Eyebrow: small caption above the heading. Heading: the
+       section heading (tag set on the Appearance tab).
+       Description: paragraph below the heading. -->
   <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - small yellow caption above heading)">Two platforms, one connected workflow</Datum>
   <Datum ID="SectionHeadingText" Type="String" Name="Section heading (optional)">Better insight for stronger execution</Datum>
-  <Datum ID="SectionHeadingTag" Type="String" Name="Section heading tag (h1-h6 - default h2)">h2</Datum>
   <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - paragraph below heading)"></Datum>
 
   <!-- ============================================================
-       Card 1
+       Cards
        ============================================================
-       Card{N}Theme                dark or light (features skin)
-       Card{N}EyebrowText          small eyebrow tag on the card (features skin)
-       Card{N}TitleText            card headline (blank hides the card)
-       Card{N}BodyText             card paragraph copy
-       Card{N}SubtitleText         optional subtitle between title and body (video-callouts skin)
-       Card{N}MediaImagePath       image URL for the media zone (video-callouts skin)
-       Card{N}MediaImageAlt        alt text for the media image (video-callouts skin)
-       Card{N}VideoUrl             video URL that opens in modal on play-button click (video-callouts skin)
-       Card{N}CtaLabel             visible CTA label e.g. 'Watch the video' (video-callouts skin)
-       Card{N}CtaHref              CTA link target (video-callouts skin - used only when VideoUrl is blank)
-       Card{N}Bullet1Text-Bullet5Text  5-slot bullet list (features skin - blank slots skip)
+       TitleText        headline (blank hides the card)
+       BodyText         paragraph copy
+       EyebrowText      small tag on the card (features skin)
+       Bullet1-5Text    bullet list (features skin, blank skips)
+       SubtitleText     line between title and body (video-callouts skin)
+       MediaImagePath   image URL (video-callouts skin)
+       MediaImageAlt    image alt text (video-callouts skin)
+       VideoUrl         opens in the modal: YouTube, Vimeo,
+                        Brightcove player URL or .mp4 (video-callouts skin)
+       CtaLabel         e.g. 'Watch the video' (video-callouts skin)
+       CtaHref          link target when VideoUrl is blank (video-callouts skin)
        ============================================================ -->
 
-  <Datum ID="Card1Theme" Type="String" Name="Card 1 : theme - type dark or light (features skin)">dark</Datum>
+  <!-- ============================================================
+       Card 1
+       ============================================================ -->
   <Datum ID="Card1EyebrowText" Type="String" Name="Card 1 : eyebrow (features skin - e.g. 'MATA - Analytics')">MATA - Analytics</Datum>
   <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (blank hides the card)">Transform data into trading intelligence</Datum>
   <Datum ID="Card1SubtitleText" Type="String" Name="Card 1 : subtitle (video-callouts skin - optional line between title and body)"></Datum>
   <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body copy">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate execution decisions before you move.</Datum>
-
   <Datum ID="Card1MediaImagePath" Type="String" Name="Card 1 : media image path (video-callouts skin)"></Datum>
   <Datum ID="Card1MediaImageAlt" Type="String" Name="Card 1 : media image alt (video-callouts skin)"></Datum>
   <Datum ID="Card1VideoUrl" Type="String" Name="Card 1 : video URL (video-callouts skin - opens in modal)"></Datum>
   <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label (video-callouts skin - e.g. 'Watch the video')"></Datum>
   <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA href (video-callouts skin - used when VideoUrl blank)"></Datum>
-
   <Datum ID="Card1Bullet1Text" Type="String" Name="Card 1 : bullet 1 (features skin)">Quantify expected execution costs before commitment</Datum>
   <Datum ID="Card1Bullet2Text" Type="String" Name="Card 1 : bullet 2 (features skin)">Compare strategies side by side to evaluate potential outcomes</Datum>
   <Datum ID="Card1Bullet3Text" Type="String" Name="Card 1 : bullet 3 (features skin)">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
@@ -84,28 +101,19 @@
   <!-- ============================================================
        Card 2
        ============================================================ -->
-  <Datum ID="Card2Theme" Type="String" Name="Card 2 : theme - type dark or light (features skin)">light</Datum>
   <Datum ID="Card2EyebrowText" Type="String" Name="Card 2 : eyebrow (features skin - e.g. 'MAAS - Execution')">MAAS - Execution</Datum>
   <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (blank hides the card)">Drive stronger performance outcomes</Datum>
   <Datum ID="Card2SubtitleText" Type="String" Name="Card 2 : subtitle (video-callouts skin - optional line between title and body)"></Datum>
   <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body copy">Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.</Datum>
-
   <Datum ID="Card2MediaImagePath" Type="String" Name="Card 2 : media image path (video-callouts skin)"></Datum>
   <Datum ID="Card2MediaImageAlt" Type="String" Name="Card 2 : media image alt (video-callouts skin)"></Datum>
   <Datum ID="Card2VideoUrl" Type="String" Name="Card 2 : video URL (video-callouts skin - opens in modal)"></Datum>
   <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label (video-callouts skin)"></Datum>
   <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA href (video-callouts skin - used when VideoUrl blank)"></Datum>
-
   <Datum ID="Card2Bullet1Text" Type="String" Name="Card 2 : bullet 1 (features skin)">Access adaptive algorithms built for live market conditions</Datum>
   <Datum ID="Card2Bullet2Text" Type="String" Name="Card 2 : bullet 2 (features skin)">Select AI-powered strategies tailored to execution objectives</Datum>
   <Datum ID="Card2Bullet3Text" Type="String" Name="Card 2 : bullet 3 (features skin)">Route orders intelligently to help minimize market impact</Datum>
   <Datum ID="Card2Bullet4Text" Type="String" Name="Card 2 : bullet 4 (features skin)">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</Datum>
   <Datum ID="Card2Bullet5Text" Type="String" Name="Card 2 : bullet 5 (features skin)">Benchmark performance against pre-trade expectations</Datum>
 
-</Properties>
-
-<!-- No repeater Groups in this component; every content field lives
-     in Properties above. Empty Data block kept because TeamSite's
-     component schema expects it to be present. -->
-<Data>
 </Data>
