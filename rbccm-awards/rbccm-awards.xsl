@@ -2,24 +2,19 @@
 <!--
   RBCCM Awards  |  XSL skin
   ============================================================
-  Reads the Preset + card Datums from Properties and renders a
-  row of award cards on a dark background. Extracted from the
-  MAAS+MATA landing page's __awards block so any page can drop
-  it in.
+  Renders a row of award cards on a dark background. Extracted
+  from the MAAS+MATA landing page's __awards block so any page can
+  drop it in.
 
-  Variants
+  Layout comes from the card count (no preset field)
   ============================================================
-  Preset "awards-3"   3-card grid  (MAAS+MATA original)
-  Preset "awards-4"   4-card grid  (US Credentials mockup)
+  3 cards   3-up modifier   MAAS+MATA (#041e42)
+  4 cards   4-up modifier   US Credentials (#051B38)
 
-  Card{N} Datums are only read up to N=3 or N=4 depending on
-  variant, so setting Card4* Datums while Preset="awards-3" is
-  a no-op (they stay hidden).
-
-  Empty card guard
-  ============================================================
-  A card with a blank title is skipped. The eyebrow is optional
-  too - blank Datum means no eyebrow line at all.
+  Cards are the repeatable AwardCard Group in Data. A card with a
+  blank title is skipped; only the first 4 titled cards render.
+  Group / Datum lookups match on @ID or @Name (same as
+  icon-carousel), since saved Group data can carry either.
   ============================================================ -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -45,17 +40,13 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Per-slot lookup + renderAwardCard dispatcher. Reads
-       Card{N}Year / Card{N}Title / Card{N}Issuer. -->
-  <xsl:template name="renderAwardSlot">
-    <xsl:param name="n"/>
-    <xsl:variable name="year"   select="normalize-space(//Datum[@ID=concat('Card', $n, 'Year')]/text()[last()])"/>
-    <xsl:variable name="title"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'Title')]/text()[last()])"/>
-    <xsl:variable name="issuer" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Issuer')]/text()[last()])"/>
+  <!-- One AwardCard Group -> renderAwardCard. -->
+  <xsl:template name="renderAwardGroup">
+    <xsl:param name="g"/>
     <xsl:call-template name="renderAwardCard">
-      <xsl:with-param name="year" select="$year"/>
-      <xsl:with-param name="title" select="$title"/>
-      <xsl:with-param name="issuer" select="$issuer"/>
+      <xsl:with-param name="year"   select="normalize-space($g/Datum[@ID='Year' or @Name='Year'])"/>
+      <xsl:with-param name="title"  select="normalize-space($g/Datum[@ID='Title' or @Name='Title'])"/>
+      <xsl:with-param name="issuer" select="normalize-space($g/Datum[@ID='Issuer' or @Name='Issuer'])"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -66,7 +57,9 @@
     <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
     <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
     <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"        select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
+    <!-- Cards with a title, in author order. -->
+    <xsl:variable name="CARDS" select="//Group[@ID='AwardCard' or @Name='Award Card'][normalize-space(Datum[@ID='Title' or @Name='Title']) != '']"/>
+    <xsl:variable name="CARD_COUNT" select="count($CARDS)"/>
     <xsl:variable name="EYEBROW"       select="normalize-space(//Datum[@ID='SectionEyebrowText']/text()[last()])"/>
     <xsl:variable name="BG_COLOR"      select="normalize-space(//Datum[@ID='SectionBgColor']/text()[last()])"/>
 
@@ -80,17 +73,16 @@
       </link>
     </xsl:if>
 
-    <!-- Preset-to-variant-class map. Extend by adding another
-         xsl:when + matching CSS scope + Properties Option. -->
-    <xsl:variable name="VARIANT_CLASS">
+    <!-- Card count picks the layout: 4 -> 4-up, otherwise 3-up. -->
+    <xsl:variable name="VARIANT">
       <xsl:choose>
-        <xsl:when test="$PRESET = 'awards-4'">rbccm-awards--4</xsl:when>
-        <xsl:otherwise>rbccm-awards--3</xsl:otherwise>
+        <xsl:when test="$CARD_COUNT >= 4">4</xsl:when>
+        <xsl:otherwise>3</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
     <section>
-      <xsl:attribute name="class">rbccm-awards <xsl:value-of select="$VARIANT_CLASS"/></xsl:attribute>
+      <xsl:attribute name="class">rbccm-awards rbccm-awards--<xsl:value-of select="$VARIANT"/></xsl:attribute>
       <xsl:if test="$SECTION_ID != ''">
         <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
       </xsl:if>
@@ -102,14 +94,10 @@
           <xsl:attribute name="aria-label">Awards</xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-      <!-- Optional section background colour override. Sets the CSS
-           custom property the base rule reads. Blank Datum == base
-           navy (#041e42). -->
-      <!-- Emit the picked bg colour as an inline CSS custom property.
-           Skip the sentinel value "custom" — that's a UI placeholder
-           telling the author to edit the XML value directly; treat
-           it as blank so the preset default wins. -->
-      <xsl:if test="$BG_COLOR != '' and $BG_COLOR != 'custom'">
+      <!-- Optional background colour override, emitted as the CSS
+           custom property the variant rules read. Blank = the
+           layout's own navy. -->
+      <xsl:if test="$BG_COLOR != ''">
         <xsl:attribute name="style">--rbccm-awards-bg: <xsl:value-of select="$BG_COLOR"/>;</xsl:attribute>
       </xsl:if>
 
@@ -129,19 +117,10 @@
              its own variant modifier (mirrors MAAS/MATA convention
              where the modifier class lives on __awards-grid too). -->
         <div data-stagger-parent="fadeInUp" data-stagger-step="120">
-          <xsl:attribute name="class">
-            rbccm-awards__grid
-            <xsl:choose>
-              <xsl:when test="$PRESET = 'awards-4'">rbccm-awards__grid--4</xsl:when>
-              <xsl:otherwise>rbccm-awards__grid--3</xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:call-template name="renderAwardSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
-          <xsl:call-template name="renderAwardSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
-          <xsl:call-template name="renderAwardSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
-          <xsl:if test="$PRESET = 'awards-4'">
-            <xsl:call-template name="renderAwardSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
-          </xsl:if>
+          <xsl:attribute name="class">rbccm-awards__grid rbccm-awards__grid--<xsl:value-of select="$VARIANT"/></xsl:attribute>
+          <xsl:for-each select="$CARDS[position() &lt;= 4]">
+            <xsl:call-template name="renderAwardGroup"><xsl:with-param name="g" select="."/></xsl:call-template>
+          </xsl:for-each>
         </div>
 
         <!-- Carousel controls: mobile-first visible. Hidden via CSS at
@@ -152,7 +131,7 @@
           <button type="button" class="rbccm-awards__btn rbccm-awards__btn--prev" aria-label="Previous award">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M12 1L2 12L12 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
-          <div class="rbccm-awards__dots" role="tablist" aria-label="Award slides"></div>
+          <div class="rbccm-awards__dots" role="group" aria-label="Award slides"></div>
           <button type="button" class="rbccm-awards__btn rbccm-awards__btn--next" aria-label="Next award">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true"><path d="M2 1L12 12L2 23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
