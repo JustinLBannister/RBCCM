@@ -1,0 +1,93 @@
+/* =========================================================================
+   RBCCM Marketo Footer
+   Deploy path: /assets/rbccm/css/components/rbccm-marketo-footer.css
+   =========================================================================
+   "Stay informed" band: heading + subheading + embedded Marketo form.
+   This file styles the section and the header only. The form renders
+   as Marketo outputs it (fields, consent checkbox, button, and their
+   styling come from the Marketo form/theme).
+
+   Header spec (mobile, Figma):
+     wrapper   flex column, gap 16px (Figma frame 315px wide)
+     heading   RBC Display 500, 24px / 28px, letter-spacing -0.789px, #003168
+     subhead   Roboto 300, 16px / 120%, #003168
+   ========================================================================= */
+
+.rbccm-marketo-footer {
+  background: var(--rbccm-marketo-footer-bg, #E7EEF1);
+  box-sizing: border-box;
+  padding: 50px 23px 30px 23px;
+  width: 100%;
+}
+.rbccm-marketo-footer *,
+.rbccm-marketo-footer *::before,
+.rbccm-marketo-footer *::after { box-sizing: border-box; }
+
+.rbccm-marketo-footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;                 /* header -> form */
+  margin: 0 auto;
+  max-width: 1140px;
+  width: 100%;
+}
+
+/* ---- Header ------------------------------------------------------------ */
+.rbccm-marketo-footer__header {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Tag-level resets win over site h2/p rules (margins, fonts). */
+.rbccm-marketo-footer h2.rbccm-marketo-footer__heading {
+  color: var(--Blue-Dark-Blue, #003168) !important;
+  font-family: "RBC Display", RBCDisplay, Georgia, serif !important;
+  font-size: 24px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.789px !important;
+  line-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rbccm-marketo-footer p.rbccm-marketo-footer__subheading {
+  color: var(--Blue-Dark-Blue, #003168) !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 300 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Desktop (992+) header spec (Figma):
+     heading   RBC Display 500, 32px / normal, letter-spacing -0.789px, #002750
+     subhead   Roboto 400, 18px / 23px, #002144 */
+@media (min-width: 992px) {
+  .rbccm-marketo-footer__header {
+    gap: 30px;
+  }
+  .rbccm-marketo-footer h2.rbccm-marketo-footer__heading {
+    color: #002750 !important;
+    font-size: 32px !important;
+    line-height: normal !important;
+  }
+  .rbccm-marketo-footer p.rbccm-marketo-footer__subheading {
+    color: #002144 !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    line-height: 23px !important;
+  }
+}
+
+/* ---- Form slot ----------------------------------------------------------
+   No styling of Marketo's markup. Just keep the slot full width. */
+.rbccm-marketo-footer__form {
+  width: 100%;
+}
