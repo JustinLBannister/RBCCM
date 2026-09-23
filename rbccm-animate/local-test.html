@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rbccm-animate -- local preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<script src="rbccm-animate.js"></script>
+<style>
+  body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; color: #1A1A1A; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .demo-stage { padding: 64px 24px; background: #fff; }
+  .demo-inner { max-width: 1140px; margin: 0 auto; }
+  .demo-caption { font-size: 14px; line-height: 1.5; color: #4A4E55; margin: 0 0 8px; }
+  .demo-caption code { font-size: 13px; }
+  .demo-spacer {
+    height: 110vh; display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 48px; box-sizing: border-box;
+    color: #6B7280; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase;
+    background: repeating-linear-gradient(180deg, #f5f7fa 0 39px, #eceff3 39px 40px);
+  }
+  .demo-eyebrow { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #0051A5; margin: 0 0 12px; }
+  .demo-title { font-family: Georgia, serif; font-size: 40px; line-height: 1.2; color: #003168; margin: 0 0 16px; }
+  .demo-body { font-size: 18px; line-height: 1.6; max-width: 640px; margin: 0 0 24px; }
+  .demo-pill { display: inline-block; background: #003168; color: #fff; border-radius: 100px; padding: 12px 28px; font-size: 16px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 24px; }
+  @media (max-width: 767px) { .demo-grid { grid-template-columns: 1fr 1fr; } }
+  .demo-card {
+    background: #E7EEF1; border-radius: 12px; padding: 24px; min-height: 140px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .demo-card strong { color: #003168; font-size: 16px; }
+  .demo-card span { font-size: 13px; color: #4A4E55; margin-top: 6px; font-family: ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body data-picker-title="rbccm-animate">
+
+<div class="demo-note" data-variant="Hero (on load)">Variant -- data-animate-hero (fires on page load, staggered by data-animate-delay)</div>
+<section class="demo-stage">
+  <div class="demo-inner">
+    <p class="demo-eyebrow" data-animate-hero="fadeInDown" data-animate-delay="0">Eyebrow · fadeInDown · 0ms</p>
+    <h1 class="demo-title" data-animate-hero="fadeInUp" data-animate-delay="150">Title · fadeInUp · 150ms</h1>
+    <p class="demo-body" data-animate-hero="fadeInUp" data-animate-delay="300">Body · fadeInUp · 300ms. Above-the-fold hero content plays as soon as the page loads, no scrolling needed.</p>
+    <span class="demo-pill" data-animate-hero="fadeInUp" data-animate-delay="450">Button · 450ms</span>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Scroll reveal">Variant -- data-animate (fires when scrolled into view)</div>
+<div class="demo-spacer">Scroll down ↓</div>
+<section class="demo-stage">
+  <div class="demo-inner">
+    <p class="demo-eyebrow" data-animate="fadeInUp">Eyebrow · fadeInUp · 0ms</p>
+    <h2 class="demo-title" data-animate="fadeInUp" data-animate-delay="120">Heading · fadeInUp · 120ms</h2>
+    <p class="demo-body" data-animate="fadeInUp" data-animate-delay="240">Body · fadeInUp · 240ms. Each element starts hidden and plays once when it enters the viewport. The eyebrow / heading / description cascade is the pattern every section uses.</p>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Stagger">Variant -- data-stagger-parent (children play in sequence)</div>
+<div class="demo-spacer">Scroll down ↓</div>
+<section class="demo-stage">
+  <div class="demo-inner">
+    <p class="demo-caption">Parent: <code>data-stagger-parent="fadeInUp" data-stagger-step="150"</code>. Children need no attributes.</p>
+    <div class="demo-grid" data-stagger-parent="fadeInUp" data-stagger-step="150">
+      <div class="demo-card"><strong>Card 1</strong><span>0ms</span></div>
+      <div class="demo-card"><strong>Card 2</strong><span>150ms</span></div>
+      <div class="demo-card"><strong>Card 3</strong><span>300ms</span></div>
+      <div class="demo-card"><strong>Card 4</strong><span>450ms</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Effects">Variant -- other animate.css effects</div>
+<div class="demo-spacer">Scroll down ↓</div>
+<section class="demo-stage">
+  <div class="demo-inner">
+    <p class="demo-caption">Any animate.css name works in <code>data-animate</code>. These are the ones worth reaching for.</p>
+    <div class="demo-grid">
+      <div class="demo-card" data-animate="fadeIn"><strong>fadeIn</strong><span>data-animate="fadeIn"</span></div>
+      <div class="demo-card" data-animate="fadeInUp" data-animate-delay="100"><strong>fadeInUp</strong><span>the default</span></div>
+      <div class="demo-card" data-animate="fadeInDown" data-animate-delay="200"><strong>fadeInDown</strong><span>eyebrows, heroes</span></div>
+      <div class="demo-card" data-animate="zoomIn" data-animate-delay="300"><strong>zoomIn</strong><span>use sparingly</span></div>
+      <div class="demo-card" data-animate="fadeInLeft"><strong>fadeInLeft</strong><span>split layouts</span></div>
+      <div class="demo-card" data-animate="fadeInRight" data-animate-delay="100"><strong>fadeInRight</strong><span>split layouts</span></div>
+      <div class="demo-card" data-animate="slideInUp" data-animate-delay="200"><strong>slideInUp</strong><span>no fade</span></div>
+      <div class="demo-card" data-animate="flipInX" data-animate-delay="300"><strong>flipInX</strong><span>probably don't</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Custom timing">Variant -- data-animate-duration / data-animate-delay</div>
+<div class="demo-spacer">Scroll down ↓</div>
+<section class="demo-stage">
+  <div class="demo-inner">
+    <p class="demo-caption">Default duration is 1.3s. Override per element with <code>data-animate-duration</code> (ms).</p>
+    <div class="demo-grid">
+      <div class="demo-card" data-animate="fadeInUp" data-animate-duration="400"><strong>Fast</strong><span>duration 400</span></div>
+      <div class="demo-card" data-animate="fadeInUp"><strong>Default</strong><span>duration 1300</span></div>
+      <div class="demo-card" data-animate="fadeInUp" data-animate-duration="2500"><strong>Slow</strong><span>duration 2500</span></div>
+      <div class="demo-card" data-animate="fadeInUp" data-animate-delay="800"><strong>Delayed</strong><span>delay 800</span></div>
+    </div>
+  </div>
+</section>
+
+<script src="../local-test-fixtures/variant-picker.js"></script>
+</body>
+</html>

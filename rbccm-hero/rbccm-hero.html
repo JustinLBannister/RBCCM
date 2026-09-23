@@ -48,117 +48,18 @@
     .demo-fake-nav { height: 98px; }
   }
 
-  /* Push fake-nav below the sticky picker so both are visible at scroll-top. */
-  .demo-fake-nav { top: 92px; }
-
-  /* -- Variant picker (dev-only chrome, not shipped) -- */
-  .variant-picker {
-    background: #003168; color: #fff; font-size: 13px;
-    padding: 14px 20px; position: sticky; top: 0; z-index: 10000;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-  }
-  .variant-picker__title {
-    font-weight: 600; font-size: 12px; text-transform: uppercase;
-    letter-spacing: 0.06em; color: #FFC72C; margin: 0 0 8px 0;
-  }
-  .variant-picker__row {
-    display: flex; flex-wrap: wrap; gap: 20px;
-    align-items: center; justify-content: space-between;
-  }
-  .variant-picker__group {
-    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
-  }
-  .variant-picker__group-label {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
-    color: rgba(255,255,255,0.7); margin-right: 4px;
-  }
-  /* Styled to match .rbccm-cta-band__btn (pill, 44px, 15/500, gap 12). */
-  .variant-picker__btn {
-    align-items: center;
-    background: transparent;
-    border: 1px solid #ffffff;
-    border-radius: 100px;
-    color: #ffffff;
-    cursor: pointer;
-    display: inline-flex;
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    gap: 12px;
-    height: 44px;
-    justify-content: center;
-    line-height: 1;
-    padding: 0 20px;
-    position: relative;
-    overflow: hidden;
-    text-decoration: none;
-    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
-  }
-  .variant-picker__btn:hover,
-  .variant-picker__btn:focus-visible {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #ffffff;
-    color: #ffffff;
-    outline: none;
-  }
-  .variant-picker__btn--active {
-    background: #FFC72C;
-    border-color: #FFC72C;
-    color: #003168;
-    isolation: isolate;
-  }
-  .variant-picker__btn--active:hover,
-  .variant-picker__btn--active:focus-visible {
-    background: #E5B325;
-    border-color: #E5B325;
-    color: #003168;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  }
-  .variant-picker__btn--active::before {
-    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
-    bottom: 0; content: ""; left: -60%; opacity: 0; pointer-events: none;
-    position: absolute; top: 0; transform: skewX(-18deg); width: 40%; z-index: 0;
-  }
-  .variant-picker__btn > * { position: relative; z-index: 1; }
-  .variant-picker__btn--active:hover::before,
-  .variant-picker__btn--active:focus-visible::before {
-    animation: rbccm-hero-picker-shine 600ms ease-out;
-  }
-  @keyframes rbccm-hero-picker-shine {
-    0%   { left: -60%; opacity: 0; }
-    20%  { opacity: 1; }
-    80%  { opacity: 1; }
-    100% { left: 120%; opacity: 0; }
-  }
-  /* Hidden variant state - toggled by picker JS. */
-  .variant-hidden { display: none !important; }
+  /* Keep the fake nav just under the shared variant picker bar. */
+  .demo-fake-nav { top: var(--variant-picker-h, 0px); }
 </style>
 </head>
-<body>
-
-<!-- Dev-only variant picker. Not part of the ship - flips which hero
-     variant is visible on the page. -->
-<div class="variant-picker">
-  <p class="variant-picker__title">rbccm-hero - variant picker</p>
-  <div class="variant-picker__row">
-    <div class="variant-picker__group" data-picker-group="variant">
-      <span class="variant-picker__group-label">Preset</span>
-      <button class="variant-picker__btn variant-picker__btn--active" data-variant="maas-mata">MAAS + MATA</button>
-      <button class="variant-picker__btn" data-variant="strategy-and-economics">Strategy &amp; Economics</button>
-      <button class="variant-picker__btn" data-variant="us-credentials">US Credentials</button>
-    </div>
-    <div class="variant-picker__group">
-      <button class="variant-picker__btn" data-variant="all">Show all</button>
-    </div>
-  </div>
-</div>
+<body data-picker-title="rbccm-hero">
 
 <div class="demo-fake-nav" aria-hidden="true"></div>
 
 <!-- =============================================================
      Variant A -- MAAS + MATA (centred, glow halo, 2-line title)
      ============================================================= -->
-<div class="demo-note">Variant A -- .rbccm-hero--maas-mata (centred, glow halo)</div>
+<div class="demo-note" data-variant="MAAS + MATA">Variant A -- .rbccm-hero--maas-mata (centred, glow halo)</div>
 
 <section class="rbccm-hero rbccm-hero--maas-mata" aria-label="MAAS+MATA hero">
   <div class="rbccm-hero__container">
@@ -196,7 +97,7 @@
 <!-- =============================================================
      Variant B -- Strategy & Economics (split 2-col, insight aside)
      ============================================================= -->
-<div class="demo-note">Variant B -- .rbccm-hero--strategy-and-economics (split-column, insight card aside)</div>
+<div class="demo-note" data-variant="Strategy &amp; Economics">Variant B -- .rbccm-hero--strategy-and-economics (split-column, insight card aside)</div>
 
 <section class="rbccm-hero rbccm-hero--strategy-and-economics" aria-label="Strategy & Economics hero">
 
@@ -259,7 +160,7 @@
 </section>
 
 
-<div class="demo-note">Variant C -- .rbccm-hero--us-credentials (centred, dark navy, bg video, no CTA)</div>
+<div class="demo-note" data-variant="US Credentials">Variant C -- .rbccm-hero--us-credentials (centred, dark navy, bg video, no CTA)</div>
 
 <section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero">
   <div class="rbccm-hero__bg-video" aria-hidden="true">
@@ -278,58 +179,7 @@
   </div>
 </section>
 
-<!-- ── Variant picker JS (dev-only) — toggles which hero variant is
-     visible. Each hero section is paired with the .demo-note that
-     immediately precedes it; both hide/show as a unit. ── -->
-<script>
-  (function () {
-    // Map: variant slug -> array of DOM nodes that make up that variant
-    // (the .demo-note label + the .rbccm-hero section).
-    var VARIANTS = ["maas-mata", "strategy-and-economics", "us-credentials"];
-    var groups = {};
-
-    VARIANTS.forEach(function (slug) {
-      var section = document.querySelector(".rbccm-hero--" + slug);
-      if (!section) return;
-      var note = section.previousElementSibling;
-      // Walk back past any whitespace text nodes; find the demo-note.
-      while (note && !(note.classList && note.classList.contains("demo-note"))) {
-        note = note.previousElementSibling;
-      }
-      groups[slug] = note ? [note, section] : [section];
-    });
-
-    function show(target) {
-      VARIANTS.forEach(function (slug) {
-        var nodes = groups[slug] || [];
-        var visible = (target === "all") || (target === slug);
-        nodes.forEach(function (n) {
-          n.classList.toggle("variant-hidden", !visible);
-        });
-      });
-      // Scroll to top so the newly visible variant is in view.
-      window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
-    }
-
-    // Wire the picker buttons.
-    document.querySelectorAll(".variant-picker__btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var target = btn.getAttribute("data-variant");
-        if (!target) return;
-        // Update active state across ALL picker buttons (single active).
-        document.querySelectorAll(".variant-picker__btn").forEach(function (b) {
-          b.classList.remove("variant-picker__btn--active");
-        });
-        btn.classList.add("variant-picker__btn--active");
-        show(target);
-      });
-    });
-
-    // Initial state: show only the first active button's variant.
-    var initial = document.querySelector(".variant-picker__btn--active");
-    if (initial) show(initial.getAttribute("data-variant"));
-  })();
-</script>
+<script src="../local-test-fixtures/variant-picker.js"></script>
 
 </body>
 </html>

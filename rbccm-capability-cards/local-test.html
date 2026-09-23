@@ -42,7 +42,7 @@
     }
   </style>
 </head>
-<body>
+<body data-picker-title="rbccm-capability-cards">
 
   <!-- Shared icon sprite used by both variants. Paths verbatim from
        the design handoff. `fill` lives on each path so the icon
@@ -101,7 +101,7 @@
          - CTA chip with 16×16 arrow SVG (matches platforms pattern)
          - Hover fires the yellow-beam shimmer (see anchor-scoped
            rules in rbccm-capability-cards.css). -->
-  <span class="demo-label">US Credentials · Preset: capabilities-4</span>
+  <span class="demo-label" data-variant="4-up (US Creds)">US Credentials · Preset: capabilities-4</span>
   <span class="demo-caption">4 anchor cards with <code>Learn more →</code> CTAs, <code>--rbccm-capability-cards-max-width: 1140px</code> content rail, hover shimmer.</span>
   <section class="rbccm-capability-cards rbccm-capability-cards--4" style="--rbccm-capability-cards-max-width: 1140px;" aria-label="Explore our capabilities">
     <p class="rbccm-capability-cards__eyebrow" data-animate="fadeInUp">An integrated global platform</p>
@@ -175,7 +175,7 @@
          - Italic subtitle between title and body.
          - Wide "Index events" card sits BELOW the 3-up grid via
            .__wide as the 4th row (120+ global indices summary). -->
-  <span class="demo-label">MAAS/MATA · Preset: capabilities-3 &nbsp;+&nbsp; --bg-transparent &nbsp;+&nbsp; __wide</span>
+  <span class="demo-label" data-variant="3-up (MAAS/MATA)">MAAS/MATA · Preset: capabilities-3 &nbsp;+&nbsp; --bg-transparent &nbsp;+&nbsp; __wide</span>
   <span class="demo-caption">3-up static <code>&lt;article&gt;</code> cards (no CTAs, no hover shimmer) + italic subtitles + wide 4th-row Index events card. Section is <code>--bg-transparent</code>; gradient comes from the parent <code>.rbccm-maas-mata__dark-strip</code> wrapper.</span>
   <div class="mock-dark-strip">
     <section class="rbccm-capability-cards rbccm-capability-cards--3 rbccm-capability-cards--bg-transparent" aria-label="MATA capabilities">
@@ -232,6 +232,7 @@
 
   <div style="height: 80px;"></div>
 
+  <script src="../local-test-fixtures/variant-picker.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="rbccm-capability-cards.js"></script>
 </body>

@@ -39,7 +39,7 @@
     }
   </style>
 </head>
-<body>
+<body data-picker-title="rbccm-awards">
 
   <!-- ══════════════════════════════════════════════════════════════
        3-COLUMN VARIANT  (awards-3 · MAAS+MATA canon)
@@ -50,7 +50,7 @@
        -->
 
   <!-- 3-column · WITH eyebrow ------------------------------------ -->
-  <span class="demo-label">Preset: awards-3</span>
+  <span class="demo-label" data-variant="3-up">Preset: awards-3</span>
   <span class="demo-caption">Extracted from MAAS+MATA. Eyebrow via <code>SectionEyebrowText</code>, three cards, default navy background.</span>
   <section class="rbccm-awards rbccm-awards--3" aria-label="Awards">
     <div class="rbccm-awards__inner">
@@ -85,7 +85,7 @@
   </section>
 
   <!-- 3-column · NO eyebrow -------------------------------------- -->
-  <span class="demo-label">Preset: awards-3 &nbsp;+&nbsp; no eyebrow</span>
+  <span class="demo-label" data-variant="3-up, no eyebrow">Preset: awards-3 &nbsp;+&nbsp; no eyebrow</span>
   <span class="demo-caption">Blank <code>SectionEyebrowText</code> hides the caption row (just cards, no header).</span>
   <section class="rbccm-awards rbccm-awards--3" aria-label="Awards, no eyebrow">
     <div class="rbccm-awards__inner">
@@ -128,7 +128,7 @@
        -->
 
   <!-- 4-column · default background ------------------------------ -->
-  <span class="demo-label">Preset: awards-4</span>
+  <span class="demo-label" data-variant="4-up">Preset: awards-4</span>
   <span class="demo-caption">US Credentials. Uppercase eyebrow (author-controlled — the component doesn't force-case; editors paste sentence-case or all-caps as-is).</span>
   <section class="rbccm-awards rbccm-awards--4" aria-label="Trusted solutions">
     <div class="rbccm-awards__inner">
@@ -171,7 +171,7 @@
   <!-- Shows how the SectionBgColor Datum overrides the base navy.
        In TeamSite this emits inline style="--rbccm-awards-bg: #XXX;"
        on the section root. -->
-  <span class="demo-label">Preset: awards-4 &nbsp;+&nbsp; SectionBgColor override</span>
+  <span class="demo-label" data-variant="4-up, custom background">Preset: awards-4 &nbsp;+&nbsp; SectionBgColor override</span>
   <span class="demo-caption">Editor sets <code>SectionBgColor</code> to <code>#0a2540</code> (a lighter navy) — inline style beats the base fill.</span>
   <section class="rbccm-awards rbccm-awards--4" aria-label="Awards on lighter navy" style="--rbccm-awards-bg: #0a2540;">
     <div class="rbccm-awards__inner">
@@ -212,6 +212,7 @@
 
   <div style="height: 80px;"></div>
 
+  <script src="../local-test-fixtures/variant-picker.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css">
