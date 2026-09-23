@@ -18,7 +18,9 @@
                  with the newest matching feed record.
     manual       Fully server-rendered from SeInsight* Datums.
 
-  Companion skin: rbccm-hero-maas-mata.xsl
+  Companion skins: rbccm-hero (double-dash) maas-mata.xsl,
+                   rbccm-hero (double-dash) us-credentials.xsl
+  Fields: see rbccm-hero-properties.xml (shared by all three skins).
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -77,6 +79,46 @@
   </xsl:template>
 
 
+  <!-- Datum lookup with legacy fallback (2026-09 Properties cleanup).
+       Reads the new shared ID; if it's blank (or a tag picker is on
+       "auto"), falls back to the pre-cleanup per-variant ID so pages
+       saved before the cleanup keep rendering. raw=true keeps the
+       full un-normalized value (HTML textareas). -->
+  <xsl:template name="datumValue">
+    <xsl:param name="n"/>
+    <xsl:param name="raw" select="false()"/>
+    <xsl:variable name="t" select="normalize-space($n[1]/text()[last()])"/>
+    <xsl:choose>
+      <xsl:when test="$raw"><xsl:value-of select="$n[1]"/></xsl:when>
+      <xsl:when test="$t != ''"><xsl:value-of select="$t"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="normalize-space($n[1]/Option[@Selected='true'][1]/Value)"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="datum">
+    <xsl:param name="id"/>
+    <xsl:param name="legacy" select="''"/>
+    <xsl:param name="raw" select="false()"/>
+    <xsl:variable name="v">
+      <xsl:call-template name="datumValue">
+        <xsl:with-param name="n" select="//Datum[@ID=$id]"/>
+        <xsl:with-param name="raw" select="$raw"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$legacy = '' or (normalize-space($v) != '' and normalize-space($v) != 'auto')">
+        <xsl:value-of select="$v"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="datumValue">
+          <xsl:with-param name="n" select="//Datum[@ID=$legacy]"/>
+          <xsl:with-param name="raw" select="$raw"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -92,12 +134,33 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- Datum lookups (Se* prefix) -->
-    <xsl:variable name="SE_BG_ACCT"          select="normalize-space(//Datum[@ID='SeBgBrightcoveAccount']/text()[last()])"/>
-    <xsl:variable name="SE_BG_PLAYER"        select="normalize-space(//Datum[@ID='SeBgBrightcovePlayer']/text()[last()])"/>
-    <xsl:variable name="SE_BG_VIDEO_ID"      select="normalize-space(//Datum[@ID='SeBgBrightcoveVideoId']/text()[last()])"/>
-    <xsl:variable name="SE_BG_MP4"           select="normalize-space(//Datum[@ID='SeBgVideoMp4']/text()[last()])"/>
+    <!-- Background video (shared IDs, with pre-cleanup Se* fallback) -->
+    <xsl:variable name="SE_BG_ACCT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcoveAccount'"/>
+        <xsl:with-param name="legacy" select="'SeBgBrightcoveAccount'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BG_PLAYER">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcovePlayer'"/>
+        <xsl:with-param name="legacy" select="'SeBgBrightcovePlayer'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BG_VIDEO_ID">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcoveVideoId'"/>
+        <xsl:with-param name="legacy" select="'SeBgBrightcoveVideoId'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BG_MP4">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgVideoMp4'"/>
+        <xsl:with-param name="legacy" select="'SeBgVideoMp4'"/>
+      </xsl:call-template>
+    </xsl:variable>
 
+    <!-- S+E-only Datums (IDs unchanged) -->
     <xsl:variable name="SE_INSIGHT_SOURCE_RAW" select="normalize-space(//Datum[@ID='SeInsightSource']/text()[last()])"/>
     <xsl:variable name="SE_INSIGHT_SOURCE">
       <xsl:choose>
@@ -118,16 +181,40 @@
     </xsl:variable>
     <xsl:variable name="SE_AUTO_LINK_OVERRIDE" select="normalize-space(//Datum[@ID='SeInsightAutoLinkOverride']/text()[last()])"/>
 
-    <xsl:variable name="SE_TITLE_TEXT"       select="normalize-space(//Datum[@ID='SeTitleText']/text()[last()])"/>
-    <xsl:variable name="SE_TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='SeTitleTag']/text()[last()])"/>
-    <xsl:variable name="SE_BODY_TEXT"        select="//Datum[@ID='SeBodyText']"/>
-    <xsl:variable name="SE_BODY_TAG_RAW"     select="normalize-space(//Datum[@ID='SeBodyTag']/text()[last()])"/>
+    <!-- Lede: title line 1 + subtitle (shared IDs, pre-cleanup SeTitle* / SeBody* fallback) -->
+    <xsl:variable name="SE_TITLE_TEXT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'TitleLine1Text'"/>
+        <xsl:with-param name="legacy" select="'SeTitleText'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_TITLE_TAG_RAW">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'TitleTag'"/>
+        <xsl:with-param name="legacy" select="'SeTitleTag'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BODY_TEXT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'SubtitleText'"/>
+        <xsl:with-param name="legacy" select="'SeBodyText'"/>
+        <xsl:with-param name="raw" select="true()"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BODY_TAG_RAW">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'SubtitleTag'"/>
+        <xsl:with-param name="legacy" select="'SeBodyTag'"/>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:variable name="SE_BODY_MAX_WIDTH"   select="normalize-space(//Datum[@ID='SeBodyMaxWidth']/text()[last()])"/>
 
     <xsl:variable name="SE_INS_EYE_TEXT"     select="normalize-space(//Datum[@ID='SeInsightEyebrowText']/text()[last()])"/>
+    <!-- SeInsightEyebrowTag / BodyTag / DateTag were removed from the
+         Properties (fixed p / p / span). Still read here so pages saved
+         before the cleanup keep any custom value. -->
     <xsl:variable name="SE_INS_EYE_TAG_RAW"  select="normalize-space(//Datum[@ID='SeInsightEyebrowTag']/text()[last()])"/>
     <xsl:variable name="SE_INS_TITLE_TEXT"   select="normalize-space(//Datum[@ID='SeInsightTitleText']/text()[last()])"/>
-    <xsl:variable name="SE_INS_TITLE_TAG_RAW" select="normalize-space(//Datum[@ID='SeInsightTitleTag']/text()[last()])"/>
     <xsl:variable name="SE_INS_BODY_TEXT"    select="//Datum[@ID='SeInsightBodyText']"/>
     <xsl:variable name="SE_INS_BODY_TAG_RAW" select="normalize-space(//Datum[@ID='SeInsightBodyTag']/text()[last()])"/>
     <xsl:variable name="SE_INS_DATE_TEXT"    select="normalize-space(//Datum[@ID='SeInsightDateText']/text()[last()])"/>
@@ -206,12 +293,10 @@
         <xsl:with-param name="default" select="'p'"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="SE_INS_TITLE_TAG">
-      <xsl:call-template name="pickTag">
-        <xsl:with-param name="raw" select="$SE_INS_TITLE_TAG_RAW"/>
-        <xsl:with-param name="default" select="'h2'"/>
-      </xsl:call-template>
-    </xsl:variable>
+    <!-- Insight card title is always an h2: it sits under the page h1
+         with no other heading above it, so h3 would skip a level.
+         Fixed on purpose; there is no tag picker for it. -->
+    <xsl:variable name="SE_INS_TITLE_TAG">h2</xsl:variable>
     <xsl:variable name="SE_INS_BODY_TAG">
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$SE_INS_BODY_TAG_RAW"/>

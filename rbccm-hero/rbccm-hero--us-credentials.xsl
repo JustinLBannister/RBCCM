@@ -12,6 +12,7 @@
 
   Companion skins: rbccm-hero (double-dash) maas-mata.xsl,
                    rbccm-hero (double-dash) strategy-and-economics.xsl
+  Fields: see rbccm-hero-properties.xml (shared by all three skins).
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
@@ -30,6 +31,46 @@
   </xsl:template>
 
 
+  <!-- Datum lookup with legacy fallback (2026-09 Properties cleanup).
+       Reads the new shared ID; if it's blank (or a tag picker is on
+       "auto"), falls back to the pre-cleanup per-variant ID so pages
+       saved before the cleanup keep rendering. raw=true keeps the
+       full un-normalized value (HTML textareas). -->
+  <xsl:template name="datumValue">
+    <xsl:param name="n"/>
+    <xsl:param name="raw" select="false()"/>
+    <xsl:variable name="t" select="normalize-space($n[1]/text()[last()])"/>
+    <xsl:choose>
+      <xsl:when test="$raw"><xsl:value-of select="$n[1]"/></xsl:when>
+      <xsl:when test="$t != ''"><xsl:value-of select="$t"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="normalize-space($n[1]/Option[@Selected='true'][1]/Value)"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="datum">
+    <xsl:param name="id"/>
+    <xsl:param name="legacy" select="''"/>
+    <xsl:param name="raw" select="false()"/>
+    <xsl:variable name="v">
+      <xsl:call-template name="datumValue">
+        <xsl:with-param name="n" select="//Datum[@ID=$id]"/>
+        <xsl:with-param name="raw" select="$raw"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$legacy = '' or (normalize-space($v) != '' and normalize-space($v) != 'auto')">
+        <xsl:value-of select="$v"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="datumValue">
+          <xsl:with-param name="n" select="//Datum[@ID=$legacy]"/>
+          <xsl:with-param name="raw" select="$raw"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -44,19 +85,76 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- Datum lookups (Uc* prefix) -->
-    <xsl:variable name="UC_EYEBROW_TEXT"     select="normalize-space(//Datum[@ID='UcEyebrowText']/text()[last()])"/>
-    <xsl:variable name="UC_EYEBROW_TAG_RAW"  select="normalize-space(//Datum[@ID='UcEyebrowTag']/Option[@Selected='true']/Value)"/>
-    <xsl:variable name="UC_TITLE_L1"         select="normalize-space(//Datum[@ID='UcTitleLine1Text']/text()[last()])"/>
-    <xsl:variable name="UC_TITLE_L2"         select="normalize-space(//Datum[@ID='UcTitleLine2Text']/text()[last()])"/>
-    <xsl:variable name="UC_TITLE_TAG_RAW"    select="normalize-space(//Datum[@ID='UcTitleTag']/Option[@Selected='true']/Value)"/>
-    <xsl:variable name="UC_SUBTITLE_TEXT"    select="//Datum[@ID='UcSubtitleText']"/>
-    <xsl:variable name="UC_SUBTITLE_TAG_RAW" select="normalize-space(//Datum[@ID='UcSubtitleTag']/Option[@Selected='true']/Value)"/>
+    <!-- Content Datums (shared IDs, with pre-cleanup Uc* fallback) -->
+    <xsl:variable name="UC_EYEBROW_TEXT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'EyebrowText'"/>
+        <xsl:with-param name="legacy" select="'UcEyebrowText'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_EYEBROW_TAG_RAW">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'EyebrowTag'"/>
+        <xsl:with-param name="legacy" select="'UcEyebrowTag'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_TITLE_L1">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'TitleLine1Text'"/>
+        <xsl:with-param name="legacy" select="'UcTitleLine1Text'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_TITLE_L2">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'TitleLine2Text'"/>
+        <xsl:with-param name="legacy" select="'UcTitleLine2Text'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_TITLE_TAG_RAW">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'TitleTag'"/>
+        <xsl:with-param name="legacy" select="'UcTitleTag'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_SUBTITLE_TEXT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'SubtitleText'"/>
+        <xsl:with-param name="legacy" select="'UcSubtitleText'"/>
+        <xsl:with-param name="raw" select="true()"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_SUBTITLE_TAG_RAW">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'SubtitleTag'"/>
+        <xsl:with-param name="legacy" select="'UcSubtitleTag'"/>
+      </xsl:call-template>
+    </xsl:variable>
 
-    <xsl:variable name="UC_BG_ACCT"          select="normalize-space(//Datum[@ID='UcBgBrightcoveAccount']/text()[last()])"/>
-    <xsl:variable name="UC_BG_PLAYER"        select="normalize-space(//Datum[@ID='UcBgBrightcovePlayer']/text()[last()])"/>
-    <xsl:variable name="UC_BG_VIDEO_ID"      select="normalize-space(//Datum[@ID='UcBgBrightcoveVideoId']/text()[last()])"/>
-    <xsl:variable name="UC_BG_MP4"           select="normalize-space(//Datum[@ID='UcBgVideoMp4']/text()[last()])"/>
+    <!-- Background video (shared IDs, with pre-cleanup Uc* fallback) -->
+    <xsl:variable name="UC_BG_ACCT">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcoveAccount'"/>
+        <xsl:with-param name="legacy" select="'UcBgBrightcoveAccount'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_BG_PLAYER">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcovePlayer'"/>
+        <xsl:with-param name="legacy" select="'UcBgBrightcovePlayer'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_BG_VIDEO_ID">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgBrightcoveVideoId'"/>
+        <xsl:with-param name="legacy" select="'UcBgBrightcoveVideoId'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="UC_BG_MP4">
+      <xsl:call-template name="datum">
+        <xsl:with-param name="id" select="'BgVideoMp4'"/>
+        <xsl:with-param name="legacy" select="'UcBgVideoMp4'"/>
+      </xsl:call-template>
+    </xsl:variable>
 
     <!-- Tag guards -->
     <xsl:variable name="UC_EYEBROW_TAG">

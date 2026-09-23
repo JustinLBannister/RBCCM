@@ -1,79 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Sample DCR payload for previewing the XSL against real data.
-  Swap the Preset value between "maas-mata" and "strategy-and-economics"
-  to test each branch. Structure matches what TeamSite would post:
-    /Properties/Data/Datum[@ID='...']
+  Sample DCR payload for previewing the hero skins against real data.
+  Not shipped. Run any of the three skins against this file with an
+  XSLT 1.0 tool (xsltproc, lxml, etc.):
 
-  Not shipped to production - this file is for the local XSL
-  transform test only (see any XSLT tool that accepts an XML +
-  XSL pair).
+    rbccm-hero (double-dash) maas-mata.xsl
+    rbccm-hero (double-dash) strategy-and-economics.xsl
+    rbccm-hero (double-dash) us-credentials.xsl
+
+  Uses the shared field IDs from rbccm-hero-properties.xml. The shared
+  content below is MAAS+MATA copy; swap it to preview the others
+  (S+E uses TitleLine1Text + SubtitleText only).
 -->
 <Properties ComponentID="rbccm-hero">
   <Data>
 
+    <Datum ID="CacheVersion">1</Datum>
     <Datum ID="SectionID">rbccm-hero-preview</Datum>
     <Datum ID="SectionAriaLabel">Page hero</Datum>
     <Datum ID="CssPath">/assets/rbccm/css/components/rbccm-hero.css</Datum>
     <Datum ID="ButtonCssPath">/assets/rbccm/css/components/rbccm-button.css</Datum>
     <Datum ID="JsPath">/assets/rbccm/js/components/rbccm-hero.js</Datum>
-    <Datum ID="CacheVersion">1</Datum>
+    <Datum ID="HeaderAlignment">left</Datum>
 
-    <!-- Toggle: "maas-mata" or "strategy-and-economics" -->
-    <Datum ID="Preset">strategy-and-economics</Datum>
+    <!-- ==== Hero content (all variants) ==== -->
+    <Datum ID="EyebrowText">Multi-Asset Agency Solutions</Datum>
+    <Datum ID="EyebrowTag">auto</Datum>
+    <Datum ID="TitleLine1Text">Trade with clarity.</Datum>
+    <Datum ID="TitleLine2Text">Execute with control.</Datum>
+    <Datum ID="TitleTag">auto</Datum>
+    <Datum ID="SubtitleText">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
+    <Datum ID="SubtitleTag">auto</Datum>
 
-    <!-- ==== MAAS + MATA content ==== -->
-    <Datum ID="MmEyebrowText">Multi-Asset Agency Solutions</Datum>
-    <Datum ID="MmEyebrowTag">h1</Datum>
-    <Datum ID="MmTitleLine1Text">Trade with clarity.</Datum>
-    <Datum ID="MmTitleLine2Text">Execute with control.</Datum>
-    <Datum ID="MmTitleTag">p</Datum>
-    <Datum ID="MmSubtitleText">RBC Capital Markets' &lt;strong&gt;multi-asset trading platform&lt;/strong&gt; is the only solution that keeps intelligence connected from decision to action.</Datum>
-    <Datum ID="MmSubtitleTag">p</Datum>
+    <!-- ==== Background video (S+E, US Creds) ==== -->
+    <Datum ID="BgVideoMp4"></Datum>
+    <Datum ID="BgBrightcoveVideoId"></Datum>
+    <Datum ID="BgBrightcoveAccount">6021289101001</Datum>
+    <Datum ID="BgBrightcovePlayer">VyvCc9BZx</Datum>
 
+    <!-- ==== MAAS+MATA buttons ==== -->
     <Datum ID="MmCta1Label">Request a demo</Datum>
     <Datum ID="MmCta1Href">#demo</Datum>
     <Datum ID="MmCta1AriaLabel"></Datum>
     <Datum ID="MmCta1Title"></Datum>
     <Datum ID="MmCta1Style">primary</Datum>
-    <Datum ID="MmCta1IconPath">M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z</Datum>
-    <Datum ID="MmCta1IconViewBox">0 0 24 24</Datum>
+    <Datum ID="MmCta1Icon">arrow</Datum>
 
     <Datum ID="MmCta2Label">Watch the video</Datum>
     <Datum ID="MmCta2Href">#video</Datum>
     <Datum ID="MmCta2AriaLabel"></Datum>
     <Datum ID="MmCta2Title"></Datum>
     <Datum ID="MmCta2Style">secondary</Datum>
-    <Datum ID="MmCta2IconPath">M8 5v14l11-7z</Datum>
-    <Datum ID="MmCta2IconViewBox">0 0 24 24</Datum>
+    <Datum ID="MmCta2Icon">play</Datum>
 
-    <!-- ==== Strategy and Economics content ==== -->
-    <Datum ID="SeBgBrightcoveAccount">6021289101001</Datum>
-    <Datum ID="SeBgBrightcovePlayer">VyvCc9BZx</Datum>
-    <Datum ID="SeBgBrightcoveVideoId"></Datum>
-
-    <Datum ID="SeInsightSource">auto-latest</Datum>
-    <Datum ID="SeInsightFeedUrls">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
-    <Datum ID="SeInsightTagKeywords">economic,strategy,macro,geopolitics,monetary,inflation</Datum>
-    <Datum ID="SeLocale">en</Datum>
-    <Datum ID="SeInsightAutoLinkOverride"></Datum>
-
-    <Datum ID="SeTitleText">Macro economics &amp; market strategy insights</Datum>
-    <Datum ID="SeTitleTag">h1</Datum>
-    <Datum ID="SeBodyText">Turning macro complexity into market clarity across economics, geopolitics, and global markets - to drive better business and investment decisions.</Datum>
-    <Datum ID="SeBodyTag">p</Datum>
-
+    <!-- ==== Strategy and Economics ==== -->
+    <Datum ID="SeBodyMaxWidth">86%</Datum>
     <Datum ID="SeInsightEyebrowText">Latest Insight</Datum>
-    <Datum ID="SeInsightEyebrowTag">p</Datum>
     <Datum ID="SeInsightTitleText">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
-    <Datum ID="SeInsightTitleTag">h2</Datum>
+    <Datum ID="SeInsightTitleTag">auto</Datum>
     <Datum ID="SeInsightBodyText">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
-    <Datum ID="SeInsightBodyTag">p</Datum>
     <Datum ID="SeInsightDateText">July 14, 2025</Datum>
-    <Datum ID="SeInsightDateTag">span</Datum>
     <Datum ID="SeInsightLinkLabel">Read more</Datum>
     <Datum ID="SeInsightLinkHref">/en/insights/strategy-and-economics/tariff-fog</Datum>
     <Datum ID="SeInsightLinkAriaLabel">Read more: The Tariff Fog</Datum>
+
+    <Datum ID="SeInsightSource">auto-latest</Datum>
+    <Datum ID="SeInsightDcrLink"></Datum>
+    <Datum ID="SeLocale">en</Datum>
+    <Datum ID="SeInsightFeedUrls">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
+    <Datum ID="SeInsightTagKeywords">economic,strategy,macro,geopolitics,monetary,inflation</Datum>
+    <Datum ID="SeInsightPinnedUrl"></Datum>
+    <Datum ID="SeInsightAutoLinkOverride"></Datum>
 
   </Data>
 </Properties>

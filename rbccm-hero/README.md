@@ -1,64 +1,52 @@
 # RBCCM Hero
 
-Shared hero component. One CSS partial, one BEM block (`.rbccm-hero`), and per-page variant modifiers (`.rbccm-hero--maas-mata`, `.rbccm-hero--strategy-and-economics`, etc.). Each page authors its own hero markup inline in its own XSL -- the shared CSS just provides the shell, typography lock, and variant-specific layout / bg / accents.
+Shared page hero. One CSS file, one BEM block (`.rbccm-hero`), three variants, each with its own TeamSite skin. All three skins share one Properties file.
 
 ## Files
 
-- `rbccm-hero.css` -- the shared partial. Base block + all variant modifiers. Ships to `/assets/rbccm/css/components/rbccm-hero.css`.
-- `rbccm-hero.html` -- local preview showing every variant side-by-side.
-- `README.md` -- this file.
+| File | What it is |
+|---|---|
+| `rbccm-hero--maas-mata.xsl` | Skin: MAAS+MATA (centred eyebrow, 2-line title, subtitle, 2 buttons, glow halo) |
+| `rbccm-hero--strategy-and-economics.xsl` | Skin: S+E (split layout, title + body left, "Latest insight" card right, optional bg video) |
+| `rbccm-hero--us-credentials.xsl` | Skin: US Credentials (centred 2-line title + subtitle on navy, optional bg video, no buttons) |
+| `rbccm-hero-properties.xml` | Fields for all three skins. Each field's label says which variants use it. |
+| `rbccm-hero-sample-dcr.xml` | Sample data for running a skin locally with any XSLT 1.0 tool. Not shipped. |
+| `rbccm-hero.css` | Base block + all variant modifiers. Ships to `/assets/rbccm/css/components/rbccm-hero.css`. |
+| `rbccm-hero.js` | S+E insight card hydrator (auto-latest / pinned URL). |
+| `rbccm-hero.html` | Local preview of all three variants (uses the shared variant picker). |
+| `_retired/rbccm-hero.xsl` | Old combined Preset-driven skin. Not used; had no US Credentials branch. |
 
-No XSL, no Properties.xml, no JS -- this is a pure CSS component. Each consumer page's XSL emits the markup with the right variant class; the component handles the visual result.
+The variant is picked by the skin, not a field. There is no Preset field.
 
-## What the base block owns
+## Fields (46)
 
-- Vertical padding response with fixed-nav compensation (`--rbccm-hero-pt-m/d`, `--rbccm-hero-pb-m/d` custom props tunable inline)
-- Container max-width + horizontal gutter (`.rbccm-hero__container`, 1180px max, 16/24 padding)
-- Font-family lock on `h1` / `h2` / `.__title` / `.__title-line` (defends against `unified.css` tag-level rules that suppress `RBCDisplay`)
-- Base color tokens (navy, blue, yellow, ink) as CSS custom props scoped to the block
-
-## Adding a new variant
-
-1. Author page markup with `class="rbccm-hero rbccm-hero--{page-slug}"` on the outer `<section>`
-2. Add a new `--{page-slug}` modifier block at the bottom of `rbccm-hero.css` with the variant's layout + typography + bg treatment
-3. Load `rbccm-hero.css` in your page **before** any page-specific CSS so page rules can still override
-
-## Consumers
-
-| Page | Modifier class | Markup shape |
+| Group | Fields | Used by |
 |---|---|---|
-| MAAS+MATA | `.rbccm-hero--maas-mata` | Centred eyebrow / 2-line H1 / subtitle / dual CTA row, glow halo backdrop |
-| Strategy & Economics | `.rbccm-hero--strategy-and-economics` | Split 2-col grid: left = eyebrow / large H1 / body; right = `__aside` slot (video panel OR insight card) |
-| _(candidates)_ Insights hub, About Us, others | (TBD) | To be added |
+| Setup | CacheVersion, SectionID, SectionAriaLabel, CssPath, ButtonCssPath, JsPath, HeaderAlignment | all (ButtonCssPath: MAAS+MATA, JsPath: S+E) |
+| Hero content | EyebrowText/Tag, TitleLine1Text, TitleLine2Text, TitleTag, SubtitleText/Tag | all. S+E uses line 1 + subtitle only (no eyebrow, no line 2). |
+| Background video | BgVideoMp4, BgBrightcoveVideoId, BgBrightcoveAccount, BgBrightcovePlayer | S+E, US Credentials |
+| MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA |
+| Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual) | S+E |
 
-## Migration checklist for MAAS+MATA
+Tag pickers default to **Auto**, which uses each variant's SEO default (MAAS+MATA and US Creds: eyebrow h1, title p; S+E: title h1). The S+E insight card title is always h2, with no picker.
 
-1. Import `rbccm-hero.css` before `maas-mata.css` in the page XSL
-2. Rename markup classes in `maas-mata.html`/`.xsl`:
-   - `rbccm-maas-mata__hero` -> `rbccm-hero rbccm-hero--maas-mata`
-   - `rbccm-maas-mata__hero-eyebrow` -> `rbccm-hero__eyebrow`
-   - `rbccm-maas-mata__hero-title` -> `rbccm-hero__title`
-   - `rbccm-maas-mata__hero-title-line` -> `rbccm-hero__title-line`
-   - `rbccm-maas-mata__hero-subtitle` -> `rbccm-hero__subtitle`
-   - `rbccm-maas-mata__hero-actions` -> `rbccm-hero__actions`
-3. Delete the corresponding rules from `maas-mata.css` (kept in `rbccm-hero.css` now)
-4. Bump the page's `AssetVersion` / cache-buster
+## Legacy field IDs (2026-09 cleanup)
 
-## Migration checklist for Strategy & Economics
+The Properties file went from 68 to 46 fields by merging the per-variant copies (`Mm*`, `Uc*`, `Se*`) of eyebrow, title, subtitle and background video into shared fields, swapping the buttons' raw SVG path fields for an icon dropdown, and dropping the S+E insight card tag pickers (title fixed at h2).
 
-1. Import `rbccm-hero.css` in the page XSL
-2. Rename markup classes in `strategy-econ.html`:
-   - `rbccm-se__hero` -> `rbccm-hero rbccm-hero--strategy-and-economics`
-   - `rbccm-se__hero-grid` -> `rbccm-hero__grid`
-   - `rbccm-se__hero-eyebrow` -> `rbccm-hero__eyebrow`
-   - `rbccm-se__hero-title` -> `rbccm-hero__title`
-   - `rbccm-se__hero-body` -> `rbccm-hero__body`
-   - `rbccm-se__hero-media` / `rbccm-se__hero-media-play` -> `rbccm-hero__aside` (and inner content, whether video-panel or insight-card, uses `__insight-*` classes documented in `rbccm-hero.css`)
-3. Delete the corresponding rules from `strategy-econ.html`'s inline `<style>` block
-4. Bump the page's `AssetVersion` / cache-buster
+Pages saved before the cleanup keep rendering: each skin reads the new field, and when it's blank (or a tag is on Auto) falls back to the old ID. The full old-to-new map is in the header comment of `rbccm-hero-properties.xml`.
 
-## Deploy checklist
+Once every hero page has been re-saved with the new fields filled in, the fallbacks can be removed from the skins (search the skins for `legacy`).
 
-1. Push `rbccm-hero.css` to `/assets/rbccm/css/components/rbccm-hero.css`
-2. Update every consumer page's XSL to import the shared CSS **before** their own component CSS
-3. Bump `AssetVersion` on each consumer page after their markup + CSS have been migrated
+## Adding a variant
+
+1. Add a `.rbccm-hero--{slug}` modifier block to `rbccm-hero.css`.
+2. Copy the closest skin to `rbccm-hero--{slug}.xsl` and change the hardcoded variant class.
+3. Reuse the shared fields. Only add new fields for things the other variants don't have, prefixed for the variant.
+4. Add the variant to `rbccm-hero.html` with a `data-variant` label.
+
+## Deploy
+
+1. Push `rbccm-hero.css` (and `rbccm-hero.js` for S+E) to `/assets/rbccm/.../components/`.
+2. Upload the three skins and `rbccm-hero-properties.xml` to TeamSite.
+3. Bump CacheVersion on each hero after saving.
