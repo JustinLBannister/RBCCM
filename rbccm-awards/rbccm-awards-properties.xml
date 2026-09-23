@@ -18,19 +18,18 @@
 <Properties ComponentID="rbccm-awards-v1">
 
   <!-- ============================================================
-       Deploy plumbing (set once)
+       Appearance tab: settings, paths, layout, tags, colours
        ============================================================ -->
-  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-awards.css</Datum>
-  <Datum ID="JsPath" Type="String" Name="JS path (technical - powers the mobile carousel)">/assets/rbccm/js/components/rbccm-awards.js</Datum>
-  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-23-1200</Datum>
-  <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-awards-1</Datum>
-  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to 'Awards')"></Datum>
 
-  <!-- ============================================================
-       Section content
-       ============================================================ -->
-  <!-- Caption line above the cards. Blank hides it. -->
-  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - blank hides it)">See why the world's top institutions choose MAAS</Datum>
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-awards.css</Datum>
+
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - powers the mobile carousel)">/assets/rbccm/js/components/rbccm-awards.js</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-23-1200</Datum>
+
+  <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-awards-1</Datum>
+
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to 'Awards')"></Datum>
 
   <!-- Blank = the layout's own navy (3 cards #041e42, 4 cards
        #051B38). Any CSS colour works: #hex, rgb(), a named colour. -->
@@ -41,17 +40,12 @@
 <Data>
 
   <!-- ============================================================
-       Award card (repeatable - add 3 or 4)
-       ============================================================
-       ONE Group only. IDs must be unique in this file (TeamSite
-       validates them as XML IDs), so the card is defined once and
-       editors add cards with the repeater's + button. Same as
-       icon-carousel / case-studies-carousel.
-       Year (optional, e.g. 2026) / Title (blank hides the card) /
-       Issuer (optional). Datum Names are kept short and equal to
-       the IDs on purpose: saved Group data can carry the Name only,
-       and the XSL matches on either.
+       Content tab: copy, links, media
        ============================================================ -->
+
+  <!-- Caption line above the cards. Blank hides it. -->
+  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - blank hides it)">See why the world's top institutions choose MAAS</Datum>
+
   <Group ID="AwardCard"
          Name="Award Card"
          Replicatable="true"
@@ -60,6 +54,5 @@
     <Datum ID="Title" Type="String" Name="Title">Best Trading Analytics Platform</Datum>
     <Datum ID="Issuer" Type="String" Name="Issuer">TradingTech Insights Awards USA</Datum>
   </Group>
-
 
 </Data>

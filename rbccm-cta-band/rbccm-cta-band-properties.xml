@@ -40,11 +40,10 @@
      ============================================================ -->
 <Properties ComponentID="cta-band-v2">
 
-  <!-- ═══ PRESET + MODIFIER ═══════════════════════════════════
-       Preset selects the visual variant; BgTransparent zeros the
-       section background when nested inside a wrapper that owns a
-       shared gradient across siblings.
-       ═════════════════════════════════════════════════════════ -->
+  <!-- ============================================================
+       Appearance tab: settings, paths, layout, tags, colours
+       ============================================================ -->
+
   <Datum ID="Preset" Type="Enum" Name="Variant" Default="maas-mata">
     <Option Value="maas-mata">Talk with an expert (big serif + 1 yellow CTA)</Option>
     <Option Value="strategy-and-economics">Research portal (small serif + 2 buttons)</Option>
@@ -56,13 +55,17 @@
     <Option Value="yes">Yes — inherit the parent wrapper's background</Option>
   </Datum>
 
+  <Datum ID="SectionId"        Type="String" Name="Section id (optional — for anchor links)"></Datum>
 
-  <!-- ═══ CONTENT ═════════════════════════════════════════════
-       Every text Datum is optional. Empty → element does not
-       render (eyebrow, secondary button) or renders empty
-       (heading parts, body). Preset owns the visual treatment;
-       these Datums own the copy.
-       ═════════════════════════════════════════════════════════ -->
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional)"></Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
 
   <!-- Eyebrow — small yellow caption above the heading. Leave
        blank to omit it entirely. Only rendered when non-empty
@@ -82,6 +85,7 @@
          strategy-and-economics      Lead: "Explore our full library of research and insights"
                               Highlight: (blank)                                     -->
   <Datum ID="HeadingLead" Type="String" Name="Heading — lead (white)">Talk with an</Datum>
+
   <Datum ID="HeadingHighlight" Type="String" Name="Heading — highlight (yellow; leave blank for a single-color heading)">expert.</Datum>
 
   <!-- Body paragraph. Textarea so authors can paste multi-line
@@ -90,29 +94,12 @@
        Leave blank to omit. -->
   <Datum ID="Body" Type="Textarea" Name="Body copy (optional)">Connect with our product teams to arrange a custom demo.</Datum>
 
-
-  <!-- ═══ PRIMARY CTA (yellow pill with arrow) ════════════════ -->
   <Datum ID="Cta1Label" Type="String" Name="Primary button — label">Request a demo</Datum>
+
   <Datum ID="Cta1Href"  Type="String" Name="Primary button — URL">#demo</Datum>
 
-
-  <!-- ═══ SECONDARY CTA (outlined ghost) ══════════════════════
-       Only rendered on the strategy-and-economics preset; leave both
-       blank on the others. If Label is blank the entire button
-       is skipped even on strategy-and-economics.
-       ═════════════════════════════════════════════════════════ -->
   <Datum ID="Cta2Label" Type="String" Name="Secondary button — label (strategy-and-economics only; leave blank to omit)"></Datum>
+
   <Datum ID="Cta2Href"  Type="String" Name="Secondary button — URL"></Datum>
 
-
-  <!-- ═══ SECTION ATTRIBUTES ══════════════════════════════════
-       Optional. SectionId gives the band a hash-anchor target
-       (e.g. "demo" → href="#demo" elsewhere on the page).
-       SectionAriaLabel is added to the <section> for screen
-       reader context — supply when the heading alone isn't a
-       clear enough label for the region.
-       ═════════════════════════════════════════════════════════ -->
-  <Datum ID="SectionId"        Type="String" Name="Section id (optional — for anchor links)"></Datum>
-  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional)"></Datum>
-
-</Properties>
+</Data>

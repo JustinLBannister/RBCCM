@@ -2,21 +2,19 @@
 <!--
   RBCCM Capability Cards  |  XSL skin
   ============================================================
-  Reads the Preset + card Datums from Properties and renders a
-  row of 3-6 identical capability cards on a dark navy section.
+  Renders a row of 3-6 identical capability cards on a dark navy
+  section.
 
-  Presets
+  Layout (no preset field)
   ============================================================
-    capabilities-3   3 cards at desktop
-    capabilities-4   4 cards at desktop
-    capabilities-5   5 cards at desktop
-    capabilities-6   6 cards at desktop
+  The number of cards with a title (Card1-Card6) sets the desktop
+  column count: 3, 4, 5 or 6. Blank-title cards are skipped.
 
   Icon system
   ============================================================
   Cards use inline SVG icons drawn from a built-in sprite. Editors
-  pick an icon by name via Card{N}IconType (chart, building, globe,
-  search, exchange, layers, info, chart-trend). The sprite <defs>
+  pick an icon by typing its name in Card{N}IconType (chart-trend, building,
+  globe, search, exchange, layers, info). The sprite <defs>
   block below carries every icon path so no external asset load
   is required. Icons inherit currentColor from .rbccm-capability-cards__icon
   so the yellow accent flows through.
@@ -37,17 +35,6 @@
         <xsl:value-of select="$raw"/>
       </xsl:when>
       <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- Preset-to-card-count map. -->
-  <xsl:template name="cardCountForPreset">
-    <xsl:param name="preset"/>
-    <xsl:choose>
-      <xsl:when test="$preset = 'capabilities-3'">3</xsl:when>
-      <xsl:when test="$preset = 'capabilities-5'">5</xsl:when>
-      <xsl:when test="$preset = 'capabilities-6'">6</xsl:when>
-      <xsl:otherwise>4</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -125,7 +112,10 @@
     <xsl:param name="n"/>
 
     <xsl:variable name="title"    select="normalize-space(//Datum[@ID=concat('Card', $n, 'TitleText')]/text()[last()])"/>
-    <xsl:variable name="iconType" select="normalize-space(//Datum[@ID=concat('Card', $n, 'IconType')]/text()[last()])"/>
+    <!-- Plain text field: chart-trend, building, globe, search,
+         exchange, layers or info. Case-insensitive; unknown or blank
+         falls back to chart-trend. -->
+    <xsl:variable name="iconType" select="translate(normalize-space(//Datum[@ID=concat('Card', $n, 'IconType')]/text()[last()]), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-')"/>
     <xsl:variable name="subtitle" select="normalize-space(//Datum[@ID=concat('Card', $n, 'SubtitleText')]/text()[last()])"/>
     <xsl:variable name="body"     select="//Datum[@ID=concat('Card', $n, 'BodyText')]"/>
     <xsl:variable name="ctaLabel" select="normalize-space(//Datum[@ID=concat('Card', $n, 'CtaLabel')]/text()[last()])"/>
@@ -175,7 +165,6 @@
     <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
     <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
     <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
-    <xsl:variable name="PRESET"        select="normalize-space(//Datum[@ID='Preset']/text()[last()])"/>
     <xsl:variable name="BG_COLOR"      select="normalize-space(//Datum[@ID='SectionBgColor']/text()[last()])"/>
     <xsl:variable name="MAX_WIDTH_RAW" select="normalize-space(//Datum[@ID='SectionMaxWidth']/text()[last()])"/>
     <!-- Accept bare integers ("1140") or values with a CSS unit
@@ -200,10 +189,15 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!-- Layout comes from how many cards have a title (3 to 6).
+         Fewer than 3 still uses the 3-up layout. -->
+    <xsl:variable name="TITLED" select="count(//Datum[starts-with(@ID, 'Card') and substring(@ID, string-length(@ID) - 8) = 'TitleText' and normalize-space(.) != ''])"/>
     <xsl:variable name="CARD_COUNT">
-      <xsl:call-template name="cardCountForPreset">
-        <xsl:with-param name="preset" select="$PRESET"/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$TITLED &gt;= 6">6</xsl:when>
+        <xsl:when test="$TITLED &lt;= 3">3</xsl:when>
+        <xsl:otherwise><xsl:value-of select="$TITLED"/></xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <!-- Stylesheet hoist. -->
@@ -216,14 +210,7 @@
       </link>
     </xsl:if>
 
-    <xsl:variable name="VARIANT_CLASS">
-      <xsl:choose>
-        <xsl:when test="$PRESET = 'capabilities-3'">rbccm-capability-cards--3</xsl:when>
-        <xsl:when test="$PRESET = 'capabilities-5'">rbccm-capability-cards--5</xsl:when>
-        <xsl:when test="$PRESET = 'capabilities-6'">rbccm-capability-cards--6</xsl:when>
-        <xsl:otherwise>rbccm-capability-cards--4</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:variable name="VARIANT_CLASS">rbccm-capability-cards--<xsl:value-of select="$CARD_COUNT"/></xsl:variable>
 
     <section>
       <xsl:attribute name="class">rbccm-capability-cards <xsl:value-of select="$VARIANT_CLASS"/></xsl:attribute>
@@ -275,15 +262,9 @@
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="1"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="2"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="3"/></xsl:call-template>
-          <xsl:if test="$CARD_COUNT &gt;= 4">
-            <xsl:call-template name="renderCard"><xsl:with-param name="n" select="4"/></xsl:call-template>
-          </xsl:if>
-          <xsl:if test="$CARD_COUNT &gt;= 5">
-            <xsl:call-template name="renderCard"><xsl:with-param name="n" select="5"/></xsl:call-template>
-          </xsl:if>
-          <xsl:if test="$CARD_COUNT &gt;= 6">
-            <xsl:call-template name="renderCard"><xsl:with-param name="n" select="6"/></xsl:call-template>
-          </xsl:if>
+          <xsl:call-template name="renderCard"><xsl:with-param name="n" select="4"/></xsl:call-template>
+          <xsl:call-template name="renderCard"><xsl:with-param name="n" select="5"/></xsl:call-template>
+          <xsl:call-template name="renderCard"><xsl:with-param name="n" select="6"/></xsl:call-template>
         </div>
       </div>
 

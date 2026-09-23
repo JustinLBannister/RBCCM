@@ -28,6 +28,8 @@ The variant is picked by the skin, not a field. There is no Preset field.
 | MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA |
 | Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual) | S+E |
 
+In TeamSite, settings (paths, IDs, alignment, tag pickers, button style/icon, Brightcove IDs, feed URLs) sit on the Appearance tab (`<Properties>`); copy, links, media and the S+E insight card sit on the Content tab (`<Data>`).
+
 Tag pickers default to **Auto**, which uses each variant's SEO default (MAAS+MATA and US Creds: eyebrow h1, title p; S+E: title h1). The S+E insight card title is always h2, with no picker.
 
 ## Legacy field IDs (2026-09 cleanup)

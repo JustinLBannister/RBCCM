@@ -5,12 +5,11 @@
      Each card: icon + yellow title + optional italic subtitle +
      body copy + optional "Learn more" text CTA.
 
-     Presets
+     Layout (no preset field)
      ============================================================
-       capabilities-3   3 cards at desktop
-       capabilities-4   4 cards at desktop (Explore our capabilities default)
-       capabilities-5   5 cards at desktop
-       capabilities-6   6 cards at desktop
+     The number of cards with a title sets the desktop columns:
+     3, 4, 5 or 6. Fill Card1-Card4 for the US Credentials 4-up
+     (the default), blank Card4 for 3-up, fill Card5/6 for 5/6-up.
 
      Responsive behaviour
      ============================================================
@@ -20,158 +19,118 @@
 
      Icon system
      ============================================================
-     Card{N}IconType picks one of the built-in inline SVG icons:
+     Card{N}IconType: type the name of a built-in icon (plain text,
+     not a dropdown; unknown or blank = chart-trend):
        chart-trend  (default)  building  globe  search
        exchange     layers     info
      ============================================================ -->
 <Properties ComponentID="rbccm-capability-cards-v1">
 
   <!-- ============================================================
-       Preset  (determines card count at desktop)
+       Appearance tab: settings, paths, layout, tags, colours
        ============================================================ -->
-  <Datum ID="Preset" Type="String" Name="Layout preset (card count at desktop)">
-    <Option Value="capabilities-3">3 cards</Option>
-    <Option Value="capabilities-4" Selected="true">4 cards</Option>
-    <Option Value="capabilities-5">5 cards</Option>
-    <Option Value="capabilities-6">6 cards</Option>
-  </Datum>
 
-  <!-- ============================================================
-       Deploy plumbing
-       ============================================================ -->
+
   <Datum ID="CssPath" Type="String" Name="CSS path (absolute URL)">/assets/rbccm/css/components/rbccm-capability-cards.css</Datum>
+
   <Datum ID="JsPath" Type="String" Name="JS path (absolute URL)">/assets/rbccm/js/components/rbccm-capability-cards.js</Datum>
+
   <Datum ID="CacheVersion" Type="String" Name="Cache version (format YYYY-MM-DD-HHMM)">2026-09-17-1200</Datum>
+
   <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-capability-cards-1</Datum>
+
   <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to heading text)"></Datum>
+
   <Datum ID="SectionBgColor" Type="String" Name="Section background colour e.g. '#041e42' (optional - blank inherits base navy)"></Datum>
+
   <Datum ID="SectionMaxWidth" Type="String" Name="Content max width in px (optional - typically 1100, 1140, etc; blank uses 1100)"></Datum>
 
-  <!-- ============================================================
-       Section header  (all optional)
-       ============================================================ -->
-  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - sentence-case yellow caption e.g. 'An integrated global platform')">An integrated global platform</Datum>
-  <Datum ID="SectionHeadingText" Type="String" Name="Section heading (optional)">Explore our capabilities</Datum>
   <Datum ID="SectionHeadingTag" Type="String" Name="Section heading tag (h1-h6 - default h2)">h2</Datum>
-  <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - paragraph below heading)"></Datum>
-
-  <!-- ============================================================
-       Card 1
-       ============================================================
-       Card{N}IconType    built-in icon name (see options in Preset comment)
-       Card{N}TitleText   yellow bold title (blank hides the card)
-       Card{N}SubtitleText optional italic subtitle between title and body
-       Card{N}BodyText    body paragraph
-       Card{N}CtaLabel    visible CTA label e.g. 'Learn more' (optional)
-       Card{N}CtaHref     CTA target (optional - when set, whole card becomes anchor)
-       ============================================================ -->
-
-  <Datum ID="Card1IconType" Type="String" Name="Card 1 : icon">
-    <Option Value="chart-trend" Selected="true">Chart trend (default)</Option>
-    <Option Value="building">Building</Option>
-    <Option Value="globe">Globe</Option>
-    <Option Value="search">Search</Option>
-    <Option Value="exchange">Exchange</Option>
-    <Option Value="layers">Layers</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (blank hides the card)">Global Investment Banking</Datum>
-  <Datum ID="Card1SubtitleText" Type="String" Name="Card 1 : subtitle (optional - italic between title and body)"></Datum>
-  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body copy">Cross-border advisory and financing capabilities with industry-specific expertise, supporting clients across M&amp;A, capital raising and strategic transactions.</Datum>
-  <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label (optional)">Learn more</Datum>
-  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA href (optional - when set, whole card becomes anchor)">#</Datum>
-
-  <!-- ============================================================
-       Card 2
-       ============================================================ -->
-  <Datum ID="Card2IconType" Type="String" Name="Card 2 : icon">
-    <Option Value="chart-trend">Chart trend</Option>
-    <Option Value="building" Selected="true">Building (default)</Option>
-    <Option Value="globe">Globe</Option>
-    <Option Value="search">Search</Option>
-    <Option Value="exchange">Exchange</Option>
-    <Option Value="layers">Layers</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title">Corporate Banking</Datum>
-  <Datum ID="Card2SubtitleText" Type="String" Name="Card 2 : subtitle (optional)"></Datum>
-  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body copy">Corporate and institutional lending capabilities across the credit spectrum, supporting clients with acquisition financing, revolving and term loans, letters of credit and other tailored credit solutions.</Datum>
-  <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label (optional)">Learn more</Datum>
-  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA href (optional)">#</Datum>
-
-  <!-- ============================================================
-       Card 3
-       ============================================================ -->
-  <Datum ID="Card3IconType" Type="String" Name="Card 3 : icon">
-    <Option Value="chart-trend">Chart trend</Option>
-    <Option Value="building">Building</Option>
-    <Option Value="globe" Selected="true">Globe (default)</Option>
-    <Option Value="search">Search</Option>
-    <Option Value="exchange">Exchange</Option>
-    <Option Value="layers">Layers</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title">Global Markets</Datum>
-  <Datum ID="Card3SubtitleText" Type="String" Name="Card 3 : subtitle (optional)"></Datum>
-  <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body copy">Connecting insight, execution, and capital across Equities and FICC markets through integrated sales and trading, financing, and structuring capabilities.</Datum>
-  <Datum ID="Card3CtaLabel" Type="String" Name="Card 3 : CTA label (optional)">Learn more</Datum>
-  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA href (optional)">#</Datum>
-
-  <!-- ============================================================
-       Card 4
-       ============================================================ -->
-  <Datum ID="Card4IconType" Type="String" Name="Card 4 : icon">
-    <Option Value="chart-trend">Chart trend</Option>
-    <Option Value="building">Building</Option>
-    <Option Value="globe">Globe</Option>
-    <Option Value="search" Selected="true">Search (default)</Option>
-    <Option Value="exchange">Exchange</Option>
-    <Option Value="layers">Layers</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title">Global Research</Datum>
-  <Datum ID="Card4SubtitleText" Type="String" Name="Card 4 : subtitle (optional)"></Datum>
-  <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body copy">Macroeconomic, geopolitical and market insights across asset classes, industries and over 1,500 stocks, delivered by a deep bench of analysts combining data science, quantitative tools and sector expertise.</Datum>
-  <Datum ID="Card4CtaLabel" Type="String" Name="Card 4 : CTA label (optional)">Learn more</Datum>
-  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA href (optional)">#</Datum>
-
-  <!-- ============================================================
-       Card 5  (rendered only when Preset = capabilities-5 or -6)
-       ============================================================ -->
-  <Datum ID="Card5IconType" Type="String" Name="Card 5 : icon (Preset 5 or 6 only)">
-    <Option Value="chart-trend">Chart trend</Option>
-    <Option Value="building">Building</Option>
-    <Option Value="globe">Globe</Option>
-    <Option Value="search">Search</Option>
-    <Option Value="exchange" Selected="true">Exchange (default)</Option>
-    <Option Value="layers">Layers</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card5TitleText" Type="String" Name="Card 5 : title (Preset 5 or 6 only)"></Datum>
-  <Datum ID="Card5SubtitleText" Type="String" Name="Card 5 : subtitle (optional)"></Datum>
-  <Datum ID="Card5BodyText" Type="Textarea" Name="Card 5 : body copy"></Datum>
-  <Datum ID="Card5CtaLabel" Type="String" Name="Card 5 : CTA label (optional)"></Datum>
-  <Datum ID="Card5CtaHref" Type="String" Name="Card 5 : CTA href (optional)"></Datum>
-
-  <!-- ============================================================
-       Card 6  (rendered only when Preset = capabilities-6)
-       ============================================================ -->
-  <Datum ID="Card6IconType" Type="String" Name="Card 6 : icon (Preset 6 only)">
-    <Option Value="chart-trend">Chart trend</Option>
-    <Option Value="building">Building</Option>
-    <Option Value="globe">Globe</Option>
-    <Option Value="search">Search</Option>
-    <Option Value="exchange">Exchange</Option>
-    <Option Value="layers" Selected="true">Layers (default)</Option>
-    <Option Value="info">Info</Option>
-  </Datum>
-  <Datum ID="Card6TitleText" Type="String" Name="Card 6 : title (Preset 6 only)"></Datum>
-  <Datum ID="Card6SubtitleText" Type="String" Name="Card 6 : subtitle (optional)"></Datum>
-  <Datum ID="Card6BodyText" Type="Textarea" Name="Card 6 : body copy"></Datum>
-  <Datum ID="Card6CtaLabel" Type="String" Name="Card 6 : CTA label (optional)"></Datum>
-  <Datum ID="Card6CtaHref" Type="String" Name="Card 6 : CTA href (optional)"></Datum>
 
 </Properties>
 
 <Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
+
+  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - sentence-case yellow caption e.g. 'An integrated global platform')">An integrated global platform</Datum>
+
+  <Datum ID="SectionHeadingText" Type="String" Name="Section heading (optional)">Explore our capabilities</Datum>
+
+  <Datum ID="SectionDescriptionText" Type="Textarea" Name="Section description (optional - paragraph below heading)"></Datum>
+
+  <Datum ID="Card1IconType" Type="String" Name="Card 1 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">chart-trend</Datum>
+
+  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (blank hides the card)">Global Investment Banking</Datum>
+
+  <Datum ID="Card1SubtitleText" Type="String" Name="Card 1 : subtitle (optional - italic between title and body)"></Datum>
+
+  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body copy">Cross-border advisory and financing capabilities with industry-specific expertise, supporting clients across M&amp;A, capital raising and strategic transactions.</Datum>
+
+  <Datum ID="Card1CtaLabel" Type="String" Name="Card 1 : CTA label (optional)">Learn more</Datum>
+
+  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA href (optional - when set, whole card becomes anchor)">#</Datum>
+
+  <Datum ID="Card2IconType" Type="String" Name="Card 2 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">building</Datum>
+
+  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title">Corporate Banking</Datum>
+
+  <Datum ID="Card2SubtitleText" Type="String" Name="Card 2 : subtitle (optional)"></Datum>
+
+  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body copy">Corporate and institutional lending capabilities across the credit spectrum, supporting clients with acquisition financing, revolving and term loans, letters of credit and other tailored credit solutions.</Datum>
+
+  <Datum ID="Card2CtaLabel" Type="String" Name="Card 2 : CTA label (optional)">Learn more</Datum>
+
+  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA href (optional)">#</Datum>
+
+  <Datum ID="Card3IconType" Type="String" Name="Card 3 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">globe</Datum>
+
+  <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title">Global Markets</Datum>
+
+  <Datum ID="Card3SubtitleText" Type="String" Name="Card 3 : subtitle (optional)"></Datum>
+
+  <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body copy">Connecting insight, execution, and capital across Equities and FICC markets through integrated sales and trading, financing, and structuring capabilities.</Datum>
+
+  <Datum ID="Card3CtaLabel" Type="String" Name="Card 3 : CTA label (optional)">Learn more</Datum>
+
+  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA href (optional)">#</Datum>
+
+  <Datum ID="Card4IconType" Type="String" Name="Card 4 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">search</Datum>
+
+  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title">Global Research</Datum>
+
+  <Datum ID="Card4SubtitleText" Type="String" Name="Card 4 : subtitle (optional)"></Datum>
+
+  <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body copy">Macroeconomic, geopolitical and market insights across asset classes, industries and over 1,500 stocks, delivered by a deep bench of analysts combining data science, quantitative tools and sector expertise.</Datum>
+
+  <Datum ID="Card4CtaLabel" Type="String" Name="Card 4 : CTA label (optional)">Learn more</Datum>
+
+  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA href (optional)">#</Datum>
+
+  <Datum ID="Card5IconType" Type="String" Name="Card 5 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">exchange</Datum>
+
+  <Datum ID="Card5TitleText" Type="String" Name="Card 5 : title"></Datum>
+
+  <Datum ID="Card5SubtitleText" Type="String" Name="Card 5 : subtitle (optional)"></Datum>
+
+  <Datum ID="Card5BodyText" Type="Textarea" Name="Card 5 : body copy"></Datum>
+
+  <Datum ID="Card5CtaLabel" Type="String" Name="Card 5 : CTA label (optional)"></Datum>
+
+  <Datum ID="Card5CtaHref" Type="String" Name="Card 5 : CTA href (optional)"></Datum>
+
+  <Datum ID="Card6IconType" Type="String" Name="Card 6 : icon - type one of: chart-trend, building, globe, search, exchange, layers, info">layers</Datum>
+
+  <Datum ID="Card6TitleText" Type="String" Name="Card 6 : title"></Datum>
+
+  <Datum ID="Card6SubtitleText" Type="String" Name="Card 6 : subtitle (optional)"></Datum>
+
+  <Datum ID="Card6BodyText" Type="Textarea" Name="Card 6 : body copy"></Datum>
+
+  <Datum ID="Card6CtaLabel" Type="String" Name="Card 6 : CTA label (optional)"></Datum>
+
+  <Datum ID="Card6CtaHref" Type="String" Name="Card 6 : CTA href (optional)"></Datum>
+
 </Data>

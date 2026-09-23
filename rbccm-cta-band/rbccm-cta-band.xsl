@@ -44,7 +44,7 @@
   <xsl:template match="/">
 
     <!-- ═══ Datum reads ═══════════════════════════════════════ -->
-    <xsl:variable name="PRESET_RAW"        select="normalize-space(/Properties/Datum[@ID='Preset'])"/>
+    <xsl:variable name="PRESET_RAW"        select="normalize-space(//Datum[@ID='Preset'])"/>
     <xsl:variable name="PRESET">
       <xsl:choose>
         <xsl:when test="$PRESET_RAW != ''"><xsl:value-of select="$PRESET_RAW"/></xsl:when>
@@ -52,21 +52,21 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="BG_TRANSPARENT"    select="normalize-space(/Properties/Datum[@ID='BgTransparent'])"/>
+    <xsl:variable name="BG_TRANSPARENT"    select="normalize-space(//Datum[@ID='BgTransparent'])"/>
 
-    <xsl:variable name="EYEBROW"           select="normalize-space(/Properties/Datum[@ID='Eyebrow'])"/>
-    <xsl:variable name="HEADING_LEAD"      select="normalize-space(/Properties/Datum[@ID='HeadingLead'])"/>
-    <xsl:variable name="HEADING_HIGHLIGHT" select="normalize-space(/Properties/Datum[@ID='HeadingHighlight'])"/>
-    <xsl:variable name="BODY"              select="/Properties/Datum[@ID='Body']"/>
+    <xsl:variable name="EYEBROW"           select="normalize-space(//Datum[@ID='Eyebrow'])"/>
+    <xsl:variable name="HEADING_LEAD"      select="normalize-space(//Datum[@ID='HeadingLead'])"/>
+    <xsl:variable name="HEADING_HIGHLIGHT" select="normalize-space(//Datum[@ID='HeadingHighlight'])"/>
+    <xsl:variable name="BODY"              select="//Datum[@ID='Body']"/>
     <xsl:variable name="BODY_NORM"         select="normalize-space($BODY)"/>
 
-    <xsl:variable name="CTA1_LABEL"        select="normalize-space(/Properties/Datum[@ID='Cta1Label'])"/>
-    <xsl:variable name="CTA1_HREF"         select="normalize-space(/Properties/Datum[@ID='Cta1Href'])"/>
-    <xsl:variable name="CTA2_LABEL"        select="normalize-space(/Properties/Datum[@ID='Cta2Label'])"/>
-    <xsl:variable name="CTA2_HREF"         select="normalize-space(/Properties/Datum[@ID='Cta2Href'])"/>
+    <xsl:variable name="CTA1_LABEL"        select="normalize-space(//Datum[@ID='Cta1Label'])"/>
+    <xsl:variable name="CTA1_HREF"         select="normalize-space(//Datum[@ID='Cta1Href'])"/>
+    <xsl:variable name="CTA2_LABEL"        select="normalize-space(//Datum[@ID='Cta2Label'])"/>
+    <xsl:variable name="CTA2_HREF"         select="normalize-space(//Datum[@ID='Cta2Href'])"/>
 
-    <xsl:variable name="SECTION_ID"        select="normalize-space(/Properties/Datum[@ID='SectionId'])"/>
-    <xsl:variable name="SECTION_ARIA"      select="normalize-space(/Properties/Datum[@ID='SectionAriaLabel'])"/>
+    <xsl:variable name="SECTION_ID"        select="normalize-space(//Datum[@ID='SectionId'])"/>
+    <xsl:variable name="SECTION_ARIA"      select="normalize-space(//Datum[@ID='SectionAriaLabel'])"/>
 
 
     <!-- ═══ Class list ═══════════════════════════════════════

@@ -11,13 +11,14 @@
   Each field's label says which variants use it. A skin ignores
   fields it doesn't use.
 
-  Groups, top to bottom:
-    Setup                    technical, set once at deploy
-    Hero content             eyebrow / title / subtitle, shared by
-                             all three variants
-    Background video         S+E and US Credentials
-    MAAS+MATA buttons        MAAS+MATA only
-    Strategy and Economics   S+E only: insight card + its sourcing
+  Where fields live (TeamSite tabs):
+    Properties / Appearance   paths, IDs, alignment, tag pickers,
+                              button style + icon, Brightcove
+                              account/player, S+E body width,
+                              locale, feed URLs
+    Data / Content            eyebrow / title / subtitle copy,
+                              background video, button labels +
+                              links, S+E insight card + sourcing
 
   Tag pickers
   ==============================================================
@@ -50,25 +51,28 @@
   Sidecar assets are cache-busted via ?v={CacheVersion}.
 -->
 <Properties ComponentID="rbccm-hero">
-</Properties>
-
-<Data>
 
   <!-- ============================================================
-       Setup (technical - set once at deploy)
+       Appearance tab: settings, paths, layout, tags, colours
        ============================================================ -->
-  <Group ID="Setup" Name="Setup (technical)">
+
   <!-- Bump on every content save. Doubles as the ?v= cache buster
        on the sidecar CSS / JS URLs. Format YYYY-MM-DD-HHMM. -->
   <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+
   <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy)">rbccm-hero-1</Datum>
+
   <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label (technical - set once at deploy)">Page hero</Datum>
+
   <Datum ID="CssPath" Type="String" Name="Hero CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-hero.css</Datum>
+
   <!-- MAAS+MATA only (its buttons). Blank skips the include when the
        page already loads rbccm-button.css. -->
   <Datum ID="ButtonCssPath" Type="String" Name="Button CSS path : MAAS+MATA (technical - blank skips the include)">/assets/rbccm/css/components/rbccm-button.css</Datum>
+
   <!-- S+E only: insight card hydrator (auto-latest / pinned URL). -->
   <Datum ID="JsPath" Type="String" Name="Hero JS path : S+E insight card (technical - blank skips the include)">/assets/rbccm/js/components/rbccm-hero.js</Datum>
+
   <!-- Left = base. Center adds the header-center modifier. MAAS+MATA
        is centred by design either way. -->
   <Datum ID="HeaderAlignment" Type="SelectSingle" Name="Header alignment (optional)">
@@ -76,18 +80,7 @@
     <Option><Display>Center</Display><Value>center</Value></Option>
     left
   </Datum>
-  </Group>
 
-  <!-- ============================================================
-       Hero content (all variants)
-       ============================================================
-       MAAS+MATA / US Credentials: eyebrow, two-line title (line 2
-       takes the accent colour), subtitle.
-       S+E: title line 1 is the headline, subtitle is the body copy
-       under it. S+E has no eyebrow and no line 2.
-       ============================================================ -->
-  <Group ID="HeroContent" Name="Hero content">
-  <Datum ID="EyebrowText" Type="String" Name="Eyebrow : MAAS+MATA, US Creds (optional - blank hides it)"></Datum>
   <Datum ID="EyebrowTag" Type="SelectSingle" Name="Eyebrow tag (optional - Auto = h1)">
     <Option Selected="true"><Display>Auto (variant default)</Display><Value>auto</Value></Option>
     <Option><Display>h1</Display><Value>h1</Value></Option>
@@ -102,8 +95,6 @@
     auto
   </Datum>
 
-  <Datum ID="TitleLine1Text" Type="String" Name="Title line 1 : all variants (required)"></Datum>
-  <Datum ID="TitleLine2Text" Type="String" Name="Title line 2, accent colour : MAAS+MATA, US Creds (optional)"></Datum>
   <Datum ID="TitleTag" Type="SelectSingle" Name="Title tag (optional - Auto = p, or h1 on S+E)">
     <Option Selected="true"><Display>Auto (variant default)</Display><Value>auto</Value></Option>
     <Option><Display>h1</Display><Value>h1</Value></Option>
@@ -118,8 +109,6 @@
     auto
   </Datum>
 
-  <!-- HTML allowed (strong, em, br); rendered unescaped. -->
-  <Datum ID="SubtitleText" Type="Textarea" Name="Subtitle / body copy : all variants (optional - blank hides it; HTML allowed)"></Datum>
   <Datum ID="SubtitleTag" Type="SelectSingle" Name="Subtitle tag (optional - Auto = p)">
     <Option Selected="true"><Display>Auto (variant default)</Display><Value>auto</Value></Option>
     <Option><Display>h1</Display><Value>h1</Value></Option>
@@ -133,32 +122,11 @@
     <Option><Display>span</Display><Value>span</Value></Option>
     auto
   </Datum>
-  </Group>
 
-  <!-- ============================================================
-       Background video (S+E, US Credentials)
-       ============================================================
-       MP4 wins if both are set (native video element, no player
-       chrome). Otherwise a Brightcove iframe when a video ID is
-       set. Blank both = the variant's solid fill.
-       ============================================================ -->
-  <Group ID="BackgroundVideo" Name="Background video (S+E, US Creds)">
-  <Datum ID="BgVideoMp4" Type="String" Name="Background MP4 URL (optional - overrides Brightcove if set)"></Datum>
-  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional)"></Datum>
   <Datum ID="BgBrightcoveAccount" Type="String" Name="Brightcove account ID (technical - RBC-wide constant)">6021289101001</Datum>
-  <Datum ID="BgBrightcovePlayer" Type="String" Name="Brightcove player ID (technical - RBC-wide constant)">VyvCc9BZx</Datum>
-  </Group>
 
-  <!-- ============================================================
-       MAAS+MATA buttons
-       ============================================================
-       Blank label hides a button. Icons are built into the skin.
-       ============================================================ -->
-  <Group ID="MaasMataButtons" Name="MAAS+MATA buttons">
-  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA : button 1 label (optional - blank hides the button)">Request a demo</Datum>
-  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : button 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
-  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA : button 1 accessible name (optional - screen-reader label)"></Datum>
-  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA : button 1 tooltip (optional - blank hides the tooltip)"></Datum>
+  <Datum ID="BgBrightcovePlayer" Type="String" Name="Brightcove player ID (technical - RBC-wide constant)">VyvCc9BZx</Datum>
+
   <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : button 1 style">
     <Option Selected="true"><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
@@ -166,6 +134,7 @@
     <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
     primary
   </Datum>
+
   <Datum ID="MmCta1Icon" Type="SelectSingle" Name="MAAS+MATA : button 1 icon">
     <Option Selected="true"><Display>Arrow</Display><Value>arrow</Value></Option>
     <Option><Display>Play</Display><Value>play</Value></Option>
@@ -173,10 +142,6 @@
     arrow
   </Datum>
 
-  <Datum ID="MmCta2Label" Type="String" Name="MAAS+MATA : button 2 label (optional - blank hides the button)">Watch the video</Datum>
-  <Datum ID="MmCta2Href" Type="String" Name="MAAS+MATA : button 2 URL (required if label is set - full URL or /en/ path)">#</Datum>
-  <Datum ID="MmCta2AriaLabel" Type="String" Name="MAAS+MATA : button 2 accessible name (optional - screen-reader label)"></Datum>
-  <Datum ID="MmCta2Title" Type="String" Name="MAAS+MATA : button 2 tooltip (optional - blank hides the tooltip)"></Datum>
   <Datum ID="MmCta2Style" Type="SelectSingle" Name="MAAS+MATA : button 2 style">
     <Option><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option Selected="true"><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
@@ -184,26 +149,70 @@
     <Option><Display>Ghost (dark-strip)</Display><Value>ghost</Value></Option>
     secondary
   </Datum>
+
   <Datum ID="MmCta2Icon" Type="SelectSingle" Name="MAAS+MATA : button 2 icon">
     <Option><Display>Arrow</Display><Value>arrow</Value></Option>
     <Option Selected="true"><Display>Play</Display><Value>play</Value></Option>
     <Option><Display>None</Display><Value>none</Value></Option>
     play
   </Datum>
-  </Group>
 
-  <!-- ============================================================
-       Strategy and Economics
-       ============================================================
-       Insight card on the right, plus how it's populated. Field
-       IDs unchanged from before the cleanup.
-       ============================================================ -->
-  <Group ID="StrategyAndEconomics" Name="Strategy and Economics">
   <!-- Optional desktop max-width on the S+E body paragraph (widow control).
        Applied only at the desktop breakpoint (>= 992px); mobile / tablet
        always render at 100% column width. Blank falls back to 100%.
        Any CSS length unit works (%, px, rem, ch). -->
   <Datum ID="SeBodyMaxWidth" Type="String" Name="S+E : body max-width at desktop e.g. '86%' (optional - blank inherits 100%)">86%</Datum>
+
+  <!-- Locale hint passed to the hydrator via data-hero-locale. Only
+       'en' and 'fr' are recognized; unknown values coerce to 'en'.
+       Reserved for future localisation of the insight card copy. -->
+  <Datum ID="SeLocale" Type="SelectSingle" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
+    <Option><Display>English (en)</Display><Value>en</Value></Option>
+    <Option><Display>French (fr)</Display><Value>fr</Value></Option>
+    en
+  </Datum>
+
+  <!-- Comma-separated list of insights XML feed URLs the hydrator
+       walks. Default covers 2024/2025/2026 - update once a year
+       when a new year feed goes live (or every year in bulk). -->
+  <Datum ID="SeInsightFeedUrls" Type="String" Name="S+E : feed URLs (required in auto-latest mode; comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
+
+  <Datum ID="EyebrowText" Type="String" Name="Eyebrow : MAAS+MATA, US Creds (optional - blank hides it)"></Datum>
+
+  <Datum ID="TitleLine1Text" Type="String" Name="Title line 1 : all variants (required)"></Datum>
+
+  <Datum ID="TitleLine2Text" Type="String" Name="Title line 2, accent colour : MAAS+MATA, US Creds (optional)"></Datum>
+
+  <!-- HTML allowed (strong, em, br); rendered unescaped. -->
+  <Datum ID="SubtitleText" Type="Textarea" Name="Subtitle / body copy : all variants (optional - blank hides it; HTML allowed)"></Datum>
+
+  <Datum ID="BgVideoMp4" Type="String" Name="Background MP4 URL (optional - overrides Brightcove if set)"></Datum>
+
+  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional)"></Datum>
+
+  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA : button 1 label (optional - blank hides the button)">Request a demo</Datum>
+
+  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : button 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
+
+  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA : button 1 accessible name (optional - screen-reader label)"></Datum>
+
+  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA : button 1 tooltip (optional - blank hides the tooltip)"></Datum>
+
+  <Datum ID="MmCta2Label" Type="String" Name="MAAS+MATA : button 2 label (optional - blank hides the button)">Watch the video</Datum>
+
+  <Datum ID="MmCta2Href" Type="String" Name="MAAS+MATA : button 2 URL (required if label is set - full URL or /en/ path)">#</Datum>
+
+  <Datum ID="MmCta2AriaLabel" Type="String" Name="MAAS+MATA : button 2 accessible name (optional - screen-reader label)"></Datum>
+
+  <Datum ID="MmCta2Title" Type="String" Name="MAAS+MATA : button 2 tooltip (optional - blank hides the tooltip)"></Datum>
 
   <!-- Insight card: pill eyebrow + title + body + footer (date + link). -->
   <Datum ID="SeInsightEyebrowText" Type="String" Name="S+E : insight card eyebrow / pill label (required - do not blank)">Latest Insight</Datum>
@@ -220,21 +229,10 @@
        stays constant across articles); LinkHref is overridden by
        the feed record's URL unless SeInsightAutoLinkOverride is set. -->
   <Datum ID="SeInsightLinkLabel" Type="String" Name="S+E : insight card link label (required - do not blank)">Read more</Datum>
+
   <Datum ID="SeInsightLinkHref" Type="String" Name="S+E : insight card link URL - manual mode only (optional - full URL or /en/ path; auto-latest overrides this)">#</Datum>
+
   <Datum ID="SeInsightLinkAriaLabel" Type="String" Name="S+E : insight card link accessible name (optional - screen-reader label for the link)"></Datum>
-
-
-  <!-- ============================================================
-       S+E technical config
-       ============================================================
-       What editors set here: the video backdrop (blank leaves the
-       section on its solid fill) and the insight-card source mode
-       (DCR-picker vs. auto-latest vs. manual). Feed URLs, tag
-       keywords, and the pin/override URLs sit at the bottom.
-       .............................................................
-       Grouped at bottom so the editor's flow moves top-to-bottom
-       in DOM order above.
-       ============================================================ -->
 
   <!-- Insight card source. Three modes:
          dcr-picker   editor picks the insights article via TeamSite's
@@ -294,21 +292,8 @@
       <DCR-Type Name="casestudy"/>
     </DCR-Category>
   </Datum>
+
   <Datum ID="SeInsightDcrLink" Type="String" Name="S+E : insight card CTA URL - dcr-picker mode (optional - blank derives from the picked DCR)"></Datum>
-
-  <!-- Locale hint passed to the hydrator via data-hero-locale. Only
-       'en' and 'fr' are recognized; unknown values coerce to 'en'.
-       Reserved for future localisation of the insight card copy. -->
-  <Datum ID="SeLocale" Type="SelectSingle" Name="S+E : locale for the insight card hydrator (optional - defaults to English)">
-    <Option><Display>English (en)</Display><Value>en</Value></Option>
-    <Option><Display>French (fr)</Display><Value>fr</Value></Option>
-    en
-  </Datum>
-
-  <!-- Comma-separated list of insights XML feed URLs the hydrator
-       walks. Default covers 2024/2025/2026 - update once a year
-       when a new year feed goes live (or every year in bulk). -->
-  <Datum ID="SeInsightFeedUrls" Type="String" Name="S+E : feed URLs (required in auto-latest mode; comma-separated)">https://www.rbccm.com/en/insights/data/2024-insights,https://www.rbccm.com/en/insights/data/2025-insights,https://www.rbccm.com/en/insights/data/2026-insights</Datum>
 
   <!-- Comma-separated list of tag keywords. rbccm-hero.js checks each
        feed record's &lt;tags&gt; field for a case-insensitive substring
@@ -351,6 +336,5 @@
        the feed record's own article URL. Editorial sometimes wants
        "Read more" to point at a hub page instead of the article. -->
   <Datum ID="SeInsightAutoLinkOverride" Type="String" Name="S+E : auto-mode link override (optional - blank uses the feed URL)"></Datum>
-  </Group>
 
 </Data>
