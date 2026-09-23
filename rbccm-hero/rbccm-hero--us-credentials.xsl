@@ -10,8 +10,8 @@
   colour on line 2, subtitle) and S+E (optional bg video, MP4 or
   Brightcove). Dark navy surface throughout. No CTA row.
 
-  Companion skins: rbccm-hero--maas-mata.xsl,
-                   rbccm-hero--strategy-and-economics.xsl
+  Companion skins: rbccm-hero (double-dash) maas-mata.xsl,
+                   rbccm-hero (double-dash) strategy-and-economics.xsl
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
