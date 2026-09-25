@@ -822,7 +822,6 @@
   .rbccm-two-up-cards [data-animate],
   .rbccm-two-up-cards [data-stagger-parent] > *,
   .rbccm-two-up-cards__card-media img,
-  .rbccm-two-up-cards__card-play,
   .rbccm-two-up-cards__card-cta {
     animation: none !important;
     transition: none !important;
@@ -830,6 +829,21 @@
     transform: none !important;
   }
   .rbccm-two-up-cards__card-media:hover img {
+    transform: none !important;
+  }
+  /* Play button: keep the centring translate (transform:none would
+     knock it off-centre). Drop the scale and all transitions; the
+     launch state just hides instantly instead of exploding. */
+  .rbccm-two-up-cards__card-play,
+  .rbccm-two-up-cards__card-play svg,
+  .rbccm-two-up-cards__card-media:hover .rbccm-two-up-cards__card-play,
+  .rbccm-two-up-cards__card-media:focus-visible .rbccm-two-up-cards__card-play,
+  .rbccm-two-up-cards__card-play.is-launching {
+    animation: none !important;
+    transition: none !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .rbccm-two-up-cards__card-play svg {
     transform: none !important;
   }
 }
