@@ -80,9 +80,9 @@ jQuery(document).ready(function ($) {
     var $next  = $section.find('.rbccm-awards__btn--next');
 
     /* Breakpoint per variant matches the CSS (row-fits-statically
-       width including the 23×2 side inset):
-         --3 (MAAS/MATA, 264 cards): 3×264 + 2×16 + 23×2 = 870
-         --4 (US Creds,  250 cards): 4×250 + 3×16 + 23×2 = 1146
+       width including the 23x2 side inset):
+         --3 (MAAS/MATA, 264 cards): 3x264 + 2x16 + 23x2 = 870
+         --4 (US Creds,  250 cards): 4x250 + 3x16 + 23x2 = 1146
        On the upward cross we snap to slide 0 so cards 1-N are the
        ones you see, not whatever slide the user paged to on mobile. */
     var desktopBp = $section.hasClass('rbccm-awards--4') ? 1146 : 870;
@@ -119,7 +119,7 @@ jQuery(document).ready(function ($) {
       /* Reset to slide 0 whenever the viewport crosses INTO desktop
          (>=1100). Without this, if the user paged to slide 3 on
          mobile then resized up, Slick's internal transform still
-         points to slide 3 — cards 1 and 2 end up off-canvas to the
+         points to slide 3 - cards 1 and 2 end up off-canvas to the
          left. Only fires on the upward cross; downward transitions
          leave whatever slide is active alone. `true` on slickGoTo
          suppresses the animation for an instant snap. */
@@ -140,11 +140,61 @@ jQuery(document).ready(function ($) {
       }
       syncSwipe();
 
+      /* Desktop a11y: every card is on screen and there are no
+         controls, so the row is a static list, not a carousel. Slick
+         still marks the current slide tabindex=0 + role=tabpanel and
+         aria-hides the rest, which puts a pointless Tab stop on a
+         non-interactive card and hides 3 visible cards from screen
+         readers. On desktop: strip those from the real slides (stash
+         them first) and show all of them to AT; clones stay hidden.
+         Back on mobile: restore the stash and let slick re-apply its
+         own per-slide state via a no-animation goTo. */
+      var ADA_ATTRS = ['tabindex', 'role', 'aria-describedby'];
+      function syncA11y() {
+        var $real = $grid.find('.slick-slide').not('.slick-cloned');
+        var $clones = $grid.find('.slick-cloned');
+        if (mqDesktop.matches) {
+          $real.each(function () {
+            var el = this;
+            ADA_ATTRS.forEach(function (a) {
+              if (el.hasAttribute(a)) {
+                el.setAttribute('data-rbccm-' + a, el.getAttribute(a));
+                el.removeAttribute(a);
+              }
+            });
+            el.setAttribute('aria-hidden', 'false');
+          });
+          $clones.attr({ 'aria-hidden': 'true', tabindex: '-1' });
+        } else {
+          $real.each(function () {
+            var el = this;
+            ADA_ATTRS.forEach(function (a) {
+              var v = el.getAttribute('data-rbccm-' + a);
+              if (v !== null) {
+                el.setAttribute(a, v);
+                el.removeAttribute('data-rbccm-' + a);
+              }
+            });
+          });
+        }
+      }
+      syncA11y();
+      /* Slick re-applies its attributes after each slide change. */
+      $grid.on('afterChange.rbccmAwards', function () {
+        if (mqDesktop.matches) syncA11y();
+      });
+
       function onBreakpointChange() {
         if (!$grid.hasClass('slick-initialized')) return;
         syncSwipe();
-        if (!mqDesktop.matches) return;
+        if (!mqDesktop.matches) {
+          syncA11y();
+          var slick = $grid.slick('getSlick');
+          $grid.slick('slickGoTo', slick ? slick.currentSlide : 0, true);
+          return;
+        }
         $grid.slick('slickGoTo', 0, true);
+        syncA11y();
       }
       if (typeof mqDesktop.addEventListener === 'function') {
         mqDesktop.addEventListener('change', onBreakpointChange);
