@@ -1,5 +1,5 @@
 /*
-   Leadership Carousel — component JS
+   Leadership Carousel - component JS
    Deploy path: /assets/rbccm/js/components/rbccm-leadership.js
 
    XSL emits i18n templates on #rbccm-leadership as data-i18n-* attrs;
@@ -27,7 +27,7 @@
     var $dots     = $('#rbccm-lead-dots');
     var FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
 
-    // i18n templates — read from data-i18n-* on the section, English fallbacks below.
+    // i18n templates - read from data-i18n-* on the section, English fallbacks below.
     var I18N = {
       slideRoleDesc:            section.getAttribute('data-i18n-slide-role')                   || 'slide',
       slideAriaTpl:             section.getAttribute('data-i18n-slide-aria-tpl')               || 'slide {n} of {total}',
@@ -89,7 +89,7 @@
     checkLongRoles();
 
     // === BEGIN DEBUG =======================================================
-    // Tab / focus tracing for QA. Off by default — flip DEBUG to true here,
+    // Tab / focus tracing for QA. Off by default - flip DEBUG to true here,
     // or set `window.__RBCCM_LEADERSHIP_DEBUG = true` before this script
     // loads, to re-enable the console traces.
     var DEBUG = window.__RBCCM_LEADERSHIP_DEBUG === true;
@@ -183,7 +183,7 @@
     }
     function isCarouselAt(bucket) { return cardCount >= threshold(bucket); }
 
-    // centerMode stays false everywhere — cards render left-aligned.
+    // centerMode stays false everywhere - cards render left-aligned.
     var STATIC_SETTINGS = {
       centerMode: false, centerPadding: '0px', variableWidth: true,
       infinite: false, slidesToScroll: 1,
@@ -273,7 +273,7 @@
       });
     }
 
-    // Debounced resize handler — flips the --no-controls class on bucket change.
+    // Debounced resize handler - flips the --no-controls class on bucket change.
     var __bucketTimer;
     $(window).on('resize.rbccmBucket', function () {
       clearTimeout(__bucketTimer);
@@ -298,21 +298,21 @@
       document.head.appendChild(slickScript);
     }
 
-    // ─────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------
     // Accessibility: roving tabindex on slide content.
     //
     // The DOM is laid out in the slick-default order
-    //   [Prev] → [slides] → [Next] → [dots]
+    //   [Prev] -> [slides] -> [Next] -> [dots]
     // so native browser tab order already produces the desired
     // sequence. No Tab interceptor is needed. We only have to keep
     // tabindex correct on slide children so off-canvas / cloned
     // slides (and any cards without an action element) don't pull
     // focus.
-    // ─────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------
 
     // True for any slide (original OR cloned) essentially fully in view.
     // 90% visibility threshold: flush-edge cards stay tabbable;
-    // peek neighbours in centerMode (typically 30–50% visible) are out.
+    // peek neighbours in centerMode (typically 30-50% visible) are out.
     function isSlideInView(slideEl) {
       var list = $track.find('.slick-list')[0];
       if (!list) return false;
@@ -334,7 +334,7 @@
 
     // Roving tabindex on slides + labelled aria on slides and dots.
     // "Current slide" is baked into the active dot's aria-label text on top
-    // of aria-current — NVDA doesn't reliably announce aria-current alone
+    // of aria-current - NVDA doesn't reliably announce aria-current alone
     // on plain buttons, so we need both.
     function applyA11y() {
       var slick      = $track.slick('getSlick');
@@ -414,7 +414,7 @@
 
     // Force the focus border via inline style + !important on focusin.
     // ALSO paint twin duplicates (original + slick clones of the same
-    // author) — slick can park keyboard focus on the off-canvas cloned
+    // author) - slick can park keyboard focus on the off-canvas cloned
     // copy while the on-canvas original is what the user is looking at.
     // Painting both copies guarantees the visible one shows the border.
     function setFocusedCard(card) {
@@ -446,7 +446,7 @@
       });
     }
 
-    // Track input modality — only paint the focus state when focus
+    // Track input modality - only paint the focus state when focus
     // arrives via keyboard (matches :focus-visible semantics).
     var focusViaKeyboard = false;
     document.addEventListener('keydown', function (e) {
@@ -462,7 +462,7 @@
       setFocusedCard(card);
     });
 
-    // Targeted Tab handler — covers all four directions in/out of the
+    // Targeted Tab handler - covers all four directions in/out of the
     // card row. Native browser Tab refuses to walk to focusable
     // elements inside slick's cloned slides (even with tabindex=0), so
     // we explicitly .focus() the next/prev visible card stop.
@@ -486,7 +486,7 @@
       }
     });
 
-    // Tab forward from Prev → first visible card (cloned or not).
+    // Tab forward from Prev -> first visible card (cloned or not).
     $('#rbccm-lead-prev').on('keydown', function (e) {
       if (e.key !== 'Tab' || e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
@@ -496,7 +496,7 @@
       }
     });
 
-    // Shift+Tab back from Next → last visible card (cloned or not).
+    // Shift+Tab back from Next -> last visible card (cloned or not).
     $('#rbccm-lead-next').on('keydown', function (e) {
       if (e.key !== 'Tab' || !e.shiftKey) return;
       var slides = $track.find('.slick-slide').toArray();
@@ -518,9 +518,9 @@
       }, 50);
     });
 
-    // ─────────────────────────────────────────────────────────
-    // Biography modal — Bootstrap pattern
-    // ─────────────────────────────────────────────────────────
+    // ---------------------------------------------------------
+    // Biography modal - Bootstrap pattern
+    // ---------------------------------------------------------
     var $modal      = $('#rbccm-lead-modal');
     var $modalName  = $modal.find('.rbccm-leadership__modal-name');
     var $modalRole  = $modal.find('.rbccm-leadership__modal-role');

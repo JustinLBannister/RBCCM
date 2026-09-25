@@ -1,7 +1,7 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!--
-    Skin: Leadership Carousel — DCR-driven, LinkedIn OR Biography modal.
+    Skin: Leadership Carousel - DCR-driven, LinkedIn OR Biography modal.
     CSS: /assets/rbccm/css/components/rbccm-leadership.css
     JS:  /assets/rbccm/js/components/rbccm-leadership.js
 
@@ -16,9 +16,9 @@
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
 
-  <!-- ─────────────────────────────────────────────────────────────
+  <!-- =============================================================
        Helper templates
-       ───────────────────────────────────────────────────────────── -->
+       ============================================================= -->
 
   <!-- fmtName: substitute {name} placeholder in a template string. -->
   <xsl:template name="fmtName">
@@ -80,7 +80,7 @@
 
     <xsl:if test="($slideCount &gt;= $minSlides) and ($slideCount &lt;= $maxSlides)">
 
-      <!-- ── Locale toggle: 'en' (default) or 'fr' ── -->
+      <!-- == Locale toggle: 'en' (default) or 'fr' == -->
       <xsl:variable name="locale">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='Locale']) = 'fr'">fr</xsl:when>
@@ -88,13 +88,13 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Heading ── -->
+      <!-- == Heading == -->
       <xsl:variable name="heading">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='Heading']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='Heading'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Direction européenne</xsl:when>
+          <xsl:when test="$locale = 'fr'">Direction europ&#233;enne</xsl:when>
           <xsl:otherwise>European leadership</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -146,25 +146,25 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── Carousel aria label ── -->
+      <!-- == Carousel aria label == -->
       <xsl:variable name="ariaLabel">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='CarouselAriaLabel'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Carrousel de l'équipe de direction européenne</xsl:when>
+          <xsl:when test="$locale = 'fr'">Carrousel de l'&#233;quipe de direction europ&#233;enne</xsl:when>
           <xsl:otherwise>European leadership team carousel</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
-      <!-- ── i18n strings ── per-instance override beats locale default beats English -->
+      <!-- == i18n strings == per-instance override beats locale default beats English -->
 
       <xsl:variable name="prevLabel">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='PrevButtonLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='PrevButtonLabel'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Diapositive précédente</xsl:when>
+          <xsl:when test="$locale = 'fr'">Diapositive pr&#233;c&#233;dente</xsl:when>
           <xsl:otherwise>Previous slide</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -184,7 +184,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='TrackRegionLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='TrackRegionLabel'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Cartes de l'équipe de direction</xsl:when>
+          <xsl:when test="$locale = 'fr'">Cartes de l'&#233;quipe de direction</xsl:when>
           <xsl:otherwise>Leadership cards</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -194,7 +194,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='KeyboardInstructions']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='KeyboardInstructions'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Utilisez les flèches gauche et droite pour naviguer entre les diapositives. Utilisez Tab pour passer d'une carte à l'autre.</xsl:when>
+          <xsl:when test="$locale = 'fr'">Utilisez les fl&#232;ches gauche et droite pour naviguer entre les diapositives. Utilisez Tab pour passer d'une carte &#224; l'autre.</xsl:when>
           <xsl:otherwise>Use left and right arrow keys to navigate between slides. Use Tab to move between cards.</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -284,7 +284,7 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='DotAriaTemplate']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DotAriaTemplate'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Aller à la diapositive {n}</xsl:when>
+          <xsl:when test="$locale = 'fr'">Aller &#224; la diapositive {n}</xsl:when>
           <xsl:otherwise>Go to slide {n}</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -322,7 +322,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <!-- "Current" language in the label text — NVDA doesn't reliably
+      <!-- "Current" language in the label text - NVDA doesn't reliably
            announce aria-current alone on plain dot buttons. -->
       <xsl:variable name="dotAriaCurrentTpl">
         <xsl:choose>
@@ -359,12 +359,12 @@
           <xsl:when test="normalize-space(/Properties/Datum[@ID='DotsListLabel']) != ''">
             <xsl:value-of select="normalize-space(/Properties/Datum[@ID='DotsListLabel'])"/>
           </xsl:when>
-          <xsl:when test="$locale = 'fr'">Sélection de diapositive</xsl:when>
+          <xsl:when test="$locale = 'fr'">S&#233;lection de diapositive</xsl:when>
           <xsl:otherwise>Slide selection</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
-      <!-- Placeholder image text (URL-encoded value expected — defaults are already encoded). -->
+      <!-- Placeholder image text (URL-encoded value expected - defaults are already encoded). -->
       <xsl:variable name="placeholderText">
         <xsl:choose>
           <xsl:when test="normalize-space(/Properties/Datum[@ID='PlaceholderImageText']) != ''">
@@ -400,7 +400,7 @@
         <xsl:if test="$subheading != ''"><xsl:text> rbccm-leadership__heading--with-subhead</xsl:text></xsl:if>
       </xsl:variable>
 
-      <!-- $headingStyle removed — old inline `margin-bottom: 25px` on the H2
+      <!-- $headingStyle removed - old inline `margin-bottom: 25px` on the H2
            is now owned by the __header flex `gap` in rbccm-leadership.css. -->
 
       <section id="rbccm-leadership">
@@ -436,9 +436,9 @@
           <div id="rbccm-lead-announce" aria-live="polite" aria-atomic="true" class="rbccm-leadership__sr-only"></div>
           <p id="rbccm-lead-instructions" class="rbccm-leadership__sr-only"><xsl:value-of select="$kbInstructions"/></p>
 
-          <!-- ── Carousel: DOM order is Prev → slides → Next → dots (slick-default).
+          <!-- == Carousel: DOM order is Prev -> slides -> Next -> dots (slick-default).
                   Visual layout reshuffles via CSS grid template-areas in
-                  rbccm-leadership.css. ── -->
+                  rbccm-leadership.css. == -->
           <div class="rbccm-leadership__carousel">
 
             <button id="rbccm-lead-prev" class="rbccm-leadership__btn" tabindex="0">
@@ -537,7 +537,7 @@
                             <path d="M16 19h12M16 23h12M16 27h8" stroke="#0051A5" stroke-width="2" stroke-linecap="round"/>
                           </svg>
                         </button>
-                        <!-- Hidden source content for the modal — copied in on click -->
+                        <!-- Hidden source content for the modal - copied in on click -->
                         <div class="rbccm-leadership__bio-source" hidden="hidden">
                           <xsl:attribute name="id"><xsl:value-of select="$bioId"/></xsl:attribute>
                           <xsl:attribute name="data-name"><xsl:value-of select="$name"/></xsl:attribute>
@@ -597,7 +597,7 @@
 
         </div>
 
-        <!-- ── Bio Modal (Bootstrap pattern, single shared instance) ── -->
+        <!-- == Bio Modal (Bootstrap pattern, single shared instance) == -->
         <xsl:if test="$linkType = 'biography'">
           <div class="modal fade" id="rbccm-lead-modal" tabindex="-1" role="dialog" aria-labelledby="rbccm-lead-modal-name" aria-hidden="true">
             <div class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;" role="document">

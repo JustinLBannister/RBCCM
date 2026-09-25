@@ -1,18 +1,18 @@
 /* ============================================================
-   Leadership Carousel — component styles
+   Leadership Carousel - component styles
    Deploy path: /assets/rbccm/css/components/rbccm-leadership.css
 
    Snapshot source: production CSS as of 2026-08-28. Prior repo baseline
    was largely in sync; this snapshot adds the three prod-only rulesets
    that were missing locally:
-     • .rbccm-leadership--on-ltblue          (light-blue color scheme)
-     • .rbccm-leadership__card-displayboth   (LinkType='both' card variant)
-     • .contact-details .blue-circle-outline (modal contact icons)
+     * .rbccm-leadership--on-ltblue          (light-blue color scheme)
+     * .rbccm-leadership__card-displayboth   (LinkType='both' card variant)
+     * .contact-details .blue-circle-outline (modal contact icons)
    Everything else is unchanged from what was already in the repo.
 
    Companion files:
-     • /assets/rbccm/js/components/rbccm-leadership.js
-     • rbccm-leadership.xsl (skin — DCR-driven author data)
+     * /assets/rbccm/js/components/rbccm-leadership.js
+     * rbccm-leadership.xsl (skin - DCR-driven author data)
 ============================================================ */
 
 /* -- Screen reader only -- */
@@ -75,7 +75,7 @@
 
     /* -- Heading --
        Clamped to the 1140px content rail so it lines up with the carousel
-       row below. Bottom margin removed — the `__inner` flex gap now owns
+       row below. Bottom margin removed - the `__inner` flex gap now owns
        spacing to the carousel, and `__header` internal gap owns spacing
        to the subheading. */
     .rbccm-leadership__heading {
@@ -131,14 +131,14 @@
 
     /* -- Active card border --
        Card widths:
-         mobile (< 560px) → 343px (fat card, one-per-view)
-         560px+           → 270px (multi-card view, tidy 1/2/3/4 math)
+         mobile (< 560px) -> 343px (fat card, one-per-view)
+         560px+           -> 270px (multi-card view, tidy 1/2/3/4 math)
        With variableWidth: true and centerMode: false, slick shows N
        cards where N = floor(container_width / 290)  (270 card + 20 gap).
-           <  560px viewport → 1 card @ 343
-           560-849  viewport → 2 cards @ 270
-           850-1139 viewport → 3 cards @ 270
-           1140+    viewport → 4 cards @ 270
+           <  560px viewport -> 1 card @ 343
+           560-849  viewport -> 2 cards @ 270
+           850-1139 viewport -> 3 cards @ 270
+           1140+    viewport -> 4 cards @ 270
        Same 270px card at every desktop-ish size keeps the 263px bio
        photos from cropping weirdly when the browser resizes. Mobile
        gets the wider 343 so single-column reads comfortably. */
@@ -157,7 +157,7 @@
     }
     /* At 1300+ the desktop arrow chevrons swap in (see the __btn-icon
        swap at min-width: 1300 below). Tighten the inter-card gutter
-       from 23 → 20 at that breakpoint to match the arrow spacing.
+       from 23 -> 20 at that breakpoint to match the arrow spacing.
        Below 1300, 23 keeps a little more breathing room from the
        container edge while the row scrolls under the mobile chevrons. */
     @media (min-width: 1300px) {
@@ -299,7 +299,7 @@
       border-radius: 4px;
     }
 
-    /* Focus ring on the Prev / Next arrow buttons — keyboard-only,
+    /* Focus ring on the Prev / Next arrow buttons - keyboard-only,
        same #003168 as everything else so the system feels consistent. */
     .rbccm-leadership__btn:focus { outline: none; }
     .rbccm-leadership__btn:focus-visible {
@@ -307,7 +307,7 @@
       border-radius: 4px;
     }
 
-    /* Hide the circular SVG icon — text-only link */
+    /* Hide the circular SVG icon - text-only link */
     .rbccm-leadership__card-bio svg {
       display: none;
     }
@@ -348,20 +348,20 @@
     .rbccm-leadership__card-linkedin:hover .li-hover   { display: block; }
 
     /* -- Carousel layout grid --
-       DOM order is [Prev] → [slides] → [Next] → [dots] (slick-default).
+       DOM order is [Prev] -> [slides] -> [Next] -> [dots] (slick-default).
        Visual layout reshuffles per breakpoint via grid-template-areas:
-         Mobile  → track on top, [Prev · Dots · Next] in a row below
-         Desktop → Prev flanks left of track, Next flanks right, dots
+         Mobile  -> track on top, [Prev - Dots - Next] in a row below
+         Desktop -> Prev flanks left of track, Next flanks right, dots
                    centred in a row beneath the track. */
     .rbccm-leadership__carousel {
       align-items: center;
       box-sizing: border-box;
       display: grid;
       gap: 24px 26px;
-      /* 5-column layout: empty 1fr · prev · dots · next · empty 1fr.
+      /* 5-column layout: empty 1fr - prev - dots - next - empty 1fr.
          The two outer 1fr cells absorb all the slack, so the
-         [prev · dots · next] cluster sits centred together with 26px
-         gaps between the arrows and the dot strip — not pushed out to
+         [prev - dots - next] cluster sits centred together with 26px
+         gaps between the arrows and the dot strip - not pushed out to
          the viewport edges. The track spans all five columns. */
       grid-template-columns: 1fr auto auto auto 1fr;
       grid-template-areas:
@@ -392,7 +392,7 @@
     #rbccm-leadership #rbccm-lead-next                { grid-area: next; }
     #rbccm-leadership #rbccm-lead-dots                { grid-area: dots; justify-self: center; }
 
-    /* -- Controls row (LEGACY — kept in case other pages still emit this markup) --
+    /* -- Controls row (LEGACY - kept in case other pages still emit this markup) --
        The new carousel uses the CSS Grid layout above; this flex row is no
        longer used by leadership-slider-bio.html but is retained for safety. */
     .rbccm-leadership__controls {
@@ -422,7 +422,7 @@
     .rbccm-leadership__btn svg { display: block; }
 
     /* In the new __carousel grid the button must auto-size to whichever
-       icon SVG is showing (14×24 on mobile, 44×44 on desktop), so undo
+       icon SVG is showing (14x24 on mobile, 44x44 on desktop), so undo
        the legacy fixed dimensions in that context only. */
     .rbccm-leadership__carousel .rbccm-leadership__btn {
       height: auto;
@@ -535,7 +535,7 @@
       outline: none;
     }
 
-    /* Desktop arrow hover — fills the circle blue and turns the chevron
+    /* Desktop arrow hover - fills the circle blue and turns the chevron
        white with a smooth transition. Targets the SVG paths directly. */
     .rbccm-leadership__btn-icon--desktop rect,
     .rbccm-leadership__btn-icon--desktop path {
@@ -548,7 +548,7 @@
       stroke: #ffffff;
     }
 
-    /* -- Desktop arrows overlay >=1245px (LEGACY — kept in case other pages
+    /* -- Desktop arrows overlay >=1245px (LEGACY - kept in case other pages
           still emit this markup; the new __carousel grid handles arrow
           placement at all viewports). -- */
     .rbccm-leadership__arrows-desktop {
@@ -607,7 +607,7 @@
       padding: 0;
     }
 
-    /* Modifier kept as a hook — spacing between H2 and subheading is now
+    /* Modifier kept as a hook - spacing between H2 and subheading is now
        owned by `__header`'s 12px flex gap. */
     .rbccm-leadership__heading--with-subhead {
       margin-bottom: 0;
@@ -616,7 +616,7 @@
     /* ============================================================
        Modifier: --on-dark
        Dark blue section background + white heading/subheading text.
-       Cards stay light (white bg, dark text) — only the section
+       Cards stay light (white bg, dark text) - only the section
        chrome switches. Arrow chevrons + dots invert to white for
        legibility against the dark bg.
        ============================================================ */
@@ -627,7 +627,7 @@
       background-color: #003168;
     }
 
-    /* Heading + subheading go white on dark. Alignment is decoupled —
+    /* Heading + subheading go white on dark. Alignment is decoupled -
        controlled by the separate `--headings-centered` modifier so
        authors can pick left-align or center independent of scheme. */
     #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__heading,
@@ -670,7 +670,7 @@
       stroke: #003168;
     }
 
-    /* Dots — inactive outlined circles switch to white outline;
+    /* Dots - inactive outlined circles switch to white outline;
        active/hover/focus circle fills white with a dark-blue ring
        gap so the active dot still reads. */
     #rbccm-leadership.rbccm-leadership--on-dark .rbccm-leadership__dots-wrap .slick-dots li button::before {
@@ -683,7 +683,7 @@
       box-shadow: 0 0 0 4px #003168, 0 0 0 5px #ffffff !important;
     }
 
-    /* Active card border — light-theme uses #003168 (dark blue) which
+    /* Active card border - light-theme uses #003168 (dark blue) which
        vanishes against the dark bg. Swap to white so the centered card
        still reads as focused. */
     #rbccm-leadership.rbccm-leadership--on-dark .slick-center .rbccm-leadership__card,
@@ -716,7 +716,7 @@
        ============================================================ */
 
     /* Modifier: --on-ltblue
-       Light-blue section background — pairs with --on-dark and the
+       Light-blue section background - pairs with --on-dark and the
        default (white) as the three available color schemes. Uses
        #f0f6fc so cards + text stay readable without any of the
        dark-scheme text/dot inversions. */
@@ -727,7 +727,7 @@
     /* Card variant: __card-displayboth
        Applied to the LinkedIn anchor when LinkType='both' so both
        the Biography button AND the LinkedIn icon can coexist on the
-       same card. Currently a hook class — layout tweak (spacing,
+       same card. Currently a hook class - layout tweak (spacing,
        positioning) lives with the site-standard rules for cards
        that carry two action elements. */
     .rbccm-leadership__card-displayboth {
@@ -739,7 +739,7 @@
     /* Modal contact icons (ContactIcons=true)
        Blue circular outline around a FA icon; fills on hover.
        Used inside the biography modal when the ContactIcons Datum
-       is enabled — otherwise the modal footer falls back to plain
+       is enabled - otherwise the modal footer falls back to plain
        text links styled by .rbccm-leadership__modal-footer. */
     .contact-details {
       margin-bottom: 20px;
@@ -774,9 +774,9 @@
       display: none !important;
     }
     /* Collapse the carousel grid to a single "track" column at every
-       breakpoint. Slick still runs underneath — this only strips the
+       breakpoint. Slick still runs underneath - this only strips the
        prev/dots/next slots so the track re-aligns with the 1140
-       heading rail (and, at ≥1300, drops the -68px gutter breakout). */
+       heading rail (and, at >=1300, drops the -68px gutter breakout). */
     #rbccm-leadership.rbccm-leadership--no-controls .rbccm-leadership__carousel {
       grid-template-columns: 1fr;
       grid-template-areas: "track";

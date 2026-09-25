@@ -1,5 +1,5 @@
 <!--
-  Leadership Carousel — Properties
+  Leadership Carousel - Properties
 
   Ships alongside:
     /assets/rbccm/css/components/rbccm-leadership.css
@@ -8,7 +8,7 @@
   Every string field defaults to blank. Blank falls back to the
   per-locale default in the XSL (EN or FR based on the Locale
   Datum). Number count/threshold fields also fall back when blank
-  — MinSlideCount defaults to 2, thresholds to the JS presets
+  - MinSlideCount defaults to 2, thresholds to the JS presets
   (desktop 5, tablet 3, mobile 2).
 -->
 <Properties ComponentID="1554499053453">
@@ -39,14 +39,14 @@
     CarouselMin* controls whether swipe/dots/infinite are on at
     each breakpoint. Below the threshold, that breakpoint renders
     cards as a static left-aligned row inside slick's own DOM.
-    Slick stays initialized either way — no destroy/rebuild.
+    Slick stays initialized either way - no destroy/rebuild.
   -->
   <Datum ID="MinSlideCount"      Type="Number" Name="Minimum slides to render section">2</Datum>
   <Datum ID="MaxSlideCount"      Type="Number" Name="Maximum slides to render section">12</Datum>
   <Datum ID="CarouselMin"        Type="Number" Name="Carousel activation min (fallback for all breakpoints)"/>
-  <Datum ID="CarouselMinDesktop" Type="Number" Name="Carousel activation min — desktop (1300px and up)"/>
-  <Datum ID="CarouselMinTablet"  Type="Number" Name="Carousel activation min — tablet (640-1299px)"/>
-  <Datum ID="CarouselMinMobile"  Type="Number" Name="Carousel activation min — mobile (under 640px)"/>
+  <Datum ID="CarouselMinDesktop" Type="Number" Name="Carousel activation min &#8212; desktop (1300px and up)"/>
+  <Datum ID="CarouselMinTablet"  Type="Number" Name="Carousel activation min &#8212; tablet (640-1299px)"/>
+  <Datum ID="CarouselMinMobile"  Type="Number" Name="Carousel activation min &#8212; mobile (under 640px)"/>
 
   <!--
     Cache buster. Bump when pushing new CSS or JS so browsers
@@ -54,7 +54,7 @@
     (semver, date, sha). Same pattern as cta-band, filter-by,
     tabbed-panels, story-carousel.
   -->
-  <Datum ID="AssetVersion" Type="String" Name="Asset version — bump to force fresh CSS + JS">1</Datum>
+  <Datum ID="AssetVersion" Type="String" Name="Asset version &#8212; bump to force fresh CSS + JS">1</Datum>
 
 
   <!-- Localization -->
@@ -73,8 +73,8 @@
 
   <!-- Card action labels -->
   <Datum ID="BioButtonLabel"       Type="String" Name="Biography Button Text"/>
-  <Datum ID="BioAriaTemplate"      Type="String" Name="Biography Aria Label — use {name}"/>
-  <Datum ID="LinkedInAriaTemplate" Type="String" Name="LinkedIn Aria Label — use {name}"/>
+  <Datum ID="BioAriaTemplate"      Type="String" Name="Biography Aria Label &#8212; use {name}"/>
+  <Datum ID="LinkedInAriaTemplate" Type="String" Name="LinkedIn Aria Label &#8212; use {name}"/>
   <Datum ID="LinkedInModalLabel"   Type="String" Name="Modal LinkedIn Link Text"/>
   <Datum ID="EmailModalLabel"      Type="String" Name="Modal Email Link Text"/>
 
@@ -91,37 +91,37 @@
     announce aria-current on plain buttons).
   -->
   <Datum ID="SlideRoleDescription"         Type="String" Name="Slide aria-roledescription"/>
-  <Datum ID="SlideAriaTemplate"            Type="String" Name="Slide Aria Label — no name available"/>
-  <Datum ID="SlideAriaNameOnlyTemplate"    Type="String" Name="Slide Aria Label — name only"/>
-  <Datum ID="SlideAriaNameTemplate"        Type="String" Name="Slide Aria Label — name + role"/>
+  <Datum ID="SlideAriaTemplate"            Type="String" Name="Slide Aria Label &#8212; no name available"/>
+  <Datum ID="SlideAriaNameOnlyTemplate"    Type="String" Name="Slide Aria Label &#8212; name only"/>
+  <Datum ID="SlideAriaNameTemplate"        Type="String" Name="Slide Aria Label &#8212; name + role"/>
 
   <Datum ID="DotAriaTemplate"              Type="String" Name="Inactive Dot Aria Label"/>
-  <Datum ID="DotAriaCurrentTemplate"       Type="String" Name="Active Dot Aria Label — with name"/>
-  <Datum ID="DotAriaCurrentNoNameTemplate" Type="String" Name="Active Dot Aria Label — no name"/>
+  <Datum ID="DotAriaCurrentTemplate"       Type="String" Name="Active Dot Aria Label &#8212; with name"/>
+  <Datum ID="DotAriaCurrentNoNameTemplate" Type="String" Name="Active Dot Aria Label &#8212; no name"/>
 
-  <Datum ID="AnnounceTemplate"             Type="String" Name="Live Region — no name"/>
-  <Datum ID="AnnounceNameTemplate"         Type="String" Name="Live Region — with name"/>
+  <Datum ID="AnnounceTemplate"             Type="String" Name="Live Region &#8212; no name"/>
+  <Datum ID="AnnounceNameTemplate"         Type="String" Name="Live Region &#8212; with name"/>
 
-  <!-- Placeholder text is URL-encoded — EN 'Team Member', FR 'Membre de l'équipe' -->
+  <!-- Placeholder text is URL-encoded - EN 'Team Member', FR 'Membre de l'equipe' -->
   <Datum ID="PlaceholderImageText" Type="String" Name="Missing-image Placeholder Text (URL-encoded)"/>
 
 </Properties>
 
 
 <!--
-  Locale defaults (reference for the XSL — not read by TeamSite)
+  Locale defaults (reference for the XSL - not read by TeamSite)
 
                                    EN                              FR
-  CarouselAriaLabel                European leadership team        Carrousel de l'équipe de
-                                   carousel                        direction européenne
-  TrackRegionLabel                 Leadership cards                Cartes de l'équipe de direction
-  KeyboardInstructions             Use left and right arrow keys   Utilisez les flèches gauche et
+  CarouselAriaLabel                European leadership team        Carrousel de l'equipe de
+                                   carousel                        direction europeenne
+  TrackRegionLabel                 Leadership cards                Cartes de l'equipe de direction
+  KeyboardInstructions             Use left and right arrow keys   Utilisez les fleches gauche et
                                    to navigate between slides.     droite pour naviguer entre les
                                    Use Tab to move between cards.  diapositives. Utilisez Tab pour
-                                                                   passer d'une carte à l'autre.
-  DotsListLabel                    Slide selection                 Sélection de diapositive
+                                                                   passer d'une carte a l'autre.
+  DotsListLabel                    Slide selection                 Selection de diapositive
 
-  PrevButtonLabel                  Previous slide                  Diapositive précédente
+  PrevButtonLabel                  Previous slide                  Diapositive precedente
   NextButtonLabel                  Next slide                      Diapositive suivante
   CloseButtonLabel                 Close                           Fermer
 
@@ -138,7 +138,7 @@
   SlideAriaNameTemplate            {name}, {role}, slide {n}       {name}, {role}, diapositive
                                    of {total}                      {n} sur {total}
 
-  DotAriaTemplate                  Go to slide {n} of {total}      Aller à la diapositive {n}
+  DotAriaTemplate                  Go to slide {n} of {total}      Aller a la diapositive {n}
                                                                    sur {total}
   DotAriaCurrentTemplate           Current slide: {name},          Diapositive actuelle : {name},
                                    slide {n} of {total}            diapositive {n} sur {total}
