@@ -13,13 +13,13 @@
 
    Player selection is automatic based on URL:
      - Direct file  (.mp4, .m4v, .webm, .ogg, .ogv, .mov)
-                    → native <video controls autoplay muted playsinline>
+                    -> native <video controls autoplay muted playsinline>
                     (iframes don't play direct files reliably; muted so
                     autoplay isn't blocked by Chrome's policy).
-     - YouTube      → <iframe> to youtube.com/embed/… with autoplay=1&rel=0.
-     - Vimeo        → <iframe> to player.vimeo.com/video/… with autoplay=1.
+     - YouTube      -> <iframe> to youtube.com/embed/... with autoplay=1&rel=0.
+     - Vimeo        -> <iframe> to player.vimeo.com/video/... with autoplay=1.
      - Everything else (Brightcove players, Wistia, etc.)
-                    → <iframe> loading the URL verbatim. If the URL is a
+                    -> <iframe> loading the URL verbatim. If the URL is a
                     Brightcove player embed (players.brightcove.net) and
                     doesn't already carry autoplay/muted, we append
                     ?autoplay=1&muted=1 so the video starts immediately
@@ -28,13 +28,13 @@
    Open / close mechanism
    =========================================================================
    Runtime tries three backends in order and stops on the first match:
-     1. Bootstrap 5 (window.bootstrap.Modal) — live site.
-     2. Bootstrap 3/4 (jQuery.fn.modal)      — legacy pages.
-     3. Vanilla                              — local previews / edge cases.
+     1. Bootstrap 5 (window.bootstrap.Modal) - live site.
+     2. Bootstrap 3/4 (jQuery.fn.modal)      - legacy pages.
+     3. Vanilla                              - local previews / edge cases.
    When Bootstrap is present it owns focus trap, backdrop, and Esc; we
    add a supplementary focus-guard span AFTER the iframe so Tab escapes
    from the video player (YouTube etc.) get pulled back to the close
-   button — same pattern the MAAS/MATA hero modal uses.
+   button - same pattern the MAAS/MATA hero modal uses.
 
    Accessibility
    =========================================================================
@@ -63,11 +63,11 @@
 
 
   /* ------------------------------------------------------------------
-     URL classification — decides which player element to mount.
+     URL classification - decides which player element to mount.
      ------------------------------------------------------------------ */
   function classifyUrl(url) {
     if (!url) return { kind: 'embed', src: '' };
-    // Strip querystring/hash for extension check so signed .mp4?sig=…
+    // Strip querystring/hash for extension check so signed .mp4?sig=...
     // URLs still classify as file.
     var pathOnly = url.split('?')[0].split('#')[0].toLowerCase();
 
@@ -83,7 +83,7 @@
       return { kind: 'vimeo', src: 'https://player.vimeo.com/video/' + vmMatch[1] + '?autoplay=1' };
     }
 
-    /* Brightcove player URL — matches players.brightcove.net/.../index.html
+    /* Brightcove player URL - matches players.brightcove.net/.../index.html
        Auto-append autoplay + muted params if the URL doesn't already
        carry them; matches the MAAS/MATA hero pattern (muted required
        because Chrome blocks unmuted autoplay). */
@@ -121,7 +121,7 @@
        MAAS/MATA hero modal so the visual (yellow top border, 960 max
        width, tight padding) is identical across the site. */
     modalEl.innerHTML =
-      '<div role="document" class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;">' +
+      '<div role="document" class="modal-dialog" style="top: 0px; width: 100%; max-width: 960px;">' +
         '<div class="modal-content">' +
           '<div>' +
             '<div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">' +
@@ -152,7 +152,7 @@
     closeBtn     = modalEl.querySelector('.close');
     focusGuardEl = modalEl.querySelector('[data-focus-guard]');
 
-    /* Close button — Bootstrap's data-bs-dismiss / data-dismiss handles
+    /* Close button - Bootstrap's data-bs-dismiss / data-dismiss handles
        this automatically when Bootstrap's JS is on the page. The
        explicit click listener catches the vanilla-fallback path. */
     closeBtn.addEventListener('click', function (e) {
@@ -160,7 +160,7 @@
       closeModal();
     });
 
-    /* Focus guard — Bootstrap's native focus trap can't reach into the
+    /* Focus guard - Bootstrap's native focus trap can't reach into the
        iframe (cross-origin), so when Tab moves focus out of the iframe
        it lands on this span. On focus, we shoot it back to the close
        button so the user stays inside the modal. */
@@ -168,7 +168,7 @@
       closeBtn.focus();
     });
 
-    /* Vanilla-fallback wiring — noops when Bootstrap owns open/close. */
+    /* Vanilla-fallback wiring - noops when Bootstrap owns open/close. */
     modalEl.addEventListener('click', function (e) {
       if (e.target === modalEl) closeModal();
     });
@@ -243,7 +243,7 @@
 
 
   /* ------------------------------------------------------------------
-     Open / close  (BS5 → BS3/4 → vanilla)
+     Open / close  (BS5 -> BS3/4 -> vanilla)
      ------------------------------------------------------------------ */
   function openModal(url, trigger) {
     ensureModal();
@@ -253,7 +253,7 @@
     mountPlayer(route.kind, route.src);
     modalEl.setAttribute('data-player-kind', route.kind);
 
-    // Bootstrap 5 (window.bootstrap.Modal) — preferred.
+    // Bootstrap 5 (window.bootstrap.Modal) - preferred.
     if (window.bootstrap && window.bootstrap.Modal) {
       window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
       return;
@@ -325,7 +325,7 @@
 
 
   /* ------------------------------------------------------------------
-     Delegated click handler — media button + "Watch the video" CTA.
+     Delegated click handler - media button + "Watch the video" CTA.
      Multi-instance safe (any number of cards on the page share one modal).
      ------------------------------------------------------------------ */
   document.addEventListener('click', function (e) {
@@ -343,7 +343,7 @@
       return;
     }
 
-    // 2. "Watch the video" CTA — opens the same modal, reading the URL
+    // 2. "Watch the video" CTA - opens the same modal, reading the URL
     //    from the sibling media button. Falls through to a plain link
     //    if the card has no video URL.
     var ctaTrigger = e.target.closest('.rbccm-two-up-cards__card-cta');
@@ -362,7 +362,7 @@
 
 
   /* ------------------------------------------------------------------
-     Tiny public API — analytics / deep-link teams occasionally need it.
+     Tiny public API - analytics / deep-link teams occasionally need it.
      ------------------------------------------------------------------ */
   window.RBCCMTwoUpCards = {
     open: openModal,
