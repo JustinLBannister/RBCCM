@@ -117,7 +117,7 @@
      counting so we're capping visible text length, not markup
      length - authored <br>/<strong> in the middle of a long
      paragraph won't skew the cut. Trailing punctuation before
-     the ellipsis is trimmed (avoid "…." / ",…"). */
+     the ellipsis is trimmed (avoid "...." / ",..."). */
   var DESC_MAX_CHARS = 100;
   function truncateDescription(html, maxChars) {
     if (!html) return '';
@@ -130,7 +130,7 @@
     /* Only back up to a space if the space isn't miles behind the
        target (avoids an aggressive cut on very long single words). */
     if (lastSpace > maxChars * 0.6) cut = cut.substr(0, lastSpace);
-    return cut.replace(/[\s.,;:—-]+$/, '') + '…';
+    return cut.replace(/[\s.,;:\u2014-]+$/, '') + '\u2026';
   }
 
   /* Build a slug -> record lookup from the parsed feed XML.

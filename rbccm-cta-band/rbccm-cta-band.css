@@ -1,12 +1,12 @@
 /* =========================================================================
-   RBCCM CTA Band — shared component
+   RBCCM CTA Band - shared component
    Deploy path: /assets/rbccm/css/components/rbccm-cta-band.css
 
    Purpose
    =========================================================================
    Reusable CTA banner section. Section-level dark bg (or a dark card
    inside a light section) with an optional eyebrow, a heading (with an
-   optional highlighted span), body copy, and 1–2 buttons.
+   optional highlighted span), body copy, and 1-2 buttons.
 
    Variants
    =========================================================================
@@ -14,7 +14,7 @@
        Full-bleed dark navy band (own gradient). Yellow eyebrow with
        centered gold underline, big serif heading with a yellow-highlight
        last word, single "Request a demo" yellow pill. PIXEL-FAITHFUL PORT
-       of MAAS+MATA .rbccm-maas-mata__demo — same type ramp, same tight
+       of MAAS+MATA .rbccm-maas-mata__demo - same type ramp, same tight
        body margin, same shine sweep + arrow flyby.
 
      .rbccm-cta-band--us-credentials
@@ -78,7 +78,7 @@
    ships in this render-blocking stylesheet so it applies before the
    browser paints the section. Without this, the buttons briefly flash
    at full opacity between initial paint and rbccm-animate.js class
-   injection — the "jump" the eye sees on scroll-in. Once
+   injection - the "jump" the eye sees on scroll-in. Once
    .rbccm-anim-ready lands on <body> and animate__animated lands on
    the element, opacity flips back to 1 and animate.css takes over. */
 .rbccm-cta-band [data-animate],
@@ -239,7 +239,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   height: 44px;
   justify-content: center;
   line-height: 1;
-  /* opacity intentionally NOT !important here — animate.css's
+  /* opacity intentionally NOT !important here - animate.css's
      fadeInUp keyframe needs to own opacity while the reveal runs.
      `footer a { opacity: 0.98 }` bleed from unified.css:2764 lands
      at 0.98 which is imperceptible; if it ever matters, escalate via
@@ -254,7 +254,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 }
 
 /* Primary: warm-yellow fill, navy text. Ported hover behavior from
-   .rbccm-maas-mata__btn--yellow — shine-sweep pseudo-element passes
+   .rbccm-maas-mata__btn--yellow - shine-sweep pseudo-element passes
    diagonally across the button while the arrow icon flies out to
    the right and returns from the left. `isolation: isolate` +
    overflow-hidden clip the pseudo to the pill shape. */
@@ -383,7 +383,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   --rbccm-cta-band-heading-color: var(--rbccm-cta-band-white);
   --rbccm-cta-band-body-color:    var(--rbccm-cta-band-white);
 
-  /* Section: Figma spec — flex column, centered, gap 10, 50/0 mobile.
+  /* Section: Figma spec - flex column, centered, gap 10, 50/0 mobile.
      Overrides the base --bg-color custom-prop path with a direct
      `background` so the gradient sticks. */
   align-items: center;
@@ -492,7 +492,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   width: 100%;
 }
 
-/* Actions row: MAAS+MATA doesn't stack — there's only one button —
+/* Actions row: MAAS+MATA doesn't stack - there's only one button -
    so no gap overrides needed. Keep default action layout. */
 
 /* Primary "Request a demo" button: MAAS+MATA production spec.
@@ -554,18 +554,18 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    highlight span, tight body pull) but tuned for the US Credentials
    page's longer, non-CMS-capped copy:
 
-     • Heading uses display: flex + flex-direction: column at desktop
+     * Heading uses display: flex + flex-direction: column at desktop
        so each <span> child renders on its own line (yellow highlight
        always drops beneath the white lead). Mobile flows naturally.
-     • NO eyebrow slot — the page's rhythm doesn't call for one.
-     • Wider inner (900) + larger gap (50) + narrower body (432) match
+     * NO eyebrow slot - the page's rhythm doesn't call for one.
+     * Wider inner (900) + larger gap (50) + narrower body (432) match
        the visual weight of the page's other centered bands.
-     • Same navy gradient as maas-mata (--linear-grad token
+     * Same navy gradient as maas-mata (--linear-grad token
        with a hardcoded fallback) so both bands share one dark-band
        vocabulary across the site.
 
    Button + shine-sweep + arrow-flyby all inherit from base + the
-   maas-mata spec — we borrow that variant's button rules
+   maas-mata spec - we borrow that variant's button rules
    through a selector list so the two bands look identical below the
    heading.
    ========================================================================= */
@@ -583,11 +583,11 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 }
 @media (min-width: 992px) {
   .rbccm-cta-band--us-credentials {
-    padding: 100px 0;
+    padding: 80px 0;
   }
 }
 
-/* Inner: wider than maas-mata (690) — 900px chosen for
+/* Inner: wider than maas-mata (690) - 900px chosen for
    visual balance around the big serif heading. Body max-width
    (432px) sits on its own rule below so widening the inner doesn't
    stretch the paragraph. Heading's own flex-column layout at
@@ -606,11 +606,11 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 }
 
 /* Heading: same big serif ramp as maas-mata (50 mobile /
-   75 desktop). Mobile flows naturally — inline spans, natural
+   75 desktop). Mobile flows naturally - inline spans, natural
    whitespace-based wrap decided by container width. Desktop switches
    to display: flex + flex-direction: column so each <span> child
    renders on its own line (yellow highlight always drops beneath
-   the white lead line) — no max-width wrap trick, no &nbsp;, no
+   the white lead line) - no max-width wrap trick, no &nbsp;, no
    display: block hack. */
 .rbccm-cta-band--us-credentials .rbccm-cta-band__heading {
   color: #FFFFFF !important;
@@ -656,7 +656,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   width: 100%;
 }
 
-/* Primary button — reuse the maas-mata spec verbatim. */
+/* Primary button - reuse the maas-mata spec verbatim. */
 .rbccm-cta-band--us-credentials .rbccm-cta-band__btn--primary {
   background: #FFC72C !important;
   border: 1px solid transparent;
@@ -805,7 +805,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    =========================================================================
    Author-toggleable override. Wire on the section (in addition to the
    variant class) when the CTA band is dropped inside a parent wrapper
-   that already paints its own bg / gradient — e.g. MAAS+MATA's
+   that already paints its own bg / gradient - e.g. MAAS+MATA's
    .deep-band wrapper runs a continuous gradient across three siblings.
    Kills both the variant bg and any solid fill so the parent surface
    reads through unbroken. !important scoped to this modifier only so
@@ -820,7 +820,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 
 /* =========================================================================
-   Reduced motion — kill button transitions, shine-sweep pseudo, and
+   Reduced motion - kill button transitions, shine-sweep pseudo, and
    arrow fly-by. All variants share the primary button selector so one
    guard covers all.
    ========================================================================= */

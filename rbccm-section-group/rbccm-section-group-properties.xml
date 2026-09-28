@@ -1,0 +1,53 @@
+<!-- ============================================================
+     RBCCM Section Group  |  Properties + Data
+     ============================================================
+     Wraps a run of separately placed sections in one div, so a shared
+     background runs continuously behind them (the MAAS+MATA dark
+     strip). Two skins share this file:
+
+       rbccm-section-group (double-dash) start.xsl
+         Place directly ABOVE the first section of the group.
+       rbccm-section-group (double-dash) end.xsl
+         Place directly BELOW the last section of the group.
+
+     Both components need the same Group name. The start component's
+     wrapper settings are the ones used; the end component only needs
+     the Group name (and the JS path). Nothing visible is output by
+     either; the wrap happens on page load.
+
+     Deploy alongside:
+       /assets/rbccm/css/components/rbccm-section-group.css
+       /assets/rbccm/js/components/rbccm-section-group.js
+     ============================================================ -->
+<Properties ComponentID="rbccm-section-group-v1">
+
+  <!-- ============================================================
+       Appearance tab: settings, paths, layout, tags, colours
+       ============================================================ -->
+
+  <Datum ID="GroupName" Type="String" Name="Group name (same on the start and end component - blank = dark-strip)">dark-strip</Datum>
+
+  <!-- Start component only. Default = the MAAS+MATA dark strip. The
+       last class keeps maas-mata.css rules for the dark strip working. -->
+  <Datum ID="WrapperClasses" Type="String" Name="Wrapper classes (start component only - blank = MAAS+MATA dark strip)">rbccm-section-group--dark-strip rbccm-maas-mata__dark-strip</Datum>
+
+  <Datum ID="SpaceAbove" Type="String" Name="Space at the top of the wrapper, in px (start component only - blank = 222, room for the video poster overlap)">222</Datum>
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - blank uses the default)">/assets/rbccm/css/components/rbccm-section-group.css</Datum>
+
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - blank uses the default)">/assets/rbccm/js/components/rbccm-section-group.js</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-28-1200</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
+
+  <!-- Optional. Leave blank: the sections inside have their own labels. -->
+  <Datum ID="GroupAriaLabel" Type="String" Name="Wrapper aria-label (optional - usually blank)"></Datum>
+
+</Data>

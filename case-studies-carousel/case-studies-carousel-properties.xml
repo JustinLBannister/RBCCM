@@ -51,7 +51,7 @@
   <Datum ID="HeadingId" Type="String" Name="Section Heading Anchor Id (optional)"></Datum>
 
 
-  <!-- ═══ TRANSITION MODE ══════════════════════════════════════
+  <!-- === TRANSITION MODE ======================================
        "slide" (default) horizontal slide between cards.
        "fade" cross-fade between cards, no horizontal motion.
        Parsed case-insensitively; unknown values fall back to
@@ -59,7 +59,7 @@
   <Datum ID="TransitionMode" Type="String" Name="Transition Mode (slide or fade)">slide</Datum>
 
 
-  <!-- ═══ VIEW ALL CTA ═════════════════════════════════════════
+  <!-- === VIEW ALL CTA =========================================
        Outlined pill below the dots. Author has two ways to hide it:
          - Flip ShowCta to false (keeps label/link values in place
            for easy re-enable later).
@@ -73,7 +73,7 @@
   <Datum ID="CtaNewTab" Type="Boolean" Name="Open View All in New Tab">false</Datum>
 
 
-  <!-- ═══ SLIDE PADDING ════════════════════════════════════════
+  <!-- === SLIDE PADDING ========================================
        Adds 15px horizontal padding inside each slide so the card
        doesn't touch the slide edges. Some page layouts want the
        card visually inset from the arrows; others want the card
@@ -82,7 +82,7 @@
   <Datum ID="SlidePadding" Type="Boolean" Name="Slide Padding (15px each side)">false</Datum>
 
 
-  <!-- ═══ FEED URL ═════════════════════════════════════════════
+  <!-- === FEED URL =============================================
        Where the JS fetches case-study metadata from. Default
        points at the shared TeamSite feed component. Override
        per instance only if a different feed is needed (e.g. a
@@ -90,7 +90,7 @@
   <Datum ID="FeedUrl" Type="String" Name="Feed URL (blank = default case-studies feed)">/en/expertise/transactions/data/case-studies.page</Datum>
 
 
-  <!-- ═══ ACCESSIBILITY (optional overrides) ══════════════════ -->
+  <!-- === ACCESSIBILITY (optional overrides) ================== -->
 
   <Datum ID="Locale" Type="String" Name="Locale (en or fr)">en</Datum>
 
@@ -111,7 +111,7 @@
   <Datum ID="AriaViewAllLabel"   Type="String" Name="View All Aria Label (override)"></Datum>
 
 
-  <!-- ═══ SECTION PADDING (optional overrides) ════════════════
+  <!-- === SECTION PADDING (optional overrides) ================
        Blank = baked-in defaults (40/16 mobile, 64/24 992+,
        64/170 1440+). Supply any CSS length to override. Written
        as CSS custom properties on the section so the stylesheet
@@ -125,7 +125,7 @@
 
 <Data>
 
-  <!-- ═══ CASE STUDY SLIDES ═══════════════════════════════════
+  <!-- === CASE STUDY SLIDES ===================================
        One Group per slide. Author's only required input is the
        case-study URL. Everything else - title, description,
        image, eyebrow, read-time - is read from the shared

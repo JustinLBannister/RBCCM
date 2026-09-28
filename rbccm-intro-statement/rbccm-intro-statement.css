@@ -1,0 +1,167 @@
+/* =========================================================================
+   RBCCM Intro Statement
+   Deploy path: /assets/rbccm/css/components/rbccm-intro-statement.css
+   =========================================================================
+   Big centred serif statement + up to 3 body paragraphs + a ghost pill
+   CTA. Extracted from the MAAS+MATA "A new standard for multi-asset
+   electronic trading." section (.rbccm-maas-mata__new-standard); values
+   are the ones the live page ends up with after maas-mata.css's
+   page-level overrides.
+
+   Heading = three spans, same size, different colours:
+     __heading-lead       40% white, own line   ("A new standard for")
+     __heading-highlight  white, own line       ("multi-asset")
+     __heading-accent     yellow, inline in the highlight line
+                                                ("electronic trading.")
+   A <br> typed in the lead is kept on phones and hidden from 600px up.
+
+   Background is transparent by default (it sits in the MAAS+MATA dark
+   strip, see rbccm-section-group); set --rbccm-is-bg for a solid one.
+   !important on typography: site h1/h2/p tag rules otherwise replace
+   the font, tracking and margins (same fix the MAAS+MATA page needed).
+   ========================================================================= */
+
+.rbccm-intro-statement {
+  background: var(--rbccm-is-bg, transparent);
+  color: #fff;
+  text-align: center;
+  padding: 60px 0 55px;
+  box-sizing: border-box;
+  width: 100%;
+}
+@media (min-width: 992px) {
+  .rbccm-intro-statement { padding: 80px 0 82px; }
+}
+.rbccm-intro-statement__inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 23px;
+  box-sizing: border-box;
+}
+
+/* ---- Heading ------------------------------------------------------------ */
+.rbccm-intro-statement .rbccm-intro-statement__heading {
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 50px !important;
+  font-style: normal;
+  font-weight: 500 !important;
+  line-height: 100% !important;
+  letter-spacing: 0 !important;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.40);
+  width: auto;
+  max-width: 331px;
+  margin: 0 auto 20px !important;
+  padding: 0;
+}
+.rbccm-intro-statement .rbccm-intro-statement__heading-lead,
+.rbccm-intro-statement .rbccm-intro-statement__heading-highlight,
+.rbccm-intro-statement .rbccm-intro-statement__heading-accent {
+  font: inherit !important;
+  letter-spacing: 0 !important;
+}
+.rbccm-intro-statement .rbccm-intro-statement__heading-lead { display: block !important; }
+.rbccm-intro-statement .rbccm-intro-statement__heading-highlight { display: block !important; color: #FFFFFF; }
+.rbccm-intro-statement .rbccm-intro-statement__heading-accent { display: inline !important; color: #FFC72C; }
+
+@media (min-width: 600px) {
+  .rbccm-intro-statement__heading br { display: none; }
+}
+@media (min-width: 600px) and (max-width: 991px) {
+  .rbccm-intro-statement .rbccm-intro-statement__heading { max-width: 100%; }
+}
+@media (min-width: 992px) {
+  .rbccm-intro-statement .rbccm-intro-statement__heading {
+    font-size: 75px !important;
+    line-height: 110% !important;   /* 82.5px */
+    max-width: 1100px;
+  }
+}
+
+/* ---- Body --------------------------------------------------------------- */
+.rbccm-intro-statement__body {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto 55px;
+}
+@media (min-width: 992px) {
+  .rbccm-intro-statement__body { margin-bottom: 30px; }
+}
+.rbccm-intro-statement .rbccm-intro-statement__body p {
+  color: #D8D8D8 !important;
+  text-align: center !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-style: normal;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  letter-spacing: 0 !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  margin: 0 0 21px !important;
+}
+.rbccm-intro-statement .rbccm-intro-statement__body p:last-child {
+  margin-bottom: 0 !important;
+}
+.rbccm-intro-statement__body strong { color: #FFFFFF; font-weight: 700; }
+
+/* ---- CTA: ghost pill ---------------------------------------------------- */
+.rbccm-intro-statement .rbccm-intro-statement__cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px;
+  height: 50px !important;
+  padding: 12px 35px !important;
+  border-radius: 100px !important;
+  border: 1px solid #D8D8D8 !important;
+  background: transparent !important;
+  color: #D8D8D8 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 29.26px !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: box-shadow 200ms ease;
+}
+.rbccm-intro-statement__cta > * { position: relative; z-index: 1; }
+/* Shine sweep on hover / keyboard focus (same as the page). */
+.rbccm-intro-statement__cta::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+.rbccm-intro-statement__cta:hover::before,
+.rbccm-intro-statement__cta:focus-visible::before {
+  animation: rbccm-is-shine 600ms ease-out;
+}
+@keyframes rbccm-is-shine {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+.rbccm-intro-statement .rbccm-intro-statement__cta:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-intro-statement__cta:hover::before,
+  .rbccm-intro-statement__cta:focus-visible::before { animation: none; }
+  .rbccm-intro-statement [data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

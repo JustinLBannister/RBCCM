@@ -26,7 +26,7 @@
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
 
 
-  <!-- ═══════════════════════════════════════════════════════════════════
+  <!-- ===================================================================
        clean - fold non-breaking spaces + collapse whitespace.
        XSLT-1.0 compatible (uses only translate() and normalize-space()). -->
   <xsl:template name="clean">
@@ -35,7 +35,7 @@
   </xsl:template>
 
 
-  <!-- ═══════════════════════════════════════════════════════════════════
+  <!-- ===================================================================
        Main - assemble the section shell.
        =================================================================== -->
   <xsl:template match="/">
@@ -133,7 +133,7 @@
 
     <xsl:if test="$filledSlideCount &gt;= 3">
 
-      <!-- ═══ EXTERNAL CSS ═══ -->
+      <!-- === EXTERNAL CSS === -->
       <link rel="stylesheet" href="/assets/rbccm/css/components/case-studies-carousel.css"/>
 
       <!-- Inline padding overrides. -->
@@ -149,9 +149,9 @@
       </xsl:if>
 
 
-      <!-- ═══════════════════════════════════════════════════════════
+      <!-- ===========================================================
            MARKUP - shell only. JS hydrates each slide from the feed.
-           ═══════════════════════════════════════════════════════════ -->
+           =========================================================== -->
       <section class="rbccm-case-studies" id="rbccm-case-studies">
         <xsl:attribute name="aria-label"><xsl:value-of select="$ariaLabel"/></xsl:attribute>
         <!-- Data attrs picked up by case-studies-carousel.js: feed URL,
@@ -270,7 +270,7 @@
         </div><!-- /.__container -->
       </section>
 
-      <!-- ═══ EXTERNAL JS ═══ -->
+      <!-- === EXTERNAL JS === -->
       <script src="/assets/rbccm/js/components/case-studies-carousel.js"></script>
 
     </xsl:if><!-- /filledSlideCount >= 3 -->

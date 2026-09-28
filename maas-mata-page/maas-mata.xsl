@@ -232,6 +232,12 @@
     <link rel="stylesheet">
       <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-cta-band.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
     </link>
+    <!-- Standalone rbccm-video-poster component styling - the chart
+         image + play button under the hero (section 2) uses its
+         markup; its JS is loaded at the bottom. -->
+    <link rel="stylesheet">
+      <xsl:attribute name="href">/assets/rbccm/css/components/rbccm-video-poster.css?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </link>
 
     <!-- JSON-LD structured data. Whole @graph block lives in
          the SeoJsonLd Datum. When SEO delivers a new schema, paste
@@ -311,25 +317,18 @@
       </section>
 
 
-      <!-- ═══ 2. CHART CARD ═══════════════════════════════════ -->
-      <div class="rbccm-maas-mata__chart rbccm-maas-mata__chart-image" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600">
-        <!-- Poster image: XSL fills src/alt from Datums on the live
-             page; data-json-attr-* lets ?preview=draft rebind from
-             chartCard.posterImage / .posterAlt in the CMS JSON. -->
-        <img class="rbccm-maas-mata__chart-image-poster" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
+      <!-- ═══ 2. CHART CARD ═══════════════════════════════════
+           rbccm-video-poster component markup (same as that
+           component's skin outputs), fed by the Chart Datums.
+           Modal is further down, outside the page wrapper. -->
+      <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
+        <!-- data-json-attr-* lets ?preview=draft rebind from the CMS JSON. -->
+        <img class="rbccm-video-poster__image" loading="lazy" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
           <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>
-        <!-- Play button always renders so editors can see the UI in
-             preview. The Brightcove attrs are set from Datums when
-             filled; when empty, the modal opens with an empty iframe
-             (useful for design review, not for a live launch). -->
-        <!-- Play button — uses the site-standard Bootstrap 5 modal
-             (#herovideo below). data-bs-toggle/data-bs-target are
-             handled by the page-shell's Bootstrap 5 JS; nothing
-             custom here. -->
-        <button type="button" class="rbccm-maas-mata__chart-image-play" data-bs-toggle="modal" data-bs-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
-          <svg class="rbccm-maas-mata__chart-image-play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
+        <button type="button" class="rbccm-video-poster__play" data-toggle="modal" data-target="#herovideo" data-bs-toggle="modal" data-bs-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
+          <svg class="rbccm-video-poster__play-icon" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true" focusable="false"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/></svg>
         </button>
       </div>
 
@@ -573,7 +572,7 @@
 
         <!-- 9. DEMO CTA -->
         <!-- Now emitted through the shared cta-band component
-             (maas-mata variant + --bg-transparent because
+             (maas-mata variant + bg-transparent because
              this instance lives inside .rbccm-maas-mata__deep-band,
              which owns the continuous navy gradient across siblings).
              Same Datums drive eyebrow / heading / body / CTA. -->
@@ -607,41 +606,37 @@
 
     </div><!-- /.rbccm-maas-mata -->
 
-    <!-- Site-standard Bootstrap video modal (matches the pattern used
-         on the home page and elsewhere). Bootstrap 5 owns open/close via
-         data-bs-toggle="modal" on the trigger + data-bs-dismiss="modal"
-         on the button; no custom JS needed. Brightcove player is embedded
-         directly in the iframe src. -->
-    <div role="dialog" class="modal fade" tabindex="-1" id="herovideo" aria-label="Video" aria-describedby="herovideo-desc">
-      <div role="document" class="modal-dialog" style="top: 0px; width: auto; max-width: 960px;">
+    <!-- rbccm-video-poster modal (same markup as that component).
+         Kept id="herovideo" so existing links to it keep working.
+         The iframe src sits in data-src; rbccm-video-poster.js sets it
+         (with autoplay) on open and clears it on close. width: 100%
+         on the dialog: with width: auto the 16:9 box has nothing to
+         size against and the modal opens at zero width. -->
+    <div class="modal fade rbccm-video-poster__modal" role="dialog" tabindex="-1" id="herovideo" aria-hidden="true" aria-label="MAAS + MATA platform overview video">
+      <div role="document" class="modal-dialog" style="top: 0px; width: 100%; max-width: 960px;">
         <div class="modal-content">
-          <div>
-            <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
-              <button aria-label="Close Modal" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-bs-dismiss="modal">×</button>
-            </div>
-            <div class="modal-body" style="padding: 0px;">
-              <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
-                <div style="margin-bottom: 20px;">
-                  <p id="herovideo-desc" class="sr-only">Video opens in an embedded player.</p>
-                  <div>
-                    <div style="position: relative; display: block; max-width: 960px;">
-                      <div style="padding-top: 56.25%;">
-                        <iframe title="MAAS + MATA platform overview video" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" frameborder="0">
-                          <xsl:attribute name="src"><xsl:value-of select="$BC_IFRAME_SRC" /></xsl:attribute>
-                        </iframe>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Focus guard: catches Tab escapes out of the iframe and
-                       loops focus back to the close button. See maas-mata.js. -->
-                  <span tabindex="0" aria-hidden="true" data-focus-guard="herovideo"></span>
+          <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+            <button aria-label="Close video" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" data-bs-dismiss="modal">&#215;</button>
+          </div>
+          <div class="modal-body" style="padding: 0px;">
+            <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+              <div style="position: relative; display: block; max-width: 960px;">
+                <div style="padding-top: 56.25%;">
+                  <iframe class="rbccm-video-poster__iframe" title="MAAS + MATA platform overview video" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" frameborder="0">
+                    <xsl:attribute name="data-src"><xsl:value-of select="$BC_IFRAME_SRC" /></xsl:attribute>
+                  </iframe>
                 </div>
               </div>
+              <span class="rbccm-video-poster__focus-guard" tabindex="0" aria-hidden="true"></span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      <xsl:attribute name="src">/assets/rbccm/js/components/rbccm-video-poster.js?v=<xsl:value-of select="$ASSET_VERSION" /></xsl:attribute>
+    </script>
 
     <!-- rbccm-json-bind must load BEFORE maas-mata.js so the
          bootstrap block at the bottom of maas-mata.js finds the

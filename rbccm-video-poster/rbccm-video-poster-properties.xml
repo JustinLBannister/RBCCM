@@ -1,0 +1,60 @@
+<!-- ============================================================
+     RBCCM Video Poster  |  Properties + Data
+     ============================================================
+     Rounded poster image with a centred play button that opens a
+     Brightcove video in a modal (the MAAS+MATA "Execution Console"
+     image under the hero).
+
+     No video ID = image only, no play button, no modal.
+     Only the Brightcove video ID normally changes; account and
+     player are RBC-wide constants (blank uses them).
+
+     Deploy alongside:
+       /assets/rbccm/css/components/rbccm-video-poster.css
+       /assets/rbccm/js/components/rbccm-video-poster.js
+     ============================================================ -->
+<Properties ComponentID="rbccm-video-poster-v1">
+
+  <!-- ============================================================
+       Appearance tab: settings, paths, layout, tags, colours
+       ============================================================ -->
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - blank uses the default)">/assets/rbccm/css/components/rbccm-video-poster.css</Datum>
+
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - blank uses the default)">/assets/rbccm/js/components/rbccm-video-poster.js</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-28-1200</Datum>
+
+  <!-- Also used for the modal id (SectionID + "-modal"), so give
+       each poster on a page its own value. -->
+  <Datum ID="SectionID" Type="String" Name="ID (unique per page - blank = rbccm-video-poster-1)">rbccm-video-poster-1</Datum>
+
+  <Datum ID="SpaceAbove" Type="String" Name="Space above on desktop, in px (blank = 75; mobile is always 0)">75</Datum>
+
+  <!-- How far the next section slides up underneath the image. 200
+       on MAAS+MATA; 0 for no overlap. -->
+  <Datum ID="OverlapBelow" Type="String" Name="Overlap into the next section, in px (blank = 200; 0 = none)">200</Datum>
+
+  <Datum ID="BrightcoveAccount" Type="String" Name="Brightcove account ID (RBC-wide constant - leave as is)">6021289101001</Datum>
+
+  <Datum ID="BrightcovePlayer" Type="String" Name="Brightcove player ID (RBC-wide constant - leave as is)">VyvCc9BZx</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
+
+  <Datum ID="PosterImage" Type="String" Name="Poster image URL (shown at 1100 x 366; narrow screens crop to the centre)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
+
+  <Datum ID="PosterAlt" Type="String" Name="Poster image alt text">MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2.</Datum>
+
+  <Datum ID="BrightcoveVideoId" Type="String" Name="Brightcove video ID (blank = no play button)">6385114247112</Datum>
+
+  <Datum ID="PlayButtonLabel" Type="String" Name="Play button label for screen readers (blank = Play video)">Play platform video</Datum>
+
+  <Datum ID="VideoTitle" Type="String" Name="Video title for screen readers (names the modal and the player)">MAAS + MATA platform overview video</Datum>
+
+</Data>

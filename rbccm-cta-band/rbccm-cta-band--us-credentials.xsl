@@ -24,7 +24,7 @@
 
   <xsl:template match="/">
 
-    <!-- ═══ Datum reads ═══════════════════════════════════════ -->
+    <!-- === Datum reads ======================================= -->
     <!-- Variant is fixed by this skin (no preset field). -->
     <xsl:variable name="PRESET" select="'us-credentials'"/>
 
@@ -48,11 +48,11 @@
     <xsl:variable name="SECTION_ARIA"      select="normalize-space(//Datum[@ID='SectionAriaLabel'])"/>
 
 
-    <!-- ═══ Class list ═══════════════════════════════════════
+    <!-- === Class list =======================================
          Base + preset modifier + optional bg-transparent flag.
          Assembled here so the <section> element gets one clean
          `class=""` value in the output.
-         ═══════════════════════════════════════════════════════ -->
+         ======================================================= -->
     <xsl:variable name="CLASS_LIST">
       <xsl:text>rbccm-cta-band rbccm-cta-band--</xsl:text>
       <xsl:value-of select="$PRESET"/>
@@ -60,10 +60,10 @@
     </xsl:variable>
 
 
-    <!-- ═══ Stylesheet link ══════════════════════════════════
+    <!-- === Stylesheet link ==================================
          Component ships its own sidecar CSS. Safe to include on
-         every render — browsers dedupe repeat <link> requests.
-         ═══════════════════════════════════════════════════════ -->
+         every render - browsers dedupe repeat <link> requests.
+         ======================================================= -->
     <link rel="stylesheet">
       <xsl:attribute name="href">
         <xsl:choose>
@@ -75,7 +75,7 @@
     </link>
 
 
-    <!-- ═══ Section shell ════════════════════════════════════ -->
+    <!-- === Section shell ==================================== -->
     <section>
       <xsl:attribute name="class"><xsl:value-of select="$CLASS_LIST"/></xsl:attribute>
       <xsl:if test="$SECTION_ID != ''">
@@ -87,11 +87,11 @@
 
       <div class="rbccm-cta-band__inner">
 
-        <!-- ═══ Eyebrow (optional) ══════════════════════════
+        <!-- === Eyebrow (optional) ==========================
              Only rendered when the Datum is non-empty. Skips
              cleanly on us-credentials / strategy-and-economics instances
              that leave the field blank.
-             ═════════════════════════════════════════════════ -->
+             ================================================= -->
         <xsl:if test="$EYEBROW != ''">
           <p class="rbccm-cta-band__eyebrow" data-json="eyebrow">
             <xsl:value-of select="$EYEBROW"/>
@@ -99,12 +99,12 @@
         </xsl:if>
 
 
-        <!-- ═══ Heading + body ═════════════════════════════
+        <!-- === Heading + body =============================
              strategy-and-economics wraps heading + body in .__intro
              (gap 12 for tight rhythm inside .__inner's gap 32).
              Other presets emit them as flex siblings of .__inner
              so its own gap owns the vertical rhythm.
-             ═════════════════════════════════════════════════ -->
+             ================================================= -->
         <xsl:choose>
           <xsl:when test="$PRESET = 'strategy-and-economics'">
             <div class="rbccm-cta-band__intro">
@@ -135,11 +135,11 @@
         </xsl:choose>
 
 
-        <!-- ═══ Actions row ════════════════════════════════
+        <!-- === Actions row ================================
              Wrapper renders only when at least one CTA has a
              label. Primary is yellow pill + arrow; secondary
              (strategy-and-economics) is outlined ghost, no icon.
-             ═════════════════════════════════════════════════ -->
+             ================================================= -->
         <xsl:if test="$CTA1_LABEL != '' or $CTA2_LABEL != ''">
           <div class="rbccm-cta-band__actions">
 
@@ -169,18 +169,18 @@
   </xsl:template>
 
 
-  <!-- ═══ Heading block template ════════════════════════════
+  <!-- === Heading block template ============================
        Emits the <h2>. Handles the three cases:
 
-         • Both lead + highlight: two spans. For us-credentials
+         * Both lead + highlight: two spans. For us-credentials
            NO text node between them (flex-column at desktop
            stacks each span on its own line); for all other
            presets a non-breaking space keeps the visual join.
 
-         • Only lead: single text run (no spans, no wrapper) —
+         * Only lead: single text run (no spans, no wrapper) -
            strategy-and-economics typically hits this branch since its
            heading is a single sentence with no yellow accent.
-       ═════════════════════════════════════════════════════════ -->
+       ========================================================= -->
   <xsl:template name="heading-block">
     <xsl:param name="preset"/>
     <xsl:param name="lead"/>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rbccm-video-poster - local test</title>
+<!-- Bootstrap 3 stands in for the site's modal plugin. The component JS
+     also works with Bootstrap 5 or with no Bootstrap at all. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="rbccm-video-poster.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
+<style>
+  body { margin: 0; background: #fff; font-family: Roboto, Arial, sans-serif; }
+  .demo-note { max-width: 1140px; margin: 0 auto; padding: 16px 23px; font: 13px/1.5 Roboto, Arial, sans-serif; color: #555; }
+  .demo-note code { background: #eef; padding: 1px 5px; border-radius: 3px; }
+  /* Stand-ins for the MAAS+MATA hero above and dark strip below, so
+     the space-above and the 200px overlap are visible. */
+  .demo-hero { background: linear-gradient(180deg, #002144 0%, #061730 100%); color: #fff; text-align: center; padding: 80px 23px 0; }
+  .demo-hero h1 { margin: 0; font: 400 40px/1.2 Georgia, serif; }
+  /* On MAAS+MATA the page wrapper is navy, so the 75px above the
+     image is navy too. */
+  .demo-page { background: #061730; }
+  .demo-strip { background: #051B38; color: #D8D8D8; text-align: center; padding: 260px 23px 80px; }
+  .demo-plain { background: #F3F4F5; padding: 40px 0; }
+</style>
+</head>
+<body data-picker-title="rbccm-video-poster">
+
+<div class="demo-note" data-variant="With video (MAAS+MATA)">
+  Poster + play button + Brightcove modal. <code>SpaceAbove</code> 75, <code>OverlapBelow</code> 200: the dark strip slides up under the image.
+</div>
+<div class="demo-page">
+<div class="demo-hero">
+  <h1>Hero stand-in</h1>
+</div>
+<div class="rbccm-video-poster" data-animate-hero="fadeIn" data-animate-delay="600" id="rbccm-video-poster-1" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;"><img class="rbccm-video-poster__image" loading="lazy" src="../maas-mata-page/maas-execution-console-reveal.png" alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2."><button type="button" class="rbccm-video-poster__play" data-toggle="modal" data-bs-toggle="modal" aria-haspopup="dialog" data-target="#rbccm-video-poster-1-modal" data-bs-target="#rbccm-video-poster-1-modal" aria-controls="rbccm-video-poster-1-modal" aria-label="Play platform video"><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-video-poster__play-icon" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true" focusable="false"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"></path></svg></button></div><div class="modal fade rbccm-video-poster__modal" role="dialog" tabindex="-1" aria-hidden="true" id="rbccm-video-poster-1-modal" aria-label="MAAS + MATA platform overview video"><div role="document" class="modal-dialog" style="top: 0px; width: 100%; max-width: 960px;"><div class="modal-content"><div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;"><button aria-label="Close video" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" data-bs-dismiss="modal">&#215;</button></div><div class="modal-body" style="padding: 0px;"><div class="white-box-text" style="padding: 25px; padding-top: 10px;"><div style="position: relative; display: block; max-width: 960px;"><div style="padding-top: 56.25%;"><iframe class="rbccm-video-poster__iframe" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" frameborder="0" title="MAAS + MATA platform overview video" data-src="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112"></iframe></div></div><span class="rbccm-video-poster__focus-guard" tabindex="0" aria-hidden="true"></span></div></div></div></div></div>
+
+<div class="demo-strip">Next section (dark strip stand-in). It starts 200px up, underneath the image.</div>
+</div>
+
+<div class="demo-note" data-variant="Image only">
+  No video ID: no play button, no modal. <code>OverlapBelow</code> 0, <code>SpaceAbove</code> 40.
+</div>
+<div class="demo-plain">
+<div class="rbccm-video-poster" data-animate-hero="fadeIn" data-animate-delay="600" id="rbccm-video-poster-2" style="--rbccm-vp-space-above: 40px; --rbccm-vp-overlap: 0px;"><img class="rbccm-video-poster__image" loading="lazy" src="../maas-mata-page/maas-execution-console-reveal.png" alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2."></div>
+
+</div>
+
+<script src="../local-test-fixtures/variant-picker.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+<script src="rbccm-video-poster.js"></script>
+</body>
+</html>

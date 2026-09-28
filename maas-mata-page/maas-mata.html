@@ -32,6 +32,17 @@
      rules can still be beaten by anything the page needs to override,
      while its base rules land first in the cascade. -->
 <link rel="stylesheet" href="../rbccm-cta-band/rbccm-cta-band.css">
+<link rel="stylesheet" href="../rbccm-video-poster/rbccm-video-poster.css">
+<!-- Preview only: bare-bones Bootstrap modal styles. The live site's
+     Bootstrap provides the real ones. -->
+<style>
+  .modal { display: none; position: fixed; inset: 0; z-index: 1050; overflow-y: auto; }
+  .modal .modal-dialog { position: relative; margin: 60px auto; padding: 0 16px; box-sizing: border-box; }
+  .modal .modal-content { background: #fff; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,.5); }
+  .modal .modal-header { display: flex; justify-content: flex-end; }
+  .modal .close { background: none; border: 0; cursor: pointer; line-height: 1; padding: 0 12px; }
+  .modal-backdrop { position: fixed; inset: 0; z-index: 1040; background: #000; opacity: .5; }
+</style>
 
 <style>
   :root {
@@ -2995,95 +3006,33 @@
     </div>
   </section>
 
-  <!-- ===== CHART CARD (poster image + video modal) =====
-       Currently a static screenshot per client direction. The
-       original HTML markup below is kept intact under a
-       --legacy modifier (display: none) so we can switch back to
-       the interactive version later without rebuilding it. Swap
-       is CSS-only: remove --legacy on the HTML block, add
-       --legacy on the __chart-image block. -->
-  <div class="rbccm-maas-mata__chart rbccm-maas-mata__chart-image" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600">
-    <!-- Single-image reveal: the desktop landscape shot is fixed
-         at 1100x366 inside a container that starts narrow
-         (max-width 331, showing just the chart + play button
-         portion via object-position: center) and animates its
-         max-width out to 1100 when the section scrolls into view.
-         Adds .is-revealed via IntersectionObserver.
-
-         object-position: center keeps the visible slice anchored
-         on the same chunk of the image as the container grows -
-         curtain-open feel without needing two image variants. -->
-    <img class="rbccm-maas-mata__chart-image-poster"
-         src="./maas-execution-console-reveal.png"
-         alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2."
-         loading="lazy" />
-    <!-- Play button overlay - opens the Brightcove modal below.
-         Brightcove identifiers ride as data-* attributes so the
-         CMS can populate each field per page:
-           data-bc-account : Brightcove Account ID
-           data-bc-player  : Brightcove Player ID (default_default
-                             works if no custom player)
-           data-bc-video   : Video ID to play
-         data-json-attr-* wires each one to chartCard.video.* so
-         authors edit them via the JSON blob, not the HTML.
-         Circle spec (56 pill, 2px white border, 20% white fill,
-         backdrop-blur) unchanged from before. -->
-    <button type="button"
-            class="rbccm-maas-mata__chart-image-play"
-            data-video-play
-            data-bc-account="6415665624001"
-            data-bc-player="default"
-            data-bc-video="6371076976112"
-            data-json-attr-data-bc-account="chartCard.video.accountId"
-            data-json-attr-data-bc-player="chartCard.video.playerId"
-            data-json-attr-data-bc-video="chartCard.video.videoId"
-            aria-label="Play platform video"
-            aria-haspopup="dialog"
-            aria-controls="rbccm-mm-video-modal">
-      <svg class="rbccm-maas-mata__chart-image-play-icon"
-           width="56" height="56" viewBox="0 0 56 56"
-           fill="currentColor" aria-hidden="true">
-        <!-- Play triangle path from Figma. Positioned in the 56x56
-             viewBox to sit optically centered inside the 56-circle
-             button (no manual translateX nudge needed). Uses
-             currentColor so the hover navy fill inherits. -->
-        <path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"/>
-      </svg>
+  <!-- ===== CHART CARD: rbccm-video-poster component =====
+       Same markup the component skin outputs. CSS + JS come from
+       ../rbccm-video-poster/. The modal is a sibling so the box's
+       overflow/z-index can't trap it. data-json-attr-* keep the CMS
+       JSON binding for the poster. -->
+  <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
+    <img class="rbccm-video-poster__image" src="./maas-execution-console-reveal.png" alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2." loading="lazy" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
+    <button type="button" class="rbccm-video-poster__play" data-toggle="modal" data-target="#herovideo" data-bs-toggle="modal" data-bs-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
+      <svg class="rbccm-video-poster__play-icon" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true" focusable="false"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"></path></svg>
     </button>
   </div>
-
-  <!-- ===== BRIGHTCOVE VIDEO MODAL =====
-       Modal shell for the platform demo video. Iframe src is left
-       empty until open (so no network hit on page load); JS builds
-       the Brightcove URL from the play button's data-bc-* attrs
-       when the modal opens, and clears src on close so the player
-       stops playing + releases memory. Backdrop click, close
-       button, and Esc all dismiss. Focus returns to the play
-       button on close. -->
-  <div class="rbccm-maas-mata__video-modal"
-       id="rbccm-mm-video-modal"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="rbccm-mm-video-modal-title"
-       hidden>
-    <div class="rbccm-maas-mata__video-modal-backdrop" data-video-close></div>
-    <div class="rbccm-maas-mata__video-modal-dialog" role="document">
-      <h2 id="rbccm-mm-video-modal-title" class="rbccm-maas-mata__video-modal-title" data-json="chartCard.video.title">Platform demo</h2>
-      <button type="button"
-              class="rbccm-maas-mata__video-modal-close"
-              data-video-close
-              aria-label="Close video">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <div class="rbccm-maas-mata__video-modal-frame">
-        <!-- Empty until opened; JS populates src on demand. -->
-        <iframe class="rbccm-maas-mata__video-modal-iframe"
-                data-video-iframe
-                title="Platform demo video"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowfullscreen></iframe>
+  <div class="modal fade rbccm-video-poster__modal" role="dialog" tabindex="-1" id="herovideo" aria-hidden="true" aria-label="MAAS + MATA platform overview video">
+    <div role="document" class="modal-dialog" style="top: 0px; width: 100%; max-width: 960px;">
+      <div class="modal-content">
+        <div class="modal-header" style="border: none; border-top: 8px #FBDE00 solid; padding: 0px;">
+          <button aria-label="Close video" class="close" style="font-size: 41px; color: #595959; font-weight: normal;" type="button" data-dismiss="modal" data-bs-dismiss="modal">&#215;</button>
+        </div>
+        <div class="modal-body" style="padding: 0px;">
+          <div class="white-box-text" style="padding: 25px; padding-top: 10px;">
+            <div style="position: relative; display: block; max-width: 960px;">
+              <div style="padding-top: 56.25%;">
+                <iframe class="rbccm-video-poster__iframe" title="MAAS + MATA platform overview video" style="position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; width: 100%; height: 100%;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" frameborder="0" data-src="https://players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6385114247112"></iframe>
+              </div>
+            </div>
+            <span class="rbccm-video-poster__focus-guard" tabindex="0" aria-hidden="true"></span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4593,5 +4542,6 @@
   })();
 </script>
 
+<script src="../rbccm-video-poster/rbccm-video-poster.js"></script>
 </body>
 </html>

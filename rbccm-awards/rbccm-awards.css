@@ -36,7 +36,7 @@
    variant should touch as few properties as possible.
    ========================================================================= */
 
-/* Section shell — outer / inner split.
+/* Section shell - outer / inner split.
    -------------------------------------------------------------------------
    The <section> is the full-viewport surface that paints the background
    colour, so a wide monitor doesn't leave the page's underlying colour
@@ -117,29 +117,29 @@
   border-radius: 10px;
   position: relative;
   height: 100%;
-  min-height: 127px;   /* 3-up MAAS/MATA baseline — --4 bumps to 148 below */
+  min-height: 127px;   /* 3-up MAAS/MATA baseline - --4 bumps to 148 below */
   box-sizing: border-box;
 }
 
 /* =========================================================================
-   Slick styling — applies at every breakpoint.
+   Slick styling - applies at every breakpoint.
    =========================================================================
    Slick is always initialized (rbccm-awards.js runs at page load and
    stays alive; only `slidesToShow` swaps at 872 via Slick's own
-   responsive config). Layout mechanics — DOM shape, track flex-ify,
-   card sizing, equal-height rig — are identical at mobile and desktop.
+   responsive config). Layout mechanics - DOM shape, track flex-ify,
+   card sizing, equal-height rig - are identical at mobile and desktop.
 
    DOM shape:
      .rbccm-awards__grid.slick-initialized
        > .slick-list
          > .slick-track
            > .slick-slide            (each direct child of the grid)
-             > div                   (Slick's own wrapper — NOT the card)
+             > div                   (Slick's own wrapper - NOT the card)
                > .rbccm-awards__card
 
    The intermediate <div> between .slick-slide and .rbccm-awards__card
    is inserted by Slick. Selectors that used the child combinator
-   (`.slick-slide > .rbccm-awards__card`) never match — always reach
+   (`.slick-slide > .rbccm-awards__card`) never match - always reach
    through with descendant. */
 
 /* Kill slick-theme's default 30px margin-bottom on dotted sliders. */
@@ -149,7 +149,7 @@
 
 /* Grid + list fill the __inner rail so Slick has the full content
    width to lay out slides in. `.slick-list` keeps Slick's default
-   `overflow: hidden` — that's what clips the infinite-mode clones
+   `overflow: hidden` - that's what clips the infinite-mode clones
    so only the 4 real cards show in the row at desktop, and gives
    the mobile peek pattern naturally (current card + start of next
    are visible in the list; everything else clips at the list edge). */
@@ -182,7 +182,7 @@
 /* Slides: `flex: none` (0 0 auto) respects Slick's variableWidth-
    computed card width (250 --4 / 264 base) AND prevents flex from
    shrinking slides when the track is wider than the list (infinite
-   mode adds clones — total track can be 2-3x the list width; without
+   mode adds clones - total track can be 2-3x the list width; without
    flex-shrink:0 every slide gets squeezed to a fraction of its
    authored width). `height: auto` lets each slide size naturally,
    then align-items:stretch on the track pulls shorter slides up to
@@ -192,7 +192,7 @@
   flex: none;
 }
 
-/* Slick's own wrapper div — passes the stretched slide height
+/* Slick's own wrapper div - passes the stretched slide height
    through to the card. */
 .rbccm-awards__grid.slick-initialized .slick-slide > div {
   height: 100%;
@@ -220,7 +220,7 @@
      - Desktop side padding 170 (wider than baseline's 23)
      - 4 cards @ 250 wide (vs. 3 cards @ 264 in baseline)
    Everything else inherits from baseline unchanged. */
-/* US Credentials navy — the preset default. The section paints the
+/* US Credentials navy - the preset default. The section paints the
    full-width bg; authors can override via the SectionBgColor Datum
    (which lands here as an inline --rbccm-awards-bg custom property
    on the section). */
@@ -228,26 +228,26 @@
   background: var(--rbccm-awards-bg, #051B38);
 }
 
-/* ---- Section overflow clips — one per variant ----------------------- */
+/* ---- Section overflow clips - one per variant ----------------------- */
 /* --4 (US Creds, 250px cards):
-     4 × 250 + 3 × 16 = 1048  →  + 23 × 2 inset = 1146.
+     4 x 250 + 3 x 16 = 1048  ->  + 23 x 2 inset = 1146.
      Below 1146 the row doesn't fit statically, so Slick's carousel
-     behavior takes over — clip its bleed at the viewport. */
+     behavior takes over - clip its bleed at the viewport. */
 @media (max-width: 1145px) {
   .rbccm-awards--4 {
     overflow: hidden;
   }
 }
 /* --3 (MAAS/MATA canon, 264px cards):
-     3 × 264 + 2 × 16 = 824  →  + 23 × 2 inset = 870.
-     Below 870 same story — Slick takes over, clip peek at viewport. */
+     3 x 264 + 2 x 16 = 824  ->  + 23 x 2 inset = 870.
+     Below 870 same story - Slick takes over, clip peek at viewport. */
 @media (max-width: 869px) {
   .rbccm-awards--3 {
     overflow: hidden;
   }
 }
 /* Card width override: 250 instead of 264 at every breakpoint. Height
-   stays content-driven — cards equalize to the tallest sibling via
+   stays content-driven - cards equalize to the tallest sibling via
    the flex-track `align-items: stretch` rig (and the base card's
    `height: 100%` which now has a definite parent height to resolve
    against). `!important` on all three width axes so nothing inside
@@ -276,7 +276,7 @@
   }
 }
 
-/* --3 variant grid: 3×264 + 2×16 = 824 max-width. Same left-inset
+/* --3 variant grid: 3x264 + 2x16 = 824 max-width. Same left-inset
    pattern as --4, dropped at the --3 breakpoint (870) so the row
    centers cleanly inside the rail. */
 .rbccm-awards--3 .rbccm-awards__grid {
@@ -290,9 +290,9 @@
   }
 }
 
-/* Controls row — arrows flanking the dot pagination. Mobile-first
+/* Controls row - arrows flanking the dot pagination. Mobile-first
    visible; hidden at each variant's own "row fits statically"
-   breakpoint (mirrors the section-overflow rules in the shell —
+   breakpoint (mirrors the section-overflow rules in the shell -
    below the breakpoint, Slick is paging; at/above it, there's
    nothing to page through). Cascade order matters here: media
    queries MUST come after the base so they win at desktop. */

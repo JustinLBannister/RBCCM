@@ -843,7 +843,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    -------------------------------------------------------------------------
    Blend of the two existing variants:
      - MAAS+MATA-style CENTERED text stack (2-line title with accent
-       colour on line 2 + subtitle) — no CTA row.
+       colour on line 2 + subtitle) - no CTA row.
      - S+E-style optional bg VIDEO backdrop (native <video> or
        Brightcove iframe), rendered under a solid navy fallback so
        the section reads even before video paints.
@@ -865,20 +865,20 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   padding: 145px 0 60px;
   overflow: hidden;
   text-align: center;
-  /* position: relative inherited from the shared block base — keeps
+  /* position: relative inherited from the shared block base - keeps
      the bg-video slot anchored to this section. */
 }
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials { padding: 218px 0 80px; }
 }
 
-/* Bg-video slot — identical mechanics to the S+E variant so the
+/* Bg-video slot - identical mechanics to the S+E variant so the
    Datum shape carries over (Uc*BgVideoMp4 or Uc*BgBrightcove*).
    The wrapper fills the section as an absolute-cover backdrop; the
    #001E3C fallback stays visible until the media paints, and if the
    source ever fails. aria-hidden on the wrapper (XSL side) keeps
    assistive tech from announcing decorative motion. Opacity kept
-   at 0.4 — higher than S+E (0.1) because US Creds uses the video
+   at 0.4 - higher than S+E (0.1) because US Creds uses the video
    as a decorative "constellation" backdrop that should register
    visually, not just ambient motion. Tune per art direction. */
 .rbccm-hero--us-credentials .rbccm-hero__bg-video {
@@ -902,7 +902,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 /* Content sits above the video. Base shared block already assigns
    z-index: 1 to `> *`, so `position: relative` here is a re-affirm.
    Container is a flex column so eyebrow / title / subtitle stack
-   with a single `gap` rule — each child gets its own bottom margin
+   with a single `gap` rule - each child gets its own bottom margin
    zeroed. */
 .rbccm-hero--us-credentials .rbccm-hero__container {
   position: relative;
@@ -920,7 +920,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   box-sizing: border-box;
 }
 
-/* Optional eyebrow — mirrors MAAS+MATA but on dark bg so colour
+/* Optional eyebrow - mirrors MAAS+MATA but on dark bg so colour
    flips to warm-yellow. Only renders if the Datum is non-empty. */
 .rbccm-hero--us-credentials .rbccm-hero__eyebrow {
   color: var(--rbccm-hero-yellow);
@@ -941,10 +941,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 15px auto 0;
 }
 
-/* Title — 2 lines, RBCDisplay serif. Line 1 white; line 2 accent
+/* Title - 2 lines, RBCDisplay serif. Line 1 white; line 2 accent
    warm-yellow via :last-child. Mobile 50/desktop 75 matches the
-   MAAS+MATA type ramp. Bottom margin is 0 — parent container's
-   flex `gap: 48px` owns the title→subtitle spacing. */
+   MAAS+MATA type ramp. Bottom margin is 0 - parent container's
+   flex `gap: 48px` owns the title->subtitle spacing. */
 .rbccm-hero--us-credentials .rbccm-hero__title {
   font-family: var(--rbccm-hero-serif);
   font-size: 50px;
@@ -965,7 +965,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   color: var(--rbccm-hero-yellow);
 }
 
-/* Subtitle — Roboto, centered white. Desktop caps at 558 per the
+/* Subtitle - Roboto, centered white. Desktop caps at 558 per the
    design spec so the paragraph wraps to ~2-3 lines. */
 .rbccm-hero--us-credentials .rbccm-hero__subtitle {
   color: #fff;

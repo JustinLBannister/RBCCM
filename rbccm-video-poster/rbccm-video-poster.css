@@ -1,0 +1,116 @@
+/* =========================================================================
+   RBCCM Video Poster
+   Deploy path: /assets/rbccm/css/components/rbccm-video-poster.css
+   =========================================================================
+   Rounded poster image + centred play button that opens a Brightcove
+   modal. Ported 1:1 from the MAAS+MATA page (.rbccm-maas-mata__chart-image).
+
+   Box: 1140 x 366 on desktop, full width minus 23px gutters below 992.
+   The image is fixed at 1100 x 366 and centred inside the box
+   (object-fit: cover, object-position: center), so narrow screens show
+   the middle of it.
+
+   Spacing (set per instance by the XSL as inline custom properties):
+     --rbccm-vp-space-above  desktop space above the box (default 75px;
+                             mobile is always 0)
+     --rbccm-vp-overlap      how far the next section slides up under the
+                             box (default 200px, 0 = none). The box sits
+                             above it via z-index.
+   ========================================================================= */
+
+.rbccm-video-poster {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: calc(100% - 46px);
+  max-width: none;
+  height: 366px;
+  margin: 0 auto calc(var(--rbccm-vp-overlap, 200px) * -1);
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster {
+    max-width: 1140px;
+    margin: var(--rbccm-vp-space-above, 75px) auto calc(var(--rbccm-vp-overlap, 200px) * -1);
+    border-radius: 30px;
+  }
+}
+
+/* Poster: fixed 1100 x 366, centred. Radius on the image too - Safari
+   doesn't always clip absolutely positioned children to the parent's
+   radius. */
+.rbccm-video-poster__image {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1100px;
+  height: 366px;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 20px;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster__image { border-radius: 30px; }
+}
+
+/* Play button - 56 circle, 2px white border, 20% white fill, 5px blur.
+   Hover / focus fills to 90% white and the icon turns navy.
+   !important on position / transform / box model: site button rules
+   otherwise move the click target off the image (same overrides the
+   MAAS+MATA page needed). */
+.rbccm-video-poster .rbccm-video-poster__play {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 55.993px;
+  height: 55.993px;
+  padding: 0 !important;
+  margin: 0;
+  border-radius: 55.993px;
+  border: 2px solid #FFF;
+  background: rgba(255, 255, 255, 0.20);
+  -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(5px);
+  color: #FFFFFF;
+  cursor: pointer !important;
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+}
+.rbccm-video-poster .rbccm-video-poster__play:hover,
+.rbccm-video-poster .rbccm-video-poster__play:focus-visible {
+  background: rgba(255, 255, 255, 0.90);
+  color: #061730;
+  transform: translate(-50%, -50%) scale(1.04) !important;
+}
+.rbccm-video-poster .rbccm-video-poster__play:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 3px;
+}
+.rbccm-video-poster__play-icon {
+  width: 56px;
+  height: 56px;
+  pointer-events: none;
+}
+
+/* Reduced motion: keep the button centred, drop the scale + fades. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-video-poster .rbccm-video-poster__play,
+  .rbccm-video-poster .rbccm-video-poster__play:hover,
+  .rbccm-video-poster .rbccm-video-poster__play:focus-visible {
+    transition: none !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .rbccm-video-poster[data-animate-hero] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
