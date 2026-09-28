@@ -403,7 +403,6 @@
   line-height: 150%;
   font-feature-settings: 'liga' off, 'clig' off;
   margin: 0;
-  flex: 1;
 }
 .rbccm-two-up-cards--features .rbccm-two-up-cards__card--dark .rbccm-two-up-cards__card-body {
   color: #ECECEC;
@@ -434,6 +433,64 @@
   line-height: inherit;
   color: inherit;
   opacity: 1;
+}
+
+/* ---- Features: spacing + type locks --------------------------------------
+   Header spacing: eyebrow, heading and cards are evenly spaced (32
+   mobile / 60 desktop). Without this the shared __header's 16px gap
+   puts the heading too close to the eyebrow, and the site's h2
+   margins push it too far from the cards.
+
+   Card spacing: 20 from eyebrow to title (the card gap), then 15
+   between title, body and bullets. The body doesn't stretch, so a
+   shorter card doesn't open a gap above its bullets; both cards
+   still match heights because the row stretches them.
+
+   Card copy: body + bullets are Roboto 14/150% with no letter-spacing,
+   #494949 on the light card and #ECECEC on the dark card.
+   !important because the site's unified2.css p / li rules otherwise
+   make the text bigger and add letter-spacing. */
+.rbccm-two-up-cards--features .rbccm-two-up-cards__header {
+  gap: 32px;
+  max-width: none;
+}
+@media (min-width: 992px) {
+  .rbccm-two-up-cards--features .rbccm-two-up-cards__header { gap: 60px; }
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__eyebrow {
+  margin: 0 auto !important;
+  letter-spacing: 3px !important;
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__heading {
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-title {
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-body,
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-bullets {
+  margin: -5px 0 0 !important;          /* 20 card gap - 5 = 15 */
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-body,
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-bullet-item {
+  color: #494949 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  letter-spacing: 0 !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card-bullet-item {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card--dark .rbccm-two-up-cards__card-body,
+.rbccm-two-up-cards--features .rbccm-two-up-cards__card--dark .rbccm-two-up-cards__card-bullet-item {
+  color: #ECECEC !important;
 }
 
 

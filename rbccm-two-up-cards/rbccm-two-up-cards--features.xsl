@@ -50,7 +50,8 @@
 
       <h3 class="rbccm-two-up-cards__card-title"><xsl:value-of select="$title"/></h3>
 
-      <xsl:if test="$body != ''">
+      <xsl:variable name="bodyText"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$body"/></xsl:call-template></xsl:variable>
+      <xsl:if test="normalize-space(translate($bodyText, '&#160;&amp;nbsp;', '')) != ''">
         <p class="rbccm-two-up-cards__card-body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
       </xsl:if>
 
@@ -99,6 +100,22 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- Visible text of a rich-text field: tags stripped. Used to treat
+       fields the editor left with only placeholder markup
+       (<br data-mce-bogus="1">, <p>&nbsp;</p>) as blank. -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -110,7 +127,16 @@
     <xsl:variable name="EYEBROW"       select="normalize-space(//Datum[@ID='SectionEyebrowText']/text()[last()])"/>
     <xsl:variable name="HEADING"       select="normalize-space(//Datum[@ID='SectionHeadingText']/text()[last()])"/>
     <xsl:variable name="HEADING_TAG_RAW" select="normalize-space(//Datum[@ID='SectionHeadingTag']/text()[last()])"/>
-    <xsl:variable name="DESCRIPTION"   select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/>
+    <xsl:variable name="DESCRIPTION_RAW" select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/>
+    <xsl:variable name="DESCRIPTION_TEXT">
+      <xsl:call-template name="stripTags"><xsl:with-param name="s" select="$DESCRIPTION_RAW"/></xsl:call-template>
+    </xsl:variable>
+    <!-- Blank unless real text is left once markup and &nbsp; are gone. -->
+    <xsl:variable name="DESCRIPTION">
+      <xsl:if test="normalize-space(translate($DESCRIPTION_TEXT, '&#160;&amp;nbsp;', '')) != ''">
+        <xsl:value-of select="$DESCRIPTION_RAW"/>
+      </xsl:if>
+    </xsl:variable>
 
     <xsl:variable name="HEADING_TAG">
       <xsl:call-template name="pickTag">
