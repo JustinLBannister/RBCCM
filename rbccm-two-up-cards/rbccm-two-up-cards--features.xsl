@@ -4,7 +4,7 @@
   ============================================================
   Standalone skin for TeamSite's Skin dropdown. Renders ONLY the
   features variant (MAAS+MATA parity): dark section, cards hold
-  eyebrow + title + body + up to 5 bullets. Each card is themed
+  eyebrow + title + body + up to 6 bullets. Each card is themed
   dark or light via Card{N}Theme (plain text: dark / light).
   No JS.
 
@@ -54,21 +54,23 @@
         <p class="rbccm-two-up-cards__card-body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
       </xsl:if>
 
-      <!-- Bullet list. Reads Card{N}Bullet1 through Card{N}Bullet5.
+      <!-- Bullet list. Reads Card{N}Bullet1 through Card{N}Bullet6.
            Only bullets with non-blank text render. -->
       <xsl:variable name="b1" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet1Text')]/text()[last()])"/>
       <xsl:variable name="b2" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet2Text')]/text()[last()])"/>
       <xsl:variable name="b3" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet3Text')]/text()[last()])"/>
       <xsl:variable name="b4" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet4Text')]/text()[last()])"/>
       <xsl:variable name="b5" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet5Text')]/text()[last()])"/>
+      <xsl:variable name="b6" select="normalize-space(//Datum[@ID=concat('Card', $n, 'Bullet6Text')]/text()[last()])"/>
 
-      <xsl:if test="$b1 != '' or $b2 != '' or $b3 != '' or $b4 != '' or $b5 != ''">
+      <xsl:if test="$b1 != '' or $b2 != '' or $b3 != '' or $b4 != '' or $b5 != '' or $b6 != ''">
         <ul class="rbccm-two-up-cards__card-bullets">
           <xsl:if test="$b1 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b1"/></li></xsl:if>
           <xsl:if test="$b2 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b2"/></li></xsl:if>
           <xsl:if test="$b3 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b3"/></li></xsl:if>
           <xsl:if test="$b4 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b4"/></li></xsl:if>
           <xsl:if test="$b5 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b5"/></li></xsl:if>
+          <xsl:if test="$b6 != ''"><li class="rbccm-two-up-cards__card-bullet-item"><xsl:value-of select="$b6"/></li></xsl:if>
         </ul>
       </xsl:if>
     </article>

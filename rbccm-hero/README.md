@@ -22,7 +22,7 @@ The variant is picked by the skin, not a field. There is no Preset field.
 
 | Group | Fields | Used by |
 |---|---|---|
-| Setup | CacheVersion, SectionID, SectionAriaLabel, CssPath, ButtonCssPath, JsPath, HeaderAlignment | all (ButtonCssPath: MAAS+MATA, JsPath: S+E) |
+| Setup | CacheVersion, SectionID, SectionAriaLabel, CssPath, ButtonCssPath, JsPath, HeaderAlignment | all (JsPath: S+E; ButtonCssPath optional, leave blank: rbccm-hero.css styles the MAAS+MATA buttons itself) |
 | Hero content | EyebrowText/Tag, TitleLine1Text, TitleLine2Text, TitleTag, SubtitleText/Tag | all. S+E uses line 1 + subtitle only (no eyebrow, no line 2). |
 | Background video | BgVideoMp4, BgBrightcoveVideoId, BgBrightcoveAccount, BgBrightcovePlayer | S+E, US Credentials |
 | MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA |

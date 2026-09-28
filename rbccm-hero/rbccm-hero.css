@@ -30,7 +30,8 @@
    -------------------------------------------------------------------------
      MAAS+MATA               .rbccm-hero.rbccm-hero--maas-mata
                              skin rbccm-hero--maas-mata.xsl
-                             (buttons also need rbccm-button.css)
+                             (buttons are styled in this file; no
+                             rbccm-button.css needed)
      Strategy & Economics    .rbccm-hero.rbccm-hero--strategy-and-economics
                              skin rbccm-hero--strategy-and-economics.xsl
                              (insight card also needs rbccm-hero.js)
@@ -193,6 +194,11 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   background-repeat: repeat, repeat, repeat;
 }
 .rbccm-hero--maas-mata .rbccm-hero__container { text-align: center; }
+/* Same as the MAAS+MATA page: 75px below the button at every size
+   (the base block's desktop 120 is for the other variants). */
+.rbccm-hero--maas-mata {
+  --rbccm-hero-pb-d: 75px;
+}
 
 /* Glow halo -- soft light-blue disc, blurred, sitting at top-centre
    like a backdrop. Kept OUT of the accessibility tree via ::before. */
@@ -211,18 +217,20 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   z-index: 0;
 }
 
-/* Eyebrow -- uppercase, blue, letter-spaced, with a 45x2 yellow
-   underline directly beneath via ::after. Bottom margin of 80px
-   lands the eyebrow-to-H1 measurement per Figma. */
+/* Eyebrow -- blue, letter-spaced, text as typed (not uppercased,
+   same as the MAAS+MATA page), with a 45x2 yellow underline beneath
+   via ::after. Bottom margin of 80px lands the eyebrow-to-H1
+   measurement per Figma. It's the page's h1, so !important beats the
+   site's h1 tag rules (size, weight, case, tracking). */
 .rbccm-hero--maas-mata .rbccm-hero__eyebrow {
-  color: var(--rbccm-hero-blue);
-  font-family: var(--rbccm-hero-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 120%;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin: 0 0 80px;
+  color: var(--rbccm-hero-blue) !important;
+  font-family: var(--rbccm-hero-sans) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 120% !important;
+  letter-spacing: 3px !important;
+  text-transform: none !important;
+  margin: 0 0 80px !important;
 }
 .rbccm-hero--maas-mata .rbccm-hero__eyebrow::after {
   content: "";
@@ -257,22 +265,25 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .rbccm-hero--maas-mata .rbccm-hero__title-line { display: block; }
 .rbccm-hero--maas-mata .rbccm-hero__title-line:last-child { color: var(--rbccm-hero-blue); }
 
-/* Subtitle -- Roboto, centered, cap width. */
+/* Subtitle -- Roboto, centered, cap width. Values match the MAAS+MATA
+   page (620 / 832 caps, 33 / 48 desktop margins). !important on type:
+   site p rules otherwise add letter-spacing and change the size. */
 .rbccm-hero--maas-mata .rbccm-hero__subtitle {
-  color: var(--rbccm-hero-ink);
-  font-family: var(--rbccm-hero-sans);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 120%;
-  max-width: 343px;
-  margin: 0 auto 32px;
+  color: var(--rbccm-hero-ink) !important;
+  font-family: var(--rbccm-hero-sans) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 120% !important;
+  letter-spacing: 0 !important;
+  max-width: 620px;
+  margin: 0 auto 32px !important;
 }
 .rbccm-hero--maas-mata .rbccm-hero__subtitle strong { font-weight: 700; }
 @media (min-width: 992px) {
   .rbccm-hero--maas-mata .rbccm-hero__subtitle {
-    font-size: 21.945px;
-    max-width: 776px;
-    margin: 48px auto;
+    font-size: 21.945px !important;
+    max-width: 832px;
+    margin: 33px auto 48px !important;
   }
 }
 
@@ -283,6 +294,128 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+/* ---- MAAS+MATA buttons (baked in) ---------------------------------------
+   The hero's buttons are styled right here, copied from maas-mata.css
+   (.rbccm-maas-mata__btn / --primary / --secondary, their icon, the
+   shine sweep + arrow flyby, and the TeamSite defence block), so the
+   hero doesn't need rbccm-button.css. The skin still outputs the
+   rbccm-button class names; these rules are scoped to the MAAS+MATA
+   hero so they don't touch rbccm-button anywhere else.
+   !important where maas-mata.css used it: unified.css / unified2.css
+   .btn, a and a:hover rules otherwise reshape the pill. */
+.rbccm-hero--maas-mata .rbccm-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px;
+  height: 50px !important;
+  padding: 12px 35px !important;
+  border-radius: 100px !important;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 18px;
+  line-height: 29.26px;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  box-sizing: border-box;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.rbccm-hero--maas-mata .rbccm-button > * { position: relative !important; z-index: 1 !important; }
+.rbccm-hero--maas-mata .rbccm-button:hover,
+.rbccm-hero--maas-mata .rbccm-button:focus { text-decoration: none !important; }
+.rbccm-hero--maas-mata .rbccm-button:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 3px;
+}
+
+/* Primary: #0051A5 pill, white 18/29.26 wt 500 text, white arrow. */
+.rbccm-hero--maas-mata .rbccm-button--primary {
+  background: #0051A5 !important;
+  color: #fff !important;
+  border: 1px solid #0051A5 !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  line-height: 29.26px !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary:hover,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible {
+  background: #003168 !important;
+  border-color: #003168 !important;
+  color: #fff !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary .rbccm-button__icon {
+  fill: #fff;
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  transition: transform 200ms ease, opacity 200ms ease !important;
+  will-change: transform, opacity;
+}
+
+/* Secondary: outlined, grey text + border, small grey icon. */
+.rbccm-hero--maas-mata .rbccm-button--secondary {
+  background: transparent !important;
+  color: #494949 !important;
+  border: 1px solid #D8D8D8 !important;
+  font-weight: 400 !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--secondary:hover,
+.rbccm-hero--maas-mata .rbccm-button--secondary:focus-visible {
+  border-color: #494949 !important;
+  color: #494949 !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--secondary .rbccm-button__icon {
+  fill: #494949;
+  width: 12px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* Shine sweep on primary: a soft white diagonal band crosses the pill
+   on hover / keyboard focus (transition-based, like the live page, so
+   it retriggers on every hover). */
+.rbccm-hero--maas-mata .rbccm-button--primary::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: -60% !important;
+  width: 40% !important;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%) !important;
+  transform: skewX(-18deg) !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  z-index: 0 !important;
+  transition: left 600ms ease-out, opacity 600ms ease-out !important;
+  animation: none !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary:hover::before,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible::before {
+  left: 120% !important;
+  opacity: 1 !important;
+}
+
+/* Arrow flyby: slides out right, reappears from the left, settles. */
+.rbccm-hero--maas-mata .rbccm-button--primary:hover .rbccm-button__icon,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible .rbccm-button__icon {
+  animation: rbccm-hero-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+}
+@keyframes rbccm-hero-arrow-flyby {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(32px);  opacity: 0; }
+  46%  { transform: translateX(-32px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--maas-mata .rbccm-button--primary::before { transition: none !important; }
+  .rbccm-hero--maas-mata .rbccm-button--primary:hover::before,
+  .rbccm-hero--maas-mata .rbccm-button--primary:focus-visible::before { opacity: 0 !important; }
+  .rbccm-hero--maas-mata .rbccm-button--primary:hover .rbccm-button__icon,
+  .rbccm-hero--maas-mata .rbccm-button--primary:focus-visible .rbccm-button__icon { animation: none !important; }
 }
 
 
