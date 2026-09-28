@@ -57,7 +57,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Shared card body — the guts inside __content (icon + title +
+  <!-- Shared card body - the guts inside __content (icon + title +
        optional subtitle + body + optional CTA). Called from both
        branches of renderCard so the anchor and article variants share
        one source of truth. -->
@@ -75,7 +75,7 @@
         <p class="rbccm-capability-cards__subtitle"><xsl:value-of select="$subtitle"/></p>
       </xsl:if>
       <p class="rbccm-capability-cards__body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
-      <!-- CTA chip. Rendered whenever a label is present — the parent
+      <!-- CTA chip. Rendered whenever a label is present - the parent
            renderCard branch has already decided whether the card is an
            <a> (link semantics live on the card, not the chip) or a
            static <article>. The chip is presentational either way. -->
@@ -90,7 +90,7 @@
 
   <!-- Render one card. Skipped when title is blank.
        Conditional wrapper: when a CtaHref is provided the whole card
-       becomes an <a> (the __cta chip inside is decorative — the click
+       becomes an <a> (the __cta chip inside is decorative - the click
        target is the card). Without a href it renders as a static
        <article>. Card guts live inside a shared __content wrapper so
        the CSS's `margin-top: auto` push on __cta bottom-aligns the
@@ -116,7 +116,7 @@
             <xsl:attribute name="href"><xsl:value-of select="$ctaHref"/></xsl:attribute>
             <xsl:attribute name="aria-label">
               <xsl:value-of select="$title"/>
-              <xsl:if test="$ctaLabel != ''"> — <xsl:value-of select="$ctaLabel"/></xsl:if>
+              <xsl:if test="$ctaLabel != ''"> &#8212; <xsl:value-of select="$ctaLabel"/></xsl:if>
             </xsl:attribute>
             <xsl:call-template name="renderCardContent">
               <xsl:with-param name="iconType" select="$iconType"/>
@@ -128,7 +128,7 @@
           </a>
         </xsl:when>
         <xsl:otherwise>
-          <!-- Static variant: no href, no CTA — pure informational card. -->
+          <!-- Static variant: no href, no CTA - pure informational card. -->
           <article class="rbccm-capability-cards__card">
             <xsl:call-template name="renderCardContent">
               <xsl:with-param name="iconType" select="$iconType"/>
