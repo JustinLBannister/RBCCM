@@ -144,6 +144,23 @@
   </xsl:template>
 
 
+  <!-- Visible text of a rich-text field: tags stripped, &nbsp; and
+       whitespace collapsed. Used to spot fields the editor left with
+       only its placeholder markup (e.g. <br data-mce-bogus="1"> or
+       <p>&nbsp;</p>) so they're treated as blank. -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -166,7 +183,18 @@
     <xsl:variable name="EYEBROW"     select="normalize-space(//Datum[@ID='SectionEyebrowText']/text()[last()])"/>
     <xsl:variable name="HEADING"     select="normalize-space(//Datum[@ID='SectionHeadingText']/text()[last()])"/>
     <xsl:variable name="HEADING_TAG_RAW" select="normalize-space(//Datum[@ID='SectionHeadingTag']/text()[last()])"/>
-    <xsl:variable name="DESCRIPTION" select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/>
+    <xsl:variable name="DESCRIPTION_RAW" select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/>
+    <xsl:variable name="DESCRIPTION_TEXT">
+      <xsl:call-template name="stripTags"><xsl:with-param name="s" select="$DESCRIPTION_RAW"/></xsl:call-template>
+    </xsl:variable>
+    <!-- Blank unless real text is left once markup, &nbsp; entities
+         and non-breaking spaces are gone. (Only an emptiness test, so
+         dropping the letters of "&nbsp;" here is harmless.) -->
+    <xsl:variable name="DESCRIPTION">
+      <xsl:if test="normalize-space(translate($DESCRIPTION_TEXT, '&#160;&amp;nbsp;', '')) != ''">
+        <xsl:value-of select="$DESCRIPTION_RAW"/>
+      </xsl:if>
+    </xsl:variable>
 
     <xsl:variable name="HEADING_TAG">
       <xsl:call-template name="pickTag">
