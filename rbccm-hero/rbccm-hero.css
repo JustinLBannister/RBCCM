@@ -26,18 +26,27 @@
      - Aside/media slot styling
      - CTA button row layout
 
-   Consumers
+   Variants (one TeamSite skin each, all sharing this file)
    -------------------------------------------------------------------------
-     MAAS+MATA page          .rbccm-hero.rbccm-hero--maas-mata
+     MAAS+MATA               .rbccm-hero.rbccm-hero--maas-mata
+                             skin rbccm-hero--maas-mata.xsl
+                             (buttons also need rbccm-button.css)
      Strategy & Economics    .rbccm-hero.rbccm-hero--strategy-and-economics
+                             skin rbccm-hero--strategy-and-economics.xsl
+                             (insight card also needs rbccm-hero.js)
+     US Credentials          .rbccm-hero.rbccm-hero--us-credentials
+                             skin rbccm-hero--us-credentials.xsl
+     Option on any variant:  .rbccm-hero--header-center (HeaderAlignment)
      (candidate) Insights hub, About Us, others as they migrate.
 
    Adding a new variant
    -------------------------------------------------------------------------
-   1. Author page markup with `.rbccm-hero.rbccm-hero--{page-slug}`
+   1. Copy the closest skin to rbccm-hero--{page-slug}.xsl and change its
+      hardcoded variant class to .rbccm-hero--{page-slug}
    2. Add a new modifier block at the bottom of this file with the
       variant's layout + typography + bg treatment
-   3. Load rbccm-hero.css BEFORE the page's own CSS so page rules can
+   3. List it above
+   4. Load rbccm-hero.css BEFORE the page's own CSS so page rules can
       still override if needed
    ========================================================================= */
 
