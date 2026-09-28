@@ -52,7 +52,7 @@
   justify-content: center;
   align-items: center;
   align-self: stretch;
-  gap: 40px;
+  gap: 45px;
   background: var(--rbccm-capability-cards-bg, #051B38);
   color: #fff;
   padding: 60px 23px;
@@ -123,12 +123,14 @@
 /* =========================================================================
    3. Header (heading + optional sub)   (mirrors .__mata-cap-header)
    ========================================================================= */
+/* Both skins wrap eyebrow / heading / description in __header.
+   38px between them (checked against the design in the browser). */
 .rbccm-capability-cards__header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
-  gap: 8px;
+  gap: 38px;
 }
 
 /* Section heading - RBC Display 36px mobile / 42px desktop. */
@@ -150,8 +152,10 @@
   }
 }
 
-/* Sub-heading - grey Roboto 16/150%, centered, capped at 490px. */
-.rbccm-capability-cards__sub {
+/* Sub-heading - grey Roboto 16/150%, centered, capped at 490px.
+   __description is the class the skins output for the same line. */
+.rbccm-capability-cards__sub,
+.rbccm-capability-cards__description {
   color: #D7D7D7;
   text-align: center;
   font-feature-settings: 'liga' off, 'clig' off;
