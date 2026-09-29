@@ -110,6 +110,25 @@
     return null;
   }
 
+  /* Character limits. The skin stamps data-title-max / data-desc-max on
+     each tile from the Tile{N}TitleLimit / Tile{N}DescLimit fields
+     (0 = no limit), so feed content is cut the same way as server-
+     rendered content. Same rule as rbccm-hero.js: cut at the last whole
+     word (unless that drops more than 40% of the allowance), trim
+     trailing punctuation, add an ellipsis that counts toward the limit. */
+  function readMax(tile, attr, fallback) {
+    var v = parseInt(tile.getAttribute(attr), 10);
+    return isNaN(v) ? fallback : v;
+  }
+  function truncate(text, max) {
+    var t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!max || max <= 0 || t.length <= max) return t;
+    var cut = t.slice(0, max - 1);
+    var sp = cut.lastIndexOf(' ');
+    if (sp + 1 > max * 0.6) cut = cut.slice(0, sp);
+    return cut.replace(/[\s,;:.\-]+$/, '') + '\u2026';
+  }
+
   function hydrateTile(tile, rec) {
     if (!tile || !rec) return;
     if (tile.classList.contains(HYDRATED)) return;
@@ -124,8 +143,8 @@
     var dateEl  = tile.querySelector('[data-hydrate-date]');
     var anchor  = tile.querySelector(ANCHOR_SEL);
 
-    if (titleEl && title) titleEl.textContent = title;
-    if (descEl  && desc)  descEl.textContent  = desc;
+    if (titleEl && title) titleEl.textContent = truncate(title, readMax(tile, 'data-title-max', 70));
+    if (descEl  && desc)  descEl.textContent  = truncate(desc, readMax(tile, 'data-desc-max', 170));
     if (dateEl  && date)  dateEl.textContent  = date;
     if (anchor  && link)  anchor.setAttribute('href', link);
 

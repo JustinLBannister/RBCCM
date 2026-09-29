@@ -84,6 +84,8 @@
   <xsl:variable name="T1_DATE"       select="//Datum[@ID='Tile1Date']"/>
   <xsl:variable name="T1_DCR"        select="//Datum[@ID='Tile1Dcr']/DCR"/>
   <xsl:variable name="T1_PINNED"     select="normalize-space(//Datum[@ID='Tile1PinnedUrl'])"/>
+  <xsl:variable name="T1_TITLE_LIMIT" select="//Datum[@ID='Tile1TitleLimit']"/>
+  <xsl:variable name="T1_DESC_LIMIT"  select="//Datum[@ID='Tile1DescLimit']"/>
 
   <!-- Tile 2 -->
   <xsl:variable name="T2_EYEBROW"    select="//Datum[@ID='Tile2Eyebrow']"/>
@@ -99,6 +101,8 @@
   <xsl:variable name="T2_DATE"       select="//Datum[@ID='Tile2Date']"/>
   <xsl:variable name="T2_DCR"        select="//Datum[@ID='Tile2Dcr']/DCR"/>
   <xsl:variable name="T2_PINNED"     select="normalize-space(//Datum[@ID='Tile2PinnedUrl'])"/>
+  <xsl:variable name="T2_TITLE_LIMIT" select="//Datum[@ID='Tile2TitleLimit']"/>
+  <xsl:variable name="T2_DESC_LIMIT"  select="//Datum[@ID='Tile2DescLimit']"/>
 
   <!-- Tile 3 -->
   <xsl:variable name="T3_EYEBROW"    select="//Datum[@ID='Tile3Eyebrow']"/>
@@ -114,6 +118,8 @@
   <xsl:variable name="T3_DATE"       select="//Datum[@ID='Tile3Date']"/>
   <xsl:variable name="T3_DCR"        select="//Datum[@ID='Tile3Dcr']/DCR"/>
   <xsl:variable name="T3_PINNED"     select="normalize-space(//Datum[@ID='Tile3PinnedUrl'])"/>
+  <xsl:variable name="T3_TITLE_LIMIT" select="//Datum[@ID='Tile3TitleLimit']"/>
+  <xsl:variable name="T3_DESC_LIMIT"  select="//Datum[@ID='Tile3DescLimit']"/>
 
   <!-- Tile 4 -->
   <xsl:variable name="T4_EYEBROW"    select="//Datum[@ID='Tile4Eyebrow']"/>
@@ -129,6 +135,8 @@
   <xsl:variable name="T4_DATE"       select="//Datum[@ID='Tile4Date']"/>
   <xsl:variable name="T4_DCR"        select="//Datum[@ID='Tile4Dcr']/DCR"/>
   <xsl:variable name="T4_PINNED"     select="normalize-space(//Datum[@ID='Tile4PinnedUrl'])"/>
+  <xsl:variable name="T4_TITLE_LIMIT" select="//Datum[@ID='Tile4TitleLimit']"/>
+  <xsl:variable name="T4_DESC_LIMIT"  select="//Datum[@ID='Tile4DescLimit']"/>
 
   <!-- Convenience: does any tile carry a non-blank pinned URL? Used to
        decide when the section as a whole needs the JS hydrator to walk
@@ -140,6 +148,97 @@
   <xsl:variable name="VIEW_ALL_LABEL" select="//Datum[@ID='ViewAllLabel']"/>
   <xsl:variable name="VIEW_ALL_HREF"  select="//Datum[@ID='ViewAllHref']"/>
   <xsl:variable name="VIEW_ALL_ARIA"  select="//Datum[@ID='ViewAllAriaLabel']"/>
+
+
+  <!-- =====================================================================
+       Tile character limits (same fields as the S+E hero insight card)
+       =====================================================================
+       Tile{N}TitleLimit / Tile{N}DescLimit (plain text):
+         default (or blank)  70 for the title, 170 for the description
+         full                no limit
+         custom=190          that many characters (a bare 190 works too)
+       limitValue turns the field into a number; 0 means no limit. Text
+       over the limit is cut at the last whole word with an ellipsis.
+       The limits are also stamped on each tile (data-title-max /
+       data-desc-max) so rbccm-featured-insights.js cuts feed content
+       the same way. -->
+  <xsl:template name="limitValue">
+    <xsl:param name="raw"/>
+    <xsl:param name="default"/>
+    <xsl:variable name="v" select="translate(normalize-space($raw), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:variable name="digits" select="translate($v, translate($v, '0123456789', ''), '')"/>
+    <xsl:choose>
+      <xsl:when test="$v = 'full'">0</xsl:when>
+      <xsl:when test="$digits != ''"><xsl:value-of select="number($digits)"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Visible text of a value that may hold HTML (tags stripped). -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Position of the last space in $s (0 if none). -->
+  <xsl:template name="lastSpace">
+    <xsl:param name="s"/>
+    <xsl:param name="offset" select="0"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, ' ')">
+        <xsl:call-template name="lastSpace">
+          <xsl:with-param name="s" select="substring-after($s, ' ')"/>
+          <xsl:with-param name="offset" select="$offset + string-length(substring-before($s, ' ')) + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$offset"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Cut $text to at most $max characters including the ellipsis.
+       Breaks at the last whole word (unless that would drop more than
+       40% of the allowance), trims trailing punctuation, adds an
+       ellipsis. $max = 0 or text already short enough: unchanged. -->
+  <xsl:template name="truncate">
+    <xsl:param name="text"/>
+    <xsl:param name="max"/>
+    <xsl:variable name="t" select="normalize-space($text)"/>
+    <xsl:choose>
+      <xsl:when test="$max &lt;= 0 or string-length($t) &lt;= $max"><xsl:value-of select="$t"/></xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="cut" select="substring($t, 1, $max - 1)"/>
+        <xsl:variable name="sp"><xsl:call-template name="lastSpace"><xsl:with-param name="s" select="$cut"/></xsl:call-template></xsl:variable>
+        <xsl:variable name="word">
+          <xsl:choose>
+            <xsl:when test="$sp &gt; ($max * 0.6)"><xsl:value-of select="substring($cut, 1, $sp - 1)"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="$cut"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name="trimEnd"><xsl:with-param name="s" select="$word"/></xsl:call-template>
+        <xsl:text>&#8230;</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Drop trailing spaces and , ; : . - before the ellipsis. -->
+  <xsl:template name="trimEnd">
+    <xsl:param name="s"/>
+    <xsl:variable name="last" select="substring($s, string-length($s))"/>
+    <xsl:choose>
+      <xsl:when test="$s != '' and contains(' ,;:.-', $last)">
+        <xsl:call-template name="trimEnd"><xsl:with-param name="s" select="substring($s, 1, string-length($s) - 1)"/></xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
 
   <!-- =====================================================================
@@ -187,6 +286,22 @@
     <xsl:param name="topic"/>
     <xsl:param name="region"/>
     <xsl:param name="date"/>
+    <xsl:param name="titleLimit"/>
+    <xsl:param name="descLimit"/>
+
+    <!-- Character limits (see limitValue). 0 = no limit. -->
+    <xsl:variable name="titleMax">
+      <xsl:call-template name="limitValue">
+        <xsl:with-param name="raw" select="$titleLimit"/>
+        <xsl:with-param name="default" select="70"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="descMax">
+      <xsl:call-template name="limitValue">
+        <xsl:with-param name="raw" select="$descLimit"/>
+        <xsl:with-param name="default" select="170"/>
+      </xsl:call-template>
+    </xsl:variable>
 
     <!-- DCR field lookups. Wildcard the DCR wrapper element name because
          the Tile{N}Dcr picker allows several types (article/.*, rbccm/
@@ -265,7 +380,13 @@
          <div class="slick-slide"> == that's a known library
          limitation, not a component bug; document it as an accepted
          exception in accessibility QA. -->
+    <!-- Plain text of the description, used to measure it against the
+         limit. -->
+    <xsl:variable name="descPlain"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$effDesc"/></xsl:call-template></xsl:variable>
+
     <li class="rbccm-insight-tiles__item">
+      <xsl:attribute name="data-title-max"><xsl:value-of select="$titleMax"/></xsl:attribute>
+      <xsl:attribute name="data-desc-max"><xsl:value-of select="$descMax"/></xsl:attribute>
       <xsl:if test="$hydrateThisTile">
         <xsl:attribute name="data-tile-pinned-url"><xsl:value-of select="$pinnedUrl"/></xsl:attribute>
       </xsl:if>
@@ -294,18 +415,38 @@
         <div class="rbccm-insight-tiles__insight-body">
           <div class="rbccm-insight-tiles__insight-label"><xsl:value-of select="$eyebrow"/></div>
           <div class="rbccm-insight-tiles__insight-divider" aria-hidden="true"></div>
-          <h3 class="rbccm-insight-tiles__insight-title">
+          <!-- Title + description grouped so the featured tile can centre
+               them as one block between the divider and the meta row. -->
+          <div class="rbccm-insight-tiles__insight-copy">
+          <h2 class="rbccm-insight-tiles__insight-title">
             <xsl:if test="$hydrateThisTile">
               <xsl:attribute name="data-hydrate-title"></xsl:attribute>
             </xsl:if>
-            <xsl:value-of select="$effTitle"/>
+            <xsl:call-template name="truncate">
+              <xsl:with-param name="text" select="$effTitle"/>
+              <xsl:with-param name="max" select="number($titleMax)"/>
+            </xsl:call-template>
           </h2>
           <p class="rbccm-insight-tiles__insight-desc">
             <xsl:if test="$hydrateThisTile">
               <xsl:attribute name="data-hydrate-desc"></xsl:attribute>
             </xsl:if>
-            <xsl:value-of select="$effDesc" disable-output-escaping="yes"/>
+            <!-- Within the limit: output as entered (keeps any inline
+                 HTML). Over it: plain text cut at the last whole word, so
+                 no tag is cut in half. -->
+            <xsl:choose>
+              <xsl:when test="number($descMax) &lt;= 0 or string-length(normalize-space($descPlain)) &lt;= number($descMax)">
+                <xsl:value-of select="$effDesc" disable-output-escaping="yes"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="truncate">
+                  <xsl:with-param name="text" select="$descPlain"/>
+                  <xsl:with-param name="max" select="number($descMax)"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
           </p>
+          </div>
 
           <!-- Bottom row: meta (left) + taxonomy stack (right). Topic +
                Region are in the DOM for downstream flip (the baseline
@@ -428,6 +569,8 @@
             <xsl:with-param name="topic"      select="$T1_TOPIC"/>
             <xsl:with-param name="region"     select="$T1_REGION"/>
             <xsl:with-param name="date"       select="$T1_DATE"/>
+            <xsl:with-param name="titleLimit" select="$T1_TITLE_LIMIT"/>
+            <xsl:with-param name="descLimit"  select="$T1_DESC_LIMIT"/>
           </xsl:call-template>
 
           <xsl:call-template name="renderTile">
@@ -446,6 +589,8 @@
             <xsl:with-param name="topic"      select="$T2_TOPIC"/>
             <xsl:with-param name="region"     select="$T2_REGION"/>
             <xsl:with-param name="date"       select="$T2_DATE"/>
+            <xsl:with-param name="titleLimit" select="$T2_TITLE_LIMIT"/>
+            <xsl:with-param name="descLimit"  select="$T2_DESC_LIMIT"/>
           </xsl:call-template>
 
           <xsl:call-template name="renderTile">
@@ -464,6 +609,8 @@
             <xsl:with-param name="topic"      select="$T3_TOPIC"/>
             <xsl:with-param name="region"     select="$T3_REGION"/>
             <xsl:with-param name="date"       select="$T3_DATE"/>
+            <xsl:with-param name="titleLimit" select="$T3_TITLE_LIMIT"/>
+            <xsl:with-param name="descLimit"  select="$T3_DESC_LIMIT"/>
           </xsl:call-template>
 
           <xsl:call-template name="renderTile">
@@ -482,6 +629,8 @@
             <xsl:with-param name="topic"      select="$T4_TOPIC"/>
             <xsl:with-param name="region"     select="$T4_REGION"/>
             <xsl:with-param name="date"       select="$T4_DATE"/>
+            <xsl:with-param name="titleLimit" select="$T4_TITLE_LIMIT"/>
+            <xsl:with-param name="descLimit"  select="$T4_DESC_LIMIT"/>
           </xsl:call-template>
 
         </ul>

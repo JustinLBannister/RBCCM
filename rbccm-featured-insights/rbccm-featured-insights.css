@@ -488,7 +488,7 @@ p.rbccm-featured-insights__subtitle,  div.rbccm-featured-insights__subtitle {
   flex: 1;
   flex-direction: column;
   height: auto;
-  min-height: 264px;
+  min-height: 315px;
   padding: 20px;
 }
 
@@ -546,6 +546,14 @@ p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
   line-height: 140%;
   letter-spacing: 0.5px;
   margin: 0 0 20px 0;
+}
+
+
+/* ---------- Copy group (title + description) ----------
+   Wrapper so the featured tile can centre title + description as one
+   block. On regular tiles it is a plain block and changes nothing. */
+.rbccm-insight-tiles__insight-copy {
+  align-self: stretch;
 }
 
 
@@ -614,11 +622,13 @@ p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
   line-height: normal;
 }
 
-/* Baseline default: topic + region hidden, only date visible. Restore
-   by removing this block. */
+/* Topic, region and date are hidden for now (content feedback: no
+   dates on these tiles). They stay in the markup so any of them can be
+   turned back on by removing it from this rule. */
 .rbccm-insight-tiles__insight-topic,
-.rbccm-insight-tiles__insight-region {
-  display: none;
+.rbccm-insight-tiles__insight-region,
+.rbccm-insight-tiles__insight-date {
+  display: none !important;
 }
 
 
@@ -676,12 +686,12 @@ p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
 
 /* ---------- Featured card horizontal layout (>=992px) ---------- */
 @media (min-width: 992px) {
-  /* Regular tiles below the featured row: lock media to a shorter 188px
-     band so the three cards line up cleanly under the featured band. */
+  /* Regular tiles below the featured row: lock media to a 240px band
+     so the three cards line up cleanly under the featured band. */
   .rbccm-insight-tiles__insight .rbccm-insight-tiles__insight-media {
     height: auto;
-    min-height: 188px;
-    max-height: 188px;
+    min-height: 240px;
+    max-height: 240px;
   }
   /* Featured tile: horizontal layout with image on the RIGHT and
      copy on the LEFT (row-reverse), per Figma. */
@@ -711,16 +721,30 @@ p.rbccm-insight-tiles__insight-title,  div.rbccm-insight-tiles__insight-title,
     min-height: 0;
     padding: 30px;
   }
-  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-bottom {
-    margin-top: 12px;
+  /* Eyebrow + divider, title + description, and the meta row stack as
+     one block with a fixed gap around the title and description
+     (20px above, 17px below). The body centres that block vertically, so it
+     moves up or down with the length of the copy instead of pinning the
+     eyebrow to the top and the meta to the bottom. */
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-copy {
+    flex: 0 0 auto;
+    margin: 20px 0 17px 0;
   }
+  .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-bottom {
+    margin-top: 0 !important;
+  }
+  /* !important because the base title rule locks font-size, line-height
+     and margin with !important (to beat the site's h2/h3 rules), which
+     otherwise wins over these featured values: the title rendered at
+     20px with 10px margins. The 20px above it now comes from the copy
+     group. */
   .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-title {
-    font-size: 24px;
-    line-height: 30px;
-    margin: 26px 0 12px 0;
+    font-size: 24px !important;
+    line-height: 30px !important;
+    margin: 0 0 12px 0 !important;
   }
   .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-desc {
-    margin: 0 0 26px 0;
+    margin: 0 !important;
   }
   .rbccm-insight-tiles__insight--featured .rbccm-insight-tiles__insight-meta {
     margin: 0;
