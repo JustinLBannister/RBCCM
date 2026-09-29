@@ -41,6 +41,11 @@
 /* Poster: fixed 1100 x 366, centred. Radius on the image too - Safari
    doesn't always clip absolutely positioned children to the parent's
    radius. */
+/* The <picture> wrapper stays out of layout so the image keeps
+   positioning against the poster box. */
+.rbccm-video-poster picture {
+  display: contents;
+}
 .rbccm-video-poster__image {
   display: block;
   position: absolute;
@@ -109,8 +114,28 @@
     transition: none !important;
     transform: translate(-50%, -50%) !important;
   }
-  .rbccm-video-poster[data-animate-hero] {
-    animation: none !important;
-    opacity: 1 !important;
-  }
+}
+
+/* ---- Hero entrance: visible from the first paint ---
+   The hero holds the largest text on the page, which is what Largest
+   Contentful Paint (LCP) measures. It used to start at opacity 0 and
+   wait for rbccm-animate.js to run after the page finished parsing,
+   plus animate.css from the CDN, so on mobile the headline showed up
+   seconds late and LCP failed. Elements marked data-hero-rise are
+   never hidden: CSS alone slides them up 16px as the page first
+   paints, with the same stagger as before. No JS involved. */
+[data-hero-rise] {
+  animation: rbccm-hero-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+[data-hero-rise][data-animate-delay="150"] { animation-delay: 150ms; }
+[data-hero-rise][data-animate-delay="300"] { animation-delay: 300ms; }
+[data-hero-rise][data-animate-delay="325"] { animation-delay: 325ms; }
+[data-hero-rise][data-animate-delay="450"] { animation-delay: 450ms; }
+[data-hero-rise][data-animate-delay="600"] { animation-delay: 600ms; }
+@keyframes rbccm-hero-rise {
+  from { transform: translate3d(0, 16px, 0); }
+  to   { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-rise] { animation: none !important; }
 }

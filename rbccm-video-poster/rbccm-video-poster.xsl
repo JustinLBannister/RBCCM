@@ -52,6 +52,10 @@
 
     <xsl:variable name="POSTER"><xsl:call-template name="datum"><xsl:with-param name="id" select="'PosterImage'"/></xsl:call-template></xsl:variable>
     <xsl:variable name="POSTER_ALT"><xsl:call-template name="datum"><xsl:with-param name="id" select="'PosterAlt'"/></xsl:call-template></xsl:variable>
+    <xsl:variable name="POSTER_WEBP"><xsl:call-template name="datum"><xsl:with-param name="id" select="'PosterImageWebp'"/></xsl:call-template></xsl:variable>
+    <xsl:variable name="LOADING_RAW"><xsl:call-template name="datum"><xsl:with-param name="id" select="'PosterLoading'"/></xsl:call-template></xsl:variable>
+    <!-- priority (default) or lazy. See the PosterLoading field. -->
+    <xsl:variable name="LAZY" select="translate($LOADING_RAW, 'LAZY', 'lazy') = 'lazy'"/>
     <xsl:variable name="PLAY_LABEL_RAW"><xsl:call-template name="datum"><xsl:with-param name="id" select="'PlayButtonLabel'"/></xsl:call-template></xsl:variable>
     <xsl:variable name="VIDEO_TITLE_RAW"><xsl:call-template name="datum"><xsl:with-param name="id" select="'VideoTitle'"/></xsl:call-template></xsl:variable>
     <xsl:variable name="BC_ACCOUNT_RAW"><xsl:call-template name="datum"><xsl:with-param name="id" select="'BrightcoveAccount'"/></xsl:call-template></xsl:variable>
@@ -120,15 +124,36 @@
       </xsl:attribute>
     </link>
 
-    <div class="rbccm-video-poster" data-animate-hero="fadeIn" data-animate-delay="600">
+    <div class="rbccm-video-poster" data-hero-rise="rise" data-animate-delay="600">
       <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
       <xsl:attribute name="style">--rbccm-vp-space-above: <xsl:value-of select="$SPACE_ABOVE"/>px; --rbccm-vp-overlap: <xsl:value-of select="$OVERLAP"/>px;</xsl:attribute>
 
       <xsl:if test="$POSTER != ''">
-        <img class="rbccm-video-poster__image" loading="lazy">
-          <xsl:attribute name="src"><xsl:value-of select="$POSTER"/></xsl:attribute>
-          <xsl:attribute name="alt"><xsl:value-of select="$POSTER_ALT"/></xsl:attribute>
-        </img>
+        <!-- Near the top of a page this image is usually the Largest
+             Contentful Paint, so by default it loads right away at high
+             priority instead of lazily. width / height reserve the box
+             before the file arrives. An optional WebP version is offered
+             first to browsers that support it (much smaller than PNG). -->
+        <picture>
+          <xsl:if test="$POSTER_WEBP != ''">
+            <source type="image/webp">
+              <xsl:attribute name="srcset"><xsl:value-of select="$POSTER_WEBP"/></xsl:attribute>
+            </source>
+          </xsl:if>
+          <img class="rbccm-video-poster__image" width="1100" height="366">
+            <xsl:choose>
+              <xsl:when test="$LAZY">
+                <xsl:attribute name="loading">lazy</xsl:attribute>
+                <xsl:attribute name="decoding">async</xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="fetchpriority">high</xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:attribute name="src"><xsl:value-of select="$POSTER"/></xsl:attribute>
+            <xsl:attribute name="alt"><xsl:value-of select="$POSTER_ALT"/></xsl:attribute>
+          </img>
+        </picture>
       </xsl:if>
 
       <!-- Play button only when there's a video to play. -->

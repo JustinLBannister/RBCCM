@@ -177,12 +177,32 @@
     return null;
   }
 
+  /* Character limits for the card title / body. The XSL writes them
+     to data-hero-title-max / data-hero-body-max (70 / 170 by default,
+     0 = no limit) and applies them to server-rendered text; this
+     applies the same cut to text that comes from a feed. Same rule as
+     the XSL: at most max characters including the ellipsis, cut at
+     the last whole word unless that drops more than 40% of the
+     allowance, trailing punctuation trimmed. */
+  function readMax(section, attr, fallback) {
+    var v = parseInt(section.getAttribute(attr), 10);
+    return isNaN(v) ? fallback : v;
+  }
+  function truncate(text, max) {
+    var t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!max || max <= 0 || t.length <= max) return t;
+    var cut = t.slice(0, max - 1);
+    var sp = cut.lastIndexOf(' ');
+    if (sp + 1 > max * 0.6) cut = cut.slice(0, sp);
+    return cut.replace(/[\s,;:.\-]+$/, '') + '\u2026';
+  }
+
   function hydrateCard(section, rec, linkOverride) {
     var card = section.querySelector(CARD_SEL);
     if (!card) return;
 
-    var title = decodeEntities(childText(rec, 'title'));
-    var desc  = decodeEntities(childText(rec, 'description'));
+    var title = truncate(decodeEntities(childText(rec, 'title')), readMax(section, 'data-hero-title-max', 70));
+    var desc  = truncate(decodeEntities(childText(rec, 'description')), readMax(section, 'data-hero-body-max', 170));
     var date  = childText(rec, 'date');           // already pretty-formatted
     var link  = linkOverride || childText(rec, 'link') || '';
 

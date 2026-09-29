@@ -246,7 +246,7 @@
         <xsl:if test="$MM_EYEBROW_TEXT != ''">
           <xsl:element name="{$MM_EYEBROW_TAG}">
             <xsl:attribute name="class">rbccm-hero__eyebrow</xsl:attribute>
-            <xsl:attribute name="data-animate-hero">fadeInDown</xsl:attribute>
+            <xsl:attribute name="data-hero-rise">rise</xsl:attribute>
             <xsl:attribute name="data-animate-delay">0</xsl:attribute>
             <xsl:value-of select="$MM_EYEBROW_TEXT"/>
           </xsl:element>
@@ -255,7 +255,7 @@
         <xsl:if test="$MM_TITLE_L1 != '' or $MM_TITLE_L2 != ''">
           <xsl:element name="{$MM_TITLE_TAG}">
             <xsl:attribute name="class">rbccm-hero__title</xsl:attribute>
-            <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+            <xsl:attribute name="data-hero-rise">rise</xsl:attribute>
             <xsl:attribute name="data-animate-delay">150</xsl:attribute>
             <xsl:if test="$MM_TITLE_L1 != ''">
               <span class="rbccm-hero__title-line"><xsl:value-of select="$MM_TITLE_L1"/></span>
@@ -269,14 +269,14 @@
         <xsl:if test="normalize-space($MM_SUBTITLE_TEXT) != ''">
           <xsl:element name="{$MM_SUBTITLE_TAG}">
             <xsl:attribute name="class">rbccm-hero__subtitle</xsl:attribute>
-            <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+            <xsl:attribute name="data-hero-rise">rise</xsl:attribute>
             <xsl:attribute name="data-animate-delay">300</xsl:attribute>
             <xsl:value-of select="$MM_SUBTITLE_TEXT" disable-output-escaping="yes"/>
           </xsl:element>
         </xsl:if>
 
         <xsl:if test="$MM_CTA1_LABEL != '' or $MM_CTA2_LABEL != ''">
-          <div class="rbccm-hero__actions" data-animate-hero="fadeInUp" data-animate-delay="450">
+          <div class="rbccm-hero__actions" data-hero-rise="rise" data-animate-delay="450">
 
             <xsl:if test="$MM_CTA1_LABEL != ''">
               <a>

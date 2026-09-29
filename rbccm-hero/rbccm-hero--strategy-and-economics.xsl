@@ -119,6 +119,92 @@
   </xsl:template>
 
 
+  <!-- ============================================================
+       Insight card character limits
+       ============================================================
+       SeInsightTitleLimit / SeInsightBodyLimit (plain text):
+         default (or blank)  70 for the title, 170 for the body
+         full                no limit
+         custom=190          that many characters (a bare 190 works too)
+       limitValue turns the field into a number; 0 means no limit. -->
+  <xsl:template name="limitValue">
+    <xsl:param name="raw"/>
+    <xsl:param name="default"/>
+    <xsl:variable name="v" select="translate(normalize-space($raw), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:variable name="digits" select="translate($v, translate($v, '0123456789', ''), '')"/>
+    <xsl:choose>
+      <xsl:when test="$v = 'full'">0</xsl:when>
+      <xsl:when test="$digits != ''"><xsl:value-of select="number($digits)"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Visible text of a value that may hold HTML (tags stripped). -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Position of the last space in $s (0 if none). -->
+  <xsl:template name="lastSpace">
+    <xsl:param name="s"/>
+    <xsl:param name="offset" select="0"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, ' ')">
+        <xsl:call-template name="lastSpace">
+          <xsl:with-param name="s" select="substring-after($s, ' ')"/>
+          <xsl:with-param name="offset" select="$offset + string-length(substring-before($s, ' ')) + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$offset"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Cut $text to at most $max characters including the ellipsis.
+       Breaks at the last whole word (unless that would drop more than
+       40% of the allowance), trims trailing punctuation, adds an
+       ellipsis. $max = 0 or text already short enough: unchanged. -->
+  <xsl:template name="truncate">
+    <xsl:param name="text"/>
+    <xsl:param name="max"/>
+    <xsl:variable name="t" select="normalize-space($text)"/>
+    <xsl:choose>
+      <xsl:when test="$max &lt;= 0 or string-length($t) &lt;= $max"><xsl:value-of select="$t"/></xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="cut" select="substring($t, 1, $max - 1)"/>
+        <xsl:variable name="sp"><xsl:call-template name="lastSpace"><xsl:with-param name="s" select="$cut"/></xsl:call-template></xsl:variable>
+        <xsl:variable name="word">
+          <xsl:choose>
+            <xsl:when test="$sp &gt; ($max * 0.6)"><xsl:value-of select="substring($cut, 1, $sp - 1)"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="$cut"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name="trimEnd"><xsl:with-param name="s" select="$word"/></xsl:call-template>
+        <xsl:text>&#8230;</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Drop trailing spaces and , ; : . - before the ellipsis. -->
+  <xsl:template name="trimEnd">
+    <xsl:param name="s"/>
+    <xsl:variable name="last" select="substring($s, string-length($s))"/>
+    <xsl:choose>
+      <xsl:when test="$s != '' and contains(' ,;:.-', $last)">
+        <xsl:call-template name="trimEnd"><xsl:with-param name="s" select="substring($s, 1, string-length($s) - 1)"/></xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -233,6 +319,20 @@
     <xsl:variable name="SE_DCR_URL"          select="normalize-space($SE_DCR_ROOT/*/url)"/>
     <xsl:variable name="SE_DCR_LINK_DATUM"   select="normalize-space(//Datum[@ID='SeInsightDcrLink']/text()[last()])"/>
 
+    <!-- Character limits (see limitValue). -->
+    <xsl:variable name="SE_TITLE_MAX">
+      <xsl:call-template name="limitValue">
+        <xsl:with-param name="raw" select="//Datum[@ID='SeInsightTitleLimit']/text()[last()]"/>
+        <xsl:with-param name="default" select="70"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="SE_BODY_MAX">
+      <xsl:call-template name="limitValue">
+        <xsl:with-param name="raw" select="//Datum[@ID='SeInsightBodyLimit']/text()[last()]"/>
+        <xsl:with-param name="default" select="170"/>
+      </xsl:call-template>
+    </xsl:variable>
+
     <!-- Effective card fields. -->
     <xsl:variable name="SE_EFF_TITLE">
       <xsl:choose>
@@ -329,6 +429,9 @@
         <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
       </xsl:if>
       <xsl:attribute name="data-hero-source"><xsl:value-of select="$SE_INSIGHT_SOURCE"/></xsl:attribute>
+      <!-- Limits for rbccm-hero.js when it fills the card from a feed. -->
+      <xsl:attribute name="data-hero-title-max"><xsl:value-of select="$SE_TITLE_MAX"/></xsl:attribute>
+      <xsl:attribute name="data-hero-body-max"><xsl:value-of select="$SE_BODY_MAX"/></xsl:attribute>
       <xsl:if test="$SE_INSIGHT_SOURCE = 'auto-latest'">
         <xsl:attribute name="data-hero-locale"><xsl:value-of select="$SE_LOCALE"/></xsl:attribute>
         <xsl:if test="$SE_TAG_KEYWORDS != ''">
@@ -382,7 +485,7 @@
             <xsl:if test="$SE_TITLE_TEXT != ''">
               <xsl:element name="{$SE_TITLE_TAG}">
                 <xsl:attribute name="class">rbccm-hero__title</xsl:attribute>
-                <xsl:attribute name="data-animate-hero">fadeInDown</xsl:attribute>
+                <xsl:attribute name="data-hero-rise">rise</xsl:attribute>
                 <xsl:value-of select="$SE_TITLE_TEXT"/>
               </xsl:element>
             </xsl:if>
@@ -390,7 +493,7 @@
             <xsl:if test="normalize-space($SE_BODY_TEXT) != ''">
               <xsl:element name="{$SE_BODY_TAG}">
                 <xsl:attribute name="class">rbccm-hero__body</xsl:attribute>
-                <xsl:attribute name="data-animate-hero">fadeInUp</xsl:attribute>
+                <xsl:attribute name="data-hero-rise">rise</xsl:attribute>
                 <xsl:attribute name="data-animate-delay">150</xsl:attribute>
                 <!-- Optional desktop max-width for widow control. When the
                      SeBodyMaxWidth Datum is non-blank, its value is passed
@@ -406,7 +509,7 @@
           </div>
 
           <!-- Right column: dark-navy insight card -->
-          <article class="rbccm-hero__insight-card" data-animate-hero="fadeIn" data-animate-delay="325">
+          <article class="rbccm-hero__insight-card" data-hero-rise="rise" data-animate-delay="325">
 
             <xsl:if test="$SE_INS_EYE_TEXT != ''">
               <div class="rbccm-hero__insight-eyebrow-row">
@@ -422,14 +525,32 @@
             <xsl:if test="$SE_EFF_TITLE != ''">
               <xsl:element name="{$SE_INS_TITLE_TAG}">
                 <xsl:attribute name="class">rbccm-hero__insight-title</xsl:attribute>
-                <xsl:value-of select="$SE_EFF_TITLE"/>
+                <xsl:call-template name="truncate">
+                  <xsl:with-param name="text" select="$SE_EFF_TITLE"/>
+                  <xsl:with-param name="max" select="number($SE_TITLE_MAX)"/>
+                </xsl:call-template>
               </xsl:element>
             </xsl:if>
 
             <xsl:if test="normalize-space($SE_EFF_BODY) != ''">
               <xsl:element name="{$SE_INS_BODY_TAG}">
                 <xsl:attribute name="class">rbccm-hero__insight-body</xsl:attribute>
-                <xsl:value-of select="$SE_EFF_BODY" disable-output-escaping="yes"/>
+                <!-- Within the limit: output as authored (HTML kept).
+                     Over it: plain text cut to the limit. -->
+                <xsl:variable name="bodyPlain">
+                  <xsl:call-template name="stripTags"><xsl:with-param name="s" select="$SE_EFF_BODY"/></xsl:call-template>
+                </xsl:variable>
+                <xsl:choose>
+                  <xsl:when test="number($SE_BODY_MAX) &lt;= 0 or string-length(normalize-space($bodyPlain)) &lt;= number($SE_BODY_MAX)">
+                    <xsl:value-of select="$SE_EFF_BODY" disable-output-escaping="yes"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="truncate">
+                      <xsl:with-param name="text" select="$bodyPlain"/>
+                      <xsl:with-param name="max" select="number($SE_BODY_MAX)"/>
+                    </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:element>
             </xsl:if>
 

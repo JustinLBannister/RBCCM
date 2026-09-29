@@ -18,7 +18,7 @@ Shared page hero. One CSS file, one BEM block (`.rbccm-hero`), three variants, e
 
 The variant is picked by the skin, not a field. There is no Preset field.
 
-## Fields (46)
+## Fields (48)
 
 | Group | Fields | Used by |
 |---|---|---|
@@ -26,9 +26,11 @@ The variant is picked by the skin, not a field. There is no Preset field.
 | Hero content | EyebrowText/Tag, TitleLine1Text, TitleLine2Text, TitleTag, SubtitleText/Tag | all. S+E uses line 1 + subtitle only (no eyebrow, no line 2). |
 | Background video | BgVideoMp4, BgBrightcoveVideoId, BgBrightcoveAccount, BgBrightcovePlayer | S+E, US Credentials |
 | MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA |
-| Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual) | S+E |
+| Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual), SeInsightTitleLimit / SeInsightBodyLimit | S+E |
 
 In TeamSite, settings (paths, IDs, alignment, tag pickers, button style/icon, Brightcove IDs, feed URLs) sit on the Appearance tab (`<Properties>`); copy, links, media and the S+E insight card sit on the Content tab (`<Data>`).
+
+Insight card length limits: `SeInsightTitleLimit` and `SeInsightBodyLimit` take `default` (title 70, body 170 characters), `full` (no limit) or `custom=N`. Text over the limit is cut at the last whole word with an ellipsis, both server-side (manual / DCR picker) and in `rbccm-hero.js` (feed content). A body within its limit keeps its HTML; a body over it is shown as plain text.
 
 Tag pickers default to **Auto**, which uses each variant's SEO default (MAAS+MATA and US Creds: eyebrow h1, title p; S+E: title h1). The S+E insight card title is always h2, with no picker.
 

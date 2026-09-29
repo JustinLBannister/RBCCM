@@ -219,7 +219,17 @@
 
   <Datum ID="SeInsightTitleText" Type="String" Name="S+E : insight card title (required - do not blank; used as fallback in auto-latest mode)">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</Datum>
 
+  <!-- Title length: default = 70 characters, full = no limit,
+       custom=90 = 90 characters. Longer titles are cut at the last
+       whole word with an ellipsis. Applies to feed content too. -->
+  <Datum ID="SeInsightTitleLimit" Type="String" Name="S+E : insight card title length - type default (70 characters), full (no limit, shows the whole title) or custom=N to set your own (e.g. custom=90). Longer titles are cut at the last whole word and end with ... (the ... counts toward the limit). Also applies to titles pulled from the feed.">default</Datum>
+
   <Datum ID="SeInsightBodyText" Type="Textarea" Name="S+E : insight card body (required - do not blank; HTML allowed; used as fallback in auto-latest mode)">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</Datum>
+
+  <!-- Body length: default = 170 characters, full = no limit,
+       custom=190 = 190 characters. A body over the limit is shown as
+       plain text cut at the last whole word with an ellipsis. -->
+  <Datum ID="SeInsightBodyLimit" Type="String" Name="S+E : insight card body length - type default (170 characters), full (no limit, shows the whole description) or custom=N to set your own (e.g. custom=190). Longer text is cut at the last whole word and ends with ... (the ... counts toward the limit); when it is cut, any bold, italics or links are removed. Also applies to descriptions pulled from the feed.">default</Datum>
 
   <Datum ID="SeInsightDateText" Type="String" Name="S+E : insight card date (optional - blank hides the date; overridden in auto-latest mode)">July 14, 2025</Datum>
 
