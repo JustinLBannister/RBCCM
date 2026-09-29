@@ -186,6 +186,12 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
 .rbccm-accordions__item-expanded button {
   cursor: pointer;
 }
+/* A note with no body copy or read-more link has nothing to open, so
+   it is not clickable. */
+.rbccm-accordions__item:not(:has(.rbccm-accordions__item-expanded)) {
+  cursor: default;
+}
+
 
 /* Item top row: category eyebrow + byline on the left, +/- toggle on right. */
 .rbccm-accordions__item-header {
@@ -540,6 +546,62 @@ p.rbccm-accordions__item-summary,  div.rbccm-accordions__item-summary {
 }
 .rbccm-accordions--strategy-and-economics-notes .rbccm-accordions__item.is-open .rbccm-accordions__item-expanded-copy p:last-child {
   margin-bottom: 0 !important;
+}
+
+/* ---- Media in the body copy (video / podcast embeds) ---
+   Editors can paste an embed (Brightcove, YouTube, Vimeo, Spotify,
+   Apple Podcasts, etc.) or a <video> / <audio> tag into the body.
+   Embed codes come with fixed pixel sizes, so without these rules a
+   640px-wide player spills out of the card on mobile. Every embed
+   fills the card width; known video players keep a 16:9 shape;
+   podcast players keep the height from their embed code. Embeds that
+   already sit in a responsive wrapper (Brightcove's "responsive"
+   code, position absolute inside a padded box) are left alone.
+   rbccm-accordions.js unloads players when a note collapses. */
+.rbccm-accordions__item-expanded-copy iframe,
+.rbccm-accordions__item-expanded-copy video,
+.rbccm-accordions__item-expanded-copy audio,
+.rbccm-accordions__item-expanded-copy video-js,
+.rbccm-accordions__item-expanded-copy img {
+  display: block;
+  max-width: 100% !important;
+  border: 0;
+}
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"]),
+.rbccm-accordions__item-expanded-copy audio {
+  width: 100% !important;
+}
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[src*="brightcove"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[data-rbccm-src*="brightcove"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[src*="youtube"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[data-rbccm-src*="youtube"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[src*="youtu.be"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[data-rbccm-src*="youtu.be"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[src*="vimeo"],
+.rbccm-accordions__item-expanded-copy iframe:not([style*="absolute"])[data-rbccm-src*="vimeo"],
+.rbccm-accordions__item-expanded-copy video,
+.rbccm-accordions__item-expanded-copy video-js {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.rbccm-accordions__item-expanded-copy img {
+  height: auto !important;
+}
+/* Space between an embed and the copy around it, matching the
+   paragraph rhythm. The site's unified.css p rules don't reach
+   these, so the margin is set directly. */
+.rbccm-accordions__item-expanded-copy > iframe,
+.rbccm-accordions__item-expanded-copy > video,
+.rbccm-accordions__item-expanded-copy > audio,
+.rbccm-accordions__item-expanded-copy > video-js,
+.rbccm-accordions__item-expanded-copy > div,
+.rbccm-accordions__item-expanded-copy > figure {
+  margin: 0 0 17px 0;
+}
+.rbccm-accordions__item-expanded-copy > :last-child {
+  margin-bottom: 0;
 }
 
 /* Read-more link lives in the open (light-blue) state, so its

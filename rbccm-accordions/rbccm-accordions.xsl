@@ -17,9 +17,9 @@
 
   Repeater
   ==============================================================
-  8 note slots exposed. A slot renders only when its CategoryText
-  Datum is non-blank, so authors leave later slots empty for
-  shorter lists. A renderNote named template holds the per-slot
+  8 note slots exposed. A slot renders when its CategoryText or
+  TitleText Datum is filled, so authors leave later slots empty for
+  shorter lists. Every other field is left out when blank. A renderNote named template holds the per-slot
   markup so a single body handles every slot without duplication.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -36,6 +36,30 @@
       </xsl:when>
       <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <!-- Visible text of a rich-text value (tags stripped). -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Returns 'yes' when a rich-text field has visible text. The editor
+       leaves placeholders like <p><br data-mce-bogus="1"></p> or
+       <p>&nbsp;</p> in a field that looks empty; those count as blank
+       so no empty tag is rendered. -->
+  <xsl:template name="hasText">
+    <xsl:param name="s"/>
+    <xsl:variable name="plain"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$s"/></xsl:call-template></xsl:variable>
+    <xsl:if test="normalize-space(translate($plain, '&#160;&amp;nbsp;', '')) != ''">yes</xsl:if>
   </xsl:template>
 
   <!-- Toggle icon: a single plus SVG whose fill inherits from the
@@ -76,6 +100,23 @@
     <xsl:param name="readMoreHref"/>
     <xsl:param name="readMoreAria"/>
 
+    <xsl:variable name="hasSummary"><xsl:call-template name="hasText"><xsl:with-param name="s" select="$summaryText"/></xsl:call-template></xsl:variable>
+    <xsl:variable name="bodyHasText"><xsl:call-template name="hasText"><xsl:with-param name="s" select="$bodyHtml"/></xsl:call-template></xsl:variable>
+    <!-- A body that is only a video / podcast embed has no text but
+         still counts as content. -->
+    <xsl:variable name="bodyLower" select="translate($bodyHtml, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:variable name="hasBody">
+      <xsl:if test="$bodyHasText = 'yes' or contains($bodyLower, '&lt;iframe') or contains($bodyLower, '&lt;video') or contains($bodyLower, '&lt;audio') or contains($bodyLower, '&lt;img') or contains($bodyLower, '&lt;embed') or contains($bodyLower, '&lt;object')">yes</xsl:if>
+    </xsl:variable>
+    <!-- Name used in the toggle's label; falls back to the category
+         when the title is blank. -->
+    <xsl:variable name="noteName">
+      <xsl:choose>
+        <xsl:when test="$titleText != ''"><xsl:value-of select="$titleText"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$categoryText"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="expandedId">
       <xsl:value-of select="$sectionId"/>-item-<xsl:value-of select="$idx"/>-body
     </xsl:variable>
@@ -97,14 +138,18 @@
             </p>
           </xsl:if>
         </div>
-        <button type="button" class="rbccm-accordions__item-toggle" aria-expanded="false">
-          <xsl:attribute name="aria-controls"><xsl:value-of select="normalize-space($expandedId)"/></xsl:attribute>
-          <xsl:attribute name="aria-label">Expand note: <xsl:value-of select="$titleText"/></xsl:attribute>
-          <xsl:call-template name="toggleIcon"/>
-        </button>
+        <!-- No toggle when there is nothing to expand (no body copy
+             and no read-more link). -->
+        <xsl:if test="$hasBody = 'yes' or $readMoreLabel != ''">
+          <button type="button" class="rbccm-accordions__item-toggle" aria-expanded="false">
+            <xsl:attribute name="aria-controls"><xsl:value-of select="normalize-space($expandedId)"/></xsl:attribute>
+            <xsl:attribute name="aria-label">Expand note: <xsl:value-of select="$noteName"/></xsl:attribute>
+            <xsl:call-template name="toggleIcon"/>
+          </button>
+        </xsl:if>
       </div>
 
-      <xsl:if test="$titleText != '' or normalize-space($summaryText) != ''">
+      <xsl:if test="$titleText != '' or $hasSummary = 'yes'">
         <div class="rbccm-accordions__item-body">
           <xsl:if test="$titleText != ''">
             <xsl:element name="{$titleTag}">
@@ -112,7 +157,7 @@
               <xsl:value-of select="$titleText"/>
             </xsl:element>
           </xsl:if>
-          <xsl:if test="normalize-space($summaryText) != ''">
+          <xsl:if test="$hasSummary = 'yes'">
             <xsl:element name="{$summaryTag}">
               <xsl:attribute name="class">rbccm-accordions__item-summary</xsl:attribute>
               <xsl:value-of select="$summaryText" disable-output-escaping="yes"/>
@@ -121,10 +166,10 @@
         </div>
       </xsl:if>
 
-      <xsl:if test="normalize-space($bodyHtml) != '' or $readMoreLabel != ''">
+      <xsl:if test="$hasBody = 'yes' or $readMoreLabel != ''">
         <div class="rbccm-accordions__item-expanded" role="region">
           <xsl:attribute name="id"><xsl:value-of select="normalize-space($expandedId)"/></xsl:attribute>
-          <xsl:if test="normalize-space($bodyHtml) != ''">
+          <xsl:if test="$hasBody = 'yes'">
             <div class="rbccm-accordions__item-expanded-copy">
               <xsl:value-of select="$bodyHtml" disable-output-escaping="yes"/>
             </div>
@@ -172,6 +217,18 @@
     <xsl:variable name="DESC_TAG_RAW" select="normalize-space(//Datum[@ID='SectionDescriptionTag']/text()[last()])"/>
     <xsl:variable name="EXPAND_LABEL"   select="normalize-space(//Datum[@ID='ExpandAllLabel']/text()[last()])"/>
     <xsl:variable name="COLLAPSE_LABEL" select="normalize-space(//Datum[@ID='CollapseAllLabel']/text()[last()])"/>
+    <xsl:variable name="EXPAND_TEXT">
+      <xsl:choose>
+        <xsl:when test="$EXPAND_LABEL != ''"><xsl:value-of select="$EXPAND_LABEL"/></xsl:when>
+        <xsl:otherwise>Expand all</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="COLLAPSE_TEXT">
+      <xsl:choose>
+        <xsl:when test="$COLLAPSE_LABEL != ''"><xsl:value-of select="$COLLAPSE_LABEL"/></xsl:when>
+        <xsl:otherwise>Collapse all</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space(//Datum[@ID='HeaderAlignment']/text()[last()])"/>
     <xsl:variable name="HEADER_ALIGN">
       <xsl:choose>
@@ -232,7 +289,8 @@
                     <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
                   </xsl:element>
                 </xsl:if>
-                <xsl:if test="normalize-space($DESC_TEXT) != ''">
+                <xsl:variable name="HAS_DESC"><xsl:call-template name="hasText"><xsl:with-param name="s" select="$DESC_TEXT"/></xsl:call-template></xsl:variable>
+                <xsl:if test="$HAS_DESC = 'yes'">
                   <xsl:element name="{$DESC_TAG}">
                     <xsl:attribute name="class">rbccm-accordions__description</xsl:attribute>
                     <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
@@ -241,15 +299,13 @@
                   </xsl:element>
                 </xsl:if>
               </div>
-              <xsl:if test="$EXPAND_LABEL != ''">
-                <button type="button" class="rbccm-accordions__expand-all" data-accordions-expand-all="" aria-expanded="false" data-animate="fadeIn" data-animate-delay="500">
-                  <xsl:attribute name="data-label-expand"><xsl:value-of select="$EXPAND_LABEL"/></xsl:attribute>
-                  <xsl:if test="$COLLAPSE_LABEL != ''">
-                    <xsl:attribute name="data-label-collapse"><xsl:value-of select="$COLLAPSE_LABEL"/></xsl:attribute>
-                  </xsl:if>
-                  <xsl:value-of select="$EXPAND_LABEL"/>
-                </button>
-              </xsl:if>
+              <!-- Always rendered, whatever else is blank. Blank labels fall
+                   back to "Expand all" / "Collapse all". -->
+              <button type="button" class="rbccm-accordions__expand-all" data-accordions-expand-all="" aria-expanded="false" data-animate="fadeIn" data-animate-delay="500">
+                <xsl:attribute name="data-label-expand"><xsl:value-of select="$EXPAND_TEXT"/></xsl:attribute>
+                <xsl:attribute name="data-label-collapse"><xsl:value-of select="$COLLAPSE_TEXT"/></xsl:attribute>
+                <xsl:value-of select="$EXPAND_TEXT"/>
+              </button>
             </div>
 
             <!-- Note list. data-stagger-parent lets rbccm-animate.js reveal
@@ -294,7 +350,10 @@
     <xsl:param name="n"/>
     <xsl:param name="sid"/>
     <xsl:variable name="cat"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'CategoryText')]/text()[last()])"/>
-    <xsl:if test="$cat != ''">
+    <xsl:variable name="titleCheck" select="normalize-space(//Datum[@ID=concat('Item', $n, 'TitleText')]/text()[last()])"/>
+    <!-- A slot renders when it has a category or a title, so a blank
+         category only hides the eyebrow, not the whole note. -->
+    <xsl:if test="$cat != '' or $titleCheck != ''">
       <xsl:variable name="catTagRaw"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'CategoryTag')]/text()[last()])"/>
       <xsl:variable name="author"        select="normalize-space(//Datum[@ID=concat('Item', $n, 'Author')]/text()[last()])"/>
       <xsl:variable name="date"          select="normalize-space(//Datum[@ID=concat('Item', $n, 'Date')]/text()[last()])"/>

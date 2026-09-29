@@ -119,15 +119,17 @@
     p
   </Datum>
 
-  <Datum ID="ExpandAllLabel" Type="String" Name="Expand-all button label - collapsed state (required - do not blank)">Expand all</Datum>
-  <Datum ID="CollapseAllLabel" Type="String" Name="Expand-all button label - expanded state (required - do not blank)">Collapse all</Datum>
+  <Datum ID="ExpandAllLabel" Type="String" Name="Expand-all button label (optional - blank uses Expand all; the button always shows)">Expand all</Datum>
+  <Datum ID="CollapseAllLabel" Type="String" Name="Collapse-all button label (optional - blank uses Collapse all)">Collapse all</Datum>
 
 
   <!-- ============================================================
        Note slots (repeater, 8 slots)
        ============================================================
-       This section renders up to 8 notes. Fill in a Category on
-       any slot you want visible; blank Category hides the row.
+       This section renders up to 8 notes. A slot shows when it has
+       a Category or a Title; every other field is left out when
+       blank. A note with no body and no read-more link has no +/x
+       toggle. Expand all / Collapse all always shows.
        3 slots are populated by default matching Figma; slots 4-8
        ship blank and stay hidden until you fill them in.
        .............................................................
@@ -148,7 +150,7 @@
        ============================================================ -->
 
   <!-- ==== Item 1 ==== -->
-  <Datum ID="Item1CategoryText" Type="String" Name="Item 1 : category eyebrow (required - blank hides this row)">Economics</Datum>
+  <Datum ID="Item1CategoryText" Type="String" Name="Item 1 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)">Economics</Datum>
   <Datum ID="Item1CategoryTag" Type="SelectSingle" Name="Item 1 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
@@ -189,13 +191,13 @@
     <Option><Display>span</Display><Value>span</Value></Option>
     p
   </Datum>
-  <Datum ID="Item1BodyHtml" Type="Textarea" Name="Item 1 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;Headline CPI came in two tenths above consensus, and the trimmed-mean measures the Bank watches most closely stopped decelerating for the first time since March.&lt;/p&gt;&lt;p&gt;Financial conditions have loosened materially since the spring. Our baseline: 25bps next week, 25bps in the following meeting, and a terminal rate of 2.25% by mid-2026.&lt;/p&gt;</Datum>
+  <Datum ID="Item1BodyHtml" Type="Textarea" Name="Item 1 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)">&lt;p&gt;Headline CPI came in two tenths above consensus, and the trimmed-mean measures the Bank watches most closely stopped decelerating for the first time since March.&lt;/p&gt;&lt;p&gt;Financial conditions have loosened materially since the spring. Our baseline: 25bps next week, 25bps in the following meeting, and a terminal rate of 2.25% by mid-2026.&lt;/p&gt;</Datum>
   <Datum ID="Item1ReadMoreLabel" Type="String" Name="Item 1 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item1ReadMoreHref" Type="String" Name="Item 1 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item1ReadMoreAria" Type="String" Name="Item 1 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
   <!-- ==== Item 2 ==== -->
-  <Datum ID="Item2CategoryText" Type="String" Name="Item 2 : category eyebrow (required - blank hides this row)">Geopolitics</Datum>
+  <Datum ID="Item2CategoryText" Type="String" Name="Item 2 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)">Geopolitics</Datum>
   <Datum ID="Item2CategoryTag" Type="SelectSingle" Name="Item 2 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
@@ -236,13 +238,13 @@
     <Option><Display>span</Display><Value>span</Value></Option>
     p
   </Datum>
-  <Datum ID="Item2BodyHtml" Type="Textarea" Name="Item 2 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;As the Iran conflict reaches its six-month mark, diplomatic resolution remains elusive despite repeated market optimism about swift resolution.&lt;/p&gt;&lt;p&gt;Our base case: modest crude premium through year-end, with tail risk on any escalation into shipping lanes.&lt;/p&gt;</Datum>
+  <Datum ID="Item2BodyHtml" Type="Textarea" Name="Item 2 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)">&lt;p&gt;As the Iran conflict reaches its six-month mark, diplomatic resolution remains elusive despite repeated market optimism about swift resolution.&lt;/p&gt;&lt;p&gt;Our base case: modest crude premium through year-end, with tail risk on any escalation into shipping lanes.&lt;/p&gt;</Datum>
   <Datum ID="Item2ReadMoreLabel" Type="String" Name="Item 2 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item2ReadMoreHref" Type="String" Name="Item 2 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item2ReadMoreAria" Type="String" Name="Item 2 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
   <!-- ==== Item 3 ==== -->
-  <Datum ID="Item3CategoryText" Type="String" Name="Item 3 : category eyebrow (required - blank hides this row)">Equity Markets</Datum>
+  <Datum ID="Item3CategoryText" Type="String" Name="Item 3 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)">Equity Markets</Datum>
   <Datum ID="Item3CategoryTag" Type="SelectSingle" Name="Item 3 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
@@ -283,14 +285,14 @@
     <Option><Display>span</Display><Value>span</Value></Option>
     p
   </Datum>
-  <Datum ID="Item3BodyHtml" Type="Textarea" Name="Item 3 : expanded body copy (optional - blank hides the expanded state; HTML allowed)">&lt;p&gt;Earnings breadth has broadened noticeably in Q2, with 60%+ of S&amp;amp;P 500 constituents beating on both revenue and EPS.&lt;/p&gt;</Datum>
+  <Datum ID="Item3BodyHtml" Type="Textarea" Name="Item 3 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)">&lt;p&gt;Earnings breadth has broadened noticeably in Q2, with 60%+ of S&amp;amp;P 500 constituents beating on both revenue and EPS.&lt;/p&gt;</Datum>
   <Datum ID="Item3ReadMoreLabel" Type="String" Name="Item 3 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item3ReadMoreHref" Type="String" Name="Item 3 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item3ReadMoreAria" Type="String" Name="Item 3 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
   <!-- ==== Items 4-8 : blank by default, hidden until the author
        fills in a Category value. Same field shape as Items 1-3. ==== -->
-  <Datum ID="Item4CategoryText" Type="String" Name="Item 4 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item4CategoryText" Type="String" Name="Item 4 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)"></Datum>
   <Datum ID="Item4CategoryTag" Type="SelectSingle" Name="Item 4 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Item4Author" Type="String" Name="Item 4 : author name (optional - blank hides the byline name)"></Datum>
@@ -301,12 +303,12 @@
   <Datum ID="Item4SummaryText" Type="Textarea" Name="Item 4 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
   <Datum ID="Item4SummaryTag" Type="SelectSingle" Name="Item 4 : summary tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
-  <Datum ID="Item4BodyHtml" Type="Textarea" Name="Item 4 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item4BodyHtml" Type="Textarea" Name="Item 4 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)"></Datum>
   <Datum ID="Item4ReadMoreLabel" Type="String" Name="Item 4 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item4ReadMoreHref" Type="String" Name="Item 4 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item4ReadMoreAria" Type="String" Name="Item 4 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
-  <Datum ID="Item5CategoryText" Type="String" Name="Item 5 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item5CategoryText" Type="String" Name="Item 5 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)"></Datum>
   <Datum ID="Item5CategoryTag" Type="SelectSingle" Name="Item 5 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Item5Author" Type="String" Name="Item 5 : author name (optional - blank hides the byline name)"></Datum>
@@ -317,12 +319,12 @@
   <Datum ID="Item5SummaryText" Type="Textarea" Name="Item 5 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
   <Datum ID="Item5SummaryTag" Type="SelectSingle" Name="Item 5 : summary tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
-  <Datum ID="Item5BodyHtml" Type="Textarea" Name="Item 5 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item5BodyHtml" Type="Textarea" Name="Item 5 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)"></Datum>
   <Datum ID="Item5ReadMoreLabel" Type="String" Name="Item 5 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item5ReadMoreHref" Type="String" Name="Item 5 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item5ReadMoreAria" Type="String" Name="Item 5 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
-  <Datum ID="Item6CategoryText" Type="String" Name="Item 6 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item6CategoryText" Type="String" Name="Item 6 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)"></Datum>
   <Datum ID="Item6CategoryTag" Type="SelectSingle" Name="Item 6 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Item6Author" Type="String" Name="Item 6 : author name (optional - blank hides the byline name)"></Datum>
@@ -333,12 +335,12 @@
   <Datum ID="Item6SummaryText" Type="Textarea" Name="Item 6 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
   <Datum ID="Item6SummaryTag" Type="SelectSingle" Name="Item 6 : summary tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
-  <Datum ID="Item6BodyHtml" Type="Textarea" Name="Item 6 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item6BodyHtml" Type="Textarea" Name="Item 6 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)"></Datum>
   <Datum ID="Item6ReadMoreLabel" Type="String" Name="Item 6 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item6ReadMoreHref" Type="String" Name="Item 6 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item6ReadMoreAria" Type="String" Name="Item 6 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
-  <Datum ID="Item7CategoryText" Type="String" Name="Item 7 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item7CategoryText" Type="String" Name="Item 7 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)"></Datum>
   <Datum ID="Item7CategoryTag" Type="SelectSingle" Name="Item 7 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Item7Author" Type="String" Name="Item 7 : author name (optional - blank hides the byline name)"></Datum>
@@ -349,12 +351,12 @@
   <Datum ID="Item7SummaryText" Type="Textarea" Name="Item 7 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
   <Datum ID="Item7SummaryTag" Type="SelectSingle" Name="Item 7 : summary tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
-  <Datum ID="Item7BodyHtml" Type="Textarea" Name="Item 7 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item7BodyHtml" Type="Textarea" Name="Item 7 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)"></Datum>
   <Datum ID="Item7ReadMoreLabel" Type="String" Name="Item 7 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item7ReadMoreHref" Type="String" Name="Item 7 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item7ReadMoreAria" Type="String" Name="Item 7 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
 
-  <Datum ID="Item8CategoryText" Type="String" Name="Item 8 : category eyebrow (optional - blank hides this row)"></Datum>
+  <Datum ID="Item8CategoryText" Type="String" Name="Item 8 : category eyebrow (optional - blank hides the eyebrow; a note shows when it has a category or a title)"></Datum>
   <Datum ID="Item8CategoryTag" Type="SelectSingle" Name="Item 8 : category tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
   <Datum ID="Item8Author" Type="String" Name="Item 8 : author name (optional - blank hides the byline name)"></Datum>
@@ -365,7 +367,7 @@
   <Datum ID="Item8SummaryText" Type="Textarea" Name="Item 8 : one-line summary (required if row is used - shown in collapsed state)"></Datum>
   <Datum ID="Item8SummaryTag" Type="SelectSingle" Name="Item 8 : summary tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
-  <Datum ID="Item8BodyHtml" Type="Textarea" Name="Item 8 : expanded body copy (optional - blank hides the expanded state; HTML allowed)"></Datum>
+  <Datum ID="Item8BodyHtml" Type="Textarea" Name="Item 8 : expanded body copy (optional - blank hides the expanded state; HTML allowed, including a video or podcast embed code - players fit the card width and stop when the note closes)"></Datum>
   <Datum ID="Item8ReadMoreLabel" Type="String" Name="Item 8 : read-more label (optional - blank hides the link)">Read more</Datum>
   <Datum ID="Item8ReadMoreHref" Type="String" Name="Item 8 : read-more URL (required if label is set - full URL or /en/ path)">#</Datum>
   <Datum ID="Item8ReadMoreAria" Type="String" Name="Item 8 : read-more accessible name (optional - screen-reader label for the link)"></Datum>
