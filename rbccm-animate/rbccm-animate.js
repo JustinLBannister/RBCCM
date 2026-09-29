@@ -6,7 +6,8 @@
    "nice" pacing (elements start hidden, JS adds a body class to reveal
    them, animate.css keyframes take it from there).
 
-   Load once per page AFTER the animate.css CDN stylesheet:
+   The fadeIn / fadeInUp / fadeInDown / fadeInRight animations are built
+   in, so animate.css is optional. If a page does load it, load it first:
 
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
      <script src="rbccm-animate/rbccm-animate.js"></script>
@@ -74,6 +75,25 @@
       + '.animate__animated{'
       + '  --animate-duration:1.3s;'
       + '}'
+      /* The four animate.css animations the RBCCM components use, built in
+         so they play even on pages that don't load animate.css. Component
+         pages built in TeamSite often don't, and without these the classes
+         had no animation behind them: elements jumped from hidden straight
+         to visible (a flicker instead of a fade). Definitions match
+         animate.css 4.1.1 exactly, so a page that does load it looks the
+         same. */
+      + '.animate__animated{'
+      + '  animation-duration:var(--animate-duration,1.3s);'
+      + '  animation-fill-mode:both;'
+      + '}'
+      + '.animate__fadeIn{animation-name:fadeIn}'
+      + '.animate__fadeInUp{animation-name:fadeInUp}'
+      + '.animate__fadeInDown{animation-name:fadeInDown}'
+      + '.animate__fadeInRight{animation-name:fadeInRight}'
+      + '@keyframes fadeIn{0%{opacity:0}to{opacity:1}}'
+      + '@keyframes fadeInUp{0%{opacity:0;transform:translate3d(0,100%,0)}to{opacity:1;transform:translateZ(0)}}'
+      + '@keyframes fadeInDown{0%{opacity:0;transform:translate3d(0,-100%,0)}to{opacity:1;transform:translateZ(0)}}'
+      + '@keyframes fadeInRight{0%{opacity:0;transform:translate3d(100%,0,0)}to{opacity:1;transform:translateZ(0)}}'
       + '@media (prefers-reduced-motion: reduce){'
       + '  [data-animate],'
       + '  [data-animate-hero],'
