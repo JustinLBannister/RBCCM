@@ -11,6 +11,13 @@
      npm run watch -- us-credentials     watch one page
      npm run list                        show pages, components, file status
 
+   One-off page from a list of components (not saved to the config;
+   the variant picker on rbccm-global/local-test.html writes this
+   command for you):
+     npm run build -- --page=my-page --components=rbccm-hero,rbccm-awards
+   Components are bundled in the order given. Add --watch to rebuild
+   on save.
+
    Output:
      dist/css/<page>.css  + .min.css
      dist/js/<page>.js    + .min.js
@@ -39,6 +46,12 @@ const args = process.argv.slice(2);
 const WATCH = args.includes('--watch');
 const LIST = args.includes('--list');
 const pageArgs = args.filter(a => !a.startsWith('--'));
+const argValue = name => {
+  const hit = args.find(a => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3).trim() : '';
+};
+const ADHOC_PAGE = argValue('page');
+const ADHOC_COMPONENTS = argValue('components').split(',').map(s => s.trim()).filter(Boolean);
 
 const c = {
   red: s => `\x1b[31m${s}\x1b[0m`,
@@ -52,7 +65,24 @@ const c = {
 async function loadConfig() {
   // Query string defeats Node's module cache so watch mode sees edits.
   const mod = await import(pathToFileURL(CONFIG_PATH).href + '?t=' + Date.now());
-  return mod.default;
+  const config = mod.default;
+  if (ADHOC_PAGE || ADHOC_COMPONENTS.length) addAdhocPage(config);
+  return config;
+}
+
+/* --page=<name> --components=a,b,c builds a page that isn't in the
+   config. Shorthand entries only (folder/folder.css + folder/folder.js),
+   in the order given. Bad input stops the build before anything is
+   written. */
+function addAdhocPage(config) {
+  const fail = msg => { console.error(c.red(msg)); process.exit(1); };
+  if (!ADHOC_PAGE) fail('--components needs --page=<name> too, e.g. --page=my-page');
+  if (!ADHOC_COMPONENTS.length) fail('--page needs --components=<folder,folder,...>');
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(ADHOC_PAGE)) fail(`Page name "${ADHOC_PAGE}": use lowercase letters, numbers and dashes`);
+  if (config.pages[ADHOC_PAGE]) fail(`"${ADHOC_PAGE}" is already a page in build/pages.config.mjs; pick another name or build it with: npm run build -- ${ADHOC_PAGE}`);
+  const missing = ADHOC_COMPONENTS.filter(n => !fs.existsSync(path.join(ROOT, n)));
+  if (missing.length) fail(`No component folder for: ${missing.join(', ')}`);
+  config.pages[ADHOC_PAGE] = { components: [...new Set(ADHOC_COMPONENTS)] };
 }
 
 /* Turn one component entry into { name, css: [...], js: [...] } with
@@ -396,6 +426,7 @@ async function watch(names) {
 }
 
 /* ---------- main -------------------------------------------------------- */
+const targetPages = ADHOC_PAGE ? [ADHOC_PAGE, ...pageArgs] : pageArgs;
 if (LIST) await list();
-else if (WATCH) await watch(pageArgs);
-else process.exitCode = (await buildAll(pageArgs)) ? 0 : 1;
+else if (WATCH) await watch(targetPages);
+else process.exitCode = (await buildAll(targetPages)) ? 0 : 1;

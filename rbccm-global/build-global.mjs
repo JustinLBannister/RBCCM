@@ -17,6 +17,8 @@
      - collects external CSS/JS, de-duped (one jQuery, one Slick)
      - renames the page's own data-variant labels so the shared picker
        lists COMPONENTS here, not per-component variants
+     - tags each section with data-build-component="<folder>" so the
+       picker's "Build a page" panel can write the npm build command
    ========================================================================= */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,6 +41,7 @@ const PAGES = [
   { name: 'Two-up cards',     dir: 'rbccm-two-up-cards',     file: 'local-test.html' },
   { name: 'Leadership',       dir: 'rbccm-leadership',       file: 'local-test.html' },
   { name: 'CTA band',         dir: 'rbccm-cta-band',         file: 'rbccm-cta-band.html' },
+  { name: 'Disclaimer',       dir: 'rbccm-disclaimer',       file: 'local-test.html' },
   { name: 'Button',           dir: 'rbccm-button',           file: 'local-test.html' },
   { name: 'Animate',          dir: 'rbccm-animate',          file: 'local-test.html' },
 ];
@@ -205,7 +208,7 @@ for (const p of PAGES) {
   }
 
   sections.push(
-`<section class="gl gl--${slug(p.dir)}" id="${slug(p.dir)}" data-variant="${p.name}">
+`<section class="gl gl--${slug(p.dir)}" id="${slug(p.dir)}" data-variant="${p.name}" data-build-component="${p.dir}">
 <div class="gl__bar"><span class="gl__name">${p.dir}</span><a class="gl__open" href="../${p.dir}/${p.file}">Open standalone test &rarr;</a></div>
 ${body.trim()}
 </section>`);

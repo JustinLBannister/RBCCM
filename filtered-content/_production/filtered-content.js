@@ -1,5 +1,5 @@
 /* =========================================================================
-   rbccm-filtered-content - SINGLE CONSOLIDATED JS
+   rbccm-filtered-content — SINGLE CONSOLIDATED JS
    ========================================================================= */
 
 /* ---------- PART 1: filter engine (ported from filter-by.js) ---------- */
@@ -28,7 +28,7 @@
        entirely (until content ops backfills the tag on articles)
 
    This means authors can drop any number of dropdowns into the filter
-   UI - the JS handles auto-populate, hide-if-empty, and match logic
+   UI — the JS handles auto-populate, hide-if-empty, and match logic
    without code changes. Add a new filter dimension by:
      1. Adding a <select data-filter="topic"> to the filter markup
      2. Emitting data-topic="..." on the items
@@ -56,17 +56,17 @@
    Hyphens are flattened to spaces on both the query and the haystack, so
    slugged values match either way ("financial institutions" == the slug).
    Region codes are reverse-mapped to their bucket key + label first, since
-   nobody searches "de" - see haystackFor() / regionSearchTerms().
+   nobody searches "de" — see haystackFor() / regionSearchTerms().
 
    ---- Plural + synonym handling -----------------------------------------
    Query "financials" would normally miss "financial institutions" because
    the substring match is too literal. normalizeSearch() therefore also:
      1. Applies a phrase-level SEARCH_SYNONYMS lookup (whole-query match)
         so common paraphrases route to the canonical taxonomy label
-        (e.g. "financial services" -> "financial institutions").
+        (e.g. "financial services" → "financial institutions").
      2. Strips trailing "s" per word so plurals fold onto their singular
-        (financials -> financial, services -> service). Skips short words
-        (<=3 chars) and double-s words (class -> class, not clas).
+        (financials → financial, services → service). Skips short words
+        (≤3 chars) and double-s words (class → class, not clas).
    Both are applied to query AND haystack so they stay in sync.
    ========================================================================= */
 
@@ -92,7 +92,7 @@
     'apac':   'APAC'
   };
 
-  /* Known acronyms -> keep uppercase in display labels rather than
+  /* Known acronyms → keep uppercase in display labels rather than
      title-casing them into "Us", "Apac", etc. */
   var ACRONYM_LABELS = {
     'apac':  'APAC',
@@ -104,17 +104,17 @@
     'emea':  'EMEA'
   };
 
-  /* Whole-query synonyms - route common paraphrases to the canonical
+  /* Whole-query synonyms — route common paraphrases to the canonical
      taxonomy phrase so search finds articles tagged under the official
      Topic label. Applied by normalizeSearch() before the plural strip.
      Keys and values are lowercased, hyphen-flattened, whitespace-collapsed
-     - i.e. the same shape normalizeSearch produces. Extend as content ops
+     — i.e. the same shape normalizeSearch produces. Extend as content ops
      identifies gaps between what editors write and what users type. */
   var SEARCH_SYNONYMS = {
     'financial services': 'financial institutions'
   };
 
-  /* Canonical Topic labels - kebab-case DCR values map to human-readable
+  /* Canonical Topic labels — kebab-case DCR values map to human-readable
      labels with proper spaces and ampersands. Matches the July 2 taxonomy
      Joe locked in (9 topics). Add here when new topics land in the DCR. */
   var TOPIC_LABELS = {
@@ -142,19 +142,17 @@
     emptyHeading:           'No results found',
     emptyMessage:           "We couldn't find any results that match your current filters.",
     emptyMessageEmphasis:   'Try adjusting your filters or search terms.',
-    emptyMessageSubject:    '',
     emptyClearLabel:        'Clear filters',
     prevPageLabel:          'Previous page',
     nextPageLabel:          'Next page',
     pageBtnLabel:           'Page {n}',
-    ellipsis:               '\u2026'
+    ellipsis:               '…'
   };
 
   var STRING_ATTRS = {
     emptyHeading:           'data-empty-heading',
     emptyMessage:           'data-empty-message',
     emptyMessageEmphasis:   'data-empty-message-emphasis',
-    emptyMessageSubject:    'data-empty-message-subject',
     emptyClearLabel:        'data-empty-clear-label',
     prevPageLabel:          'data-prev-page-label',
     nextPageLabel:          'data-next-page-label',
@@ -191,11 +189,11 @@
   }
 
   /* Format a raw value into a display label for a given dimension.
-     Month YYYY-MM -> "Month YYYY". Other dimensions get title-cased with
+     Month YYYY-MM → "Month YYYY". Other dimensions get title-cased with
      hyphens replaced by spaces. */
   function formatValue(value, dim) {
     if (!value) return value;
-    /* Year is already display-ready ("2025", "2026") - pass through. */
+    /* Year is already display-ready ("2025", "2026") — pass through. */
     if (dim === 'year') {
       return value;
     }
@@ -215,7 +213,7 @@
       return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
     /* Generic fallback for any other dimension: title-case each word,
-       keep known acronyms all-caps ("apac" -> "APAC", not "Apac"). */
+       keep known acronyms all-caps ("apac" → "APAC", not "Apac"). */
     return genericTitleCase(value);
   }
 
@@ -348,7 +346,7 @@
 
     /* Fetch one year's archive. On the RBC archive endpoints, a URL like
        /en/about-us/data/2025 actually returns items spanning 2025 back
-       through the earliest available year (2010) - one endpoint = all
+       through the earliest available year (2010) — one endpoint = all
        history from that year down. So instead of trusting the year arg
        to stamp items, we parse each <date> for its real year and mark
        every year we actually saw as loaded. If the requested year has
@@ -388,7 +386,7 @@
 
     function fetchYearArchive(year) {
       if (!yearFeedTemplate) return Promise.resolve();
-      /* Loading state - hide real items via `.is-lazy-loading` on
+      /* Loading state — hide real items via `.is-lazy-loading` on
          root and inject skeleton rows in their place. Clear on
          success OR failure so a failed fetch doesn't leave the
          list stuck in skeleton mode. */
@@ -420,7 +418,7 @@
         for (var i = 0; i < newsNodes.length; i++) {
           var built = buildYearArchiveItem(newsNodes[i]);
           if (!built) continue;
-          /* Dedup against server-rendered items - the current year's
+          /* Dedup against server-rendered items — the current year's
              initial 200 items overlap with the fetched archive. */
           if (built.link && seededLinkSet[built.link]) continue;
           if (built.link) seededLinkSet[built.link] = true;
@@ -445,7 +443,7 @@
         }
         /* `container` may be the OUTER section (when data-container
            points at it) rather than the list <ul>. Inject items into
-           the actual list so they participate in the grid - appending
+           the actual list so they participate in the grid — appending
            to the section would put them AFTER the pagination host. */
         var listEl = container.matches && container.matches('ul')
           ? container
@@ -459,12 +457,12 @@
         }
         yearLoadedCache[requestedYear] = true;
         allItems = container.querySelectorAll(itemSelector);
-        /* Clear per-item cached search haystacks - items with the same
+        /* Clear per-item cached search haystacks — items with the same
            dim tokens will regenerate cleanly on next haystackFor() call. */
         for (var j = 0; j < allItems.length; j++) delete allItems[j].__rbccmHaystack;
         return null;
       }).catch(function (err) {
-        /* Direct-year endpoint may 404 for older years - fall back to
+        /* Direct-year endpoint may 404 for older years — fall back to
            the master archive at the earliest available year. */
         if (allowFallback && availableYears.length > 0) {
           var fallbackYear = availableYears[availableYears.length - 1];
@@ -502,14 +500,14 @@
       var dateStr = getText('date');   /* "September 4, 2026" */
       var topic = getText('topic').toLowerCase();
 
-      /* Local HTML-escape - the shared `esc` helper lives in a
+      /* Local HTML-escape — the shared `esc` helper lives in a
          different IIFE and isn't visible from bindFilter's closure. */
       var localEsc = function (s) {
         return String(s == null ? '' : s)
           .replace(/&/g,'&amp;').replace(/</g,'&lt;')
           .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       };
-      /* Local month lookup - MONTH_NUM lives in a different IIFE and
+      /* Local month lookup — MONTH_NUM lives in a different IIFE and
          isn't visible from bindFilter's closure. Keep this table in
          sync if the shared one gains new tokens. */
       var LOCAL_MONTH_NUM = {
@@ -531,7 +529,7 @@
       var haystack = (title + ' ' + description).toLowerCase();
 
       var li = document.createElement('li');
-      li.className = 'rbccm-filtered-content__item rbccm-filtered-content__item--article';
+      li.className = 'rbccm-filtered-content__item';
       li.setAttribute('data-type', typeToken);
       if (itemYear) li.setAttribute('data-year', itemYear);
       if (monthNum) li.setAttribute('data-month', monthNum);
@@ -544,19 +542,19 @@
          blank <description> don't leave an empty <p> in the DOM.
          Mirrors the XSL template for server-rendered items. */
       var descriptionHtml = description
-        ? '<p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--article">' + localEsc(description) + '</p>'
+        ? '<p class="rbccm-filtered-content__card-description">' + localEsc(description) + '</p>'
         : '';
 
       li.innerHTML =
         '<div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">' +
-          '<div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">' +
-            '<div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">' + localEsc(dateStr) + '</div>' +
+          '<div class="rbccm-filtered-content__card-topbar">' +
+            '<div class="rbccm-filtered-content__card-date">' + localEsc(dateStr) + '</div>' +
           '</div>' +
-          '<h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a' + linkAttrs + '>' + localEsc(title) + '</a></h3>' +
+          '<h3 class="rbccm-filtered-content__card-title"><a' + linkAttrs + '>' + localEsc(title) + '</a></h3>' +
           descriptionHtml +
-          '<div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">' +
-            '<div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">' +
-              '<span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article ' + eyebrowMod + '">' + localEsc(eyebrowLabel) + '</span>' +
+          '<div class="rbccm-filtered-content__card-footer">' +
+            '<div class="rbccm-filtered-content__card-footer-metadata">' +
+              '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' + localEsc(eyebrowLabel) + '</span>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -583,7 +581,7 @@
       if (!button) return null;
 
       /* Reset any prior inline display state from a previous bind
-         (e.g. a rebind after tiles were populated by the feed script -
+         (e.g. a rebind after tiles were populated by the feed script —
          the first bind ran on an empty item set and hid the wrap;
          this bind may find data and needs the wrap visible again). */
       wrap.style.display = '';
@@ -613,7 +611,7 @@
          use that list verbatim instead of auto-populating from items.
          This lets the ITM preset offer historical years (e.g. 2010-2026)
          in the dropdown while only having the current year's items in
-         the DOM initially - lazy-loaded on year select. Seed the `seen`
+         the DOM initially — lazy-loaded on year select. Seed the `seen`
          map with each authored year so subsequent logic treats them as
          known values. */
       if (dim === 'year' && availableYears.length > 0) {
@@ -640,7 +638,7 @@
         }
       }
 
-      /* No data for this dimension -> hide the whole dropdown. */
+      /* No data for this dimension → hide the whole dropdown. */
       if (rawTokens.length === 0) {
         wrap.style.display = 'none';
         return null;
@@ -659,7 +657,7 @@
             if (seen[codes[c]]) { values.push(bucketKey); break; }
           }
         }
-        /* No bucket matched - nothing to show. */
+        /* No bucket matched — nothing to show. */
         if (values.length === 0) {
           wrap.style.display = 'none';
           return null;
@@ -672,7 +670,7 @@
       }
 
       /* Derive the default label from the button's aria-label (e.g. "Filter
-         by topic" -> "Topic"). Sourcing from aria-label rather than the
+         by topic" → "Topic"). Sourcing from aria-label rather than the
          current visible text is important: if URL params or an earlier
          setValue call have already changed the button's visible text to
          (say) "Energy", rebuilding the dropdown would otherwise capture
@@ -870,7 +868,7 @@
           var lbl = btn.querySelector('.rbccm-filtered-content__select-label');
           var fallback = (btn.getAttribute('aria-label') || '').replace(/^Filter by\s+/i, '');
           if (lbl && fallback) {
-            // Capitalize first letter to match default (e.g. "year" -> "Year")
+            // Capitalize first letter to match default (e.g. "year" → "Year")
             lbl.textContent = fallback.charAt(0).toUpperCase() + fallback.slice(1);
           }
         }
@@ -891,7 +889,7 @@
             haystack too, harmlessly: an item tagged "financial services"
             would surface under a "financial institutions" query as well.
          2. Trailing-s strip per word so plurals match singulars
-            (financials -> financial). Skips length <=3 (spare "as", "is",
+            (financials → financial). Skips length ≤3 (spare "as", "is",
             "us", "his") and words ending in "ss" (spare "class"). */
     function stripTrailingS(word) {
       if (word.length <= 3) return word;
@@ -933,7 +931,7 @@
        codes to the bucket key + label it belongs to, and folds those in
        alongside the codes.
 
-       Note it maps the item's own codes only - NOT the bucket's full code
+       Note it maps the item's own codes only — NOT the bucket's full code
        list. Folding in the whole list would put every European code on a
        German article, so searching "uk" would return it. The narrower map
        keeps "europe"/"canada"/"apac" working without that false positive.
@@ -1034,11 +1032,11 @@
       for (var u = 0; u < unmatched.length; u++) unmatched[u].setAttribute('hidden', 'hidden');
 
       /* Mixed page sizes for the editorial pattern:
-           - Unfiltered page 1: `pageSize` (default 4 - featured hero + 3).
-           - Unfiltered page 2+: `filteredPageSize` (default 6 - dense 3x2).
+           - Unfiltered page 1: `pageSize` (default 4 — featured hero + 3).
+           - Unfiltered page 2+: `filteredPageSize` (default 6 — dense 3x2).
            - Any filtered page: `filteredPageSize` (dense grid).
          The featured tile only exists as the first item, so once you
-         leave page 1 there's no hero to anchor the hero layout anyway -
+         leave page 1 there's no hero to anchor the hero layout anyway —
          switching to the dense page size gives a clean 3-up grid.
 
          When either size is 0/unset we degrade gracefully to a single page. */
@@ -1161,8 +1159,7 @@
       /* Dimension label prefix ("Type: Press release"). Kept subtle
          visually but carried in the accessible name for AT users. */
       var DIM_LABELS = { type:'Type', year:'Year', month:'Month',
-                         region:'Region', topic:'Topic', search:'Search',
-                         'transaction-type':'Transaction type' };
+                         region:'Region', topic:'Topic', search:'Search' };
 
       for (var j = 0; j < built.length; j++) {
         var c = built[j];
@@ -1233,11 +1230,11 @@
 
     /* ---------- URL param sync ----------
        Deep-link support. Reads state from
-       ?year=...&region=...&topic=...&search=...&page=... on load, writes it back
+       ?year=…&region=…&topic=…&search=…&page=… on load, writes it back
        on every filter/page change. Popstate re-applies from URL so
        browser back/forward works.
 
-       Param names match dimension keys 1:1 (year, region, topic - whatever
+       Param names match dimension keys 1:1 (year, region, topic — whatever
        the filter's dropdown data-dim attributes are), plus `search` for
        the search input and `page` for the 1-indexed page number. All
        values lowercase for readable, shareable URLs. */
@@ -1262,7 +1259,7 @@
         var newUrl = window.location.pathname + (query ? '?' + query : '') + window.location.hash;
         var method = pushHistory ? 'pushState' : 'replaceState';
         window.history[method]({ page: currentPage }, '', newUrl);
-      } catch (e) { /* sandboxed iframes / older browsers - silent fail */ }
+      } catch (e) { /* sandboxed iframes / older browsers — silent fail */ }
     }
 
     function readUrlState() {
@@ -1294,8 +1291,8 @@
       return Promise.resolve();
     }
 
-    /* Back / forward - re-apply state from the URL that the browser
-       just restored. Don't reset page - the URL is authoritative. */
+    /* Back / forward — re-apply state from the URL that the browser
+       just restored. Don't reset page — the URL is authoritative. */
     window.addEventListener('popstate', function () {
       readUrlState();
       ensureUrlYearLoaded().then(function () { apply(false); });
@@ -1309,9 +1306,6 @@
          Type=press, Year=2025    -> "We couldn't find any press releases in 2025."
          Year=2018 alone          -> "We couldn't find any media coverage in 2018."
          search only              -> "We couldn't find any media coverage matching \"donald\"."
-       Deals use their own order (year, then transaction type):
-         Year=2025, Type=Equity Offering
-                                  -> "We couldn't find any matching transactions for 2025 in Equity Offerings."
        Falls back to the generic data-empty-message when we somehow
        land here with zero filters active (defensive). */
     function buildDynamicEmptyMessage() {
@@ -1320,13 +1314,10 @@
       var monthLabel = '';
       var regionLabel = '';
       var topicLabel = '';
-      var txTypeLabel = '';
-      var hasTxTypeDim = false;
       var searchQuery = (searchInput && searchInput.value) ? searchInput.value.trim() : '';
 
       for (var i = 0; i < dropdowns.length; i++) {
         var dd = dropdowns[i];
-        if (dd.dim === 'transaction-type') hasTxTypeDim = true;
         var v = (dd.getValue() || '').trim();
         if (!v) continue;
         var pretty = formatValue(v, dd.dim);
@@ -1335,21 +1326,10 @@
         else if (dd.dim === 'month')  monthLabel  = pretty;
         else if (dd.dim === 'region') regionLabel = pretty;
         else if (dd.dim === 'topic')  topicLabel  = pretty;
-        else if (dd.dim === 'transaction-type') txTypeLabel = pretty;
       }
 
-      if (!typeLabel && !yearLabel && !monthLabel && !regionLabel && !topicLabel && !txTypeLabel && !searchQuery) {
+      if (!typeLabel && !yearLabel && !monthLabel && !regionLabel && !topicLabel && !searchQuery) {
         return strings.emptyMessage || '';
-      }
-
-      /* Deals: "for {year}" then "in {transaction types}". Type labels are
-         pluralized unless they already end in "s" (Debt Capital Markets). */
-      if (hasTxTypeDim) {
-        var dealParts = ["We couldn't find any " + (strings.emptyMessageSubject || 'matching transactions')];
-        if (yearLabel) dealParts.push('for ' + yearLabel);
-        if (txTypeLabel) dealParts.push('in ' + (/s$/i.test(txTypeLabel) ? txTypeLabel : txTypeLabel + 's'));
-        if (searchQuery) dealParts.push('matching "' + searchQuery + '"');
-        return dealParts.join(' ') + '.';
       }
 
       /* Subject noun -- lowercase the type label if set ("Press release"
@@ -1447,7 +1427,7 @@
       nav.appendChild(buildArrowBtn('previous', currentPage === 0));
       var pages = computePageList(currentPage, totalPages);
       for (var i = 0; i < pages.length; i++) {
-        if (pages[i] === '\u2026') {
+        if (pages[i] === '…') {
           var el = document.createElement('span');
           el.className = 'rbccm-filtered-content__page-ellipsis';
           el.setAttribute('aria-hidden', 'true');
@@ -1463,9 +1443,9 @@
 
     /* Responsive target circle count. Odd numbers keep the current-page
        chip visually centered when it's in the middle of the range:
-         - Mobile   (<768px): 7 max, degrades to 5 when total <= 5
+         - Mobile   (<768px): 7 max, degrades to 5 when total ≤ 5
          - Tablet   (768-1023): 9 max
-         - Desktop  (>=1024): 11 max
+         - Desktop  (≥1024): 11 max
        Fall back to 7 when window is unavailable (SSR/pre-hydrate). */
     function getTargetPageCount() {
       if (typeof window === 'undefined' || !window.matchMedia) return 7;
@@ -1477,7 +1457,7 @@
     function computePageList(current, total) {
       var target = getTargetPageCount();
 
-      /* Total fits in the window - show every page, no ellipsis. */
+      /* Total fits in the window — show every page, no ellipsis. */
       if (total <= target) {
         var all = [];
         for (var i = 0; i < total; i++) all.push(i);
@@ -1490,26 +1470,26 @@
       var half = Math.floor(windowSize / 2);
       var out;
 
-      /* Near start - no left ellipsis, extend right window. */
+      /* Near start — no left ellipsis, extend right window. */
       if (current <= half + 1) {
         out = [];
         for (var i = 0; i < target - 2; i++) out.push(i);
-        out.push('\u2026');
+        out.push('…');
         out.push(total - 1);
         return out;
       }
 
-      /* Near end - no right ellipsis, extend left window. */
+      /* Near end — no right ellipsis, extend left window. */
       if (current >= total - half - 2) {
-        out = [0, '\u2026'];
+        out = [0, '…'];
         for (var i = total - (target - 2); i < total; i++) out.push(i);
         return out;
       }
 
-      /* Middle - both ellipses, current centered inside window. */
-      out = [0, '\u2026'];
+      /* Middle — both ellipses, current centered inside window. */
+      out = [0, '…'];
       for (var i = current - half; i <= current + half; i++) out.push(i);
-      out.push('\u2026');
+      out.push('…');
       out.push(total - 1);
       return out;
     }
@@ -1520,19 +1500,19 @@
        top of the results area. Prevents users landing mid-page after
        clicking "Page 3" and having to hunt for where the new tiles start.
 
-       Filter changes do NOT trigger this - user's eye is already at the
+       Filter changes do NOT trigger this — user's eye is already at the
        filter when they interact, and the results updating in place is
        the expected micro-iteration flow.
 
        Respects prefers-reduced-motion: skips animation, jumps instantly.
 
        Offset for sticky headers is handled via CSS `scroll-margin-top`
-       on the target element - set it in the consuming component's CSS
+       on the target element — set it in the consuming component's CSS
        if the page has a fixed top bar. */
     function scrollToFirstResult() {
       /* Default: scroll to the filter root itself. Puts the filter bar
          at the top of the viewport with the first result of the new
-         page immediately below - user has both the controls they just
+         page immediately below — user has both the controls they just
          used and the fresh content in a single glance.
 
          Override with [data-scroll-target="#some-id"] on the filter root
@@ -1548,7 +1528,7 @@
     /* ---------- Focus retention after pagination clicks ----------
        paginate() rebuilds the entire nav on every click, so the button
        the user just activated is destroyed and replaced. Without help,
-       focus drops to <body> - keyboard users get dumped mid-navigation.
+       focus drops to <body> — keyboard users get dumped mid-navigation.
        These helpers restore focus to the equivalent button after
        re-render, preserving the "focus stays on the thing I clicked"
        expectation that lets keyboard users rapid-fire pagination. */
@@ -1591,7 +1571,7 @@
         currentPage = pageIndex;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
-        writeUrlState(true); // pushState - back button walks page steps
+        writeUrlState(true); // pushState — back button walks page steps
         scrollToFirstResult();
         focusRebuiltPageBtn(pageIndex);
       });
@@ -1603,7 +1583,7 @@
       btn.type = 'button';
       btn.className = 'rbccm-filtered-content__page-button rbccm-filtered-content__page-button--' + dir;
       btn.setAttribute('aria-label', dir === 'previous' ? strings.prevPageLabel : strings.nextPageLabel);
-      /* Chevron SVG - 14x24 viewBox from the RBC design spec. Base path
+      /* Chevron SVG — 14x24 viewBox from the RBC design spec. Base path
          is a right-facing chevron; prev mirrors it horizontally to point
          left. stroke="currentColor" so hover/focus/dark/disabled states
          adapt automatically. */
@@ -1620,7 +1600,7 @@
         if (dir === 'next') currentPage++;
         var r = computeMatches();
         paginate(r.matched, r.unmatched, anyFilterActive(r.state));
-        writeUrlState(true); // pushState - back button walks page steps
+        writeUrlState(true); // pushState — back button walks page steps
         scrollToFirstResult();
         focusRebuiltArrowBtn(dir);
       });
@@ -1637,7 +1617,7 @@
     if (resetBtn) resetBtn.addEventListener('click', resetFilters);
 
     /* Re-render pagination when the viewport crosses a breakpoint so the
-       circle count adapts (mobile 7 -> tablet 9 -> desktop 11). Debounced
+       circle count adapts (mobile 7 → tablet 9 → desktop 11). Debounced
        so drag-resizes don't rebuild the DOM on every frame; matchMedia
        fires the callback once per crossing, resize fires continuously so
        we throttle it. Skipped when pageSize <= 0 (no pagination in play). */
@@ -1664,7 +1644,7 @@
     /* Signal to consumer CSS that the filter has initialized and tiles
        are in their correct visible/hidden state. Consumers can hide the
        tile grid (opacity 0) + show a skeleton state until this attribute
-       lands, then cross-fade to the real tiles - kills the "everything
+       lands, then cross-fade to the real tiles — kills the "everything
        flashes then re-renders" moment on page load. */
     container.setAttribute('data-filter-ready', 'true');
   }
@@ -1674,7 +1654,7 @@
      filter's target container AFTER our initial bind, unbind and re-bind
      the matching filter root(s) so the dropdowns pick up the fresh items.
      Safe no-op for filters bound to a container that isn't the event's
-     target. Kept for backward compat + belt-and-suspenders - the
+     target. Kept for backward compat + belt-and-suspenders — the
      coordinator below already calls bindFilter after each adapter run. */
   function rebindFilterForContainer(container) {
     if (!container) return;
@@ -1701,21 +1681,21 @@
 
 
 /* =========================================================================
-   PART 2 - Preset adapters (feed fetch + parse + render)
+   PART 2 — Preset adapters (feed fetch + parse + render)
    -------------------------------------------------------------------------
    One file, three presets. Each adapter defines:
-     - fetchItems(root)     -> Promise<Array<entry>>   (feed -> common entry shape)
-     - render(entry, i)     -> HTMLElement (li)         (entry -> DOM)
+     - fetchItems(root)     → Promise<Array<entry>>   (feed → common entry shape)
+     - render(entry, i)     → HTMLElement (li)         (entry → DOM)
 
    Common entry fields (all optional except title/href):
-     title, href, thumbnail, description, dateStr, year, month (01-12),
+     title, href, thumbnail, description, dateStr, year, month (01–12),
      dateTs (numeric for sort), searchText (lowercased haystack),
      + preset-specific fields.
 
    Preset selection: coordinator reads the root modifier class
    (`--conference-insights`, `--in-the-media-and-press-releases`,
    `--deals-and-transactions`). When no adapter matches, the coordinator
-   just binds the filter engine over author-provided items - the "custom"
+   just binds the filter engine over author-provided items — the "custom"
    preset case.
    ========================================================================= */
 
@@ -1755,9 +1735,9 @@
   function normalizeTitle(t) {
     if (!t) return '';
     return t.toLowerCase()
-      .replace(/[\u2018\u2019]/g, "'")
-      .replace(/[\u201c\u201d]/g, '"')
-      .replace(/[\u2013\u2014]/g, '-')
+      .replace(/[‘’]/g, "'")
+      .replace(/[“”]/g, '"')
+      .replace(/[–—]/g, '-')
       .replace(/[^\w\s]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -1785,7 +1765,7 @@
   };
   /* Deterministic "Month YYYY" -> unix ms. Falls back to Date.parse for
      ISO strings, then to 0 if nothing parses. Used to sort deals whose
-     <date> is already pre-abbreviated ("Aug 2026") - Date.parse of that
+     <date> is already pre-abbreviated ("Aug 2026") — Date.parse of that
      string returns NaN in some browsers, so we build it ourselves. */
   function parseMonthYearToTs(dateStr) {
     if (!dateStr) return 0;
@@ -1828,8 +1808,8 @@
     var cut = text.substring(0, maxChars);
     var lastSpace = cut.lastIndexOf(' ');
     if (lastSpace > maxChars * 0.6) cut = cut.substring(0, lastSpace);
-    cut = cut.replace(/[\s,.;:!?\-\u2013\u2014]+$/, '');
-    return cut + '\u2026';
+    cut = cut.replace(/[\s,.;:!?\-–—]+$/, '');
+    return cut + '…';
   }
   function firstToken(str) {
     if (!str) return '';
@@ -1876,7 +1856,7 @@
     return s.length <= 3 ? s.toUpperCase() : (s.charAt(0).toUpperCase() + s.slice(1));
   }
 
-  /* Transaction type normalization - ported from live filter-deals.js. */
+  /* Transaction type normalization — ported from live filter-deals.js. */
   var TRANSACTION_TYPE_MAP = {
     'mergers and acquisitions': 'Mergers and Acquisitions',
     'equity capital markets':   'Equity Capital Markets',
@@ -1962,7 +1942,7 @@
     },
     render: function (entry, index) {
       var li = document.createElement('li');
-      li.className = 'rbccm-filtered-content__item rbccm-filtered-content__item--insight';
+      li.className = 'rbccm-filtered-content__item';
       if (entry.year)       li.setAttribute('data-year', entry.year);
       if (entry.dataRegion) li.setAttribute('data-region', entry.dataRegion);
       if (entry.dataTopic)  li.setAttribute('data-topic', entry.dataTopic);
@@ -1975,27 +1955,27 @@
 
       var taxonomyHtml = '';
       if (entry.topicLabel || entry.regionLabel || entry.dateLabel) {
-        taxonomyHtml = '<div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">';
-        if (entry.topicLabel)  taxonomyHtml += '<span class="rbccm-filtered-content__card-topic rbccm-filtered-content__card-topic--insight">' + esc(entry.topicLabel) + '</span>';
-        if (entry.regionLabel) taxonomyHtml += '<span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">' + esc(entry.regionLabel) + (entry.dateLabel ? ' \u00b7 ' : '') + '</span>';
-        if (entry.dateLabel)   taxonomyHtml += '<span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">' + esc(entry.dateLabel) + '</span>';
+        taxonomyHtml = '<div class="rbccm-filtered-content__card-taxonomy">';
+        if (entry.topicLabel)  taxonomyHtml += '<span class="rbccm-filtered-content__card-topic">' + esc(entry.topicLabel) + '</span>';
+        if (entry.regionLabel) taxonomyHtml += '<span class="rbccm-filtered-content__card-region">' + esc(entry.regionLabel) + (entry.dateLabel ? ' · ' : '') + '</span>';
+        if (entry.dateLabel)   taxonomyHtml += '<span class="rbccm-filtered-content__card-date">' + esc(entry.dateLabel) + '</span>';
         taxonomyHtml += '</div>';
       }
 
-      var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>';
-      var metaHtml = '<p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>' + esc(entry.meta || '') + '</span>' + arrowSvg + '</p>';
+      var arrowSvg = '<svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg>';
+      var metaHtml = '<p class="rbccm-filtered-content__card-metadata"><span>' + esc(entry.meta || '') + '</span>' + arrowSvg + '</p>';
       var bottomHtml = taxonomyHtml
-        ? '<div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">' + metaHtml + taxonomyHtml + '</div>'
+        ? '<div class="rbccm-filtered-content__card-bottom">' + metaHtml + taxonomyHtml + '</div>'
         : metaHtml;
 
       li.innerHTML =
-        '<a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight' + featuredCls + '" href="' + esc(entry.href || '#') + '" aria-label="' + esc(ariaLabel) + '">' +
-          '<div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight"><img loading="lazy" alt="" src="' + esc(entry.thumbnail || '') + '"></div>' +
-          '<div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">' +
-            '<div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">' + esc(entry.eyebrow || 'Insights') + '</div>' +
-            '<div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>' +
-            '<h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">' + esc(entry.title || '') + '</h2>' +
-            '<p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">' + esc(entry.description || '') + '</p>' +
+        '<a class="rbccm-filtered-content__card' + featuredCls + '" href="' + esc(entry.href || '#') + '" aria-label="' + esc(ariaLabel) + '">' +
+          '<div class="rbccm-filtered-content__card-media"><img loading="lazy" alt="" src="' + esc(entry.thumbnail || '') + '"></div>' +
+          '<div class="rbccm-filtered-content__card-body">' +
+            '<div class="rbccm-filtered-content__card-label">' + esc(entry.eyebrow || 'Insights') + '</div>' +
+            '<div class="rbccm-filtered-content__card-divider" aria-hidden="true"></div>' +
+            '<h2 class="rbccm-filtered-content__card-title">' + esc(entry.title || '') + '</h2>' +
+            '<p class="rbccm-filtered-content__card-description">' + esc(entry.description || '') + '</p>' +
             bottomHtml +
           '</div>' +
         '</a>';
@@ -2079,7 +2059,7 @@
      ADAPTER: in-the-media-and-press-releases
      -------------------------------------------------------------------------
      Fetches the /press_release DCR feed and renders each item as a bare
-     row stub - real markup drops in when the authored ITM item CSS spec
+     row stub — real markup drops in when the authored ITM item CSS spec
      is locked. Data attrs already wired so the filter engine's Type /
      Year / Month / Region dropdowns auto-populate.
      ========================================================================== */
@@ -2097,7 +2077,7 @@
     },
     render: function (entry) {
       var li = document.createElement('li');
-      li.className = 'rbccm-filtered-content__item rbccm-filtered-content__item--article';
+      li.className = 'rbccm-filtered-content__item';
       if (entry.type)       li.setAttribute('data-type', entry.type);
       if (entry.year)       li.setAttribute('data-year', entry.year);
       if (entry.month)      li.setAttribute('data-month', entry.month);
@@ -2107,8 +2087,8 @@
       /* Row markup per authored Figma spec:
            [outlet ......... date]                                  (topbar)
            [title]                                                  (only link)
-           [Featured: person ....................  region - eyebrow] (footer)
-         Wrapper is a <div> - only the title text is a link, which lets
+           [Featured: person ....................  region · eyebrow] (footer)
+         Wrapper is a <div> — only the title text is a link, which lets
          the CSS :has(.__card-title a:hover) selector propagate hover
          state to the wrapper for the row-level bg tint.
          Footer has two clusters: Featured on the left, meta (region
@@ -2118,14 +2098,14 @@
       var featuredInner = '';
       if (entry.featured) {
         featuredInner =
-          '<div class="rbccm-filtered-content__card-featured rbccm-filtered-content__card-featured--article">' +
-            '<span class="rbccm-filtered-content__card-featured-label rbccm-filtered-content__card-featured-label--article">Featured:</span>' +
-            '<span class="rbccm-filtered-content__card-featured-name rbccm-filtered-content__card-featured-name--article">' + esc(entry.featured) + '</span>' +
+          '<div class="rbccm-filtered-content__card-featured">' +
+            '<span class="rbccm-filtered-content__card-featured-label">Featured:</span>' +
+            '<span class="rbccm-filtered-content__card-featured-name">' + esc(entry.featured) + '</span>' +
           '</div>';
       }
 
       var regionHtml = entry.regionLabel
-        ? '<span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--article">' + esc(entry.regionLabel) + '</span>'
+        ? '<span class="rbccm-filtered-content__card-region">' + esc(entry.regionLabel) + '</span>'
         : '';
 
       var eyebrowHtml = '';
@@ -2135,7 +2115,7 @@
           ? 'rbccm-filtered-content__card-eyebrow--press'
           : 'rbccm-filtered-content__card-eyebrow--media';
         eyebrowHtml =
-          '<span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article ' + eyebrowMod + '">' +
+          '<span class="rbccm-filtered-content__card-eyebrow ' + eyebrowMod + '">' +
             esc(eyebrowLabel) +
           '</span>';
       }
@@ -2143,7 +2123,7 @@
       var metaInner = '';
       if (regionHtml || eyebrowHtml) {
         metaInner =
-          '<div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">' +
+          '<div class="rbccm-filtered-content__card-footer-metadata">' +
             regionHtml + eyebrowHtml +
           '</div>';
       }
@@ -2151,18 +2131,18 @@
       var footerHtml = '';
       if (featuredInner || metaInner) {
         footerHtml =
-          '<div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">' +
+          '<div class="rbccm-filtered-content__card-footer">' +
             featuredInner + metaInner +
           '</div>';
       }
 
       li.innerHTML =
         '<div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">' +
-          '<div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">' +
-            '<div class="rbccm-filtered-content__card-source rbccm-filtered-content__card-source--article">' + esc(entry.outlet || '') + '</div>' +
-            '<div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">' + esc(entry.dateLongLabel || entry.dateLabel || '') + '</div>' +
+          '<div class="rbccm-filtered-content__card-topbar">' +
+            '<div class="rbccm-filtered-content__card-source">' + esc(entry.outlet || '') + '</div>' +
+            '<div class="rbccm-filtered-content__card-date">' + esc(entry.dateLongLabel || entry.dateLabel || '') + '</div>' +
           '</div>' +
-          '<h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a href="' + esc(entry.href || '#') + '">' + esc(entry.title || '') + '</a></h3>' +
+          '<h3 class="rbccm-filtered-content__card-title"><a href="' + esc(entry.href || '#') + '">' + esc(entry.title || '') + '</a></h3>' +
           footerHtml +
         '</div>';
       return li;
@@ -2184,7 +2164,7 @@
   /* Concatenated-title parser for the ITM feed. Real items follow:
        "RBC {KIND}: {PERSON} on {NETWORK}   [optionally: (timecode)]"
      where KIND is TV / Radio / Podcast / Talks. Returns
-     { kind, person, source, timecode, raw } - fields not matched
+     { kind, person, source, timecode, raw } — fields not matched
      come back as ''. Trailing "(...)" only extracts when it clearly
      looks like a timecode / modifier ("starts, HH:MM", "from HH:MM",
      or a bare HH:MM); anything else (e.g. "(Video)") stays in the
@@ -2224,10 +2204,10 @@
     var link = child(node, 'link').trim();
     var dateStr = child(node, 'date').trim() || child(node, 'publish_date').trim();
     /* Try the dedicated feed tags first (in case the schema gets
-       richer later) - today they ship blank on every real item, so
+       richer later) — today they ship blank on every real item, so
        fall through to parsing the concatenated title. */
     var outlet = child(node, 'outlet').trim() || child(node, 'publication').trim() || child(node, 'source').trim();
-    /* Description / summary for the row body - try common tag names. */
+    /* Description / summary for the row body — try common tag names. */
     var description = child(node, 'description').trim() || child(node, 'summary').trim() || child(node, 'abstract').trim();
     /* "Featured" person from the feed (kept in searchText for filtering). */
     var featured = child(node, 'featured').trim() || child(node, 'person').trim() || child(node, 'spokesperson').trim();
@@ -2243,7 +2223,7 @@
 
     /* Feed may expose either a "topic" (media / press) or a "type" field. */
     var rawType = (child(node, 'topic') || child(node, 'type') || '').trim().toLowerCase();
-    /* Type resolution priority - <topic> is unreliable (blank /
+    /* Type resolution priority — <topic> is unreliable (blank /
        misclassified on several items), so we harden with the link
        shape and, as a last resort, the title parse:
          1. link on /rbccm/ or /assets/rbccm/  -> press
@@ -2266,7 +2246,7 @@
     var dateTs = dateStr ? Date.parse(dateStr) : 0;
     if (isNaN(dateTs)) dateTs = 0;
 
-    /* External flag - media coverage links leave the RBC domain; press
+    /* External flag — media coverage links leave the RBC domain; press
        releases stay on-site. Also flag any explicit protocol-based URL. */
     var isExternal = (type === 'media') || /^https?:\/\//i.test(link);
 
@@ -2276,16 +2256,16 @@
       external: isExternal,
       outlet: outlet,
       featured: featured,
-      kind: kind,                                /* "RBC TV" / "RBC Radio" / etc - blank when unparseable */
+      kind: kind,                                /* "RBC TV" / "RBC Radio" / etc — blank when unparseable */
       description: description,
       type: type,
       year: parseYear(dateStr),
       month: parseMonthNum(dateStr),
-      dateLabel: formatMonthYear(dateStr),       /* "Jun 2025" - used for filter dropdown option display */
-      dateLongLabel: formatLongDate(dateStr),    /* "June 28, 2025" - used for the row date line */
+      dateLabel: formatMonthYear(dateStr),       /* "Jun 2025" — used for filter dropdown option display */
+      dateLongLabel: formatLongDate(dateStr),    /* "June 28, 2025" — used for the row date line */
       dateTs: dateTs,
       dataRegion: region ? region.toLowerCase() : '',
-      regionLabel: labelForRegion(region),       /* "Global" / "US" / etc - displayed as inline pill */
+      regionLabel: labelForRegion(region),       /* "Global" / "US" / etc — displayed as inline pill */
       searchText: (title + ' ' + outlet + ' ' + featured + ' ' + description).toLowerCase()
     };
   }
@@ -2295,7 +2275,7 @@
      -------------------------------------------------------------------------
      Fetches the deals XML feed, filters to closed deals, normalizes each
      item's transaction type via the canonical map, renders tombstone-style
-     cards. Item CSS is placeholder pending final spec - data attrs wired.
+     cards. Item CSS is placeholder pending final spec — data attrs wired.
      ========================================================================== */
 
   var DEALS_CONFIG = {
@@ -2314,23 +2294,23 @@
     },
     render: function (entry) {
       var li = document.createElement('li');
-      li.className = 'rbccm-filtered-content__item rbccm-filtered-content__item--deal';
+      li.className = 'rbccm-filtered-content__item';
       if (entry.year)                li.setAttribute('data-year', entry.year);
       if (entry.transactionTypeSlug) li.setAttribute('data-transaction-type', entry.transactionTypeSlug);
       if (entry.searchText)          li.setAttribute('data-search-text', entry.searchText);
 
       /* Card structure (BEM subclasses; visual spec ported from the
          live .tombstone via the deals preset CSS scope):
-           __card-header  -> date row (top)
-           __card-media   -> logo container (background-image contain-fit)
-           __card-info    -> amount (deal value) + deal title + role (desc)
-           __card-bottom  -> status line (specialty|type / status) + Read more
+           __card-header  → date row (top)
+           __card-media   → logo container (background-image contain-fit)
+           __card-info    → amount (deal value) + deal title + role (desc)
+           __card-bottom  → status line (specialty|type / status) + Read more
          Subclasses __card-value / __card-status / __card-link are new;
          __card-title / __card-description collide with CI tile classes and get
          re-styled under the .rbccm-filtered-content--deals-and-transactions
          scope. */
       var logoHtml = entry.thumbnail
-        ? '<div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--deal"><div class="rbccm-filtered-content__card-logo rbccm-filtered-content__card-logo--deal" style="background-image:url(\'' + esc(entry.thumbnail) + '\')"></div></div>'
+        ? '<div class="rbccm-filtered-content__card-media"><div class="rbccm-filtered-content__card-logo" style="background-image:url(\'' + esc(entry.thumbnail) + '\')"></div></div>'
         : '';
 
       var typeLabel = entry.specialty || entry.transactionType || '';
@@ -2339,33 +2319,24 @@
       else if (typeLabel)                  statusLineText = typeLabel;
       else if (entry.statusLabel)          statusLineText = entry.statusLabel;
 
-      /* Role line, as on the live tombstone: the role, plus " / Pending"
-         when the deal isn't closed. It sits in the bottom row where the
-         type / status line used to be; that line now sits in the info
-         block and is hidden by CSS. */
-      var roleLineText = entry.role || '';
-      if (entry.status && entry.status !== 'closed' && entry.statusLabel) {
-        roleLineText = roleLineText ? roleLineText + ' / ' + entry.statusLabel : entry.statusLabel;
-      }
-
       var linkAriaLabel = entry.role
         ? 'Link to ' + entry.role
         : 'Deal: ' + (entry.title || '');
 
       li.innerHTML =
         '<a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="' + esc(entry.href || '#') + '" title="' + esc(linkAriaLabel) + '" aria-label="' + esc(linkAriaLabel) + '">' +
-          '<div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">' +
-            '<p class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--deal">' + esc(entry.dateLabel || '') + '</p>' +
+          '<div class="rbccm-filtered-content__card-header">' +
+            '<p class="rbccm-filtered-content__card-date">' + esc(entry.dateLabel || '') + '</p>' +
           '</div>' +
           logoHtml +
-          '<div class="rbccm-filtered-content__card-info rbccm-filtered-content__card-info--deal">' +
-            '<p class="rbccm-filtered-content__card-value rbccm-filtered-content__card-value--deal">' + esc(entry.amount || '') + '</p>' +
-            (entry.title ? '<p class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--deal">' + esc(entry.title) + '</p>' : '') +
-            (statusLineText ? '<p class="rbccm-filtered-content__card-status rbccm-filtered-content__card-status--deal">' + esc(statusLineText) + '</p>' : '') +
+          '<div class="rbccm-filtered-content__card-info">' +
+            '<p class="rbccm-filtered-content__card-value">' + esc(entry.amount || '') + '</p>' +
+            (entry.title ? '<p class="rbccm-filtered-content__card-title">' + esc(entry.title) + '</p>' : '') +
+            (entry.role  ? '<p class="rbccm-filtered-content__card-description">' + esc(entry.role) + '</p>' : '') +
           '</div>' +
-          '<div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--deal">' +
-            (roleLineText ? '<p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--deal">' + esc(roleLineText) + '</p>' : '') +
-            '<p class="rbccm-filtered-content__card-link rbccm-filtered-content__card-link--deal">Read more</p>' +
+          '<div class="rbccm-filtered-content__card-bottom">' +
+            (statusLineText ? '<p class="rbccm-filtered-content__card-status">' + esc(statusLineText) + '</p>' : '') +
+            '<p class="rbccm-filtered-content__card-link">Read more</p>' +
           '</div>' +
         '</a>';
       return li;
@@ -2381,7 +2352,7 @@
     var role = child(node, 'role').trim();
     var status = child(node, 'status').trim().toLowerCase();
     var amount = child(node, 'amount').trim();
-    var specialty = child(node, 'specialty').trim();               /* "Senior Unsecured Notes" etc - populated on debt deals, empty on M&A */
+    var specialty = child(node, 'specialty').trim();               /* "Senior Unsecured Notes" etc — populated on debt deals, empty on M&A */
     var rawType = child(node, 'type').trim();
     var canonicalType = normalizeTransactionType(rawType);
 
@@ -2390,17 +2361,17 @@
     var statusLabel = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1);
 
     return {
-      title: title,                                     /* deal name - used for aria-label + card fallback */
+      title: title,                                     /* deal name — used for aria-label + card fallback */
       href: link,
       thumbnail: thumb,
-      dateLabel: formatMonthYear(dateStr),              /* "Aug 2026" - displayed at top of card */
+      dateLabel: formatMonthYear(dateStr),              /* "Aug 2026" — displayed at top of card */
       dateTs: parseMonthYearToTs(dateStr),              /* deterministic sort key (Date.parse of "Aug 2026" is browser-inconsistent) */
-      role: role,                                       /* "Sole Financial Adviser", "Active Bookrunner" - shown as desc */
+      role: role,                                       /* "Sole Financial Adviser", "Active Bookrunner" — shown as desc */
       status: statusNorm,
       statusLabel: statusLabel,
       amount: amount || 'Undisclosed',                  /* ensure something renders in the amount slot */
       specialty: specialty,                             /* takes precedence over canonicalType in the status line */
-      transactionType: canonicalType,                   /* "Mergers and Acquisitions" - filter dropdown value */
+      transactionType: canonicalType,                   /* "Mergers and Acquisitions" — filter dropdown value */
       transactionTypeSlug: canonicalType ? slugifyTransactionType(canonicalType) : '',
       year: parseYear(dateStr),
       searchText: (title + ' ' + role + ' ' + amount + ' ' + specialty + ' ' + (canonicalType || '')).toLowerCase()
@@ -2422,7 +2393,7 @@
 
 
 /* =========================================================================
-   PART 3 - Coordinator
+   PART 3 — Coordinator
    -------------------------------------------------------------------------
    For each `.rbccm-filtered-content` root on the page:
      1. Detect preset from the root modifier class (`--conference-insights`,
@@ -2443,7 +2414,7 @@
 
   var ENGINE = window.__rbccmFilteredContent || {};
   if (!ENGINE.bindFilter) {
-    console.warn('[rbccm-filtered-content] filter engine not loaded - bindFilter missing');
+    console.warn('[rbccm-filtered-content] filter engine not loaded — bindFilter missing');
     return;
   }
   var PRESET_ADAPTERS = ENGINE.PRESET_ADAPTERS || {};
@@ -2458,7 +2429,6 @@
     'data-empty-heading',
     'data-empty-message',
     'data-empty-message-emphasis',
-    'data-empty-message-subject',
     'data-empty-clear-label',
     'data-scroll-target',
     'data-available-years',

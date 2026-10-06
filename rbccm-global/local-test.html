@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="../rbccm-two-up-cards/rbccm-two-up-cards.css">
 <link rel="stylesheet" href="../rbccm-leadership/rbccm-leadership.css">
 <link rel="stylesheet" href="../rbccm-cta-band/rbccm-cta-band.css">
+<link rel="stylesheet" href="../rbccm-disclaimer/rbccm-disclaimer.css">
 <link rel="stylesheet" href="../rbccm-button/rbccm-button.css">
 <script src="../rbccm-animate/rbccm-animate.js"></script>
 <style>
@@ -285,6 +286,10 @@
     font-family: Roboto, sans-serif;
   }
 
+/* ---- rbccm-disclaimer ---- */
+.gl--rbccm-disclaimer{ margin: 0; font-family: Roboto, Arial, sans-serif; background: #E5E7EB; }
+.gl--rbccm-disclaimer .demo-note{ background: #FFF8DC; color: #333; font-size: 13px; line-height: 1.5; padding: 12px 23px; }
+
 /* ---- rbccm-button ---- */
 .gl--rbccm-button{ margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
 .gl--rbccm-button .demo-note{
@@ -337,7 +342,7 @@
 </head>
 <body data-picker-title="rbccm-global - all components" data-picker-default="all">
 
-<section class="gl gl--rbccm-hero" id="rbccm-hero" data-variant="Hero">
+<section class="gl gl--rbccm-hero" id="rbccm-hero" data-variant="Hero" data-build-component="rbccm-hero">
 <div class="gl__bar"><span class="gl__name">rbccm-hero</span><a class="gl__open" href="../rbccm-hero/rbccm-hero.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="MAAS + MATA">Variant A -- .rbccm-hero--maas-mata (centred, glow halo)</div>
 
@@ -443,7 +448,7 @@
 </section>
 </section>
 
-<section class="gl gl--rbccm-capability-cards" id="rbccm-capability-cards" data-variant="Capability cards">
+<section class="gl gl--rbccm-capability-cards" id="rbccm-capability-cards" data-variant="Capability cards" data-build-component="rbccm-capability-cards">
 <div class="gl__bar"><span class="gl__name">rbccm-capability-cards</span><a class="gl__open" href="../rbccm-capability-cards/local-test.html">Open standalone test &rarr;</a></div>
 <svg width="0" height="0" style="position:absolute;overflow:hidden;" aria-hidden="true" focusable="false">
     <defs>
@@ -547,7 +552,7 @@
   <div style="height: 80px;"></div>
 </section>
 
-<section class="gl gl--rbccm-awards" id="rbccm-awards" data-variant="Awards">
+<section class="gl gl--rbccm-awards" id="rbccm-awards" data-variant="Awards" data-build-component="rbccm-awards">
 <div class="gl__bar"><span class="gl__name">rbccm-awards</span><a class="gl__open" href="../rbccm-awards/local-test.html">Open standalone test &rarr;</a></div>
 <span class="demo-label" data-demo-variant="3-up">3 cards</span>
   <span class="demo-caption">Extracted from MAAS+MATA. Eyebrow via <code>SectionEyebrowText</code>, three cards, default navy background.</span>
@@ -704,7 +709,7 @@
   <div style="height: 80px;"></div>
 </section>
 
-<section class="gl gl--rbccm-video-poster" id="rbccm-video-poster" data-variant="Video poster">
+<section class="gl gl--rbccm-video-poster" id="rbccm-video-poster" data-variant="Video poster" data-build-component="rbccm-video-poster">
 <div class="gl__bar"><span class="gl__name">rbccm-video-poster</span><a class="gl__open" href="../rbccm-video-poster/local-test.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="With video (MAAS+MATA)">
   Poster + play button + Brightcove modal. <code>SpaceAbove</code> 75, <code>OverlapBelow</code> 200: the dark strip slides up under the image.
@@ -727,7 +732,7 @@
 </div>
 </section>
 
-<section class="gl gl--rbccm-section-group" id="rbccm-section-group" data-variant="Section group">
+<section class="gl gl--rbccm-section-group" id="rbccm-section-group" data-variant="Section group" data-build-component="rbccm-section-group">
 <div class="gl__bar"><span class="gl__name">rbccm-section-group</span><a class="gl__open" href="../rbccm-section-group/local-test.html">Open standalone test &rarr;</a></div>
 <div class="demo-note">
   Each block below sits in its own <code>.iw_component</code> div, like TeamSite outputs them, with no wrapper in the source.
@@ -766,7 +771,7 @@
 </div>
 </section>
 
-<section class="gl gl--rbccm-intro-statement" id="rbccm-intro-statement" data-variant="Intro statement">
+<section class="gl gl--rbccm-intro-statement" id="rbccm-intro-statement" data-variant="Intro statement" data-build-component="rbccm-intro-statement">
 <div class="gl__bar"><span class="gl__name">rbccm-intro-statement</span><a class="gl__open" href="../rbccm-intro-statement/local-test.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="MAAS+MATA (in dark strip)">Default content, transparent background, inside the dark-strip wrapper (what rbccm-section-group builds on the page).</div>
 <div class="rbccm-section-group rbccm-section-group--dark-strip" style="--rbccm-sg-pad-top: 0px;">
@@ -778,7 +783,7 @@
 <section class="rbccm-intro-statement" aria-label="Built for what comes next." style="--rbccm-is-bg: #051B38;"><div class="rbccm-intro-statement__inner"><h2 class="rbccm-intro-statement__heading" data-animate="fadeInUp"><span class="rbccm-intro-statement__heading-lead">Built for</span><span class="rbccm-intro-statement__heading-highlight"><span class="rbccm-intro-statement__heading-accent">what comes next.</span></span></h2><div class="rbccm-intro-statement__body" data-animate="fadeInUp" data-animate-delay="150"><p>Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</p></div></div></section>
 </section>
 
-<section class="gl gl--rbccm-numbered-features" id="rbccm-numbered-features" data-variant="Numbered features">
+<section class="gl gl--rbccm-numbered-features" id="rbccm-numbered-features" data-variant="Numbered features" data-build-component="rbccm-numbered-features">
 <div class="gl__bar"><span class="gl__name">rbccm-numbered-features</span><a class="gl__open" href="../rbccm-numbered-features/local-test.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="MAAS+MATA">Default MAAS+MATA content ("Innovation for the next execution era").</div>
 <section class="rbccm-numbered-features" aria-label="Innovation for the next execution era"><div class="rbccm-numbered-features__inner"><div class="rbccm-numbered-features__header" data-animate="fadeInUp"><h2 class="rbccm-numbered-features__heading">Innovation for the next execution era</h2><p class="rbccm-numbered-features__intro">Technology, scale and multi-asset expertise &#8212; engineered to help you execute with confidence.</p></div><ul class="rbccm-numbered-features__grid" data-stagger-parent="fadeInUp" data-stagger-step="120"><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/01</p><h3 class="rbccm-numbered-features__title">Model with depth</h3><p class="rbccm-numbered-features__body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</p></li><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/02</p><h3 class="rbccm-numbered-features__title">Connect with ease</h3><p class="rbccm-numbered-features__body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform &#8212; without rebuilding your stack or retraining your team.</p></li><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/03</p><h3 class="rbccm-numbered-features__title">Optimize with experts</h3><p class="rbccm-numbered-features__body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</p></li></ul></div></section>
@@ -788,7 +793,7 @@
 <section class="rbccm-numbered-features" aria-label="Innovation for the next execution era" style="--rbccm-nf-bg: #FFFFFF;"><div class="rbccm-numbered-features__inner"><div class="rbccm-numbered-features__header" data-animate="fadeInUp"><h2 class="rbccm-numbered-features__heading">Innovation for the next execution era</h2></div><ul class="rbccm-numbered-features__grid" data-stagger-parent="fadeInUp" data-stagger-step="120"><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/01</p><h3 class="rbccm-numbered-features__title">Model with depth</h3><p class="rbccm-numbered-features__body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</p></li><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/02</p><h3 class="rbccm-numbered-features__title">Connect with ease</h3><p class="rbccm-numbered-features__body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform &#8212; without rebuilding your stack or retraining your team.</p></li><li class="rbccm-numbered-features__item"><p class="rbccm-numbered-features__number" aria-hidden="true">/03</p><h3 class="rbccm-numbered-features__title">Optimize with experts</h3><p class="rbccm-numbered-features__body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</p></li></ul></div></section>
 </section>
 
-<section class="gl gl--rbccm-platforms" id="rbccm-platforms" data-variant="Platforms">
+<section class="gl gl--rbccm-platforms" id="rbccm-platforms" data-variant="Platforms" data-build-component="rbccm-platforms">
 <div class="gl__bar"><span class="gl__name">rbccm-platforms</span><a class="gl__open" href="../rbccm-platforms/rbccm-platforms.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="Strategy &amp; Economics">Variant -- .rbccm-platforms __ strategy-and-economics-platforms</div>
 
@@ -963,7 +968,7 @@
 </section>
 </section>
 
-<section class="gl gl--rbccm-two-up-cards" id="rbccm-two-up-cards" data-variant="Two-up cards">
+<section class="gl gl--rbccm-two-up-cards" id="rbccm-two-up-cards" data-variant="Two-up cards" data-build-component="rbccm-two-up-cards">
 <div class="gl__bar"><span class="gl__name">rbccm-two-up-cards</span><a class="gl__open" href="../rbccm-two-up-cards/local-test.html">Open standalone test &rarr;</a></div>
 <span class="demo-label" data-demo-variant="Features">Skin: rbccm-two-up-cards--features.xsl</span>
   <span class="demo-caption">MAAS+MATA parity. Dark section, one <code>--dark</code> card + one <code>--light</code> card, 5-slot bullet list per card.</span>
@@ -1058,7 +1063,7 @@
   <div style="height: 80px;"></div>
 </section>
 
-<section class="gl gl--rbccm-leadership" id="rbccm-leadership" data-variant="Leadership">
+<section class="gl gl--rbccm-leadership" id="rbccm-leadership" data-variant="Leadership" data-build-component="rbccm-leadership">
 <div class="gl__bar"><span class="gl__name">rbccm-leadership</span><a class="gl__open" href="../rbccm-leadership/local-test.html">Open standalone test &rarr;</a></div>
 <div class="lead-picker">
     <p class="lead-picker__title">Leadership carousel — variant picker</p>
@@ -1327,7 +1332,7 @@
   </section>
 </section>
 
-<section class="gl gl--rbccm-cta-band" id="rbccm-cta-band" data-variant="CTA band">
+<section class="gl gl--rbccm-cta-band" id="rbccm-cta-band" data-variant="CTA band" data-build-component="rbccm-cta-band">
 <div class="gl__bar"><span class="gl__name">rbccm-cta-band</span><a class="gl__open" href="../rbccm-cta-band/rbccm-cta-band.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="MAAS+MATA">
   Variant — .rbccm-cta-band--maas-mata
@@ -1439,7 +1444,17 @@
 </section>
 </section>
 
-<section class="gl gl--rbccm-button" id="rbccm-button" data-variant="Button">
+<section class="gl gl--rbccm-disclaimer" id="rbccm-disclaimer" data-variant="Disclaimer" data-build-component="rbccm-disclaimer">
+<div class="gl__bar"><span class="gl__name">rbccm-disclaimer</span><a class="gl__open" href="../rbccm-disclaimer/local-test.html">Open standalone test &rarr;</a></div>
+<div class="demo-note" data-demo-variant="Default (white)">Default: white background.</div>
+<div class="rbccm-disclaimer"><div class="rbccm-disclaimer__inner"><p class="rbccm-disclaimer__text">This advertisement is for informational purposes only. RBC Capital Markets is a registered trademark of Royal Bank of Canada. RBC Capital Markets is the global brand name for the capital markets business of Royal Bank of Canada and its affiliates, including RBC Capital Markets, LLC (member FINRA, NYSE, and SIPC); RBC Dominion Securities Inc. (member CIRO and CIPF), RBC Europe Limited authorized by the Prudential Regulation Authority (&#8220;PRA&#8221;) and regulated by the Financial Conduct Authority and PRA, and RBC Capital Markets (Europe) GmbH authorized by BaFin. &#174; Registered trademark of Royal Bank of Canada. Used under license. &#169; Copyright 2020. All rights reserved.</p></div></div>
+
+
+<div class="demo-note" data-demo-variant="Background colour">Background colour field set to #F1F5FB.</div>
+<div class="rbccm-disclaimer" style="--rbccm-disclaimer-bg: #F1F5FB;"><div class="rbccm-disclaimer__inner"><p class="rbccm-disclaimer__text">This advertisement is for informational purposes only. RBC Capital Markets is a registered trademark of Royal Bank of Canada. RBC Capital Markets is the global brand name for the capital markets business of Royal Bank of Canada and its affiliates, including RBC Capital Markets, LLC (member FINRA, NYSE, and SIPC); RBC Dominion Securities Inc. (member CIRO and CIPF), RBC Europe Limited authorized by the Prudential Regulation Authority (&#8220;PRA&#8221;) and regulated by the Financial Conduct Authority and PRA, and RBC Capital Markets (Europe) GmbH authorized by BaFin. &#174; Registered trademark of Royal Bank of Canada. Used under license. &#169; Copyright 2020. All rights reserved.</p></div></div>
+</section>
+
+<section class="gl gl--rbccm-button" id="rbccm-button" data-variant="Button" data-build-component="rbccm-button">
 <div class="gl__bar"><span class="gl__name">rbccm-button</span><a class="gl__open" href="../rbccm-button/local-test.html">Open standalone test &rarr;</a></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z"/></symbol>
@@ -1503,7 +1518,7 @@
 </section>
 </section>
 
-<section class="gl gl--rbccm-animate" id="rbccm-animate" data-variant="Animate">
+<section class="gl gl--rbccm-animate" id="rbccm-animate" data-variant="Animate" data-build-component="rbccm-animate">
 <div class="gl__bar"><span class="gl__name">rbccm-animate</span><a class="gl__open" href="../rbccm-animate/local-test.html">Open standalone test &rarr;</a></div>
 <div class="demo-note" data-demo-variant="Hero (on load)">Variant -- data-animate-hero (fires on page load, staggered by data-animate-delay)</div>
 <section class="demo-stage">
