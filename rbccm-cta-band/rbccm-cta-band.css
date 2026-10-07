@@ -48,7 +48,7 @@
   --rbccm-cta-band-gold:       #FFC72C;
   --rbccm-cta-band-white:      #FFFFFF;
   --rbccm-cta-band-gray:       #D7D7D7;
-  --rbccm-cta-band-serif:      "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --rbccm-cta-band-serif:      RBCDisplay, Georgia, Times, serif; /* same stack as --rbccm-hero-serif */
   --rbccm-cta-band-sans:       Roboto, Arial, sans-serif;
 
   /* Variant-swappable tokens. */
@@ -100,9 +100,14 @@
   }
 }
 
-/* Font-family lock on tag-pickable heading. Defends against
-   unified.css tag-level rules stripping RBCDisplay on h1..h6. */
-.rbccm-cta-band .rbccm-cta-band__heading {
+/* Font-family lock on tag-pickable heading and its lead/highlight
+   spans. Defends against unified.css tag-level rules stripping
+   RBCDisplay on h1..h6, and the site's global `* { font-family:
+   Roboto }` rule, which hits the inner spans directly and beats
+   inheritance from the heading. Same approach as the hero's
+   __title / __title-line lock. */
+.rbccm-cta-band .rbccm-cta-band__heading,
+.rbccm-cta-band .rbccm-cta-band__heading span {
   font-family: var(--rbccm-cta-band-serif) !important;
   letter-spacing: 0 !important;
 }
@@ -451,7 +456,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    desktop (MAAS+MATA caps the CMS at ~25 chars so a single line fits). */
 .rbccm-cta-band--maas-mata .rbccm-cta-band__heading {
   color: #FFFFFF !important;
-  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
+  font-family: var(--rbccm-cta-band-serif) !important;
   font-size: 50px !important;
   font-style: normal !important;
   font-weight: 500 !important;
@@ -614,7 +619,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
    display: block hack. */
 .rbccm-cta-band--us-credentials .rbccm-cta-band__heading {
   color: #FFFFFF !important;
-  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
+  font-family: var(--rbccm-cta-band-serif) !important;
   font-size: 50px !important;
   font-style: normal !important;
   font-weight: 500 !important;
@@ -729,7 +734,7 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
 
 .rbccm-cta-band--strategy-and-economics .rbccm-cta-band__heading {
   color: #FFFFFF !important;
-  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
+  font-family: var(--rbccm-cta-band-serif) !important;
   font-size: 28px !important;
   font-style: normal !important;
   font-weight: 400 !important;
