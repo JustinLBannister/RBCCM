@@ -23,6 +23,35 @@
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
 
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <!-- === Datum reads ======================================= -->
@@ -44,6 +73,8 @@
     <xsl:variable name="CTA1_HREF"         select="normalize-space(//Datum[@ID='Cta1Href'])"/>
     <xsl:variable name="CTA2_LABEL"        select="normalize-space(//Datum[@ID='Cta2Label'])"/>
     <xsl:variable name="CTA2_HREF"         select="normalize-space(//Datum[@ID='Cta2Href'])"/>
+    <xsl:variable name="CTA1_ARIA"         select="normalize-space(//Datum[@ID='Cta1AriaLabel'])"/>
+    <xsl:variable name="CTA2_ARIA"         select="normalize-space(//Datum[@ID='Cta2AriaLabel'])"/>
 
     <xsl:variable name="SECTION_ID"        select="normalize-space(//Datum[@ID='SectionId'])"/>
     <xsl:variable name="SECTION_ARIA"      select="normalize-space(//Datum[@ID='SectionAriaLabel'])"/>
@@ -82,9 +113,20 @@
       <xsl:if test="$SECTION_ID != ''">
         <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
       </xsl:if>
-      <xsl:if test="$SECTION_ARIA != ''">
-        <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
-      </xsl:if>
+      <!-- A section only becomes a named region for screen readers when
+           it has a label. Blank field: fall back to the eyebrow, then the
+           heading, so the band is never an unnamed section. -->
+      <xsl:choose>
+        <xsl:when test="$SECTION_ARIA != ''">
+          <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$EYEBROW != ''">
+          <xsl:attribute name="aria-label"><xsl:value-of select="$EYEBROW"/></xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$HEADING_LEAD != '' or $HEADING_HIGHLIGHT != ''">
+          <xsl:attribute name="aria-label"><xsl:value-of select="normalize-space(concat($HEADING_LEAD, ' ', $HEADING_HIGHLIGHT))"/></xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
 
       <div class="rbccm-cta-band__inner">
 
@@ -116,7 +158,7 @@
               </xsl:call-template>
               <xsl:if test="$BODY_NORM != ''">
                 <p class="rbccm-cta-band__body" data-json-html="body">
-                  <xsl:value-of select="$BODY" disable-output-escaping="yes"/>
+                  <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$BODY"/></xsl:call-template>
                 </p>
               </xsl:if>
             </div>
@@ -129,7 +171,7 @@
             </xsl:call-template>
             <xsl:if test="$BODY_NORM != ''">
               <p class="rbccm-cta-band__body" data-json-html="body">
-                <xsl:value-of select="$BODY" disable-output-escaping="yes"/>
+                <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$BODY"/></xsl:call-template>
               </p>
             </xsl:if>
           </xsl:otherwise>
@@ -147,6 +189,7 @@
             <xsl:if test="$CTA1_LABEL != ''">
               <a class="rbccm-cta-band__btn rbccm-cta-band__btn--primary" data-json-attr-href="cta.href">
                 <xsl:attribute name="href"><xsl:value-of select="$CTA1_HREF"/></xsl:attribute>
+                <xsl:if test="$CTA1_ARIA != ''"><xsl:attribute name="aria-label"><xsl:value-of select="$CTA1_ARIA"/></xsl:attribute></xsl:if>
                 <span data-json="cta.label"><xsl:value-of select="$CTA1_LABEL"/></span>
                 <svg class="rbccm-cta-band__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M1.4375 11.5C1.4375 11.3094 1.51323 11.1266 1.64802 10.9918C1.78281 10.857 1.96563 10.7812 2.15625 10.7812H19.1087L14.5849 6.25887C14.4499 6.12391 14.3741 5.94086 14.3741 5.74999C14.3741 5.55913 14.4499 5.37608 14.5849 5.24112C14.7198 5.10616 14.9029 5.03033 15.0938 5.03033C15.2846 5.03033 15.4677 5.10616 15.6026 5.24112L21.3526 10.9911C21.4196 11.0579 21.4727 11.1372 21.5089 11.2245C21.5451 11.3118 21.5638 11.4055 21.5638 11.5C21.5638 11.5945 21.5451 11.6881 21.5089 11.7755C21.4727 11.8628 21.4196 11.9421 21.3526 12.0089L15.6026 17.7589C15.4677 17.8938 15.2846 17.9696 15.0938 17.9696C14.9029 17.9696 14.7198 17.8938 14.5849 17.7589C14.4499 17.6239 14.3741 17.4409 14.3741 17.25C14.3741 17.0591 14.4499 16.8761 14.5849 16.7411L19.1087 12.2187H2.15625C1.96563 12.2187 1.78281 12.143 1.64802 12.0082C1.51323 11.8734 1.4375 11.6906 1.4375 11.5Z" fill="currentColor"/>
@@ -157,6 +200,7 @@
             <xsl:if test="$CTA2_LABEL != ''">
               <a class="rbccm-cta-band__btn rbccm-cta-band__btn--secondary" data-json-attr-href="cta2.href">
                 <xsl:attribute name="href"><xsl:value-of select="$CTA2_HREF"/></xsl:attribute>
+                <xsl:if test="$CTA2_ARIA != ''"><xsl:attribute name="aria-label"><xsl:value-of select="$CTA2_ARIA"/></xsl:attribute></xsl:if>
                 <span data-json="cta2.label"><xsl:value-of select="$CTA2_LABEL"/></span>
               </a>
             </xsl:if>
