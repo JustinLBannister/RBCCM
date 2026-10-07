@@ -777,6 +777,49 @@
 }
 
 
+/* Whole-card link (video-callouts). The card is one <a> so it is a
+   single tab stop and screen readers hear the full card text; the media
+   and "Watch the video" are visual parts of that link. Hover and keyboard
+   focus on the card drive the effects that used to sit on the separate
+   play button and CTA link. `a.` prefix + !important beat the site's
+   Bootstrap a:hover / a:focus underline and colour. */
+a.rbccm-two-up-cards__card--link,
+a.rbccm-two-up-cards__card--link:link,
+a.rbccm-two-up-cards__card--link:visited,
+a.rbccm-two-up-cards__card--link:hover,
+a.rbccm-two-up-cards__card--link:focus,
+a.rbccm-two-up-cards__card--link:active {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+a.rbccm-two-up-cards__card--link {
+  cursor: pointer;
+}
+a.rbccm-two-up-cards__card--link:focus {
+  outline: none;
+}
+a.rbccm-two-up-cards__card--link:focus-visible {
+  outline: 3px solid #0051A5 !important;
+  outline-offset: 3px;
+}
+.rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-media img,
+.rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-media img {
+  transform: scale(1.03);
+}
+.rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-play,
+.rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-play {
+  transform: translate(-50%, -50%) scale(1.05);
+  background: rgba(0, 49, 104, 0.6);
+}
+.rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-cta span,
+.rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-cta span {
+  text-decoration-color: currentColor;
+}
+.rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-cta svg,
+.rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-cta svg {
+  transform: translateX(4px);
+}
+
 /* =========================================================================
    4. Video modal
    =========================================================================
@@ -885,7 +928,10 @@
     opacity: 1 !important;
     transform: none !important;
   }
-  .rbccm-two-up-cards__card-media:hover img {
+  .rbccm-two-up-cards__card-media:hover img,
+  .rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-media img,
+  .rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-media img,
+  .rbccm-two-up-cards__card--link .rbccm-two-up-cards__card-cta svg {
     transform: none !important;
   }
   /* Play button: keep the centring translate (transform:none would
@@ -895,6 +941,8 @@
   .rbccm-two-up-cards__card-play svg,
   .rbccm-two-up-cards__card-media:hover .rbccm-two-up-cards__card-play,
   .rbccm-two-up-cards__card-media:focus-visible .rbccm-two-up-cards__card-play,
+  .rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-play,
+  .rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-play,
   .rbccm-two-up-cards__card-play.is-launching {
     animation: none !important;
     transition: none !important;

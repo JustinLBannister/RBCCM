@@ -5,8 +5,11 @@
    Behavior
    =========================================================================
    Only needed for the video-callouts preset. Attaches a click handler on
-   any .rbccm-two-up-cards__card-media[data-video-url] element and opens a
-   Bootstrap-shaped modal with the video URL. The DOM shape mirrors the
+   any .rbccm-two-up-cards__card[data-video-url] (the whole-card link) and
+   opens a Bootstrap-shaped modal with the video URL. Older markup (a
+   .rbccm-two-up-cards__card-media[data-video-url] button plus a separate
+   "Watch the video" link) is still handled until every page is on the
+   current skin. The DOM shape mirrors the
    MAAS/MATA hero video modal (yellow top border, 8px), so the modal
    inherits site-standard Bootstrap CSS on production while carrying its
    own fallback CSS in rbccm-two-up-cards.css for local previews.
@@ -41,10 +44,10 @@
    - Focus is trapped inside the modal while open. Bootstrap handles the
      usual trap; the focus-guard span catches iframe Tab escapes.
    - ESC closes the modal (Bootstrap handles it; vanilla fallback wires it
-     manually) and returns focus to the play button that opened it.
+     manually) and returns focus to the card link that opened it.
    - Clicking the backdrop closes.
-   - Play trigger is a real button so screen readers and keyboard users
-     activate it the same way sighted users do.
+   - The whole card is one link, so it is a single tab stop and screen
+     readers hear the full card text. Enter opens the video.
    ========================================================================= */
 (function () {
   'use strict';
@@ -331,7 +334,19 @@
   document.addEventListener('click', function (e) {
     if (!e.target || !e.target.closest) return;
 
-    // 1. Media button (with data-video-url).
+    // 1. Whole-card link (current skin).
+    var cardTrigger = e.target.closest('a.rbccm-two-up-cards__card[data-video-url]');
+    if (cardTrigger) {
+      var cardUrl = cardTrigger.getAttribute('data-video-url');
+      if (cardUrl) {
+        e.preventDefault();
+        explodePlayButton(cardTrigger);
+        openModal(cardUrl, cardTrigger);
+      }
+      return;
+    }
+
+    // 2. Older markup: media button (with data-video-url).
     var mediaTrigger = e.target.closest('.rbccm-two-up-cards__card-media[data-video-url]');
     if (mediaTrigger) {
       e.preventDefault();
@@ -343,7 +358,7 @@
       return;
     }
 
-    // 2. "Watch the video" CTA - opens the same modal, reading the URL
+    // 3. Older markup: "Watch the video" CTA - opens the same modal, reading the URL
     //    from the sibling media button. Falls through to a plain link
     //    if the card has no video URL.
     var ctaTrigger = e.target.closest('.rbccm-two-up-cards__card-cta');

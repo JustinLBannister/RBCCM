@@ -58,7 +58,17 @@
 
   <!-- ============================================================
        renderVideoCard  (Preset = video-callouts)
-       Emits media (with play button) -> title -> subtitle -> body -> CTA.
+       The whole card is ONE link (accessibility review, Oct 2026): a
+       single tab stop whose accessible name is the full card text, in
+       place of the old play <button> plus "Watch the video" <a> that
+       did the same thing. Media, play icon and CTA are visual only.
+         - Video URL set: href is the video URL and data-video-url is
+           on the card; the JS opens the modal (no-JS falls back to the
+           video page).
+         - No video, CTA URL set: plain link to the CTA URL.
+         - Neither: a static <article>, no link.
+       Links typed into the body are stripped, since a link inside a
+       link is invalid HTML.
        ============================================================ -->
   <xsl:template name="renderVideoCard">
     <xsl:param name="n"/>
@@ -71,35 +81,42 @@
     <xsl:param name="ctaLabel"/>
     <xsl:param name="ctaHref"/>
 
-    <article class="rbccm-two-up-cards__card">
-
-      <!-- Media zone. Rendered as a button when videoUrl is set so
-           screen readers understand it's actionable and it takes
-           keyboard focus. When no videoUrl, renders as a plain img
-           with no play overlay. Play SVG uses Figma's 56x56 viewBox
-           and its triangle path (path fill white sits over the CSS
-           navy-45%-fill + backdrop-blur circle on __card-play). -->
+    <xsl:variable name="cardHref">
       <xsl:choose>
-        <xsl:when test="$videoUrl != ''">
-          <button type="button" class="rbccm-two-up-cards__card-media" data-video-url="{$videoUrl}" aria-label="Play video: {$title}">
-            <img alt="{$mediaAlt}" loading="lazy" decoding="async">
-              <xsl:attribute name="src"><xsl:value-of select="$mediaPath"/></xsl:attribute>
-            </img>
+        <xsl:when test="$videoUrl != ''"><xsl:value-of select="$videoUrl"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$ctaHref"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:element name="{normalize-space(substring('a      article', 1 + 7 * number($cardHref = ''), 7))}">
+      <xsl:attribute name="class">
+        <xsl:text>rbccm-two-up-cards__card</xsl:text>
+        <xsl:if test="$cardHref != ''"><xsl:text> rbccm-two-up-cards__card--link</xsl:text></xsl:if>
+      </xsl:attribute>
+      <xsl:if test="$cardHref != ''">
+        <xsl:attribute name="href"><xsl:value-of select="$cardHref"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$videoUrl != ''">
+        <xsl:attribute name="data-video-url"><xsl:value-of select="$videoUrl"/></xsl:attribute>
+      </xsl:if>
+
+      <!-- Media zone. Play icon only when there is a video. Play SVG
+           uses Figma's 56x56 viewBox and triangle path (white path
+           over the CSS navy-45% fill + backdrop-blur circle). -->
+      <xsl:if test="$mediaPath != ''">
+        <div class="rbccm-two-up-cards__card-media">
+          <img alt="{$mediaAlt}" loading="lazy" decoding="async">
+            <xsl:attribute name="src"><xsl:value-of select="$mediaPath"/></xsl:attribute>
+          </img>
+          <xsl:if test="$videoUrl != ''">
             <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true">
                 <path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/>
               </svg>
             </span>
-          </button>
-        </xsl:when>
-        <xsl:when test="$mediaPath != ''">
-          <div class="rbccm-two-up-cards__card-media">
-            <img alt="{$mediaAlt}" loading="lazy" decoding="async">
-              <xsl:attribute name="src"><xsl:value-of select="$mediaPath"/></xsl:attribute>
-            </img>
-          </div>
-        </xsl:when>
-      </xsl:choose>
+          </xsl:if>
+        </div>
+      </xsl:if>
 
       <!-- Content: text group at top (title-block + body), CTA pinned
            at bottom via parent justify-content: space-between. -->
@@ -112,29 +129,43 @@
             </xsl:if>
           </div>
           <xsl:variable name="bodyText"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$body"/></xsl:call-template></xsl:variable>
-      <xsl:if test="normalize-space(translate($bodyText, '&#160;&amp;nbsp;', '')) != ''">
-            <p class="rbccm-two-up-cards__card-body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$body"/></xsl:call-template></p>
+          <xsl:if test="normalize-space(translate($bodyText, '&#160;&amp;nbsp;', '')) != ''">
+            <xsl:variable name="bodyNoLinks"><xsl:call-template name="rbccmStripAnchors"><xsl:with-param name="s" select="string($body)"/></xsl:call-template></xsl:variable>
+            <p class="rbccm-two-up-cards__card-body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$bodyNoLinks"/></xsl:call-template></p>
           </xsl:if>
         </div>
 
         <xsl:if test="$ctaLabel != ''">
-          <a class="rbccm-two-up-cards__card-cta">
-            <xsl:attribute name="href">
-              <xsl:choose>
-                <xsl:when test="$ctaHref != ''"><xsl:value-of select="$ctaHref"/></xsl:when>
-                <xsl:otherwise>#</xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
+          <span class="rbccm-two-up-cards__card-cta">
             <span><xsl:value-of select="$ctaLabel"/></span>
             <!-- Figma arrow icon (16x16, fill via currentColor so the
                  link colour flows through to the glyph). -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/>
             </svg>
-          </a>
+          </span>
         </xsl:if>
       </div>
-    </article>
+    </xsl:element>
+  </xsl:template>
+
+  <!-- Removes <a ...> and </a> tags from rich text so the body can sit
+       inside the card link. The link text itself is kept. -->
+  <xsl:template name="rbccmStripAnchors">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;a ') and contains(substring-after($s, '&lt;a '), '&gt;')">
+        <xsl:call-template name="rbccmStripAnchors">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;a '), substring-after(substring-after($s, '&lt;a '), '&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;/a&gt;')">
+        <xsl:call-template name="rbccmStripAnchors">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;/a&gt;'), substring-after($s, '&lt;/a&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- ============================================================
