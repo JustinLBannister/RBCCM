@@ -18,6 +18,35 @@
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
   <!-- Tag allow-list guard. -->
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="pickTag">
     <xsl:param name="raw"/>
     <xsl:param name="default"/>
@@ -84,7 +113,7 @@
       <xsl:if test="$subtitle != ''">
         <p class="rbccm-capability-cards__subtitle"><xsl:value-of select="$subtitle"/></p>
       </xsl:if>
-      <p class="rbccm-capability-cards__body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
+      <p class="rbccm-capability-cards__body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$body"/></xsl:call-template></p>
       <!-- CTA chip. Rendered whenever a label is present - the parent
            renderCard branch has already decided whether the card is an
            <a> (link semantics live on the card, not the chip) or a
@@ -120,14 +149,11 @@
     <xsl:if test="$title != ''">
       <xsl:choose>
         <xsl:when test="$ctaHref != ''">
-          <!-- Anchor variant: whole card is the link. aria-label sets
-               a descriptive accessible name combining title + CTA. -->
+          <!-- Anchor variant: whole card is the link. No aria-label:
+               screen readers read the card's own text (title, body,
+               CTA) as the link name (Oct 2026 accessibility review). -->
           <a class="rbccm-capability-cards__card">
             <xsl:attribute name="href"><xsl:value-of select="$ctaHref"/></xsl:attribute>
-            <xsl:attribute name="aria-label">
-              <xsl:value-of select="$title"/>
-              <xsl:if test="$ctaLabel != ''"> &#8212; <xsl:value-of select="$ctaLabel"/></xsl:if>
-            </xsl:attribute>
             <xsl:call-template name="renderCardContent">
               <xsl:with-param name="iconType" select="$iconType"/>
               <xsl:with-param name="title"    select="$title"/>
@@ -259,7 +285,7 @@
           </xsl:if>
           <xsl:if test="$DESCRIPTION != ''">
             <p class="rbccm-capability-cards__description" data-animate="fadeInUp" data-animate-delay="240">
-              <xsl:value-of select="$DESCRIPTION" disable-output-escaping="yes"/>
+              <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$DESCRIPTION"/></xsl:call-template>
             </p>
           </xsl:if>
         </div>
@@ -294,7 +320,7 @@
                 <p class="rbccm-capability-cards__subtitle"><xsl:value-of select="$W_SUBTITLE"/></p>
               </xsl:if>
               <xsl:if test="normalize-space($W_BODY) != ''">
-                <p class="rbccm-capability-cards__body"><xsl:value-of select="$W_BODY" disable-output-escaping="yes"/></p>
+                <p class="rbccm-capability-cards__body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$W_BODY"/></xsl:call-template></p>
               </xsl:if>
             </div>
           </article>
