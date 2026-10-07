@@ -57,6 +57,35 @@
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
   <!-- Tag allow-list guard. -->
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="pickTag">
     <xsl:param name="raw"/>
     <xsl:param name="default"/>
@@ -133,7 +162,7 @@
         <xsl:if test="normalize-space($bodyText) != ''">
           <xsl:element name="{$bodyTag}">
             <xsl:attribute name="class">rbccm-platforms__card-body</xsl:attribute>
-            <xsl:value-of select="$bodyText" disable-output-escaping="yes"/>
+            <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$bodyText"/></xsl:call-template>
           </xsl:element>
         </xsl:if>
       </div>
@@ -297,7 +326,7 @@
                   <xsl:attribute name="id"><xsl:value-of select="$TITLE_ID"/></xsl:attribute>
                   <!-- Scroll-triggered reveal driven by rbccm-animate/rbccm-animate.js. -->
                   <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
-                  <xsl:value-of select="$TITLE_TEXT" disable-output-escaping="yes"/>
+                  <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$TITLE_TEXT"/></xsl:call-template>
                 </xsl:element>
               </xsl:if>
               <xsl:if test="$SUBTITLE_TEXT != ''">
@@ -305,7 +334,7 @@
                   <xsl:attribute name="class">rbccm-platforms__subtitle</xsl:attribute>
                   <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
                   <xsl:attribute name="data-animate-delay">250</xsl:attribute>
-                  <xsl:value-of select="$SUBTITLE_TEXT" disable-output-escaping="yes"/>
+                  <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SUBTITLE_TEXT"/></xsl:call-template>
                 </xsl:element>
               </xsl:if>
             </div>
