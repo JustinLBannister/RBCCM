@@ -3,8 +3,8 @@
   <!-- Skin: RBCCM Upcoming Conference Programming
        - Pulls from the centralized Events List Datum (same source as the
          conferences hub table at /en/conference/upcoming-and-past-conferences.page).
-       - Filters to events where sitelocation contains 'conference', event_date is
-         in the current year, and event_date >= today.
+       - Filters to events where sitelocation contains 'conference' and the
+         event has not ended (any year, so next year's events show too).
        - Sorts ascending by event_date.
        - Renders ALL matching events into the DOM. CSS hides cards beyond index 6
          by default; JS uses the full set for search/filter show-hide.
@@ -29,7 +29,7 @@
  
     <!-- Source: centralized Events List Datum, filtered inline to:
            - conference events only (sitelocation contains 'conference')
-           - current year (event_date year = today's year)
+           - any year (no current-year cap, so next year's events show)
            - NOT fully ended: keep "happening now" + "future" events.
              A conference is shown if EITHER:
                * its start date (event_date) is >= today, OR
@@ -39,7 +39,6 @@
          This is a node-set, so the card + modal loops sort it directly with xsl:sort. -->
     <xsl:variable name="events" select="/Properties/Data/Datum[@Name='Events List']/DCR/events/event[
         contains(sitelocation, 'conference')
-        and substring(event_date, 1, 4) = $CURRENT_YEAR
         and (
           number(concat(substring(event_date, 1, 4), substring(event_date, 6, 2), substring(event_date, 9, 2))) &gt;= number($CURRENT_DATE)
           or (
