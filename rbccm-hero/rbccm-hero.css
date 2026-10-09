@@ -140,6 +140,8 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    the two stacks are visually identical and layer harmlessly.
    ========================================================================= */
 .rbccm-hero--maas-mata {
+  /* Clears the fixed site navbar; 170px from 992 up (below). */
+  padding-top: 140px;
   background-color: #fff;
   background-image:
     repeating-linear-gradient(
@@ -193,15 +195,14 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   background-position: 0 0, 0 0, -57.775px -57.775px;
   background-repeat: repeat, repeat, repeat;
 }
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata { padding-top: 170px; }
+}
 .rbccm-hero--maas-mata .rbccm-hero__container { text-align: center; }
 /* Same as the MAAS+MATA page: 75px below the button at every size
-   (the base block's desktop 120 is for the other variants).
-   Top: 140px at every size, clear of the fixed site navbar (65px
-   mobile, 99px desktop on live); the base 95/130 left ~30px. */
+   (the base block's desktop 120 is for the other variants). */
 .rbccm-hero--maas-mata {
   --rbccm-hero-pb-d: 75px;
-  --rbccm-hero-pt-m: 140px;
-  --rbccm-hero-pt-d: 140px;
 }
 
 /* Glow halo -- soft light-blue disc, blurred, sitting at top-centre
