@@ -195,9 +195,13 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 .rbccm-hero--maas-mata .rbccm-hero__container { text-align: center; }
 /* Same as the MAAS+MATA page: 75px below the button at every size
-   (the base block's desktop 120 is for the other variants). */
+   (the base block's desktop 120 is for the other variants).
+   Top: 140px at every size, clear of the fixed site navbar (65px
+   mobile, 99px desktop on live); the base 95/130 left ~30px. */
 .rbccm-hero--maas-mata {
   --rbccm-hero-pb-d: 75px;
+  --rbccm-hero-pt-m: 140px;
+  --rbccm-hero-pt-d: 140px;
 }
 
 /* Glow halo -- soft light-blue disc, blurred, sitting at top-centre
@@ -249,16 +253,11 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   font-weight: 500;
   line-height: 100%;
   color: var(--rbccm-hero-ink);
-  max-width: 342px;
   margin: 0 auto 12px;
-}
-@media (min-width: 768px) {
-  .rbccm-hero--maas-mata .rbccm-hero__title { max-width: 100%; }
 }
 @media (min-width: 992px) {
   .rbccm-hero--maas-mata .rbccm-hero__title {
     font-size: 75px;
-    max-width: none;
     margin: 0 0 20px;
   }
 }
@@ -1011,7 +1010,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
      the bg-video slot anchored to this section. */
 }
 @media (min-width: 992px) {
-  .rbccm-hero--us-credentials { padding: 218px 0 80px; }
+  .rbccm-hero--us-credentials { padding: 138px 0 0px; }
 }
 
 /* Bg-video slot - identical mechanics to the S+E variant so the
