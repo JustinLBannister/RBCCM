@@ -132,7 +132,7 @@
             </p>
           </xsl:if>
  
-          <!-- Filter / search bar (now active; JS populates Month + Region dropdowns
+          <!-- Filter / search bar (JS populates Month + Region dropdowns
                from rendered card data). Hidden via inline style when there are 6 or
                fewer rendered cards (all fit on screen, nothing to filter through);
                shown automatically when the count grows to 7+. -->
@@ -174,6 +174,9 @@
                 <xsl:attribute name="placeholder"><xsl:value-of select="$searchPlaceholder"/></xsl:attribute>
               </input>
             </label>
+            <!-- Clear filters (same reset as the empty-state button; styled like
+                 the Conference Insights filter-by reset, dark variant). -->
+            <button type="button" class="rbccm-upcoming-conferences__reset" id="rbccm-uc-reset">Clear filters</button>
           </div>
  
           <!-- Cards: ALL upcoming 2026 events rendered. CSS hides cards beyond
@@ -329,8 +332,8 @@
               <a class="rbccm-upcoming-conferences__cta">
                 <xsl:attribute name="href"><xsl:value-of select="$ctaHref"/></xsl:attribute>
                 <xsl:if test="starts-with($ctaHref, '#')">
-                  <xsl:attribute name="data-toggle">modal</xsl:attribute>
-                  <xsl:attribute name="data-target"><xsl:value-of select="$ctaHref"/></xsl:attribute>
+                  <xsl:attribute name="data-bs-toggle">modal</xsl:attribute>
+                  <xsl:attribute name="data-bs-target"><xsl:value-of select="$ctaHref"/></xsl:attribute>
                 </xsl:if>
                 <xsl:attribute name="aria-label"><xsl:value-of select="$ctaText"/></xsl:attribute>
                 <xsl:value-of select="$ctaText"/>
@@ -348,7 +351,7 @@
           <div role="document" class="modal-dialog rbccm-upcoming-conferences__modal-dialog">
             <div class="modal-content rbccm-upcoming-conferences__modal-content">
               <div class="modal-header rbccm-upcoming-conferences__modal-header">
-                <button aria-label="Close Modal" class="close rbccm-upcoming-conferences__modal-close" type="button" data-dismiss="modal">&#215;</button>
+                <button aria-label="Close Modal" class="close rbccm-upcoming-conferences__modal-close" type="button" data-bs-dismiss="modal">&#215;</button>
               </div>
               <div class="modal-body rbccm-upcoming-conferences__modal-body">
  

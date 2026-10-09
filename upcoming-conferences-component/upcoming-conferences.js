@@ -33,7 +33,8 @@
     var $monthSel  = $section.find('#rbccm-uc-filter-month');
     var $regionSel = $section.find('#rbccm-uc-filter-region');
     var $empty     = $section.find('#rbccm-uc-empty');
-    var $clearBtn  = $section.find('#rbccm-uc-clear');
+    // Empty-state button + filter-bar button share one handler.
+    var $clearBtn  = $section.find('#rbccm-uc-clear, #rbccm-uc-reset');
 
     // Snapshot the original cards markup BEFORE slick ever touches it.
     // destroyCarousel() restores from this snapshot so each destroy lands clean.
@@ -274,7 +275,7 @@
     $monthSel.on('change', applyFilters);
     $regionSel.on('change', applyFilters);
 
-    // -- Clear filters button (lives inside the empty state) --
+    // -- Clear filters buttons (empty state + filter bar) --
     // Resets all three filter inputs and re-runs applyFilters, which:
     //   - flips filtersActive back to false
     //   - removes .is-filtered + .is-filtered-out classes
