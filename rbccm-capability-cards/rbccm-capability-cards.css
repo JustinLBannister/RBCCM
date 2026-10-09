@@ -806,7 +806,12 @@ a.rbccm-capability-cards__card:focus-visible .rbccm-capability-cards__cta {
   opacity: 1 !important;
   position: static !important;
   width: 11px !important;
-  transition: background-image 0.2s ease, box-shadow 0.2s ease, border-radius 0.2s ease;
+  /* Always round; the ring starts at 0 width on the dot edge and grows
+     out to 4px on activate (same zoom-in feel as the old box-shadow). */
+  border-radius: 50% !important;
+  outline: 0 solid #FFC72C !important;
+  outline-offset: 0 !important;
+  transition: background-image 0.2s ease, outline-width 0.2s ease, outline-offset 0.2s ease;
 }
 /* Active / hover / focus dot: filled white + 1px yellow ring 4px out.
    Outline + offset leaves a real gap, so the ring works on any section
