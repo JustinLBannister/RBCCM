@@ -83,6 +83,21 @@
     <xsl:variable name="SHOW_REGION" select="/Properties/Data/Datum[@ID='ShowRegion']"/>
     <xsl:variable name="SHOW_SEARCH" select="/Properties/Data/Datum[@ID='ShowSearch']"/>
 
+    <xsl:variable name="SHOW_REGIONTAG" select="/Properties/Data/Datum[@ID='ShowRegionTag']"/>
+
+    <!-- Section heading (all presets) + featured deal (deals preset). -->
+    <xsl:variable name="SECTION_HEADING" select="normalize-space(/Properties/Data/Datum[@ID='SectionHeading'])"/>
+    <xsl:variable name="FEATURED_IMAGE" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedImage']/Image/Path)"/>
+    <xsl:variable name="FEATURED_IMAGE_ALT" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedImageAlt'])"/>
+    <xsl:variable name="FEATURED_DATE" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedDate'])"/>
+    <xsl:variable name="FEATURED_TITLE" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedTitle'])"/>
+    <xsl:variable name="FEATURED_P1" select="/Properties/Data/Datum[@ID='FeaturedParagraph1']"/>
+    <xsl:variable name="FEATURED_P2" select="/Properties/Data/Datum[@ID='FeaturedParagraph2']"/>
+    <xsl:variable name="FEATURED_P3" select="/Properties/Data/Datum[@ID='FeaturedParagraph3']"/>
+    <xsl:variable name="FEATURED_LINK_URL" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedLinkUrl'])"/>
+    <xsl:variable name="FEATURED_LINK_LABEL" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedLinkLabel'])"/>
+    <xsl:variable name="FEATURED_LINK_NEW_TAB" select="normalize-space(/Properties/Data/Datum[@ID='FeaturedLinkNewTab'])"/>
+
     <!-- Asset paths + cache buster. Bump CacheVersion after publishing
          an updated sidecar CSS or JS so browsers pull the fresh copy. -->
     <xsl:variable name="CSS_PATH" select="/Properties/Data/Datum[@ID='CssPath']"/>
@@ -151,6 +166,66 @@
       <xsl:if test="$YEAR_FEED_TEMPLATE != ''">
         <xsl:attribute name="data-year-feed-template"><xsl:value-of select="$YEAR_FEED_TEMPLATE"/></xsl:attribute>
       </xsl:if>
+      <!-- Deals: per-option counts are built (hidden by CSS), matching
+           the transactions page filter. -->
+      <xsl:if test="$PRESET = 'deals-and-transactions'">
+        <xsl:attribute name="data-option-counts">true</xsl:attribute>
+      </xsl:if>
+
+      <!-- Section heading (all presets). Blank hides it. -->
+      <xsl:if test="$SECTION_HEADING != ''">
+        <h2 class="rbccm-filtered-content__heading"><xsl:value-of select="$SECTION_HEADING"/></h2>
+      </xsl:if>
+
+      <!-- Featured deal (deals preset only). Authored, not from the feed,
+           and outside the list, so the filters never hide it. Blank title
+           hides the whole block. Paragraphs are Textarea Datums and may
+           carry inline markup / entities, same as other RBCCM skins. -->
+      <xsl:if test="$PRESET = 'deals-and-transactions' and $FEATURED_TITLE != ''">
+        <div class="rbccm-filtered-content__featured rbccm-filtered-content__featured--deal">
+          <xsl:if test="$FEATURED_IMAGE != ''">
+            <div class="rbccm-filtered-content__featured-media rbccm-filtered-content__featured-media--deal">
+              <img class="rbccm-filtered-content__featured-image rbccm-filtered-content__featured-image--deal" loading="lazy">
+                <xsl:attribute name="src"><xsl:value-of select="$FEATURED_IMAGE"/></xsl:attribute>
+                <xsl:attribute name="alt"><xsl:value-of select="$FEATURED_IMAGE_ALT"/></xsl:attribute>
+              </img>
+            </div>
+          </xsl:if>
+          <div class="rbccm-filtered-content__featured-body rbccm-filtered-content__featured-body--deal">
+            <xsl:if test="$FEATURED_DATE != ''">
+              <p class="rbccm-filtered-content__featured-date rbccm-filtered-content__featured-date--deal"><xsl:value-of select="$FEATURED_DATE"/></p>
+            </xsl:if>
+            <!-- Yellow rule is the title's ::before (CSS), so no empty element
+                 that could be serialized as a self-closing span. -->
+            <h3 class="rbccm-filtered-content__featured-title rbccm-filtered-content__featured-title--deal"><xsl:value-of select="$FEATURED_TITLE"/></h3>
+            <xsl:if test="normalize-space($FEATURED_P1) != ''">
+              <p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal"><xsl:value-of select="$FEATURED_P1" disable-output-escaping="yes"/></p>
+            </xsl:if>
+            <xsl:if test="normalize-space($FEATURED_P2) != ''">
+              <p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal"><xsl:value-of select="$FEATURED_P2" disable-output-escaping="yes"/></p>
+            </xsl:if>
+            <xsl:if test="normalize-space($FEATURED_P3) != ''">
+              <p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal"><xsl:value-of select="$FEATURED_P3" disable-output-escaping="yes"/></p>
+            </xsl:if>
+            <xsl:if test="$FEATURED_LINK_URL != ''">
+              <a class="rbccm-filtered-content__featured-link rbccm-filtered-content__featured-link--deal">
+                <xsl:attribute name="href"><xsl:value-of select="$FEATURED_LINK_URL"/></xsl:attribute>
+                <xsl:if test="$FEATURED_LINK_NEW_TAB = 'true'">
+                  <xsl:attribute name="target">_blank</xsl:attribute>
+                  <xsl:attribute name="rel">noopener</xsl:attribute>
+                </xsl:if>
+                <span class="rbccm-filtered-content__featured-link-label rbccm-filtered-content__featured-link-label--deal">
+                  <xsl:choose>
+                    <xsl:when test="$FEATURED_LINK_LABEL != ''"><xsl:value-of select="$FEATURED_LINK_LABEL"/></xsl:when>
+                    <xsl:otherwise>Read more</xsl:otherwise>
+                  </xsl:choose>
+                </span>
+                <svg class="rbccm-filtered-content__featured-link-arrow rbccm-filtered-content__featured-link-arrow--deal" xmlns="http://www.w3.org/2000/svg" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true" focusable="false"><path d="M0.996 9.033L3.464 5.251C3.518 5.169 3.561 5.071 3.591 4.964C3.621 4.856 3.636 4.741 3.636 4.625C3.636 4.508 3.621 4.393 3.591 4.286C3.561 4.178 3.518 4.081 3.464 3.999L0.996 0.261C0.942 0.178 0.877 0.113 0.807 0.068C0.736 0.023 0.66 0 0.583 0C0.506 0 0.43 0.023 0.359 0.068C0.288 0.113 0.224 0.178 0.169 0.261C0.061 0.426 0 0.649 0 0.882C0 1.115 0.061 1.339 0.169 1.504L2.23 4.625L0.169 7.746C0.062 7.91 0.001 8.131 0.001 8.363C0 8.479 0.015 8.594 0.044 8.701C0.073 8.809 0.116 8.906 0.169 8.989C0.222 9.074 0.284 9.143 0.354 9.192C0.424 9.24 0.5 9.268 0.577 9.272C0.653 9.276 0.73 9.257 0.802 9.216C0.874 9.175 0.94 9.113 0.996 9.033Z" fill="currentColor"/></svg>
+              </a>
+            </xsl:if>
+          </div>
+        </div>
+      </xsl:if>
 
       <!-- Filter chrome (dropdowns + search + reset).
            A <div>, not a <section>: the outer .rbccm-filtered-content
@@ -200,7 +275,32 @@
                 </div>
               </xsl:if>
 
+              <!-- Deals: Transaction type (options + order come from the JS). -->
+              <xsl:if test="$PRESET = 'deals-and-transactions'">
+                <div class="rbccm-filtered-content__select-wrapper" data-filter="transaction-type">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Transaction type">
+                    <span class="rbccm-filtered-content__select-label">Transaction type</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
+
             </div>
+
+            <!-- Deals: Amount range (millions). Built for parity with the
+                 transactions page and hidden the same way it is there, with
+                 display: none. Remove the inline style to show it. -->
+            <xsl:if test="$PRESET = 'deals-and-transactions'">
+              <div class="rbccm-filtered-content__range" data-filter-range="amount" data-min="0" data-max="50000" data-step="250" style="display: none;">
+                <span class="rbccm-filtered-content__range-label">Amount:</span>
+                <div class="rbccm-filtered-content__range-track">
+                  <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--min" aria-label="Minimum amount"/>
+                  <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--max" aria-label="Maximum amount"/>
+                </div>
+                <span class="rbccm-filtered-content__range-value" aria-live="polite"></span>
+                <button type="button" class="rbccm-filtered-content__range-clear" aria-label="Clear amount filter" hidden="hidden">&#215;</button>
+              </div>
+            </xsl:if>
 
             <xsl:if test="$SHOW_SEARCH = 'true'">
               <div class="rbccm-filtered-content__search">
@@ -376,7 +476,7 @@
 
                         <xsl:if test="$REGION_LABEL != '' or $EYEBROW_LABEL != ''">
                           <div class="rbccm-filtered-content__card-footer-metadata">
-                            <xsl:if test="$REGION_LABEL != ''">
+                            <xsl:if test="$REGION_LABEL != '' and $SHOW_REGIONTAG = 'true' ">
                               <span class="rbccm-filtered-content__card-region">
                                 <xsl:value-of select="$REGION_LABEL"/>
                               </span>

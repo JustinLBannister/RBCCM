@@ -285,6 +285,103 @@
   font-weight: 500;
 }
 
+/* Per-option counts (data-option-counts="true", deals preset). Built for
+   parity with the transactions page filter, which also hides its counts
+   (.ycnt / .tcnt). Remove this display: none to show them. */
+.rbccm-filtered-content__select-option-count {
+  display: none;
+  margin-left: auto;
+  color: #555;
+}
+
+
+/* ---------- Range filter (deals Amount) ----------
+   Ships hidden: the wrapper carries an inline style="display: none;" in
+   the skin + test markup, matching the transactions page where the
+   Amount slider is built but hidden. These styles are ready for when the
+   inline style is removed. Two stacked range inputs share one track. */
+.rbccm-filtered-content__range {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.rbccm-filtered-content__range-label {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.rbccm-filtered-content__range-track {
+  height: 20px;
+  position: relative;
+  width: 180px;
+}
+.rbccm-filtered-content__range-track::before {
+  background: #A8A8A8;
+  border-radius: 2px;
+  content: '';
+  height: 4px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 8px;
+}
+.rbccm-filtered-content__range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 20px;
+  left: 0;
+  margin: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.rbccm-filtered-content__range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: var(--Blue-Bright-Blue, #0051A5);
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  height: 16px;
+  pointer-events: all;
+  width: 16px;
+}
+.rbccm-filtered-content__range-input::-moz-range-thumb {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  height: 12px;
+  pointer-events: all;
+  width: 12px;
+}
+.rbccm-filtered-content__range-input:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+.rbccm-filtered-content__range-value {
+  color: #555;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.rbccm-filtered-content__range.is-active .rbccm-filtered-content__range-value {
+  color: var(--Blue-Bright-Blue, #0051A5);
+}
+.rbccm-filtered-content__range-clear {
+  background: none;
+  border: 0;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
 
 /* ---------- Search (input + magnifying-glass icon) ----------
    Design spec: flex row with 10px gap, 11px vertical / 10px horizontal
@@ -2443,4 +2540,161 @@ a.rbccm-filtered-content__card:active {
 }
 .rbccm-filtered-content__card.rbccm-filtered-content__card--deal:focus-visible .rbccm-filtered-content__card-link {
   border-bottom-color: currentColor;
+}
+
+
+/* ---------- Section heading (all presets) ----------
+   SectionHeading Datum, blank hides it. Matches the Conference Insights
+   page heading: RBC Display 500, dark blue, 24px mobile / 29px desktop,
+   1.2 line-height. Same 1140 column as the filter chrome. */
+.rbccm-filtered-content__heading {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0 auto 32px;
+  max-width: 1140px;
+  text-transform: none;
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content__heading {
+    font-size: 29px;
+  }
+}
+
+
+/* ---------- Featured deal (deals preset) ----------
+   Authored block that replaces the static "deal snapshot" on the
+   transactions page. Sits between the heading and the filter bar and is
+   never filtered. Visual language follows the deal cards (1px #d3d3d3
+   border, white) and the CI featured tile (eyebrow date, yellow rule,
+   serif title). Mobile: image on top. Desktop (>=992): image left half,
+   text right half, vertically centered. */
+.rbccm-filtered-content__featured.rbccm-filtered-content__featured--deal {
+  background: #FFF;
+  border: 1px solid #d3d3d3;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto 40px;
+  max-width: 1140px;
+  overflow: hidden;
+}
+.rbccm-filtered-content__featured-media.rbccm-filtered-content__featured-media--deal {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.rbccm-filtered-content__featured-image.rbccm-filtered-content__featured-image--deal {
+  display: block;
+  height: 240px;
+  object-fit: cover;
+  width: 100%;
+}
+.rbccm-filtered-content__featured-body.rbccm-filtered-content__featured-body--deal {
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.rbccm-filtered-content__featured-date.rbccm-filtered-content__featured-date--deal {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+.rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal {
+  color: #002144;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 125%;
+  margin: 0 0 12px;
+}
+/* Yellow rule above the title (was a separate empty span). */
+.rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal::before {
+  background: #FFC72C;
+  content: '';
+  display: block;
+  height: 2px;
+  margin: 0 0 16px;
+  width: 30.9px;
+}
+.rbccm-filtered-content__featured-text.rbccm-filtered-content__featured-text--deal {
+  color: #252525;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 140%;
+  margin: 0 0 12px;
+}
+/* Link: same blue + reserved-border hover underline as the deal cards'
+   "Read more". Bootstrap's a:hover underline is (0,1,1), so the a-prefixed
+   selectors keep text-decoration off. */
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:hover,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus {
+  align-items: center;
+  align-self: flex-start;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 7px;
+  line-height: 20px;
+  margin-top: 8px;
+  padding-bottom: 2px;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:hover,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus-visible {
+  border-bottom-color: currentColor;
+}
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 3px;
+}
+.rbccm-filtered-content__featured-link-arrow.rbccm-filtered-content__featured-link-arrow--deal {
+  flex-shrink: 0;
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content__featured.rbccm-filtered-content__featured--deal {
+    flex-direction: row;
+  }
+  /* Row: text side holds 615px minimum, the image side takes the rest. */
+  .rbccm-filtered-content__featured-media.rbccm-filtered-content__featured-media--deal {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content__featured-image.rbccm-filtered-content__featured-image--deal {
+    height: 100%;
+    min-height: 320px;
+  }
+  .rbccm-filtered-content__featured-body.rbccm-filtered-content__featured-body--deal {
+    box-sizing: border-box;
+    flex: 0 0 615px;
+    min-width: 615px;
+    justify-content: center;
+    padding: 30px;
+  }
+  .rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal {
+    font-size: 24px;
+    line-height: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal {
+    transition: none;
+  }
 }

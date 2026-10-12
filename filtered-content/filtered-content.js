@@ -138,6 +138,23 @@
     'media':  'Media coverage'
   };
 
+  /* Transaction type dropdown (deals preset). Items carry the slug; the
+     dropdown, chips and empty message show the canonical label, in the
+     canonical order used by the transactions page (filter-deals.js) -
+     not title-cased slugs in alphabetical order. */
+  var TRANSACTION_TYPE_LABELS = {
+    'mergers-and-acquisitions': 'Mergers and Acquisitions',
+    'equity-capital-markets':   'Equity Capital Markets',
+    'debt-capital-markets':     'Debt Capital Markets',
+    'gold-stream':              'Gold Stream'
+  };
+  var TRANSACTION_TYPE_SLUG_ORDER = [
+    'mergers-and-acquisitions',
+    'equity-capital-markets',
+    'debt-capital-markets',
+    'gold-stream'
+  ];
+
   var DEFAULT_STRINGS = {
     emptyHeading:           'No results found',
     emptyMessage:           "We couldn't find any results that match your current filters.",
@@ -214,6 +231,9 @@
          reads the same way as the eyebrow on the card itself. */
       return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
+    if (dim === 'transaction-type') {
+      return TRANSACTION_TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
+    }
     /* Generic fallback for any other dimension: title-case each word,
        keep known acronyms all-caps ("apac" -> "APAC", not "Apac"). */
     return genericTitleCase(value);
@@ -225,6 +245,26 @@
       if (ACRONYM_LABELS[lower]) return ACRONYM_LABELS[lower];
       return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase();
     });
+  }
+
+  /* Range filter values. `amount` is in millions (the deals adapter turns
+     "US$2.34 billion" into 2340) and displays the same way as the
+     transactions page filter-deals.js: $250M, $2.3B. */
+  function formatAmountMillions(v) {
+    if (!isFinite(v)) return '';
+    if (v >= 1000) return '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'B';
+    return '$' + Math.round(v) + 'M';
+  }
+  function formatRangeValue(dim, v) {
+    return dim === 'amount' ? formatAmountMillions(v) : String(v);
+  }
+
+  /* Items marked data-unfiltered-only="true" (pending deals) appear in the
+     default unfiltered list but drop out as soon as any filter is active,
+     and never feed the dropdown options or counts. Matches filter-deals.js,
+     which builds options from closed deals and filters closed deals only. */
+  function isUnfilteredOnly(item) {
+    return item.getAttribute('data-unfiltered-only') === 'true';
   }
 
   function ensureEmptyState(container, isDark) {
@@ -596,10 +636,12 @@
       button.parentNode.replaceChild(freshButton, button);
       button = freshButton;
 
-      /* Collect unique lowercased tokens across all items. */
+      /* Collect unique lowercased tokens across all items (unfiltered-only
+         items excluded - they can never match an active filter). */
       var seen = {};
       var rawTokens = [];
       for (var i = 0; i < allItems.length; i++) {
+        if (isUnfilteredOnly(allItems[i])) continue;
         var tokens = tokenize(allItems[i].getAttribute(attrName) || '');
         for (var t = 0; t < tokens.length; t++) {
           if (!seen[tokens[t]]) {
@@ -666,9 +708,34 @@
         }
       } else {
         values = rawTokens.slice();
-        /* Sort: year descending (newest first), everything else alphabetical. */
+        /* Sort: year descending (newest first), transaction type in its
+           canonical order, everything else alphabetical. */
         values.sort();
         if (dim === 'year') values.reverse();
+        if (dim === 'transaction-type') {
+          values.sort(function (a, b) {
+            var ia = TRANSACTION_TYPE_SLUG_ORDER.indexOf(a);
+            var ib = TRANSACTION_TYPE_SLUG_ORDER.indexOf(b);
+            if (ia === -1) ia = TRANSACTION_TYPE_SLUG_ORDER.length;
+            if (ib === -1) ib = TRANSACTION_TYPE_SLUG_ORDER.length;
+            return ia - ib || (a < b ? -1 : a > b ? 1 : 0);
+          });
+        }
+      }
+
+      /* Optional per-option counts (data-option-counts="true" on the
+         filter root, set for the deals preset). Rendered in a span that
+         CSS hides with display: none, like the transactions page's
+         hidden .ycnt / .tcnt counts. */
+      var countsOn = filterRoot.getAttribute('data-option-counts') === 'true';
+      function countFor(value) {
+        var n = 0;
+        for (var ci = 0; ci < allItems.length; ci++) {
+          if (isUnfilteredOnly(allItems[ci])) continue;
+          var itemTokens = tokenize(allItems[ci].getAttribute(attrName) || '');
+          if (dim === 'region' ? matchesRegion(itemTokens, value) : itemTokens.indexOf(value) !== -1) n++;
+        }
+        return n;
       }
 
       /* Derive the default label from the button's aria-label (e.g. "Filter
@@ -709,7 +776,7 @@
       /* First option clears the filter. */
       panel.appendChild(makeOption('', defaultLabel));
       for (var v = 0; v < values.length; v++) {
-        panel.appendChild(makeOption(values[v], formatValue(values[v], dim)));
+        panel.appendChild(makeOption(values[v], formatValue(values[v], dim), countsOn ? countFor(values[v]) : null));
       }
       wrap.appendChild(panel);
 
@@ -717,14 +784,21 @@
       var currentValue = '';
       options[0].setAttribute('aria-selected', 'true');
 
-      function makeOption(value, text) {
+      function makeOption(value, text, count) {
         var li = document.createElement('li');
         li.className = 'rbccm-filtered-content__select-option';
         li.setAttribute('role', 'option');
         li.setAttribute('data-value', value);
+        li.setAttribute('data-label', text);
         li.setAttribute('aria-selected', 'false');
         li.tabIndex = -1;
         li.textContent = text;
+        if (count != null) {
+          var countEl = document.createElement('span');
+          countEl.className = 'rbccm-filtered-content__select-option-count';
+          countEl.textContent = String(count);
+          li.appendChild(countEl);
+        }
         return li;
       }
 
@@ -741,7 +815,8 @@
           options[i].setAttribute('aria-selected', options[i].getAttribute('data-value') === value ? 'true' : 'false');
         }
         var match = findOption(value);
-        labelEl.textContent = (match && value !== '') ? match.textContent : defaultLabel;
+        /* data-label, not textContent: the option may also hold a count span. */
+        labelEl.textContent = (match && value !== '') ? (match.getAttribute('data-label') || match.textContent) : defaultLabel;
       }
 
       function isOpen() {
@@ -850,6 +925,93 @@
       }
     });
 
+    /* -------- Range filters (e.g. deals Amount) --------
+       Markup: `.rbccm-filtered-content__range[data-filter-range="<dim>"]`
+       with data-min / data-max / data-step and two range inputs
+       (__range-input--min / --max). Items carry a numeric data-<dim>.
+       Active when either thumb leaves its end stop. Matching mirrors the
+       transactions page filter-deals.js: an item with no numeric value
+       fails, and values above the max count as the max ("$50B+"). The
+       deals preset ships this hidden with display: none. */
+    var ranges = [];
+    var rangeWraps = filterRoot.querySelectorAll('.rbccm-filtered-content__range[data-filter-range]');
+    for (var rw = 0; rw < rangeWraps.length; rw++) {
+      var builtRange = buildRange(rangeWraps[rw]);
+      if (builtRange) ranges.push(builtRange);
+    }
+
+    function buildRange(wrap) {
+      var dim = wrap.getAttribute('data-filter-range');
+      var minInput = wrap.querySelector('.rbccm-filtered-content__range-input--min');
+      var maxInput = wrap.querySelector('.rbccm-filtered-content__range-input--max');
+      if (!dim || !minInput || !maxInput) return null;
+      var min  = parseFloat(wrap.getAttribute('data-min'));
+      var max  = parseFloat(wrap.getAttribute('data-max'));
+      var step = parseFloat(wrap.getAttribute('data-step'));
+      if (!isFinite(min)) min = 0;
+      if (!isFinite(max)) max = 100;
+      if (!isFinite(step) || step <= 0) step = 1;
+      var valueEl = wrap.querySelector('.rbccm-filtered-content__range-value');
+      var clearEl = wrap.querySelector('.rbccm-filtered-content__range-clear');
+      [minInput, maxInput].forEach(function (inp) {
+        inp.min = String(min);
+        inp.max = String(max);
+        inp.step = String(step);
+      });
+      minInput.value = String(min);
+      maxInput.value = String(max);
+
+      function lo() { return parseFloat(minInput.value); }
+      function hi() { return parseFloat(maxInput.value); }
+      function isActive() { return lo() > min || hi() < max; }
+      function label() {
+        return formatRangeValue(dim, lo()) + ' \u2013 ' + formatRangeValue(dim, hi()) + (hi() >= max ? '+' : '');
+      }
+      function sync() {
+        if (valueEl) valueEl.textContent = label();
+        if (clearEl) clearEl.hidden = !isActive();
+        wrap.classList.toggle('is-active', isActive());
+      }
+      function reset() {
+        minInput.value = String(min);
+        maxInput.value = String(max);
+        sync();
+      }
+      /* Keep the thumbs from crossing: whichever one moved gives way. */
+      minInput.addEventListener('input', function () {
+        if (lo() > hi()) minInput.value = maxInput.value;
+        sync();
+        apply(true);
+      });
+      maxInput.addEventListener('input', function () {
+        if (hi() < lo()) maxInput.value = minInput.value;
+        sync();
+        apply(true);
+      });
+      if (clearEl) {
+        clearEl.addEventListener('click', function (e) {
+          e.preventDefault();
+          reset();
+          apply(true);
+        });
+      }
+      sync();
+
+      return {
+        dim: dim,
+        max: max,
+        isActive: isActive,
+        label: label,
+        reset: reset,
+        matches: function (item) {
+          var v = parseFloat(item.getAttribute('data-' + dim));
+          if (!isFinite(v)) return false;
+          var capped = Math.min(v, max);
+          return capped >= lo() && capped <= hi();
+        }
+      };
+    }
+
     var searchInput = filterRoot.querySelector('[data-filter="search"]');
     var resetBtn    = filterRoot.querySelector('.rbccm-filtered-content__reset');
     var currentPage = 0;
@@ -875,6 +1037,7 @@
           }
         }
       }
+      for (var r = 0; r < ranges.length; r++) ranges[r].reset();
       if (searchInput) searchInput.value = '';
       apply(true);
     }
@@ -998,12 +1161,24 @@
 
     function computeMatches() {
       var state = getState();
+      var filtering = anyFilterActive(state);
       var matched = [];
       var unmatched = [];
 
       for (var i = 0; i < allItems.length; i++) {
         var item = allItems[i];
         var pass = true;
+
+        /* Pending deals etc: default list only. */
+        if (filtering && isUnfilteredOnly(item)) {
+          unmatched.push(item);
+          continue;
+        }
+
+        /* Range filters (AND with everything else). */
+        for (var rg = 0; rg < ranges.length; rg++) {
+          if (ranges[rg].isActive() && !ranges[rg].matches(item)) { pass = false; break; }
+        }
 
         /* Iterate every registered dropdown. */
         for (var d = 0; d < dropdowns.length; d++) {
@@ -1116,6 +1291,9 @@
       for (var d = 0; d < dropdowns.length; d++) {
         if (state[dropdowns[d].dim]) return true;
       }
+      for (var r = 0; r < ranges.length; r++) {
+        if (ranges[r].isActive()) return true;
+      }
       return false;
     }
 
@@ -1144,6 +1322,16 @@
           })(dd)
         });
       }
+      for (var ri = 0; ri < ranges.length; ri++) {
+        if (!ranges[ri].isActive()) continue;
+        built.push({
+          key:     ranges[ri].dim,
+          label:   ranges[ri].label(),
+          onClear: (function (rng) {
+            return function () { rng.reset(); apply(true); };
+          })(ranges[ri])
+        });
+      }
       if (searchInput && searchInput.value && searchInput.value.trim()) {
         built.push({
           key:     'search',
@@ -1162,7 +1350,8 @@
          visually but carried in the accessible name for AT users. */
       var DIM_LABELS = { type:'Type', year:'Year', month:'Month',
                          region:'Region', topic:'Topic', search:'Search',
-                         'transaction-type':'Transaction type' };
+                         'transaction-type':'Transaction type',
+                         amount:'Amount' };
 
       for (var j = 0; j < built.length; j++) {
         var c = built[j];
@@ -1900,6 +2089,22 @@
     if (!raw) return null;
     return TRANSACTION_TYPE_MAP[String(raw).trim().toLowerCase()] || null;
   }
+  /* Deal amount -> millions, ported from filter-deals.js parseAmount():
+     "US&#36;2.34 billion" -> 2340. Anything without a million / billion /
+     trillion figure ("Undisclosed", "24.5% stake") returns null. */
+  function parseDealAmount(raw) {
+    if (!raw) return null;
+    var normalized = String(raw).replace(/&#36;/g, '').replace(/\$/g, '').replace(/,/g, '').trim();
+    var match = normalized.match(/([\d.]+)\s*(billion|million|trillion)/i);
+    if (!match) return null;
+    var value = parseFloat(match[1]);
+    if (!isFinite(value)) return null;
+    var unit = match[2].toLowerCase();
+    if (unit === 'million') return value;
+    if (unit === 'billion') return value * 1000;
+    return value * 1000000;
+  }
+
   function slugifyTransactionType(name) {
     return String(name || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   }
@@ -2293,7 +2498,8 @@
   /* ==========================================================================
      ADAPTER: deals-and-transactions
      -------------------------------------------------------------------------
-     Fetches the deals XML feed, filters to closed deals, normalizes each
+     Fetches the deals XML feed (closed + pending; pending are default-list
+     only via data-unfiltered-only), normalizes each
      item's transaction type via the canonical map, renders tombstone-style
      cards. Item CSS is placeholder pending final spec - data attrs wired.
      ========================================================================== */
@@ -2304,9 +2510,12 @@
       var url = opts.dealsUrl || '/en/expertise/transactions/data/deals.page';
       return fetchOptional(url).then(function (xml) {
         var news = parseNewsNodes(xml);
+        /* Closed AND pending deals. Pending ones are rendered with
+           data-unfiltered-only, so (like the transactions page) they show
+           in the default list but drop out once any filter is active and
+           don't feed the dropdown options. */
         var entries = news.map(buildDealsEntry).filter(function (e) {
-          /* Only closed deals show in the listing (matches live filter-deals.js). */
-          return e && e.status === 'closed';
+          return !!e;
         });
         entries.sort(function (a, b) { return (b.dateTs || 0) - (a.dateTs || 0); });
         return entries;
@@ -2318,6 +2527,8 @@
       if (entry.year)                li.setAttribute('data-year', entry.year);
       if (entry.transactionTypeSlug) li.setAttribute('data-transaction-type', entry.transactionTypeSlug);
       if (entry.searchText)          li.setAttribute('data-search-text', entry.searchText);
+      if (entry.amountMillions != null) li.setAttribute('data-amount', String(entry.amountMillions));
+      if (entry.status !== 'closed')   li.setAttribute('data-unfiltered-only', 'true');
 
       /* Card structure (BEM subclasses; visual spec ported from the
          live .tombstone via the deals preset CSS scope):
@@ -2399,6 +2610,7 @@
       status: statusNorm,
       statusLabel: statusLabel,
       amount: amount || 'Undisclosed',                  /* ensure something renders in the amount slot */
+      amountMillions: parseDealAmount(amount),          /* numeric, for the (hidden) Amount range filter */
       specialty: specialty,                             /* takes precedence over canonicalType in the status line */
       transactionType: canonicalType,                   /* "Mergers and Acquisitions" - filter dropdown value */
       transactionTypeSlug: canonicalType ? slugifyTransactionType(canonicalType) : '',
@@ -2462,7 +2674,8 @@
     'data-empty-clear-label',
     'data-scroll-target',
     'data-available-years',
-    'data-year-feed-template'
+    'data-year-feed-template',
+    'data-option-counts'
   ];
 
   function detectPreset(root) {

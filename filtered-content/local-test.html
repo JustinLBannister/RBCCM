@@ -425,18 +425,22 @@
        No search input. Item template stubbed pending spec.
        ============================================================ -->
   <p class="local-test-section-label" style="margin-top:48px;">Preset: deals-and-transactions</p>
-  <p class="local-test-hint">Two-dropdown filter with Clear filters only — no search input, no amount range slider (v1). Row is short enough that no layout override is needed vs. the base filter chrome. Item template stubbed as bare <code>&lt;li&gt;</code>s pending the transaction-row spec.</p>
+  <p class="local-test-hint">Year + Transaction type + Clear filters, no search. Amount range and per-option counts are built but hidden with display: none (same as the transactions page). Pending deals carry data-unfiltered-only: they show in the default list and drop out once any filter is set. 6 per page. The live page fills this list from the deals feed; these four are static samples.</p>
 
   <section class="rbccm-filtered-content rbccm-filtered-content--deals-and-transactions"
            id="rbccm-filtered-content-deals"
            data-container="#rbccm-filtered-content-deals"
-           data-page-size="10"
-           data-page-size-filtered="10"
+           data-page-size="6"
+           data-page-size-filtered="6"
+           data-option-counts="true"
            data-empty-heading="No transactions found"
            data-empty-message="We couldn't find any transactions that match your current filters."
            data-empty-message-emphasis="Try adjusting your filters."
            data-empty-clear-label="Clear filters"
            aria-label="Filter deals and transactions">
+
+    <!-- Section heading + featured deal: same markup the skin emits (SectionHeading + Featured* Datums). -->
+    <h2 class="rbccm-filtered-content__heading">Select deals and client execution</h2><div class="rbccm-filtered-content__featured rbccm-filtered-content__featured--deal"><div class="rbccm-filtered-content__featured-media rbccm-filtered-content__featured-media--deal"><img class="rbccm-filtered-content__featured-image rbccm-filtered-content__featured-image--deal" loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/deals/20260922-apollo-deal-spotlight.webp" alt=""/></div><div class="rbccm-filtered-content__featured-body rbccm-filtered-content__featured-body--deal"><p class="rbccm-filtered-content__featured-date rbccm-filtered-content__featured-date--deal">Sep 10, 2026</p><h3 class="rbccm-filtered-content__featured-title rbccm-filtered-content__featured-title--deal">RBC Capital Markets acts as sole financial advisor to Apollo on its $9 billion strategic investment in ONEOK</h3><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">TULSA, Okla., Sept. 10, 2026 (GLOBE NEWSWIRE) - ONEOK, Inc. today announced the closing of the previously announced $9 billion minority equity investment by funds and affiliates managed by Apollo.</p><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">Under the terms of the agreement, Apollo has invested $9 billion in exchange for a nonvoting Class B minority interest in a newly formed holding company, ONEOK Holdings, L.L.C., which is structurally subordinate to the company&#8217;s debt.</p><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">The minority equity investment has been reviewed with ONEOK&#39;s credit rating agencies, all of which consider the transaction credit-enhancing.</p><a class="rbccm-filtered-content__featured-link rbccm-filtered-content__featured-link--deal" href="https://ir.oneok.com/news-and-events/press-releases/2026/09-10-2026-211556751" target="_blank" rel="noopener"><span class="rbccm-filtered-content__featured-link-label rbccm-filtered-content__featured-link-label--deal">Read the full press release</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__featured-link-arrow rbccm-filtered-content__featured-link-arrow--deal" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true" focusable="false"><path d="M0.996 9.033L3.464 5.251C3.518 5.169 3.561 5.071 3.591 4.964C3.621 4.856 3.636 4.741 3.636 4.625C3.636 4.508 3.621 4.393 3.591 4.286C3.561 4.178 3.518 4.081 3.464 3.999L0.996 0.261C0.942 0.178 0.877 0.113 0.807 0.068C0.736 0.023 0.66 0 0.583 0C0.506 0 0.43 0.023 0.359 0.068C0.288 0.113 0.224 0.178 0.169 0.261C0.061 0.426 0 0.649 0 0.882C0 1.115 0.061 1.339 0.169 1.504L2.23 4.625L0.169 7.746C0.062 7.91 0.001 8.131 0.001 8.363C0 8.479 0.015 8.594 0.044 8.701C0.073 8.809 0.116 8.906 0.169 8.989C0.222 9.074 0.284 9.143 0.354 9.192C0.424 9.24 0.5 9.268 0.577 9.272C0.653 9.276 0.73 9.257 0.802 9.216C0.874 9.175 0.94 9.113 0.996 9.033Z" fill="currentColor"/></svg></a></div></div>
 
     <div class="rbccm-filtered-content__filter">
       <div class="rbccm-filtered-content__filter-inner">
@@ -466,6 +470,18 @@
 
           <!-- NO search input for deals preset -->
 
+          <!-- Amount range (millions): built for parity with the transactions
+               page, hidden there and here with display: none. -->
+          <div class="rbccm-filtered-content__range" data-filter-range="amount" data-min="0" data-max="50000" data-step="250" style="display: none;">
+            <span class="rbccm-filtered-content__range-label">Amount:</span>
+            <div class="rbccm-filtered-content__range-track">
+              <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--min" aria-label="Minimum amount">
+              <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--max" aria-label="Maximum amount">
+            </div>
+            <span class="rbccm-filtered-content__range-value" aria-live="polite"></span>
+            <button type="button" class="rbccm-filtered-content__range-clear" aria-label="Clear amount filter" hidden>&#215;</button>
+          </div>
+
           <button type="button" class="rbccm-filtered-content__reset">Clear filters</button>
 
         </div>
@@ -483,7 +499,7 @@
                5. Status line     "Financial Advisor / Pending"
                6. Read more       CTA -->
         <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
-            data-year="2026" data-transaction-type="mergers-and-acquisitions"
+            data-year="2026" data-transaction-type="mergers-and-acquisitions" data-amount="10000" data-unfiltered-only="true"
             data-search-text="boralex brookfield la caisse acquisition financial advisor">
           <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Financial Advisor" aria-label="Link to Financial Advisor">
             <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
@@ -505,7 +521,7 @@
         </li>
 
         <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
-            data-year="2026" data-transaction-type="equity-offering"
+            data-year="2026" data-transaction-type="equity-capital-markets" data-amount="850"
             data-search-text="global tech ipo joint bookrunner rbc capital markets">
           <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Joint Bookrunner" aria-label="Link to Joint Bookrunner">
             <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
@@ -527,7 +543,7 @@
         </li>
 
         <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
-            data-year="2025" data-transaction-type="debt-offering"
+            data-year="2025" data-transaction-type="debt-capital-markets" data-amount="1200"
             data-search-text="canadian utility senior notes issuance rbc lead arranger">
           <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Lead Arranger" aria-label="Link to Lead Arranger">
             <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
@@ -549,7 +565,7 @@
         </li>
 
         <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
-            data-year="2025" data-transaction-type="mergers-and-acquisitions"
+            data-year="2025" data-transaction-type="mergers-and-acquisitions" data-amount="3100"
             data-search-text="pharma merger cross border sell side advisor divestiture">
           <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Sell-side Advisor" aria-label="Link to Sell-side Advisor">
             <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">

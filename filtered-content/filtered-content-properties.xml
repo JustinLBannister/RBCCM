@@ -57,6 +57,33 @@
   <Datum ID="SectionID" Type="String" Name="Section ID (unique per page)">rbccm-filtered-content-1</Datum>
   <Datum ID="SectionAriaLabel" Type="String" Name="Section ARIA label">Filter articles</Datum>
 
+  <!-- Section heading (all presets). Renders as an h2 above the filter
+       bar. Blank hides it, so existing instances are unchanged. -->
+  <Datum ID="SectionHeading" Type="String" Name="Section heading (optional - blank hides it)"></Datum>
+
+  <!-- Featured deal (Deals &amp; Transactions preset only; ignored by the
+       other presets). Replaces the static "deal snapshot" block on the
+       transactions page: image left, date, yellow rule, title, up to three
+       paragraphs and a link. Sits between the section heading and the
+       filter bar and is NOT affected by the filters. Blank title hides the
+       whole block.
+       Type="Image" needs the nested Image/Path/Description skeleton. -->
+  <Datum ID="FeaturedImage" Type="Image" Name="Featured deal : image - pick from DAM (optional - blank shows text only)">
+    <Image>
+      <Path>/assets/rbccm/images/deals/20260922-apollo-deal-spotlight.webp</Path>
+      <Description/>
+    </Image>
+  </Datum>
+  <Datum ID="FeaturedImageAlt" Type="String" Name="Featured deal : image alt text (blank = decorative)"></Datum>
+  <Datum ID="FeaturedDate" Type="String" Name="Featured deal : date (shown exactly as typed)">Sep 10, 2026</Datum>
+  <Datum ID="FeaturedTitle" Type="String" Name="Featured deal : title (blank hides the featured deal)">RBC Capital Markets acts as sole financial advisor to Apollo on its $9 billion strategic investment in ONEOK</Datum>
+  <Datum ID="FeaturedParagraph1" Type="Textarea" Name="Featured deal : paragraph 1 (blank hides it)">TULSA, Okla., Sept. 10, 2026 (GLOBE NEWSWIRE) - ONEOK, Inc. today announced the closing of the previously announced $9 billion minority equity investment by funds and affiliates managed by Apollo.</Datum>
+  <Datum ID="FeaturedParagraph2" Type="Textarea" Name="Featured deal : paragraph 2 (blank hides it)">Under the terms of the agreement, Apollo has invested $9 billion in exchange for a nonvoting Class B minority interest in a newly formed holding company, ONEOK Holdings, L.L.C., which is structurally subordinate to the company&amp;#8217;s debt.</Datum>
+  <Datum ID="FeaturedParagraph3" Type="Textarea" Name="Featured deal : paragraph 3 (blank hides it)">The minority equity investment has been reviewed with ONEOK&amp;#39;s credit rating agencies, all of which consider the transaction credit-enhancing.</Datum>
+  <Datum ID="FeaturedLinkUrl" Type="String" Name="Featured deal : link URL (blank hides the link)">https://ir.oneok.com/news-and-events/press-releases/2026/09-10-2026-211556751</Datum>
+  <Datum ID="FeaturedLinkLabel" Type="String" Name="Featured deal : link label">Read the full press release</Datum>
+  <Datum ID="FeaturedLinkNewTab" Type="Boolean" Name="Featured deal : open link in a new tab">true</Datum>
+
   <Datum ID="PageSize" Type="Number" Name="Items per page (default view)">10</Datum>
   <Datum ID="PageSizeFiltered" Type="Number" Name="Items per page (when a filter is active)">10</Datum>
 
@@ -67,6 +94,7 @@
   <Datum ID="ShowYear" Type="Boolean" Name="Show Year dropdown">true</Datum>
   <Datum ID="ShowMonth" Type="Boolean" Name="Show Month dropdown">true</Datum>
   <Datum ID="ShowRegion" Type="Boolean" Name="Show Region dropdown">true</Datum>
+  <Datum ID="ShowRegionTag" Type="Boolean" Name="Show Region tag on each item">true</Datum>
   <Datum ID="ShowSearch" Type="Boolean" Name="Show search input">true</Datum>
 
   <Datum ID="FilterByLabel" Type="String" Name="'Filter by:' label">Filter by:</Datum>
