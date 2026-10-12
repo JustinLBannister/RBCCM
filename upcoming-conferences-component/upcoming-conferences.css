@@ -493,12 +493,17 @@
 }
  
 /* -- Mobile carousel controls -- */
+/* Arrows | dots | arrow. With many conferences the dots WRAP onto extra rows
+   between the arrows instead of pushing them out of bounds (same pattern as
+   deal-carousel). align-items: center keeps the arrows level with the middle
+   of however many dot rows there are. */
 .rbccm-upcoming-conferences__controls {
   align-items: center;
   display: none;
   gap: 16px;
   justify-content: center;
   margin: 0;
+  max-width: 100%;
 }
  
 .rbccm-upcoming-conferences.is-carousel .rbccm-upcoming-conferences__controls {
@@ -517,6 +522,7 @@
   padding: 0;
   transition: opacity 0.2s ease;
   width: 24px;
+  flex: 0 0 auto;               /* arrows never shrink; the dots give way */
 }
 .rbccm-upcoming-conferences__btn:disabled,
 .rbccm-upcoming-conferences__btn[aria-disabled="true"] {
@@ -524,11 +530,20 @@
 }
  
 /* Dots */
+/* flex: 0 1 auto + min-width: 0 let the dots box shrink below its content
+   width, which is what forces the wrap (a flex item will not shrink past its
+   content without min-width: 0). */
+.rbccm-upcoming-conferences__dots {
+  flex: 0 1 auto;
+  min-width: 0;
+}
 .rbccm-upcoming-conferences__dots .slick-dots {
   align-items: center;
   bottom: auto;
   display: flex !important;
-  gap: 26px;
+  flex-wrap: wrap;
+  gap: 16px 26px;               /* 16px between wrapped rows, 26px between dots */
+  justify-content: center;
   list-style: none;
   margin: 0;
   padding: 0;
