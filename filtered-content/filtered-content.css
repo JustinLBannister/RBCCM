@@ -1989,9 +1989,10 @@ a.rbccm-filtered-content__card:active {
    effect (subtle bg tint) while keeping the Figma design as-is.
 */
 
-/* List - mobile-first single column stack (overrides the CSS grid used
-   by the CI tile preset). Border-top on each card creates the row
-   separator; :last-child gets a matching border-bottom to close off. */
+/* List - single column stack at every breakpoint (overrides the CSS
+   grid used by the CI tile preset; was 2 columns from 768px until
+   2026-10-13). Border-top on each card creates the row separator; the
+   last visible item gets a matching border-bottom to close off. */
 .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__list {
   display: flex;
   flex-direction: column;
@@ -2008,36 +2009,23 @@ a.rbccm-filtered-content__card:active {
   display: flex;
   flex-direction: column;
 }
-/* Close the list with a border-bottom on the last row of visible items.
-   JS's paginate() tags the last 1-2 visible items with
-   `is-last-visible-row` after every apply so this rule stays accurate
-   across pagination (DOM-order :last-child would match hidden items on
-   any page > 1). */
+/* Close the list with a border-bottom on the last visible item. JS's
+   paginate() tags it with `is-last-visible-row` after every apply so
+   this rule stays accurate across pagination (DOM-order :last-child
+   would match hidden items on any page > 1). */
 .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item.is-last-visible-row .rbccm-filtered-content__card--article {
   border-bottom: 1px solid #CCC;
 }
 
-/* Desktop - 2-column grid (matches in-the-media-redesign.html layout).
-   Column gap 32px, row gap 0 so border-top on each card creates the
-   row separator (broken at the column-gap, matching the redesign
-   look).
-
-   Bottom edge: the single-col :last-child border-bottom rule above
-   only closes one column in a 2-col grid, so on desktop we swap it
-   for :nth-last-child(-n+2) which closes the last row (whether it
-   has 1 or 2 items). This matches the column-broken look of the
-   top borders - no full-width horizontal rule spanning the gap. */
+/* Every breakpoint is one column, the same grid the base list uses
+   (grid-template-columns: 1fr). Row gap 0 so the border-top on each
+   card is the row separator. */
 @media (min-width: 768px) {
   .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 32px;
-    row-gap: 0;
+    grid-template-columns: 1fr;
+    gap: 0;
   }
-  /* Bottom edge - desktop uses the same is-last-visible-row hook from
-     JS. paginate() adds the class to the last 2 visible items on desktop
-     (2-col grid) and the last 1 on single-column layouts; both cases
-     resolve to the correct row closure here. */
 }
 
 /* Card / row wrapper. Content stays inside the card's box (no bleed
