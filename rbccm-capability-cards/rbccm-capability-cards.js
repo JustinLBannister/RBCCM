@@ -3,8 +3,10 @@
    Deploy path: /assets/rbccm/js/components/rbccm-capability-cards.js
 
    Only acts on `.rbccm-capability-cards--slider` sections (the US
-   Credentials skin). The MAAS+MATA skin has no --slider class, so this
-   file is a no-op there.
+   Credentials and three-up skins). The old MAAS+MATA skin has no
+   --slider class, so this file is a no-op there. Sections that also
+   carry --three-up use setupThreeUp() (paged 3/2 per view, stacked on
+   mobile); everything below describes the US Credentials peek row.
 
    Behaviour (same pattern as rbccm-awards)
    =========================================================================
@@ -75,7 +77,141 @@ jQuery(document).ready(function ($) {
     return isNaN(n) ? fallback : n;
   }
 
+  /* --three-up (three-up skin, MAAS+MATA): paged, not variableWidth.
+       992+     3 per view, paged 3 at a time
+       768-991  2 per view, paged 2 at a time
+       <768     no carousel: Slick is removed and the cards stack (CSS)
+     Non-infinite, so the last page shows the last full set of cards
+     (5 cards on desktop = 2 dots: 1-3, then 3-5) with no clones. When
+     the cards fit one page there is no carousel either: the section
+     gets .is-static and the CSS lays them out as a plain row. */
+  function setupThreeUp($section) {
+    var $grid  = $section.find('.rbccm-capability-cards__grid');
+    var $cards = $grid.children('.rbccm-capability-cards__card');
+    var $dots  = $section.find('.rbccm-capability-cards__dots');
+    var $prev  = $section.find('.rbccm-capability-cards__btn--prev');
+    var $next  = $section.find('.rbccm-capability-cards__btn--next');
+    var count  = $cards.length;
+    var mqTablet  = window.matchMedia('(min-width: 768px)');
+    var mqDesktop = window.matchMedia('(min-width: 992px)');
+    var built = null;   /* cards per view of the current build; 0 = stacked */
+
+    /* Same slide wrapper as the peek row, added once; it survives unslick. */
+    $cards.wrap('<div class="rbccm-capability-cards__slide"></div>');
+    var $slides = $grid.children('.rbccm-capability-cards__slide');
+
+    function perView() {
+      if (!mqTablet.matches) return 0;
+      return mqDesktop.matches ? 3 : 2;
+    }
+
+    function clearA11y() {
+      $slides.each(function () {
+        this.removeAttribute('role');
+        this.removeAttribute('aria-roledescription');
+        this.removeAttribute('aria-label');
+        this.removeAttribute('aria-hidden');
+        $(this).find('a, button').removeAttr('tabindex');
+      });
+    }
+
+    /* Only the cards on the current page are read and tabbable. Slick
+       marks them .slick-active when slidesToShow > 1. */
+    function applyA11y() {
+      if (!$grid.hasClass('slick-initialized')) return;
+      var slick = $grid.slick('getSlick');
+      var total = slick ? slick.slideCount : count;
+      $grid.find('.slick-slide').each(function () {
+        var el = this;
+        var n = parseInt(el.getAttribute('data-slick-index'), 10) + 1;
+        var visible = $(el).hasClass('slick-active');
+        el.removeAttribute('tabindex');
+        el.removeAttribute('aria-describedby');
+        el.setAttribute('role', 'group');
+        el.setAttribute('aria-roledescription', 'slide');
+        el.setAttribute('aria-label', n + ' of ' + total);
+        el.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        $(el).find('a, button').each(function () {
+          if (visible) this.removeAttribute('tabindex');
+          else this.setAttribute('tabindex', '-1');
+        });
+      });
+      $dots.find('li, ul').removeAttr('role');
+      $dots.find('button').each(function (i) {
+        this.removeAttribute('role');
+        this.removeAttribute('aria-controls');
+        this.removeAttribute('aria-selected');
+        this.removeAttribute('tabindex');
+        this.setAttribute('aria-label', 'Go to page ' + (i + 1));
+        if ($(this).parent().hasClass('slick-active')) this.setAttribute('aria-current', 'true');
+        else this.removeAttribute('aria-current');
+      });
+      /* Arrows disable at the ends (non-infinite). */
+      var current = slick ? slick.currentSlide : 0;
+      $prev.prop('disabled', current <= 0);
+      $next.prop('disabled', current + built >= total);
+    }
+
+    function destroy() {
+      if ($grid.hasClass('slick-initialized')) {
+        $grid.off('.rbccmCap3');
+        $grid.slick('unslick');
+      }
+      $dots.empty();
+      $prev.prop('disabled', false);
+      $next.prop('disabled', false);
+      clearA11y();
+      $section.removeClass('is-static');
+    }
+
+    function build(n) {
+      if (count <= n) { $section.addClass('is-static'); return; }
+      $grid.slick({
+        rows: 0,
+        slidesToShow: n,
+        slidesToScroll: n,
+        infinite: false,
+        arrows: false,
+        dots: true,
+        appendDots: $dots,
+        adaptiveHeight: false,
+        accessibility: false,         /* a11y handled in applyA11y */
+        speed: reducedMotion ? 0 : 350,
+        cssEase: reducedMotion ? 'linear' : 'cubic-bezier(0.4, 0, 0.2, 1)'
+      });
+      $grid.on('afterChange.rbccmCap3', applyA11y);
+      applyA11y();
+    }
+
+    function update() {
+      var n = perView();
+      if (n === built) return;
+      destroy();
+      built = n;
+      if (n > 0) build(n);
+    }
+
+    $prev.off('click.rbccmCap').on('click.rbccmCap', function () {
+      if ($grid.hasClass('slick-initialized')) $grid.slick('slickPrev');
+    });
+    $next.off('click.rbccmCap').on('click.rbccmCap', function () {
+      if ($grid.hasClass('slick-initialized')) $grid.slick('slickNext');
+    });
+    $dots.on('click.rbccmCap', 'button', function () { setTimeout(applyA11y, 0); });
+
+    update();
+    var t;
+    $(window).on('resize.rbccmCap3', function () {
+      clearTimeout(t);
+      t = setTimeout(update, 100);
+    });
+  }
+
   function setupSection($section) {
+    if ($section.hasClass('rbccm-capability-cards--three-up')) {
+      loadSlick(function () { setupThreeUp($section); });
+      return;
+    }
     var section = $section[0];
     var $grid   = $section.find('.rbccm-capability-cards__grid');
     var $cards  = $grid.children('.rbccm-capability-cards__card');

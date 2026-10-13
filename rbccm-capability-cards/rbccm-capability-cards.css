@@ -462,6 +462,12 @@ a.rbccm-capability-cards__card:focus-visible::before {
   flex-shrink: 0;
   margin-bottom: 0;
 }
+/* Rates is a wide line glyph: drawn at its Figma size (34 x 24.182),
+   not squeezed into the 30x30 box, so it sits shorter than the others. */
+.rbccm-capability-cards__icon.rbccm-capability-cards__icon--rates {
+  width: 34px;
+  height: 24.182px;
+}
 
 
 /* =========================================================================
@@ -712,6 +718,91 @@ a.rbccm-capability-cards__card:focus-visible .rbccm-capability-cards__cta {
 }
 .rbccm-capability-cards--slider.is-static .rbccm-capability-cards__controls {
   display: none;
+}
+
+/* =========================================================================
+   11b. Three-up  (--slider + --three-up, three-up skin, MAAS+MATA)
+   =========================================================================
+   Figma: 1100 row, 16px gap, cards 355 wide (3 x 355 + 2 x 16 = 1097),
+   card padding 30/25, 21px content gap (section 7).
+   The JS pages it (3 per view on desktop, 2 on tablet) instead of the
+   peek row above, and removes Slick below 768 so the cards stack.
+   Slick sizes the slides itself in this mode (list width / per view),
+   so the fixed 276px card width is undone here and the 16px gap comes
+   from 8px slide padding + a -8px list margin; a flex gap on the track
+   would push the last card out of the list. 1100 + 16 = 1116 / 3 =
+   372 per slide, minus 16 padding = 356 card, i.e. the Figma 355. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up {
+  --rbccm-cc-gap: 16px;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__card {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 30px 25px;
+}
+/* Back inside the section padding (no full-bleed), capped at 1100. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__cards {
+  align-self: center;
+  margin: 0 auto;
+  max-width: var(--rbccm-capability-cards-max-width, 1100px);
+  width: 100%;
+}
+/* Mobile / no Slick: every card stacked full width. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid {
+  align-items: stretch;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rbccm-cc-gap);
+  max-width: none;
+  overflow: visible;
+  padding: 0;
+  width: 100%;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__slide {
+  display: flex;
+  flex: none;
+  width: 100%;
+}
+@media (max-width: 767px) {
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__controls {
+    display: none;
+  }
+}
+/* Tablet+ before Slick runs (or when the cards fit one page, .is-static):
+   a plain equal-width row, so nothing jumps when Slick takes over. */
+@media (min-width: 768px) {
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid {
+    flex-direction: row;
+    gap: var(--rbccm-cc-gap);
+  }
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid > .rbccm-capability-cards__slide {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up.is-static .rbccm-capability-cards__grid {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+}
+/* Slick running (768+). */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized {
+  display: block;
+  overflow: visible;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .slick-list {
+  margin: 0 calc(var(--rbccm-cc-gap) / -2);
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .slick-track {
+  gap: 0;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .rbccm-capability-cards__slide {
+  box-sizing: border-box;
+  padding: 0 calc(var(--rbccm-cc-gap) / 2);
 }
 
 /* ---- Controls (copied from rbccm-awards) ----------------------------- */
