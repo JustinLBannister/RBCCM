@@ -1,0 +1,587 @@
+/* =========================================================================
+   RBCCM Marketo Modal
+   Deploy path: /assets/rbccm/css/components/rbccm-marketo-modal.css
+   =========================================================================
+   "Talk with an expert." popup (native <dialog>) with an embedded
+   Marketo form. Opened by links to #{ModalID}; see
+   rbccm-marketo-modal.js.
+
+   Design (desktop):
+     panel     100% wide up to 600, 563 tall (min), white, 24 radius, 48/40 padding
+     close     36 circle, 10px padding, #F1F5FB, 16px X (1.4 stroke,
+               #003168), 18 from the top-right corner
+     header    column, centred, 11px gaps, 27/52/41.594 padding
+     heading   RBC Display 500 36/36, -0.6px, #082043; last word(s) #0051A5;
+               45 x 2 yellow rule
+     subhead   Roboto 400 16/24, #494949
+     fields    2 columns (First/Last, Company/Title), Email full width,
+               32px column gap, 24px row gap; #979797 underline, 11/0
+               field padding; label Roboto 500 13/15, 0.52px, #858585,
+               sits in the field until it has focus or a value
+     consent   18px checkbox; copy Roboto 400 13/18.85 #494949; privacy
+               link Roboto 400 13/15 #0051A5
+     buttons   submit: 45 tall, 14/35 padding, 14 gap, #0051A5 pill,
+               Roboto 500 17/20 white, 18px arrow; Cancel right: Roboto
+               400 15/18 #494949, underlined
+   Mobile (<600): full-width panel, one column, 28px heading.
+
+   Marketo injects forms2.css + its theme AFTER this file, with inline
+   widths, floats and a gradient button, so the form overrides below
+   carry !important. Every rule is scoped to .rbccm-marketo-modal so
+   other Marketo forms on the page (e.g. the footer) are untouched.
+   ========================================================================= */
+
+html.rbccm-marketo-modal-open {
+  overflow: hidden;                   /* no page scroll behind the modal */
+}
+
+/* ---- Panel (the <dialog> itself) --------------------------------------- */
+dialog.rbccm-marketo-modal {
+  background: #FFF;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 33, 68, 0.25);
+  box-sizing: border-box;
+  color: #252525;
+  margin: auto;
+  min-height: 563px;                  /* Figma 563; grows (not scrolls) when Marketo adds error lines */
+  max-height: calc(100% - 32px);
+  max-width: min(600px, calc(100% - 32px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 48px 40px;
+  width: 100%;
+}
+dialog.rbccm-marketo-modal *,
+dialog.rbccm-marketo-modal *::before,
+dialog.rbccm-marketo-modal *::after {
+  box-sizing: border-box;
+}
+dialog.rbccm-marketo-modal:focus {
+  outline: none;                      /* focused on open (tabindex -1) */
+}
+dialog.rbccm-marketo-modal::backdrop {
+  background: rgba(0, 33, 68, 0.35);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+dialog.rbccm-marketo-modal[open] {
+  animation: rbccm-marketo-modal-in 0.25s ease-out;
+}
+dialog.rbccm-marketo-modal[open]::backdrop {
+  animation: rbccm-marketo-modal-fade 0.25s ease-out;
+}
+@keyframes rbccm-marketo-modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rbccm-marketo-modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Browsers without showModal(): fixed, centred, over a plain scrim. */
+dialog.rbccm-marketo-modal.is-fallback-open {
+  box-shadow: 0 0 0 100vmax rgba(0, 33, 68, 0.35);
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+}
+.rbccm-marketo-modal [hidden] {
+  display: none !important;
+}
+
+/* ---- Close (X) ---------------------------------------------------------- */
+/* Figma: 36 x 36, 10px padding, 100px radius, #F1F5FB; 16px X frame
+   (10px glyph, 1.4 stroke, #003168). */
+.rbccm-marketo-modal__close {
+  align-items: center;
+  background: #F1F5FB;
+  border: 0;
+  border-radius: 100px;
+  color: #003168;
+  cursor: pointer;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  padding: 10px;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  transition: background-color 0.15s ease;
+  width: 36px;
+}
+.rbccm-marketo-modal__close-icon {
+  display: block;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+.rbccm-marketo-modal__close:hover {
+  background: #E1E9F5;
+}
+.rbccm-marketo-modal__close:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+
+/* ---- Header ------------------------------------------------------------- */
+/* Figma: column, centred, 11px between heading / rule / paragraph,
+   27 / 52 / 41.594 padding. The bottom padding is the space before the
+   first field (the form wrap adds none). */
+.rbccm-marketo-modal__header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 27px 52px 41.594px;
+  text-align: center;
+}
+.rbccm-marketo-modal h2.rbccm-marketo-modal__heading {
+  color: #082043 !important;
+  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.6px !important;
+  line-height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+.rbccm-marketo-modal__heading-highlight {
+  color: #0051A5;
+  font-family: inherit !important;
+  letter-spacing: inherit;
+}
+/* Yellow rule under the heading (no empty element in the markup). */
+.rbccm-marketo-modal h2.rbccm-marketo-modal__heading::after {
+  background: #FFC72C;
+  content: '';
+  display: block;
+  height: 2px;
+  margin: 11px auto 0;                /* same 11px as the header gap */
+  width: 45px;
+}
+.rbccm-marketo-modal p.rbccm-marketo-modal__subheading {
+  color: #494949 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  line-height: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ---- Form shell --------------------------------------------------------- */
+.rbccm-marketo-modal__form {
+  margin-top: 0;
+}
+.rbccm-marketo-modal .mktoForm {
+  color: #252525 !important;
+  column-gap: 32px;
+  display: grid !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0 !important;
+  row-gap: 24px;
+  width: 100% !important;
+}
+@media (min-width: 600px) {
+  .rbccm-marketo-modal .mktoForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* forms2.css gives EVERY element in a form `padding: 10px` under 480px
+   (.mktoForm *), which collapses the 20px submit arrow to nothing and
+   insets the fields. Zeroed here at higher specificity; the elements
+   that need padding (inputs, labels, button, Cancel) set it with
+   !important or a more specific selector below. */
+.rbccm-marketo-modal .mktoForm * {
+  padding: 0;
+}
+/* Marketo's rows become transparent so every field column is a direct
+   grid item; layout then follows field names (classes from the JS). */
+.rbccm-marketo-modal .mktoForm .mktoFormRow {
+  display: contents !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoFormCol {
+  float: none !important;
+  grid-column: 1 / -1;                /* unknown fields: full width, after the known ones */
+  margin: 0 !important;
+  min-height: 0 !important;
+  order: 10;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoOffset,
+.rbccm-marketo-modal .mktoForm .mktoGutter,
+.rbccm-marketo-modal .mktoForm .mktoClear,
+.rbccm-marketo-modal .mktoForm .mktoAsterix,
+.rbccm-marketo-modal .mktoForm .mktoInstruction {
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap {
+  float: none !important;
+  width: 100% !important;
+}
+/* Design order: First | Last, Company | Title, Email, consent, buttons. */
+@media (min-width: 600px) {
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--firstname,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--lastname,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title {
+    grid-column: auto;
+  }
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--firstname { order: 1; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--lastname  { order: 2; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company   { order: 3; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title     { order: 4; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--email     { order: 5; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--checkbox  { order: 20; }
+
+/* ---- Text fields: underline + floating label ---------------------------- */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text .mktoFieldWrap {
+  position: relative;
+}
+/* display: block !important because form-level custom CSS (form 1574)
+   hides every .mktoLabel under 800px and relies on placeholders; here the
+   label IS the prompt (placeholders are transparent). */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text .mktoLabel {
+  color: #858585 !important;
+  display: block !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  left: 0;
+  letter-spacing: 0.52px !important;
+  line-height: 15px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  top: 11px;                          /* Figma field padding 11 / 0 */
+  transition: top 0.15s ease, font-size 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text:focus-within .mktoLabel,
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text.is-filled .mktoLabel {
+  font-size: 11px !important;
+  top: -8px;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text:focus-within .mktoLabel {
+  color: var(--Blue-Bright-Blue, #0051A5) !important;
+}
+.rbccm-marketo-modal .mktoForm input.mktoField:not([type="checkbox"]):not([type="radio"]),
+.rbccm-marketo-modal .mktoForm textarea.mktoField,
+.rbccm-marketo-modal .mktoForm select.mktoField {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid #979797 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #252525 !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 15px !important;
+  height: 38px;                       /* 11 + 15 + 11 + 1px underline */
+  line-height: 15px !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 11px 0 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100% !important;
+}
+.rbccm-marketo-modal .mktoForm textarea.mktoField {
+  height: auto;
+  min-height: 88px;
+}
+.rbccm-marketo-modal .mktoForm .mktoField::placeholder {
+  color: transparent !important;      /* the label is the visible prompt */
+}
+.rbccm-marketo-modal .mktoForm input.mktoField:not([type="checkbox"]):not([type="radio"]):focus,
+.rbccm-marketo-modal .mktoForm textarea.mktoField:focus,
+.rbccm-marketo-modal .mktoForm select.mktoField:focus {
+  border-bottom-color: var(--Blue-Bright-Blue, #0051A5) !important;
+  box-shadow: 0 1px 0 0 var(--Blue-Bright-Blue, #0051A5) !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoField.mktoInvalid {
+  border-bottom-color: #C8102E !important;
+}
+
+/* ---- Consent checkbox --------------------------------------------------- */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--checkbox .mktoFieldWrap > .mktoLabel {
+  display: none !important;           /* Marketo's empty outer label (just the asterisk) */
+}
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList,
+.rbccm-marketo-modal .mktoForm .mktoRadioList {
+  align-items: flex-start;
+  display: flex !important;
+  float: none !important;
+  gap: 14px;
+  padding: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList > input,
+.rbccm-marketo-modal .mktoForm .mktoRadioList > input {
+  accent-color: var(--Blue-Bright-Blue, #0051A5);
+  flex: 0 0 auto;
+  height: 18px !important;
+  margin: 0.5px 0 0 !important;       /* centred on the first 18.85px line */
+  opacity: 1 !important;
+  padding: 0 !important;
+  width: 18px !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList > label,
+.rbccm-marketo-modal .mktoForm .mktoRadioList > label {
+  color: #494949 !important;
+  display: block !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 18.85px !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList > label a,
+.rbccm-marketo-modal .mktoForm .mktoHtmlText a {
+  color: #0051A5 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 15px !important;
+  text-decoration: none !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList > label a:hover,
+.rbccm-marketo-modal .mktoForm .mktoCheckboxList > label a:focus-visible,
+.rbccm-marketo-modal .mktoForm .mktoHtmlText a:hover {
+  text-decoration: underline !important;
+}
+
+/* ---- Errors: inline under the field, not Marketo's tooltip -------------- */
+.rbccm-marketo-modal .mktoForm .mktoError {
+  bottom: auto !important;
+  left: auto !important;
+  margin: 6px 0 0 !important;
+  position: static !important;
+  right: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoErrorArrowWrap {
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoErrorMsg {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #C8102E !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  max-width: none !important;
+  padding: 0 !important;
+  text-shadow: none !important;
+}
+
+/* ---- Buttons: submit pill + Cancel -------------------------------------- */
+/* Figma: padding-bottom 3px, items centred, gap 317.328px. That gap is
+   Figma's space-between at the 520px content width (Submit hard left,
+   Cancel hard right), so it is space-between here; a fixed 317px gap
+   would wrap Cancel onto its own line on narrower modals. */
+.rbccm-marketo-modal .mktoForm .mktoButtonRow {
+  align-items: center;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 16px;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  margin-top: 12px;
+  order: 30;
+  padding-bottom: 3px !important;
+}
+/* Form-level custom CSS in Marketo (e.g. form 1574) sets the wrap to
+   width: 100% and adds a FontAwesome arrow on the button's ::after;
+   undone here so Cancel fits beside the button and only our arrow shows. */
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap {
+  display: block !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoButton::before,
+.rbccm-marketo-modal .mktoForm .mktoButton::after {
+  content: none !important;
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton {
+  align-items: center !important;
+  background: var(--Blue-Bright-Blue, #0051A5) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 100px !important;
+  box-shadow: none !important;
+  color: #FFF !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 17px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  gap: 14px;
+  height: 45px;
+  justify-content: center !important;
+  letter-spacing: 0 !important;
+  line-height: 20px !important;
+  padding: 14px 35px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  transition: background-color 0.15s ease;
+  width: auto !important;
+}
+/* Marketo's theme adds a 1px border on :hover / :focus / :active, which
+   widened the pill by 2px and squeezed its content (looked like a
+   shrink). Border stays off in every state. */
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton:hover,
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton:focus,
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton:active {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton:hover {
+  background: #003168 !important;
+}
+/* Marketo's theme sets outline: none on the focused button, so keyboard
+   users could tab onto Submit with no visible ring; forced back on. */
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5) !important;
+  outline-offset: 3px !important;
+}
+.rbccm-marketo-modal .mktoForm .mktoButtonWrap .mktoButton[disabled] {
+  cursor: progress;
+  opacity: 0.7;
+}
+.rbccm-marketo-modal__submit-arrow {
+  display: block;
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+  transition: transform 0.15s ease;
+}
+.rbccm-marketo-modal .mktoForm .mktoButton:hover .rbccm-marketo-modal__submit-arrow {
+  transform: translateX(3px);
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__cancel {
+  background: none;
+  border: 0;
+  color: #494949;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  padding: 4px 0;
+  text-align: center;
+  text-decoration-line: underline;
+  text-decoration-skip-ink: auto;
+  text-decoration-style: solid;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__cancel:hover {
+  color: var(--Blue-Bright-Blue, #0051A5);
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__cancel:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+
+/* ---- Thank-you ---------------------------------------------------------- */
+.rbccm-marketo-modal__thanks {
+  text-align: center;
+}
+.rbccm-marketo-modal h2.rbccm-marketo-modal__thanks-heading {
+  color: #002144 !important;
+  font-family: RBCDisplay, "RBC Display", Georgia, Times, serif !important;
+  font-size: 32px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
+  outline: none;
+}
+.rbccm-marketo-modal h2.rbccm-marketo-modal__thanks-heading::after {
+  background: #FFC72C;
+  content: '';
+  display: block;
+  height: 2px;
+  margin: 16px auto 0;
+  width: 45px;
+}
+.rbccm-marketo-modal p.rbccm-marketo-modal__thanks-message {
+  color: #333;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.4 !important;
+  margin: 18px 0 0 !important;
+}
+.rbccm-marketo-modal__thanks-close {
+  background: transparent;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+  border-radius: 999px;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  height: 48px;
+  margin-top: 32px;
+  padding: 0 32px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.rbccm-marketo-modal__thanks-close:hover,
+.rbccm-marketo-modal__thanks-close:focus-visible {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #FFF;
+  outline: none;
+}
+
+/* ---- Mobile ------------------------------------------------------------- */
+@media (max-width: 599px) {
+  /* One column; height follows the content (the stacked form is taller
+     than 563). Header side padding drops so the copy isn't squeezed. */
+  dialog.rbccm-marketo-modal {
+    border-radius: 20px;
+    min-height: 0;
+    padding: 48px 20px 32px;
+  }
+  .rbccm-marketo-modal__header {
+    padding: 27px 0 32px;
+  }
+  .rbccm-marketo-modal h2.rbccm-marketo-modal__heading {
+    font-size: 30px !important;
+    line-height: 32px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.rbccm-marketo-modal[open],
+  dialog.rbccm-marketo-modal[open]::backdrop {
+    animation: none;
+  }
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text .mktoLabel,
+  .rbccm-marketo-modal__submit-arrow {
+    transition: none;
+  }
+}

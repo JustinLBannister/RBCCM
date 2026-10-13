@@ -1,0 +1,77 @@
+<!-- ============================================================
+     RBCCM Marketo Modal  |  Properties + Data
+     ============================================================
+     "Talk with an expert." popup with an embedded Marketo form,
+     opened by any link on the page whose URL is #{ModalID}
+     (default #request-demo), e.g. the hero and CTA band
+     "Request a demo" buttons. Place one instance anywhere on the
+     page; it stays hidden until a trigger is clicked.
+
+     The fields, consent checkbox and submit button come from the
+     Marketo form (form builder). This component restyles them to
+     the RBCCM design, adds a Cancel button, checks for a business
+     email, and swaps in a thank-you message on success.
+
+     Content tab: copy, Marketo form ID, button labels, thank-you.
+     Appearance tab: paths, modal ID, Marketo instance (set once).
+     ============================================================ -->
+<Properties ComponentID="rbccm-marketo-modal-v1">
+
+  <!-- ============================================================
+       Appearance tab: settings, paths
+       ============================================================ -->
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-marketo-modal.css</Datum>
+
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - set once at deploy)">/assets/rbccm/js/components/rbccm-marketo-modal.js</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-10-13-1200</Datum>
+
+  <!-- Any link whose URL is #request-demo opens this modal (set the
+       hero / CTA band button URL to #request-demo). Letters, numbers
+       and hyphens only; must be unique on the page. -->
+  <Datum ID="ModalID" Type="String" Name="Modal ID - buttons link to #this-id to open it (e.g. request-demo)">request-demo</Datum>
+
+  <!-- Marketo instance. Same for every RBCCM form; only change if
+       Marketo moves. -->
+  <Datum ID="MarketoBaseUrl" Type="String" Name="Marketo base URL (technical - RBCCM-wide constant)">//discover.rbccm.com</Datum>
+
+  <Datum ID="MarketoMunchkinId" Type="String" Name="Marketo Munchkin ID (technical - RBCCM-wide constant)">577-RQV-784</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy + form
+       ============================================================ -->
+
+  <!-- Heading is two parts so the last word(s) can be blue:
+       "Talk with an" + "expert." -->
+  <Datum ID="HeadingText" Type="String" Name="Heading (dark part)">Talk with an</Datum>
+
+  <Datum ID="HeadingHighlightText" Type="String" Name="Heading (blue part, optional - e.g. expert.)">expert.</Datum>
+
+  <!-- Plain text or light HTML (strong, em, a). -->
+  <Datum ID="SubheadingText" Type="Textarea" Name="Subheading (optional - blank hides it)">Connect with our product team to arrange a custom demo.</Datum>
+
+  <!-- The number from Marketo, e.g. 1602 for mktoForm_1602.
+       Digits only; anything else is stripped. Blank = no form. -->
+  <Datum ID="MarketoFormId" Type="String" Name="Marketo form ID (numbers only, e.g. 1602)">1602</Datum>
+
+  <Datum ID="SubmitLabel" Type="String" Name="Submit button label (replaces the Marketo button text)">Submit</Datum>
+
+  <Datum ID="CancelLabel" Type="String" Name="Cancel link label">Cancel</Datum>
+
+  <Datum ID="CloseLabel" Type="String" Name="Close (X) button label for screen readers">Close</Datum>
+
+  <!-- Shown in place of the form after a successful submit.
+       {FirstName} is replaced with the name they entered (dropped,
+       with its comma, if they left it blank). -->
+  <Datum ID="ThankYouHeading" Type="String" Name="Thank-you heading ({FirstName} = their first name)">Thanks, {FirstName}.</Datum>
+
+  <Datum ID="ThankYouMessage" Type="Textarea" Name="Thank-you message">A member of our product team will be in touch shortly to arrange your demo.</Datum>
+
+  <Datum ID="ThankYouCloseLabel" Type="String" Name="Thank-you close button label">Close</Datum>
+
+</Data>

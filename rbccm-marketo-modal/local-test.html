@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rbccm-marketo-modal -- local preview</title>
+<style>
+  body { margin: 0; background: #F4F6F8; font-family: Roboto, Arial, sans-serif; color: #002144; }
+  .demo-note { background: #002144; color: #fff; padding: 12px 24px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  .demo-section { padding: 64px 24px; text-align: center; }
+  .demo-section--dark { background: #12234A; color: #fff; }
+  .demo-section h2 { font-family: RBCDisplay, "RBC Display", Georgia, serif; font-weight: 500; font-size: 40px; margin: 0 0 24px; }
+  .demo-btn { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 32px; border-radius: 999px; font-size: 16px; font-weight: 500; text-decoration: none; }
+  .demo-btn--primary { background: #0051A5; color: #fff; }
+  .demo-btn--yellow { background: #FFC72C; color: #002144; }
+  .demo-hint { font-size: 13px; opacity: .75; margin-top: 16px; }
+</style>
+</head>
+<body data-picker-title="rbccm-marketo-modal">
+
+<!-- Triggers: same markup shape as the hero and CTA band buttons, with
+     their URL field set to #request-demo. Neither component changes. -->
+<div class="demo-note">Hero button (URL field = #request-demo)</div>
+<section class="demo-section">
+  <h2>Trade with clarity. Execute with control.</h2>
+  <a class="demo-btn demo-btn--primary" href="#request-demo">Request a demo &#8594;</a>
+  <p class="demo-hint">Also opens from a page URL ending in #request-demo.</p>
+</section>
+
+<div class="demo-note">CTA band button (URL field = #request-demo)</div>
+<section class="demo-section demo-section--dark">
+  <h2>Talk with an expert.</h2>
+  <a class="demo-btn demo-btn--yellow" href="#request-demo">Request a demo &#8594;</a>
+</section>
+
+<!-- The modal: exact output of rbccm-marketo-modal.xsl (xsltproc) with
+     the default Properties (Marketo form 1602, the new
+     demo form). Asset paths point at the local files. -->
+<link rel="stylesheet" type="text/css" href="rbccm-marketo-modal.css"><dialog class="rbccm-marketo-modal" tabindex="-1" id="request-demo" aria-labelledby="request-demo-title" data-form-id="1602" data-base-url="//discover.rbccm.com" data-munchkin="577-RQV-784" data-submit-label="Submit" data-cancel-label="Cancel"><button type="button" class="rbccm-marketo-modal__close" data-rbccm-modal-close="" aria-label="Close"><svg class="rbccm-marketo-modal__close-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" stroke-width="1.4"></path></svg></button><div class="rbccm-marketo-modal__body"><div class="rbccm-marketo-modal__header"><h2 class="rbccm-marketo-modal__heading" id="request-demo-title">Talk with an <span class="rbccm-marketo-modal__heading-highlight">expert.</span></h2><p class="rbccm-marketo-modal__subheading">Connect with our product team to arrange a custom demo.</p></div><div class="rbccm-marketo-modal__form"><form id="mktoForm_1602"></form></div><div class="rbccm-marketo-modal__thanks" hidden="hidden"><h2 class="rbccm-marketo-modal__thanks-heading" tabindex="-1">Thanks, {FirstName}.</h2><p class="rbccm-marketo-modal__thanks-message">A member of our product team will be in touch shortly to arrange your demo.</p><button type="button" class="rbccm-marketo-modal__thanks-close" data-rbccm-modal-close="">Close</button></div></div></dialog><script src="rbccm-marketo-modal.js"></script>
+
+
+</body>
+</html>
