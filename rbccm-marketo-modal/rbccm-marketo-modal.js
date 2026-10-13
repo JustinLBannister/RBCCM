@@ -40,6 +40,16 @@
   'use strict';
 
   var BAD_DOMAINS = ['@gmail.', '@yahoo.', '@hotmail.', '@live.', '@aol.', '@outlook.'];
+  /* Sentence-case labels (design), by Marketo field name. Overrides the
+     form builder's wording ("First Name", "Company Name:"); fields not
+     listed keep their Marketo label. */
+  var FIELD_LABELS = {
+    FirstName: 'First name',
+    LastName:  'Last name',
+    Company:   'Company',
+    Title:     'Title',
+    Email:     'Business email'
+  };
   /* Figma: 18 x 18 frame, 15.751 x 10.126 glyph, white (currentColor). */
   var ARROW_SVG = '<svg class="rbccm-marketo-modal__submit-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.125 8.99998C1.125 8.85079 1.18426 8.70772 1.28975 8.60223C1.39524 8.49674 1.53832 8.43748 1.6875 8.43748H14.9546L11.4142 4.89823C11.3086 4.79261 11.2493 4.64935 11.2493 4.49998C11.2493 4.35061 11.3086 4.20735 11.4142 4.10173C11.5199 3.99611 11.6631 3.93677 11.8125 3.93677C11.9619 3.93677 12.1051 3.99611 12.2108 4.10173L16.7108 8.60173C16.7631 8.65398 16.8047 8.71605 16.8331 8.78439C16.8614 8.85273 16.876 8.92599 16.876 8.99998C16.876 9.07397 16.8614 9.14723 16.8331 9.21557C16.8047 9.2839 16.7631 9.34598 16.7108 9.39823L12.2108 13.8982C12.1051 14.0038 11.9619 14.0632 11.8125 14.0632C11.6631 14.0632 11.5199 14.0038 11.4142 13.8982C11.3086 13.7926 11.2493 13.6494 11.2493 13.5C11.2493 13.3506 11.3086 13.2073 11.4142 13.1017L14.9546 9.56248H1.6875C1.53832 9.56248 1.39524 9.50321 1.28975 9.39773C1.18426 9.29224 1.125 9.14916 1.125 8.99998Z" fill="currentColor"/></svg>';
 
@@ -239,6 +249,18 @@
         col.classList.add('rbccm-marketo-modal__field--' + slug(field.name));
         col.classList.add(isCheckbox ? 'rbccm-marketo-modal__field--checkbox' : 'rbccm-marketo-modal__field--text');
         if (isCheckbox) return;
+        /* Label text: replace Marketo's wording, keep its hidden asterisk
+           element. The placeholder follows so autofill / screen readers
+           that read it get the same words. */
+        var newLabel = FIELD_LABELS[field.name];
+        var labelEl = col.querySelector('label.mktoLabel');
+        if (newLabel && labelEl) {
+          Array.prototype.slice.call(labelEl.childNodes).forEach(function (node) {
+            if (node.nodeType === 3) labelEl.removeChild(node);
+          });
+          labelEl.appendChild(document.createTextNode(newLabel));
+          if (field.hasAttribute('placeholder')) field.setAttribute('placeholder', newLabel);
+        }
         /* Floating label: .is-filled keeps it up once there is a value
            (typed, autofilled or restored). */
         var sync = function () { col.classList.toggle('is-filled', !!field.value); };
@@ -266,15 +288,106 @@
         buttonRow.appendChild(cancel);
       }
 
-      form.onValidate(function () {
-        var email = form.vals().Email;
-        if (!email) return;
-        if (!emailOk(email)) {
-          form.submitable(false);
-          form.showErrorMessage('Must be Business email.', form.getFormElem().find('[name="Email"]'));
-        } else {
-          form.submitable(true);
+      /* Validation: every message at once. Marketo flags all invalid
+         fields but only writes a message under the first, so the rest
+         looked fine until visited. On submit this checks every field
+         Marketo marks required (.mktoRequiredField, so it follows the
+         form builder), plus email format and the business email rule,
+         writes a message under each, and focuses the first. After the
+         first attempt each message clears or updates as the field is
+         edited. Marketo's own single message is hidden while ours show
+         (has-inline-errors); if it rejects something we don't check,
+         its message still shows. */
+      var attempted = false;
+      var errorSeq = 0;
+
+      function checkWrap(wrap) {
+        var input = wrap.querySelector('.mktoField');
+        if (!input || input.type === 'hidden') return '';
+        var required = wrap.classList.contains('mktoRequiredField');
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          return required && !wrap.querySelector('.mktoField:checked') ? 'This field is required.' : '';
         }
+        var value = String(input.value || '').trim();
+        if (!value) return required ? 'This field is required.' : '';
+        if (input.type === 'email' || input.name === 'Email') {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Must be valid email.';
+          if (input.name === 'Email' && !emailOk(value)) return 'Must be Business email.';
+        }
+        return '';
+      }
+
+      function showError(wrap, msg) {
+        var inputs = wrap.querySelectorAll('.mktoField');
+        var el = wrap.querySelector('.rbccm-marketo-modal__error');
+        if (msg && !el) {
+          el = document.createElement('div');
+          el.className = 'rbccm-marketo-modal__error';
+          el.id = id + '-error-' + (++errorSeq);
+          wrap.appendChild(el);
+        }
+        if (msg) el.textContent = msg;
+        /* Our own flag: Marketo clears mktoInvalid / aria-invalid on blur
+           for anything its own rules accept (e.g. a gmail address). */
+        wrap.classList.toggle('is-invalid', !!msg);
+        var errId = el ? el.id : '';
+        Array.prototype.forEach.call(inputs, function (input) {
+          var refs = (input.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (r) {
+            return r && r !== errId;
+          });
+          if (msg) {
+            refs.push(errId);
+            input.setAttribute('aria-invalid', 'true');
+            input.classList.add('mktoInvalid');
+          } else {
+            input.removeAttribute('aria-invalid');
+            input.classList.remove('mktoInvalid');
+          }
+          if (refs.length) input.setAttribute('aria-describedby', refs.join(' '));
+          else input.removeAttribute('aria-describedby');
+        });
+        if (!msg && el) el.parentNode.removeChild(el);
+        return !!msg;
+      }
+
+      function validateAll() {
+        var bad = [];
+        Array.prototype.forEach.call(formEl.querySelectorAll('.mktoFieldWrap'), function (wrap) {
+          if (showError(wrap, checkWrap(wrap))) bad.push(wrap);
+        });
+        formEl.classList.toggle('has-inline-errors', bad.length > 0);
+        return bad;
+      }
+
+      form.onValidate(function () {
+        attempted = true;
+        var bad = validateAll();
+        form.submitable(bad.length === 0);
+        if (!bad.length) return;
+        /* First invalid field on screen (the CSS orders fields by name,
+           so DOM order can differ from what the user sees). */
+        bad.sort(function (a, b) {
+          var ra = a.getBoundingClientRect();
+          var rb = b.getBoundingClientRect();
+          return (ra.top - rb.top) || (ra.left - rb.left);
+        });
+        var target = bad[0].querySelector('.mktoField');
+        setTimeout(function () { if (target) target.focus(); }, 0);
+      });
+
+      function revalidate(e) {
+        if (!attempted) return;
+        var wrap = e.target.closest && e.target.closest('.mktoFieldWrap');
+        if (!wrap || !formEl.contains(wrap)) return;
+        showError(wrap, checkWrap(wrap));
+        formEl.classList.toggle('has-inline-errors', !!formEl.querySelector('.rbccm-marketo-modal__error'));
+      }
+      formEl.addEventListener('input', revalidate);
+      formEl.addEventListener('change', revalidate);
+      /* Marketo re-validates on blur and resets aria-invalid; re-apply
+         ours after it runs. */
+      formEl.addEventListener('focusout', function (e) {
+        setTimeout(function () { revalidate(e); }, 0);
       });
 
       form.vals({ gacid: gacid() });

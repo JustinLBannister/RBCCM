@@ -224,6 +224,18 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 .rbccm-marketo-modal .mktoForm .mktoInstruction {
   display: none !important;
 }
+/* Required marker: an asterisk after the label of every field Marketo
+   marks required (.mktoRequiredField, so it follows the form builder),
+   e.g. "First Name*", and after the consent text ("...Privacy Policy*").
+   Marketo's own asterisk sits before the label and stays hidden above.
+   The "/ ''" alt text keeps screen readers from reading "star"; they
+   already announce the field as required (aria-required). The first
+   declaration is the fallback for browsers without alt text. */
+.rbccm-marketo-modal .mktoForm .mktoRequiredField > label.mktoLabel::after,
+.rbccm-marketo-modal .mktoForm .mktoRequiredField .mktoCheckboxList > label::after {
+  content: "*";
+  content: "*" / "";
+}
 .rbccm-marketo-modal .mktoForm .mktoFieldWrap {
   float: none !important;
   width: 100% !important;
@@ -312,8 +324,25 @@ dialog.rbccm-marketo-modal.is-fallback-open {
   border-bottom-color: var(--Blue-Bright-Blue, #0051A5) !important;
   box-shadow: 0 1px 0 0 var(--Blue-Bright-Blue, #0051A5) !important;
 }
-.rbccm-marketo-modal .mktoForm .mktoField.mktoInvalid {
+/* Invalid: red underline. Same selectors as the base underline rule so it
+   actually wins (the bare .mktoField.mktoInvalid version was outranked
+   and the line stayed grey); after the focus rule so it stays red while
+   the field is being fixed. */
+.rbccm-marketo-modal .mktoForm input.mktoField.mktoInvalid:not([type="checkbox"]):not([type="radio"]),
+.rbccm-marketo-modal .mktoForm textarea.mktoField.mktoInvalid,
+.rbccm-marketo-modal .mktoForm select.mktoField.mktoInvalid,
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid input.mktoField:not([type="checkbox"]):not([type="radio"]),
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid textarea.mktoField,
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid select.mktoField {
   border-bottom-color: #C8102E !important;
+}
+.rbccm-marketo-modal .mktoForm input.mktoField.mktoInvalid:not([type="checkbox"]):not([type="radio"]):focus,
+.rbccm-marketo-modal .mktoForm textarea.mktoField.mktoInvalid:focus,
+.rbccm-marketo-modal .mktoForm select.mktoField.mktoInvalid:focus,
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid input.mktoField:not([type="checkbox"]):not([type="radio"]):focus,
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid textarea.mktoField:focus,
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid select.mktoField:focus {
+  box-shadow: 0 1px 0 0 #C8102E !important;
 }
 
 /* ---- Consent checkbox --------------------------------------------------- */
@@ -379,6 +408,20 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 }
 .rbccm-marketo-modal .mktoForm .mktoErrorArrowWrap {
   display: none !important;
+}
+/* The modal JS writes its own message under every invalid field (Marketo
+   only writes one at a time), so Marketo's single message is hidden while
+   ours are up. Same type as Marketo's message below. */
+.rbccm-marketo-modal .mktoForm.has-inline-errors .mktoError {
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__error {
+  color: #C8102E;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
 }
 .rbccm-marketo-modal .mktoForm .mktoErrorMsg {
   background: none !important;
@@ -509,6 +552,14 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 }
 
 /* ---- Thank-you ---------------------------------------------------------- */
+/* Once the form is swapped for the thank-you, the panel drops the 563px
+   form height and fits the message: auto height, 48px top and bottom at
+   every breakpoint. margin: auto on the dialog keeps it centred. */
+dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
+  min-height: 0;
+  padding-bottom: 48px;
+  padding-top: 48px;
+}
 .rbccm-marketo-modal__thanks {
   text-align: center;
 }
