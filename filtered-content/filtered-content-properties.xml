@@ -34,12 +34,13 @@
 <Data>
 
   <!-- Preset selector: picks which variant this instance renders as.
-       Each <Option> is element-only (Display label + Value machine-
-       value children). The bare text after the closing </Option> is
-       the default value. -->
-  <Datum ID="Preset" Type="String" Name="Preset" Label="Component variant">
+       SelectSingle so TeamSite shows a dropdown (it was a String, which
+       showed a plain text box). Each <Option> is element-only (Display
+       label + Value machine-value children). The bare text after the
+       closing </Option> is the default value. -->
+  <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)" Label="Component variant">
     <Option>
-      <Display>In the Media &amp; Press Releases</Display>
+      <Display>In the Media &amp; News Releases</Display>
       <Value>in-the-media-and-press-releases</Value>
     </Option>
     <Option>
