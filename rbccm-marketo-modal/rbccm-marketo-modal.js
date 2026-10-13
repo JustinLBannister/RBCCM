@@ -273,10 +273,29 @@
 
       /* Submit label + arrow, Cancel beside it. */
       var btn = formEl.querySelector('.mktoButton');
-      if (btn) {
+      function renderButton() {
         btn.innerHTML = '<span class="rbccm-marketo-modal__submit-label"></span>' + ARROW_SVG;
         btn.querySelector('.rbccm-marketo-modal__submit-label').textContent = submitLabel;
         btn.classList.add('rbccm-marketo-modal__submit');
+      }
+      if (btn) renderButton();
+
+      /* Guard against page-wide scripts from other Marketo forms. The
+         MAAS page's legacy form 1205 script runs
+         $(".mktoButton").html("Sign up") and
+         $("#autofill").prependTo(".mktoCheckboxList"), which hit every
+         form on the page, so whichever form loaded last decided this
+         button's text. Put the label + arrow back if anything rewrites
+         the button, and drop any copy of 1205's #autofill block that
+         lands in this form. Our own writes leave the label span in
+         place, so this never loops. */
+      if (window.MutationObserver) {
+        new MutationObserver(function () {
+          if (btn && !btn.querySelector('.rbccm-marketo-modal__submit-label')) renderButton();
+          Array.prototype.forEach.call(formEl.querySelectorAll('#autofill'), function (el) {
+            el.parentNode.removeChild(el);
+          });
+        }).observe(formEl, { childList: true, subtree: true });
       }
       var buttonRow = formEl.querySelector('.mktoButtonRow');
       if (buttonRow && !buttonRow.querySelector('.rbccm-marketo-modal__cancel')) {
