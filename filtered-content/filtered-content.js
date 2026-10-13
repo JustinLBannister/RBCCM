@@ -130,11 +130,11 @@
   };
 
   /* Type dropdown labels -- ITM preset uses "press" and "media" as the
-     raw data-type tokens, but the dropdown should read "Press release"
+     raw data-type tokens, but the dropdown should read "News release"
      and "Media coverage" (matching the eyebrow labels on the cards
      themselves). Applied via formatValue() below. */
   var TYPE_LABELS = {
-    'press':  'Press release',
+    'press':  'News release',
     'media':  'Media coverage'
   };
 
@@ -227,7 +227,7 @@
     }
     if (dim === 'type') {
       /* ITM type tokens ("press" / "media") map to human labels
-         "Press release" / "Media coverage" so the dropdown option
+         "News release" / "Media coverage" so the dropdown option
          reads the same way as the eyebrow on the card itself. */
       return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
@@ -563,7 +563,7 @@
       var yearMatch = dateStr.match(/(\d{4})/);
       var itemYear = yearMatch ? yearMatch[1] : '';
       var typeToken = topic.indexOf('press') !== -1 ? 'press' : 'media';
-      var eyebrowLabel = typeToken === 'press' ? 'Press release' : 'Media coverage';
+      var eyebrowLabel = typeToken === 'press' ? 'News release' : 'Media coverage';
       var eyebrowMod = typeToken === 'press'
         ? 'rbccm-filtered-content__card-eyebrow--press'
         : 'rbccm-filtered-content__card-eyebrow--media';
@@ -1346,7 +1346,7 @@
       }
       chipRow.hidden = false;
 
-      /* Dimension label prefix ("Type: Press release"). Kept subtle
+      /* Dimension label prefix ("Type: News release"). Kept subtle
          visually but carried in the accessible name for AT users. */
       var DIM_LABELS = { type:'Type', year:'Year', month:'Month',
                          region:'Region', topic:'Topic', search:'Search',
@@ -1495,7 +1495,7 @@
        the empty-state message names WHAT the user was looking for
        instead of just saying "your current filters." Examples:
          Type=media, Year=2004    -> "We couldn't find any media coverage in 2004."
-         Type=press, Year=2025    -> "We couldn't find any press releases in 2025."
+         Type=press, Year=2025    -> "We couldn't find any news releases in 2025."
          Year=2018 alone          -> "We couldn't find any media coverage in 2018."
          search only              -> "We couldn't find any media coverage matching \"donald\"."
        Deals use their own order (year, then transaction type):
@@ -1541,15 +1541,15 @@
         return dealParts.join(' ') + '.';
       }
 
-      /* Subject noun -- lowercase the type label if set ("Press release"
-         becomes "press releases"; "Media coverage" stays "media coverage").
+      /* Subject noun -- lowercase the type label if set ("News release"
+         becomes "news releases"; "Media coverage" stays "media coverage").
          Otherwise use the generic fallback authored on data-empty-message-
          subject, or "coverage" as a last resort. */
       var subject;
       if (typeLabel) {
         var lower = typeLabel.toLowerCase();
-        /* Simple pluralization for the two ITM cases -- press release ->
-           press releases; media coverage is already a mass noun so it
+        /* Simple pluralization for the two ITM cases -- news release ->
+           news releases; media coverage is already a mass noun so it
            stays. Guarded to a one-word check so we don't accidentally
            add "s" to values that are already plural or use a different
            idiom for other presets. */
@@ -2335,7 +2335,7 @@
 
       var eyebrowHtml = '';
       if (entry.type === 'press' || entry.type === 'media') {
-        var eyebrowLabel = entry.type === 'press' ? 'Press release' : 'Media coverage';
+        var eyebrowLabel = entry.type === 'press' ? 'News release' : 'Media coverage';
         var eyebrowMod   = entry.type === 'press'
           ? 'rbccm-filtered-content__card-eyebrow--press'
           : 'rbccm-filtered-content__card-eyebrow--media';
