@@ -26,7 +26,19 @@
 
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
-  <xsl:variable name="SEO_JSONLD" select="//Datum[@ID='SeoJsonLd']"/>
+  <!-- Content tab (Data) first. The field moved there from the
+       Appearance tab (Properties) on 2026-10-13; an existing instance
+       can still hold its old value on the Appearance side, and
+       //Datum alone would pick that one because it comes first. The
+       Appearance copy is only used when the Content tab one is blank. -->
+  <xsl:variable name="SEO_JSONLD_DATA" select="//Data/Datum[@ID='SeoJsonLd'][normalize-space(.) != '']"/>
+  <xsl:variable name="SEO_JSONLD_ANY"  select="//Datum[@ID='SeoJsonLd'][normalize-space(.) != '']"/>
+  <xsl:variable name="SEO_JSONLD">
+    <xsl:choose>
+      <xsl:when test="$SEO_JSONLD_DATA"><xsl:value-of select="$SEO_JSONLD_DATA[1]"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$SEO_JSONLD_ANY[1]"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:template match="/">
     <xsl:if test="normalize-space($SEO_JSONLD) != ''">
