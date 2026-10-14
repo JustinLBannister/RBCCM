@@ -135,7 +135,7 @@ dialog.rbccm-marketo-modal.is-fallback-open {
   display: flex;
   flex-direction: column;
   gap: 11px;
-  padding: 27px 52px 41.594px;
+  padding: 27px 0 41.594px;          /* full width so the subheading fits on one line */
   text-align: center;
 }
 .rbccm-marketo-modal h2.rbccm-marketo-modal__heading {
@@ -568,6 +568,7 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
   font-family: RBCDisplay, "RBC Display", Georgia, Times, serif !important;
   font-size: 32px !important;
   font-weight: 500 !important;
+  letter-spacing: 0 !important;       /* site h2 adds 1px */
   line-height: 1.15 !important;
   margin: 0 !important;
   outline: none;
@@ -584,6 +585,7 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
   color: #333;
   font-family: Roboto, Arial, sans-serif !important;
   font-size: 16px !important;
+  letter-spacing: 0 !important;       /* site p adds 0.5px */
   line-height: 1.4 !important;
   margin: 18px 0 0 !important;
 }

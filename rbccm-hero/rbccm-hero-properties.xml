@@ -196,11 +196,18 @@
 
   <Datum ID="BgVideoMp4" Type="String" Name="Background MP4 URL (optional - overrides Brightcove if set)"></Datum>
 
-  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional)"></Datum>
+  <!-- One ID plays at every width. Strategy & Economics also takes
+       IDs separated by commas, one cut per breakpoint, and loads only
+       the one for the current width (swapping if the width crosses
+       768 / 992):
+         3 IDs: mobile (under 768), tablet (768-991), desktop (992+)
+         2 IDs: mobile, desktop (tablet uses the desktop cut)
+       The other hero variants use a single ID only. -->
+  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional - Strategy &amp; Economics: 3 IDs separated by commas = mobile, tablet, desktop)"></Datum>
 
   <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA : button 1 label (optional - blank hides the button)">Request a demo</Datum>
 
-  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : button 1 URL (required if label is set - full URL or /en/ path)">#</Datum>
+  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA : button 1 URL (required if label is set - full URL or /en/ path; #request-demo opens the demo form modal)">#request-demo</Datum>
 
   <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA : button 1 accessible name (optional - screen-reader label)"></Datum>
 

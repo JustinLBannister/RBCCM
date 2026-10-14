@@ -27,6 +27,35 @@
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
   <!-- Tag allow-list guard. -->
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="pickTag">
     <xsl:param name="raw"/>
     <xsl:param name="default"/>
@@ -239,6 +268,12 @@
         <xsl:with-param name="legacy" select="'SeBgBrightcoveVideoId'"/>
       </xsl:call-template>
     </xsl:variable>
+    <!-- Brightcove ID(s). A comma means one cut per breakpoint
+         (mobile, tablet, desktop); the inline script below splits the
+         list. Spaces around the commas are ignored. -->
+    <xsl:variable name="SE_BG_IDS" select="translate($SE_BG_VIDEO_ID, ' ', '')"/>
+    <xsl:variable name="SE_BG_URL_BASE">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.html?videoId=</xsl:variable>
+    <xsl:variable name="SE_BG_URL_PARAMS">&amp;autoplay=true&amp;muted=true&amp;loop=true&amp;playsinline=true&amp;controls=false</xsl:variable>
     <xsl:variable name="SE_BG_MP4">
       <xsl:call-template name="datum">
         <xsl:with-param name="id" select="'BgVideoMp4'"/>
@@ -464,12 +499,62 @@
             </video>
           </div>
         </xsl:when>
-        <xsl:when test="$SE_BG_VIDEO_ID != ''">
+        <!-- Brightcove, one ID: one video at every width, src set
+             server side (unchanged markup). -->
+        <xsl:when test="$SE_BG_IDS != '' and not(contains($SE_BG_IDS, ','))">
           <div class="rbccm-hero__bg-video" aria-hidden="true">
             <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen">
-              <xsl:attribute name="src">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.html?videoId=<xsl:value-of select="$SE_BG_VIDEO_ID"/>&amp;autoplay=true&amp;muted=true&amp;loop=true&amp;playsinline=true&amp;controls=false</xsl:attribute>
+              <xsl:attribute name="src"><xsl:value-of select="$SE_BG_URL_BASE"/><xsl:value-of select="$SE_BG_IDS"/><xsl:value-of select="$SE_BG_URL_PARAMS"/></xsl:attribute>
             </iframe>
           </div>
+        </xsl:when>
+        <!-- Brightcove, IDs separated by commas: one cut per breakpoint.
+             The iframe starts empty; the inline script right after it
+             splits the list, loads only the cut for the current width
+             and swaps if the width crosses a breakpoint:
+               3 IDs  mobile (under 768), tablet (768-991), desktop (992+)
+               2 IDs  mobile, desktop (tablet uses desktop)
+             Inline so the video starts as early as a server-set src. -->
+        <xsl:when test="contains($SE_BG_IDS, ',')">
+          <div class="rbccm-hero__bg-video rbccm-hero__bg-video--responsive" aria-hidden="true">
+            <xsl:attribute name="data-bg-video-ids"><xsl:value-of select="$SE_BG_IDS"/></xsl:attribute>
+            <xsl:attribute name="data-bg-video-base"><xsl:value-of select="$SE_BG_URL_BASE"/></xsl:attribute>
+            <xsl:attribute name="data-bg-video-params"><xsl:value-of select="$SE_BG_URL_PARAMS"/></xsl:attribute>
+            <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" tabindex="-1"></iframe>
+          </div>
+          <script>
+(function () {
+  var s = document.currentScript;
+  var wrap = s ? s.previousElementSibling : null;
+  var frame = wrap ? wrap.querySelector('iframe') : null;
+  if (!frame) return;
+  var ids = (wrap.getAttribute('data-bg-video-ids') || '').split(',').filter(function (id) { return id; });
+  if (!ids.length) return;
+  var byWidth = {
+    mobile:  ids[0],
+    tablet:  ids.length > 2 ? ids[1] : ids[ids.length - 1],
+    desktop: ids[ids.length > 2 ? 2 : ids.length - 1]
+  };
+  function urlFor(size) {
+    return wrap.getAttribute('data-bg-video-base') + byWidth[size] + wrap.getAttribute('data-bg-video-params');
+  }
+  if (!window.matchMedia) {
+    frame.setAttribute('src', urlFor('desktop'));
+    return;
+  }
+  var desktop = window.matchMedia('(min-width: 992px)');
+  var tablet = window.matchMedia('(min-width: 768px)');
+  function pick() {
+    var url = urlFor(desktop.matches ? 'desktop' : (tablet.matches ? 'tablet' : 'mobile'));
+    if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
+  }
+  pick();
+  [desktop, tablet].forEach(function (q) {
+    if (q.addEventListener) q.addEventListener('change', pick);
+    else if (q.addListener) q.addListener(pick);
+  });
+})();
+          </script>
         </xsl:when>
       </xsl:choose>
 
@@ -502,7 +587,7 @@
                 <xsl:if test="$SE_BODY_MAX_WIDTH != ''">
                   <xsl:attribute name="style">--rbccm-hero-se-body-max-width: <xsl:value-of select="$SE_BODY_MAX_WIDTH"/>;</xsl:attribute>
                 </xsl:if>
-                <xsl:value-of select="$SE_BODY_TEXT" disable-output-escaping="yes"/>
+                <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SE_BODY_TEXT"/></xsl:call-template>
               </xsl:element>
             </xsl:if>
 
@@ -542,7 +627,7 @@
                 </xsl:variable>
                 <xsl:choose>
                   <xsl:when test="number($SE_BODY_MAX) &lt;= 0 or string-length(normalize-space($bodyPlain)) &lt;= number($SE_BODY_MAX)">
-                    <xsl:value-of select="$SE_EFF_BODY" disable-output-escaping="yes"/>
+                    <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SE_EFF_BODY"/></xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:call-template name="truncate">

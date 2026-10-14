@@ -493,6 +493,40 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   opacity: 0.1;
 }
 
+/* Per-breakpoint Brightcove cuts (IDs separated by commas, see the
+   skin). object-fit does nothing on an iframe: the player fits its
+   video inside the frame, so a frame that doesn't match the video's
+   shape shows bars. Here the iframe takes the shape of the cut that is
+   playing and is sized to cover the hero, anchored top right like the
+   MP4, with the overflow clipped by the wrapper. Ratios from the
+   delivered files:
+     mobile  750 x 1000   (3:4)
+     tablet  1024 x 768   (4:3)
+     desktop 1920 x 800   (2.4:1)
+   Container query units (cqw / cqh) measure the hero; browsers without
+   them keep the 100% x 100% sizing above. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
+  --rbccm-hero-bg-ratio: 0.75;
+  container-type: size;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
+    --rbccm-hero-bg-ratio: 1.3333;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
+    --rbccm-hero-bg-ratio: 2.4;
+  }
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive iframe {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: max(100cqw, 100cqh * var(--rbccm-hero-bg-ratio));
+  height: max(100cqh, 100cqw / var(--rbccm-hero-bg-ratio));
+}
+
 /* Content column lifted above the video. Base container already
    sits at z-index 1 (from the shared block's `> *` z-index safety
    net), so this rule just makes the intent explicit. */
