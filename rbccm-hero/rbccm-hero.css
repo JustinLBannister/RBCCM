@@ -492,6 +492,18 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
      toward 0.1 for a barely-there ambient feel. */
   opacity: 0.1;
 }
+/* Brightcove iframe backdrop (2026-10-14): the S&E hero cuts read too
+   faint at 0.1. Mobile 0.2 (the video sits behind the stacked title and
+   card there), tablet and desktop 0.4. The MP4 <video> path above stays
+   at 0.1. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+  opacity: 0.2;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+    opacity: 0.4;
+  }
+}
 
 /* Per-breakpoint Brightcove cuts (IDs separated by commas, see the
    skin). object-fit does nothing on an iframe: the player fits its

@@ -2580,16 +2580,35 @@
     }
   };
 
+  /* The deals feed stores some characters as HTML character references
+     INSIDE its CDATA blocks, e.g. <amount><![CDATA[US&#36;1.65 billion]]>
+     and "Inc&period;" in titles (2026-10: 143 amounts, 45 titles). CDATA
+     is literal, so textContent hands back "&#36;" and the card showed
+     "US&#36;1.65 billion". The live transactions page renders the same
+     strings as HTML, which decodes them; this does the same for the text
+     fields. A <textarea> parses its content as text only (no elements,
+     nothing runs), so it is a safe decoder. */
+  var entityDecoder = null;
+  function decodeEntities(s) {
+    if (!s || s.indexOf('&') === -1) return s;
+    if (!entityDecoder) entityDecoder = document.createElement('textarea');
+    entityDecoder.innerHTML = s;
+    return entityDecoder.value;
+  }
+  function dealText(node, tag) {
+    return decodeEntities(child(node, tag)).trim();
+  }
+
   function buildDealsEntry(node) {
-    var title = child(node, 'title').trim();
+    var title = dealText(node, 'title');
     if (!title) return null;
     var link = child(node, 'link').trim();
     var thumb = extractImageUrl(child(node, 'thumbnail').trim());  /* CSS bg-image -> plain URL */
     var dateStr = child(node, 'date').trim();
-    var role = child(node, 'role').trim();
+    var role = dealText(node, 'role');
     var status = child(node, 'status').trim().toLowerCase();
-    var amount = child(node, 'amount').trim();
-    var specialty = child(node, 'specialty').trim();               /* "Senior Unsecured Notes" etc - populated on debt deals, empty on M&A */
+    var amount = dealText(node, 'amount');
+    var specialty = dealText(node, 'specialty');                   /* "Senior Unsecured Notes" etc - populated on debt deals, empty on M&A */
     var rawType = child(node, 'type').trim();
     var canonicalType = normalizeTransactionType(rawType);
 
