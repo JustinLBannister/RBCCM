@@ -1194,25 +1194,50 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     top: 98px;
   }
 }
-/* Wider than the 1440 art: stop scaling it up. contain keeps it at its
-   own 1440 x 490 size, pinned right. The strip to its left is filled
-   with the gradient's navy (#002142), and a 240px fade sits on the art's
-   left edge so the edge of the art doesn't show as a hard vertical line
-   (100% - 1200px puts the fade's left side 1440px from the right, where
-   the art starts). From 1441: at 1440 the art fills the hero exactly. */
+/* Wider than the 1440 art (1441+), GIB robots: keep cover so the art
+   grows with the screen and always reaches the left edge (no navy
+   strip), pinned top right. Its copy gradient is off 1240-1439 and
+   back at 1440+, scaled with the art (see below). The globe has its own rules (bottom left, gradient on). */
 @media (min-width: 1441px) {
   .rbccm-hero--us-credentials .rbccm-hero__bg-image {
-    background-color: #002142;
-    background-image:
-      linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0) 100%),
-      var(--rbccm-hero-bg-desktop);
-    background-position:
-      calc(100% - 1200px) 0,
-      right center;
-    background-repeat: no-repeat, no-repeat;
-    background-size:
-      240px 100%,
-      contain;
+    background-position: right top;
+  }
+}
+/* GIB (default) 1240-1439: no copy gradient. The robots sit far
+   enough right at these widths that the art's own dark left side
+   carries the copy. */
+@media (min-width: 1240px) and (max-width: 1439px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gib"] .rbccm-hero__bg-image::after {
+    opacity: 0;
+  }
+}
+/* GIB 1440+: the gradient is back as a narrow band on the far left
+   (10.18% of the width, about 147px at 1440), growing with the art as
+   the screen widens. */
+@media (min-width: 1440px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gib"] .rbccm-hero__bg-image::after {
+    opacity: 1;
+    width: 10.18%;
+  }
+}
+/* Global Markets (globe) desktop, 992+: always cover, pinned bottom
+   left (keeps the globe's left side and lower half, crops from the
+   right / top), and the
+   standard desktop copy gradient at every width. The globe and
+   starfield hold up to scaling, so it skips the 1441+ fixed-size art and
+   navy extension above, which stays for the GIB robots. The
+   [data-hero-bg="gm"] attribute outranks the 1441+ rules. */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gm"] .rbccm-hero__bg-image {
+    background-color: transparent;
+    background-position: left bottom;
+    background-size: cover;
+  }
+  /* Wider than the base gradient (50% + 933px vs 233px) so the globe
+     fades out more gradually behind and beyond the copy. */
+  .rbccm-hero--us-credentials[data-hero-bg="gm"] .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0.55) 50%, rgba(0, 33, 66, 0) 100%);
+    width: max(953px, calc(50% + 933px));
   }
 }
 
