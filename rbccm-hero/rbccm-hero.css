@@ -1120,6 +1120,20 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     background-position: center bottom;
   }
 }
+/* 768-991: the site nav is already its two-row desktop size here (99px,
+   119px just above 768 where "Sign In" wraps), not the 65px phone nav,
+   so the copy and the art start lower. */
+@media (min-width: 768px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials {
+    padding: 161px 0 60px;
+  }
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    min-height: calc(99px + min(142.4vw, 760px));
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    top: 99px;
+  }
+}
 /* Navy glow between the art and the copy (Figma "Ellipse 55" on the
    v3 mobile frame): 443 x 434, rgba(5, 27, 56, 0.81), blur 150px,
    centred horizontally (left -34 in the 375 frame) with its top 53px
@@ -1177,6 +1191,27 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     background-image: var(--rbccm-hero-bg-desktop);
     background-position: right center;
     top: 98px;
+  }
+}
+/* Wider than the 1440 art: stop scaling it up. contain keeps it at its
+   own 1440 x 490 size, pinned right. The strip to its left is filled
+   with the gradient's navy (#002142), and a 240px fade sits on the art's
+   left edge so the edge of the art doesn't show as a hard vertical line
+   (100% - 1200px puts the fade's left side 1440px from the right, where
+   the art starts). From 1441: at 1440 the art fills the hero exactly. */
+@media (min-width: 1441px) {
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-color: #002142;
+    background-image:
+      linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0) 100%),
+      var(--rbccm-hero-bg-desktop);
+    background-position:
+      calc(100% - 1200px) 0,
+      right center;
+    background-repeat: no-repeat, no-repeat;
+    background-size:
+      240px 100%,
+      contain;
   }
 }
 
@@ -1257,7 +1292,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   padding: 0;
   text-transform: none;
 }
-/* v3 desktop: 50px / 87%. The comp's text column is 477px; the h1 is
+/* v3 desktop: 50px / 100%. The comp's text column is 477px; the h1 is
    capped at 380px because that is what gives the comp's line breaks in
    RBC Display in the browser ("Your capital / needs strategy. / Our
    insights / deliver results."): "needs strategy." is 343px and "Your
@@ -1265,7 +1300,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__title {
     font-size: 50px;
-    line-height: 87%;
+    line-height: 100%;
     max-width: 380px;
   }
 }
@@ -1288,12 +1323,12 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 0 auto;
 }
 .rbccm-hero--us-credentials .rbccm-hero__subtitle strong { font-weight: 700; }
-/* v3 desktop: Roboto 18px / 130%, 474px wide. */
+/* v3 desktop: Roboto 18px / 130%, 514px wide. */
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__subtitle {
     font-size: 18px;
     line-height: 130%;
-    max-width: 474px;
+    max-width: 514px;
   }
 }
 

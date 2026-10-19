@@ -186,9 +186,10 @@
     </xsl:variable>
 
     <!-- Background images, two sets picked by the page URL:
-           ?hero=global-markets (or gm)   Global Markets set
+           the UcBgUrlParamGm parameter   Global Markets set
+           (default ?hero=global-markets)
            anything else / no parameter   Global Investment Banking set
-         Each set has a desktop (768px+) and a mobile image. A blank
+         Each set has a desktop (992px+) and a mobile image. A blank
          image falls back to the other size of the same set, and a blank
          Global Markets set falls back to Global Investment Banking, so
          any one path is enough. Any image set = images win over the
