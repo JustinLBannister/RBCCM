@@ -179,6 +179,33 @@
   </div>
 </section>
 
+
+<div class="demo-note" data-variant="US Credentials - background images">Variant D -- .rbccm-hero--us-credentials with background images (rendered from the skin). Add ?hero=global-markets to the URL for the Global Markets set; art from upload-images/ (the WebPs to upload)</div>
+
+<section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero" data-hero-bg="gib" data-hero-bg-gm-param="hero=global-markets" style="--rbccm-hero-bg-gib-desktop: url('upload-images/us-credentials-gib-hero-desktop.webp'); --rbccm-hero-bg-gib-mobile: url('upload-images/us-credentials-gib-hero-mobile.webp'); --rbccm-hero-bg-gm-desktop: url('upload-images/us-credentials-gm-hero-desktop.webp'); --rbccm-hero-bg-gm-mobile: url('upload-images/us-credentials-gm-hero-mobile.webp');"><div class="rbccm-hero__bg-image" aria-hidden="true"></div><script>
+(function () {
+  var s = document.currentScript;
+  var section = s ? s.parentNode : null;
+  if (!section) return;
+  /* Content tab field, e.g. "hero=global-markets". */
+  var want = (section.getAttribute('data-hero-bg-gm-param') || 'hero=global-markets').toLowerCase().split('=');
+  var pairs = window.location.search.replace(/^\?/, '').split('&');
+  for (var i = 0; i < pairs.length; i++) {
+    var kv = pairs[i].split('=');
+    var key = '';
+    var value = '';
+    try {
+      key = decodeURIComponent(kv[0]).toLowerCase();
+      value = decodeURIComponent((kv[1] || '').replace(/\+/g, ' ')).toLowerCase();
+    } catch (e) {}
+    if (key === want[0]) {
+      if (value === (want[1] || '')) section.setAttribute('data-hero-bg', 'gm');
+      break;
+    }
+  }
+})();
+        </script><div class="rbccm-hero__container"><h1 class="rbccm-hero__title" data-hero-rise="rise" data-animate-delay="150"><span class="rbccm-hero__title-line">Your capital needs strategy.</span><span class="rbccm-hero__title-line">Our insights deliver results.</span></h1><p class="rbccm-hero__subtitle" data-hero-rise="rise" data-animate-delay="300">Advisory expertise, market-leading insights, and exceptional execution from one of the world's safest banks.</p></div></section>
+
 <script src="../local-test-fixtures/variant-picker.js"></script>
 
 </body>

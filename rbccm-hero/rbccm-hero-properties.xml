@@ -95,7 +95,7 @@
     auto
   </Datum>
 
-  <Datum ID="TitleTag" Type="SelectSingle" Name="Title tag (optional - Auto = p, or h1 on S+E)">
+  <Datum ID="TitleTag" Type="SelectSingle" Name="Title tag (optional - Auto = p, or h1 on S+E and on US Creds without an eyebrow)">
     <Option Selected="true"><Display>Auto (variant default)</Display><Value>auto</Value></Option>
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
@@ -126,6 +126,12 @@
   <Datum ID="BgBrightcoveAccount" Type="String" Name="Brightcove account ID (technical - RBC-wide constant)">6021289101001</Datum>
 
   <Datum ID="BgBrightcovePlayer" Type="String" Name="Brightcove player ID (technical - RBC-wide constant)">VyvCc9BZx</Datum>
+
+  <!-- S+E Brightcove background: stylesheet that hides the player's
+       controls and crops the video to cover. Loaded only when the hero
+       uses Brightcove; blank (or missing on older instances) uses the
+       standard path. -->
+  <Datum ID="BgBrightcoveLayerCssPath" Type="String" Name="Brightcove background stylesheet path : S+E (technical - set once at deploy; blank uses the standard path)">/assets/rbccm/css/components/rbccm-brightcove-bg-layer.css</Datum>
 
   <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : button 1 style">
     <Option Selected="true"><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
@@ -204,6 +210,28 @@
          2 IDs: mobile, desktop (tablet uses the desktop cut)
        The other hero variants use a single ID only. -->
   <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional - Strategy &amp; Economics: 3 IDs separated by commas = mobile, tablet, desktop)"></Datum>
+
+  <!-- US Creds background images (replace the video when any is set).
+       Two sets, picked by the page URL: ?hero=global-markets (or gm)
+       shows the Global Markets set, anything else the Global Investment
+       Banking set. Desktop = 992px and up, mobile = under 992px. Root
+       paths, e.g. /assets/rbccm/images/... A blank image falls back to
+       the other size of its set; a blank Global Markets set falls back
+       to Global Investment Banking. -->
+  <Datum ID="UcBgImageGibDesktop" Type="String" Name="US Creds : background image, Global Investment Banking - desktop 992px+ (default; path e.g. /assets/rbccm/images/...)"></Datum>
+
+  <Datum ID="UcBgImageGibMobile" Type="String" Name="US Creds : background image, Global Investment Banking - mobile under 992px (blank uses the desktop image)"></Datum>
+
+  <Datum ID="UcBgImageGmDesktop" Type="String" Name="US Creds : background image, Global Markets - desktop 992px+ (shown with ?hero=global-markets in the URL)"></Datum>
+
+  <Datum ID="UcBgImageGmMobile" Type="String" Name="US Creds : background image, Global Markets - mobile under 992px (blank uses the desktop image)"></Datum>
+
+  <!-- The Global Markets set shows when the page URL has this
+       parameter, e.g. /en/...?hero=global-markets. Type it as it appears
+       in the URL (name=value, not case-sensitive). Without it the page
+       always shows the Global Investment Banking set. Blank uses
+       hero=global-markets. -->
+  <Datum ID="UcBgUrlParamGm" Type="String" Name="US Creds : URL parameter that shows the Global Markets background (name=value; default hero=global-markets)">hero=global-markets</Datum>
 
   <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA : button 1 label (optional - blank hides the button)">Request a demo</Datum>
 

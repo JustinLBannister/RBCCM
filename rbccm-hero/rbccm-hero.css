@@ -492,51 +492,23 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
      toward 0.1 for a barely-there ambient feel. */
   opacity: 0.1;
 }
-/* Brightcove iframe backdrop (2026-10-14): the S&E hero cuts read too
-   faint at 0.1. Mobile 0.2 (the video sits behind the stacked title and
-   card there), tablet and desktop 0.4. The MP4 <video> path above stays
-   at 0.1. */
-.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+/* Brightcove background (in-page player, see the skin and
+   rbccm-brightcove-bg-layer.css, which hides the player chrome and crops
+   the video to cover). The S&E cuts read too faint at the MP4's 0.1, so
+   the layer is 0.2 on mobile (behind the stacked title and card) and
+   0.4 from tablet up. The opacity sits on the layer, so the poster
+   fallback matches; the video inside goes back to 1 to undo the 0.1
+   from the shared video rule above. */
+.rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer {
   opacity: 0.2;
 }
 @media (min-width: 768px) {
-  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+  .rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer {
     opacity: 0.4;
   }
 }
-
-/* Per-breakpoint Brightcove cuts (IDs separated by commas, see the
-   skin). object-fit does nothing on an iframe: the player fits its
-   video inside the frame, so a frame that doesn't match the video's
-   shape shows bars. Here the iframe takes the shape of the cut that is
-   playing and is sized to cover the hero, anchored top right like the
-   MP4, with the overflow clipped by the wrapper. Ratios from the
-   delivered files:
-     mobile  750 x 1000   (3:4)
-     tablet  1024 x 768   (4:3)
-     desktop 1920 x 800   (2.4:1)
-   Container query units (cqw / cqh) measure the hero; browsers without
-   them keep the 100% x 100% sizing above. */
-.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
-  --rbccm-hero-bg-ratio: 0.75;
-  container-type: size;
-}
-@media (min-width: 768px) {
-  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
-    --rbccm-hero-bg-ratio: 1.3333;
-  }
-}
-@media (min-width: 992px) {
-  .rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive {
-    --rbccm-hero-bg-ratio: 2.4;
-  }
-}
-.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video.rbccm-hero__bg-video--responsive iframe {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: max(100cqw, 100cqh * var(--rbccm-hero-bg-ratio));
-  height: max(100cqh, 100cqw / var(--rbccm-hero-bg-ratio));
+.rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer video {
+  opacity: 1;
 }
 
 /* Content column lifted above the video. Base container already
@@ -1050,14 +1022,17 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
                total  228 / 0 / 80 / 0
      Horizontal 0 on the section; inner .__container carries its
      own 23px gutter so copy never touches the viewport edge. */
-  padding: 145px 0 60px;
+  /* 2026-10 v3 mobile: 46 top / 60 bottom below the nav (65). */
+  padding: 111px 0 60px;
   overflow: hidden;
   text-align: center;
   /* position: relative inherited from the shared block base - keeps
      the bg-video slot anchored to this section. */
 }
+/* v3 desktop: 130 top / 80 bottom below the nav (98); the art layer is
+   the 490px band between the nav and the hero's bottom edge. */
 @media (min-width: 992px) {
-  .rbccm-hero--us-credentials { padding: 138px 0 0px; }
+  .rbccm-hero--us-credentials { padding: 228px 0 80px; }
 }
 
 /* Bg-video slot - identical mechanics to the S+E variant so the
@@ -1087,6 +1062,124 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   opacity: 0.4;
 }
 
+/* Background image sets (2026-10 design v3: stills replace the video).
+   The skin puts all four URLs on the section as custom properties and
+   sets data-hero-bg from the page URL (?hero=global-markets -> gm,
+   otherwise gib). Only the active pair is referenced here, so only the
+   image in use downloads. Mobile art (under 768px) is portrait with the
+   subject at the bottom under the copy; desktop art has the subject on
+   the right, so each anchors to its subject when cropped. Full opacity:
+   the art is designed to sit behind the copy (dark where the text is). */
+.rbccm-hero--us-credentials[data-hero-bg="gib"] {
+  --rbccm-hero-bg-mobile: var(--rbccm-hero-bg-gib-mobile);
+  --rbccm-hero-bg-desktop: var(--rbccm-hero-bg-gib-desktop);
+}
+.rbccm-hero--us-credentials[data-hero-bg="gm"] {
+  --rbccm-hero-bg-mobile: var(--rbccm-hero-bg-gm-mobile);
+  --rbccm-hero-bg-desktop: var(--rbccm-hero-bg-gm-desktop);
+}
+/* The art starts below the fixed nav (65 mobile, 98 desktop), as in
+   the comps, instead of running under it.
+
+   Phones (under 600): the hero's height follows the art's shape
+   (750 x 1068 = 142.4vw tall) instead of a fixed 534px, so the
+   composition matches the comp at every phone width: the dark top of
+   the art stays behind the copy and the subject stays below it. A
+   fixed height let the art scale up with the width, crop its dark top
+   and bring the robots / globe up behind the text on wider phones.
+   Longer copy still makes the hero taller (the art is anchored to the
+   top, so any extra crops off the bottom).
+
+   600-991 (big phones, small tablets): following the art would make the
+   hero 900px+ tall, so it is capped at 760px of art and the art anchors
+   to the bottom to keep the subject in view; the navy glow below grows
+   with the width to keep the copy readable where the subject rises.
+
+   The desktop art takes over at 992, where the layout changes. */
+.rbccm-hero--us-credentials[data-hero-bg] {
+  min-height: calc(65px + 142.4vw);
+}
+.rbccm-hero--us-credentials .rbccm-hero__bg-image {
+  background-image: var(--rbccm-hero-bg-mobile);
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 65px;
+  z-index: 0;
+}
+@media (min-width: 600px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    min-height: calc(65px + min(142.4vw, 760px));
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-position: center bottom;
+  }
+}
+/* Navy glow between the art and the copy (Figma "Ellipse 55" on the
+   v3 mobile frame): 443 x 434, rgba(5, 27, 56, 0.81), blur 150px,
+   centred horizontally (left -34 in the 375 frame) with its top 53px
+   above the art. It darkens the art behind the headline and fades out
+   toward the edges; it is not in the exported images. Sized in vw so
+   it scales with the art (exactly the comp's px values at 375), and
+   capped at its 600px-wide size so it doesn't swallow the subject on
+   tablets. The hero's overflow: hidden clips the blur. */
+.rbccm-hero--us-credentials .rbccm-hero__bg-image::after {
+  background: rgba(5, 27, 56, 0.81);
+  border-radius: 50%;
+  content: "";
+  filter: blur(min(40vw, 240px));
+  height: min(115.73vw, 694px);
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: max(-14.13vw, -85px);
+  transform: translateX(-50%);
+  width: min(118.13vw, 709px);
+}
+@media (min-width: 992px) {
+  /* Desktop: 98 nav + the 490px art band from the comp (the 1440 x 490
+     art fills it exactly at 1440), with the copy pinned to the bottom:
+     always 80px under the paragraph, at least 130px above the h1 (the
+     section's padding). The browser sets the copy a little shorter than
+     Figma's 280px text box, so the spare height goes above it, not
+     below. Longer copy grows the hero and keeps both paddings. */
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 588px;
+  }
+  /* Desktop: the glow becomes the v3 desktop frame's gradient behind
+     the copy: 953 x 490 at 1440, #002142 solid -> 55% -> 0% left to
+     right. It is kept wide enough to stay behind the copy on wider
+     screens, where the copy rail moves right with the centred
+     container (50% + 233px = 953 at 1440). */
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0.55) 50%, rgba(0, 33, 66, 0) 100%);
+    border-radius: 0;
+    filter: none;
+    height: 100%;
+    left: 0;
+    top: 0;
+    transform: none;
+    width: max(953px, calc(50% + 233px));
+  }
+  /* Desktop: the hero starts at the top of the page under the fixed
+     nav (99px), so the art layer starts 98px down: the 490px band below
+     the nav, where the 1440 x 490 art fits at its comp size. With top: 0
+     the art scales up ~1.2x to fill the strip hidden under the nav. */
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-image: var(--rbccm-hero-bg-desktop);
+    background-position: right center;
+    top: 98px;
+  }
+}
+
 /* Content sits above the video. Base shared block already assigns
    z-index: 1 to `> *`, so `position: relative` here is a re-affirm.
    Container is a flex column so eyebrow / title / subtitle stack
@@ -1101,11 +1194,26 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   justify-content: center;
   text-align: center;
   width: 100%;
-  max-width: 1180px;
+  /* v3 mobile: copy at most 275px wide, centred. The container is
+     border-box, so the 23px side gutters (kept for narrow phones) are
+     added on top of the 275. */
+  max-width: calc(275px + 46px);
   padding: 0 23px;
   margin: 0 auto;
-  gap: 40px;
+  gap: 16px;                 /* v3 mobile: title -> paragraph */
   box-sizing: border-box;
+}
+/* Large phones / small tablets: copy up to 475px wide. */
+@media (min-width: 600px) {
+  .rbccm-hero--us-credentials .rbccm-hero__container {
+    max-width: calc(475px + 46px);
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__container {
+    gap: 24px;                 /* v3 desktop: title -> paragraph */
+    max-width: 1180px;       /* desktop unchanged until the v3 desktop specs */
+  }
 }
 
 /* Optional eyebrow - mirrors MAAS+MATA but on dark bg so colour
@@ -1133,19 +1241,32 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    warm-yellow via :last-child. Mobile 50/desktop 75 matches the
    MAAS+MATA type ramp. Bottom margin is 0 - parent container's
    flex `gap: 48px` owns the title->subtitle spacing. */
+/* v3 mobile: 35px / 100%. letter-spacing and text-transform reset so
+   picking h1 (or any tag) in the Title tag field can't pull in the
+   site's global heading styles. */
 .rbccm-hero--us-credentials .rbccm-hero__title {
   font-family: var(--rbccm-hero-serif);
-  font-size: 50px;
+  font-size: 35px;
+  font-style: normal;
   font-weight: 500;
+  letter-spacing: 0;
   line-height: 100%;
   color: #fff;
   max-width: 100%;
   margin: 0 auto;
+  padding: 0;
+  text-transform: none;
 }
+/* v3 desktop: 50px / 87%. The comp's text column is 477px; the h1 is
+   capped at 380px because that is what gives the comp's line breaks in
+   RBC Display in the browser ("Your capital / needs strategy. / Our
+   insights / deliver results."): "needs strategy." is 343px and "Your
+   capital needs" 415px, so anything from 343 to 414 works. */
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__title {
-    font-size: 75px;
-    line-height: 110%;
+    font-size: 50px;
+    line-height: 87%;
+    max-width: 380px;
   }
 }
 .rbccm-hero--us-credentials .rbccm-hero__title-line { display: block; }
@@ -1157,6 +1278,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    design spec so the paragraph wraps to ~2-3 lines. */
 .rbccm-hero--us-credentials .rbccm-hero__subtitle {
   color: #fff;
+  font-feature-settings: 'liga' off, 'clig' off;
   font-family: var(--rbccm-hero-sans);
   font-size: 16px;
   font-weight: 400;
@@ -1166,9 +1288,30 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 0 auto;
 }
 .rbccm-hero--us-credentials .rbccm-hero__subtitle strong { font-weight: 700; }
+/* v3 desktop: Roboto 18px / 130%, 474px wide. */
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__subtitle {
     font-size: 18px;
+    line-height: 130%;
+    max-width: 474px;
+  }
+}
+
+/* v3 desktop (992+, with the desktop art, type and gradient): copy
+   left-aligned over the dark left side of the art, at the container's
+   left edge (same rail as the page content). */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__container {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    margin: 0;
+    text-align: left;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow::after {
+    margin: 15px 0 0;
   }
 }
 

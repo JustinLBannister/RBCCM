@@ -1,0 +1,87 @@
+/* =========================================================================
+   RBCCM Brightcove Background Layer
+   Deploy path: /assets/rbccm/css/components/rbccm-brightcove-bg-layer.css
+   =========================================================================
+   Turns a Brightcove in-page player (<video-js>) into a decorative
+   background video: no controls, no play button, no spinner, no title or
+   captions, nothing clickable - just the video, cropped to cover its box
+   (anchored top right) like a native <video> with object-fit: cover.
+
+   Used by the Strategy & Economics hero (rbccm-hero) when its background
+   is Brightcove. The skin loads this file before the player script, so
+   the chrome is hidden from the first frame on every device (the iframe
+   player ignored controls=false and showed its control bar for ~3s on
+   mobile).
+
+   Markup (the component positions the wrapper and sets its opacity):
+     <div class="... rbccm-brightcove-bg-layer" aria-hidden="true" inert>
+       <video-js class="rbccm-brightcove-bg-layer__player"
+                 data-account="..." data-player="..." data-embed="default"
+                 data-video-id="..." muted autoplay loop playsinline>
+       </video-js>
+     </div>
+
+   Poster: if the device blocks autoplay (e.g. iOS Low Power Mode) the
+   video's poster image (set per video in Brightcove) shows instead,
+   cropped the same way. The player hides it once playback starts.
+   ========================================================================= */
+
+.rbccm-brightcove-bg-layer {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Player fills the wrapper. Brightcove sizes its player itself (fixed or
+   fluid with a padding-top ratio), so these carry !important. */
+.rbccm-brightcove-bg-layer .rbccm-brightcove-bg-layer__player,
+.rbccm-brightcove-bg-layer .video-js {
+  background: transparent !important;
+  bottom: 0;
+  cursor: default !important;
+  height: 100% !important;
+  left: 0;
+  padding-top: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0;
+  top: 0;
+  width: 100% !important;
+}
+
+/* Video: cover the box, keep the top-right corner in view. */
+.rbccm-brightcove-bg-layer .video-js .vjs-tech {
+  background: transparent !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: top right;
+  width: 100% !important;
+}
+
+/* Poster fallback, cropped like the video. Newer players use an <img>,
+   older ones a background image. */
+.rbccm-brightcove-bg-layer .video-js .vjs-poster {
+  background-color: transparent !important;
+  background-position: top right !important;
+  background-size: cover !important;
+}
+.rbccm-brightcove-bg-layer .video-js .vjs-poster img {
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top right !important;
+  width: 100% !important;
+}
+
+/* Every piece of player chrome. */
+.rbccm-brightcove-bg-layer .video-js .vjs-control-bar,
+.rbccm-brightcove-bg-layer .video-js .vjs-big-play-button,
+.rbccm-brightcove-bg-layer .video-js .vjs-loading-spinner,
+.rbccm-brightcove-bg-layer .video-js .vjs-dock-text,
+.rbccm-brightcove-bg-layer .video-js .vjs-dock-shelf,
+.rbccm-brightcove-bg-layer .video-js .vjs-text-track-display,
+.rbccm-brightcove-bg-layer .video-js .vjs-modal-dialog,
+.rbccm-brightcove-bg-layer .video-js .vjs-error-display,
+.rbccm-brightcove-bg-layer .video-js .vjs-overlay,
+.rbccm-brightcove-bg-layer .video-js .vjs-title-bar,
+.rbccm-brightcove-bg-layer .video-js .vjs-context-menu-ui {
+  display: none !important;
+}

@@ -272,8 +272,19 @@
          (mobile, tablet, desktop); the inline script below splits the
          list. Spaces around the commas are ignored. -->
     <xsl:variable name="SE_BG_IDS" select="translate($SE_BG_VIDEO_ID, ' ', '')"/>
-    <xsl:variable name="SE_BG_URL_BASE">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.html?videoId=</xsl:variable>
-    <xsl:variable name="SE_BG_URL_PARAMS">&amp;autoplay=true&amp;muted=true&amp;loop=true&amp;playsinline=true&amp;controls=false</xsl:variable>
+    <!-- Brightcove in-page player script (same account + player as the
+         old iframe URL) and the background-layer stylesheet that hides
+         the player chrome. The stylesheet path falls back to the
+         standard location when the Datum is missing (instances saved
+         before it existed) or blank. -->
+    <xsl:variable name="SE_BG_PLAYER_JS">https://players.brightcove.net/<xsl:value-of select="$SE_BG_ACCT"/>/<xsl:value-of select="$SE_BG_PLAYER"/>_default/index.min.js</xsl:variable>
+    <xsl:variable name="SE_BG_LAYER_CSS_RAW" select="normalize-space(//Datum[@ID='BgBrightcoveLayerCssPath']/text()[last()])"/>
+    <xsl:variable name="SE_BG_LAYER_CSS">
+      <xsl:choose>
+        <xsl:when test="$SE_BG_LAYER_CSS_RAW != ''"><xsl:value-of select="$SE_BG_LAYER_CSS_RAW"/></xsl:when>
+        <xsl:otherwise>/assets/rbccm/css/components/rbccm-brightcove-bg-layer.css</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="SE_BG_MP4">
       <xsl:call-template name="datum">
         <xsl:with-param name="id" select="'BgVideoMp4'"/>
@@ -454,6 +465,16 @@
         </xsl:attribute>
       </link>
     </xsl:if>
+    <!-- Brightcove background only: the layer stylesheet, loaded before
+         the player so its controls are hidden from the first frame. -->
+    <xsl:if test="$SE_BG_MP4 = '' and $SE_BG_IDS != ''">
+      <link rel="stylesheet" type="text/css">
+        <xsl:attribute name="href">
+          <xsl:value-of select="$SE_BG_LAYER_CSS"/>
+          <xsl:if test="$CACHE_VERSION != ''">?v=<xsl:value-of select="$CACHE_VERSION"/></xsl:if>
+        </xsl:attribute>
+      </link>
+    </xsl:if>
 
     <section>
       <xsl:attribute name="class">rbccm-hero rbccm-hero--strategy-and-economics<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-hero--header-center</xsl:if></xsl:attribute>
@@ -499,35 +520,32 @@
             </video>
           </div>
         </xsl:when>
-        <!-- Brightcove, one ID: one video at every width, src set
-             server side (unchanged markup). -->
-        <xsl:when test="$SE_BG_IDS != '' and not(contains($SE_BG_IDS, ','))">
-          <div class="rbccm-hero__bg-video" aria-hidden="true">
-            <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen">
-              <xsl:attribute name="src"><xsl:value-of select="$SE_BG_URL_BASE"/><xsl:value-of select="$SE_BG_IDS"/><xsl:value-of select="$SE_BG_URL_PARAMS"/></xsl:attribute>
-            </iframe>
-          </div>
-        </xsl:when>
-        <!-- Brightcove, IDs separated by commas: one cut per breakpoint.
-             The iframe starts empty; the inline script right after it
-             splits the list, loads only the cut for the current width
-             and swaps if the width crosses a breakpoint:
+        <!-- Brightcove, in-page embed (not an iframe) so the page can
+             style the player: rbccm-brightcove-bg-layer.css hides every
+             control from the first frame and crops the video to cover
+             the hero. One ID plays at every width; IDs separated by
+             commas are one cut per breakpoint:
                3 IDs  mobile (under 768), tablet (768-991), desktop (992+)
                2 IDs  mobile, desktop (tablet uses desktop)
-             Inline so the video starts as early as a server-set src. -->
-        <xsl:when test="contains($SE_BG_IDS, ',')">
-          <div class="rbccm-hero__bg-video rbccm-hero__bg-video--responsive" aria-hidden="true">
+             The inline script picks the cut for the current width before
+             the player loads, loads Brightcove's player script once, and
+             swaps the cut if the width crosses a breakpoint. inert keeps
+             the player out of the tab order and the accessibility tree. -->
+        <xsl:when test="$SE_BG_IDS != ''">
+          <div class="rbccm-hero__bg-video rbccm-brightcove-bg-layer" aria-hidden="true" inert="inert">
             <xsl:attribute name="data-bg-video-ids"><xsl:value-of select="$SE_BG_IDS"/></xsl:attribute>
-            <xsl:attribute name="data-bg-video-base"><xsl:value-of select="$SE_BG_URL_BASE"/></xsl:attribute>
-            <xsl:attribute name="data-bg-video-params"><xsl:value-of select="$SE_BG_URL_PARAMS"/></xsl:attribute>
-            <iframe allow="autoplay" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" tabindex="-1"></iframe>
+            <xsl:attribute name="data-bg-player-js"><xsl:value-of select="$SE_BG_PLAYER_JS"/></xsl:attribute>
+            <video-js class="rbccm-brightcove-bg-layer__player" data-embed="default" muted="muted" autoplay="autoplay" loop="loop" playsinline="playsinline" preload="auto" tabindex="-1">
+              <xsl:attribute name="data-account"><xsl:value-of select="$SE_BG_ACCT"/></xsl:attribute>
+              <xsl:attribute name="data-player"><xsl:value-of select="$SE_BG_PLAYER"/></xsl:attribute>
+            </video-js>
           </div>
           <script>
 (function () {
   var s = document.currentScript;
   var wrap = s ? s.previousElementSibling : null;
-  var frame = wrap ? wrap.querySelector('iframe') : null;
-  if (!frame) return;
+  var el = wrap ? wrap.querySelector('video-js') : null;
+  if (!el) return;
   var ids = (wrap.getAttribute('data-bg-video-ids') || '').split(',').filter(function (id) { return id; });
   if (!ids.length) return;
   var byWidth = {
@@ -535,24 +553,67 @@
     tablet:  ids.length > 2 ? ids[1] : ids[ids.length - 1],
     desktop: ids[ids.length > 2 ? 2 : ids.length - 1]
   };
-  function urlFor(size) {
-    return wrap.getAttribute('data-bg-video-base') + byWidth[size] + wrap.getAttribute('data-bg-video-params');
+  var desktop = window.matchMedia ? window.matchMedia('(min-width: 992px)') : null;
+  var tablet = window.matchMedia ? window.matchMedia('(min-width: 768px)') : null;
+  function currentId() {
+    if (!desktop) return byWidth.desktop;
+    return byWidth[desktop.matches ? 'desktop' : (tablet.matches ? 'tablet' : 'mobile')];
   }
-  if (!window.matchMedia) {
-    frame.setAttribute('src', urlFor('desktop'));
-    return;
+  if (!el.id) el.id = 'rbccm-bg-player-' + Math.random().toString(36).slice(2, 9);
+  el.setAttribute('data-video-id', currentId());
+
+  function getPlayer() {
+    return window.videojs ? window.videojs.getPlayer(el.id) : null;
   }
-  var desktop = window.matchMedia('(min-width: 992px)');
-  var tablet = window.matchMedia('(min-width: 768px)');
-  function pick() {
-    var url = urlFor(desktop.matches ? 'desktop' : (tablet.matches ? 'tablet' : 'mobile'));
-    if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
+  function quiet(player) {
+    player.controls(false);
+    player.muted(true);
+    var p = player.play();
+    if (p) {
+      if (p.catch) p.catch(function () {});
+    }
   }
-  pick();
-  [desktop, tablet].forEach(function (q) {
-    if (q.addEventListener) q.addEventListener('change', pick);
-    else if (q.addListener) q.addListener(pick);
-  });
+  function onReady() {
+    var player = getPlayer();
+    if (!player) return;
+    player.ready(function () { quiet(player); });
+    if (!desktop) return;
+    var shown = currentId();
+    function swap() {
+      var id = currentId();
+      if (id === shown) return;
+      shown = id;
+      if (!player.catalog) return;
+      player.catalog.getVideo(id, function (err, video) {
+        if (err) return;
+        player.catalog.load(video);
+        quiet(player);
+      });
+    }
+    [desktop, tablet].forEach(function (q) {
+      if (q.addEventListener) q.addEventListener('change', swap);
+      else if (q.addListener) q.addListener(swap);
+    });
+  }
+
+  /* Brightcove's script sets up every video-js tag on the page when it
+     loads. If another component already loaded it, set this one up
+     with bc(); otherwise add the script once. */
+  var src = wrap.getAttribute('data-bg-player-js');
+  var existing = document.querySelector('script[src="' + src + '"]');
+  if (window.bc) {
+    if (existing) {
+      window.bc(el);
+      onReady();
+      return;
+    }
+  }
+  var tag = existing || document.createElement('script');
+  tag.addEventListener('load', onReady);
+  if (!existing) {
+    tag.src = src;
+    document.body.appendChild(tag);
+  }
 })();
           </script>
         </xsl:when>

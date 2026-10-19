@@ -185,6 +185,63 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!-- Background images, two sets picked by the page URL:
+           ?hero=global-markets (or gm)   Global Markets set
+           anything else / no parameter   Global Investment Banking set
+         Each set has a desktop (768px+) and a mobile image. A blank
+         image falls back to the other size of the same set, and a blank
+         Global Markets set falls back to Global Investment Banking, so
+         any one path is enough. Any image set = images win over the
+         background video fields. -->
+    <xsl:variable name="UC_IMG_GIB_D_RAW" select="normalize-space(//Datum[@ID='UcBgImageGibDesktop']/text()[last()])"/>
+    <xsl:variable name="UC_IMG_GIB_M_RAW" select="normalize-space(//Datum[@ID='UcBgImageGibMobile']/text()[last()])"/>
+    <xsl:variable name="UC_IMG_GM_D_RAW"  select="normalize-space(//Datum[@ID='UcBgImageGmDesktop']/text()[last()])"/>
+    <xsl:variable name="UC_IMG_GM_M_RAW"  select="normalize-space(//Datum[@ID='UcBgImageGmMobile']/text()[last()])"/>
+    <xsl:variable name="UC_IMG_GIB_D">
+      <xsl:choose>
+        <xsl:when test="$UC_IMG_GIB_D_RAW != ''"><xsl:value-of select="$UC_IMG_GIB_D_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GIB_M_RAW != ''"><xsl:value-of select="$UC_IMG_GIB_M_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GM_D_RAW != ''"><xsl:value-of select="$UC_IMG_GM_D_RAW"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$UC_IMG_GM_M_RAW"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="UC_IMG_GIB_M">
+      <xsl:choose>
+        <xsl:when test="$UC_IMG_GIB_M_RAW != ''"><xsl:value-of select="$UC_IMG_GIB_M_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GIB_D_RAW != ''"><xsl:value-of select="$UC_IMG_GIB_D_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GM_M_RAW != ''"><xsl:value-of select="$UC_IMG_GM_M_RAW"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$UC_IMG_GM_D_RAW"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="UC_IMG_GM_D">
+      <xsl:choose>
+        <xsl:when test="$UC_IMG_GM_D_RAW != ''"><xsl:value-of select="$UC_IMG_GM_D_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GM_M_RAW != ''"><xsl:value-of select="$UC_IMG_GM_M_RAW"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$UC_IMG_GIB_D"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="UC_IMG_GM_M">
+      <xsl:choose>
+        <xsl:when test="$UC_IMG_GM_M_RAW != ''"><xsl:value-of select="$UC_IMG_GM_M_RAW"/></xsl:when>
+        <xsl:when test="$UC_IMG_GM_D_RAW != ''"><xsl:value-of select="$UC_IMG_GM_D_RAW"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$UC_IMG_GIB_M"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="UC_HAS_IMAGES" select="$UC_IMG_GIB_D != ''"/>
+
+    <!-- URL parameter that switches to the Global Markets set, editable
+         on the Content tab so it can change without touching code. Typed
+         as it appears in the URL (name=value, not case-sensitive). Blank,
+         or missing on older instances, uses hero=global-markets. Without
+         it the page always shows Global Investment Banking. -->
+    <xsl:variable name="UC_BG_GM_PARAM_RAW" select="normalize-space(//Datum[@ID='UcBgUrlParamGm']/text()[last()])"/>
+    <xsl:variable name="UC_BG_GM_PARAM">
+      <xsl:choose>
+        <xsl:when test="$UC_BG_GM_PARAM_RAW != ''"><xsl:value-of select="translate($UC_BG_GM_PARAM_RAW, '?&amp; ', '')"/></xsl:when>
+        <xsl:otherwise>hero=global-markets</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <!-- Tag guards -->
     <xsl:variable name="UC_EYEBROW_TAG">
       <xsl:call-template name="pickTag">
@@ -192,10 +249,18 @@
         <xsl:with-param name="default" select="'h1'"/>
       </xsl:call-template>
     </xsl:variable>
+    <!-- Title on Auto: p when there is an eyebrow (the eyebrow is the
+         h1), h1 when there isn't, so the page always has one h1. The
+         Title tag picker overrides either way. -->
     <xsl:variable name="UC_TITLE_TAG">
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$UC_TITLE_TAG_RAW"/>
-        <xsl:with-param name="default" select="'p'"/>
+        <xsl:with-param name="default">
+          <xsl:choose>
+            <xsl:when test="$UC_EYEBROW_TEXT != ''">p</xsl:when>
+            <xsl:otherwise>h1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="UC_SUBTITLE_TAG">
@@ -223,12 +288,50 @@
       <xsl:if test="$SECTION_ARIA != ''">
         <xsl:attribute name="aria-label"><xsl:value-of select="$SECTION_ARIA"/></xsl:attribute>
       </xsl:if>
+      <!-- Background image set: server default GIB, the inline script
+           below switches it to GM when the URL has the Content tab's
+           parameter (see UC_BG_GM_PARAM), before the first paint. The
+           four URLs ride on custom properties; the CSS only applies the
+           two for the active set, so only the image in use downloads. -->
+      <xsl:if test="$UC_HAS_IMAGES">
+        <xsl:attribute name="data-hero-bg">gib</xsl:attribute>
+        <xsl:attribute name="data-hero-bg-gm-param"><xsl:value-of select="$UC_BG_GM_PARAM"/></xsl:attribute>
+        <xsl:attribute name="style">--rbccm-hero-bg-gib-desktop: url('<xsl:value-of select="$UC_IMG_GIB_D"/>'); --rbccm-hero-bg-gib-mobile: url('<xsl:value-of select="$UC_IMG_GIB_M"/>'); --rbccm-hero-bg-gm-desktop: url('<xsl:value-of select="$UC_IMG_GM_D"/>'); --rbccm-hero-bg-gm-mobile: url('<xsl:value-of select="$UC_IMG_GM_M"/>');</xsl:attribute>
+      </xsl:if>
+
+      <xsl:if test="$UC_HAS_IMAGES">
+        <div class="rbccm-hero__bg-image" aria-hidden="true"></div>
+        <script>
+(function () {
+  var s = document.currentScript;
+  var section = s ? s.parentNode : null;
+  if (!section) return;
+  /* Content tab field, e.g. "hero=global-markets". */
+  var want = (section.getAttribute('data-hero-bg-gm-param') || 'hero=global-markets').toLowerCase().split('=');
+  var pairs = window.location.search.replace(/^\?/, '').split('&amp;');
+  for (var i = 0; i &lt; pairs.length; i++) {
+    var kv = pairs[i].split('=');
+    var key = '';
+    var value = '';
+    try {
+      key = decodeURIComponent(kv[0]).toLowerCase();
+      value = decodeURIComponent((kv[1] || '').replace(/\+/g, ' ')).toLowerCase();
+    } catch (e) {}
+    if (key === want[0]) {
+      if (value === (want[1] || '')) section.setAttribute('data-hero-bg', 'gm');
+      break;
+    }
+  }
+})();
+        </script>
+      </xsl:if>
 
       <!-- Optional bg video. MP4 wins if both are set; renders a
            native <video> for lighter payload + no player chrome.
            Falls back to a Brightcove iframe when only the Brightcove
            Video ID is populated. Blank both = solid navy fill only. -->
       <xsl:choose>
+        <xsl:when test="$UC_HAS_IMAGES"></xsl:when>
         <xsl:when test="$UC_BG_MP4 != ''">
           <div class="rbccm-hero__bg-video" aria-hidden="true">
             <video autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline" preload="auto">
