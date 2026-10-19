@@ -1029,10 +1029,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   /* position: relative inherited from the shared block base - keeps
      the bg-video slot anchored to this section. */
 }
-/* v3 desktop: 130 top / 80 bottom below the nav (98); the art layer is
+/* v3 desktop: 120 top / 80 bottom below the nav (98); the art layer is
    the 490px band between the nav and the hero's bottom edge. */
 @media (min-width: 992px) {
-  .rbccm-hero--us-credentials { padding: 228px 0 80px; }
+  .rbccm-hero--us-credentials { padding: 218px 0 80px; }
 }
 
 /* Bg-video slot - identical mechanics to the S+E variant so the
@@ -1156,9 +1156,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   width: min(118.13vw, 709px);
 }
 @media (min-width: 992px) {
-  /* Desktop: 98 nav + the 490px art band from the comp (the 1440 x 490
-     art fills it exactly at 1440), with the copy pinned to the bottom:
-     always 80px under the paragraph, at least 130px above the h1 (the
+  /* Desktop: 98 nav + a 480px art band (the comp's 490 less 10, to sit
+     the copy 10px higher; the 1440 x 490 art crops 10px top/bottom at
+     1440), with the copy pinned to the bottom:
+     always 80px under the paragraph, at least 120px above the h1 (the
      section's padding). The browser sets the copy a little shorter than
      Figma's 280px text box, so the spare height goes above it, not
      below. Longer copy grows the hero and keeps both paddings. */
@@ -1166,7 +1167,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    min-height: 588px;
+    min-height: 578px;
   }
   /* Desktop: the glow becomes the v3 desktop frame's gradient behind
      the copy: 953 x 490 at 1440, #002142 solid -> 55% -> 0% left to
@@ -1323,14 +1324,14 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 0 auto;
 }
 .rbccm-hero--us-credentials .rbccm-hero__subtitle strong { font-weight: 700; }
-/* v3 desktop: Roboto 16px / 130%, 514px wide. (The comp says 18px;
+/* v3 desktop: Roboto 16px / 130%, 459px wide. (The comp says 18px;
    16px was chosen 2026-10-19. Rule kept separate so it can go back to
    18 by changing this one value.) */
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__subtitle {
     font-size: 16px;
     line-height: 130%;
-    max-width: 514px;
+    max-width: 459px;
   }
 }
 
