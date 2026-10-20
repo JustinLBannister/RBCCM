@@ -82,7 +82,7 @@ jQuery(document).ready(function ($) {
        768-991  2 per view, paged 2 at a time
        <768     no carousel: Slick is removed and the cards stack (CSS)
      Non-infinite, so the last page shows the last full set of cards
-     (5 cards on desktop = 2 dots: 1-3, then 3-5) with no clones. When
+     (5 cards on desktop = 2 dots: 1-3, then 3-5; 6 cards = 1-3, 4-6) with no clones. When
      the cards fit one page there is no carousel either: the section
      gets .is-static and the CSS lays them out as a plain row. */
   function setupThreeUp($section) {

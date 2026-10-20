@@ -3,7 +3,7 @@
   RBCCM Capability Cards :: us-credentials (single-skin build)
   ============================================================
   Standalone skin for TeamSite's Skin dropdown. US Credentials
-  "Explore our capabilities": a carousel of up to 5 cards, same
+  "Explore our capabilities": a carousel of up to 6 cards, same
   pattern as rbccm-awards (fixed-width cards, next card bleeds off
   canvas, arrows + dots). Each card is a link (<a>) when
   Card{N}CtaHref is set, with a "Learn more" chip from
@@ -12,7 +12,7 @@
   (e.g. 4 cards on a wide screen) the JS turns it into a static
   centred row with no controls.
 
-  Card1-Card5. A blank title hides that card.
+  Card1-Card6. A blank title hides that card.
   Companion skin: rbccm-capability-cards (double-dash) maas-mata.xsl
   Fields: rbccm-capability-cards-properties.xml (shared).
   ============================================================ -->
@@ -316,6 +316,7 @@
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="3"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="4"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="5"/></xsl:call-template>
+          <xsl:call-template name="renderCard"><xsl:with-param name="n" select="6"/></xsl:call-template>
         </div>
 
         <!-- Carousel controls, same markup as rbccm-awards. The JS hides

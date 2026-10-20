@@ -16,7 +16,7 @@
   trades." (5 cards). Rail defaults to 1100 (Figma); SectionMaxWidth
   overrides. Set SectionBgColor to transparent there.
 
-  Card1-Card5. A blank title hides that card. A blank CTA URL renders
+  Card1-Card6. A blank title hides that card. A blank CTA URL renders
   the card as a plain article (no link, no Learn more).
   Companion skins: us-credentials, maas-mata (same Properties).
   Fields: rbccm-capability-cards-properties.xml (shared).
@@ -321,6 +321,7 @@
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="3"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="4"/></xsl:call-template>
           <xsl:call-template name="renderCard"><xsl:with-param name="n" select="5"/></xsl:call-template>
+          <xsl:call-template name="renderCard"><xsl:with-param name="n" select="6"/></xsl:call-template>
         </div>
 
         <!-- Carousel controls, same markup as rbccm-awards. The JS hides
