@@ -6,7 +6,7 @@
 
        Selection: events with the dedicated event_featured flag set (y / yes /
        true / 1), sorted by event_date ascending, first 3. Renders when at
-       least MinFeatured (default 1) qualify. The flag is the ONLY gate —
+       least MinFeatured (default 1) qualify. The flag is the ONLY gate -
        authors are responsible for unflagging past conferences as part of
        post-event cleanup.
 
@@ -44,7 +44,7 @@
     <xsl:variable name="allEvents" select="/Properties/Data/Datum[@ID='EventsList' or @Name='Events List']/DCR/events/event"/>
 
     <!-- Featured events: dedicated event_featured flag (y / yes / true / 1,
-         any case; blank = never featured). No date safety net — a flagged
+         any case; blank = never featured). No date safety net - a flagged
          event stays featured until an author manually unflags it. -->
     <xsl:variable name="featuredEvents" select="$allEvents[
         normalize-space(event_featured) != ''
@@ -596,7 +596,7 @@
       </section>
 
       <!-- == External JS (scoped to #rbccm-featured-conferences) == -->
-      <script src="/assets/rbccm/js/sub/test/featured-conferences.js"></script>
+      <script src="/assets/rbccm/js/sub/test/featured-conferences.js?v=2026-10-20"></script>
 
     </xsl:if>
 
@@ -679,7 +679,21 @@
 
       <a>
         <xsl:attribute name="class">rbccm-featured-conferences__insight <xsl:value-of select="$modifierClass"/></xsl:attribute>
-        <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+        <!-- insight_href is copied from the story at edit time and can still be
+             the old story URL:
+               .../en/story/story.page?dcr=templatedata/article/story/data/2026/07/slug
+             The site redirects that to the current format, so output the
+             current format directly:
+               .../en/insights/2026/07/slug
+             Anything else (already current, external) is output as entered. -->
+        <xsl:attribute name="href">
+          <xsl:choose>
+            <xsl:when test="contains($href, '/story/story.page') and contains($href, 'templatedata/article/story/data/')">
+              <xsl:value-of select="concat(substring-before($href, '/story/story.page'), '/insights/', substring-after($href, 'templatedata/article/story/data/'))"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$href"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
         <div class="rbccm-featured-conferences__insight-media">
           <img loading="lazy">
             <xsl:attribute name="src"><xsl:value-of select="$image"/></xsl:attribute>

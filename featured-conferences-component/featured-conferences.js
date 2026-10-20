@@ -2,6 +2,86 @@
    RBC CM - Featured Conferences
    Scoped to #rbccm-featured-conferences
    ========================================= */
+
+/* -- Screen-reader text, English + French ---------------------------------
+   Every aria-label / aria-roledescription the script writes comes from this
+   table, so French pages announce French. The language comes from the
+   nearest lang attribute (<html lang="fr"> on rbccm.com/fr/ pages);
+   data-lang="fr" on #rbccm-featured-conferences overrides it. Anything
+   else falls back to English. Placeholders: {name} {n} {total} {conf}.
+   File is ASCII only, so accented letters are \u escapes. */
+(function () {
+  var root = document.getElementById('rbccm-featured-conferences');
+  if (!root) return;
+
+  var STRINGS = {
+    en: {
+      tab:              '{name}, tab {n} of {total}',
+      colon:            ': ',
+      carousel:         'carousel',
+      slide:            'slide',
+      slideOf:          '{n} of {total}',
+      speakersRegion:   'Featured speakers',
+      speakerPrev:      'Previous speaker',
+      speakerNext:      'Next speaker',
+      speakerDots:      'Choose a speaker',
+      speakerDot:       'Go to speaker {n} of {total}',
+      insightsRegion:   'Conference insights',
+      insightPrev:      'Previous insight',
+      insightNext:      'Next insight',
+      insightDots:      'Choose an insight',
+      insightDot:       'Go to insight {n} of {total}',
+      viewAll:          'View all {conf} insights',
+      viewAllNoConf:    'View all conference insights',
+      playVideo:        'Play video',
+      videoTitle:       'Video: {conf}',
+      videoTitleNoConf: 'Video',
+      insightsLabel:    'Insights'
+    },
+    fr: {
+      tab:              '{name}, onglet {n} sur {total}',
+      colon:            ' : ',
+      carousel:         'carrousel',
+      slide:            'diapositive',
+      slideOf:          '{n} sur {total}',
+      speakersRegion:   'Conf\u00e9renciers en vedette',
+      speakerPrev:      'Conf\u00e9rencier pr\u00e9c\u00e9dent',
+      speakerNext:      'Conf\u00e9rencier suivant',
+      speakerDots:      'Choisir un conf\u00e9rencier',
+      speakerDot:       'Aller au conf\u00e9rencier {n} sur {total}',
+      insightsRegion:   'Perspectives de la conf\u00e9rence',
+      insightPrev:      'Perspective pr\u00e9c\u00e9dente',
+      insightNext:      'Perspective suivante',
+      insightDots:      'Choisir une perspective',
+      insightDot:       'Aller \u00e0 la perspective {n} sur {total}',
+      viewAll:          'Voir toutes les perspectives : {conf}',
+      viewAllNoConf:    'Voir toutes les perspectives de la conf\u00e9rence',
+      playVideo:        'Lire la vid\u00e9o',
+      videoTitle:       'Vid\u00e9o : {conf}',
+      videoTitleNoConf: 'Vid\u00e9o',
+      insightsLabel:    'Perspectives'
+    }
+  };
+
+  var langEl = root.closest('[lang]');
+  var lang   = (root.getAttribute('data-lang') ||
+                (langEl ? langEl.getAttribute('lang') : '') ||
+                document.documentElement.lang || '').toLowerCase();
+  var isFr   = lang.indexOf('fr') === 0;
+  var table  = isFr ? STRINGS.fr : STRINGS.en;
+
+  // 'fr' or 'en' - used by the sample Insights cards further down.
+  root.rbccmFcLang = isFr ? 'fr' : 'en';
+
+  // rbccmFcText('speakerDot', { n: 2, total: 5 }) -> "Go to speaker 2 of 5"
+  root.rbccmFcText = function (key, vals) {
+    var str = table[key] != null ? table[key] : (STRINGS.en[key] || '');
+    return str.replace(/\{(\w+)\}/g, function (m, k) {
+      return vals && vals[k] != null ? String(vals[k]) : '';
+    });
+  };
+})();
+
 (function () {
   var root = document.getElementById('rbccm-featured-conferences');
   if (!root) return;
@@ -21,11 +101,13 @@
   // ("tab 1 of 3") and, for inner tabs, the parent conference name. Pattern
   // matches the speakers/insights dot labels for consistency.
   (function labelTabs() {
+    var t = root.rbccmFcText;
     // Outer tabs: "Global Healthcare Conference, tab 1 of 3"
+    // (French: "..., onglet 1 sur 3")
     var nOuter = outerTabs.length;
     Array.prototype.forEach.call(outerTabs, function (tab, i) {
       var name = tab.textContent.trim();
-      tab.setAttribute('aria-label', name + ', tab ' + (i + 1) + ' of ' + nOuter);
+      tab.setAttribute('aria-label', t('tab', { name: name, n: i + 1, total: nOuter }));
     });
 
     // Inner tabs: "Overview, tab 1 of 3, Global Energy Conference"
@@ -46,7 +128,7 @@
       Array.prototype.forEach.call(innerTabsInPanel, function (tab, i) {
         var labelEl = tab.querySelector('.rbccm-featured-conferences__inner-tab-label');
         var name    = labelEl ? labelEl.textContent.trim() : tab.textContent.trim();
-        var aria    = name + ', tab ' + (i + 1) + ' of ' + nInner;
+        var aria    = t('tab', { name: name, n: i + 1, total: nInner });
         if (confName) aria += ', ' + confName;
         tab.setAttribute('aria-label', aria);
       });
@@ -214,6 +296,8 @@
   var GAP        = 32;
   var STEP       = CARD_WIDTH + GAP; // 226 - distance from one card's left edge to the next
 
+  var t = root.rbccmFcText;   // set before initOne runs
+
   Array.prototype.forEach.call(sliders, initOne);
 
   function initOne(slider) {
@@ -289,24 +373,24 @@
     }
 
     slider.setAttribute('role', 'region');
-    slider.setAttribute('aria-roledescription', 'carousel');
-    setIfEmpty(slider, 'aria-label', 'Featured speakers');
+    slider.setAttribute('aria-roledescription', t('carousel'));
+    setIfEmpty(slider, 'aria-label', t('speakersRegion'));
     track.setAttribute('aria-live', 'polite');
     track.setAttribute('aria-atomic', 'false');
 
     realSpeakers.forEach(function (s, i) {
       s.setAttribute('role', 'group');
-      s.setAttribute('aria-roledescription', 'slide');
+      s.setAttribute('aria-roledescription', t('slide'));
       // Rich label: "1 of 5: Sarah Chen, CEO, Global Healthcare Ventures"
-      var label = (i + 1) + ' of ' + n;
-      if (info[i].name)  label += ': ' + info[i].name;
+      var label = t('slideOf', { n: i + 1, total: n });
+      if (info[i].name)  label += t('colon') + info[i].name;
       if (info[i].title) label += ', ' + info[i].title;
       s.setAttribute('aria-label', label);
     });
 
-    setIfEmpty(prevBtn,  'aria-label', 'Previous speaker');
-    setIfEmpty(nextBtn,  'aria-label', 'Next speaker');
-    setIfEmpty(dotsWrap, 'aria-label', 'Choose a speaker');
+    setIfEmpty(prevBtn,  'aria-label', t('speakerPrev'));
+    setIfEmpty(nextBtn,  'aria-label', t('speakerNext'));
+    setIfEmpty(dotsWrap, 'aria-label', t('speakerDots'));
 
     // -- Build dots --------------------------------------------------------
     realSpeakers.forEach(function (s, i) {
@@ -315,8 +399,8 @@
       dot.className = 'rbccm-featured-conferences__speakers-dot';
       // Rich aria-label, matching the insights pattern:
       // "Go to speaker 1 of 5: Sarah Chen, CEO, Global Healthcare Ventures"
-      var label = 'Go to speaker ' + (i + 1) + ' of ' + n;
-      if (info[i].name)  label += ': ' + info[i].name;
+      var label = t('speakerDot', { n: i + 1, total: n });
+      if (info[i].name)  label += t('colon') + info[i].name;
       if (info[i].title) label += ', ' + info[i].title;
       dot.setAttribute('aria-label', label);
       dot.setAttribute('data-index', String(i));
@@ -509,6 +593,11 @@
   var GAP        = 32;
   var STEP       = CARD_WIDTH + GAP; // 378 - distance from one card's left edge to the next
 
+  var t = root.rbccmFcText;   // set before initOne runs
+
+  // Insights shows as a CSS grid, not a carousel (see initOne below).
+  var INSIGHTS_CAROUSEL = false;
+
   Array.prototype.forEach.call(sliders, initOne);
 
   function initOne(slider) {
@@ -534,6 +623,38 @@
       cards[i].classList.add('rbccm-featured-conferences__insight--card');
     }
 
+    function setIfEmpty(el, attr, value) {
+      if (el && !el.getAttribute(attr)) el.setAttribute(attr, value);
+    }
+
+    // Rich aria-label on the "View all conference insights" CTA - include the
+    // specific conference name so screen-reader users know which conference's
+    // archive they're heading to. The CTA lives outside the slider but inside
+    // the same inner-panel.
+    var panel = slider.closest('.rbccm-featured-conferences__inner-panel');
+    var cta   = panel ? panel.querySelector('.rbccm-featured-conferences__insights-cta') : null;
+    if (cta) {
+      var confKey  = slider.getAttribute('data-conf');
+      var tab      = confKey
+        ? root.querySelector('.rbccm-featured-conferences__tab[data-panel="' + confKey + '"]')
+        : null;
+      var confName = tab ? tab.textContent.trim() : '';
+      setIfEmpty(
+        cta,
+        'aria-label',
+        confName ? t('viewAll', { conf: confName }) : t('viewAllNoConf')
+      );
+    }
+
+    // Insights is a plain CSS grid now (featured-conferences.css: clones
+    // hidden, transform disabled, arrows/dots hidden), so the carousel setup
+    // below is switched off. It also crashed on the live markup, where the
+    // cards sit inside an __insights-row wrapper, and that error stopped the
+    // rest of this file (video facade, sample cards) from running; and its
+    // "carousel" / "1 of 3" announcements described a slider that isn't
+    // there. Set INSIGHTS_CAROUSEL = true (top of this block) to bring it back.
+    if (!INSIGHTS_CAROUSEL) return;
+
     // -- Insert clones for infinite wrap -----------------------------------
     // Layout: [start-clones 0..n-1] [real 0..n-1] [end-clones 0..n-1]
     // Real cards occupy DOM positions n..2n-1.
@@ -558,8 +679,10 @@
       });
       return frag;
     }
-    track.insertBefore(buildCloneFragment('prev'), cards[0]);
-    track.appendChild(buildCloneFragment('next'));
+    // Clones go next to the real cards, which may sit in an __insights-row
+    // wrapper rather than directly in the track.
+    cards[0].parentNode.insertBefore(buildCloneFragment('prev'), cards[0]);
+    cards[n - 1].parentNode.appendChild(buildCloneFragment('next'));
 
     // currentIndex is a REAL card index (0..n-1). DOM position of real i
     // is (n + i). displayedPos tracks the actual DOM position currently
@@ -568,15 +691,11 @@
     var displayedPos = n;
 
     // -- ARIA setup --------------------------------------------------------
-    // Same "set if empty" pattern as speakers - author overrides via DCR
-    // flow through markup and win over JS defaults.
-    function setIfEmpty(el, attr, value) {
-      if (el && !el.getAttribute(attr)) el.setAttribute(attr, value);
-    }
-
+    // Same "set if empty" pattern as speakers (setIfEmpty above) - author
+    // overrides via DCR flow through markup and win over JS defaults.
     slider.setAttribute('role', 'region');
-    slider.setAttribute('aria-roledescription', 'carousel');
-    setIfEmpty(slider, 'aria-label', 'Conference insights');
+    slider.setAttribute('aria-roledescription', t('carousel'));
+    setIfEmpty(slider, 'aria-label', t('insightsRegion'));
     track.setAttribute('aria-live', 'polite');
     track.setAttribute('aria-atomic', 'false');
 
@@ -596,36 +715,17 @@
 
     cards.forEach(function (c, i) {
       c.setAttribute('role', 'group');
-      c.setAttribute('aria-roledescription', 'slide');
+      c.setAttribute('aria-roledescription', t('slide'));
       // Rich slide label: "2 of 4: Clinical Trial Innovation, 6 min read"
-      var label = (i + 1) + ' of ' + n;
-      if (info[i].title) label += ': ' + info[i].title;
+      var label = t('slideOf', { n: i + 1, total: n });
+      if (info[i].title) label += t('colon') + info[i].title;
       if (info[i].meta)  label += ', ' + info[i].meta;
       c.setAttribute('aria-label', label);
     });
 
-    setIfEmpty(prevBtn,  'aria-label', 'Previous insight');
-    setIfEmpty(nextBtn,  'aria-label', 'Next insight');
-    setIfEmpty(dotsWrap, 'aria-label', 'Choose an insight');
-
-    // Rich aria-label on the "View all conference insights" CTA - include the
-    // specific conference name so screen-reader users know which conference's
-    // archive they're heading to. The CTA lives outside the slider but inside
-    // the same inner-panel.
-    var panel = slider.closest('.rbccm-featured-conferences__inner-panel');
-    var cta   = panel ? panel.querySelector('.rbccm-featured-conferences__insights-cta') : null;
-    if (cta) {
-      var confKey  = slider.getAttribute('data-conf');
-      var tab      = confKey
-        ? root.querySelector('.rbccm-featured-conferences__tab[data-panel="' + confKey + '"]')
-        : null;
-      var confName = tab ? tab.textContent.trim() : '';
-      setIfEmpty(
-        cta,
-        'aria-label',
-        'View all ' + (confName || 'conference') + ' insights'
-      );
-    }
+    setIfEmpty(prevBtn,  'aria-label', t('insightPrev'));
+    setIfEmpty(nextBtn,  'aria-label', t('insightNext'));
+    setIfEmpty(dotsWrap, 'aria-label', t('insightDots'));
 
     // -- Build dots --------------------------------------------------------
     cards.forEach(function (c, i) {
@@ -633,8 +733,8 @@
       dot.type = 'button';
       dot.className = 'rbccm-featured-conferences__insights-dot';
       // Rich dot label: "Go to insight 2 of 4: Clinical Trial Innovation, 6 min read"
-      var label = 'Go to insight ' + (i + 1) + ' of ' + n;
-      if (info[i].title) label += ': ' + info[i].title;
+      var label = t('insightDot', { n: i + 1, total: n });
+      if (info[i].title) label += t('colon') + info[i].title;
       if (info[i].meta)  label += ', ' + info[i].meta;
       dot.setAttribute('aria-label', label);
       dot.setAttribute('data-index', String(i));
@@ -796,6 +896,27 @@
 })();
 
 /* =========================================================================
+   Insight links: old story URL -> current format
+   The events DCR copies each picked story's URL at edit time, so older
+   picks can still carry the old format, which the site redirects:
+     /en/story/story.page?dcr=templatedata/article/story/data/2026/07/slug
+     -> /en/insights/2026/07/slug
+   The English skin already outputs the current format; this catches any
+   skin that doesn't (e.g. the French copy) so every card links direct.
+   ========================================================================= */
+(function () {
+  var root = document.getElementById('rbccm-featured-conferences');
+  if (!root) return;
+
+  var OLD = /\/story\/story\.page\?dcr=templatedata\/article\/story\/data\//;
+  var links = root.querySelectorAll('a.rbccm-featured-conferences__insight[href]');
+  Array.prototype.forEach.call(links, function (a) {
+    var href = a.getAttribute('href');
+    if (OLD.test(href)) a.setAttribute('href', href.replace(OLD, '/insights/'));
+  });
+})();
+
+/* =========================================================================
    Video facade: click-to-play (custom Poster Override)
    When a conference has a Poster Override, the Overview tab renders a poster
    image + play button instead of the iframe (Brightcove iframe embeds ignore
@@ -806,10 +927,25 @@
   var root = document.getElementById('rbccm-featured-conferences');
   if (!root) return;
 
+  var t = root.rbccmFcText;
+
+  // Conference name for this facade, from the outer tab matching its panel.
+  function confNameFor(facade) {
+    var panel = facade.closest('.rbccm-featured-conferences__panel');
+    var key   = panel ? panel.getAttribute('data-panel') : '';
+    var tab   = key
+      ? root.querySelector('.rbccm-featured-conferences__tab[data-panel="' + key + '"]')
+      : null;
+    return tab ? tab.textContent.trim() : '';
+  }
+
   function play(facade) {
     var src = facade.getAttribute('data-bc-src');
     if (!src) return;
     var iframe = document.createElement('iframe');
+    var conf   = confNameFor(facade);
+    // Screen readers announce an iframe by its title.
+    iframe.setAttribute('title', conf ? t('videoTitle', { conf: conf }) : t('videoTitleNoConf'));
     iframe.setAttribute('src', src);
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
@@ -821,6 +957,12 @@
 
   var facades = root.querySelectorAll('.rbccm-featured-conferences__video-facade');
   Array.prototype.forEach.call(facades, function (facade) {
+    // The skin hard-codes aria-label="Play video"; swap in the page
+    // language's text (an author-set label other than that is kept).
+    var current = facade.getAttribute('aria-label');
+    if (!current || current === 'Play video') {
+      facade.setAttribute('aria-label', t('playVideo'));
+    }
     facade.addEventListener('click', function (e) {
       e.preventDefault();
       play(facade);
@@ -835,12 +977,12 @@
    event at a time. Events that already have real DCR data (like Global
    Communications Infrastructure Conference) render the author-selected
    articles. Events that haven't been wired yet render nothing, or emit a
-   "+ Insights coming soon" placeholder — for those, this IIFE drops in
+   "+ Insights coming soon" placeholder  -  for those, this IIFE drops in
    3 sample cards so the Insights tab never looks empty.
 
    Behavior:
-     - Panel has 1+ real .rbccm-featured-conferences__insight--card → skip.
-     - Panel has 0 cards → replace track content with sample cards AND
+     - Panel has 1+ real .rbccm-featured-conferences__insight--card -> skip.
+     - Panel has 0 cards -> replace track content with sample cards AND
        strip any "+ Insights coming soon" placeholder.
 
    Runs after the carousel IIFEs above (via setTimeout 0) so clone insertion
@@ -864,7 +1006,7 @@
   // the default "Insights" eyebrow per card.
   var PREVIEW_CARDS = [
     {
-      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/05/natural-gas-powers-the-data-center-boom',
+      href:  '/en/insights/2026/05/natural-gas-powers-the-data-center-boom',
       image: '/assets/rbccm/images/insights/2026/data-center-energy-article-thumbnail.webp',
       alt:   'Natural gas powers the data center boom',
       title: 'Natural gas powers the data center boom',
@@ -872,7 +1014,7 @@
       meta:  '8 min read'
     },
     {
-      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/05/datacenter-equipment-demand-is-reshaping-industrial-markets',
+      href:  '/en/insights/2026/05/datacenter-equipment-demand-is-reshaping-industrial-markets',
       image: '/assets/rbccm/images/insights/2026/datacenter-equipment-demand-is-reshaping-th.webp',
       alt:   'Datacenter equipment demand is reshaping industrial markets',
       title: 'Datacenter equipment demand is reshaping industrial markets',
@@ -880,7 +1022,7 @@
       meta:  '7 min read'
     },
     {
-      href:  '/en/story/story.page?dcr=templatedata/article/story/data/2026/04/the-great-recalibration-offers-a-roadmap-to-the-future',
+      href:  '/en/insights/2026/04/the-great-recalibration-offers-a-roadmap-to-the-future',
       image: '/assets/rbccm/images/insights/2026/the-great-recalibration-offers-a-roadmap-to-the-future-th.webp',
       alt:   'The great recalibration offers a roadmap to the future',
       title: 'The great recalibration offers a roadmap to the future',
@@ -889,10 +1031,41 @@
     }
   ];
 
+  // French pages: the same three articles, with the French titles, copy,
+  // reading times and links used on rbccm.com/fr/a-propos-nous/conferences.
+  // (The first link is the one that page uses: the English story URL.)
+  var PREVIEW_CARDS_FR = [
+    {
+      href:  '/en/insights/2026/05/natural-gas-powers-the-data-center-boom',
+      image: '/assets/rbccm/images/insights/2026/data-center-energy-article-thumbnail.webp',
+      alt:   'Le gaz naturel alimente l\u2019essor des centres de donn\u00e9es',
+      title: 'Le gaz naturel alimente l\u2019essor des centres de donn\u00e9es',
+      desc:  'L\u2019intelligence artificielle g\u00e9n\u00e8re une demande sans pr\u00e9c\u00e9dent en \u00e9lectricit\u00e9 de base fiable, cr\u00e9ant ainsi de nouvelles occasions sur les march\u00e9s am\u00e9ricains du gaz naturel.',
+      meta:  'Temps de lecture : 8 min'
+    },
+    {
+      href:  '/en/insights/related-articles/la-demande-fr',
+      image: '/assets/rbccm/images/insights/2026/datacenter-equipment-demand-is-reshaping-th.webp',
+      alt:   'La demande d\u2019\u00e9quipement pour les centres de donn\u00e9es remod\u00e8le les march\u00e9s industriels',
+      title: 'La demande d\u2019\u00e9quipement pour les centres de donn\u00e9es remod\u00e8le les march\u00e9s industriels',
+      desc:  'Les besoins en \u00e9lectricit\u00e9 des centres de donn\u00e9es \u00e9voluent rapidement, n\u00e9cessitant de nouvelles approches architecturales et cr\u00e9ant \u00e0 la fois des risques de perturbation et de nouvelles occasions de march\u00e9.',
+      meta:  'Temps de lecture : 7 min'
+    },
+    {
+      href:  '/en/insights/related-articles/the-great-recalibration-offers-a-roadmap-to-the-future-fr',
+      image: '/assets/rbccm/images/insights/2026/the-great-recalibration-offers-a-roadmap-to-the-future-th.webp',
+      alt:   'Le grand recalibrage trace la voie vers l\u2019avenir',
+      title: 'Le grand recalibrage trace la voie vers l\u2019avenir',
+      desc:  'RBC\u00a0Imagine explore les nouvelles forces perturbatrices qui redessinent la soci\u00e9t\u00e9. Comment vont-elles se manifester et comment les entreprises et les investisseurs peuvent-ils s\u2019y pr\u00e9parer?',
+      meta:  'Temps de lecture : 3 min'
+    }
+  ];
+  var CARDS = root.rbccmFcLang === 'fr' ? PREVIEW_CARDS_FR : PREVIEW_CARDS;
+
   function buildCardHTML(c) {
     var targetAttr = c.target ? ' target="' + c.target + '"' : '';
     var relAttr    = c.rel    ? ' rel="'    + c.rel    + '"' : '';
-    var label      = c.label  ? c.label     : 'Insights';
+    var label      = c.label  ? c.label     : root.rbccmFcText('insightsLabel');
     return '<a class="rbccm-featured-conferences__insight rbccm-featured-conferences__insight--card" href="' + c.href + '"' + targetAttr + relAttr + '>' +
              '<div class="rbccm-featured-conferences__insight-media"><img loading="lazy" src="' + c.image + '" alt="' + c.alt + '"></div>' +
              '<div class="rbccm-featured-conferences__insight-body">' +
@@ -916,7 +1089,7 @@
       // (author-selected via the per-event DCR data flow), leave them
       // alone. Fallback is only for events with 0 cards. Clones from
       // the carousel IIFE also carry the --card class, but they can
-      // only exist when originals do — so the > 0 test is a safe
+      // only exist when originals do  -  so the > 0 test is a safe
       // "real content is present" heuristic.
       var existingCards = track.querySelectorAll('.rbccm-featured-conferences__insight--card');
       if (existingCards.length > 0) continue;
@@ -933,7 +1106,7 @@
       }
 
       track.innerHTML = '<div class="rbccm-featured-conferences__insights-row">' +
-                          PREVIEW_CARDS.map(buildCardHTML).join('') +
+                          CARDS.map(buildCardHTML).join('') +
                         '</div>';
       if (slider) slider.style.display = '';
     }
