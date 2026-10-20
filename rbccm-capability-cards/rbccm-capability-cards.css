@@ -451,23 +451,21 @@ a.rbccm-capability-cards__card:focus-visible::before {
 /* =========================================================================
    8. Icon   (mirrors .__mata-cap-icon)
    =========================================================================
-   30x30 yellow. Class lives directly on the <svg> element (MATA
+   30px tall, yellow. Class lives directly on the <svg> element (MATA
    pattern - no wrapper). Paths inside carry inline fill="#FFC72C",
    or use currentColor which inherits from the `color: #FFC72C` here. */
 .rbccm-capability-cards__icon {
-  width: 30px;
-  height: 30px;
+  width: auto;               /* follows each icon's own proportions */
+  height: 30px;              /* one height for every icon, so the bottoms line up */
   color: #FFC72C;
   display: block;
   flex-shrink: 0;
   margin-bottom: 0;
 }
-/* Rates is a wide line glyph: drawn at its Figma size (34 x 24.182),
-   not squeezed into the 30x30 box, so it sits shorter than the others. */
-.rbccm-capability-cards__icon.rbccm-capability-cards__icon--rates {
-  width: 34px;
-  height: 24.182px;
-}
+/* Every icon is 30px tall and as wide as its shape needs (FX ~27px,
+   Investment Banking ~33px, ETF ~44px, Rates ~41px). Each SVG's viewBox
+   is trimmed to its drawing, so equal heights give equal bottoms; the
+   --rates / --etf classes stay as hooks but no longer resize. */
 
 
 /* =========================================================================
