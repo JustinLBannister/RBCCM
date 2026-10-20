@@ -234,6 +234,23 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Breadcrumbs (US Creds, S+E): one Textarea on the Content tab
+       (HeroBreadcrumbs) holding just the list items, e.g.
+         <li><a href="/en/">Home</a></li><li><a href="/en/about-us">About Us</a></li>
+       The skin wraps them in the breadcrumb nav + list; separators are
+       drawn in CSS. Blank = no breadcrumbs. Figma spans are stripped like
+       the other rich-text fields. -->
+  <xsl:template name="heroBreadcrumbs">
+    <xsl:variable name="CRUMBS_HTML" select="//Datum[@ID='HeroBreadcrumbs']"/>
+    <xsl:if test="normalize-space($CRUMBS_HTML) != ''">
+      <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb">
+        <ul class="rbccm-hero__breadcrumb-list">
+          <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$CRUMBS_HTML"/></xsl:call-template>
+        </ul>
+      </nav>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -621,6 +638,10 @@
 
       <!-- Decorative blur ellipse (desktop only, per CSS). -->
       <div class="rbccm-hero__blur" aria-hidden="true"></div>
+
+      <!-- Breadcrumbs: first content in the section, above the container
+           (copy + card row). -->
+      <xsl:call-template name="heroBreadcrumbs"/>
 
       <div class="rbccm-hero__container">
         <div class="rbccm-hero__grid">

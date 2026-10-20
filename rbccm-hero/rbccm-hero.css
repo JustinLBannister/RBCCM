@@ -1255,20 +1255,14 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   justify-content: center;
   text-align: center;
   width: 100%;
-  /* v3 mobile: copy at most 284px wide, centred. The container is
-     border-box, so the 23px side gutters (kept for narrow phones) are
-     added on top of the 284. */
-  max-width: calc(284px + 46px);
+  /* v3 mobile: the container runs the full hero width inside 23px side
+     gutters, so the breadcrumbs can span it left-aligned. The copy
+     itself is capped (284px, 475px from 600) by the rule below. */
+  max-width: none;
   padding: 0 23px;
   margin: 0 auto;
   gap: 16px;                 /* v3 mobile: title -> paragraph */
   box-sizing: border-box;
-}
-/* Large phones / small tablets: copy up to 475px wide. */
-@media (min-width: 600px) {
-  .rbccm-hero--us-credentials .rbccm-hero__container {
-    max-width: calc(475px + 46px);
-  }
 }
 @media (min-width: 992px) {
   .rbccm-hero--us-credentials .rbccm-hero__container {
@@ -1360,6 +1354,23 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   }
 }
 
+/* Mobile / tablet copy width: at most 284px, centred; large phones and
+   small tablets (600+) up to 475px. Set on the copy, not the container,
+   so the breadcrumbs above it can go full width. */
+@media (max-width: 991px) {
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow,
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    max-width: 284px;
+  }
+}
+@media (min-width: 600px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow,
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    max-width: 475px;
+  }
+}
 /* v3 desktop (992+, with the desktop art, type and gradient): copy
    left-aligned over the dark left side of the art, at the container's
    left edge (same rail as the page content). */
@@ -1375,6 +1386,124 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   }
   .rbccm-hero--us-credentials .rbccm-hero__eyebrow::after {
     margin: 15px 0 0;
+  }
+}
+
+/* ---- Breadcrumbs (US Creds, S+E) ------------------------------------
+   <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb"> wrapping
+   the editor's <li> items from the HeroBreadcrumbs field (plain <li> /
+   <a>, no classes needed). Matches the Imagine hero's
+   .rbccm-hero__breadcrumbs spec: 13px, line-height 160%, a muted "|"
+   (82%, the spec's #ffffffd0) with a 4px gap + 4px / 6px margin, no
+   hover underline; about 30px down to the headline. Colour per hero: white on US Creds' dark
+   art, navy on S+E's light hero. Separators are CSS, so screen readers
+   don't read them. Selectors are specific enough to beat the site's
+   bare li / a colour rules. */
+.rbccm-hero .rbccm-hero__breadcrumbs {
+  margin: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list {
+  align-items: center;
+  color: var(--rbccm-hero-crumb-color, #fff);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: "Roboto Light", Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  gap: 0.25rem;
+  letter-spacing: 0;
+  line-height: 160%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list > li {
+  align-items: center;         /* pipe and link share one centre line */
+  background: none;
+  color: inherit;
+  display: inline-flex;
+  font-size: 13px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list > li + li::before {
+  color: inherit;
+  content: "|";
+  font-size: 13px;
+  line-height: 1;
+  margin: 0 6px 0 4px;
+  opacity: 0.82;               /* the Imagine spec's #ffffffd0 muted pipe */
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list a,
+.rbccm-hero .rbccm-hero__breadcrumb-list a:visited,
+.rbccm-hero .rbccm-hero__breadcrumb-list a:hover {
+  color: inherit;
+  font-size: 13px;
+  line-height: 160%;
+  text-decoration: none;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* US Creds: white, the first item in the copy column (.__container).
+   Left-aligned at every width. Mobile / tablet: they span the full-width
+   container (23px from the hero edge) above the centred, capped copy; the column's 16px gap +
+   14px margin = 30px to the headline.
+   Desktop (992+, background images): the hero's top padding drops to
+   128px (98 nav + 30) and the copy column fills the hero, its items
+   pushed to the bottom. The breadcrumbs take margin-bottom: auto, so
+   they sit at the top of the column, 30px under the nav, and the copy
+   stays pinned 80px from the bottom exactly as without breadcrumbs.
+   Without breadcrumbs the copy is simply pinned to the bottom. */
+.rbccm-hero--us-credentials {
+  --rbccm-hero-crumb-color: #fff;
+}
+.rbccm-hero--us-credentials .rbccm-hero__breadcrumbs {
+  align-self: stretch;         /* full column width, so the list can sit left */
+  margin-bottom: 14px;
+}
+.rbccm-hero--us-credentials .rbccm-hero__breadcrumb-list {
+  justify-content: flex-start;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    padding-top: 128px;
+  }
+  .rbccm-hero--us-credentials[data-hero-bg] .rbccm-hero__container {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__breadcrumbs {
+    margin-bottom: auto;
+  }
+}
+
+/* S+E: navy like its headline, left-aligned. The breadcrumbs are a
+   direct child of the section, before .__container (copy + card row),
+   30px above it. The section is a centring flex row, so it stacks as a
+   column instead (identical without breadcrumbs: the video and blur
+   layers are absolute, the container is the only flow child). On
+   desktop the breadcrumbs share the row's 1140px cap so they line up
+   with the headline. */
+.rbccm-hero--strategy-and-economics {
+  --rbccm-hero-crumb-color: var(--rbccm-hero-navy);
+  flex-direction: column;
+}
+.rbccm-hero--strategy-and-economics > .rbccm-hero__container {
+  align-self: stretch;
+}
+.rbccm-hero--strategy-and-economics > .rbccm-hero__breadcrumbs {
+  align-self: stretch;
+  margin-bottom: 30px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--strategy-and-economics > .rbccm-hero__breadcrumbs {
+    align-self: center;
+    max-width: 1140px;
+    width: 100%;
   }
 }
 

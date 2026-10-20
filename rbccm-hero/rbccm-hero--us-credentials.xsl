@@ -100,6 +100,23 @@
   </xsl:template>
 
 
+  <!-- Breadcrumbs (US Creds, S+E): one Textarea on the Content tab
+       (HeroBreadcrumbs) holding just the list items, e.g.
+         <li><a href="/en/">Home</a></li><li><a href="/en/about-us">About Us</a></li>
+       The skin wraps them in the breadcrumb nav + list; separators are
+       drawn in CSS. Blank = no breadcrumbs. Figma spans are stripped like
+       the other rich-text fields. -->
+  <xsl:template name="heroBreadcrumbs">
+    <xsl:variable name="CRUMBS_HTML" select="//Datum[@ID='HeroBreadcrumbs']"/>
+    <xsl:if test="normalize-space($CRUMBS_HTML) != ''">
+      <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb">
+        <ul class="rbccm-hero__breadcrumb-list">
+          <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$CRUMBS_HTML"/></xsl:call-template>
+        </ul>
+      </nav>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="/">
 
     <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
@@ -352,6 +369,13 @@
       </xsl:choose>
 
       <div class="rbccm-hero__container">
+
+        <!-- Breadcrumbs: first item in the copy column. Centred above the
+             copy on mobile; on desktop the column fills the hero and the
+             breadcrumbs sit at its top (30px under the nav, like the
+             Imagine page banner) while the copy stays pinned to the
+             bottom. -->
+        <xsl:call-template name="heroBreadcrumbs"/>
 
         <xsl:if test="$UC_EYEBROW_TEXT != ''">
           <xsl:element name="{$UC_EYEBROW_TAG}">
