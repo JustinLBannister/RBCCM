@@ -104,7 +104,12 @@
 }
 .rbccm-intro-statement__body strong { color: #FFFFFF; font-weight: 700; }
 
-/* ---- CTA: ghost pill ---------------------------------------------------- */
+/* ---- CTA: yellow pill ----------------------------------------------------
+   Same shape and type as before (50px pill, Roboto 18); colours from the
+   CTA band's "Request a demo" button (rbccm-cta-band.css): warm-yellow
+   fill, navy #061730 text; hover / focus one shade deeper with a soft
+   shadow and the shine sweep. !important because the site's global a /
+   a:hover rules otherwise win. */
 .rbccm-intro-statement .rbccm-intro-statement__cta {
   display: inline-flex !important;
   align-items: center !important;
@@ -113,9 +118,9 @@
   height: 50px !important;
   padding: 12px 35px !important;
   border-radius: 100px !important;
-  border: 1px solid #D8D8D8 !important;
-  background: transparent !important;
-  color: #D8D8D8 !important;
+  border: 1px solid transparent !important;
+  background: #FFC72C !important;
+  color: #061730 !important;
   font-family: Roboto, Arial, sans-serif !important;
   font-size: 18px !important;
   font-weight: 400 !important;
@@ -126,10 +131,17 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  transition: box-shadow 200ms ease;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.rbccm-intro-statement .rbccm-intro-statement__cta:hover,
+.rbccm-intro-statement .rbccm-intro-statement__cta:focus-visible {
+  background: #E5B325 !important; /* one shade deeper than the base gold */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #061730 !important;
+  text-decoration: none !important;
 }
 .rbccm-intro-statement__cta > * { position: relative; z-index: 1; }
-/* Shine sweep on hover / keyboard focus (same as the page). */
+/* Shine sweep on hover / keyboard focus (same as the CTA band). */
 .rbccm-intro-statement__cta::before {
   content: "";
   position: absolute;
@@ -160,6 +172,7 @@
 @media (prefers-reduced-motion: reduce) {
   .rbccm-intro-statement__cta:hover::before,
   .rbccm-intro-statement__cta:focus-visible::before { animation: none; }
+  .rbccm-intro-statement .rbccm-intro-statement__cta { transition: none; }
   .rbccm-intro-statement [data-animate] {
     animation: none !important;
     opacity: 1 !important;
