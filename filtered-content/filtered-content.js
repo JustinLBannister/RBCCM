@@ -130,11 +130,11 @@
   };
 
   /* Type dropdown labels -- ITM preset uses "press" and "media" as the
-     raw data-type tokens, but the dropdown should read "News releases"
+     raw data-type tokens, but the dropdown should read "News release"
      and "Media coverage" (matching the eyebrow labels on the cards
      themselves). Applied via formatValue() below. */
   var TYPE_LABELS = {
-    'press':  'News releases',
+    'press':  'News release',
     'media':  'Media coverage'
   };
 
@@ -227,7 +227,7 @@
     }
     if (dim === 'type') {
       /* ITM type tokens ("press" / "media") map to human labels
-         "News releases" / "Media coverage" so the dropdown option
+         "News release" / "Media coverage" so the dropdown option
          reads the same way as the eyebrow on the card itself. */
       return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
