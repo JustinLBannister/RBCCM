@@ -1450,12 +1450,19 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   opacity: 0.82;               /* the Imagine spec's #ffffffd0 muted pipe */
 }
 .rbccm-hero .rbccm-hero__breadcrumb-list a,
-.rbccm-hero .rbccm-hero__breadcrumb-list a:visited,
-.rbccm-hero .rbccm-hero__breadcrumb-list a:hover {
+.rbccm-hero .rbccm-hero__breadcrumb-list a:visited {
   color: inherit;
   font-size: 13px;
   line-height: 160%;
   text-decoration: none;
+}
+/* Underline on hover (and keyboard focus), in the link's own colour. */
+.rbccm-hero .rbccm-hero__breadcrumb-list a:hover,
+.rbccm-hero .rbccm-hero__breadcrumb-list a:focus-visible {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 .rbccm-hero .rbccm-hero__breadcrumb-list a:focus-visible {
   outline: 2px solid currentColor;
@@ -1508,6 +1515,11 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 .rbccm-hero--strategy-and-economics > .rbccm-hero__container {
   align-self: stretch;
+  /* Full width. The shared container rule's margin: 0 auto would
+     otherwise win over the stretch in this column and shrink the row to
+     its content (centred, narrower than the breadcrumbs) when the copy
+     is short. */
+  width: 100%;
 }
 .rbccm-hero--strategy-and-economics > .rbccm-hero__breadcrumbs {
   align-self: stretch;
