@@ -1417,7 +1417,21 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 0;
   padding: 0;
 }
-.rbccm-hero .rbccm-hero__breadcrumb-list > li {
+/* The field's rich-text editor wraps the items in its own <ul>. The skins
+   unwrap it (so the markup is one valid list); this is a safety net for
+   older skin versions or other editor wrappers (<p> / <div>): they drop
+   out of the layout so the items still sit in this row, and the item
+   rules below match items at any depth. */
+.rbccm-hero .rbccm-hero__breadcrumb-list ul,
+.rbccm-hero .rbccm-hero__breadcrumb-list ol,
+.rbccm-hero .rbccm-hero__breadcrumb-list p,
+.rbccm-hero .rbccm-hero__breadcrumb-list div {
+  display: contents;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list li {
   align-items: center;         /* pipe and link share one centre line */
   background: none;
   color: inherit;
@@ -1427,7 +1441,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   margin: 0;
   padding: 0;
 }
-.rbccm-hero .rbccm-hero__breadcrumb-list > li + li::before {
+.rbccm-hero .rbccm-hero__breadcrumb-list li + li::before {
   color: inherit;
   content: "|";
   font-size: 13px;
@@ -1504,6 +1518,36 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
     align-self: center;
     max-width: 1140px;
     width: 100%;
+  }
+}
+/* With breadcrumbs (the skin adds --has-breadcrumbs when the field is
+   filled) they sit at the top of the hero, 30px under the fixed nav
+   (65px below 768, 98px from 768), and the copy + card row stays where
+   the design puts it: the top padding shrinks to nav + 30 and the
+   breadcrumbs' bottom margin takes up the difference (breadcrumb row =
+   20.8px tall: 13px x 160%).
+     below 768   padding 95,  row at 171 (95 + 20.8 + 55.2)
+     768 - 991   padding 128, row at 178.8 (needs the 30px minimum gap,
+                 so the row sits 8px lower than without breadcrumbs)
+     992+        padding 128, row at 216 (128 + 20.8 + 67.2)
+   Without breadcrumbs nothing here applies. */
+.rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs {
+  padding-top: 95px;
+}
+.rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+  margin-bottom: 55.2px;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs {
+    padding-top: 128px;
+  }
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+    margin-bottom: 30px;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+    margin-bottom: 67.2px;
   }
 }
 

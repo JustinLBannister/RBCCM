@@ -243,12 +243,65 @@
   <xsl:template name="heroBreadcrumbs">
     <xsl:variable name="CRUMBS_HTML" select="//Datum[@ID='HeroBreadcrumbs']"/>
     <xsl:if test="normalize-space($CRUMBS_HTML) != ''">
+      <!-- The field's rich-text editor wraps the items in its own list
+           (<ul><li>...</li></ul>) and adds data-mce-* attributes. The
+           skin supplies the <ul>, so the editor's wrapper is unwrapped
+           (a <ul> directly inside a <ul> isn't valid) and the editor
+           attributes are dropped: only the <li> items go in the list. -->
+      <xsl:variable name="CRUMBS_ITEMS">
+        <xsl:call-template name="heroCrumbsUnwrap">
+          <xsl:with-param name="s" select="normalize-space($CRUMBS_HTML)"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="CRUMBS_CLEAN">
+        <xsl:call-template name="heroCrumbsStripMce">
+          <xsl:with-param name="s" select="string($CRUMBS_ITEMS)"/>
+        </xsl:call-template>
+      </xsl:variable>
       <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb">
         <ul class="rbccm-hero__breadcrumb-list">
-          <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$CRUMBS_HTML"/></xsl:call-template>
+          <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="string($CRUMBS_CLEAN)"/></xsl:call-template>
         </ul>
       </nav>
     </xsl:if>
+  </xsl:template>
+
+  <!-- Breadcrumbs: if the field starts with an opening <ul ...> or
+       <ol ...>, return just what's inside it (up to its closing tag);
+       otherwise return the field as entered. -->
+  <xsl:template name="heroCrumbsUnwrap">
+    <xsl:param name="s"/>
+    <xsl:variable name="head" select="translate(substring($s, 1, 3), 'ULO', 'ulo')"/>
+    <xsl:choose>
+      <xsl:when test="($head = '&lt;ul' or $head = '&lt;ol') and contains($s, '&gt;')">
+        <xsl:variable name="inner" select="substring-after($s, '&gt;')"/>
+        <!-- Find the closing tag in a lower-cased copy (so </UL> matches
+             too), then cut the original at that position. -->
+        <xsl:variable name="innerLc" select="translate($inner, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+        <xsl:choose>
+          <xsl:when test="contains($innerLc, '&lt;/ul&gt;')"><xsl:value-of select="substring($inner, 1, string-length(substring-before($innerLc, '&lt;/ul&gt;')))"/></xsl:when>
+          <xsl:when test="contains($innerLc, '&lt;/ol&gt;')"><xsl:value-of select="substring($inner, 1, string-length(substring-before($innerLc, '&lt;/ol&gt;')))"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="$inner"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Breadcrumbs: drop every data-mce-* attribute (name="value") the
+       editor adds, e.g. data-mce-href="/en/". -->
+  <xsl:template name="heroCrumbsStripMce">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, ' data-mce-')">
+        <xsl:variable name="rest" select="substring-after($s, ' data-mce-')"/>
+        <xsl:value-of select="substring-before($s, ' data-mce-')"/>
+        <xsl:call-template name="heroCrumbsStripMce">
+          <xsl:with-param name="s" select="substring-after(substring-after($rest, '&quot;'), '&quot;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="/">
@@ -494,7 +547,7 @@
     </xsl:if>
 
     <section>
-      <xsl:attribute name="class">rbccm-hero rbccm-hero--strategy-and-economics<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-hero--header-center</xsl:if></xsl:attribute>
+      <xsl:attribute name="class">rbccm-hero rbccm-hero--strategy-and-economics<xsl:if test="$HEADER_ALIGN = 'center'"> rbccm-hero--header-center</xsl:if><xsl:if test="normalize-space(//Datum[@ID='HeroBreadcrumbs']) != ''"> rbccm-hero--has-breadcrumbs</xsl:if></xsl:attribute>
       <xsl:if test="$SECTION_ID != ''">
         <xsl:attribute name="id"><xsl:value-of select="$SECTION_ID"/></xsl:attribute>
       </xsl:if>
