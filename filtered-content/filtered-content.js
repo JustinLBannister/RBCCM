@@ -130,11 +130,11 @@
   };
 
   /* Type dropdown labels -- ITM preset uses "press" and "media" as the
-     raw data-type tokens, but the dropdown should read "News release"
+     raw data-type tokens, but the dropdown should read "News releases"
      and "Media coverage" (matching the eyebrow labels on the cards
      themselves). Applied via formatValue() below. */
   var TYPE_LABELS = {
-    'press':  'News release',
+    'press':  'News releases',
     'media':  'Media coverage'
   };
 
@@ -227,7 +227,7 @@
     }
     if (dim === 'type') {
       /* ITM type tokens ("press" / "media") map to human labels
-         "News release" / "Media coverage" so the dropdown option
+         "News releases" / "Media coverage" so the dropdown option
          reads the same way as the eyebrow on the card itself. */
       return TYPE_LABELS[value.toLowerCase()] || genericTitleCase(value);
     }
@@ -1845,7 +1845,95 @@
        URL year isn't in the DOM yet, ensureUrlYearLoaded() fetches
        that archive first so the deep link actually matches items. */
     readUrlState();
-    ensureUrlYearLoaded().then(function () { apply(false); });
+
+    /* ITM only: pick up items published since the page itself was last
+       published. The server-rendered list is a snapshot from the page's
+       last publish (and doesn't include news releases), while the
+       current-year feed updates on its own. Once the list has rendered,
+       fetch that feed and add any media coverage / news release that
+       isn't on the page yet:
+         - external links only (internal story.page items are already in
+           the server list under a different URL)
+         - matched by link, so nothing doubles up
+         - only items dated within the range the list already covers
+           (its oldest item onwards), so the list doesn't grow back into
+           older history; older years still load from the Year filter
+         - each new item goes in date order without reshuffling the
+           items already there
+       Then the current view is re-applied (filters / page kept). */
+    var isItmList = !!(container.closest &&
+      container.closest('.rbccm-filtered-content--in-the-media-and-press-releases'));
+
+    function itemDateTs(li) {
+      var d = li.querySelector('.rbccm-filtered-content__card-date');
+      var ts = d ? Date.parse(String(d.textContent || '').trim()) : NaN;
+      return isNaN(ts) ? 0 : ts;
+    }
+
+    function refreshLatestFromFeed() {
+      if (!isItmList || !yearFeedTemplate || !availableYears.length) return Promise.resolve(0);
+      var url = yearFeedTemplate.replace('{year}', availableYears[0]);
+      return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      }).then(function (xmlStr) {
+        var doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
+        if (!doc || doc.getElementsByTagName('parsererror').length > 0) return 0;
+        var newsNodes = doc.getElementsByTagName('news');
+        if (!seededLinkSet) { isYearLoaded('__seed__'); }
+        var listEl = container.matches && container.matches('ul')
+          ? container
+          : (container.querySelector && container.querySelector('.rbccm-filtered-content__list'))
+              || container;
+        var existing = Array.prototype.slice.call(listEl.children).filter(function (el) {
+          return el.matches && el.matches(itemSelector);
+        });
+        /* Oldest date the list already shows. */
+        var floorTs = Infinity;
+        for (var k = 0; k < existing.length; k++) {
+          var kt = itemDateTs(existing[k]);
+          if (kt && kt < floorTs) floorTs = kt;
+        }
+        if (floorTs === Infinity) floorTs = 0;
+        var fresh = [];
+        for (var i = 0; i < newsNodes.length; i++) {
+          var built = buildYearArchiveItem(newsNodes[i]);
+          if (!built || !built.link) continue;
+          if (!/^https?:\/\//i.test(built.link)) continue;
+          if (seededLinkSet[built.link]) continue;
+          var ts = itemDateTs(built.li);
+          if (!ts || ts < floorTs) continue;
+          seededLinkSet[built.link] = true;
+          fresh.push({ li: built.li, ts: ts });
+        }
+        if (!fresh.length) return 0;
+        fresh.sort(function (a, b) { return b.ts - a.ts; });
+        for (var f = 0; f < fresh.length; f++) {
+          var before = null;
+          for (var e = 0; e < existing.length; e++) {
+            if (itemDateTs(existing[e]) < fresh[f].ts) { before = existing[e]; break; }
+          }
+          if (before) listEl.insertBefore(fresh[f].li, before);
+          else listEl.appendChild(fresh[f].li);
+          existing = Array.prototype.slice.call(listEl.children).filter(function (el) {
+            return el.matches && el.matches(itemSelector);
+          });
+        }
+        allItems = container.querySelectorAll(itemSelector);
+        for (var j = 0; j < allItems.length; j++) delete allItems[j].__rbccmHaystack;
+        return fresh.length;
+      }).catch(function (err) {
+        console.warn('[rbccm-filtered-content] latest-items refresh failed:', err);
+        return 0;
+      });
+    }
+
+    ensureUrlYearLoaded().then(function () {
+      apply(false);
+      return refreshLatestFromFeed();
+    }).then(function (added) {
+      if (added) apply(false);
+    });
 
     /* Signal to consumer CSS that the filter has initialized and tiles
        are in their correct visible/hidden state. Consumers can hide the
