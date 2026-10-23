@@ -498,6 +498,36 @@
   margin-bottom: 0;
 }
 
+/* Links inside a card (e.g. a footnote reference in the issuer line,
+   <a href="#footnotes-section">). Without this they took the site's
+   default link blue, which fails contrast on the navy card. Warm yellow
+   on navy is well over 4.5:1, and the permanent underline marks it as
+   a link apart from the grey text around it (colour alone isn't
+   enough: yellow vs #D1D1D1 is too close). */
+.rbccm-awards .rbccm-awards__card a,
+.rbccm-awards .rbccm-awards__card a:visited {
+  color: #FFC72C;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+/* The footnote number sits in a <sup> inside the link; it follows the
+   link colour (beats any plain `sup` or `.__issuer sup` colour rule). */
+.rbccm-awards .rbccm-awards__card a sup {
+  color: inherit;
+}
+.rbccm-awards .rbccm-awards__card a:hover,
+.rbccm-awards .rbccm-awards__card a:focus {
+  color: #FFC72C;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+.rbccm-awards .rbccm-awards__card a:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #FFC72C;
+  outline-offset: 2px;
+}
+
 /* Reduced motion - kill the scroll-triggered fade/stagger the section
    inherits from rbccm-animate.js. rbccm-animate.js itself checks for
    prefers-reduced-motion and no-ops the observer path, but this
