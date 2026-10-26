@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mega Menu Scroll Fade</title>
+<style>
+  :root {
+    --page: #f3f4f6;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --line: #d1d5db;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: Roboto, -apple-system, "Segoe UI", Arial, sans-serif;
+  }
+  .intro { max-width: 720px; margin: 0 auto; padding: 32px 16px 8px; }
+  .intro h1 { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
+  .intro p { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; align-items: center;
+    padding: 16px; font-size: 14px; color: var(--muted);
+  }
+  .controls label { display: flex; align-items: center; gap: 8px; }
+  .controls output { min-width: 36px; color: var(--ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; padding: 8px 16px 40px; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .col span { font-size: 13px; color: var(--muted); }
+
+  .phone {
+    position: relative; width: 300px; max-width: 100%; height: 470px;
+    background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  }
+  .bar {
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; border-bottom: 1px solid #e6edf3; color: #003168;
+  }
+  .logo { font-weight: 700; letter-spacing: 1px; }
+  .icons { display: flex; gap: 16px; }
+  .icons svg { width: 22px; height: 22px; }
+  .scroll { height: 414px; overflow-y: auto; padding: 12px 28px 24px; }
+  .h { font-size: 11px; letter-spacing: 2px; color: #6b6b6b; margin: 18px 0 6px; }
+  .a { display: block; color: #0d2a5c; font-size: 16px; line-height: 1.9; text-decoration: none; }
+  .a.big { font-size: 20px; }
+  .a.cta { color: #0051a5; }
+  .pick {
+    background: #0d2a5c; border-radius: 16px; padding: 16px; margin-top: 20px;
+    color: #fff; font-size: 15px; line-height: 1.35;
+  }
+  .pick .eyebrow { color: #ffc72c; font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; }
+  .pick .meta { font-size: 12px; color: #c9d3e3; margin-top: 8px; }
+
+  /* The idea: a white fade over the bottom of the panel. */
+  .fade {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%);
+    transition: opacity .2s;
+  }
+</style>
+</head>
+<body>
+  <div class="intro">
+    <h1>Insights mega menu: bottom scroll fade</h1>
+    <p>Design idea. A white fade over the bottom 10&ndash;15% of the mobile menu panel half-hides the last item or two, so it reads as &ldquo;keep scrolling&rdquo;. It fades away once you reach the end. Scroll the right-hand panel to try it.</p>
+  </div>
+
+  <div class="controls">
+    <label>Fade height <input type="range" id="fh" min="5" max="30" step="1" value="12"> <output id="fhv">12%</output></label>
+    <label><input type="checkbox" id="hideEnd" checked> Hide at the end</label>
+  </div>
+
+  <div class="row">
+    <div class="col"><span>Today</span><div class="phone"></div></div>
+    <div class="col"><span>With bottom fade</span><div class="phone" data-fade></div></div>
+  </div>
+
+<script>
+  var menu =
+    '<div class="bar"><span class="logo">RBC</span><span class="icons">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="M15 15l5 5" stroke-linecap="round"/></svg>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>' +
+    '</span></div>' +
+    '<div class="scroll">' +
+      '<div class="h">EXPLORE</div>' +
+      '<a class="a big">All Insights &rarr;</a><a class="a">Latest</a><a class="a">Podcasts &amp; video</a><a class="a">Thought leaders</a>' +
+      '<a class="a cta">Log in to RBC Insight &rarr;</a>' +
+      '<div class="h">FLAGSHIP PROGRAMS</div>' +
+      '<a class="a">Real-Time Geopolitics</a><a class="a">Strategic Alternatives</a><a class="a">RBC Imagine</a>' +
+      '<a class="a">Markets in Motion</a><a class="a">Macro Minutes</a><a class="a">RBC Economics</a>' +
+      '<div class="h">TOPICS</div>' +
+      '<a class="a">Artificial intelligence</a><a class="a">Energy transition</a><a class="a">Geopolitics</a>' +
+      '<a class="a">Macro &amp; rates</a><a class="a">Sustainable finance</a><a class="a cta">All topics &rarr;</a>' +
+      '<div class="pick"><div class="eyebrow">EDITOR\'S PICK</div>How transport operators are tackling the decarbonisation challenge' +
+      '<div class="meta">RBC Imagine &middot; 4 min read</div></div>' +
+    '</div>';
+
+  var fh = document.getElementById('fh');
+  var fhv = document.getElementById('fhv');
+  var hideEnd = document.getElementById('hideEnd');
+
+  document.querySelectorAll('.phone').forEach(function (phone) {
+    phone.innerHTML = menu;
+    if (!phone.hasAttribute('data-fade')) return;
+    var fade = document.createElement('div');
+    fade.className = 'fade';
+    phone.appendChild(fade);
+    var sc = phone.querySelector('.scroll');
+    function update() {
+      fade.style.height = Math.round(sc.clientHeight * fh.value / 100) + 'px';
+      var atEnd = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4;
+      fade.style.opacity = (hideEnd.checked && atEnd) ? 0 : 1;
+      fhv.textContent = Math.round(fh.value) + '%';
+    }
+    sc.addEventListener('scroll', update);
+    fh.addEventListener('input', update);
+    hideEnd.addEventListener('change', update);
+    update();
+  });
+</script>
+</body>
+</html>

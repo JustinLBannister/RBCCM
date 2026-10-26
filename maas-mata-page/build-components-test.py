@@ -121,7 +121,7 @@ S.append(('Hero :: rbccm-hero--maas-mata.xsl', render(
         'EyebrowText': MM['HeroEyebrow'],
         'TitleLine1Text': MM['HeroTitleLine1'], 'TitleLine2Text': MM['HeroTitleLine2'],
         'SubtitleText': MM['HeroSubtitle'],
-        'MmCta1Label': MM['HeroCtaLabel'], 'MmCta1Href': MM['HeroCtaHref'],
+        'MmCta1Label': MM['HeroCtaLabel'], 'MmCta1Href': '#request-demo',   # opens rbccm-marketo-modal
         'MmCta2Label': '', 'MmCta2Href': '',
     })))
 S.append(('Chart image + video :: rbccm-video-poster.xsl', render(
@@ -175,8 +175,8 @@ for n in (1, 2):
     plat['Card%dEyebrowText' % n] = MM['Platform%dEyebrow' % n]
     plat['Card%dTitleText' % n] = MM['Platform%dTitle' % n]
     plat['Card%dBodyText' % n] = MM['Platform%dBody' % n]
-    for b in range(1, 6):
-        plat['Card%dBullet%dText' % (n, b)] = MM['Platform%dBullet%d' % (n, b)]
+    for b in range(1, 7):
+        plat['Card%dBullet%dText' % (n, b)] = MM.get('Platform%dBullet%d' % (n, b), '')
 S.append(('Platforms :: rbccm-two-up-cards--features.xsl', render(
     'rbccm-two-up-cards/rbccm-two-up-cards--features.xsl', 'rbccm-two-up-cards/rbccm-two-up-cards-properties.xml', plat)))
 
@@ -184,12 +184,12 @@ cap = {'SectionAriaLabel': 'MATA capabilities',
        'SectionEyebrowText': MM['MataCapEyebrow'] or 'MATA capabilities',
        'SectionHeadingText': MM['MataCapHeading'],
        'SectionDescriptionText': MM['MataCapSubheading']}
-for n, icon in ((1, 'investment-banking'), (2, 'markets'), (3, 'corporate-banking')):
-    cap['Card%dIconType' % n] = MM['Card%dIcon' % n] or icon
+for n, icon in ((1, 'equities'), (2, 'fx'), (3, 'futures')):
+    cap['Card%dIconType' % n] = icon
     cap['Card%dTitleText' % n] = MM['Card%dTitle' % n]
     cap['Card%dSubtitleText' % n] = MM['Card%dSubtitle' % n]
     cap['Card%dBodyText' % n] = MM['Card%dBody' % n]
-cap.update({'Card4IconType': MM['IndexEventsIcon'] or 'info',
+cap.update({'Card4IconType': 'index-events',
             'Card4TitleText': MM['IndexEventsTitle'],
             'Card4SubtitleText': MM['IndexEventsSubtitle'],
             'Card4BodyText': MM['IndexEventsBody'],
@@ -216,7 +216,7 @@ S.append(('Demo CTA :: rbccm-cta-band--maas-mata.xsl', render(
         'BgTransparent': 'yes', 'SectionId': 'demo', 'SectionAriaLabel': 'See the platform',
         'Eyebrow': MM['DemoEyebrow'], 'HeadingLead': MM['DemoHeadlinePrefix'],
         'HeadingHighlight': MM['DemoHeadlineHighlight'], 'Body': MM['DemoBody'],
-        'Cta1Label': MM['DemoCtaLabel'], 'Cta1Href': MM['DemoCtaHref'], 'Cta2Label': '', 'Cta2Href': ''})))
+        'Cta1Label': MM['DemoCtaLabel'], 'Cta1Href': '#request-demo', 'Cta2Label': '', 'Cta2Href': ''})))
 S.append(('Deep band END :: rbccm-section-group--end.xsl', render(
     'rbccm-section-group/rbccm-section-group--end.xsl', 'rbccm-section-group/rbccm-section-group-properties.xml', {
         'GroupName': 'deep-band'})))

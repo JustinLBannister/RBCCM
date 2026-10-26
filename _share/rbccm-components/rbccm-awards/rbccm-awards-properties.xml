@@ -1,0 +1,58 @@
+<!-- ============================================================
+     RBCCM Awards  |  Properties + Data
+     ============================================================
+     Row of award cards on a dark background. Extracted from the
+     MAAS+MATA landing page so any page can drop it in.
+
+     Layout comes from the number of cards, no preset to pick:
+       3 cards   3-up grid, MAAS+MATA navy (#041e42)
+       4 cards   4-up grid, US Credentials navy (#051B38)
+     A card with a blank title is skipped. Only the first 4 cards
+     with a title render (the grid is designed for 3 or 4).
+     The file ships one card; editors add the rest in TeamSite.
+
+     Same structure as icon-carousel / case-studies-carousel:
+     section settings live in Properties, the cards are a
+     repeatable Group in Data.
+     ============================================================ -->
+<Properties ComponentID="rbccm-awards-v1">
+
+  <!-- ============================================================
+       Appearance tab: settings, paths, layout, tags, colours
+       ============================================================ -->
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-awards.css</Datum>
+
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - powers the mobile carousel)">/assets/rbccm/js/components/rbccm-awards.js</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-23-1200</Datum>
+
+  <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target)">rbccm-awards-1</Datum>
+
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to 'Awards')"></Datum>
+
+  <!-- Blank = the layout's own navy (3 cards #041e42, 4 cards
+       #051B38). Any CSS colour works: #hex, rgb(), a named colour. -->
+  <Datum ID="SectionBgColor" Type="String" Name="Background colour override (optional - blank uses the default navy; e.g. #051B38)"></Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy, links, media
+       ============================================================ -->
+
+  <!-- Caption line above the cards. Blank hides it. -->
+  <Datum ID="SectionEyebrowText" Type="String" Name="Section eyebrow (optional - blank hides it)">See why the world's top institutions choose MAAS</Datum>
+
+  <Group ID="AwardCard"
+         Name="Award Card"
+         Replicatable="true"
+         CloneGroupID="rbccm-awards-card">
+    <Datum ID="Year" Type="String" Name="Year">2026</Datum>
+    <Datum ID="Title" Type="String" Name="Title">Best Trading Analytics Platform</Datum>
+    <Datum ID="Issuer" Type="String" Name="Issuer">TradingTech Insights Awards USA</Datum>
+  </Group>
+
+</Data>

@@ -1,0 +1,947 @@
+/* =========================================================================
+   RBCCM Capability Cards - standalone component
+   Deploy path: /assets/rbccm/css/components/rbccm-capability-cards.css
+
+   Design intent
+   =========================================================================
+   Direct 1:1 port of MAAS+MATA's `.rbccm-maas-mata__mata-cap*` block.
+   Dark navy section with a 3-up or 4-up row of capability cards. Each
+   card carries an icon (yellow 30x30), an optional italic subtitle,
+   a yellow title, and body copy. Optionally a full-width "wide" card
+   sits below the grid (Index events pattern on MAAS+MATA).
+
+   Every visual value in this file is verbatim from maas-mata.css -
+   only the class prefix changes:
+     `.rbccm-maas-mata__mata-cap` -> `.rbccm-capability-cards`
+     `.rbccm-maas-mata__mata-cap-<x>` -> `.rbccm-capability-cards__<x>`
+
+   Variants
+   =========================================================================
+     .rbccm-capability-cards--3   3-card row (MATA original)
+     .rbccm-capability-cards--4   US Credentials card padding / gap
+     .rbccm-capability-cards--slider  US Credentials carousel (up to
+                                  5 cards, see section 11 + the JS)
+
+   Responsive behaviour
+   =========================================================================
+   Below 992px: cards stack in a single column.
+   At 992px+: cards flex-row across the 1100px content rail.
+
+   A Slick carousel wraps the grid below 992px when the sidecar JS is
+   loaded (universal loader - shared with rbccm-awards / rbccm-expertise).
+   Without the JS the section still renders as a stacked list.
+
+   Section bg
+   =========================================================================
+   Standalone: paints its own dark navy (--rbccm-capability-cards-bg,
+   default #051B38). MATA-nested use: pass `--bg-transparent` modifier
+   so the parent .rbccm-maas-mata__deep-band gradient shows through.
+   ========================================================================= */
+
+
+/* =========================================================================
+   1. Section shell   (mirrors .rbccm-maas-mata__mata-cap)
+   =========================================================================
+   Vertical padding 60/80 mobile/desktop, horizontal 23 both. Mobile
+   stacks cards vertically (flex-column below on the grid) - no Slick
+   for now; if a mobile carousel becomes necessary later, section 11
+   below re-adds the peek pattern. */
+.rbccm-capability-cards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  gap: 45px;
+  background: var(--rbccm-capability-cards-bg, #051B38);
+  color: #fff;
+  padding: 60px 23px;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards {
+    padding: 80px 23px;
+  }
+}
+
+/* Modifier for MATA-nested use - kills the section bg so the parent
+   .deep-band wrapper's continuous navy gradient reads through. */
+.rbccm-capability-cards--bg-transparent {
+  background: transparent !important;
+}
+
+
+/* =========================================================================
+   2. Eyebrow   (mirrors .rbccm-maas-mata__mata-cap-eyebrow)
+   ========================================================================= */
+.rbccm-capability-cards__eyebrow {
+  color: #FFC72C;
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 120%;      /* 16.8px */
+  letter-spacing: 3px;
+  /* Sentence case - text ships as-authored from the Datum. */
+  /* Top margin + top padding are 0 at every breakpoint - the section
+     shell already owns the 60/80 top offset. Bottom padding of 15px
+     preserves the room between the eyebrow text and the gold ::after
+     rule below it. */
+  margin: 0 auto;
+  padding: 0 35px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__eyebrow {
+    width: 858px;
+    max-width: 100%;
+    height: auto;
+    align-self: auto;
+    padding-bottom: 5px;
+  }
+}
+.rbccm-capability-cards__eyebrow::after {
+  content: '';
+  display: block;
+  width: 45px;
+  height: 2px;
+  background: #FFC72C;
+}
+
+
+/* =========================================================================
+   3. Header (heading + optional sub)   (mirrors .__mata-cap-header)
+   ========================================================================= */
+/* Both skins wrap eyebrow / heading / description in __header.
+   38px between them (checked against the design in the browser). */
+.rbccm-capability-cards__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 38px;
+}
+
+/* Section heading - RBC Display 36px mobile / 42px desktop. */
+.rbccm-capability-cards__heading {
+  color: #FFFFFF;
+  text-align: center;
+  font-family: RBCDisplay, Georgia, Times, serif;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;      /* 43.2px */
+  align-self: stretch;
+  margin: 0;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__heading {
+    font-size: 42px;
+    line-height: 125%;    /* 52.5px */
+  }
+}
+
+/* Sub-heading - grey Roboto 16/150%, centered, capped at 490px.
+   __description is the class the skins output for the same line. */
+.rbccm-capability-cards__sub,
+.rbccm-capability-cards__description {
+  color: #D7D7D7;
+  text-align: center;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;      /* 24px */
+  align-self: center;
+  margin: 0 auto;
+  width: 490px;
+  max-width: 100%;
+}
+
+
+/* =========================================================================
+   4. Cards wrapper   (mirrors .__mata-cap-cards)
+   =========================================================================
+   Wraps the grid + optional wide card so they share a single content
+   rail at desktop and don't inherit the section's 40px gap.
+
+   Rail width is controlled by the `--rbccm-capability-cards-max-width`
+   custom property (default 1100px). The editor exposes this via the
+   `SectionMaxWidth` Datum; typical values are 1100 (MATA 3-up canon)
+   or 1140 (US Credentials 4-up), but authors can override per section
+   without a CSS deploy. */
+.rbccm-capability-cards__cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  width: 100%;
+  gap: 16px;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__cards {
+    max-width: var(--rbccm-capability-cards-max-width, 1100px);
+    margin: 0 auto;
+  }
+}
+
+
+/* =========================================================================
+   5. Grid   (mirrors .__mata-cap-grid)
+   =========================================================================
+   Mobile: flex column, cards stack full-width.
+   Desktop (992+): flex row, cards flex-share the 1100px rail.
+
+   For the `--4` variant the same row width fits four cards evenly
+   (1100 - 3*16) / 4 ~ 263px each before padding, comfortable at
+   default type sizes.
+
+   `__track` is an alias for `__grid` - the current markup and JS
+   still reference `__track`; keeping the alias avoids a churn pass
+   through the consumer HTMLs and the Slick initializer. */
+.rbccm-capability-cards__grid,
+.rbccm-capability-cards__track {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-self: stretch;
+  width: 100%;
+  gap: 16px;
+  text-align: left;
+  box-sizing: border-box;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__grid,
+  .rbccm-capability-cards__track {
+    flex-direction: row;
+    align-items: flex-start;
+    width: var(--rbccm-capability-cards-max-width, 1100px);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+
+/* =========================================================================
+   6. Card   (mirrors .__mata-cap-card)
+   =========================================================================
+   Padding 40/30, radius 20, white-13% border, white-5% fill, subtle
+   drop shadow. No hover lift - mirrors MATA (cards are static, not
+   clickable). Content wrapper below owns vertical rhythm. */
+.rbccm-capability-cards__card {
+  display: flex;
+  width: 100%;
+  height: auto;
+  padding: 40px 30px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+  box-sizing: border-box;
+  color: inherit;
+  text-decoration: none;
+}
+/* Site-wide `a:hover, a:focus { text-decoration: underline }` (Bootstrap)
+   outranks the class rule above and underlined all the card text on the
+   anchor variant. Keep it off; the "Learn more" chip has its own
+   underline on hover. */
+.rbccm-capability-cards__card:hover,
+.rbccm-capability-cards__card:focus {
+  text-decoration: none;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__card {
+    /* Desktop: cards flex-grow equally to fill the 1100 row.
+       flex: 1 0 0 means grow, don't shrink, basis 0 - cards share
+       the row evenly regardless of card count (3-up on MATA,
+       4-up on US Credentials). */
+    width: auto;
+    flex: 1 0 0;
+    align-self: stretch;
+  }
+}
+/* Focus ring for the anchor variant (if any consumer wraps the card
+   in an <a>). No visual change on the static <article> variant. */
+.rbccm-capability-cards__card:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 2px;
+}
+
+/* Hover - two yellow highlights start at the top and bottom edges,
+   sweep 180 deg clockwise around the perimeter, and disappear when
+   each has traveled to its opposite edge.
+   ---------------------------------------------------------------
+   Technique: mask-composite gradient border + animated conic
+   gradient with two symmetric yellow arcs (one at 0% of the sweep
+   = top-center, one at 50% = bottom-center). Rotating the
+   gradient's `from` angle from 0deg -> 180deg moves both arcs
+   clockwise by half a turn; the top arc ends up at the bottom and
+   the bottom arc ends up at the top (their inverse positions),
+   then opacity fades to 0 so nothing lingers.
+
+   `--card-shimmer-angle` is registered via `@property` because
+   regular CSS variables can't tween through gradient `from`
+   values - `@property` opts the variable into interpolation.
+
+   Focus-visible mirrors hover for keyboard users. Reduced-motion
+   users get an instant static horizontal ring so they still get
+   a hover cue. */
+@property --card-shimmer-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+/* Scoped to `a.rbccm-capability-cards__card` - the shimmer is a
+   hover affordance and only makes sense on clickable cards. Static
+   <article> cards (e.g. MAAS/MATA MATA capabilities, where copy is
+   informational rather than linked) inherit neither the ::before
+   ring nor the hover animation. */
+.rbccm-capability-cards__card {
+  position: relative;
+}
+a.rbccm-capability-cards__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;             /* matches card radius */
+  padding: 1px;                    /* ring thickness */
+  /* Two narrow yellow arcs - one centered on the gradient's start
+     (0% / 100% wrap = top-center) and one at 50% (bottom-center).
+     Each arc spans ~10% of the perimeter (~36 deg) so the "line"
+     reads as a short glowing beam rather than a halo. */
+  background: conic-gradient(
+    from var(--card-shimmer-angle),
+    #FFC72C              0%,
+    rgba(255,199,44,0)   5%,
+    rgba(255,199,44,0)  45%,
+    #FFC72C             50%,
+    rgba(255,199,44,0)  55%,
+    rgba(255,199,44,0)  95%,
+    #FFC72C            100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+}
+a.rbccm-capability-cards__card:hover::before,
+a.rbccm-capability-cards__card:focus-visible::before {
+  animation: rbccm-capability-cards-shimmer 1.1s ease-in-out forwards;
+}
+/* Angle sweeps 0->180 deg (half turn clockwise). Opacity starts full
+   and fades continuously across the sweep, so each beam dims
+   progressively as it travels toward its inverse edge - it's
+   already invisible by the time it arrives, so nothing lingers. */
+@keyframes rbccm-capability-cards-shimmer {
+  0%   { --card-shimmer-angle:   0deg; opacity: 1; }
+  100% { --card-shimmer-angle: 180deg; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  a.rbccm-capability-cards__card:hover::before,
+  a.rbccm-capability-cards__card:focus-visible::before {
+    animation: none;
+    background: linear-gradient(to right, rgba(255,199,44,0), #FFC72C 50%, rgba(255,199,44,0));
+    opacity: 1;
+  }
+}
+
+/* Padding tuning by variant.
+   ---------------------------------------------------------------
+   3-up: 40/30 (default - plenty of horizontal room, body copy
+     breathes vertically).
+   4-up: 30/30 - narrower cards, tighter vertical padding matches
+     the Figma spec so bodies don't feel over-cushioned at the
+     narrower column width. Applies to all four columns
+     automatically via the `--4` variant on the section. */
+.rbccm-capability-cards--4 .rbccm-capability-cards__card {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+/* 4-up desktop also tightens the inter-card gap from the default 16px
+   to 12px (Figma spec - narrower cards look better with a tighter
+   rhythm). Mobile keeps 16px between stacked slick slides via the
+   .slick-slide margin-right rule in section 11. */
+@media (min-width: 992px) {
+  .rbccm-capability-cards--4 .rbccm-capability-cards__grid,
+  .rbccm-capability-cards--4 .rbccm-capability-cards__track {
+    gap: 12px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Tablet - iPad range (768-1024): 2x2 grid
+   -------------------------------------------------------------------------
+   Applies to BOTH variants (default 3-up and --4 4-up). Overrides the
+   flex-row + `flex: 1 0 0` desktop rig from 992+ (both media queries
+   match in the 992-1024 overlap; this block comes later so it wins).
+     - 3-up variant: 2 cards row 1, 1 card row 2 (left-aligned)
+     - 4-up variant: 2x2 perfect grid
+   `flex: initial` on the card unsets the desktop equal-grow so cards
+   sit in their grid cells at 100% width. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rbccm-capability-cards__grid,
+  .rbccm-capability-cards__track {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-direction: initial;
+    gap: 16px;
+    width: 100%;
+    max-width: var(--rbccm-capability-cards-max-width, 1100px);
+    margin: 0 auto;
+  }
+  .rbccm-capability-cards__card {
+    width: 100%;
+    flex: initial;
+    align-self: stretch;
+  }
+  /* --4 keeps its tighter 12px gap at tablet too, per the Figma
+     spec - cards are still narrower relative to the container. */
+  .rbccm-capability-cards--4 .rbccm-capability-cards__grid,
+  .rbccm-capability-cards--4 .rbccm-capability-cards__track {
+    gap: 12px;
+  }
+}
+
+
+/* =========================================================================
+   7. Content wrapper   (mirrors .__mata-cap-content)
+   =========================================================================
+   Flex-column stack inside each card holding icon + title (+ subtitle)
+   + body + optional CTA. Owns the vertical rhythm - the card itself
+   has no gap.
+
+   `flex: 1 1 auto` + `align-self: stretch` make __content fill the
+   card's height at desktop (where cards stretch equal via
+   `flex: 1 0 0` + `align-self: stretch` on the card itself). That
+   lets `margin-top: auto` on __cta push the CTA to the true bottom of
+   the card, so "Learn more ->" bottom-aligns across cards regardless
+   of body length (the Card 3 / Global Markets short-body case). */
+.rbccm-capability-cards__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  flex: 1 1 auto;
+  height: 100%;
+  gap: 16px;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__content { gap: 21px; }
+}
+
+
+/* =========================================================================
+   8. Icon   (mirrors .__mata-cap-icon)
+   =========================================================================
+   30px tall, yellow. Class lives directly on the <svg> element (MATA
+   pattern - no wrapper). Paths inside carry inline fill="#FFC72C",
+   or use currentColor which inherits from the `color: #FFC72C` here. */
+.rbccm-capability-cards__icon {
+  width: auto;               /* follows each icon's own proportions */
+  height: 30px;              /* one height for every icon, so the bottoms line up */
+  color: #FFC72C;
+  display: block;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+/* Every icon is 30px tall and as wide as its shape needs (FX ~27px,
+   Investment Banking ~33px, ETF ~44px, Rates ~41px). Each SVG's viewBox
+   is trimmed to its drawing, so equal heights give equal bottoms; the
+   --rates / --etf classes stay as hooks but no longer resize. */
+
+
+/* =========================================================================
+   9. Title / Subtitle / Body   (mirror .__mata-cap-{title,subtitle,body})
+   ========================================================================= */
+
+/* Title - yellow Roboto 20 / weight 400. */
+.rbccm-capability-cards__title {
+  color: #FFC72C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+}
+
+/* Subtitle (optional) - white italic Roboto 18 / weight 500. */
+.rbccm-capability-cards__subtitle {
+  color: #FFFFFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0;
+}
+
+/* Body - grey Roboto 16 / 120%. */
+.rbccm-capability-cards__body {
+  color: #D7D7D7;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 120%;      /* 19.2px */
+  margin: 0;
+}
+
+
+/* -------------------------------------------------------------------------
+   9a. Card CTA   ("Learn more ->" text link - mirrors platforms__card-cta)
+   -------------------------------------------------------------------------
+   Visual chip that sits at the bottom of `__content`. The link semantics
+   live on the card itself when a href is provided (see the anchor-variant
+   rules in section 6); this `__cta` element is purely presentational so
+   the whole card remains the click target - matches how
+   rbccm-platforms__card renders its own "Explore ->" chip.
+
+   Auto-pushes to the bottom of the card via `margin-top: auto` so mixed-
+   height card bodies still bottom-align the CTAs across the row. The
+   label text ships from the Datum (defaults to "Learn more").
+
+   Hover / focus on the parent card slides the arrow 4px right - same
+   micro-interaction as .rbccm-platforms__card-cta. Reduced-motion users
+   get an instant translate with no easing (handled by the base
+   `transition: none` in section 13). */
+.rbccm-capability-cards__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;      /* push to bottom of __content */
+  color: #FFC72C;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  padding-top: 8px;
+}
+.rbccm-capability-cards__cta svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Whole-card anchor variant: hover/focus on the card nudges the arrow. */
+a.rbccm-capability-cards__card:hover .rbccm-capability-cards__cta svg,
+a.rbccm-capability-cards__card:focus-visible .rbccm-capability-cards__cta svg {
+  transform: translateX(4px);
+}
+/* Underline the label on hover for a stronger link affordance. */
+a.rbccm-capability-cards__card:hover .rbccm-capability-cards__cta,
+a.rbccm-capability-cards__card:focus-visible .rbccm-capability-cards__cta {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* =========================================================================
+   10. Wide card   (mirrors .__mata-cap-wide)
+   =========================================================================
+   Same treatment as the top-row cards (padding 40/30, radius 20,
+   white-13% border, 5% fill, subtle shadow) but stretches the full
+   row width. Used for the "Index events" summary card in MATA. Icon
+   stacks on top like the row cards. */
+.rbccm-capability-cards__wide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 21px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+  color: #fff;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__wide {
+    width: var(--rbccm-capability-cards-max-width, 1100px);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+.rbccm-capability-cards__wide .rbccm-capability-cards__icon {
+  flex-shrink: 0;
+}
+.rbccm-capability-cards__wide-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+}
+@media (min-width: 992px) {
+  .rbccm-capability-cards__wide-body { gap: 21px; }
+}
+
+
+/* =========================================================================
+   11. Carousel  (--slider, US Credentials skin)
+   =========================================================================
+   Same pattern as rbccm-awards so the two read as one family:
+     - every card is a fixed 276px wide at every breakpoint
+       (4 x 276 + 3 x 12 = 1140, the US Creds rail)
+     - desktop shows 4 and clips at the 1140 rail; below that the
+       row runs off the right edge so the next card peeks in
+     - prev / dots / next underneath
+   rbccm-capability-cards.js runs Slick (variableWidth, infinite).
+   When every card fits the rail (e.g. only 4 cards on a wide screen)
+   the JS adds .is-static: the row centres at its own width and the
+   controls hide. Without the JS the cards still sit in one row. */
+.rbccm-capability-cards--slider {
+  --rbccm-cc-card: 276px;
+  --rbccm-cc-gap: 12px;
+  overflow: hidden;                   /* clip the off-canvas bleed */
+}
+
+/* Cards wrapper goes full-bleed (cancels the section's 23px side
+   padding) so the row can run to the viewport edge. */
+.rbccm-capability-cards--slider .rbccm-capability-cards__cards {
+  align-self: stretch;
+  width: auto;
+  max-width: none;
+  margin: 0 -23px;
+  gap: 40px;                          /* row -> controls */
+}
+
+/* Row: same rig as rbccm-awards. The list is capped at the rail
+   (1140 = exactly 4 cards) and clips there, so on desktop you see
+   4 cards and the rest sit hidden until you page. Below the rail
+   width the row starts 23px in and runs off the right edge (peek).
+   At 1186+ (1140 + 23 x 2) the 23px inset drops so the row centres. */
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--rbccm-cc-gap);
+  align-self: stretch;                /* fill the wrapper, not max-content */
+  width: auto;
+  max-width: var(--rbccm-capability-cards-max-width, 1140px);
+  margin: 0;
+  padding: 0 0 0 23px;
+  box-sizing: content-box;
+  overflow: hidden;                   /* pre-Slick: clip at the rail too */
+}
+@media (min-width: 1186px) {
+  .rbccm-capability-cards--slider .rbccm-capability-cards__grid {
+    align-self: center;
+    width: var(--rbccm-capability-cards-max-width, 1140px);
+    padding: 0;
+  }
+}
+
+/* Fixed card width. !important on every width axis so the desktop
+   flex-grow, the tablet 2x2 grid and Slick's inline widths can't
+   resize them. */
+.rbccm-capability-cards--slider .rbccm-capability-cards__card {
+  flex: 0 0 var(--rbccm-cc-card) !important;
+  width: var(--rbccm-cc-card) !important;
+  min-width: var(--rbccm-cc-card) !important;
+  max-width: var(--rbccm-cc-card) !important;
+  align-self: stretch;
+}
+
+/* ---- Slick internals (same rig as rbccm-awards) ---------------------- */
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized {
+  display: block;
+}
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-dotted.slick-slider {
+  margin-bottom: 0;
+}
+/* Clip at the list edge ourselves in case slick.css isn't on the page. */
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized .slick-list {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized .slick-track {
+  display: flex;
+  align-items: stretch;               /* equal-height cards */
+  gap: var(--rbccm-cc-gap);
+  margin-left: 0;
+}
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized .slick-track::before,
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized .slick-track::after {
+  display: none;                      /* slick's clearfix adds a flex gap */
+}
+/* The JS wraps each card in .rbccm-capability-cards__slide (the Slick
+   slide). It stretches to the tallest card; the card fills it. */
+.rbccm-capability-cards--slider .rbccm-capability-cards__slide {
+  display: flex;
+  float: none;
+  height: auto;
+  flex: none;
+}
+.rbccm-capability-cards--slider .rbccm-capability-cards__grid.slick-initialized .slick-slide .rbccm-capability-cards__card {
+  height: 100%;
+}
+
+/* ---- Static row (all cards fit; set by the JS) ------------------------ */
+.rbccm-capability-cards--slider.is-static .rbccm-capability-cards__grid {
+  padding: 0;
+  width: var(--rbccm-cc-row, 100%);
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.rbccm-capability-cards--slider.is-static .rbccm-capability-cards__controls {
+  display: none;
+}
+
+/* =========================================================================
+   11b. Three-up  (--slider + --three-up, three-up skin, MAAS+MATA)
+   =========================================================================
+   Figma: 1100 row, 16px gap, cards 355 wide (3 x 355 + 2 x 16 = 1097),
+   card padding 30/25, 21px content gap (section 7).
+   The JS pages it (3 per view on desktop, 2 on tablet) instead of the
+   peek row above, and removes Slick below 768 so the cards stack.
+   Slick sizes the slides itself in this mode (list width / per view),
+   so the fixed 276px card width is undone here and the 16px gap comes
+   from 8px slide padding + a -8px list margin; a flex gap on the track
+   would push the last card out of the list. 1100 + 16 = 1116 / 3 =
+   372 per slide, minus 16 padding = 356 card, i.e. the Figma 355. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up {
+  --rbccm-cc-gap: 16px;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__card {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 30px 25px;
+}
+/* Back inside the section padding (no full-bleed), capped at 1100. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__cards {
+  align-self: center;
+  margin: 0 auto;
+  max-width: var(--rbccm-capability-cards-max-width, 1100px);
+  width: 100%;
+}
+/* Mobile / no Slick: every card stacked full width. */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid {
+  align-items: stretch;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rbccm-cc-gap);
+  max-width: none;
+  overflow: visible;
+  padding: 0;
+  width: 100%;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__slide {
+  display: flex;
+  flex: none;
+  width: 100%;
+}
+@media (max-width: 767px) {
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__controls {
+    display: none;
+  }
+}
+/* Tablet+ before Slick runs (or when the cards fit one page, .is-static):
+   a plain equal-width row, so nothing jumps when Slick takes over. */
+@media (min-width: 768px) {
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid {
+    flex-direction: row;
+    gap: var(--rbccm-cc-gap);
+  }
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid > .rbccm-capability-cards__slide {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-capability-cards--slider.rbccm-capability-cards--three-up.is-static .rbccm-capability-cards__grid {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+}
+/* Slick running (768+). */
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized {
+  display: block;
+  overflow: visible;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .slick-list {
+  margin: 0 calc(var(--rbccm-cc-gap) / -2);
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .slick-track {
+  gap: 0;
+}
+.rbccm-capability-cards--slider.rbccm-capability-cards--three-up .rbccm-capability-cards__grid.slick-initialized .rbccm-capability-cards__slide {
+  box-sizing: border-box;
+  padding: 0 calc(var(--rbccm-cc-gap) / 2);
+}
+
+/* ---- Controls (copied from rbccm-awards) ----------------------------- */
+.rbccm-capability-cards__controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 12px;
+  margin: 0;
+}
+.rbccm-capability-cards__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.rbccm-capability-cards__btn svg {
+  display: block;
+  width: 14px;
+  height: 24px;
+}
+.rbccm-capability-cards__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.rbccm-capability-cards__btn:focus-visible {
+  outline: 2px solid #FFC72C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.rbccm-capability-cards__dots {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots {
+  align-items: center;
+  bottom: auto !important;
+  display: flex !important;
+  gap: 12px 26px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: static !important;
+  width: auto !important;
+  flex-wrap: wrap;
+}
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex !important;
+  height: 11px !important;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 11px !important;
+}
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button {
+  background: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  display: block !important;
+  font-size: 0 !important;
+  height: 11px !important;
+  line-height: 0 !important;
+  margin: 0 !important;
+  outline: none;
+  padding: 0 !important;
+  position: static !important;
+  width: 11px !important;
+  color: transparent !important;
+}
+/* Inactive dot: white outlined circle. */
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-size: 11px 11px !important;
+  content: '' !important;
+  display: block !important;
+  height: 11px !important;
+  opacity: 1 !important;
+  position: static !important;
+  width: 11px !important;
+  /* Always round; the ring starts at 0 width on the dot edge and grows
+     out to 4px on activate (same zoom-in feel as the old box-shadow). */
+  border-radius: 50% !important;
+  outline: 0 solid #FFC72C !important;
+  outline-offset: 0 !important;
+  transition: background-image 0.2s ease, outline-width 0.2s ease, outline-offset 0.2s ease;
+}
+/* Active / hover / focus dot: filled white + 1px yellow ring 4px out.
+   Outline + offset leaves a real gap, so the ring works on any section
+   background (a bg-coloured box-shadow gap broke with a transparent bg). */
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li.slick-active button::before,
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button:focus-visible::before,
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Ccircle cx='5.5' cy='5.5' r='5.5' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+  background-size: 11px 11px !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+  height: 11px !important;
+  width: 11px !important;
+  outline: 1px solid #FFC72C !important;
+  outline-offset: 4px !important;
+}
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button:focus-visible { outline: none; }
+/* accessible-slick extras: hide its dot glyph and ::after ring. */
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button .slick-dot-icon,
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button .slick-dot-icon::before {
+  display: none !important;
+}
+.rbccm-capability-cards .rbccm-capability-cards__dots .slick-dots li button::after {
+  border: 0 !important;
+  display: none !important;
+}
+
+
+/* =========================================================================
+   13. Reduced motion
+   =========================================================================
+   Kill the scroll-triggered fade/stagger. rbccm-animate.js checks the
+   media query at runtime; this belts-and-braces any inline animate.css
+   classes an author might paste. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-capability-cards [data-animate],
+  .rbccm-capability-cards [data-stagger-parent] > *,
+  .rbccm-capability-cards__card {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

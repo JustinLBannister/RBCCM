@@ -2977,11 +2977,11 @@
   <!-- ===== HERO ===== -->
   <section class="rbccm-maas-mata__hero" aria-label="Hero">
     <div class="rbccm-maas-mata__container">
-      <h1 class="rbccm-maas-mata__hero-eyebrow" data-animate-hero="fadeInDown" data-animate-delay="0" data-json="hero.eyebrow">Introducing MAAS + MATA</h1>
+      <h1 class="rbccm-maas-mata__hero-eyebrow" data-hero-rise="rise" data-animate-delay="0" data-json="hero.eyebrow">Introducing MAAS + MATA</h1>
 
       <!-- 2-line headline. data-json-list-fallback children mirror
            the JSON so the page still renders without a data load. -->
-      <p class="rbccm-maas-mata__hero-title" data-animate-hero="fadeInUp" data-animate-delay="150" data-json-list="hero.headlineLines">
+      <p class="rbccm-maas-mata__hero-title" data-hero-rise="rise" data-animate-delay="150" data-json-list="hero.headlineLines">
         <template><span class="rbccm-maas-mata__hero-title-line" data-json=""></span></template>
         <span class="rbccm-maas-mata__hero-title-line" data-json-list-fallback>Trade with Clarity.</span>
         <span class="rbccm-maas-mata__hero-title-line" data-json-list-fallback>Execute with Control.</span>
@@ -2989,13 +2989,13 @@
 
       <!-- Subtitle uses data-json-html (not -json) so authors can
            inline <strong> or other markup from the JSON. -->
-      <p class="rbccm-maas-mata__hero-subtitle" data-animate-hero="fadeInUp" data-animate-delay="300" data-json-html="hero.subtitle">
+      <p class="rbccm-maas-mata__hero-subtitle" data-hero-rise="rise" data-animate-delay="300" data-json-html="hero.subtitle">
         RBC Capital Markets&rsquo; Multi Asset Agency Solutions (MAAS) connects intelligence to execution, working alongside <strong>MATA</strong> &mdash; our Multi-Asset Trade Analytics platform &mdash; so insight and action stay connected across asset classes.
       </p>
 
       <!-- CTA row. Extra buttons can drop in as siblings if we
            bring back the secondary link. -->
-      <div class="rbccm-maas-mata__hero-actions" data-animate-hero="fadeInUp" data-animate-delay="450">
+      <div class="rbccm-maas-mata__hero-actions" data-hero-rise="rise" data-animate-delay="450">
         <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--primary" href="#demo" data-json-attr-href="hero.primaryCta.href">
           <span data-json="hero.primaryCta.label">Request demo</span>
           <svg class="rbccm-maas-mata__btn-icon" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none" aria-hidden="true" focusable="false">
@@ -3011,8 +3011,8 @@
        ../rbccm-video-poster/. The modal is a sibling so the box's
        overflow/z-index can't trap it. data-json-attr-* keep the CMS
        JSON binding for the poster. -->
-  <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
-    <img class="rbccm-video-poster__image" src="./maas-execution-console-reveal.png" alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2." loading="lazy" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
+  <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-hero-rise="rise" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
+    <img class="rbccm-video-poster__image" width="1100" height="366" fetchpriority="high" src="./maas-execution-console-reveal.png" alt="MAAS Execution Console dashboard preview showing a portfolio chart, three instrument rows (Holly Inc., CAD/USD, Ardy Dec 26), and an Execution quality score of 98.2." loading="lazy" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
     <button type="button" class="rbccm-video-poster__play" data-toggle="modal" data-target="#herovideo" data-bs-toggle="modal" data-bs-target="#herovideo" aria-label="Play platform video" aria-haspopup="dialog" aria-controls="herovideo">
       <svg class="rbccm-video-poster__play-icon" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true" focusable="false"><path d="M36.6843 28.4791L22.9275 36.4216L22.9275 20.5366L36.6843 28.4791Z"></path></svg>
     </button>
@@ -4098,7 +4098,7 @@
 
   // ---- animate.css bindings ----------------------------------
   // Two triggers:
-  //   data-animate-hero="fadeInUp"       fires on load (staggered)
+  //   data-hero-rise="rise"       fires on load (staggered)
   //   data-animate="fadeInUp"            fires on scroll-in
   //   data-stagger-parent="fadeInUp"     children stagger on scroll-in
   //   data-animate-delay="200"           optional ms delay

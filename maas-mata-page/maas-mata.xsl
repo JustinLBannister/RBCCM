@@ -293,18 +293,18 @@
       <!-- ═══ 1. HERO ═════════════════════════════════════════ -->
       <section class="rbccm-maas-mata__hero" aria-label="Hero">
         <div class="rbccm-maas-mata__container">
-          <h1 class="rbccm-maas-mata__hero-eyebrow" data-animate-hero="fadeInDown" data-animate-delay="0" data-json="hero.eyebrow">
+          <h1 class="rbccm-maas-mata__hero-eyebrow" data-hero-rise="rise" data-animate-delay="0" data-json="hero.eyebrow">
             <xsl:value-of select="$HERO_EYEBROW" />
           </h1>
-          <p class="rbccm-maas-mata__hero-title" data-animate-hero="fadeInUp" data-animate-delay="150" data-json-list="hero.headlineLines">
+          <p class="rbccm-maas-mata__hero-title" data-hero-rise="rise" data-animate-delay="150" data-json-list="hero.headlineLines">
             <template><span class="rbccm-maas-mata__hero-title-line" data-json=""></span></template>
             <span class="rbccm-maas-mata__hero-title-line" data-json-list-fallback=""><xsl:value-of select="$HERO_TITLE_1" /></span>
             <span class="rbccm-maas-mata__hero-title-line" data-json-list-fallback=""><xsl:value-of select="$HERO_TITLE_2" /></span>
           </p>
-          <p class="rbccm-maas-mata__hero-subtitle" data-animate-hero="fadeInUp" data-animate-delay="300" data-json-html="hero.subtitle">
+          <p class="rbccm-maas-mata__hero-subtitle" data-hero-rise="rise" data-animate-delay="300" data-json-html="hero.subtitle">
             <xsl:value-of select="$HERO_SUBTITLE" disable-output-escaping="yes" />
           </p>
-          <div class="rbccm-maas-mata__hero-actions" data-animate-hero="fadeInUp" data-animate-delay="450">
+          <div class="rbccm-maas-mata__hero-actions" data-hero-rise="rise" data-animate-delay="450">
             <a class="rbccm-maas-mata__btn rbccm-maas-mata__btn--primary" data-json-attr-href="hero.primaryCta.href">
               <xsl:attribute name="href"><xsl:value-of select="$HERO_CTA_HREF" /></xsl:attribute>
               <span data-json="hero.primaryCta.label"><xsl:value-of select="$HERO_CTA_LABEL" /></span>
@@ -321,9 +321,9 @@
            rbccm-video-poster component markup (same as that
            component's skin outputs), fed by the Chart Datums.
            Modal is further down, outside the page wrapper. -->
-      <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-animate-hero="fadeIn" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
+      <div class="rbccm-video-poster" id="rbccm-mm-chart-image" data-hero-rise="rise" data-animate-delay="600" style="--rbccm-vp-space-above: 75px; --rbccm-vp-overlap: 200px;">
         <!-- data-json-attr-* lets ?preview=draft rebind from the CMS JSON. -->
-        <img class="rbccm-video-poster__image" loading="lazy" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
+        <img class="rbccm-video-poster__image" width="1100" height="366" fetchpriority="high" data-json-attr-src="chartCard.posterImage" data-json-attr-alt="chartCard.posterAlt">
           <xsl:attribute name="src"><xsl:value-of select="$CHART_IMG" /></xsl:attribute>
           <xsl:attribute name="alt"><xsl:value-of select="$CHART_IMG_ALT" /></xsl:attribute>
         </img>

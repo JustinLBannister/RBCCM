@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rbccm-button -- local preview</title>
+<link rel="stylesheet" href="rbccm-button.css">
+<style>
+  body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .demo-stage { padding: 56px 24px; }
+  .demo-stage--light { background: #ffffff; }
+  .demo-stage--navy  { background: #003168; }
+  .demo-stage--dark  { background: #061730; }
+  .demo-caption { max-width: 1140px; margin: 0 auto 28px; font-size: 14px; line-height: 1.5; color: #4A4E55; }
+  .demo-stage--navy .demo-caption,
+  .demo-stage--dark .demo-caption { color: rgba(255,255,255,0.75); }
+  .demo-row { max-width: 1140px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+  .demo-caption code { font-size: 13px; }
+</style>
+</head>
+<body data-picker-title="rbccm-button">
+
+<!-- Arrow + play icons reused across variants. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+</svg>
+
+<div class="demo-note" data-variant="Primary">Variant -- .rbccm-button--primary</div>
+<section class="demo-stage demo-stage--light">
+  <p class="demo-caption">Blue fill, white text. Hover or Tab to a button to see the shine sweep and arrow fly-by.</p>
+  <div class="demo-row">
+    <a class="rbccm-button rbccm-button--primary" href="#">
+      <span class="rbccm-button__label">Request a demo</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--primary" href="#">No icon</a>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Yellow">Variant -- .rbccm-button--yellow</div>
+<section class="demo-stage demo-stage--navy">
+  <p class="demo-caption">Warm yellow fill, deep navy text, slightly larger type. Built for navy bands.</p>
+  <div class="demo-row">
+    <a class="rbccm-button rbccm-button--yellow" href="#">
+      <span class="rbccm-button__label">Learn more</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--yellow" href="#">No icon</a>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Secondary">Variant -- .rbccm-button--secondary</div>
+<section class="demo-stage demo-stage--light">
+  <p class="demo-caption">Transparent with grey text and border. No shine. Usually sits next to a primary button.</p>
+  <div class="demo-row">
+    <a class="rbccm-button rbccm-button--primary" href="#">
+      <span class="rbccm-button__label">Request a demo</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--secondary" href="#">
+      <span class="rbccm-button__label">Watch the video</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-play"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--secondary" href="#">No icon</a>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Ghost">Variant -- .rbccm-button--ghost</div>
+<section class="demo-stage demo-stage--dark">
+  <p class="demo-caption">Transparent with a grey border and light text, for dark strips. Shown next to yellow, its usual pairing.</p>
+  <div class="demo-row">
+    <a class="rbccm-button rbccm-button--yellow" href="#">
+      <span class="rbccm-button__label">Get started</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--ghost" href="#">
+      <span class="rbccm-button__label">Talk to us</span>
+      <svg class="rbccm-button__icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
+    </a>
+    <a class="rbccm-button rbccm-button--ghost" href="#">No icon</a>
+  </div>
+</section>
+
+<script src="../local-test-fixtures/variant-picker.js"></script>
+</body>
+</html>

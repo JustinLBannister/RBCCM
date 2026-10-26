@@ -18,6 +18,35 @@
 
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="datum">
     <xsl:param name="id"/>
     <xsl:value-of select="normalize-space(//Datum[@ID=$id]/text()[last()])"/>
@@ -55,7 +84,7 @@
       <p class="rbccm-numbered-features__number" aria-hidden="true">/<xsl:value-of select="$digits"/></p>
       <h3 class="rbccm-numbered-features__title"><xsl:value-of select="$title"/></h3>
       <xsl:if test="normalize-space(translate($bodyText, '&#160;&amp;nbsp;', '')) != ''">
-        <p class="rbccm-numbered-features__body"><xsl:value-of select="$body" disable-output-escaping="yes"/></p>
+        <p class="rbccm-numbered-features__body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$body"/></xsl:call-template></p>
       </xsl:if>
     </li>
   </xsl:template>
@@ -119,7 +148,7 @@
               </xsl:element>
             </xsl:if>
             <xsl:if test="$HAS_INTRO">
-              <p class="rbccm-numbered-features__intro"><xsl:value-of select="$INTRO" disable-output-escaping="yes"/></p>
+              <p class="rbccm-numbered-features__intro"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$INTRO"/></xsl:call-template></p>
             </xsl:if>
           </div>
         </xsl:if>

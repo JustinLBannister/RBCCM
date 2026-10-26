@@ -21,6 +21,35 @@
        ============================================================= -->
 
   <!-- fmtName: substitute {name} placeholder in a template string. -->
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="fmtName">
     <xsl:param name="tpl"/>
     <xsl:param name="name"/>
@@ -514,8 +543,8 @@
                   <div class="rbccm-leadership__card-body">
                     <h3 class="rbccm-leadership__card-name"><xsl:value-of select="$name"/></h3>
                     <p class="rbccm-leadership__card-role">
-                      <xsl:value-of select="$title" disable-output-escaping="yes"/>
-                      <xsl:if test="$subtitle != ''">, <xsl:value-of select="$subtitle" disable-output-escaping="yes"/></xsl:if>
+                      <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$title"/></xsl:call-template>
+                      <xsl:if test="$subtitle != ''">, <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$subtitle"/></xsl:call-template></xsl:if>
                     </p>
 
                     <!-- BIOGRAPHY MODE -->
@@ -549,7 +578,7 @@
                           <xsl:attribute name="data-linkedin"><xsl:value-of select="$linkedin"/></xsl:attribute>
                           <xsl:attribute name="data-email"><xsl:value-of select="$email"/></xsl:attribute>
                           <xsl:attribute name="data-twitter"><xsl:value-of select="$twitter"/></xsl:attribute>
-                          <xsl:value-of select="$bio" disable-output-escaping="yes"/>
+                          <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$bio"/></xsl:call-template>
                         </div>
                       </xsl:if>
                     </xsl:if>

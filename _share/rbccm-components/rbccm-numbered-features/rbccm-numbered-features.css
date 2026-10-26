@@ -1,0 +1,150 @@
+/* =========================================================================
+   RBCCM Numbered Features
+   Deploy path: /assets/rbccm/css/components/rbccm-numbered-features.css
+   =========================================================================
+   Heading + intro line, then up to 3 numbered features (/01 /02 /03)
+   separated by thin grey rules. Extracted 1:1 from the MAAS+MATA
+   "Innovation for the next execution era" section
+   (.rbccm-maas-mata__innovation-era), including the page's font
+   overrides.
+
+   Layout: features stack below 992 (rule above each, and below the
+   last); at 992+ they sit in a row, 367px each, with vertical rules
+   between them. Content rail 1100px. Light #F1F5FB background by
+   default (--rbccm-nf-bg overrides).
+
+   !important on type: site h2/h3/p tag rules otherwise replace the
+   font, tracking and margins.
+   ========================================================================= */
+
+.rbccm-numbered-features {
+  background: var(--rbccm-nf-bg, #F1F5FB);
+  padding: 60px 23px;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+}
+@media (min-width: 992px) {
+  .rbccm-numbered-features { padding: 80px 23px; }
+}
+.rbccm-numbered-features__inner {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---- Header -------------------------------------------------------------- */
+.rbccm-numbered-features__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 60px;
+}
+@media (min-width: 992px) {
+  .rbccm-numbered-features__header { gap: 16px; }
+}
+.rbccm-numbered-features .rbccm-numbered-features__heading {
+  color: #000 !important;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 36px !important;
+  font-style: normal;
+  font-weight: 500 !important;
+  line-height: 120% !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  padding: 0;
+  width: 100%;
+}
+@media (min-width: 992px) {
+  .rbccm-numbered-features .rbccm-numbered-features__heading {
+    font-size: 42px !important;
+    line-height: 125% !important;
+  }
+}
+.rbccm-numbered-features .rbccm-numbered-features__intro {
+  color: #494949 !important;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 150% !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+}
+
+/* ---- Features ------------------------------------------------------------ */
+.rbccm-numbered-features__grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 992px) {
+  .rbccm-numbered-features__grid { flex-direction: row; }
+}
+.rbccm-numbered-features__item {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 14px;
+  padding: 30px 0;
+  border-top: 1px solid #A8A8A8;
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.rbccm-numbered-features__item:last-child { border-bottom: 1px solid #A8A8A8; }
+@media (min-width: 992px) {
+  .rbccm-numbered-features__item {
+    width: 367px;
+    max-width: 367px;
+    padding: 30px 20px;
+    border-right: 1px solid #A8A8A8;
+    border-bottom: 1px solid #A8A8A8;
+  }
+  .rbccm-numbered-features__item:last-child { border-right: none; }
+}
+
+.rbccm-numbered-features .rbccm-numbered-features__number {
+  color: #0051A5 !important;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  letter-spacing: 4px !important;
+  margin: 0 !important;
+}
+.rbccm-numbered-features .rbccm-numbered-features__title {
+  color: #000 !important;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 24px !important;
+  font-weight: 500 !important;
+  line-height: 30px !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  padding: 0;
+}
+.rbccm-numbered-features .rbccm-numbered-features__body {
+  color: #494949 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-numbered-features [data-animate],
+  .rbccm-numbered-features [data-stagger-parent] > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,49 @@
+<!-- ============================================================
+     RBCCM Marketo Footer  |  Properties + Data
+     ============================================================
+     "Stay informed" sign-up band: heading + subheading + an
+     embedded Marketo form. The form's fields, consent checkbox and
+     button come from Marketo (form builder); this component styles
+     them to the RBCCM design.
+
+     Content tab: heading, subheading, Marketo form ID.
+     Appearance tab: paths, IDs, Marketo instance (set once).
+     ============================================================ -->
+<Properties ComponentID="rbccm-marketo-footer-v1">
+
+  <!-- ============================================================
+       Appearance tab: settings, paths
+       ============================================================ -->
+
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-marketo-footer.css</Datum>
+
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-09-23-1200</Datum>
+
+  <Datum ID="SectionID" Type="String" Name="Section ID (optional - anchor target, e.g. stay-informed)">stay-informed</Datum>
+
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria-label (optional - defaults to the heading)"></Datum>
+
+  <!-- Marketo instance. Same for every RBCCM form; only change if
+       Marketo moves. -->
+  <Datum ID="MarketoBaseUrl" Type="String" Name="Marketo base URL (technical - RBCCM-wide constant)">//discover.rbccm.com</Datum>
+
+  <Datum ID="MarketoMunchkinId" Type="String" Name="Marketo Munchkin ID (technical - RBCCM-wide constant)">577-RQV-784</Datum>
+
+</Properties>
+
+<Data>
+
+  <!-- ============================================================
+       Content tab: copy + form
+       ============================================================ -->
+
+  <Datum ID="HeadingText" Type="String" Name="Heading">Stay informed</Datum>
+
+  <!-- Plain text or light HTML (strong, em, a). -->
+  <Datum ID="SubheadingText" Type="Textarea" Name="Subheading (optional - blank hides it)">Get the latest updates and insights from RBC Capital Markets delivered to your inbox.</Datum>
+
+  <!-- The number from Marketo, e.g. 1574 for mktoForm_1574.
+       Digits only; anything else is stripped. Blank = no form. -->
+  <Datum ID="MarketoFormId" Type="String" Name="Marketo form ID (numbers only, e.g. 1574)">1574</Datum>
+
+</Data>

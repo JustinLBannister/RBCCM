@@ -1,0 +1,1803 @@
+<!doctype html>
+<!--
+  MAAS+MATA CMS — v2
+  ------------------------------------------------------------------
+  Editor form for maas-mata.json.
+
+  What's new in v2:
+    - Every field now shows a "Figma:" reference label so editors
+      know exactly which visual element they're editing on the design
+    - Newsletter section simplified — only heading, body, and
+      Marketo form ID. Marketo owns the form inputs; editors can't
+      change them here.
+
+  Round-trip:
+    1. Edit content, click Download → maas-mata.json downloads
+    2. Send file to dev
+    3. Dev drops into /assets/rbccm/js/pages/data/maas-mata.json on RBCCM server
+    4. Page picks it up on next load
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Internal-only tool. Keep out of Google, Bing, archive crawlers,
+     and any preview/thumbnail bots. Complement server-side with an
+     X-Robots-Tag header on the response if possible. -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<title>MAAS+MATA CMS — Prototype</title>
+<style>
+  :root {
+    --navy: #003168; --navy-dark: #002144; --yellow: #FBDE00; --yellow-soft: #FFF8CC;
+    --blue: #0051A5; --grey-100: #f5f5f5; --grey-200: #e6e6e6;
+    --grey-300: #d0d3d7; --grey-400: #b0b0b0; --grey-600: #595959;
+    --grey-800: #333; --red: #c62828; --green: #2e7d32;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--grey-100); color: var(--grey-800); line-height: 1.4;
+    height: 100vh; overflow: hidden;
+  }
+  header {
+    background: var(--navy); color: #fff;
+    padding: 10px 20px;
+    border-top: 6px solid var(--yellow);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  header h1 { margin: 0; font-size: 16px; font-weight: 500; }
+  header .actions { display: flex; gap: 8px; }
+  button {
+    font: inherit; padding: 6px 12px;
+    border: 1px solid var(--navy); background: #fff; color: var(--navy);
+    border-radius: 3px; cursor: pointer; font-size: 12px;
+  }
+  button:hover { background: var(--navy); color: #fff; }
+  button.primary { background: var(--navy); color: #fff; }
+  button.primary:hover { background: var(--navy-dark); }
+  button.ghost { border-color: var(--grey-400); color: var(--grey-600); background: transparent; }
+  button.ghost:hover { background: var(--grey-200); color: var(--grey-800); }
+  button.danger { border-color: var(--red); color: var(--red); }
+  button.danger:hover { background: var(--red); color: #fff; }
+  button.small { padding: 3px 7px; font-size: 11px; }
+  button.yellow { background: var(--yellow); color: var(--navy-dark); border-color: var(--yellow); }
+  button.yellow:hover { background: #e6ca00; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 400px;
+    height: calc(100vh - 50px);
+  }
+  .pane { overflow-y: auto; }
+  .pane--nav { background: #fff; border-right: 1px solid var(--grey-200); padding: 16px 0; }
+  .pane--form { background: #fff; border-right: 1px solid var(--grey-200); padding: 20px 28px; }
+  .pane--json { background: #fafafa; padding: 16px; }
+  .section-nav { list-style: none; margin: 0; padding: 0; }
+  .section-nav li {
+    padding: 9px 20px; font-size: 13px; color: var(--grey-800);
+    cursor: pointer; border-left: 3px solid transparent;
+  }
+  .section-nav li:hover { background: var(--grey-100); }
+  .section-nav li.active { background: var(--grey-100); border-left-color: var(--navy); color: var(--navy-dark); font-weight: 600; }
+  .section-nav-header {
+    padding: 4px 20px 8px; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--grey-600); font-weight: 700; margin-top: 8px;
+  }
+
+  h2.section-title { font-size: 18px; color: var(--navy-dark); margin: 0 0 4px 0; }
+  .section-path { font-size: 11px; color: var(--grey-600); font-family: monospace; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--grey-200); }
+
+  .field { margin-bottom: 14px; }
+  .field-label {
+    display: block;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--grey-600); margin-bottom: 4px; font-weight: 600;
+  }
+  .field-hint { font-size: 11px; color: var(--grey-600); margin-top: 3px; }
+
+  /* Figma reference chip — shows WHERE on the design this maps to */
+  .figma-ref {
+    display: block;
+    font-size: 11px;
+    color: var(--grey-800);
+    margin: 0 0 6px;
+    padding: 4px 8px;
+    background: var(--yellow-soft);
+    border-left: 3px solid var(--yellow);
+    border-radius: 0 3px 3px 0;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .figma-ref::before {
+    content: "Figma: ";
+    font-weight: 700;
+    font-style: normal;
+    color: var(--navy-dark);
+    letter-spacing: 0.3px;
+  }
+
+  input[type="text"], input[type="email"], input[type="url"], textarea, select {
+    width: 100%; padding: 7px 9px;
+    border: 1px solid var(--grey-300); border-radius: 3px;
+    font: inherit; font-size: 13px; background: #fff;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--navy);
+    box-shadow: 0 0 0 2px rgba(0,49,104,0.12);
+  }
+  textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+  label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+
+  .group { border: 1px solid var(--grey-200); border-radius: 4px; padding: 12px; margin-bottom: 12px; background: #fdfdfd; }
+  .group-title { font-size: 12px; font-weight: 600; color: var(--grey-800); margin-bottom: 8px; }
+
+  .array { margin-bottom: 12px; }
+  /* Item-count badge for repeaters with min/max limits. Colour tracks
+     status: green = in range, amber = below minimum, red = at cap. */
+  .array-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 4px 0 10px;
+    border: 1px solid transparent;
+  }
+  .array-badge--ok   { background: #E7F5EA; color: #1F5E2A; border-color: #C4E5CB; }
+  .array-badge--warn { background: #FFF4E5; color: #7A4B00; border-color: #F5D9A6; }
+  .array-badge--cap  { background: #FDECEC; color: #8A1F1F; border-color: #F3C4C4; }
+
+  /* Character counter under text inputs with a maxLength cap. Turns
+     amber when the user is within 2 chars of the limit so they know
+     they're about to be blocked. */
+  .char-count {
+    font-size: 11px;
+    color: var(--grey-600);
+    margin-top: 4px;
+    text-align: right;
+  }
+  .char-count--near-cap { color: #8A1F1F; font-weight: 500; }
+
+  /* ------------------------------------------------------------
+     ARTICLE PICKER — modal that pulls the insights RSS feeds
+     (same feeds article-visualizer.html uses) so marketing can
+     pick a live article instead of typing title / body / image
+     by hand. Only appears on the Insights section.
+     ------------------------------------------------------------ */
+  .picker-btn {
+    background: var(--navy);
+    color: #fff;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .picker-btn:hover { background: var(--navy-dark); }
+  .picker-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 33, 68, 0.55);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .picker-modal.open { display: flex; }
+  .picker-modal-dialog {
+    background: #fff;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 33, 68, 0.28);
+  }
+  .picker-modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--grey-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .picker-modal-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+  .picker-modal-close {
+    background: transparent;
+    border: 0;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--grey-600);
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .picker-modal-toolbar {
+    padding: 12px 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .picker-modal-toolbar input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--grey-300);
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 200px;
+  }
+  .picker-modal-toolbar select {
+    padding: 6px 10px;
+    border: 1px solid var(--grey-300);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .picker-modal-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+  .picker-article {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--grey-100);
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .picker-article:hover { background: #F8FAFB; }
+  .picker-article-thumb {
+    width: 72px;
+    height: 48px;
+    background: var(--grey-200);
+    background-size: cover;
+    background-position: center;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .picker-article-body { flex: 1; min-width: 0; }
+  .picker-article-meta {
+    font-size: 11px;
+    color: var(--grey-600);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .picker-article-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+    margin: 0 0 4px;
+    line-height: 1.35;
+  }
+  .picker-article-desc {
+    font-size: 12px;
+    color: var(--grey-700);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .picker-status {
+    padding: 24px;
+    text-align: center;
+    color: var(--grey-600);
+    font-size: 13px;
+  }
+  .array-item {
+    border: 1px solid var(--grey-200); border-radius: 4px;
+    padding: 12px; margin-bottom: 8px; background: #fdfdfd; position: relative;
+  }
+  .array-item-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--grey-200);
+  }
+  .array-item-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--grey-600); font-weight: 600; }
+  .array-item-actions { display: flex; gap: 4px; }
+  .array-add { margin-top: 4px; }
+
+  .cta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .json-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-600); font-weight: 600; }
+  .json-preview {
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 11px; background: #1e1e1e; color: #d4d4d4;
+    padding: 12px; border-radius: 4px; overflow: auto;
+    white-space: pre; height: calc(100vh - 130px); line-height: 1.5;
+  }
+  .json-preview .json-key { color: #9cdcfe; }
+  .json-preview .json-str { color: #ce9178; }
+  .json-preview .json-num { color: #b5cea8; }
+  .json-preview .json-bool { color: #569cd6; }
+  .json-preview .json-null { color: #569cd6; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 4px;
+    width: 700px; max-width: 90vw; max-height: 90vh;
+    display: flex; flex-direction: column;
+    border-top: 6px solid var(--yellow);
+  }
+  .modal-header { padding: 14px 18px; border-bottom: 1px solid var(--grey-200); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { margin: 0; font-size: 15px; color: var(--navy-dark); }
+  .modal-header .close { border: none; background: none; font-size: 24px; color: var(--grey-600); cursor: pointer; padding: 0 8px; }
+  .modal-body { padding: 18px; overflow-y: auto; flex: 1; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #fff; padding: 8px 14px; border-radius: 3px;
+    font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  .badge {
+    display: inline-block; background: var(--yellow); color: var(--navy-dark);
+    padding: 1px 6px; font-size: 10px; font-weight: 600;
+    border-radius: 8px; margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MAAS+MATA CMS · Prototype</h1>
+  <div class="actions">
+    <button class="ghost" id="btn-load-json">Load JSON</button>
+    <button class="ghost" id="btn-reset">Load sample</button>
+    <button id="btn-copy">Copy JSON</button>
+    <button class="yellow" id="btn-export">Export draft &rarr; download</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="pane pane--nav">
+    <div class="section-nav-header">Sections</div>
+    <ul class="section-nav" id="section-nav"></ul>
+    <div class="section-nav-header">Reference</div>
+    <ul class="section-nav">
+      <li id="btn-show-schema">View data shape</li>
+    </ul>
+  </nav>
+
+  <div class="pane pane--form" id="form-pane"></div>
+
+  <div class="pane pane--json">
+    <div class="json-header">
+      <span>Live JSON <span class="badge">saved locally</span></span>
+    </div>
+    <pre class="json-preview" id="json-out"></pre>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-load">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Load from JSON</h3>
+      <button class="close" id="modal-load-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600);">Paste an existing maas-mata.json to load it for editing. This will replace all current content.</p>
+      <textarea id="load-json-input" style="min-height: 300px; font-family: monospace; font-size: 11px;" placeholder='{"meta": {...}, "hero": {...}, ...}'></textarea>
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+        <button class="ghost" id="modal-load-cancel">Cancel</button>
+        <button class="primary" id="modal-load-apply">Replace all with pasted JSON</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-schema">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Data shape</h3>
+      <button class="close" id="modal-schema-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600);">The MAAS+MATA page reads this shape from <code>/assets/rbccm/js/pages/data/maas-mata.json</code>. Every editable text on the page maps to a path here.</p>
+      <pre class="json-preview" id="schema-preview" style="height: 500px;"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Export draft modal - collects an editor name + optional note,
+     then downloads the current state as JSON with a `_meta` block
+     that names the editor, timestamp, and which sections changed
+     since the seed. The consuming page ignores `_meta` since no
+     data-json binding path points at it. -->
+<div class="modal-backdrop" id="modal-export">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Export draft</h3>
+      <button class="close" id="modal-export-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12px; color: var(--grey-600); margin: 0 0 16px;">Fills in author + timestamp + a change summary, then downloads a JSON file you can attach to Asana (or hand off however).</p>
+      <div class="field">
+        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Your name (remembered for next time)</label>
+        <input type="text" id="export-editor" placeholder="e.g. Joon" autocomplete="name" style="width: 100%; padding: 8px 10px; border: 1px solid var(--grey-400); border-radius: 4px; font-size: 14px;">
+      </div>
+      <div class="field" style="margin-top: 12px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Note (optional)</label>
+        <textarea id="export-note" rows="3" placeholder="e.g. Q4 hero copy pass" style="width: 100%; padding: 8px 10px; border: 1px solid var(--grey-400); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+      </div>
+      <div id="export-summary" style="margin-top: 16px; padding: 12px; background: var(--grey-100); border-radius: 4px; font-size: 12px; color: var(--grey-700); max-height: 200px; overflow-y: auto;"></div>
+      <div style="display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end;">
+        <button class="ghost" id="modal-export-cancel">Cancel</button>
+        <button class="yellow" id="modal-export-download">Download JSON</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Article picker modal — opens when marketing clicks "Pick article
+     from feed" on an Insights item. Hidden by default (display: none
+     via .picker-modal without .open). Same feeds used by
+     article-visualizer.html (2024 / 2025 / 2026 insights XML). -->
+<div class="picker-modal" id="article-picker">
+  <div class="picker-modal-dialog">
+    <div class="picker-modal-head">
+      <span class="picker-modal-title">Pick an insights article</span>
+      <button type="button" class="picker-modal-close" data-picker-action="close" aria-label="Close">×</button>
+    </div>
+    <div class="picker-modal-toolbar">
+      <input type="search" id="picker-search" placeholder="Search title or description…">
+      <select id="picker-year">
+        <option value="all">All years</option>
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+      </select>
+    </div>
+    <div class="picker-modal-list" id="picker-list">
+      <div class="picker-status">Loading articles…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // v3 was the previous key; v4 forces a reset for editors upgrading
+  // to the new design so they see the v4 SAMPLE seed on next load
+  // instead of their stale v3 draft.
+  // Storage key bumped v4 → v4b to force a reset for editors on a
+  // stale draft — v4b adds newStandard, chartCard.video, and the
+  // 3-item thoughtLeadership.items array. Legacy sections (whyRbc,
+  // assetCoverage) are hidden from the nav.
+  // v4c → v4d: bumped ahead of team demo — SAMPLE seed matches the
+  // final rendered copy (post XSL/properties sync), so opening the
+  // CMS fresh now pre-fills with production-accurate placeholders.
+  // v4d → v4e: renamed closeTheLoop → innovationEra and
+  // thoughtLeadership → marketInsights so exported JSON keys match
+  // the data-json paths the XSL emits. Bump forces reset for any
+  // drafts saved under the old key names.
+  var STORAGE_KEY = 'rbccm-maas-mata-cms-draft-v4g';
+
+  // ==============================================================
+  // SAMPLE / SEED DATA - v4 (from MAAS-MATA design v4 PDF)
+  // ==============================================================
+  // Real v4 copy across every section. Two sections that v4
+  // removed entirely (whyRbc, assetCoverage) are kept in the seed
+  // so their editor panels still open with sample content, but the
+  // production page no longer renders them (they're marked --legacy
+  // in maas-mata.html). Editors can leave those alone.
+  var SAMPLE = {
+    meta: {
+      title: "MAAS + MATA · RBC Capital Markets"
+    },
+    hero: {
+      eyebrow: "Multi-Asset Agency Solutions",
+      headlineLines: ["Trade with Clarity.", "Execute with Control."],
+      subtitle: "RBC Capital Markets' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.",
+      primaryCta: { label: "Request demo", href: "#demo" },
+      secondaryCta: { label: "", href: "" }
+    },
+    chartCard: {
+      // v4: the interactive chart is now a static screenshot with a
+      // Brightcove video modal overlay. The chart data fields below
+      // (labels/quotes/quality) still exist for the v3 legacy block
+      // that's kept hidden in markup, but editors don't need to
+      // touch them anymore. Only the poster + video sub-objects
+      // matter for v4.
+      posterImage: "https://www.rbccm.com/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png",
+      posterAlt: "MAAS Execution Console — cross-asset portfolio chart with live quote strip.",
+      leftLabel: "MAAS · Execution Console",
+      rightLabel: "MATA · Analytics",
+      leftHeadline: "Portfolio · Cross-Asset",
+      leftValue: "+13,300 M",
+      quotes: [
+        { label: "Notify Inc.",   value: "$921.87", delta: "+2.14%", positive: true },
+        { label: "CAD / USD",     value: "0.7372",  delta: "-0.16%", positive: false },
+        { label: "Notify Dec 26", value: "$245.80", delta: "+0.62%", positive: true }
+      ],
+      quality: { label: "Execution quality", score: "98.2", trend: "+ 1.4% vs Benchmark" },
+      video: {
+        // Account + Player are RBC constants — same across every video
+        // on the site. Only videoId changes per video; that's the only
+        // field exposed in the CMS UI.
+        title: "Platform demo",
+        accountId: "6021289101001",
+        playerId: "VyvCc9BZx",
+        videoId: "6385114247112"
+      }
+    },
+    // v4 NEW section: "A new standard for multi-asset trading" —
+    // sits inside the dark-strip between the chart image and the
+    // awards row. 2-line stacked heading (grey lead + white/yellow
+    // highlight), 3 body paragraphs, single yellow CTA.
+    newStandard: {
+      headingLead: "A new standard for",
+      headingHighlight: "multi-asset ",
+      headingHighlightAccent: "trading",
+      body: [
+        "Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.",
+        "Many platforms help you analyze the trade. MAAS, RBC's Multi-Asset Agency Solutions platform, goes further, bringing trading intelligence, and execution technology into one unified experience. Across all major asset classes and index events, MAAS helps you analyze opportunities, execute strategies and manage risk with greater visibility and control.",
+        "Because in complex markets, the traders who win aren't just faster — they're better informed, better connected, and better positioned to execute."
+      ],
+      cta: { label: "See MAAS in action", href: "#platform" }
+    },
+    awards: {
+      eyebrow: "See why the world's top institutions choose MAAS",
+      items: [
+        { year: "2026", title: "Best Trading Analytics Platform",           issuer: "TradingTech Insights Awards USA" },
+        { year: "2025", title: "Overall Best Provider, Algorithmic Trading", issuer: "The Trade" },
+        { year: "2025", title: "Best Provider, Multi-User Clients",          issuer: "The Trade" }
+      ]
+    },
+    platforms: {
+      eyebrow: "Two platforms, one unified ecosystem",
+      heading: "Stronger execution for sharper insights",
+      cards: [
+        {
+          theme: "dark",
+          eyebrow: "MATA – Analytics",
+          title: "Transform data into trading intelligence",
+          acronym: "",
+          body: "Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.",
+          bullets: [
+            "Quantify expected execution costs before commitment",
+            "Compare strategies side by side to evaluate potential outcomes",
+            "Explore interactive outlier views to focus on higher-risk or harder-to-trade orders",
+            "Monitor market conditions and portfolio exposures",
+            "Model scenarios across asset classes"
+          ],
+          cta: { label: "", href: "" }
+        },
+        {
+          theme: "light",
+          eyebrow: "MAAS - Execution",
+          title: "Drive stronger performance outcomes",
+          acronym: "",
+          body: "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.",
+          bullets: [
+            "Access adaptive algorithms built for live market conditions",
+            "Select AI-powered strategies tailored to execution objectives",
+            "Route orders intelligently to help minimize market impact",
+            "Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls",
+            "Benchmark performance against pre-trade expectations"
+          ],
+          cta: { label: "", href: "" }
+        }
+      ]
+    },
+    // v4: this section slot is now "Innovation for the next
+    // execution era". Renamed key from closeTheLoop → innovationEra
+    // to match the data-json paths the XSL emits.
+    innovationEra: {
+      heading: "Innovation for the next execution era",
+      body: "Technology, scale and multi-asset expertise — engineered to help you execute with confidence.",
+      features: [
+        { number: "01", title: "Model with depth",      body: "Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team." },
+        { number: "02", title: "Connect with ease",     body: "Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team." },
+        { number: "03", title: "Optimize with experts", body: "Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions." }
+      ]
+    },
+    // v4: REMOVED. Kept in seed so the CMS panel opens with
+    // context, but the live page marks its section --legacy and
+    // won't ship it. Safe to leave as-is.
+    whyRbc: {
+      eyebrow: "Our Numbers",
+      heading: "Why RBC Capital Markets",
+      body: "They power the innovation, capabilities, and culture that have ranked us among the world's top financial institutions.",
+      stats: [
+        { value: "700+",      label: "Asset coverage",         body: "700+ trading and risk specialists across 4 continents" },
+        { value: "$1T+",      label: "Balance sheet strength", body: "In RBC balance-sheet capacity behind every trade." },
+        { value: "AI-driven", label: "Innovation leadership",  body: "Award-winning trading powered by THOR and Aiden®." },
+        { value: "1:1",       label: "Client partnership",     body: "Trusted relationships built on stability and expertise." }
+      ]
+    },
+    // v4: REMOVED. Same legacy note as whyRbc above.
+    assetCoverage: {
+      eyebrow: "Asset coverage",
+      heading: "Connected across the desk",
+      assets: [
+        { icon: "equities", title: "Equities",         subtitle: "Equities subtitle",         body: "Connected execution and performance insights.",    cta: { label: "Learn more", href: "#" } },
+        { icon: "futures",  title: "Futures",          subtitle: "Futures subtitle",          body: "Streamlined workflows across complex strategies.", cta: { label: "Learn more", href: "#" } },
+        { icon: "fx",       title: "FX",               subtitle: "FX subtitle",               body: "Unified trading with cross asset visibility.",     cta: { label: "Learn more", href: "#" } },
+        { icon: "index",    title: "Index strategies", subtitle: "Index strategies subtitle", body: "Integrated analytics for event driven execution.", cta: { label: "Learn more", href: "#" } }
+      ]
+    },
+    // v4: "MATA Capabilities / Sharper insight. Smarter trades."
+    // Three regular asset cards + one wide "Index events" card.
+    // (Schema may not surface all fields yet - safe to add here
+    // so JSON round-trips cleanly.)
+    mataCapabilities: {
+      eyebrow: "MATA capabilities",
+      heading: "Sharper insight. Smarter trades.",
+      subheading: "Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.",
+      cards: [
+        { icon: "equities", title: "Equities",         subtitle: "Cash Equities, ETFs & ADRs",  body: "Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views." },
+        { icon: "fx",       title: "Foreign Exchange", subtitle: "G10 & EM Currency Pairs",     body: "Analyse real-time market liquidity conditions, assess expected execution costs across currency pairs, and monitor live order performance and benchmarks during execution." },
+        { icon: "futures",  title: "Futures",          subtitle: "Index, Commodity & Rate Futures", body: "Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures." }
+      ],
+      indexEvents: {
+        icon: "index",
+        title: "Index events",
+        subtitle: "120+ Global Indices",
+        body: "Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates."
+      }
+    },
+    // v4: "Market insights" is now a 3-card Slick-style carousel.
+    // items[] replaces the old single `featured` object. PDF v4
+    // shows lorem ipsum across all 3 - real copy lands separately.
+    // Renamed key from thoughtLeadership → marketInsights to match
+    // the data-json paths the XSL emits.
+    marketInsights: {
+      eyebrow: "Trends shaping institutional trading",
+      heading: "Market insights",
+      items: [
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "2 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        },
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "3 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        },
+        {
+          eyebrow: "Insights",
+          title: "Lorem ipsum dolor sit amet consectetur adipiscing elit",
+          body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud",
+          cta: { label: "4 min read", href: "#" },
+          image: "./insights-featured-story.jpg"
+        }
+      ]
+    },
+    demoCta: {
+      eyebrow: "See the platform",
+      headlinePrefix: "Talk with an ",
+      headlineHighlight: "expert",
+      body: "Connect with our product teams to arrange a custom demo.",
+      cta: { label: "Request a demo", href: "#demo" }
+    }
+    // Newsletter removed — handled by the shared Marketo component.
+  };
+
+  // ==============================================================
+  // SCHEMA — with figmaRef on every field
+  // ==============================================================
+  var SCHEMA = {
+    hero: {
+      label: 'Hero',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption at the top of the hero ("Multi-Asset Agency Solutions")' },
+        headlineLines: { type: 'stringArray', label: 'Headline lines', figmaRef: 'The large 2-line serif headline ("Trade with Clarity." / "Execute with Control.") — each line is a separate row, note the period at the end of each line' },
+        subtitle: { type: 'textarea', label: 'Subtitle', figmaRef: 'The paragraph under the big headline ("RBC Capital Markets\' multi-asset trading platform is the only solution that keeps intelligence connected from decision to action.")' },
+        primaryCta: { type: 'cta', label: 'Primary CTA', figmaRef: 'The blue "Request demo" button' }
+        // secondaryCta intentionally omitted — the hero only has
+        // one CTA. Keeping the SAMPLE key for backward compatibility
+        // but not exposing it in the CMS UI.
+      }
+    },
+    chartCard: {
+      // v4: chart card is now a static screenshot with a Brightcove
+      // video modal. The old chart data fields (labels/quotes/quality)
+      // still exist for the v3 legacy block (hidden in markup) but
+      // editors only need to fill in the video sub-object.
+      label: 'Chart / Video',
+      fields: {
+        posterImage: {
+          type: 'text', label: 'Poster image URL',
+          figmaRef: 'The still image shown behind the play button — the dashboard screenshot. Full URL or an /assets/... path. Default is the current MAAS Execution Console reveal PNG.'
+        },
+        posterAlt: {
+          type: 'text', label: 'Poster image alt text',
+          figmaRef: 'Screen-reader description of the poster image (accessibility). Example: "MAAS Execution Console — cross-asset portfolio chart with live quote strip."'
+        },
+        video: {
+          type: 'object', label: 'Video (Brightcove)',
+          figmaRef: 'The video that plays when the user clicks the play button on the chart. Only the Video ID needs to change per video — Account and Player IDs are one-time constants dev sets in TeamSite.',
+          fields: {
+            videoId: { type: 'text', label: 'Brightcove Video ID', figmaRef: 'The Video ID from Brightcove Studio (long numeric string, e.g. "6371076976112"). Copy from the Brightcove Studio URL after the "videoId=" segment.' },
+            // Account + Player are dev-managed constants — hidden from the CMS to keep marketing from breaking playback.
+            title:     { hidden: true, type: 'text', label: 'Video title' },
+            accountId: { hidden: true, type: 'text', label: 'Brightcove Account ID' },
+            playerId:  { hidden: true, type: 'text', label: 'Brightcove Player ID' }
+          }
+        },
+        leftLabel: { type: 'text', label: 'Legacy: Top-left label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        rightLabel: { type: 'text', label: 'Legacy: Top-right label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        leftHeadline: { type: 'text', label: 'Legacy: Headline label', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        leftValue: { type: 'text', label: 'Legacy: Headline value', figmaRef: 'static screenshot ignores this. Kept for legacy chart block.' },
+        quotes: {
+          type: 'array', label: 'Legacy: Quotes (right column)',
+          figmaRef: 'static screenshot ignores this. Kept for legacy chart block.',
+          itemLabelKey: 'label',
+          defaultItem: { label: '', value: '', delta: '', positive: true },
+          itemFields: {
+            label: { type: 'text', label: 'Instrument', figmaRef: 'The instrument name.' },
+            value: { type: 'text', label: 'Value', figmaRef: 'The price value.' },
+            delta: { type: 'text', label: 'Delta', figmaRef: 'The change with sign.' },
+            positive: { type: 'checkbox', label: 'Positive (green delta)', figmaRef: 'Check for green (gain), leave blank for red (loss).' }
+          }
+        },
+        quality: {
+          type: 'object', label: 'Legacy: Execution quality box',
+          figmaRef: 'static screenshot ignores this. Kept for legacy chart block.',
+          fields: {
+            label: { type: 'text', label: 'Label', figmaRef: 'Legacy label field.' },
+            score: { type: 'text', label: 'Score', figmaRef: 'Legacy score field.' },
+            trend: { type: 'text', label: 'Trend text', figmaRef: 'Legacy trend field.' }
+          }
+        }
+      }
+    },
+    newStandard: {
+      label: 'A New Standard',
+      fields: {
+        headingLead: { type: 'text', label: 'Heading — first line (grey)', figmaRef: 'The top line of the section heading, rendered in 40%-white/grey ("A new standard for").' },
+        headingHighlight: { type: 'text', label: 'Heading — second line prefix (white)', figmaRef: 'The white portion of the second line — note the trailing space so it reads correctly against the yellow accent ("multi-asset ").' },
+        headingHighlightAccent: { type: 'text', label: 'Heading — yellow accent word', figmaRef: 'The single word rendered in warm yellow at the end of the second line. Period is added by the markup ("trading").' },
+        body: {
+          type: 'stringArray', label: 'Body paragraphs',
+          figmaRef: 'Each row is a separate paragraph under the heading.'
+        },
+        cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "See MAAS in action" button below the body copy.' }
+      }
+    },
+    awards: {
+      label: 'Awards',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The caption above the badges ("See why the world\'s top institutions choose MAAS")' },
+        items: {
+          type: 'array', label: 'Award badges',
+          figmaRef: '3 award cards (was 4 in ). Each has a year pill, a title, and an issuer.',
+          itemLabelKey: 'title',
+          min: 3, max: 3,
+          defaultItem: { year: '', title: '', issuer: '' },
+          itemFields: {
+            year: { type: 'text', label: 'Year', figmaRef: 'Yellow year pill at the top of the card' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Award title in white text' },
+            issuer: { type: 'text', label: 'Issuer', figmaRef: 'Small grey issuer line under the title ("TradingTech Insights Awards USA" / "The Trade")' }
+          }
+        }
+      }
+    },
+    platforms: {
+      label: 'Platforms (MAAS / MATA cards)',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small caption above the section heading ("Two platforms, one unified ecosystem")' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The big white section headline ("Stronger execution for sharper insights")' },
+        cards: {
+          type: 'array', label: 'Cards',
+          figmaRef: 'The two large side-by-side platform cards. Each has 5-6 bullets.',
+          itemLabelKey: 'title',
+          min: 2, max: 2,
+          defaultItem: { theme: 'dark', eyebrow: '', title: '', acronym: '', body: '', bullets: [], cta: { label: '', href: '' } },
+          itemFields: {
+            theme: {
+              type: 'select', label: 'Theme',
+              figmaRef: 'Dark = navy card (MATA on the left), Light = white card (MAAS on the right)',
+              options: [ { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' } ]
+            },
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small sentence-case label at the top of the card ("MATA – Analytics" / "MAAS - Execution")' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card headline ("Transform data into trading intelligence" / "Drive stronger performance outcomes")' },
+            acronym: { type: 'text', label: 'Acronym', figmaRef: 'leave blank.' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph in the card ("Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move." / "Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.")' },
+            bullets: { type: 'stringArray', label: 'Bullets', min: 3, max: 8, figmaRef: 'Bullet points below the body copy. Cards equalize height via CSS (align-items: stretch on the row + flex on __platform-body), so counts can differ between cards — the shorter card just gets whitespace absorbed. 5 is the Figma baseline; 6+ is fine.' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'leave blank.' }
+          }
+        }
+      }
+    },
+    innovationEra: {
+      label: 'Innovation Era',
+      fields: {
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big serif heading on the light-grey band ("Innovation for the next execution era")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading ("Technology, scale and multi-asset expertise — engineered to help you execute with confidence.")' },
+        features: {
+          type: 'array', label: 'Features',
+          figmaRef: 'The 3 numbered feature blocks below the header (/01 /02 /03).',
+          itemLabelKey: 'title',
+          min: 3, max: 3,
+          defaultItem: { number: '', title: '', body: '' },
+          itemFields: {
+            number: { type: 'text', label: 'Number', figmaRef: 'The "/01", "/02", "/03" number label in yellow' },
+            title: { type: 'text', label: 'Title', figmaRef: 'Feature title' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Short description under the title' }
+          }
+        }
+      }
+    },
+    whyRbc: {
+      hidden: true,
+      label: 'Why RBC',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("OUR NUMBERS")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'The big serif heading ("Why RBC Capital Markets")' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph on the right of the section heading' },
+        stats: {
+          type: 'array', label: 'Stats',
+          figmaRef: 'The 4 big-number stat blocks with yellow-underlined values (700+, $1T+, AI-driven, 1:1)',
+          itemLabelKey: 'label',
+          defaultItem: { value: '', label: '', body: '' },
+          itemFields: {
+            value: { type: 'text', label: 'Value', figmaRef: 'The big serif number with yellow underline (e.g. "700+")' },
+            label: { type: 'text', label: 'Label', figmaRef: 'Small uppercase label under the number (e.g. "ASSET COVERAGE")' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'One-line description at the bottom of the stat block' }
+          }
+        }
+      }
+    },
+    assetCoverage: {
+      hidden: true,
+      label: 'Asset Coverage',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small uppercase caption ("ASSET COVERAGE")' },
+        heading: { type: 'text', label: 'Heading', figmaRef: 'Big white section heading ("Connected across the desk")' },
+        assets: {
+          type: 'array', label: 'Assets',
+          figmaRef: 'The 4 dark cards with yellow icons at the bottom of the dark strip',
+          itemLabelKey: 'title',
+          defaultItem: { icon: 'equities', title: '', subtitle: '', body: '', cta: { label: 'Learn more', href: '#' } },
+          itemFields: {
+            icon: {
+              type: 'select', label: 'Icon',
+              figmaRef: 'Yellow icon at the top of the card',
+              options: [
+                { value: 'equities', label: 'Equities (line chart)' },
+                { value: 'futures', label: 'Futures (bars)' },
+                { value: 'fx', label: 'FX (arrows)' },
+                { value: 'index', label: 'Index (crosshair)' }
+              ]
+            },
+            title: { type: 'text', label: 'Title', figmaRef: 'Card title (e.g. "Equities")' },
+            subtitle: { type: 'text', label: 'Subtitle', figmaRef: 'Italic white subtitle under the title' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Small grey description under the title' },
+            cta: { type: 'cta', label: 'Learn more CTA', figmaRef: 'Yellow "Learn more →" anchor at the bottom of the card' }
+          }
+        }
+      }
+    },
+    marketInsights: {
+      label: 'Market Insights',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Yellow caption above the section heading ("Trends shaping institutional trading").' },
+        heading: { type: 'text', label: 'Section heading', figmaRef: 'The section heading ("Market insights").' },
+        items: {
+          type: 'array', label: 'Insight cards',
+          figmaRef: '3-card Slick-style carousel (was a single featured card in ). Each card shows an eyebrow, headline, body, "N min read" CTA, and a right-side illustration image. Add/remove rows to change the slide count.',
+          itemLabelKey: 'title',
+          min: 3, max: 9,
+          pickerType: 'article',
+          defaultItem: { eyebrow: 'Insights', title: '', body: '', cta: { label: '', href: '' }, image: './insights-featured-story.jpg', imageAlt: '' },
+          itemFields: {
+            eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'The small pill at the top of the card ("Insights").' },
+            title: { type: 'text', label: 'Title', figmaRef: 'The serif headline in the card' },
+            body: { type: 'textarea', label: 'Body', figmaRef: 'Story preview paragraph' },
+            cta: { type: 'cta', label: 'CTA', figmaRef: 'The read-time badge at the bottom ("2 min read"). Label is what shows; href goes to the article.' },
+            image: { type: 'text', label: 'Illustration image URL', figmaRef: 'Path to the right-side illustration image.' },
+            imageAlt: { type: 'text', label: 'Illustration alt text', figmaRef: 'Accessibility description of the image. Screen readers read this aloud. Defaults to the article title when picked from the feed.' }
+          }
+        }
+      }
+    },
+    demoCta: {
+      label: 'Demo CTA',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', figmaRef: 'Small yellow caption ("See the platform")' },
+        headlinePrefix: { type: 'text', label: 'Headline (normal text)', maxLength: 25, figmaRef: 'The regular-color part of the big headline ("Talk with an " — note trailing space). Kept short so the heading fits on one line at desktop.' },
+        headlineHighlight: { type: 'text', label: 'Highlighted word', maxLength: 20, figmaRef: 'The yellow word at the end of the headline ("expert" — period is added by markup). Kept short so the heading fits on one line at desktop.' },
+        body: { type: 'textarea', label: 'Body', figmaRef: 'The paragraph under the headline ("Connect with our product teams to arrange a custom demo.")' },
+        cta: { type: 'cta', label: 'CTA', figmaRef: 'The yellow "Request a demo →" button' }
+      }
+    },
+    // Newsletter section removed — the site's shared Marketo signup
+    // component is dropped onto the page separately, so nothing to
+    // edit here. If we ever bring the newsletter back in-component,
+    // restore this block from git.
+  };
+
+  // ==============================================================
+  // STATE
+  // ==============================================================
+  var state = deepClone(SAMPLE);
+  var currentSection = 'hero';
+
+  function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+  function getPath(obj, path) {
+    var parts = String(path).split('.');
+    var cur = obj;
+    for (var i = 0; i < parts.length; i++) { if (cur == null) return undefined; cur = cur[parts[i]]; }
+    return cur;
+  }
+  function setPath(obj, path, value) {
+    var parts = String(path).split('.');
+    var cur = obj;
+    for (var i = 0; i < parts.length - 1; i++) {
+      if (cur[parts[i]] == null) cur[parts[i]] = {};
+      cur = cur[parts[i]];
+    }
+    cur[parts[parts.length - 1]] = value;
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    renderJson();
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      state = JSON.parse(raw);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // ==============================================================
+  // FORM RENDERING
+  // ==============================================================
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+
+  // Render Figma reference chip (yellow band under label)
+  function figmaChip(ref) {
+    return ref ? '<div class="figma-ref">' + esc(ref) + '</div>' : '';
+  }
+
+  function fieldWrap(labelText, figmaRef, innerHtml, hint) {
+    return '<div class="field">'
+      + '<label class="field-label">' + esc(labelText) + '</label>'
+      + figmaChip(figmaRef)
+      + innerHtml
+      + (hint ? '<div class="field-hint">' + esc(hint) + '</div>' : '')
+      + '</div>';
+  }
+
+  function renderField(key, def, basePath) {
+    var path = basePath + (basePath ? '.' : '') + key;
+    var val = getPath(state, path);
+
+    // Skip any field explicitly marked hidden OR labelled "Legacy:"
+    // - lets us leave the schema/data in place (so nothing breaks
+    // when a stale draft re-saves) while just not surfacing the
+    // field in the editor UI.
+    if (def.hidden || (typeof def.label === 'string' && /^\s*Legacy:/i.test(def.label))) return '';
+
+    if (def.type === 'text' || def.type === 'url') {
+      // Optional maxLength cap. When set: input enforces via native
+      // maxlength attribute AND a small live counter appears below
+      // so marketing can see "18 / 25 characters" as they type.
+      var textMax = typeof def.maxLength === 'number' ? def.maxLength : null;
+      var textAttrs = 'data-path="' + esc(path) + '" value="' + esc(val || '') + '"' + (textMax ? ' maxlength="' + textMax + '"' : '');
+      var textInput = '<input type="text" ' + textAttrs + '>';
+      if (textMax) {
+        textInput += '<div class="char-count" data-count-for="' + esc(path) + '">' + (val || '').length + ' / ' + textMax + ' characters</div>';
+      }
+      return fieldWrap(def.label, def.figmaRef, textInput, def.hint);
+    }
+    if (def.type === 'textarea') {
+      var taMax = typeof def.maxLength === 'number' ? def.maxLength : null;
+      var taAttrs = 'data-path="' + esc(path) + '"' + (taMax ? ' maxlength="' + taMax + '"' : '');
+      var taInput = '<textarea ' + taAttrs + '>' + esc(val || '') + '</textarea>';
+      if (taMax) {
+        taInput += '<div class="char-count" data-count-for="' + esc(path) + '">' + (val || '').length + ' / ' + taMax + ' characters</div>';
+      }
+      return fieldWrap(def.label, def.figmaRef, taInput, def.hint);
+    }
+    if (def.type === 'checkbox') {
+      return '<div class="field">'
+        + figmaChip(def.figmaRef)
+        + '<label class="check">'
+        +   '<input type="checkbox" data-path="' + esc(path) + '" ' + (val ? 'checked' : '') + '>'
+        +   esc(def.label)
+        + '</label></div>';
+    }
+    if (def.type === 'select') {
+      var opts = def.options.map(function (o) {
+        return '<option value="' + esc(o.value) + '"' + (o.value === val ? ' selected' : '') + '>' + esc(o.label) + '</option>';
+      }).join('');
+      return fieldWrap(def.label, def.figmaRef,
+        '<select data-path="' + esc(path) + '">' + opts + '</select>',
+        def.hint);
+    }
+    if (def.type === 'cta') {
+      var cta = val || { label: '', href: '' };
+      return fieldWrap(def.label, def.figmaRef,
+        '<div class="cta-row">'
+        + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta.label || '') + '">'
+        + '<input type="text" placeholder="URL / #anchor" data-path="' + esc(path) + '.href" value="' + esc(cta.href || '') + '">'
+        + '</div>',
+        def.hint);
+    }
+    if (def.type === 'ctaWithRead') {
+      var cta2 = val || { label: '', href: '', readTime: '' };
+      return fieldWrap(def.label, def.figmaRef,
+        '<div class="cta-row" style="grid-template-columns: 2fr 2fr 1fr;">'
+        + '<input type="text" placeholder="Label" data-path="' + esc(path) + '.label" value="' + esc(cta2.label || '') + '">'
+        + '<input type="text" placeholder="URL" data-path="' + esc(path) + '.href" value="' + esc(cta2.href || '') + '">'
+        + '<input type="text" placeholder="Read time" data-path="' + esc(path) + '.readTime" value="' + esc(cta2.readTime || '') + '">'
+        + '</div>',
+        def.hint);
+    }
+    if (def.type === 'object') {
+      var inner = '';
+      Object.keys(def.fields).forEach(function (k) {
+        inner += renderField(k, def.fields[k], path);
+      });
+      return '<div class="group">'
+        + '<div class="group-title">' + esc(def.label) + '</div>'
+        + figmaChip(def.figmaRef)
+        + inner
+        + '</div>';
+    }
+    if (def.type === 'stringArray') {
+      var arr = Array.isArray(val) ? val : [];
+      // Layout limits mirror the object-array renderer: min defaults
+      // to 0, max to Infinity. When min === max the row count is
+      // locked (Add and Delete are hidden entirely). Otherwise Add
+      // disables at max, Delete disables at min. Used for bullets
+      // fields where the visual layout requires a fixed row count.
+      var saMin = typeof def.min === 'number' ? def.min : 0;
+      var saMax = typeof def.max === 'number' ? def.max : Infinity;
+      var saAtMax = arr.length >= saMax;
+      var saAtMin = arr.length <= saMin;
+      var saLocked = (saMin === saMax);
+      var itemsHtml = arr.map(function (s, i) {
+        var delBtn = saLocked
+          ? ''
+          : '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (saAtMin ? ' disabled title="Minimum reached — cannot delete"' : '') + '>×</button>';
+        return '<div class="array-item">'
+          + '<div class="array-item-header">'
+          +   '<span class="array-item-title">Item ' + (i + 1) + '</span>'
+          +   '<div class="array-item-actions">'
+          +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+          +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr.length - 1 ? ' disabled' : '') + '>↓</button>'
+          +     delBtn
+          +   '</div>'
+          + '</div>'
+          + '<input type="text" data-path="' + esc(path) + '.' + i + '" value="' + esc(s) + '">'
+          + '</div>';
+      }).join('');
+      // Count badge — same three-state pattern as object arrays.
+      var saBadge = '';
+      if (saMax !== Infinity || saMin > 0) {
+        var saStatus, saCls;
+        if (saLocked) {
+          saStatus = arr.length + ' of ' + saMax + ' items — layout locked (this section requires exactly ' + saMax + ')';
+          saCls = arr.length === saMax ? 'array-badge--ok' : 'array-badge--warn';
+        } else if (arr.length < saMin) {
+          saStatus = arr.length + ' of ' + saMax + ' items — need at least ' + saMin + ' for this section to display';
+          saCls = 'array-badge--warn';
+        } else if (arr.length >= saMax) {
+          saStatus = arr.length + ' of ' + saMax + ' items — maximum reached';
+          saCls = 'array-badge--danger';
+        } else {
+          saStatus = arr.length + ' of ' + saMax + ' items';
+          saCls = 'array-badge--ok';
+        }
+        saBadge = '<span class="array-badge ' + saCls + '">' + esc(saStatus) + '</span>';
+      }
+      var saAddBtn = saLocked
+        ? ''
+        : '<button class="ghost small array-add" data-array-action="add-string" data-array-path="' + esc(path) + '"' + (saAtMax ? ' disabled title="Maximum reached"' : '') + '>+ Add item</button>';
+      return '<div class="field">'
+        + '<label class="field-label">' + esc(def.label) + '</label>'
+        + saBadge
+        + figmaChip(def.figmaRef)
+        + '<div class="array">' + itemsHtml + '</div>'
+        + saAddBtn
+        + '</div>';
+    }
+    if (def.type === 'array') {
+      var arr2 = Array.isArray(val) ? val : [];
+      // Layout limits from the schema. min defaults to 0, max to
+      // Infinity if not set. When min === max the section is locked
+      // (Add and Delete are hidden entirely). Otherwise Add disables
+      // at max, Delete disables at min.
+      var min = typeof def.min === 'number' ? def.min : 0;
+      var max = typeof def.max === 'number' ? def.max : Infinity;
+      var atMax = arr2.length >= max;
+      var atMin = arr2.length <= min;
+      var locked = (min === max);
+      var itemsHtml2 = arr2.map(function (item, i) {
+        var itemPath = path + '.' + i;
+        var itemLabel = def.itemLabelKey && item[def.itemLabelKey] ? item[def.itemLabelKey] : ('Item ' + (i + 1));
+        var itemInner = '';
+        Object.keys(def.itemFields).forEach(function (k) {
+          itemInner += renderField(k, def.itemFields[k], itemPath);
+        });
+        var deleteBtn = locked
+          ? ''
+          : '<button class="danger small" data-array-action="delete" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (atMin ? ' disabled title="Minimum reached — cannot delete"' : '') + '>Delete</button>';
+        // "Pick from feed" button — only rendered when the schema
+        // opts in via pickerType. Clicking opens the article picker
+        // modal; on select, the modal populates this item's fields.
+        var pickerBtn = def.pickerType === 'article'
+          ? '<button type="button" class="picker-btn" data-picker-action="open" data-picker-target="' + esc(path + '.' + i) + '">Pick article from feed</button>'
+          : '';
+        return '<div class="array-item">'
+          + '<div class="array-item-header">'
+          +   '<span class="array-item-title">' + esc(itemLabel) + '</span>'
+          +   '<div class="array-item-actions">'
+          +     '<button class="ghost small" data-array-action="up" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+          +     '<button class="ghost small" data-array-action="down" data-array-path="' + esc(path) + '" data-array-index="' + i + '"' + (i === arr2.length - 1 ? ' disabled' : '') + '>↓</button>'
+          +     deleteBtn
+          +   '</div>'
+          + '</div>'
+          + pickerBtn
+          + itemInner
+          + '</div>';
+      }).join('');
+      var defaultJson = JSON.stringify(def.defaultItem).replace(/'/g, "&#39;");
+
+      // Count badge + human-readable status. Colors: green when in
+      // range, amber when below min, red when at hard cap.
+      var badge = '';
+      if (max !== Infinity || min > 0) {
+        var status, cls;
+        if (locked) {
+          status = arr2.length + ' of ' + max + ' items — layout locked (this section requires exactly ' + max + ')';
+          cls = arr2.length === max ? 'array-badge--ok' : 'array-badge--warn';
+        } else if (arr2.length < min) {
+          status = arr2.length + ' of ' + max + ' items — need at least ' + min + ' for this section to display';
+          cls = 'array-badge--warn';
+        } else if (arr2.length >= max) {
+          status = arr2.length + ' of ' + max + ' items — maximum reached';
+          cls = 'array-badge--cap';
+        } else {
+          status = arr2.length + ' of ' + max + ' items (' + min + '–' + max + ' allowed)';
+          cls = 'array-badge--ok';
+        }
+        badge = '<div class="array-badge ' + cls + '">' + esc(status) + '</div>';
+      }
+
+      var addBtn = locked
+        ? ''
+        : '<button class="ghost small array-add" data-array-action="add-obj" data-array-path="' + esc(path) + '" data-default=\'' + defaultJson + '\'' + (atMax ? ' disabled title="Maximum reached"' : '') + '>+ Add item</button>';
+
+      return '<div class="field">'
+        + '<label class="field-label">' + esc(def.label) + '</label>'
+        + figmaChip(def.figmaRef)
+        + badge
+        + '<div class="array">' + itemsHtml2 + '</div>'
+        + addBtn
+        + '</div>';
+    }
+    return '';
+  }
+
+  function renderSection(sectionId) {
+    var def = SCHEMA[sectionId];
+    if (!def) return;
+    currentSection = sectionId;
+    var container = document.getElementById('form-pane');
+    var html = '<h2 class="section-title">' + esc(def.label) + '</h2>'
+             + '<div class="section-path">state.' + esc(sectionId) + '</div>';
+    Object.keys(def.fields).forEach(function (key) {
+      html += renderField(key, def.fields[key], sectionId);
+    });
+    container.innerHTML = html;
+    container.scrollTop = 0;
+    var lis = document.querySelectorAll('#section-nav li');
+    for (var i = 0; i < lis.length; i++) {
+      lis[i].classList.toggle('active', lis[i].getAttribute('data-section') === sectionId);
+    }
+  }
+
+  function renderNav() {
+    var html = '';
+    Object.keys(SCHEMA).forEach(function (id) {
+      // Skip legacy sections (whyRbc, assetCoverage etc.) from the
+      // sidebar — SCHEMA + SAMPLE still carry them so the underlying
+      // data is preserved for anyone who wants to re-enable the
+      // panel, but editors shouldn't see them in day-to-day use.
+      if (SCHEMA[id].hidden) return;
+      html += '<li data-section="' + esc(id) + '">' + esc(SCHEMA[id].label) + '</li>';
+    });
+    document.getElementById('section-nav').innerHTML = html;
+  }
+
+  // ==============================================================
+  // JSON PREVIEW
+  // ==============================================================
+  function syntaxHighlight(json) {
+    return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'json-num';
+        if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-str';
+        else if (/true|false/.test(match)) cls = 'json-bool';
+        else if (/null/.test(match)) cls = 'json-null';
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+  }
+  function renderJson() {
+    document.getElementById('json-out').innerHTML = syntaxHighlight(JSON.stringify(state, null, 2));
+  }
+
+  // ==============================================================
+  // TOAST
+  // ==============================================================
+  var toastTimer;
+  function toast(msg, isError) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.className = 'toast'; }, 2200);
+  }
+
+  // ==============================================================
+  // EVENTS
+  // ==============================================================
+  document.getElementById('section-nav').addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-section]');
+    if (!li) return;
+    renderSection(li.getAttribute('data-section'));
+  });
+
+  document.getElementById('form-pane').addEventListener('input', function (e) {
+    var el = e.target;
+    var path = el.getAttribute('data-path');
+    if (!path) return;
+    var val = el.type === 'checkbox' ? el.checked : el.value;
+    setPath(state, path, val);
+    // Live-update the "N / max characters" counter if this input has
+    // a max attached.
+    var max = el.getAttribute('maxlength');
+    if (max) {
+      var counter = document.querySelector('.char-count[data-count-for="' + path.replace(/"/g, '\\"') + '"]');
+      if (counter) {
+        var len = (val || '').length;
+        counter.textContent = len + ' / ' + max + ' characters';
+        counter.classList.toggle('char-count--near-cap', len >= max - 2);
+      }
+    }
+    save();
+  });
+  document.getElementById('form-pane').addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.tagName !== 'SELECT' && el.type !== 'checkbox') return;
+    var path = el.getAttribute('data-path');
+    if (!path) return;
+    var val = el.type === 'checkbox' ? el.checked : el.value;
+    setPath(state, path, val);
+    save();
+  });
+
+  document.getElementById('form-pane').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-array-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-array-action');
+    var arrPath = btn.getAttribute('data-array-path');
+    var idx = parseInt(btn.getAttribute('data-array-index'), 10);
+    var arr = getPath(state, arrPath);
+    if (!Array.isArray(arr) && (action !== 'add-string' && action !== 'add-obj')) return;
+
+    // Look up the field's min/max limits from the SCHEMA (so
+    // programmatic add/delete respects the same rules the UI
+    // enforces via disabled buttons). We walk the schema by the
+    // dotted path; only array fields will have min/max set.
+    function schemaAt(pathStr) {
+      var parts = String(pathStr).split('.');
+      var node = SCHEMA[parts[0]];
+      if (!node) return null;
+      var fields = node.fields || {};
+      for (var i = 1; i < parts.length; i++) {
+        var seg = parts[i];
+        if (/^\d+$/.test(seg)) { node = node && node.itemFields ? { fields: node.itemFields } : null; continue; }
+        node = fields[seg];
+        if (!node) return null;
+        fields = node.fields || node.itemFields || {};
+      }
+      return node;
+    }
+    var limits = schemaAt(arrPath) || {};
+    var min = typeof limits.min === 'number' ? limits.min : 0;
+    var max = typeof limits.max === 'number' ? limits.max : Infinity;
+
+    if (action === 'up' && idx > 0) {
+      var t = arr[idx - 1]; arr[idx - 1] = arr[idx]; arr[idx] = t;
+    } else if (action === 'down' && idx < arr.length - 1) {
+      var t2 = arr[idx + 1]; arr[idx + 1] = arr[idx]; arr[idx] = t2;
+    } else if (action === 'delete') {
+      if (Array.isArray(arr) && arr.length <= min) {
+        toast('This section requires at least ' + min + ' item' + (min === 1 ? '' : 's') + '.', true);
+        return;
+      }
+      arr.splice(idx, 1);
+    } else if (action === 'add-string') {
+      if (!Array.isArray(arr)) setPath(state, arrPath, []);
+      var cur1 = getPath(state, arrPath);
+      if (cur1.length >= max) {
+        toast('Maximum of ' + max + ' items reached.', true);
+        return;
+      }
+      cur1.push('');
+    } else if (action === 'add-obj') {
+      var def = JSON.parse(btn.getAttribute('data-default'));
+      if (!Array.isArray(arr)) setPath(state, arrPath, []);
+      var cur2 = getPath(state, arrPath);
+      if (cur2.length >= max) {
+        toast('Maximum of ' + max + ' items reached.', true);
+        return;
+      }
+      cur2.push(deepClone(def));
+    }
+
+    save();
+    renderSection(currentSection);
+  });
+
+  // ==============================================================
+  // ARTICLE PICKER
+  //
+  // Small feed-picker module for the Insights section. Mirrors the
+  // approach in /assets/rbccm/js/components/data/article-visualizer.html:
+  // fetch the 2024–2026 insights XML feeds (same-origin when deployed
+  // to rbccm.com), parse <news> nodes, show a searchable list, and
+  // populate the currently-active Insights item on click.
+  //
+  // When the CMS is opened from file:// or from a different origin
+  // the fetch will fail — we surface a status message pointing to
+  // the deployed URL. On rbccm.com it "just works" because feeds are
+  // same-origin.
+  // ==============================================================
+  var picker = {
+    articles: null,   // cached across opens
+    loading: false,
+    target: null,     // dotted path of the item currently being edited
+    modal: document.getElementById('article-picker'),
+    listEl: document.getElementById('picker-list'),
+    searchEl: document.getElementById('picker-search'),
+    yearEl: document.getElementById('picker-year')
+  };
+
+  function pickerFetchFeeds() {
+    if (picker.articles) return Promise.resolve(picker.articles);
+    if (picker.loading) return picker.loading;
+    var years = [2024, 2025, 2026];
+    picker.loading = Promise.all(years.map(function (y) {
+      // Try same-origin first, then absolute rbccm.com URL as fallback.
+      var sameOrigin = '/en/insights/data/' + y + '-insights';
+      var absolute = 'https://www.rbccm.com/en/insights/data/' + y + '-insights';
+      function tryUrl(url) {
+        return fetch(url).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        });
+      }
+      return tryUrl(sameOrigin)
+        .catch(function () { return tryUrl(absolute); })
+        .then(function (xml) { return { year: y, xml: xml }; })
+        .catch(function () { return { year: y, xml: '' }; });
+    })).then(function (feeds) {
+      var out = [];
+      feeds.forEach(function (f) {
+        pickerParseNews(f.xml, f.year).forEach(function (a) { out.push(a); });
+      });
+      out.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+      picker.articles = out;
+      picker.loading = null;
+      return out;
+    });
+    return picker.loading;
+  }
+
+  function pickerParseNews(xmlStr, feedYear) {
+    if (!xmlStr) return [];
+    var doc;
+    try {
+      // Strip stray & that aren't already part of an entity — RBC feeds
+      // occasionally emit unescaped ampersands in titles.
+      var cleaned = xmlStr.replace(/&(?![a-z]+;|#\d+;|#x[0-9a-f]+;)/gi, '&amp;');
+      doc = new DOMParser().parseFromString(cleaned, 'application/xml');
+    } catch (e) { return []; }
+    if (!doc || doc.getElementsByTagName('parsererror').length > 0) return [];
+    function child(node, name) {
+      var el = node.getElementsByTagName(name)[0];
+      return el ? (el.textContent || '').trim() : '';
+    }
+    return Array.prototype.slice.call(doc.getElementsByTagName('news')).map(function (n) {
+      var dateStr = child(n, 'date');
+      var ts = dateStr ? Date.parse(dateStr) : 0;
+      if (isNaN(ts)) ts = 0;
+      var readtime = child(n, 'readtime') || child(n, 'watchtime') || '';
+      return {
+        title: child(n, 'title'),
+        desc: child(n, 'description'),
+        link: child(n, 'link'),
+        image: child(n, 'thumbnail') || child(n, 'image') || '',
+        date: dateStr,
+        ts: ts,
+        year: feedYear,
+        readtime: readtime
+      };
+    });
+  }
+
+  function pickerRenderList(filter, yearFilter) {
+    if (!picker.articles) return;
+    var q = (filter || '').trim().toLowerCase();
+    var y = yearFilter === 'all' ? null : parseInt(yearFilter, 10);
+    var list = picker.articles.filter(function (a) {
+      if (y && a.year !== y) return false;
+      if (!q) return true;
+      return (a.title + ' ' + a.desc).toLowerCase().indexOf(q) !== -1;
+    });
+    if (!list.length) {
+      picker.listEl.innerHTML = '<div class="picker-status">No matching articles.</div>';
+      return;
+    }
+    picker.listEl.innerHTML = list.map(function (a, i) {
+      var thumbStyle = a.image ? ' style="background-image:url(' + a.image.replace(/"/g, '&quot;') + ')"' : '';
+      var date = a.date ? a.date.slice(0, 10) : '';
+      return '<div class="picker-article" data-picker-action="pick" data-picker-i="' + i + '">'
+        + '<div class="picker-article-thumb"' + thumbStyle + '></div>'
+        + '<div class="picker-article-body">'
+        +   '<div class="picker-article-meta">' + esc((a.year || '') + (date ? ' · ' + date : '') + (a.readtime ? ' · ' + a.readtime + ' min' : '')) + '</div>'
+        +   '<h4 class="picker-article-title">' + esc(a.title) + '</h4>'
+        +   '<p class="picker-article-desc">' + esc(a.desc) + '</p>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    // Cache the filtered list on the container so click handler can
+    // look up the exact article by index without re-filtering.
+    picker.listEl._filtered = list;
+  }
+
+  function pickerOpen(itemPath) {
+    picker.target = itemPath;
+    picker.modal.classList.add('open');
+    picker.searchEl.value = '';
+    picker.yearEl.value = 'all';
+    picker.listEl.innerHTML = '<div class="picker-status">Loading articles from feeds…</div>';
+    pickerFetchFeeds().then(function (articles) {
+      if (!articles.length) {
+        picker.listEl.innerHTML = '<div class="picker-status">No articles loaded. If you are opening the CMS locally (file://), open it via the RBCCM URL instead — the feeds are only reachable from rbccm.com.</div>';
+        return;
+      }
+      pickerRenderList('', 'all');
+    }).catch(function () {
+      picker.listEl.innerHTML = '<div class="picker-status">Feed fetch failed. Open the CMS from rbccm.com so the article feeds are reachable.</div>';
+    });
+  }
+
+  function pickerClose() {
+    picker.modal.classList.remove('open');
+    picker.target = null;
+  }
+
+  function pickerPick(article) {
+    if (!picker.target || !article) { pickerClose(); return; }
+    var item = getPath(state, picker.target);
+    if (!item) { pickerClose(); return; }
+    // Populate every card-visible field the feed gives us:
+    //   title, body, CTA (label + href), image, image alt.
+    // Eyebrow stays as "Insights" (the card's default eyebrow) so
+    // it doesn't clobber the branded pill above the title.
+    item.title = article.title || '';
+    item.body = article.desc || '';
+    item.cta = item.cta || {};
+    item.cta.href = article.link || '';
+    item.cta.label = article.readtime ? (article.readtime + ' min read') : (item.cta.label || 'Read more');
+    if (article.image) item.image = article.image;
+    // Screen-reader alt text — default to the article title, which
+    // reads better than "Featured insight illustration" for real
+    // stories. Marketing can override in the CMS if needed.
+    item.imageAlt = article.title || item.imageAlt || '';
+    save();
+    renderSection(currentSection);
+    pickerClose();
+    toast('Article loaded into ' + picker.target);
+  }
+
+  // Delegated click handlers for picker open/close/pick.
+  document.addEventListener('click', function (e) {
+    var openBtn = e.target.closest('[data-picker-action="open"]');
+    if (openBtn) { e.preventDefault(); pickerOpen(openBtn.getAttribute('data-picker-target')); return; }
+    var closeBtn = e.target.closest('[data-picker-action="close"]');
+    if (closeBtn) { pickerClose(); return; }
+    var pickRow = e.target.closest('[data-picker-action="pick"]');
+    if (pickRow) {
+      var idx = parseInt(pickRow.getAttribute('data-picker-i'), 10);
+      var list = picker.listEl._filtered || [];
+      pickerPick(list[idx]);
+    }
+  });
+
+  // Click backdrop to close.
+  picker.modal.addEventListener('click', function (e) {
+    if (e.target === picker.modal) pickerClose();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && picker.modal.classList.contains('open')) pickerClose();
+  });
+
+  picker.searchEl.addEventListener('input', function () {
+    pickerRenderList(picker.searchEl.value, picker.yearEl.value);
+  });
+  picker.yearEl.addEventListener('change', function () {
+    pickerRenderList(picker.searchEl.value, picker.yearEl.value);
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', function () {
+    var json = JSON.stringify(state, null, 2);
+    navigator.clipboard.writeText(json).then(
+      function () { toast('Copied to clipboard'); },
+      function () { toast('Copy failed', true); }
+    );
+  });
+
+  // ==============================================================
+  // EXPORT DRAFT (v2 flow — replaces the plain "Download .json")
+  //
+  // Opens a small modal that captures the editor's name + an
+  // optional note, computes a summary of which sections changed vs
+  // SAMPLE, then bundles all of that into a `_meta` block at the
+  // top of the JSON download. Filename encodes the ISO timestamp
+  // and editor name so uploads to Asana are self-documenting.
+  //
+  // The consuming page (maas-mata.html) doesn't need to change:
+  // no data-json path targets `_meta`, so it's silently ignored.
+  // ==============================================================
+
+  // Remember the editor across sessions so Joon types it once.
+  var EDITOR_KEY = 'preview-generator__editor-name';
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function timestampParts() {
+    var d = new Date();
+    var iso = d.toISOString();
+    var stamp = d.getUTCFullYear()
+      + pad2(d.getUTCMonth() + 1)
+      + pad2(d.getUTCDate())
+      + 'T'
+      + pad2(d.getUTCHours())
+      + pad2(d.getUTCMinutes())
+      + 'Z';
+    return { iso: iso, stamp: stamp };
+  }
+
+  // Deep-compare state vs SAMPLE. Returns a flat list of paths
+  // where leaves differ. Arrays report length changes + per-index.
+  function diffAgainstSample(current, sample, path) {
+    path = path || '';
+    var out = [];
+    if (typeof current !== typeof sample || (current === null) !== (sample === null)) {
+      out.push(path || '(root)');
+      return out;
+    }
+    if (current === null || typeof current !== 'object') {
+      if (current !== sample) out.push(path);
+      return out;
+    }
+    if (Array.isArray(current) || Array.isArray(sample)) {
+      if (current.length !== sample.length) {
+        out.push(path + ' (length ' + sample.length + ' -> ' + current.length + ')');
+      }
+      var max = Math.max(current.length, sample.length);
+      for (var i = 0; i < max; i++) {
+        out = out.concat(diffAgainstSample(current[i], sample[i], path + '[' + i + ']'));
+      }
+      return out;
+    }
+    var keys = {};
+    Object.keys(current).forEach(function (k) { keys[k] = true; });
+    Object.keys(sample).forEach(function (k) { keys[k] = true; });
+    Object.keys(keys).forEach(function (k) {
+      out = out.concat(diffAgainstSample(current[k], sample[k], path ? path + '.' + k : k));
+    });
+    return out;
+  }
+
+  function summariseSections(diffs) {
+    var buckets = {};
+    diffs.forEach(function (d) {
+      var section = d.split(/[.\[]/)[0];
+      buckets[section] = (buckets[section] || 0) + 1;
+    });
+    var allSections = Object.keys(SAMPLE);
+    var changed = [];
+    var unchanged = [];
+    allSections.forEach(function (s) {
+      if (buckets[s]) changed.push(s + ' (' + buckets[s] + ' field' + (buckets[s] === 1 ? '' : 's') + ')');
+      else unchanged.push(s);
+    });
+    return { changed: changed, unchanged: unchanged };
+  }
+
+  function renderExportSummary() {
+    var diffs = diffAgainstSample(state, SAMPLE);
+    var summary = summariseSections(diffs);
+    var box = document.getElementById('export-summary');
+    var html = '';
+    if (summary.changed.length) {
+      html += '<div><strong>Changed sections</strong><br>' + summary.changed.map(esc).join('<br>') + '</div>';
+    } else {
+      html += '<div><em>No changes vs sample content yet.</em></div>';
+    }
+    if (summary.unchanged.length) {
+      html += '<div style="margin-top: 10px; color: var(--grey-500);"><strong>Untouched</strong><br>' + summary.unchanged.map(esc).join(', ') + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function openExportModal() {
+    try {
+      var saved = window.localStorage.getItem(EDITOR_KEY);
+      if (saved) document.getElementById('export-editor').value = saved;
+    } catch (e) { /* ignore */ }
+    renderExportSummary();
+    document.getElementById('modal-export').classList.add('open');
+    setTimeout(function () { document.getElementById('export-editor').focus(); }, 0);
+  }
+
+  function closeExportModal() {
+    document.getElementById('modal-export').classList.remove('open');
+  }
+
+  function doExport() {
+    var editor = document.getElementById('export-editor').value.trim();
+    var note = document.getElementById('export-note').value.trim();
+    if (editor) {
+      try { window.localStorage.setItem(EDITOR_KEY, editor); } catch (e) { /* ignore */ }
+    }
+    var diffs = diffAgainstSample(state, SAMPLE);
+    var summary = summariseSections(diffs);
+    var ts = timestampParts();
+
+    var payload = { _meta: {
+      generatedAt: ts.iso,
+      editor: editor || null,
+      note: note || null,
+      sectionsChanged: summary.changed,
+      sectionsUnchanged: summary.unchanged,
+      changedPaths: diffs,
+      previewInstructions:
+        'Upload this file to /assets/rbccm/js/pages/data/maas-mata.json. ' +
+        'Preview it at the live page URL with ?preview=draft appended — that ' +
+        'flag is what triggers the page to fetch the JSON and rebind live copy. ' +
+        'Without the flag, the page renders the XSL/Datum defaults untouched.'
+    }};
+    Object.keys(state).forEach(function (k) { payload[k] = state[k]; });
+
+    var safeEditor = editor
+      ? '_' + editor.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      : '';
+    var filename = 'maas-mata-draft_' + ts.stamp + safeEditor + '.json';
+
+    var json = JSON.stringify(payload, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    closeExportModal();
+    toast('Downloaded ' + filename);
+  }
+
+  document.getElementById('btn-export').addEventListener('click', openExportModal);
+  document.getElementById('modal-export-close').addEventListener('click', closeExportModal);
+  document.getElementById('modal-export-cancel').addEventListener('click', closeExportModal);
+  document.getElementById('modal-export-download').addEventListener('click', doExport);
+
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    if (!confirm('Replace all content with the sample data?')) return;
+    state = deepClone(SAMPLE);
+    save();
+    renderSection(currentSection);
+    toast('Sample content loaded');
+  });
+
+  document.getElementById('btn-load-json').addEventListener('click', function () {
+    document.getElementById('load-json-input').value = '';
+    document.getElementById('modal-load').classList.add('open');
+  });
+  document.getElementById('modal-load-close').addEventListener('click', function () { document.getElementById('modal-load').classList.remove('open'); });
+  document.getElementById('modal-load-cancel').addEventListener('click', function () { document.getElementById('modal-load').classList.remove('open'); });
+  document.getElementById('modal-load-apply').addEventListener('click', function () {
+    var raw = document.getElementById('load-json-input').value.trim();
+    if (!raw) { toast('Paste JSON first', true); return; }
+    try {
+      state = JSON.parse(raw);
+      save();
+      renderSection(currentSection);
+      document.getElementById('modal-load').classList.remove('open');
+      toast('JSON loaded');
+    } catch (e) {
+      toast('Invalid JSON: ' + e.message, true);
+    }
+  });
+
+  document.getElementById('btn-show-schema').addEventListener('click', function () {
+    var out = {};
+    Object.keys(SCHEMA).forEach(function (sid) {
+      out[sid] = describeSection(SCHEMA[sid]);
+    });
+    document.getElementById('schema-preview').innerHTML = syntaxHighlight(JSON.stringify(out, null, 2));
+    document.getElementById('modal-schema').classList.add('open');
+  });
+  document.getElementById('modal-schema-close').addEventListener('click', function () {
+    document.getElementById('modal-schema').classList.remove('open');
+  });
+
+  function describeSection(def) {
+    var out = {};
+    Object.keys(def.fields).forEach(function (k) { out[k] = describeField(def.fields[k]); });
+    return out;
+  }
+  function describeField(f) {
+    if (f.type === 'text' || f.type === 'textarea' || f.type === 'url') return 'string';
+    if (f.type === 'checkbox') return 'boolean';
+    if (f.type === 'select') return 'string (' + f.options.map(function (o) { return o.value; }).join(' | ') + ')';
+    if (f.type === 'cta') return { label: 'string', href: 'string' };
+    if (f.type === 'ctaWithRead') return { label: 'string', href: 'string', readTime: 'string' };
+    if (f.type === 'stringArray') return ['string', '...'];
+    if (f.type === 'object') return describeSection(f);
+    if (f.type === 'array') return [describeSection({ fields: f.itemFields }), '...'];
+    return f.type;
+  }
+
+  document.querySelectorAll('.modal-backdrop').forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) m.classList.remove('open'); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop.open').forEach(function (m) { m.classList.remove('open'); });
+    }
+  });
+
+  // ==============================================================
+  // INIT
+  // ==============================================================
+  load();
+  renderNav();
+  renderSection('hero');
+  renderJson();
+})();
+</script>
+
+</body>
+</html>

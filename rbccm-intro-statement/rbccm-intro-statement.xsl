@@ -18,6 +18,35 @@
 
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="datum">
     <xsl:param name="id"/>
     <xsl:value-of select="normalize-space(//Datum[@ID=$id]/text()[last()])"/>
@@ -44,7 +73,7 @@
     <xsl:variable name="raw"><xsl:call-template name="datum"><xsl:with-param name="id" select="$id"/></xsl:call-template></xsl:variable>
     <xsl:variable name="text"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$raw"/></xsl:call-template></xsl:variable>
     <xsl:if test="normalize-space(translate($text, '&#160;&amp;nbsp;', '')) != ''">
-      <p><xsl:value-of select="$raw" disable-output-escaping="yes"/></p>
+      <p><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$raw"/></xsl:call-template></p>
     </xsl:if>
   </xsl:template>
 
@@ -105,7 +134,7 @@
             <xsl:attribute name="class">rbccm-intro-statement__heading</xsl:attribute>
             <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
             <xsl:if test="$LEAD != ''">
-              <span class="rbccm-intro-statement__heading-lead"><xsl:value-of select="$LEAD" disable-output-escaping="yes"/></span>
+              <span class="rbccm-intro-statement__heading-lead"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$LEAD"/></xsl:call-template></span>
             </xsl:if>
             <xsl:if test="$HIGHLIGHT != '' or $ACCENT != ''">
               <span class="rbccm-intro-statement__heading-highlight">

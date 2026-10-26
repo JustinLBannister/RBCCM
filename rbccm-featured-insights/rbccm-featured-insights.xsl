@@ -162,6 +162,35 @@
        The limits are also stamped on each tile (data-title-max /
        data-desc-max) so rbccm-featured-insights.js cuts feed content
        the same way. -->
+  <!-- Rich text output. Text pasted into the editor straight from Figma
+       carries two hidden spans (data-metadata="(figmeta)..." and
+       data-buffer="(figma)...") holding the Figma file key and a base64
+       copy of the design, often tens of KB per field. They are invisible
+       but bloat the page and expose internal file details, so they are
+       removed here; all other HTML is output as entered. -->
+  <xsl:template name="rbccmRich">
+    <xsl:param name="s"/>
+    <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
+    <xsl:value-of select="$clean" disable-output-escaping="yes"/>
+  </xsl:template>
+
+  <xsl:template name="rbccmStripFigma">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;span data-metadata=') and contains(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-metadata='), substring-after(substring-after($s, '&lt;span data-metadata='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&lt;span data-buffer=') and contains(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;')">
+        <xsl:call-template name="rbccmStripFigma">
+          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;span data-buffer='), substring-after(substring-after($s, '&lt;span data-buffer='), '&lt;/span&gt;'))"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="limitValue">
     <xsl:param name="raw"/>
     <xsl:param name="default"/>
@@ -436,7 +465,7 @@
                  no tag is cut in half. -->
             <xsl:choose>
               <xsl:when test="number($descMax) &lt;= 0 or string-length(normalize-space($descPlain)) &lt;= number($descMax)">
-                <xsl:value-of select="$effDesc" disable-output-escaping="yes"/>
+                <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$effDesc"/></xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="truncate">
@@ -537,7 +566,7 @@
             </xsl:otherwise>
           </xsl:choose>
           <xsl:if test="normalize-space($SECTION_SUBHEAD) != ''">
-            <p class="rbccm-featured-insights__subtitle" data-animate="fadeInUp" data-animate-delay="250"><xsl:value-of select="$SECTION_SUBHEAD" disable-output-escaping="yes"/></p>
+            <p class="rbccm-featured-insights__subtitle" data-animate="fadeInUp" data-animate-delay="250"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SECTION_SUBHEAD"/></xsl:call-template></p>
           </xsl:if>
         </div>
 

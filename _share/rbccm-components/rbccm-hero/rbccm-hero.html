@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBCCM Hero -- local preview</title>
+<!-- rbccm-button.css not needed: rbccm-hero.css styles the MAAS+MATA buttons itself. -->
+<link rel="stylesheet" href="rbccm-hero.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<script src="../rbccm-animate/rbccm-animate.js"></script>
+<style>
+  body { margin: 0; background: #f5f7fa; font-family: Roboto, Arial, sans-serif; }
+  .demo-note {
+    background: #002144; color: #fff;
+    padding: 12px 24px; font-size: 13px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  /* Fake fixed nav for local testing. Mirrors the production RBCCM
+     nav dimensions so each hero variant's top-padding clearance can
+     be visually verified at both breakpoints:
+       Mobile   65px tall
+       Desktop  98px tall  (min-width: 992px)
+     Anchored top:0 with position:fixed so it overlays every hero
+     variant as you scroll. High z-index keeps it above bg-videos,
+     glow halos, etc. */
+  .demo-fake-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 65px;
+    background: #fff;
+    border-bottom: 1px solid #D9DBDE;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4A4E55;
+    z-index: 9999;
+    box-sizing: border-box;
+  }
+  .demo-fake-nav::after {
+    content: "FAKE NAV (test) \2014  65 mobile / 98 desktop";
+    opacity: 0.65;
+  }
+  @media (min-width: 992px) {
+    .demo-fake-nav { height: 98px; }
+  }
+
+  /* Keep the fake nav just under the shared variant picker bar. */
+  .demo-fake-nav { top: var(--variant-picker-h, 0px); }
+</style>
+</head>
+<body data-picker-title="rbccm-hero">
+
+<div class="demo-fake-nav" aria-hidden="true"></div>
+
+<!-- =============================================================
+     Variant A -- MAAS + MATA (centred, glow halo, 2-line title)
+     ============================================================= -->
+<div class="demo-note" data-variant="MAAS + MATA">Variant A -- .rbccm-hero--maas-mata (centred, glow halo)</div>
+
+<section class="rbccm-hero rbccm-hero--maas-mata" aria-label="MAAS+MATA hero">
+  <div class="rbccm-hero__container">
+    <!-- H1 sits on the eyebrow for SEO (matches production maas-mata
+         markup -- the eyebrow is the descriptive H1, the visual "title"
+         below is a <p>). Uppercase Roboto styling comes from the
+         __eyebrow class rule regardless of tag. -->
+    <h1 class="rbccm-hero__eyebrow" data-hero-rise="rise" data-animate-delay="0">Multi-Asset Agency Solutions</h1>
+    <p class="rbccm-hero__title" data-hero-rise="rise" data-animate-delay="150">
+      <span class="rbccm-hero__title-line">Trade with clarity.</span>
+      <span class="rbccm-hero__title-line">Execute with control.</span>
+    </p>
+    <p class="rbccm-hero__subtitle" data-hero-rise="rise" data-animate-delay="300">
+      RBC Capital Markets' <strong>multi-asset trading platform</strong> is the
+      only solution that keeps intelligence connected from decision to action.
+    </p>
+    <div class="rbccm-hero__actions" data-hero-rise="rise" data-animate-delay="450">
+      <a class="rbccm-button rbccm-button--primary" href="#">
+        <span class="rbccm-button__label">Request a demo</span>
+        <svg class="rbccm-button__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.293 5.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L17.586 13H4a1 1 0 110-2h13.586l-4.293-4.293a1 1 0 010-1.414z"/>
+        </svg>
+      </a>
+      <a class="rbccm-button rbccm-button--secondary" href="#">
+        <span class="rbccm-button__label">Watch the video</span>
+        <svg class="rbccm-button__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================================
+     Variant B -- Strategy & Economics (split 2-col, insight aside)
+     ============================================================= -->
+<div class="demo-note" data-variant="Strategy &amp; Economics">Variant B -- .rbccm-hero--strategy-and-economics (split-column, insight card aside)</div>
+
+<section class="rbccm-hero rbccm-hero--strategy-and-economics" aria-label="Strategy & Economics hero">
+
+  <!-- Optional background video slot. Production swaps in a Brightcove
+       Player iframe with autoplay+muted+loop+playsinline+controls=off:
+       <iframe src="https://players.brightcove.net/{account}/{player}_default/index.html?videoId={id}&autoplay=true&muted=true&loop=true&playsinline=true&controls=false" allow="autoplay"></iframe>
+       For the local preview we drop in a stable public MP4 (W3Schools'
+       Big Buck Bunny mirror -- Google's original bucket started
+       returning AccessDenied) so the layer visibly works without
+       needing Brightcove credentials. Author omits this whole block
+       if they want the solid #E7EEF1 bg to show through. -->
+  <div class="rbccm-hero__bg-video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <!-- Local RBC-branded hero loop (drop hero-bg-light.mp4 into this
+           folder). Falls back to a public sample if the local file is
+           missing so the layer still visibly works for anyone cloning
+           the repo fresh. -->
+      <source src="hero-bg-light.mp4" type="video/mp4">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Blur ellipse (Figma "Ellipse 56"). Only visible at >=992 via
+       CSS; sits behind the text column so text stays readable when
+       a video backdrop plays underneath. Decorative -- aria-hidden. -->
+  <div class="rbccm-hero__blur" aria-hidden="true"></div>
+
+  <!-- Breadcrumbs, as the skin renders the HeroBreadcrumbs field -->
+  <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb"><ul class="rbccm-hero__breadcrumb-list"><li><a href="/en/">Home</a></li><li><a href="/en/insights">Insights</a></li></ul></nav>
+
+  <div class="rbccm-hero__container">
+    <div class="rbccm-hero__grid">
+
+      <!-- Top block: H1 + body copy, 24px gap -->
+      <div class="rbccm-hero__lede">
+        <h1 class="rbccm-hero__title" data-hero-rise="rise">Macro economics &amp; market strategy insights</h1>
+        <p class="rbccm-hero__body" data-hero-rise="rise" data-animate-delay="150">Turning macro complexity into market clarity across economics, geopolitics, and global markets -- to drive better business and investment decisions.</p>
+      </div>
+
+      <!-- Dark navy Latest Insight card -->
+      <article class="rbccm-hero__insight-card" data-hero-rise="rise" data-animate-delay="325">
+        <div class="rbccm-hero__insight-eyebrow-row">
+          <div class="rbccm-hero__insight-eyebrow-inner">
+            <p class="rbccm-hero__insight-eyebrow">Latest Insight</p>
+          </div>
+        </div>
+        <h2 class="rbccm-hero__insight-title">The Tariff Fog: How Supply-Side Shocks Are Reshaping Canada's Export Calculus</h2>
+        <p class="rbccm-hero__insight-body">With U.S. tariffs covering 38% of Canadian exports, RBC economists model three divergent recovery paths through 2026.</p>
+        <footer class="rbccm-hero__insight-footer">
+          <span class="rbccm-hero__insight-date">July 14, 2025</span>
+          <a class="rbccm-hero__insight-link" href="#">
+            Read more
+            <svg class="rbccm-hero__insight-link-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2.70801 6.5H10.2913" stroke="#FFC72C" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 2.70825L10.2917 6.49992L6.5 10.2916" stroke="#FFC72C" stroke-width="1.08333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </footer>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<div class="demo-note" data-variant="US Credentials">Variant C -- .rbccm-hero--us-credentials (centred, dark navy, bg video, no CTA)</div>
+
+<section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero">
+  <div class="rbccm-hero__bg-video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="hero-background-animation-4k-loop.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="rbccm-hero__container">
+    <p class="rbccm-hero__title" data-hero-rise="rise" data-animate-delay="150">
+      <span class="rbccm-hero__title-line">Your capital needs strategy.</span>
+      <span class="rbccm-hero__title-line">Our insights deliver results.</span>
+    </p>
+    <p class="rbccm-hero__subtitle" data-hero-rise="rise" data-animate-delay="300">
+      Advisory expertise, market-leading insights, and exceptional execution from one of the world's largest and safest banks.
+    </p>
+  </div>
+</section>
+
+
+<div class="demo-note" data-variant="US Credentials - background images">Variant D -- .rbccm-hero--us-credentials with background images (rendered from the skin). Add ?hero=global-markets to the URL for the Global Markets set; art from upload-images/ (the WebPs to upload)</div>
+
+<section class="rbccm-hero rbccm-hero--us-credentials" aria-label="US Credentials hero" data-hero-bg="gib" data-hero-bg-gm-param="hero=global-markets" style="--rbccm-hero-bg-gib-desktop: url('upload-images/us-credentials-gib-hero-desktop.webp'); --rbccm-hero-bg-gib-mobile: url('upload-images/us-credentials-gib-hero-mobile.webp'); --rbccm-hero-bg-gm-desktop: url('upload-images/us-credentials-gm-hero-desktop.webp'); --rbccm-hero-bg-gm-mobile: url('upload-images/us-credentials-gm-hero-mobile.webp');"><div class="rbccm-hero__bg-image" aria-hidden="true"></div><script>
+(function () {
+  var s = document.currentScript;
+  var section = s ? s.parentNode : null;
+  if (!section) return;
+  /* Content tab field, e.g. "hero=global-markets". */
+  var want = (section.getAttribute('data-hero-bg-gm-param') || 'hero=global-markets').toLowerCase().split('=');
+  var pairs = window.location.search.replace(/^\?/, '').split('&');
+  for (var i = 0; i < pairs.length; i++) {
+    var kv = pairs[i].split('=');
+    var key = '';
+    var value = '';
+    try {
+      key = decodeURIComponent(kv[0]).toLowerCase();
+      value = decodeURIComponent((kv[1] || '').replace(/\+/g, ' ')).toLowerCase();
+    } catch (e) {}
+    if (key === want[0]) {
+      if (value === (want[1] || '')) section.setAttribute('data-hero-bg', 'gm');
+      break;
+    }
+  }
+})();
+        </script><div class="rbccm-hero__container"><nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb"><ul class="rbccm-hero__breadcrumb-list"><li><a href="/en/">Home</a></li><li><a href="/en/about-us">About Us</a></li></ul></nav><h1 class="rbccm-hero__title" data-hero-rise="rise" data-animate-delay="150"><span class="rbccm-hero__title-line">Your capital needs strategy.</span><span class="rbccm-hero__title-line">Our insights deliver results.</span></h1><p class="rbccm-hero__subtitle" data-hero-rise="rise" data-animate-delay="300">Advisory expertise, market-leading insights, and exceptional execution from one of the world's safest banks.</p></div></section>
+
+<script src="../local-test-fixtures/variant-picker.js"></script>
+
+</body>
+</html>

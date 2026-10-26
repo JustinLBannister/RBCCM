@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rbccm-marketo-footer -- local preview</title>
+<link rel="stylesheet" href="rbccm-marketo-footer.css">
+<style>
+  body { margin: 0; background: #fff; font-family: Roboto, Arial, sans-serif; }
+  .demo-note { background: #002144; color: #fff; padding: 12px 24px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+</style>
+</head>
+<body data-picker-title="rbccm-marketo-footer">
+
+<!-- Same markup the XSL emits with the default Properties. The form
+     loads live from Marketo (needs network; Marketo may refuse to
+     render on file:// or unlisted domains). -->
+<div class="demo-note" data-variant="Live Marketo form">Live form -- mktoForm_1574 from discover.rbccm.com</div>
+<section class="rbccm-marketo-footer" id="stay-informed" aria-label="Stay informed">
+  <div class="rbccm-marketo-footer__inner">
+    <div class="rbccm-marketo-footer__header">
+      <h2 class="rbccm-marketo-footer__heading">Stay informed</h2>
+      <p class="rbccm-marketo-footer__subheading">Get the latest updates and insights from RBC Capital Markets delivered to your inbox.</p>
+    </div>
+    <div class="rbccm-marketo-footer__form">
+      <script src="//discover.rbccm.com/js/forms2/js/forms2.min.js"></script>
+      <form id="mktoForm_1574"></form>
+      <script>MktoForms2.loadForm("//discover.rbccm.com", "577-RQV-784", 1574);</script>
+    </div>
+  </div>
+</section>
+
+<div class="demo-note" data-variant="Header only">Header only -- no form ID</div>
+<section class="rbccm-marketo-footer" aria-label="Stay informed">
+  <div class="rbccm-marketo-footer__inner">
+    <div class="rbccm-marketo-footer__header">
+      <h2 class="rbccm-marketo-footer__heading">Stay informed</h2>
+      <p class="rbccm-marketo-footer__subheading">Get the latest updates and insights from RBC Capital Markets delivered to your inbox.</p>
+    </div>
+  </div>
+</section>
+
+<script src="../local-test-fixtures/variant-picker.js"></script>
+</body>
+</html>

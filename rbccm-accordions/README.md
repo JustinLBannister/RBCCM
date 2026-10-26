@@ -64,6 +64,19 @@ Bump the slot count by copying an Item block in Properties.xml and adding one mo
 - Click `.__expand-all` (`data-accordions-expand-all`) -> expands every item in that instance. When all items are already open, clicking collapses them. Button label swaps between the `data-label-expand` and `data-label-collapse` strings (defaults "Expand all" / "Collapse all"; overridable via the Datums of the same names).
 - Keyboard: both toggles are native `<button>`s so Enter/Space work by default. `:focus-visible` outline lands on the yellow icon so the focus ring stays legible on the dark bg.
 - ARIA: each `.__item-expanded` is a `role="region"` referenced by the toggle's `aria-controls`.
+- Expand all / Collapse all always renders; blank label Datums fall back to the defaults. It only opens notes that have something to expand.
+- Blank fields are left out, including editor placeholders like `<p><br data-mce-bogus="1"></p>`. A note shows when it has a category or a title; a note with no body and no read-more link has no toggle.
+
+## Video and podcast embeds
+
+Paste an embed code (Brightcove, YouTube, Vimeo, Spotify, Apple Podcasts...) or a `<video>` / `<audio>` tag into a note's body field, on its own or between paragraphs.
+
+- **Sizing:** embeds fill the card width. Brightcove / YouTube / Vimeo iframes and `<video>` keep 16:9; podcast players keep the height from their embed code. Embeds already in a responsive wrapper (iframe with `position: absolute`) are left alone.
+- **Loading:** iframe players only load while their note is open (src is held in `data-rbccm-src`), so closed notes don't load players on page load.
+- **Stopping:** collapsing a note (or Collapse all) unloads its iframes and pauses `<video>`, `<audio>` and Brightcove in-page players.
+- **Accessibility:** an iframe without a `title` gets "Media: {note title}".
+- A body that is only an embed (no text) still counts as content.
+- Check once in TeamSite preview that the editor keeps the `<iframe>` tag when saving.
 
 ## Status
 

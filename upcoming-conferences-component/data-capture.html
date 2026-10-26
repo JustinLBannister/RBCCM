@@ -5,19 +5,20 @@
 if DTD validation is needed. -->
  
 <data-capture-requirements
-dtd-system-identifier=http://localhost/iw-cc/sample/press-release.dtd.txt
+dtd-system-identifier="http://localhost/iw-cc/sample/press-release.dtd.txt"
 dcr-validation="none" name="">
 <ruleset name="dct">
  
 <description>
 This form is used to define a list of events
 </description>
-
+ 
 <!-- ================================================================
      Edit-time denormalization (mirrors the article/story DCR pattern).
      When an author picks a Speaker (author record) or an Insight (story
      record) inside an event, these handlers AJAX-load the picked record
-     and copy its fields into the event's read-only auto fields. The
+     and copy its fields into the event's auto fields (editable, so a
+     value can be corrected by hand; re-picking overwrites it). The
      Featured Conferences component then reads those fields directly at
      render - no XSLT document() (which the component-skin sandbox blocks).
      Includes are copied from the working story DCR. Net new: June 5, 2026.
@@ -31,7 +32,7 @@ This form is used to define a list of events
   // story DCR's populateAuthorNew). Picked values look like
   // /templatedata/rbccm/authors/data/<id> or /templatedata/article/story/data/...
   var IW_SHARED = "/iw-mount/default/main/internet/rbccm/WORKAREA/shared";
-
+ 
   // Speaker pick -> copy author fields into the sibling auto fields.
   function populateSpeaker(item) {
     var base = item.getName().replace(/author$/, "");
@@ -44,11 +45,26 @@ This form is used to define a list of events
       IWDatacapture.getItem(base + "speaker_image").setValue(x.find("photo").first().text());
     }});
   }
+ 
+  // Insight link, built from the picked story's own DCR path:
+  //   /templatedata/article/story/data/2026/05/slug
+  //   -> https://www.rbccm.com/en/insights/2026/05/slug
+  // The story's can_url can't be trusted for this: the story DCR only fills
+  // it when it's empty, so a story made by copying another one keeps the
+  // original's URL (that's how "Datacenter equipment demand..." got the
+  // "why this global crisis" link). can_url is only used if the path isn't
+  // a story path.
+  var INSIGHTS_BASE = "https://www.rbccm.com/en/insights/";
+  function insightHref(path, canUrl) {
+    var m = /templatedata\/article\/story\/data\/(.+?)(\.xml)?$/.exec(path || "");
+    return m ? INSIGHTS_BASE + m[1] : canUrl;
+  }
 
   // Insight pick -> copy story fields into the sibling auto fields.
   function populateInsight(item) {
     var base = item.getName().replace(/story$/, "");
-    var url = IW_SHARED + item.getValue();
+    var path = item.getValue();
+    var url = IW_SHARED + path;
     jQuery.ajax({ type: "GET", url: url, dataType: "xml", success: function (xml) {
       var x = jQuery(xml);
       IWDatacapture.getItem(base + "insight_title").setValue(x.find("title").first().text());
@@ -58,7 +74,7 @@ This form is used to define a list of events
       IWDatacapture.getItem(base + "insight_readtime").setValue(x.find("time_to_read").first().text());
       IWDatacapture.getItem(base + "insight_watchtime").setValue(x.find("time_to_watch").first().text());
       IWDatacapture.getItem(base + "insight_subcategory").setValue(x.find("subcategory").first().text());
-      IWDatacapture.getItem(base + "insight_href").setValue(x.find("can_url").first().text());
+      IWDatacapture.getItem(base + "insight_href").setValue(insightHref(path, x.find("can_url").first().text()));
     }});
   }
 
@@ -79,8 +95,7 @@ This form is used to define a list of events
   });
 ]]>
 </script>
-
-
+ 
 <root-container name="events" location="events">
  
 <item name="title" pathid="title">
@@ -117,18 +132,19 @@ This form is used to define a list of events
 <label>Open URL in New Window?</label>
     <radio required="t">
       <option label="Yes" value="y"/>
-      <option label="No" value="n" selected="t" />
+      <option label="No" value="n" selected="t" /> 
     </radio>
 </item>
-
+ 
 <item name="location" pathid="location">
 <label>Event Location</label>
 <description>e.g. Toronto, ON</description>
 <text required="t" size="50" maxlength="256" />
 </item>
  
-  <item name="sitelocation" pathid="sitelocation">
-    <label>Location to Feature</label>
+ 
+<item name="sitelocation" pathid="sitelocation">
+    <label>Location to Feature</label> 
     <description>&lt;strong style='color: #f00;'&gt;*ONLY check approved locations*&lt;/strong&gt;</description>
     <checkbox required="f">
       <option label="RBCCM Homepage" value="rbccm-homepage" />
@@ -139,89 +155,89 @@ This form is used to define a list of events
       <option label="Sustainable Finance" value="sustainable-finance" />
       <option label="Realtime Geopolitics" value="realtime-geopolitics" />
       <option label="Trade and Tariffs" value="trade-and-tariffs" />
-      <option label="*(Conference and Events Team ONLY - Conference Page)*" value="conference" />
+      <option label="*(Conference and Events Team ONLY - Conference Page)*" value="conference" />     
     </checkbox>
-  </item>
-
+</item>
+ 
 <!-- ================================================================
      NET NEW FIELDS
      All items below were added to the original event schema after launch.
      Each description ends with a "Net new: <date>" stamp so authors can
      see at a glance when each field was introduced.
      ================================================================ -->
-
+ 
 <item name="event_image" pathid="event_image">
 <label>Event Image (optional)</label>
 <description>Pick the poster image shown on the Upcoming Conferences card. 16:9 recommended. Net new: June 1, 2026.</description>
 <browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
 </item>
-
-<item name="event_title_override" pathid="event_title_override">
-<label>Title Override (optional)</label>
-<description>Optional alternate display title. Leave blank to use Event Name. Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="event_format" pathid="event_format">
-<label>Format</label>
-<description>e.g. "In-person", "Virtual", "Hybrid", "In-person and virtual". Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<item name="event_region" pathid="event_region">
-<label>Region</label>
-<description>Broader geographic region for filtering. Suggested values: US, Canada, Europe, UK, Asia, LATAM. Different from the city/state in Location above. Net new: June 5, 2026.</description>
-<text required="f" size="50" maxlength="256" />
-</item>
-
-<!-- Featured Conferences - Overview tab fields (only used when this event
-     is one of the 3 featured conferences). Net new: June 5, 2026. -->
-
-<item name="event_overview_image" pathid="event_overview_image">
-<label>Overview Tab Image (optional)</label>
-<description>Pick the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
-<browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
-</item>
-
-<item name="event_brightcove_id" pathid="event_brightcove_id">
-<label>Brightcove Video ID (optional)</label>
-<description>If set, plays a Brightcove reel in the Overview tab. Fallback chain when blank: Overview Tab Image -&gt; Event Image -&gt; section placeholder. Net new: June 5, 2026.</description>
-<text required="f" size="40" maxlength="64" />
-</item>
-
-<item name="event_overview_body" pathid="event_overview_body">
-<label>Overview Body</label>
-<description>Main overview paragraph shown in the Featured Conferences Overview tab. WYSIWYG (TinyMCE) - supports rich text formatting. Net new: June 5, 2026.</description>
-<textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce"/>
-</item>
-
-<item name="event_key_themes" pathid="event_key_themes">
-<label>Key Themes (pipe-separated)</label>
-<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026. Up to 512 characters.</description>
-<text required="f" size="80" maxlength="512" />
-</item>
-
-<item name="event_overview_contact" pathid="event_overview_contact">
-<label>Overview Contact (override)</label>
-<description>Italic note at bottom of Overview tab. Default: "Please contact your RBC representative to attend or get more information." Leave blank to use the default. Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
-</item>
-
-<item name="event_speakers_footnote" pathid="event_speakers_footnote">
-<label>Speakers Footnote (override)</label>
-<description>Note below the speakers list. Default when speakers exist: "+ Additional speakers to be announced". Leave blank to use the default. (When no speakers are filled, the Speakers tab shows "Speakers coming soon".) Net new: June 5, 2026.</description>
-<text required="f" size="80" maxlength="256" />
-</item>
-
+ 
 <item name="event_featured" pathid="event_featured">
 <label>Feature in Featured Conferences?</label>
-<description>Yes = this event appears as one of the 3 Featured Conferences tabs. The soonest 3 flagged events (by start date) are used. Not required - existing events without a value are simply not featured. Net new: June 5, 2026.</description>
+<description>Yes = this event appears as one of the 3 Featured Conferences tabs. The soonest 3 flagged events (by start date) are used; flag exactly 3 to control it precisely. Net new: June 5, 2026.</description>
 <radio required="f">
   <option label="Yes" value="y"/>
   <option label="No" value="n" selected="t" />
 </radio>
 </item>
-
+ 
+<item name="event_title_override" pathid="event_title_override">
+<label>Title Override (optional)</label>
+<description>Optional alternate display title. Leave blank to use Event Name. Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+ 
+<item name="event_format" pathid="event_format">
+<label>Format</label>
+<description>e.g. "In-person", "Virtual", "Hybrid", "In-person and virtual". Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+ 
+<item name="event_region" pathid="event_region">
+<label>Region</label>
+<description>Broader geographic region for filtering. Suggested values: US, Canada, Europe, UK, Asia, LATAM. Different from the city/state in Location above. Net new: June 5, 2026.</description>
+<text required="f" size="50" maxlength="256" />
+</item>
+ 
+<!-- Featured Conferences - Overview tab fields (only used when this event
+     is one of the 3 featured conferences). Net new: June 5, 2026. -->
+ 
+<item name="event_overview_image" pathid="event_overview_image">
+<label>Overview Tab Image (optional)</label>
+<description>Pick the larger image used in the Featured Conferences Overview tab. Different from the small Event Image (card) above. Net new: June 5, 2026.</description>
+<browser required="f" extns='gif,jpg,png,webp' initial-dir='/assets/' ceiling-dir='/assets/' />
+</item>
+ 
+<item name="event_brightcove_id" pathid="event_brightcove_id">
+<label>Brightcove Video ID (optional)</label>
+<description>If set, plays a Brightcove reel in the Overview tab. Fallback chain when blank: Overview Tab Image -&gt; Event Image -&gt; section placeholder. Net new: June 5, 2026.</description>
+<text required="f" size="40" maxlength="64" />
+</item>
+ 
+<item name="event_overview_body" pathid="event_overview_body">
+<label>Overview Body</label>
+<description>Main overview paragraph shown in the Featured Conferences Overview tab. WYSIWYG (TinyMCE) - supports rich text formatting. Net new: June 5, 2026.</description>
+<textarea required="f" rows="10" cols="75" wrap="virtual" external-editor="tinymce"/>
+</item>
+ 
+<item name="event_key_themes" pathid="event_key_themes">
+<label>Key Themes (pipe-separated)</label>
+<description>Enter themes separated by " | " (pipe). e.g., "Energy | Financial | Infrastructure". Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="712" />
+</item>
+ 
+<item name="event_overview_contact" pathid="event_overview_contact">
+<label>Overview Contact (override)</label>
+<description>Italic note at bottom of Overview tab. Default: "Please contact your RBC representative to attend or get more information." Leave blank to use the default. Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="256" />
+</item>
+ 
+<item name="event_speakers_footnote" pathid="event_speakers_footnote">
+<label>Speakers Footnote (override)</label>
+<description>Note below the speakers list. Default when speakers exist: "+ Additional speakers to be announced". Leave blank to use the default. (When no speakers are filled, the Speakers tab shows "Speakers coming soon".) Select up to 5 speakers below from templatedata/rbccm/authors/data. Net new: June 5, 2026.</description>
+<text required="f" size="80" maxlength="256" />
+</item>
+ 
 <!-- Featured Conferences - Speakers (repeating, up to 5).
      Each speaker is a single pick from the author DCR (templatedata/rbccm/
      authors/data). On pick, the denormalization <script> at the top of this
@@ -232,39 +248,40 @@ This form is used to define a list of events
      component reads the snapshot fields directly at render (no XSLT document(),
      which the component-skin sandbox blocks). 0 speakers filled = Speakers tab
      shows "+ Additional speakers to be announced". Net new: June 5, 2026. -->
-
-<container name="speaker" location="speaker" combination="and" min="0" max="5">
-
+ 
+<container name="speaker" location="speaker" combination="and" max="5">
+ 
 <item name="author" pathid="author">
 <label>Speaker (pick author)</label>
 <description>Pick an author from templatedata/rbccm/authors/data. On pick, the name/title/company/photo fields below auto-fill from the author record. &lt;strong style='color: #f00;'&gt;Denormalized snapshot: a copy is saved here, so if this author's name, title, or photo changes later, re-pick (or re-save) this event to refresh it.&lt;/strong&gt; Net new: June 5, 2026.</description>
 <browser initial-dir="templatedata/rbccm/authors/data" ceiling-dir="templatedata/rbccm" required="f" readonly="f" />
 </item>
-
+ 
 <!-- DENORMALIZED snapshot fields - auto-filled from the picked author by the
      denormalization <script> at the top of this file when the author is
-     selected. Read-only: do not edit by hand; to refresh, re-pick the author.
+     selected. Editable: a hand correction stays until the author is re-picked
+     (re-picking refills every field below).
      The Featured Conferences component reads these directly at render, so no
      XSLT document() is needed (the skin sandbox blocks document()). -->
 <item name="speaker_name" pathid="speaker_name">
 <label>Speaker Name (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="speaker_title" pathid="speaker_title">
 <label>Speaker Title (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="speaker_company" pathid="speaker_company">
 <label>Speaker Company (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="speaker_image" pathid="speaker_image">
 <label>Speaker Image (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
-
+ 
 </container>
-
+ 
 <!-- Featured Conferences - Insights (repeating, up to 3).
      Each insight is a single pick from the article/story DCR (templatedata/
      article/story/data). On pick, the denormalization <script> at the top of
@@ -275,55 +292,56 @@ This form is used to define a list of events
      re-picked / re-saved here. The Featured Conferences component reads the
      snapshot fields directly at render (no XSLT document()). 0 insights filled
      = Insights tab shows "+ Insights coming soon". Net new: June 5, 2026. -->
-
-<container name="insight" location="insight" combination="and" min="0" max="3">
-
+ 
+<container name="insight" location="insight" combination="and" max="3">
+ 
 <item name="story" pathid="story">
 <label>Insight Article</label>
 <description>Pick an article from templatedata/article/story/data. On pick, the fields below auto-fill from the article record. &lt;strong style='color: #f00;'&gt;Denormalized snapshot: a copy is saved here, so if this article's title, image, or summary changes later, re-pick (or re-save) this event to refresh it.&lt;/strong&gt; Net new: June 5, 2026.</description>
 <browser initial-dir="templatedata/article/story/data" ceiling-dir="templatedata/article" required="f" readonly="f" />
 </item>
-
+ 
 <!-- DENORMALIZED snapshot fields - auto-filled from the picked article by the
      denormalization <script> at the top of this file when the article is
-     selected. Read-only: do not edit by hand; to refresh, re-pick the article.
+     selected. Editable: a hand correction stays until the article is re-picked
+     (re-picking refills every field below).
      The Featured Conferences component reads these directly at render, so no
      XSLT document() is needed (the skin sandbox blocks document()). -->
 <item name="insight_title" pathid="insight_title">
 <label>Insight Title (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="insight_description" pathid="insight_description">
 <label>Insight Description (auto)</label>
-<text required="f" size="80" maxlength="512" readonly="t" />
+<text required="f" size="80" maxlength="512" readonly="f" />
 </item>
 <item name="insight_image" pathid="insight_image">
 <label>Insight Image (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="insight_type" pathid="insight_type">
 <label>Insight Type (auto)</label>
-<text required="f" size="20" maxlength="32" readonly="t" />
+<text required="f" size="20" maxlength="32" readonly="f" />
 </item>
 <item name="insight_readtime" pathid="insight_readtime">
 <label>Insight Read Time (auto)</label>
-<text required="f" size="20" maxlength="32" readonly="t" />
+<text required="f" size="20" maxlength="32" readonly="f" />
 </item>
 <item name="insight_watchtime" pathid="insight_watchtime">
 <label>Insight Watch/Listen Time (auto)</label>
-<text required="f" size="20" maxlength="32" readonly="t" />
+<text required="f" size="20" maxlength="32" readonly="f" />
 </item>
 <item name="insight_subcategory" pathid="insight_subcategory">
 <label>Insight Eyebrow / Subcategory (auto)</label>
-<text required="f" size="50" maxlength="256" readonly="t" />
+<text required="f" size="50" maxlength="256" readonly="f" />
 </item>
 <item name="insight_href" pathid="insight_href">
 <label>Insight Link (auto)</label>
-<text required="f" size="80" maxlength="512" readonly="t" />
+<text required="f" size="80" maxlength="512" readonly="f" />
 </item>
-
+ 
 </container>
-
+ 
 </container>
 </root-container>
  
