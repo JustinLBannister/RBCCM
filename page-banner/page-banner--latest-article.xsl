@@ -37,6 +37,32 @@
     <xsl:variable name="SHOW_YELLOWTEAR" select="/Properties/Datum[@ID='ShowYellowTear']/Option[@Selected='true']/Value"/>
     <xsl:variable name="SHOW_CTA" select="/Properties/Datum[@ID='ShowCTA']/Option[@Selected='true']/Value"/>
     <xsl:variable name="CTA_LINK" select="/Properties/Data/Datum[@ID='CTALink']"/>
+
+    <!-- Latest article button styles: same look as the hand-made Read more
+         link that used to sit in Lead Content. -->
+    <style>
+      .page-banner .latest-article-cta { margin: 30px 0 0; }
+      .page-banner .latest-article-btn,
+      .page-banner .latest-article-btn:visited {
+        align-items: center;
+        background: #0051A5;
+        border: 1px solid #FFF;
+        color: #fff !important;
+        display: flex;
+        font-family: 'Roboto Medium', 'Roboto', Arial, Verdana, sans-serif !important;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        justify-content: center;
+        letter-spacing: .9px;
+        line-height: normal;
+        max-width: 185px;
+        padding: 13px 33px;
+        text-align: center;
+        text-decoration: none !important;
+      }
+    </style>
+
     <xsl:choose>
       <xsl:when test="$EPTOSHOW != 0">
 
@@ -232,9 +258,10 @@
 
                   <p><xsl:value-of select='$LEAD_CONTENT' disable-output-escaping="yes"/></p>
 
-                  <!-- Latest article button: href and aria-label set by the
-                       script at the bottom from the geopolitics feed. -->
-                  <p class="latest-article-cta"><a class="latest-article-btn is-pending" href="#" title="Link to Insights article" data-latest-feed="/en/insights/real-time-geopolitics/data/rtg" data-latest-category="Insights">Read more</a></p>
+                  <!-- Latest article button: shown straight away linking to
+                       Insights; the script at the bottom swaps in the newest
+                       geopolitics article's href and aria-label. -->
+                  <p class="latest-article-cta"><a class="latest-article-btn" href="/en/insights" title="Link to Insights article" data-latest-feed="/en/insights/real-time-geopolitics/data/rtg" data-latest-category="Insights">Read more</a></p>
 
 
                   <xsl:if test="$SHOW_CTA = 'Yes'">
@@ -302,33 +329,6 @@
       });
     </script>
 
-    <!-- Latest article button styles: same look as the hand-made Read more
-         link that used to sit in Lead Content. -->
-    <style>
-      .page-banner .latest-article-cta { margin: 30px 0 0; }
-      .page-banner .latest-article-btn,
-      .page-banner .latest-article-btn:visited {
-        align-items: center;
-        background: #0051A5;
-        border: 1px solid #FFF;
-        color: #fff !important;
-        display: flex;
-        font-family: 'Roboto Medium', 'Roboto', Arial, Verdana, sans-serif !important;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 500;
-        justify-content: center;
-        letter-spacing: .9px;
-        line-height: normal;
-        max-width: 185px;
-        padding: 13px 33px;
-        text-align: center;
-        text-decoration: none !important;
-      }
-      .page-banner .latest-article-btn.is-pending { visibility: hidden; }
-      .page-banner .latest-article-cta.is-unavailable { display: none; }
-    </style>
-
     <!-- Latest article button: newest Insights item in the feed. Written
          without less-than, greater-than or ampersand characters so the XSL
          output can't escape them. -->
@@ -340,10 +340,6 @@
         function text(node, tag) {
           var el = node.getElementsByTagName(tag)[0];
           return el ? (el.textContent || '').replace(/^\s+|\s+$/g, '') : '';
-        }
-
-        function hide(btn) {
-          btn.parentNode.className += ' is-unavailable';
         }
 
         [].forEach.call(buttons, function (btn) {
@@ -366,12 +362,11 @@
                 if (Math.max(time, bestTime) === time) { best = items[i]; bestTime = time; }
               }
             }
-            if (!best) { hide(btn); return; }
+            if (!best) { return; }
 
             btn.setAttribute('href', text(best, 'link'));
             btn.setAttribute('aria-label', 'Read more: ' + text(best, 'title'));
-            btn.className = 'latest-article-btn';
-          })['catch'](function () { hide(btn); });
+          })['catch'](function () {});
         });
       })();
     </script>
