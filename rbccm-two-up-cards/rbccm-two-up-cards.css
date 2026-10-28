@@ -18,6 +18,10 @@
                         title, subtitle, body copy, and a text CTA link.
                         Clicking the play button opens a modal video.
 
+     --video-single     Layout add-on for --video-callouts: one video
+                        card, with the section heading + description
+                        beside it in the left column (section 3b).
+
    Shared shell
    =========================================================================
    Both presets share:
@@ -818,6 +822,52 @@ a.rbccm-two-up-cards__card--link:focus-visible {
 .rbccm-two-up-cards__card--link:hover .rbccm-two-up-cards__card-cta svg,
 .rbccm-two-up-cards__card--link:focus-visible .rbccm-two-up-cards__card-cta svg {
   transform: translateX(4px);
+}
+
+
+/* =========================================================================
+   3b. Layout: --video-single   (one video card, header beside it)
+   =========================================================================
+   Used with --video-callouts, which supplies every colour, type and card
+   style above. This block only changes the layout: __split holds the
+   header and the one-card grid. Below 872 they stack (header centred
+   above the card, as in --video-callouts). From 872 they sit in two equal
+   columns: header left, vertically centred and left-aligned; card right,
+   the same 486px width as one card of the two-up row (1020 - 48 gap). */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1020px;
+}
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__grid {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: none;
+}
+@media (min-width: 872px) {
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 48px;
+  }
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__header {
+    align-items: flex-start;
+    max-width: none;
+    text-align: left;
+  }
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__grid {
+    grid-auto-rows: auto;
+  }
+}
+
+/* Section background colour set (SectionBgColor; the skin adds --has-bg):
+   the card's 5% grey tint is made for a white section, so on a coloured
+   one the card gets a solid white background to stand out. */
+.rbccm-two-up-cards--video-callouts.rbccm-two-up-cards--has-bg .rbccm-two-up-cards__card {
+  background: #fff;
 }
 
 /* =========================================================================
