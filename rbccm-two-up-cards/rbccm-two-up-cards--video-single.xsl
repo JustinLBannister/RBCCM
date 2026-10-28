@@ -18,6 +18,29 @@
 
   <xsl:output method="html" indent="no" omit-xml-declaration="yes"/>
 
+  <!-- ============================================================
+       FPO fallback (temporary, Oct 2026). The component won't open in
+       the content editor yet, so when Card 1 has no video URL and no
+       image (blank, or still the properties defaults, which are
+       features-skin copy) the skin shows the hardcoded Institutional
+       Investors content below instead of the entered text. Once the
+       editor works and Card 1 has a video or image, the entered
+       content shows. Remove this block and the USE_FPO branches then.
+       FPO_CACHE replaces the stale CacheVersion default so the new
+       CSS loads; bump it if the CSS is uploaded again.
+       ============================================================ -->
+  <xsl:variable name="USE_FPO" select="normalize-space(//Datum[@ID='Card1VideoUrl']/text()[last()]) = '' and normalize-space(//Datum[@ID='Card1MediaImagePath']/text()[last()]) = ''"/>
+  <xsl:variable name="FPO_CACHE">2026-10-28-1500</xsl:variable>
+  <xsl:variable name="FPO_HEADING">Find conviction through complexity</xsl:variable>
+  <xsl:variable name="FPO_DESCRIPTION">Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.</xsl:variable>
+  <xsl:variable name="FPO_TITLE">Institutional Investors</xsl:variable>
+  <xsl:variable name="FPO_SUBTITLE">The investment equation is getting more complex</xsl:variable>
+  <xsl:variable name="FPO_BODY">Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC&#8217;s senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.</xsl:variable>
+  <xsl:variable name="FPO_IMAGE">https://www.rbccm.com/assets/rbccm/images/about-us/us-credentials/us-credentials-institutional-investors.webp</xsl:variable>
+  <xsl:variable name="FPO_IMAGE_ALT">Institutional Investors</xsl:variable>
+  <xsl:variable name="FPO_VIDEO">//players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6406869575112</xsl:variable>
+  <xsl:variable name="FPO_CTA">Watch the video</xsl:variable>
+
   <!-- Tag allow-list guard. -->
   <!-- Rich text output. Text pasted into the editor straight from Figma
        carries two hidden spans (data-metadata="(figmeta)..." and
@@ -186,8 +209,22 @@
     <xsl:variable name="ctaLabel"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'CtaLabel')]/text()[last()])"/>
     <xsl:variable name="ctaHref"   select="normalize-space(//Datum[@ID=concat('Card', $n, 'CtaHref')]/text()[last()])"/>
 
+    <xsl:choose>
+      <xsl:when test="$USE_FPO">
+        <xsl:call-template name="renderVideoCard">
+          <xsl:with-param name="n" select="$n"/>
+          <xsl:with-param name="mediaPath" select="string($FPO_IMAGE)"/>
+          <xsl:with-param name="mediaAlt" select="string($FPO_IMAGE_ALT)"/>
+          <xsl:with-param name="videoUrl" select="string($FPO_VIDEO)"/>
+          <xsl:with-param name="title" select="string($FPO_TITLE)"/>
+          <xsl:with-param name="subtitle" select="string($FPO_SUBTITLE)"/>
+          <xsl:with-param name="body" select="string($FPO_BODY)"/>
+          <xsl:with-param name="ctaLabel" select="string($FPO_CTA)"/>
+          <xsl:with-param name="ctaHref" select="''"/>
+        </xsl:call-template>
+      </xsl:when>
     <!-- Blank title hides the whole card. -->
-    <xsl:if test="$title != ''">
+    <xsl:when test="$title != ''">
       <xsl:call-template name="renderVideoCard">
         <xsl:with-param name="n" select="$n"/>
         <xsl:with-param name="mediaPath" select="$mediaPath"/>
@@ -199,7 +236,8 @@
         <xsl:with-param name="ctaLabel" select="$ctaLabel"/>
         <xsl:with-param name="ctaHref" select="$ctaHref"/>
       </xsl:call-template>
-    </xsl:if>
+    </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Visible text of a rich-text field: tags stripped. Used to treat
@@ -222,15 +260,48 @@
 
     <xsl:variable name="SECTION_ID"    select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
     <xsl:variable name="SECTION_ARIA"  select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"      select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="CSS_PATH_IN"   select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
+    <xsl:variable name="JS_PATH_IN"    select="normalize-space(//Datum[@ID='JsPath']/text()[last()])"/>
+    <xsl:variable name="CACHE_IN"      select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
     <xsl:variable name="BG_COLOR"      select="normalize-space(//Datum[@ID='SectionBgColor']/text()[last()])"/>
 
-    <xsl:variable name="EYEBROW"       select="normalize-space(//Datum[@ID='SectionEyebrowText']/text()[last()])"/>
-    <xsl:variable name="HEADING"       select="normalize-space(//Datum[@ID='SectionHeadingText']/text()[last()])"/>
+    <!-- Blank paths fall back to the properties defaults. -->
+    <xsl:variable name="CSS_PATH">
+      <xsl:choose>
+        <xsl:when test="$CSS_PATH_IN != ''"><xsl:value-of select="$CSS_PATH_IN"/></xsl:when>
+        <xsl:otherwise>/assets/rbccm/css/components/rbccm-two-up-cards.css</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="JS_PATH">
+      <xsl:choose>
+        <xsl:when test="$JS_PATH_IN != ''"><xsl:value-of select="$JS_PATH_IN"/></xsl:when>
+        <xsl:otherwise>/assets/rbccm/js/components/rbccm-two-up-cards.js</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="CACHE_VERSION">
+      <xsl:choose>
+        <xsl:when test="$USE_FPO or $CACHE_IN = ''"><xsl:value-of select="$FPO_CACHE"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$CACHE_IN"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- FPO mode: no eyebrow, hardcoded heading and description. -->
+    <xsl:variable name="EYEBROW">
+      <xsl:if test="not($USE_FPO)"><xsl:value-of select="normalize-space(//Datum[@ID='SectionEyebrowText']/text()[last()])"/></xsl:if>
+    </xsl:variable>
+    <xsl:variable name="HEADING">
+      <xsl:choose>
+        <xsl:when test="$USE_FPO"><xsl:value-of select="$FPO_HEADING"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID='SectionHeadingText']/text()[last()])"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="HEADING_TAG_RAW" select="normalize-space(//Datum[@ID='SectionHeadingTag']/text()[last()])"/>
-    <xsl:variable name="DESCRIPTION_RAW" select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/>
+    <xsl:variable name="DESCRIPTION_RAW">
+      <xsl:choose>
+        <xsl:when test="$USE_FPO"><xsl:value-of select="$FPO_DESCRIPTION"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID='SectionDescriptionText']/text()[last()])"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="DESCRIPTION_TEXT">
       <xsl:call-template name="stripTags"><xsl:with-param name="s" select="$DESCRIPTION_RAW"/></xsl:call-template>
     </xsl:variable>
