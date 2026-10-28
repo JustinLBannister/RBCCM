@@ -8,7 +8,9 @@
   Card 1's video thumbnail sits in the right column. The card is
   the thumbnail and play icon only; Card 1's title, subtitle,
   body and CTA label are not shown (the title still names the
-  link for screen readers). Stacks (header, then video) below
+  link for screen readers). Below the description, a text link
+  (Card 1's CTA label, default "Watch the video") goes to the
+  same place as the thumbnail. Stacks (header, then video) below
   872px. Card 2 fields are ignored. Section classes: the video-callouts modifier (all its
   styling) plus the video-single modifier (the split layout).
 
@@ -32,7 +34,7 @@
        CSS loads; bump it if the CSS is uploaded again.
        ============================================================ -->
   <xsl:variable name="USE_FPO" select="normalize-space(//Datum[@ID='Card1VideoUrl']/text()[last()]) = '' and normalize-space(//Datum[@ID='Card1MediaImagePath']/text()[last()]) = ''"/>
-  <xsl:variable name="FPO_CACHE">2026-10-28-1800</xsl:variable>
+  <xsl:variable name="FPO_CACHE">2026-10-28-1900</xsl:variable>
   <xsl:variable name="FPO_HEADING">Find conviction through complexity</xsl:variable>
   <xsl:variable name="FPO_DESCRIPTION">&lt;span&gt;Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC&#8217;s senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.&lt;/span&gt;</xsl:variable>
   <xsl:variable name="FPO_TITLE">Institutional Investors</xsl:variable>
@@ -258,6 +260,24 @@
       </xsl:if>
     </xsl:variable>
 
+    <!-- Header text link: same destination as the card (video URL,
+         else CTA href); label from Card 1's CTA label. -->
+    <xsl:variable name="CARD1_VIDEO" select="normalize-space(//Datum[@ID='Card1VideoUrl']/text()[last()])"/>
+    <xsl:variable name="HEADER_LINK">
+      <xsl:choose>
+        <xsl:when test="$USE_FPO"><xsl:value-of select="$FPO_LINK"/></xsl:when>
+        <xsl:when test="$CARD1_VIDEO != ''"><xsl:value-of select="$CARD1_VIDEO"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID='Card1CtaHref']/text()[last()])"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="CTA_IN" select="normalize-space(//Datum[@ID='Card1CtaLabel']/text()[last()])"/>
+    <xsl:variable name="HEADER_LINK_LABEL">
+      <xsl:choose>
+        <xsl:when test="not($USE_FPO) and $CTA_IN != ''"><xsl:value-of select="$CTA_IN"/></xsl:when>
+        <xsl:otherwise>Watch the video</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="HEADING_TAG">
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$HEADING_TAG_RAW"/>
@@ -300,7 +320,7 @@
       <!-- Two columns at 872px+: header left, card right. -->
       <div class="rbccm-two-up-cards__split">
 
-      <xsl:if test="$EYEBROW != '' or $HEADING != '' or $DESCRIPTION != ''">
+      <xsl:if test="$EYEBROW != '' or $HEADING != '' or $DESCRIPTION != '' or $HEADER_LINK != ''">
         <div class="rbccm-two-up-cards__header">
           <xsl:if test="$EYEBROW != ''">
             <p class="rbccm-two-up-cards__eyebrow" data-animate="fadeInUp"><xsl:value-of select="$EYEBROW"/></p>
@@ -317,6 +337,16 @@
             <p class="rbccm-two-up-cards__description" data-animate="fadeInUp" data-animate-delay="240">
               <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$DESCRIPTION"/></xsl:call-template>
             </p>
+          </xsl:if>
+          <!-- Arrow matches the featured-insights "View all insights" link. -->
+          <xsl:if test="$HEADER_LINK != ''">
+            <a class="rbccm-two-up-cards__header-link" data-animate="fadeInUp" data-animate-delay="360">
+              <xsl:attribute name="href"><xsl:value-of select="$HEADER_LINK"/></xsl:attribute>
+              <span><xsl:value-of select="$HEADER_LINK_LABEL"/></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M4 10H16 M16 10L10.5 4.5 M16 10L10.5 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
           </xsl:if>
         </div>
       </xsl:if>

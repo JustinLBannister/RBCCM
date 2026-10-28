@@ -862,6 +862,65 @@ a.rbccm-two-up-cards__card--link:focus-visible {
   width: 24px;
   height: 24px;
 }
+
+/* Header text link ("Watch the video"), same destination as the card.
+   Matches rbccm-featured-insights "View all insights": Roboto 16/500,
+   #0051A5, 20px arrow, underline fades in and the arrow nudges on
+   hover. `a.` prefix + !important beat the site's Bootstrap a:hover. */
+a.rbccm-two-up-cards__header-link,
+a.rbccm-two-up-cards__header-link:link,
+a.rbccm-two-up-cards__header-link:visited,
+a.rbccm-two-up-cards__header-link:hover,
+a.rbccm-two-up-cards__header-link:focus,
+a.rbccm-two-up-cards__header-link:active {
+  color: #0051A5 !important;
+}
+a.rbccm-two-up-cards__header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  width: fit-content;
+  margin-top: 8px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16.5px;
+  letter-spacing: 1px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+a.rbccm-two-up-cards__header-link:hover,
+a.rbccm-two-up-cards__header-link:focus-visible {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+a.rbccm-two-up-cards__header-link:focus {
+  outline: none;
+}
+a.rbccm-two-up-cards__header-link:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 3px;
+}
+.rbccm-two-up-cards__header-link svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+.rbccm-two-up-cards__header-link:hover svg,
+.rbccm-two-up-cards__header-link:focus-visible svg {
+  animation: rbccm-tuc-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-tuc-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
 @media (min-width: 872px) {
   .rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
     display: grid;
@@ -1016,5 +1075,12 @@ a.rbccm-two-up-cards__card--link:focus-visible {
   }
   .rbccm-two-up-cards__card-play svg {
     transform: none !important;
+  }
+  a.rbccm-two-up-cards__header-link {
+    transition: none !important;
+  }
+  .rbccm-two-up-cards__header-link:hover svg,
+  .rbccm-two-up-cards__header-link:focus-visible svg {
+    animation: none !important;
   }
 }
