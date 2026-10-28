@@ -32,11 +32,11 @@
   <xsl:variable name="USE_FPO" select="normalize-space(//Datum[@ID='Card1VideoUrl']/text()[last()]) = '' and normalize-space(//Datum[@ID='Card1MediaImagePath']/text()[last()]) = ''"/>
   <xsl:variable name="FPO_CACHE">2026-10-28-1500</xsl:variable>
   <xsl:variable name="FPO_HEADING">Find conviction through complexity</xsl:variable>
-  <xsl:variable name="FPO_DESCRIPTION">Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.</xsl:variable>
+  <xsl:variable name="FPO_DESCRIPTION">&lt;span&gt;Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.&lt;/span&gt;</xsl:variable>
   <xsl:variable name="FPO_TITLE">Institutional Investors</xsl:variable>
   <xsl:variable name="FPO_SUBTITLE">The investment equation is getting more complex</xsl:variable>
   <xsl:variable name="FPO_BODY">Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC&#8217;s senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.</xsl:variable>
-  <xsl:variable name="FPO_IMAGE">https://www.rbccm.com/assets/rbccm/images/about-us/us-credentials/us-credentials-institutional-investors.webp</xsl:variable>
+  <xsl:variable name="FPO_IMAGE">/assets/rbccm/images/about-us/us-credentials/us-credentials-institutional-investors.webp</xsl:variable>
   <xsl:variable name="FPO_IMAGE_ALT">Institutional Investors</xsl:variable>
   <xsl:variable name="FPO_VIDEO">//players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6406869575112</xsl:variable>
   <xsl:variable name="FPO_CTA">Watch the video</xsl:variable>
