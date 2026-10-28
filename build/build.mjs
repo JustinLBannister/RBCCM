@@ -21,6 +21,8 @@
    Output:
      dist/css/<page>.css  + .min.css
      dist/js/<page>.js    + .min.js
+     dist/<page>.html     preview: the page's components on the bundle
+                          alone (see build/page-preview.mjs)
      dist/build-report.json
 
    Minifying uses esbuild (devDependency). If it isn't installed yet the
@@ -35,6 +37,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { writePagePreview } from './page-preview.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = path.join(ROOT, 'build', 'pages.config.mjs');
@@ -304,6 +307,15 @@ async function buildPage(pageName, page, version) {
     result.files[kind] = entry;
   }
   result.components = parts.map(p => p.name);
+
+  if (!result.errors.length && (result.files.css || result.files.js)) {
+    try {
+      result.preview = writePagePreview({ root: ROOT, dist: DIST, pageName, page, parts, files: result.files });
+      result.warnings.push(...result.preview.warnings);
+    } catch (e) {
+      result.warnings.push(`preview: dist/${pageName}.html not written (${e.message})`);
+    }
+  }
   return result;
 }
 
@@ -335,6 +347,7 @@ async function buildAll(names) {
     const css = r.files.css, js = r.files.js;
     const fmt = f => !f ? c.dim('none') : f.minSize != null ? `${kb(f.minSize)} min (${kb(f.size)} raw)` : kb(f.size);
     console.log(`${c.green('✔')} ${c.bold(r.pageName)}  ${c.dim(r.components.length + ' parts')}  css ${fmt(css)}  js ${fmt(js)}`);
+    if (r.preview) console.log(c.dim(`  preview ${r.preview.file} (${r.preview.sections} sections)`));
     r.warnings.forEach(w => console.warn(c.yellow('  ⚠ ' + w)));
   }
 
