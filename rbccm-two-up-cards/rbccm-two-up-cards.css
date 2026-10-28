@@ -846,6 +846,22 @@ a.rbccm-two-up-cards__card--link:focus-visible {
   grid-template-columns: minmax(0, 1fr);
   max-width: none;
 }
+/* The card is the thumbnail alone (no text below it): 16:9 in place of
+   the fixed 243px strip, rounded on all four corners. */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-media {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 15px;
+}
+/* The skin puts the CTA arrow (16x16 viewBox) in the play circle in
+   place of the 56x56 triangle: white, drawn at 24px. */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-play {
+  color: #fff;
+}
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-play svg {
+  width: 24px;
+  height: 24px;
+}
 @media (min-width: 872px) {
   .rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
     display: grid;

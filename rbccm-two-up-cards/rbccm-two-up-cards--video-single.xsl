@@ -2,12 +2,14 @@
 <!--
   RBCCM Two-Up Cards :: video-single (single-skin build)
   ============================================================
-  Standalone skin for TeamSite's Skin dropdown. Same card and
-  styling as the video-callouts skin, but ONE video card: the
-  section heading + description sit in the left column
-  (vertically centred) and Card 1 sits in the right column.
-  Stacks (header, then card) below 872px. Card 2 fields are
-  ignored. Section classes: the video-callouts modifier (all its
+  Standalone skin for TeamSite's Skin dropdown. Same styling as
+  the video-callouts skin, but ONE video: the section heading +
+  description sit in the left column (vertically centred) and
+  Card 1's video thumbnail sits in the right column. The card is
+  the thumbnail and play icon only; Card 1's title, subtitle,
+  body and CTA label are not shown (the title still names the
+  link for screen readers). Stacks (header, then video) below
+  872px. Card 2 fields are ignored. Section classes: the video-callouts modifier (all its
   styling) plus the video-single modifier (the split layout).
 
   Companion skins: rbccm-two-up-cards (double-dash) features.xsl,
@@ -30,16 +32,13 @@
        CSS loads; bump it if the CSS is uploaded again.
        ============================================================ -->
   <xsl:variable name="USE_FPO" select="normalize-space(//Datum[@ID='Card1VideoUrl']/text()[last()]) = '' and normalize-space(//Datum[@ID='Card1MediaImagePath']/text()[last()]) = ''"/>
-  <xsl:variable name="FPO_CACHE">2026-10-28-1500</xsl:variable>
+  <xsl:variable name="FPO_CACHE">2026-10-28-1800</xsl:variable>
   <xsl:variable name="FPO_HEADING">Find conviction through complexity</xsl:variable>
-  <xsl:variable name="FPO_DESCRIPTION">&lt;span&gt;Markets are moving faster and decisions are becoming more interconnected. RBC Capital Markets brings the insight, advice, and execution to help clients act with conviction when it matters most.&lt;/span&gt;</xsl:variable>
+  <xsl:variable name="FPO_DESCRIPTION">&lt;span&gt;Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC&#8217;s senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.&lt;/span&gt;</xsl:variable>
   <xsl:variable name="FPO_TITLE">Institutional Investors</xsl:variable>
-  <xsl:variable name="FPO_SUBTITLE">The investment equation is getting more complex</xsl:variable>
-  <xsl:variable name="FPO_BODY">Macro shifts, changing correlations, and a broader opportunity set are reshaping how institutions pursue alpha. RBC&#8217;s senior leaders discuss what institutional investors need from a counterparty today, and how innovation, collaboration and creative solutions can help them move with greater speed and agility.</xsl:variable>
   <xsl:variable name="FPO_IMAGE">/assets/rbccm/images/about-us/us-credentials/us-credentials-institutional-investors.webp</xsl:variable>
   <xsl:variable name="FPO_IMAGE_ALT">Institutional Investors</xsl:variable>
-  <xsl:variable name="FPO_VIDEO">//players.brightcove.net/6021289101001/VyvCc9BZx_default/index.html?videoId=6406869575112</xsl:variable>
-  <xsl:variable name="FPO_CTA">Watch the video</xsl:variable>
+  <xsl:variable name="FPO_LINK">/en/about-us/us-credentials?hero=global-markets</xsl:variable>
 
   <!-- Tag allow-list guard. -->
   <!-- Rich text output. Text pasted into the editor straight from Figma
@@ -83,34 +82,35 @@
   </xsl:template>
 
   <!-- ============================================================
-       renderVideoCard  (Preset = video-callouts)
-       The whole card is ONE link (accessibility review, Oct 2026): a
-       single tab stop whose accessible name is the full card text, in
-       place of the old play <button> plus "Watch the video" <a> that
-       did the same thing. Media, play icon and CTA are visual only.
+       renderVideoCard  (video-single)
+       The whole card is ONE link: the thumbnail with the play icon
+       over it (the icon shows whenever the card links). aria-label
+       names it from the title (or image alt), since there is no
+       visible text.
          - Video URL set: href is the video URL and data-video-url is
            on the card; the JS opens the modal (no-JS falls back to the
            video page).
-         - No video, CTA URL set: plain link to the CTA URL.
+         - No video, CTA URL set: plain link to the CTA URL (a page
+           that plays the video), no modal.
          - Neither: a static <article>, no link.
-       Links typed into the body are stripped, since a link inside a
-       link is invalid HTML.
        ============================================================ -->
   <xsl:template name="renderVideoCard">
-    <xsl:param name="n"/>
     <xsl:param name="mediaPath"/>
     <xsl:param name="mediaAlt"/>
     <xsl:param name="videoUrl"/>
     <xsl:param name="title"/>
-    <xsl:param name="subtitle"/>
-    <xsl:param name="body"/>
-    <xsl:param name="ctaLabel"/>
     <xsl:param name="ctaHref"/>
 
     <xsl:variable name="cardHref">
       <xsl:choose>
         <xsl:when test="$videoUrl != ''"><xsl:value-of select="$videoUrl"/></xsl:when>
         <xsl:otherwise><xsl:value-of select="$ctaHref"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="name">
+      <xsl:choose>
+        <xsl:when test="$title != ''"><xsl:value-of select="$title"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$mediaAlt"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
@@ -121,51 +121,27 @@
       </xsl:attribute>
       <xsl:if test="$cardHref != ''">
         <xsl:attribute name="href"><xsl:value-of select="$cardHref"/></xsl:attribute>
+        <xsl:attribute name="aria-label">
+          <xsl:choose>
+            <xsl:when test="$videoUrl != '' and $name != ''">Watch the video: <xsl:value-of select="$name"/></xsl:when>
+            <xsl:when test="$videoUrl != ''">Watch the video</xsl:when>
+            <xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$videoUrl != ''">
         <xsl:attribute name="data-video-url"><xsl:value-of select="$videoUrl"/></xsl:attribute>
       </xsl:if>
 
-      <!-- Media zone. Play icon only when there is a video. Play SVG
-           uses Figma's 56x56 viewBox and triangle path (white path
-           over the CSS navy-45% fill + backdrop-blur circle). -->
-      <xsl:if test="$mediaPath != ''">
-        <div class="rbccm-two-up-cards__card-media">
-          <img alt="{$mediaAlt}" loading="lazy" decoding="async">
-            <xsl:attribute name="src"><xsl:value-of select="$mediaPath"/></xsl:attribute>
-          </img>
-          <xsl:if test="$videoUrl != ''">
-            <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                <path d="M36.6895 28.4828L22.9308 36.4264L22.9308 20.5393L36.6895 28.4828Z" fill="white"/>
-              </svg>
-            </span>
-          </xsl:if>
-        </div>
-      </xsl:if>
-
-      <!-- Content: text group at top (title-block + body), CTA pinned
-           at bottom via parent justify-content: space-between. -->
-      <div class="rbccm-two-up-cards__card-content">
-        <div class="rbccm-two-up-cards__card-text">
-          <div class="rbccm-two-up-cards__card-headline">
-            <h3 class="rbccm-two-up-cards__card-title"><xsl:value-of select="$title"/></h3>
-            <xsl:if test="$subtitle != ''">
-              <p class="rbccm-two-up-cards__card-subtitle"><xsl:value-of select="$subtitle"/></p>
-            </xsl:if>
-          </div>
-          <xsl:variable name="bodyText"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$body"/></xsl:call-template></xsl:variable>
-          <xsl:if test="normalize-space(translate($bodyText, '&#160;&amp;nbsp;', '')) != ''">
-            <xsl:variable name="bodyNoLinks"><xsl:call-template name="rbccmStripAnchors"><xsl:with-param name="s" select="string($body)"/></xsl:call-template></xsl:variable>
-            <p class="rbccm-two-up-cards__card-body"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$bodyNoLinks"/></xsl:call-template></p>
-          </xsl:if>
-        </div>
-
-        <xsl:if test="$ctaLabel != ''">
-          <span class="rbccm-two-up-cards__card-cta">
-            <span><xsl:value-of select="$ctaLabel"/></span>
-            <!-- Figma arrow icon (16x16, fill via currentColor so the
-                 link colour flows through to the glyph). -->
+      <!-- Play circle (CSS navy-45% fill + backdrop-blur) holding the
+           "Watch the video" CTA arrow from the video-callouts skin, in
+           place of the play triangle. White via currentColor. -->
+      <div class="rbccm-two-up-cards__card-media">
+        <img alt="{$mediaAlt}" loading="lazy" decoding="async">
+          <xsl:attribute name="src"><xsl:value-of select="$mediaPath"/></xsl:attribute>
+        </img>
+        <xsl:if test="$cardHref != ''">
+          <span class="rbccm-two-up-cards__card-play" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 8.00002C1.5 7.86741 1.55268 7.74024 1.64645 7.64647C1.74021 7.5527 1.86739 7.50002 2 7.50002H13.793L10.646 4.35402C10.5521 4.26013 10.4994 4.1328 10.4994 4.00002C10.4994 3.86725 10.5521 3.73991 10.646 3.64602C10.7399 3.55213 10.8672 3.49939 11 3.49939C11.1328 3.49939 11.2601 3.55213 11.354 3.64602L15.354 7.64602C15.4006 7.69247 15.4375 7.74764 15.4627 7.80839C15.4879 7.86913 15.5009 7.93425 15.5009 8.00002C15.5009 8.06579 15.4879 8.13091 15.4627 8.19165C15.4375 8.2524 15.4006 8.30758 15.354 8.35402L11.354 12.354C11.2601 12.4479 11.1328 12.5007 11 12.5007C10.8672 12.5007 10.7399 12.4479 10.646 12.354C10.5521 12.2601 10.4994 12.1328 10.4994 12C10.4994 11.8672 10.5521 11.7399 10.646 11.646L13.793 8.50002H2C1.86739 8.50002 1.74021 8.44734 1.64645 8.35357C1.55268 8.25981 1.5 8.13263 1.5 8.00002Z" fill="currentColor"/>
             </svg>
@@ -175,25 +151,6 @@
     </xsl:element>
   </xsl:template>
 
-  <!-- Removes <a ...> and </a> tags from rich text so the body can sit
-       inside the card link. The link text itself is kept. -->
-  <xsl:template name="rbccmStripAnchors">
-    <xsl:param name="s"/>
-    <xsl:choose>
-      <xsl:when test="contains($s, '&lt;a ') and contains(substring-after($s, '&lt;a '), '&gt;')">
-        <xsl:call-template name="rbccmStripAnchors">
-          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;a '), substring-after(substring-after($s, '&lt;a '), '&gt;'))"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="contains($s, '&lt;/a&gt;')">
-        <xsl:call-template name="rbccmStripAnchors">
-          <xsl:with-param name="s" select="concat(substring-before($s, '&lt;/a&gt;'), substring-after($s, '&lt;/a&gt;'))"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <!-- ============================================================
        renderCardSlot : per-slot lookup.
        ============================================================ -->
@@ -201,42 +158,31 @@
     <xsl:param name="n"/>
 
     <xsl:variable name="title"     select="normalize-space(//Datum[@ID=concat('Card', $n, 'TitleText')]/text()[last()])"/>
-    <xsl:variable name="body"      select="//Datum[@ID=concat('Card', $n, 'BodyText')]"/>
     <xsl:variable name="mediaPath" select="normalize-space(//Datum[@ID=concat('Card', $n, 'MediaImagePath')]/text()[last()])"/>
     <xsl:variable name="mediaAlt"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'MediaImageAlt')]/text()[last()])"/>
     <xsl:variable name="videoUrl"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'VideoUrl')]/text()[last()])"/>
-    <xsl:variable name="subtitle"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'SubtitleText')]/text()[last()])"/>
-    <xsl:variable name="ctaLabel"  select="normalize-space(//Datum[@ID=concat('Card', $n, 'CtaLabel')]/text()[last()])"/>
     <xsl:variable name="ctaHref"   select="normalize-space(//Datum[@ID=concat('Card', $n, 'CtaHref')]/text()[last()])"/>
 
     <xsl:choose>
       <xsl:when test="$USE_FPO">
         <xsl:call-template name="renderVideoCard">
-          <xsl:with-param name="n" select="$n"/>
           <xsl:with-param name="mediaPath" select="string($FPO_IMAGE)"/>
           <xsl:with-param name="mediaAlt" select="string($FPO_IMAGE_ALT)"/>
-          <xsl:with-param name="videoUrl" select="string($FPO_VIDEO)"/>
+          <xsl:with-param name="videoUrl" select="''"/>
           <xsl:with-param name="title" select="string($FPO_TITLE)"/>
-          <xsl:with-param name="subtitle" select="string($FPO_SUBTITLE)"/>
-          <xsl:with-param name="body" select="string($FPO_BODY)"/>
-          <xsl:with-param name="ctaLabel" select="string($FPO_CTA)"/>
-          <xsl:with-param name="ctaHref" select="''"/>
+          <xsl:with-param name="ctaHref" select="string($FPO_LINK)"/>
         </xsl:call-template>
       </xsl:when>
-    <!-- Blank title hides the whole card. -->
-    <xsl:when test="$title != ''">
-      <xsl:call-template name="renderVideoCard">
-        <xsl:with-param name="n" select="$n"/>
-        <xsl:with-param name="mediaPath" select="$mediaPath"/>
-        <xsl:with-param name="mediaAlt" select="$mediaAlt"/>
-        <xsl:with-param name="videoUrl" select="$videoUrl"/>
-        <xsl:with-param name="title" select="$title"/>
-        <xsl:with-param name="subtitle" select="$subtitle"/>
-        <xsl:with-param name="body" select="$body"/>
-        <xsl:with-param name="ctaLabel" select="$ctaLabel"/>
-        <xsl:with-param name="ctaHref" select="$ctaHref"/>
-      </xsl:call-template>
-    </xsl:when>
+      <!-- No image hides the card (there is nothing else to show). -->
+      <xsl:when test="$mediaPath != ''">
+        <xsl:call-template name="renderVideoCard">
+          <xsl:with-param name="mediaPath" select="$mediaPath"/>
+          <xsl:with-param name="mediaAlt" select="$mediaAlt"/>
+          <xsl:with-param name="videoUrl" select="$videoUrl"/>
+          <xsl:with-param name="title" select="$title"/>
+          <xsl:with-param name="ctaHref" select="$ctaHref"/>
+        </xsl:call-template>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
@@ -385,7 +331,7 @@
 
     </section>
 
-    <!-- Video modal runtime (play button + "Watch the video" link). -->
+    <!-- Video modal runtime. -->
     <xsl:if test="$JS_PATH != ''">
       <script>
         <xsl:attribute name="src">
