@@ -323,8 +323,16 @@
           });
           if (!btn) { return; }
 
+          /* Status class so you can check it in DevTools:
+             is-latest-article = newest article from the feed,
+             is-latest-fallback = feed failed, linking to /en/insights. */
+          function mark(name) {
+            btn.className = (btn.className ? btn.className + ' ' : '') + name;
+          }
+
           function fallback() {
             btn.setAttribute('href', FALLBACK);
+            mark('is-latest-fallback');
           }
           if (!window.fetch || !window.DOMParser) { fallback(); return; }
 
@@ -350,6 +358,7 @@
             if (!best) { fallback(); return; }
 
             btn.setAttribute('href', text(best, 'link'));
+            mark('is-latest-article');
           })['catch'](fallback);
         });
       })();
