@@ -1,12 +1,11 @@
 <!DOCTYPE html-entities SYSTEM "http://www.interwoven.com/livesite/xsl/xsl-html.dtd">
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Skin: Default XSL + Latest Article button
-       Same as the Default XSL skin, plus a "Read more" button under the lead
-       content (non-episode banner) that always points at the newest Insights
-       article in the Real-Time Geopolitics feed
-       (/en/insights/real-time-geopolitics/data/rtg). The button stays
-       invisible until the feed answers and hides if the feed fails.
-       Remove any hand-made "Read more" link from Lead Content. -->
+       Same as the Default XSL skin, but the "Read more" link in Lead Content
+       (non-episode banner) is repointed at the newest Insights article in the
+       Real-Time Geopolitics feed (/en/insights/real-time-geopolitics/data/rtg).
+       If the feed fails or has no article, the link goes to /en/insights.
+       The link's own markup and style come from Lead Content as authored. -->
 
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
@@ -37,31 +36,6 @@
     <xsl:variable name="SHOW_YELLOWTEAR" select="/Properties/Datum[@ID='ShowYellowTear']/Option[@Selected='true']/Value"/>
     <xsl:variable name="SHOW_CTA" select="/Properties/Datum[@ID='ShowCTA']/Option[@Selected='true']/Value"/>
     <xsl:variable name="CTA_LINK" select="/Properties/Data/Datum[@ID='CTALink']"/>
-
-    <!-- Latest article button styles: same look as the hand-made Read more
-         link that used to sit in Lead Content. -->
-    <style>
-      .page-banner .latest-article-cta { margin: 30px 0 0; }
-      .page-banner .latest-article-btn,
-      .page-banner .latest-article-btn:visited {
-        align-items: center;
-        background: #0051A5;
-        border: 1px solid #FFF;
-        color: #fff !important;
-        display: flex;
-        font-family: 'Roboto Medium', 'Roboto', Arial, Verdana, sans-serif !important;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 500;
-        justify-content: center;
-        letter-spacing: .9px;
-        line-height: normal;
-        max-width: 185px;
-        padding: 13px 33px;
-        text-align: center;
-        text-decoration: none !important;
-      }
-    </style>
 
     <xsl:choose>
       <xsl:when test="$EPTOSHOW != 0">
@@ -256,12 +230,10 @@
                     <h2><xsl:value-of select='$PAGE_SUBTITLE' disable-output-escaping="yes"/></h2>
                   </xsl:if>
 
-                  <p><xsl:value-of select='$LEAD_CONTENT' disable-output-escaping="yes"/></p>
-
-                  <!-- Latest article button: shown straight away linking to
-                       Insights; the script at the bottom swaps in the newest
-                       geopolitics article's href and aria-label. -->
-                  <p class="latest-article-cta"><a class="latest-article-btn" href="/en/insights" title="Link to Insights article" data-latest-feed="/en/insights/real-time-geopolitics/data/rtg" data-latest-category="Insights">Read more</a></p>
+                  <!-- Latest article: the script at the bottom points the
+                       Read more link in Lead Content at the newest
+                       geopolitics article. -->
+                  <p data-latest-feed="/en/insights/real-time-geopolitics/data/rtg" data-latest-category="Insights"><xsl:value-of select='$LEAD_CONTENT' disable-output-escaping="yes"/></p>
 
 
                   <xsl:if test="$SHOW_CTA = 'Yes'">
@@ -329,23 +301,36 @@
       });
     </script>
 
-    <!-- Latest article button: newest Insights item in the feed. Written
-         without less-than, greater-than or ampersand characters so the XSL
-         output can't escape them. -->
+    <!-- Latest article: repoints the Read more link in Lead Content at the
+         newest Insights item in the feed, or /en/insights if there isn't one.
+         Written without less-than, greater-than or ampersand characters so
+         the XSL output can't escape them. -->
     <script>
       (function () {
-        var buttons = document.querySelectorAll('.latest-article-btn[data-latest-feed]');
-        if (!buttons.length || !window.fetch || !window.DOMParser) { return; }
+        var FALLBACK = '/en/insights';
 
         function text(node, tag) {
           var el = node.getElementsByTagName(tag)[0];
           return el ? (el.textContent || '').replace(/^\s+|\s+$/g, '') : '';
         }
 
-        [].forEach.call(buttons, function (btn) {
-          var category = (btn.getAttribute('data-latest-category') || '').toLowerCase();
+        [].forEach.call(document.querySelectorAll('[data-latest-feed]'), function (lead) {
+          var btn = null;
+          [].forEach.call(lead.getElementsByTagName('a'), function (a) {
+            if (!btn) {
+              if ((a.textContent || '').replace(/^\s+|\s+$/g, '').toLowerCase() === 'read more') { btn = a; }
+            }
+          });
+          if (!btn) { return; }
 
-          fetch(btn.getAttribute('data-latest-feed'), { credentials: 'same-origin' }).then(function (r) {
+          function fallback() {
+            btn.setAttribute('href', FALLBACK);
+          }
+          if (!window.fetch || !window.DOMParser) { fallback(); return; }
+
+          var category = (lead.getAttribute('data-latest-category') || '').toLowerCase();
+
+          fetch(lead.getAttribute('data-latest-feed'), { credentials: 'same-origin' }).then(function (r) {
             return r.ok ? r.text() : '';
           }).then(function (xml) {
             var items = new DOMParser().parseFromString(xml, 'text/xml').getElementsByTagName('news');
@@ -362,11 +347,10 @@
                 if (Math.max(time, bestTime) === time) { best = items[i]; bestTime = time; }
               }
             }
-            if (!best) { return; }
+            if (!best) { fallback(); return; }
 
             btn.setAttribute('href', text(best, 'link'));
-            btn.setAttribute('aria-label', 'Read more: ' + text(best, 'title'));
-          })['catch'](function () {});
+          })['catch'](fallback);
         });
       })();
     </script>
