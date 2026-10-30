@@ -14,7 +14,8 @@
      heading   RBC Display 500 36/36, -0.6px, #082043; last word(s) #0051A5;
                45 x 2 yellow rule
      subhead   Roboto 400 16/24, #494949
-     fields    2 columns (First/Last, Company/Title), Email full width,
+     fields    2 columns (First/Last, Company/Title, Email/Phone), Asset
+               class full width (row of checkboxes),
                32px column gap, 24px row gap; #979797 underline, 11/0
                field padding; label Roboto 500 13/15, 0.52px, #858585,
                sits in the field until it has focus or a value
@@ -47,9 +48,49 @@ dialog.rbccm-marketo-modal {
   min-height: 563px;                  /* Figma 563; grows (not scrolls) when Marketo adds error lines */
   max-height: calc(100% - 32px);
   max-width: min(600px, calc(100% - 32px));
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;                   /* the body scrolls, so the X and the progress bar stay put */
   padding: 48px 40px;
+  width: 100%;
+}
+dialog.rbccm-marketo-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+.rbccm-marketo-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;              /* the progress bar stands in for it */
+}
+.rbccm-marketo-modal__body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Scroll progress ---------------------------------------------------- */
+/* Only when the body is taller than the dialog (is-scrollable, from the
+   JS): a 4px grey track down the right edge with a yellow fill for how
+   much of the form has been seen. Below the X, so they never overlap. */
+.rbccm-marketo-modal__progress {
+  background: #E1E5EA;
+  border-radius: 2px;
+  bottom: 32px;
+  display: none;
+  overflow: hidden;
+  position: absolute;
+  right: 14px;
+  top: 70px;                          /* X: 18 top + 36 tall, plus 16 */
+  width: 4px;
+}
+dialog.rbccm-marketo-modal.is-scrollable .rbccm-marketo-modal__progress {
+  display: block;
+}
+.rbccm-marketo-modal__progress-fill {
+  background: #FFC72C;
+  border-radius: 2px;
+  display: block;
+  height: 0;
+  transition: height 0.1s linear;
   width: 100%;
 }
 dialog.rbccm-marketo-modal *,
@@ -240,12 +281,15 @@ dialog.rbccm-marketo-modal.is-fallback-open {
   float: none !important;
   width: 100% !important;
 }
-/* Design order: First | Last, Company | Title, Email, consent, buttons. */
+/* Design order: First | Last, Company | Title, Email | Phone, Asset class,
+   consent, buttons. */
 @media (min-width: 600px) {
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--firstname,
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--lastname,
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company,
-  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title {
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--email,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--phone {
     grid-column: auto;
   }
 }
@@ -254,6 +298,8 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company   { order: 3; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title     { order: 4; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--email     { order: 5; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--phone     { order: 6; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--assetclass { order: 7; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--checkbox  { order: 20; }
 
 /* ---- Text fields: underline + floating label ---------------------------- */
@@ -343,6 +389,86 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 .rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid textarea.mktoField:focus,
 .rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid select.mktoField:focus {
   box-shadow: 0 1px 0 0 #C8102E !important;
+}
+
+/* ---- Multi-select (e.g. Asset Class): label + row of checkboxes ------- */
+/* The JS hides Marketo's list box and adds one checkbox per option. The
+   select stays in the form for submit and validation. The label sits
+   above in the text fields' raised style (display: block !important for
+   the same form 1574 reason as above). */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoLabel {
+  color: #858585 !important;
+  display: block !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.52px !important;
+  line-height: 15px !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoFieldWrap {
+  position: relative;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect select.mktoField {
+  border: 0 !important;
+  bottom: 0;
+  height: 1px !important;
+  left: 0;
+  margin: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 !important;
+  pointer-events: none;
+  position: absolute !important;
+  width: 1px !important;
+}
+/* Marketo's own message would sit on the hidden select; our inline
+   message (rbccm-marketo-modal__error) covers this field. */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoError {
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+}
+.rbccm-marketo-modal .mktoForm label.rbccm-marketo-modal__multi-option {
+  align-items: center;
+  color: #252525 !important;
+  cursor: pointer;
+  display: flex !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  gap: 10px;
+  line-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-option input {
+  accent-color: var(--Blue-Bright-Blue, #0051A5);
+  flex: 0 0 auto;
+  float: none !important;
+  height: 18px !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  padding: 0 !important;
+  position: static !important;
+  width: 18px !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-option input:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid .rbccm-marketo-modal__multi-option input {
+  outline: 1px solid #C8102E;
+  outline-offset: 0;
 }
 
 /* ---- Consent checkbox --------------------------------------------------- */
@@ -622,6 +748,9 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
   .rbccm-marketo-modal__header {
     padding: 27px 0 32px;
   }
+  .rbccm-marketo-modal__progress {
+    right: 8px;                       /* in the 20px side padding */
+  }
   .rbccm-marketo-modal h2.rbccm-marketo-modal__heading {
     font-size: 30px !important;
     line-height: 32px !important;
@@ -634,6 +763,7 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
     animation: none;
   }
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text .mktoLabel,
+  .rbccm-marketo-modal__progress-fill,
   .rbccm-marketo-modal__submit-arrow {
     transition: none;
   }

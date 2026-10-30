@@ -28,9 +28,12 @@
        references follow) so they can't clash with another Marketo form
        on the page, which uses the same field IDs.
      - Tags each field column with rbccm-marketo-modal__field--{name}
-       (+ --text / --checkbox) so the CSS can lay the form out by field
-       name instead of Marketo's own rows and inline widths, and marks
-       text fields .is-filled for the floating labels.
+       (+ --text / --checkbox / --multiselect) so the CSS can lay the form
+       out by field name instead of Marketo's own rows and inline widths,
+       and marks text fields .is-filled for the floating labels.
+     - Multi-selects (e.g. Asset Class) become a row of checkboxes under
+       the label. The real select stays in the form, hidden, and is kept
+       in step, so Marketo's submit and our validation read it as usual.
      - Submit button label + arrow, Cancel button next to it.
      - Business email check, gacid hidden field, dataLayer "mktoLead"
        push and the thank-you state (same behaviour as the Marketo
@@ -48,7 +51,9 @@
     LastName:  'Last name',
     Company:   'Company',
     Title:     'Title',
-    Email:     'Business email'
+    Email:     'Business email',
+    Phone:     'Phone number',
+    assetClass: 'Asset class'
   };
   /* Figma: 18 x 18 frame, 15.751 x 10.126 glyph, white (currentColor). */
   var ARROW_SVG = '<svg class="rbccm-marketo-modal__submit-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.125 8.99998C1.125 8.85079 1.18426 8.70772 1.28975 8.60223C1.39524 8.49674 1.53832 8.43748 1.6875 8.43748H14.9546L11.4142 4.89823C11.3086 4.79261 11.2493 4.64935 11.2493 4.49998C11.2493 4.35061 11.3086 4.20735 11.4142 4.10173C11.5199 3.99611 11.6631 3.93677 11.8125 3.93677C11.9619 3.93677 12.1051 3.99611 12.2108 4.10173L16.7108 8.60173C16.7631 8.65398 16.8047 8.71605 16.8331 8.78439C16.8614 8.85273 16.876 8.92599 16.876 8.99998C16.876 9.07397 16.8614 9.14723 16.8331 9.21557C16.8047 9.2839 16.7631 9.34598 16.7108 9.39823L12.2108 13.8982C12.1051 14.0038 11.9619 14.0632 11.8125 14.0632C11.6631 14.0632 11.5199 14.0038 11.4142 13.8982C11.3086 13.7926 11.2493 13.6494 11.2493 13.5C11.2493 13.3506 11.3086 13.2073 11.4142 13.1017L14.9546 9.56248H1.6875C1.53832 9.56248 1.39524 9.50321 1.28975 9.39773C1.18426 9.29224 1.125 9.14916 1.125 8.99998Z" fill="currentColor"/></svg>';
@@ -94,6 +99,57 @@
   function gacid() {
     try { return window.ga.getAll()[0].get('clientId'); } catch (e) { return 'n/a'; }
   }
+  /* Multi-select as a row of checkboxes, one per option. Each tick sets
+     the matching option on the hidden select and fires change, so
+     validation and Marketo both follow the select. */
+  function buildMultiSelect(col, field, labelEl) {
+    var base = field.id || ('multi-' + slug(field.name));
+    if (labelEl && !labelEl.id) labelEl.id = base + '-label';
+
+    var group = document.createElement('div');
+    group.className = 'rbccm-marketo-modal__multi-options';
+    group.setAttribute('role', 'group');
+    if (labelEl) group.setAttribute('aria-labelledby', labelEl.id);
+
+    /* An option with no value is Marketo's placeholder ("Select..."):
+       not a choice, and Marketo pre-selects it, so it is cleared and
+       left out. */
+    var items = Array.prototype.filter.call(field.options, function (opt) {
+      if (opt.value !== '') return true;
+      opt.selected = false;
+      return false;
+    }).map(function (opt) {
+      var row = document.createElement('label');
+      row.className = 'rbccm-marketo-modal__multi-option';
+      var box = document.createElement('input');
+      box.type = 'checkbox';
+      box.value = opt.value;
+      box.addEventListener('change', function () {
+        opt.selected = box.checked;
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      var text = document.createElement('span');
+      text.textContent = opt.text;
+      row.appendChild(box);
+      row.appendChild(text);
+      group.appendChild(row);
+      return { opt: opt, box: box };
+    });
+
+    /* Before the select: Marketo inserts its own error message straight
+       after the field, which would otherwise land above the checkboxes. */
+    field.parentNode.insertBefore(group, field);
+    /* The select is only data now: out of the tab order, and anything
+       that focuses it (e.g. our first-error focus) lands on the first
+       checkbox. */
+    field.tabIndex = -1;
+    field.setAttribute('aria-hidden', 'true');
+    field.addEventListener('focus', function () { if (items.length) items[0].box.focus(); });
+    field.addEventListener('change', function () {
+      items.forEach(function (item) { item.box.checked = item.opt.selected; });
+    });
+  }
+
   function slug(s) {
     return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   }
@@ -123,6 +179,7 @@
       document.documentElement.classList.add('rbccm-marketo-modal-open');
       if (canShowModal) modal.showModal();
       else { modal.setAttribute('open', ''); modal.classList.add('is-fallback-open'); }
+      updateProgress();
       /* Focus the panel (tabindex -1), not the first control: screen
          readers announce the dialog + heading, and Tab moves to the X. */
       try { modal.focus({ preventScroll: true }); } catch (e) { modal.focus(); }
@@ -142,6 +199,37 @@
       }
     }
     modal.addEventListener('close', onClosed);
+
+    /* ---------- scroll progress ---------- */
+    /* The body scrolls inside the dialog (the X stays put). When it is
+       taller than the screen (mostly phones), a grey track with a yellow
+       fill on the right shows how much has been seen, so it's clear the
+       form carries on below. Hidden when everything fits. */
+    var body = modal.querySelector('.rbccm-marketo-modal__body');
+    var progressFill = null;
+    if (body) {
+      var progress = document.createElement('div');
+      progress.className = 'rbccm-marketo-modal__progress';
+      progress.setAttribute('aria-hidden', 'true');
+      progress.innerHTML = '<span class="rbccm-marketo-modal__progress-fill"></span>';
+      modal.appendChild(progress);
+      progressFill = progress.firstChild;
+      body.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress);
+      /* Content height changes: the form loading, error lines, thank-you. */
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(updateProgress);
+        Array.prototype.forEach.call(body.children, function (el) { ro.observe(el); });
+      }
+    }
+    function updateProgress() {
+      if (!progressFill || !modal.open) return;
+      var scrollable = body.scrollHeight - body.clientHeight > 1;
+      modal.classList.toggle('is-scrollable', scrollable);
+      if (!scrollable) return;
+      var seen = (body.scrollTop + body.clientHeight) / body.scrollHeight;
+      progressFill.style.height = Math.min(100, seen * 100) + '%';
+    }
 
     /* Focus guard: Tab past the last control loops back to the X and
        Shift+Tab past the X loops to the last one (Cancel, or the
@@ -245,9 +333,11 @@
         var field = col.querySelector('.mktoField');
         if (!field || field.type === 'hidden') return;
         var isCheckbox = field.type === 'checkbox' || field.type === 'radio';
+        var isMulti = field.tagName === 'SELECT' && field.multiple;
         col.classList.add('rbccm-marketo-modal__field');
         col.classList.add('rbccm-marketo-modal__field--' + slug(field.name));
-        col.classList.add(isCheckbox ? 'rbccm-marketo-modal__field--checkbox' : 'rbccm-marketo-modal__field--text');
+        col.classList.add(isCheckbox ? 'rbccm-marketo-modal__field--checkbox' :
+          isMulti ? 'rbccm-marketo-modal__field--multiselect' : 'rbccm-marketo-modal__field--text');
         if (isCheckbox) return;
         /* Label text: replace Marketo's wording, keep its hidden asterisk
            element. The placeholder follows so autofill / screen readers
@@ -261,6 +351,7 @@
           labelEl.appendChild(document.createTextNode(newLabel));
           if (field.hasAttribute('placeholder')) field.setAttribute('placeholder', newLabel);
         }
+        if (isMulti) buildMultiSelect(col, field, labelEl);
         /* Floating label: .is-filled keeps it up once there is a value
            (typed, autofilled or restored). */
         var sync = function () { col.classList.toggle('is-filled', !!field.value); };
