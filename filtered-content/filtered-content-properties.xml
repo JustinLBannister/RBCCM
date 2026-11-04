@@ -1,7 +1,7 @@
 <!--
   RBCCM Filtered Content - Properties
 
-  Component publishes one of three preset variants driven by the
+  Component publishes one of four preset variants driven by the
   Preset Datum. Content editors pick a preset per instance; the
   filter chrome + list container render the same way, only the
   data source and item template differ.
@@ -10,6 +10,7 @@
     conference-insights
     in-the-media-and-press-releases
     deals-and-transactions
+    etf-innovators
 
   For the in-the-media-and-press-releases preset ONLY, the External
   block below runs a MetaQueryExternal query at publish time and
@@ -18,7 +19,7 @@
   AND press releases render in one list. The Type dropdown lets
   users narrow to one or the other.
 
-  For conference-insights and deals-and-transactions, the External
+  For conference-insights, deals-and-transactions and etf-innovators, the External
   block is unused. filtered-content.js fetches the respective DCR
   feeds on page load. The Preset Datum still drives the outer
   section's modifier class so the JS coordinator picks the right
@@ -39,7 +40,7 @@
        and did not render as a dropdown for this component). The Option
        children are kept as the reference list. The bare text after the
        closing </Option> is the default value. -->
-  <Datum ID="Preset" Type="String" Name="Preset - type one exactly: in-the-media-and-press-releases | conference-insights | deals-and-transactions" Label="Preset - type one exactly: in-the-media-and-press-releases | conference-insights | deals-and-transactions">
+  <Datum ID="Preset" Type="String" Name="Preset - type one exactly: in-the-media-and-press-releases | conference-insights | deals-and-transactions | etf-innovators" Label="Preset - type one exactly: in-the-media-and-press-releases | conference-insights | deals-and-transactions | etf-innovators">
     <Option>
       <Display>In the Media &amp; Press Releases</Display>
       <Value>in-the-media-and-press-releases</Value>
@@ -51,6 +52,10 @@
     <Option>
       <Display>Deals &amp; Transactions</Display>
       <Value>deals-and-transactions</Value>
+    </Option>
+    <Option>
+      <Display>ETF Innovators</Display>
+      <Value>etf-innovators</Value>
     </Option>
     in-the-media-and-press-releases
   </Datum>
@@ -88,6 +93,16 @@
 
   <Datum ID="PageSize" Type="Number" Name="Items per page (default view)">10</Datum>
   <Datum ID="PageSizeFiltered" Type="Number" Name="Items per page (when a filter is active)">10</Datum>
+  <!-- Optional page size under 768px for both views. Blank = same as above.
+       ETF Innovators uses 6 / 6 / 3. -->
+  <Datum ID="PageSizeMobile" Type="String" Name="Items per page on mobile (optional - blank uses the sizes above)"></Datum>
+
+  <!-- ETF Innovators preset only: the episodes JSON. Episodes come from
+       the live insights feeds (links containing etf-innovators or
+       etf_innovators); this file adds the Company filter names, the
+       category label rules and per episode overrides (title, company,
+       category, speaker, date, watch time, thumbnail, hidden). -->
+  <Datum ID="EtfEpisodesUrl" Type="String" Name="ETF Innovators : episodes JSON path">/assets/rbccm/js/components/data/etf-innovators-episodes.json</Datum>
 
   <!-- Filter chrome: dropdown visibility per preset. Set false to
        hide a dimension entirely (e.g. Deals preset hides Type,

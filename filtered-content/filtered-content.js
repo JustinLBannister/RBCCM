@@ -210,8 +210,15 @@
   /* Format a raw value into a display label for a given dimension.
      Month YYYY-MM -> "Month YYYY". Other dimensions get title-cased with
      hyphens replaced by spaces. */
+  /* Option labels authored on the items themselves: an item with
+     data-company="t-rowe-price" data-company-label="T. Rowe Price" makes
+     the dropdown, chips and empty message read "T. Rowe Price" rather
+     than a title-cased slug. Filled by buildCustomDropdown. */
+  var VALUE_LABELS = {};
+
   function formatValue(value, dim) {
     if (!value) return value;
+    if (VALUE_LABELS[dim] && VALUE_LABELS[dim][value]) return VALUE_LABELS[dim][value];
     /* Year is already display-ready ("2025", "2026") - pass through. */
     if (dim === 'year') {
       return value;
@@ -326,6 +333,12 @@
        to a denser utilitarian view (page-size-filtered=6). Falls back to
        the default page size if not set. */
     var filteredPageSize = parseInt(filterRoot.getAttribute('data-page-size-filtered'), 10) || pageSize;
+    /* Optional page size below 768px (both default and filtered views).
+       The resize handler re-applies, so crossing the breakpoint repaginates. */
+    var mobilePageSize = parseInt(filterRoot.getAttribute('data-page-size-mobile'), 10) || 0;
+    function isMobileViewport() {
+      return !!(mobilePageSize > 0 && window.matchMedia && window.matchMedia('(max-width: 767px)').matches);
+    }
     var allItems       = container.querySelectorAll(itemSelector);
     var emptyState     = ensureEmptyState(container, isDark);
     var paginationHost = ensurePaginationHost(container);
@@ -651,6 +664,17 @@
         }
       }
 
+      /* Item-authored option labels (data-<dim>-label). */
+      var labelAttrName = attrName + '-label';
+      for (var la = 0; la < allItems.length; la++) {
+        var itemLabel = allItems[la].getAttribute(labelAttrName);
+        if (!itemLabel) continue;
+        var labelTokens = tokenize(allItems[la].getAttribute(attrName) || '');
+        if (labelTokens.length !== 1) continue;
+        VALUE_LABELS[dim] = VALUE_LABELS[dim] || {};
+        VALUE_LABELS[dim][labelTokens[0]] = itemLabel;
+      }
+
       /* Year dropdown special case: when data-available-years is authored,
          use that list verbatim instead of auto-populating from items.
          This lets the ITM preset offer historical years (e.g. 2010-2026)
@@ -712,6 +736,13 @@
            canonical order, everything else alphabetical. */
         values.sort();
         if (dim === 'year') values.reverse();
+        if (VALUE_LABELS[dim]) {
+          values.sort(function (a, b) {
+            var la2 = formatValue(a, dim).toLowerCase();
+            var lb2 = formatValue(b, dim).toLowerCase();
+            return la2 < lb2 ? -1 : la2 > lb2 ? 1 : 0;
+          });
+        }
         if (dim === 'transaction-type') {
           values.sort(function (a, b) {
             var ia = TRANSACTION_TYPE_SLUG_ORDER.indexOf(a);
@@ -1219,6 +1250,7 @@
          When either size is 0/unset we degrade gracefully to a single page. */
       var heroSize  = pageSize > 0 ? pageSize : matched.length;
       var denseSize = filteredPageSize > 0 ? filteredPageSize : (pageSize > 0 ? pageSize : matched.length);
+      if (isMobileViewport()) { heroSize = mobilePageSize; denseSize = mobilePageSize; }
 
       var totalPages;
       var start, end;
@@ -1348,6 +1380,7 @@
       var DIM_LABELS = { type:'Type', year:'Year', month:'Month',
                          region:'Region', topic:'Topic', search:'Search',
                          'transaction-type':'Transaction type',
+                         company:'Company',
                          amount:'Amount' };
 
       for (var j = 0; j < built.length; j++) {
@@ -1507,6 +1540,7 @@
       var regionLabel = '';
       var topicLabel = '';
       var txTypeLabel = '';
+      var companyLabel = '';
       var hasTxTypeDim = false;
       var searchQuery = (searchInput && searchInput.value) ? searchInput.value.trim() : '';
 
@@ -1522,9 +1556,10 @@
         else if (dd.dim === 'region') regionLabel = pretty;
         else if (dd.dim === 'topic')  topicLabel  = pretty;
         else if (dd.dim === 'transaction-type') txTypeLabel = pretty;
+        else if (dd.dim === 'company') companyLabel = pretty;
       }
 
-      if (!typeLabel && !yearLabel && !monthLabel && !regionLabel && !topicLabel && !txTypeLabel && !searchQuery) {
+      if (!typeLabel && !yearLabel && !monthLabel && !regionLabel && !topicLabel && !txTypeLabel && !companyLabel && !searchQuery) {
         return strings.emptyMessage || '';
       }
 
@@ -1556,6 +1591,7 @@
       }
 
       var parts = ["We couldn't find any " + subject];
+      if (companyLabel) parts.push('from ' + companyLabel);
       if (regionLabel) parts.push('in ' + regionLabel);
       if (topicLabel)  parts.push('on ' + topicLabel);
       if (monthLabel && yearLabel) {
@@ -1977,7 +2013,7 @@
 /* =========================================================================
    PART 2 - Preset adapters (feed fetch + parse + render)
    -------------------------------------------------------------------------
-   One file, three presets. Each adapter defines:
+   One file, four presets. Each adapter defines:
      - fetchItems(root)     -> Promise<Array<entry>>   (feed -> common entry shape)
      - render(entry, i)     -> HTMLElement (li)         (entry -> DOM)
 
@@ -1988,7 +2024,7 @@
 
    Preset selection: coordinator reads the root modifier class
    (`--conference-insights`, `--in-the-media-and-press-releases`,
-   `--deals-and-transactions`). When no adapter matches, the coordinator
+   `--deals-and-transactions`, `--etf-innovators`). When no adapter matches, the coordinator
    just binds the filter engine over author-provided items - the "custom"
    preset case.
    ========================================================================= */
@@ -2723,11 +2759,307 @@
     };
   }
 
+  /* ==========================================================================
+     ADAPTER: etf-innovators
+     -------------------------------------------------------------------------
+     ETF Innovators episode grid. The live insights feeds are the source
+     (one per year, settings.firstYear to the current year), kept to links
+     matching settings.linkMatch (etf-innovators / etf_innovators). A small
+     JSON file (data-episodes-url on the root) adds what the feed does not
+     carry and overrides it where needed:
+       settings       first year, link match, title prefix, pill label,
+                      date source ("url" = the URL month, "feed" = <date>)
+       companies      names for the Company filter, found in the title,
+                      then tags, then description
+       categoryRules  ordered keyword rules for the eyebrow label
+       overrides      per episode, keyed by URL slug: title, company,
+                      category, speaker, date, watch, thumbnail, hidden
+     An override with a title and url for a slug not in the feed adds that
+     episode by hand. Old story.page duplicates in the 2023 feed are
+     dropped, then anything with the same title.
+
+     Root attributes (optional):
+       data-episodes-url        the JSON above
+       data-feed-url-template   per year feed, {year} placeholder
+       data-asset-origin        prefix for root-relative links and images
+                                (local preview only)
+     ========================================================================== */
+
+  var ETF_DEFAULTS = {
+    episodesUrl: '/assets/rbccm/js/components/data/etf-innovators-episodes.json',
+    feedUrlTemplate: '/en/insights/data/{year}-insights',
+    firstYear: 2023,
+    linkMatch: 'etf[-_]innovators',
+    titlePrefix: '^ETF Innovators\\s*:?\\s*',
+    pillLabel: 'Full Episode',
+    dateFrom: 'url'
+  };
+
+  function etfRegex(pattern) {
+    try { return new RegExp(pattern, 'i'); } catch (e) { return null; }
+  }
+  function escapeRegex(s) {
+    return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  function slugify(s) {
+    return String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  function stripTags(s) {
+    return String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  }
+  function etfText(node, tag) {
+    return stripTags(decodeEntities(child(node, tag)));
+  }
+  function slugFromLink(link) {
+    var parts = String(link || '').split('?')[0].replace(/\/+$/, '').split('/');
+    return parts[parts.length - 1] || '';
+  }
+  function withOrigin(url, origin) {
+    if (!origin || !url || url.charAt(0) !== '/' || url.charAt(1) === '/') return url;
+    return origin.replace(/\/+$/, '') + url;
+  }
+  /* "/en/insights/2026/05/slug" -> { label: "May 2026", ts, year } */
+  function etfUrlMonth(link) {
+    var m = String(link || '').match(/\/(\d{4})\/(\d{2})\//);
+    if (!m) return null;
+    var month = parseInt(m[2], 10);
+    if (!(month >= 1 && month <= 12)) return null;
+    return {
+      label: MONTH_ABBR_LIST[month - 1] + ' ' + m[1],
+      ts: new Date(parseInt(m[1], 10), month - 1, 1).getTime(),
+      year: m[1]
+    };
+  }
+  var MONTH_ABBR_LIST = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  /* "June 16, 2026" -> { label: "Jun 2026", ts, year } */
+  function etfFeedMonth(dateStr) {
+    var ts = Date.parse(dateStr || '');
+    if (isNaN(ts)) ts = parseMonthYearToTs(dateStr);
+    if (!ts) return null;
+    var d = new Date(ts);
+    return { label: MONTH_ABBR_LIST[d.getMonth()] + ' ' + d.getFullYear(), ts: ts, year: String(d.getFullYear()) };
+  }
+
+  function etfFindCompany(companies, fields) {
+    for (var f = 0; f < fields.length; f++) {
+      if (!fields[f]) continue;
+      for (var c = 0; c < companies.length; c++) {
+        var co = companies[c];
+        if (!co || !co.name) continue;
+        var re = etfRegex(co.match || escapeRegex(co.name));
+        if (re && re.test(fields[f])) return co.name;
+      }
+    }
+    return '';
+  }
+  function etfFindCategory(rules, fields) {
+    for (var f = 0; f < fields.length; f++) {
+      if (!fields[f]) continue;
+      for (var r = 0; r < rules.length; r++) {
+        var re = rules[r] && rules[r].match ? etfRegex(rules[r].match) : null;
+        if (re && re.test(fields[f])) return rules[r].label || '';
+      }
+    }
+    return '';
+  }
+  function etfWatch(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return '';
+    return /watch$/i.test(s) ? s : s + ' watch';
+  }
+
+  /* Feed node (or a hand-added override) -> card entry. */
+  function buildEtfEntry(src, cfg) {
+    var ov = src.override || {};
+    var settings = cfg.settings;
+
+    /* Title: strip the series prefix. 2023 titles read "ETF Innovators
+       featuring <name>, <role>, <company>": the part after "featuring"
+       becomes the speaker line and the title falls back to
+       "In conversation with <name>" unless an override sets one. */
+    var rawTitle = src.title || '';
+    var prefixRe = etfRegex(settings.titlePrefix);
+    var stripped = prefixRe ? rawTitle.replace(prefixRe, '') : rawTitle;
+    var speakerFromTitle = '';
+    var featuring = stripped.match(/^featuring\s+(.+)$/i);
+    if (featuring) {
+      speakerFromTitle = featuring[1].trim();
+      stripped = 'In conversation with ' + speakerFromTitle.split(',')[0].trim();
+    }
+    if (stripped) stripped = stripped.charAt(0).toUpperCase() + stripped.slice(1);
+    var title = ov.title || stripped || rawTitle;
+
+    var tagsTitle = (src.tags || '') + ' ' + rawTitle;
+    var company = ov.company || etfFindCompany(cfg.companies, [rawTitle, src.tags, src.description]);
+    var category = ov.category || etfFindCategory(cfg.rules, [tagsTitle, src.description]);
+
+    /* Speaker line: override, else the 2023 title, else "Featuring <name>"
+       from the author field plus the company, else the company alone. */
+    var speaker = ov.speaker || speakerFromTitle;
+    if (!speaker) {
+      var guest = (String(src.author || '').match(/featuring\s+(.+)$/i) || [])[1];
+      guest = guest ? guest.replace(/[\s,]+$/, '').trim() : '';
+      speaker = guest ? (company ? guest + ', ' + company : guest) : company;
+    }
+
+    /* Date: the URL month by default (the feed <date> runs one to three
+       months later on most 2025-2026 episodes), else the feed date. */
+    var when = null;
+    if (ov.date) {
+      var ovTs = parseMonthYearToTs(ov.date);
+      when = { label: formatMonthYear(ov.date) || ov.date, ts: ovTs, year: parseYear(ov.date) };
+    }
+    if (!when && settings.dateFrom !== 'feed') when = etfUrlMonth(src.link);
+    if (!when) when = etfFeedMonth(src.date);
+    if (!when) when = { label: '', ts: 0, year: '' };
+
+    /* Watch time: <watchtime>, else <readtime> on video items (four of
+       the 2023 episodes put the running time there). */
+    var watch = ov.watch || src.watchtime || (String(src.type || '').toLowerCase() === 'video' ? src.readtime : '');
+    var meta = [when.label, etfWatch(watch)].filter(Boolean).join(' \u00b7 ');
+
+    var feedTs = Date.parse(src.date || '');
+    return {
+      title: title,
+      href: withOrigin(src.link, cfg.origin),
+      thumbnail: withOrigin(ov.thumbnail || src.thumbnail, cfg.origin),
+      pillLabel: settings.pillLabel,
+      category: category,
+      speaker: speaker,
+      company: company,
+      companySlug: slugify(company),
+      year: when.year,
+      meta: meta,
+      dateTs: when.ts || 0,
+      feedTs: isNaN(feedTs) ? 0 : feedTs,
+      searchText: (title + ' ' + speaker + ' ' + company + ' ' + category).toLowerCase()
+    };
+  }
+
+  var ETF_CONFIG = {
+    fetchItems: function (root) {
+      var episodesUrl = root.getAttribute('data-episodes-url') || ETF_DEFAULTS.episodesUrl;
+      var template = root.getAttribute('data-feed-url-template') || ETF_DEFAULTS.feedUrlTemplate;
+      var origin = root.getAttribute('data-asset-origin') || '';
+
+      /* The JSON is optional: without it the grid still renders from the
+         feed, just without company, category or overrides. */
+      return fetchJson(episodesUrl).catch(function (err) {
+        console.warn('[rbccm-filtered-content] etf-innovators: episodes JSON not loaded, using the feed only', err);
+        return {};
+      }).then(function (data) {
+        data = data || {};
+        var settings = {};
+        var s = data.settings || {};
+        for (var k in ETF_DEFAULTS) {
+          if (ETF_DEFAULTS.hasOwnProperty(k)) settings[k] = (s[k] != null && s[k] !== '') ? s[k] : ETF_DEFAULTS[k];
+        }
+        var cfg = {
+          settings: settings,
+          companies: data.companies || [],
+          rules: data.categoryRules || [],
+          overrides: data.overrides || {},
+          origin: origin
+        };
+
+        var years = [];
+        var thisYear = new Date().getFullYear();
+        for (var y = parseInt(settings.firstYear, 10) || thisYear; y <= thisYear; y++) years.push(y);
+
+        return Promise.all(years.map(function (yr) {
+          return fetchOptional(template.replace('{year}', String(yr)));
+        })).then(function (xmlStrings) {
+          var linkRe = etfRegex(settings.linkMatch);
+          var seenSlug = {};
+          var seenTitle = {};
+          var entries = [];
+
+          function add(src, slug) {
+            var ov = cfg.overrides[slug] || {};
+            if (ov.hidden === true) { seenSlug[slug] = true; return; }
+            src.override = ov;
+            var entry = buildEtfEntry(src, cfg);
+            var key = normalizeTitle(entry.title);
+            if (seenTitle[key]) return;
+            seenSlug[slug] = true;
+            seenTitle[key] = true;
+            entries.push(entry);
+          }
+
+          xmlStrings.forEach(function (xml) {
+            parseNewsNodes(xml).forEach(function (n) {
+              var link = child(n, 'link').trim();
+              if (!link || !linkRe || !linkRe.test(link)) return;
+              if (/story\.page/i.test(link)) return;   /* 2023 duplicates with the old URL */
+              var slug = slugFromLink(link);
+              if (seenSlug[slug]) return;
+              add({
+                title: etfText(n, 'title'),
+                link: link,
+                date: child(n, 'date').trim(),
+                thumbnail: child(n, 'thumbnail').trim(),
+                description: etfText(n, 'description'),
+                author: etfText(n, 'author'),
+                tags: etfText(n, 'tags'),
+                readtime: child(n, 'readtime').trim(),
+                watchtime: child(n, 'watchtime').trim(),
+                type: child(n, 'type').trim()
+              }, slug);
+            });
+          });
+
+          /* Hand-added episodes (override with title + url, not in the feed). */
+          for (var slug in cfg.overrides) {
+            if (!cfg.overrides.hasOwnProperty(slug) || seenSlug[slug]) continue;
+            var ov = cfg.overrides[slug];
+            if (!ov || !ov.title || !ov.url) continue;
+            add({ title: ov.title, link: ov.url, date: ov.date || '', thumbnail: ov.thumbnail || '', type: 'video' }, slug);
+          }
+
+          entries.sort(function (a, b) {
+            return (b.dateTs - a.dateTs) || (b.feedTs - a.feedTs);
+          });
+          return entries;
+        });
+      });
+    },
+    render: function (entry) {
+      var li = document.createElement('li');
+      li.className = 'rbccm-filtered-content__item rbccm-filtered-content__item--etf-innovators';
+      if (entry.year)        li.setAttribute('data-year', entry.year);
+      if (entry.companySlug) {
+        li.setAttribute('data-company', entry.companySlug);
+        li.setAttribute('data-company-label', entry.company);
+      }
+      li.setAttribute('data-search-text', entry.searchText || '');
+
+      var ariaLabel = (entry.title || '') + (entry.speaker ? '. ' + entry.speaker : '') + (entry.meta ? '. ' + entry.meta : '');
+      var playSvg = '<svg class="rbccm-filtered-content__card-play-icon rbccm-filtered-content__card-play-icon--etf-innovators" xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true" focusable="false"><path d="M22.2756 17.2931L13.9222 22.116L13.9222 12.4702L22.2756 17.2931Z" fill="currentColor"/></svg>';
+
+      li.innerHTML =
+        '<a class="rbccm-filtered-content__card rbccm-filtered-content__card--etf-innovators" href="' + esc(entry.href || '#') + '" aria-label="' + esc(ariaLabel) + '">' +
+          '<div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--etf-innovators">' +
+            '<img class="rbccm-filtered-content__card-image rbccm-filtered-content__card-image--etf-innovators" loading="lazy" alt="" src="' + esc(entry.thumbnail || '') + '">' +
+            (entry.pillLabel ? '<span class="rbccm-filtered-content__card-pill rbccm-filtered-content__card-pill--etf-innovators">' + esc(entry.pillLabel) + '</span>' : '') +
+            '<span class="rbccm-filtered-content__card-play rbccm-filtered-content__card-play--etf-innovators" aria-hidden="true">' + playSvg + '</span>' +
+          '</div>' +
+          '<div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--etf-innovators">' +
+            (entry.category ? '<p class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--etf-innovators">' + esc(entry.category) + '</p>' : '') +
+            '<h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--etf-innovators">' + esc(entry.title || '') + '</h3>' +
+            (entry.speaker ? '<p class="rbccm-filtered-content__card-speaker rbccm-filtered-content__card-speaker--etf-innovators">' + esc(entry.speaker) + '</p>' : '') +
+            (entry.meta ? '<p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--etf-innovators">' + esc(entry.meta) + '</p>' : '') +
+          '</div>' +
+        '</a>';
+      return li;
+    }
+  };
+
   /* ---------- Adapter registry (preset -> config) ---------- */
   var PRESET_ADAPTERS = {
     'conference-insights':             CI_CONFIG,
     'in-the-media-and-press-releases': ITM_CONFIG,
-    'deals-and-transactions':          DEALS_CONFIG
+    'deals-and-transactions':          DEALS_CONFIG,
+    'etf-innovators':                  ETF_CONFIG
   };
 
   ENGINE.PRESET_ADAPTERS = PRESET_ADAPTERS;
@@ -2771,6 +3103,7 @@
     'data-item-selector',
     'data-page-size',
     'data-page-size-filtered',
+    'data-page-size-mobile',
     'data-empty-heading',
     'data-empty-message',
     'data-empty-message-emphasis',

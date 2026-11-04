@@ -2688,3 +2688,287 @@ a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--d
     transition: none;
   }
 }
+
+
+/* =========================================================================
+   ETF Innovators preset (.rbccm-filtered-content--etf-innovators)
+   -------------------------------------------------------------------------
+   "Explore the full series" grid on the ETF Innovators page. Episodes come
+   from the insights feeds via the etf-innovators adapter in the JS.
+     - 23px side gutter at every width; content inherits the global 1140
+       max-width from the base rules
+     - heading 36/120 mobile, 42/125 desktop (same as the Featured heading)
+     - filter bar: same chrome and layout as In the Media (Filter by:,
+       Company + Year dropdowns, Clear filters), between two #E6E9EF
+       hairlines
+     - cards: 16:9-ish thumbnail with "Full Episode" pill and play badge,
+       category eyebrow, title, speaker line, date + watch time
+     - 1 column mobile, 2 tablet, 3 desktop
+   ========================================================================= */
+.rbccm-filtered-content--etf-innovators {
+  padding: 48px 23px;          /* mobile spec: 48 top/bottom; 23 gutter (spec 20) */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators {
+    padding: 80px 23px;
+  }
+}
+
+/* ---------- Heading ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__heading {
+  color: #003168;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 120%;
+  margin-bottom: 32px;         /* heading -> filter bar */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__heading {
+    font-size: 42px;
+    line-height: 125%;
+    margin-bottom: 36px;
+  }
+}
+
+/* ---------- Filter bar ----------
+   Same chrome as In the Media: "Filter by:" label, rectangular
+   dropdowns and the Clear filters button all come from the base rules.
+   Layout mirrors the ITM preset: stacked up to 1024px (dropdowns share a
+   row, Clear filters full width below), one row on desktop with the
+   dropdowns sharing the space and Clear filters pinned right. */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter {
+  margin: 0 auto 40px;         /* filter bar -> cards, all widths */
+}
+/* Hairlines above and below the bar, 12px padding, controls centred. */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter-inner {
+  border-bottom: 1px solid #E6E9EF;
+  border-top: 1px solid #E6E9EF;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 62px;
+  padding: 12px 0;
+}
+@media (max-width: 1024px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__reset {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+@media (min-width: 1025px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group {
+    flex: 1 1 auto;
+    order: 1;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__reset {
+    margin-left: auto;
+    order: 2;
+  }
+}
+
+/* ---------- Grid ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+  gap: 40px 30px;
+  grid-template-columns: 1fr;
+  margin-bottom: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+    gap: 40.401px 29.382px;    /* row, column - tablet 2 up and desktop 3 up */
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.rbccm-filtered-content__item.rbccm-filtered-content__item--etf-innovators {
+  display: flex;
+  min-width: 0;
+}
+.rbccm-filtered-content__item.rbccm-filtered-content__item--etf-innovators[hidden] {
+  display: none;
+}
+
+/* ---------- Card ---------- */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12.855px;               /* media -> card content, mobile + desktop */
+  text-decoration: none;
+  width: 100%;
+}
+.rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:focus-visible {
+  border-radius: 14px;
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 4px;
+}
+
+.rbccm-filtered-content__card-media.rbccm-filtered-content__card-media--etf-innovators {
+  align-self: stretch;
+  aspect-ratio: 347 / 207;     /* spec frame: 347 x 207 */
+  background: lightgray;       /* shows until the thumbnail loads */
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.rbccm-filtered-content__card-image.rbccm-filtered-content__card-image--etf-innovators {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+
+.rbccm-filtered-content__card-pill.rbccm-filtered-content__card-pill--etf-innovators {
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 91.82px;
+  box-sizing: border-box;
+  color: #003168;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11.018px;
+  font-style: normal;
+  font-weight: 500;
+  height: 22.037px;
+  justify-content: center;
+  left: 14px;                  /* media padding: 10.561 top, 14 left */
+  line-height: 12.855px;
+  padding: 4.591px 9.797px 4.446px 10.1px;
+  position: absolute;
+  top: 10.561px;
+  white-space: nowrap;
+}
+
+.rbccm-filtered-content__card-play.rbccm-filtered-content__card-play--etf-innovators {
+  -webkit-backdrop-filter: blur(2.361px);
+  backdrop-filter: blur(2.361px);
+  background: rgba(255, 255, 255, 0.20);
+  border-radius: 34px;
+  box-shadow: inset 0 0 0 0.944px #FFFFFF;   /* the 0.944px white border, drawn inside so the 34px frame stays exact */
+  bottom: 14.688px;            /* media padding: 14.688 bottom, 14 left */
+  box-sizing: border-box;
+  color: #FFFFFF;
+  height: 34px;
+  left: 14px;
+  position: absolute;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  width: 34px;
+}
+/* Triangle drawn in the full 34 x 34 frame (same coordinates as the
+   spec SVG). */
+.rbccm-filtered-content__card-play-icon.rbccm-filtered-content__card-play-icon--etf-innovators {
+  display: block;
+  height: 34px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 34px;
+}
+
+.rbccm-filtered-content__card-body.rbccm-filtered-content__card-body--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.rbccm-filtered-content__card-label.rbccm-filtered-content__card-label--etf-innovators {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 1.212px;
+  line-height: 11.937px;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+.rbccm-filtered-content__card-title.rbccm-filtered-content__card-title--etf-innovators {
+  color: #003168;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 25.25px;
+  margin: 0 0 12px;            /* title -> name */
+  text-transform: none;
+  transition: color 0.2s ease;
+}
+.rbccm-filtered-content__card-speaker.rbccm-filtered-content__card-speaker--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 14.691px;
+  margin: 0 0 8px;             /* name -> date + watch time */
+}
+.rbccm-filtered-content__card-metadata.rbccm-filtered-content__card-metadata--etf-innovators {
+  color: #6B6B6B;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 12.855px;
+  margin: 0;
+}
+
+@media (hover: hover) {
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-image--etf-innovators {
+    transform: scale(1.04);
+  }
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-play--etf-innovators {
+    background: var(--Blue-Bright-Blue, #0051A5);
+    box-shadow: inset 0 0 0 0.944px var(--Blue-Bright-Blue, #0051A5);
+  }
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-title--etf-innovators {
+    color: var(--Blue-Bright-Blue, #0051A5);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__card-image.rbccm-filtered-content__card-image--etf-innovators,
+  .rbccm-filtered-content__card-play.rbccm-filtered-content__card-play--etf-innovators,
+  .rbccm-filtered-content__card-title.rbccm-filtered-content__card-title--etf-innovators {
+    transition: none;
+  }
+}
+
+/* ---------- Pagination ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__inner {
+  margin-bottom: 0;
+}
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__pagination {
+  margin: 32px 0 0;            /* cards -> pagination; section padding below */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__pagination {
+    margin-top: 40px;
+  }
+}

@@ -3,10 +3,11 @@
   <!--
     Skin: RBCCM Filtered Content
 
-    Preset driven filter + list component. Three variants:
+    Preset driven filter + list component. Four variants:
       conference-insights            (JS adapter fetches insights feed + whitelist)
       in-the-media-and-press-releases (server rendered inline via MetaQueryExternal)
       deals-and-transactions          (JS adapter fetches deals feed)
+      etf-innovators                  (JS adapter fetches insights feeds + episodes JSON)
 
     The In the Media preset publishes its list items INLINE via the
     MetaQueryExternal declared in Properties.xml. We iterate the
@@ -52,6 +53,8 @@
     <xsl:variable name="SECTION_ID" select="/Properties/Data/Datum[@ID='SectionID']"/>
     <xsl:variable name="PAGE_SIZE" select="/Properties/Data/Datum[@ID='PageSize']"/>
     <xsl:variable name="PAGE_SIZE_FILTERED" select="/Properties/Data/Datum[@ID='PageSizeFiltered']"/>
+    <xsl:variable name="PAGE_SIZE_MOBILE" select="normalize-space(/Properties/Data/Datum[@ID='PageSizeMobile'])"/>
+    <xsl:variable name="ETF_EPISODES_URL" select="normalize-space(/Properties/Data/Datum[@ID='EtfEpisodesUrl'])"/>
     <xsl:variable name="ARIA_LABEL" select="/Properties/Data/Datum[@ID='SectionAriaLabel']"/>
     <xsl:variable name="FILTER_BY_LABEL" select="/Properties/Data/Datum[@ID='FilterByLabel']"/>
     <xsl:variable name="CLEAR_LABEL" select="/Properties/Data/Datum[@ID='ClearFiltersLabel']"/>
@@ -144,6 +147,17 @@
       </xsl:if>
       <xsl:if test="$PAGE_SIZE_FILTERED != ''">
         <xsl:attribute name="data-page-size-filtered"><xsl:value-of select="$PAGE_SIZE_FILTERED"/></xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$PAGE_SIZE_MOBILE != ''">
+        <xsl:attribute name="data-page-size-mobile"><xsl:value-of select="$PAGE_SIZE_MOBILE"/></xsl:attribute>
+      </xsl:if>
+      <!-- ETF Innovators: episodes JSON (company names, category rules,
+           per episode overrides) and the noun for the empty message. -->
+      <xsl:if test="$PRESET = 'etf-innovators'">
+        <xsl:if test="$ETF_EPISODES_URL != ''">
+          <xsl:attribute name="data-episodes-url"><xsl:value-of select="$ETF_EPISODES_URL"/></xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="data-empty-message-subject">episodes</xsl:attribute>
       </xsl:if>
       <xsl:if test="$EMPTY_HEADING != ''">
         <xsl:attribute name="data-empty-heading"><xsl:value-of select="$EMPTY_HEADING"/></xsl:attribute>
@@ -248,6 +262,16 @@
                 </div>
               </xsl:if>
 
+              <!-- ETF Innovators: Company (options come from the episodes JSON
+                   company names, labels from data-company-label). -->
+              <xsl:if test="$PRESET = 'etf-innovators'">
+                <div class="rbccm-filtered-content__select-wrapper" data-filter="company">
+                  <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Company">
+                    <span class="rbccm-filtered-content__select-label">Company</span>
+                  </button>
+                  <xsl:value-of select="$CHEVRON_SVG" disable-output-escaping="yes"/>
+                </div>
+              </xsl:if>
               <xsl:if test="$SHOW_YEAR = 'true'">
                 <div class="rbccm-filtered-content__select-wrapper" data-filter="year">
                   <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
@@ -500,7 +524,7 @@
 
             </xsl:when>
 
-            <!-- CI / Deals presets: JS adapter populates on load. -->
+            <!-- CI / Deals / ETF presets: JS adapter populates on load. -->
             <xsl:otherwise/>
 
           </xsl:choose>
