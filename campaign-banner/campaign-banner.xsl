@@ -308,8 +308,6 @@
        - In the page source the link is #episode-title-1, the first story
          tile's heading on the same page, so the source never holds a
          broken or out-of-date link.
-       - Once the page has loaded, the link is set to the first story
-         tile's episode page (e.g. /en/insights/2026/09/slug).
        - Clicking it presses the first tile's "Play episode" button, so
          the tiles' own player opens at the bottom of the window (handled
          by the story tiles component's script). Closing the player
@@ -364,20 +362,6 @@
                 if (button) return { card: card, button: button };
               }
               return null;
-            }
-
-            // Point the link at the first tile's episode page.
-            function setLink() {
-              var tile = firstTile();
-              if (!tile) return;
-              var link = tile.card.querySelector('a[href]');
-              if (!link) return;
-              heroLink.setAttribute('href', link.getAttribute('href').replace('/templatedata/article/story/data/', '/'));
-            }
-            if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', setLink);
-            } else {
-              setLink();
             }
 
             hero.addEventListener('click', function (e) {
