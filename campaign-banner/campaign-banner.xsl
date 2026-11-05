@@ -3,11 +3,11 @@
   <!-- Skin: M&A Fall 2022
        Podcast pages (Biopharma, Macro Minutes, Markets in Motion,
        Powering Sustainable Ideas) use CTA Type "generic" for the
-       Start listening button. That button no longer uses the CTA Link
-       field: it links to the newest episode from the component's
-       episode query and opens the story tiles' player, so the pages no
-       longer need podcast-episode-replacer.js (see PODCAST_TRIGGER at
-       the end of this file). -->
+       Start listening button. That button now always plays the first
+       story tile using the tiles' own player, and the page source never
+       holds a broken link, so the pages no longer need
+       podcast-episode-replacer.js (see PODCAST_TRIGGER at the end of
+       this file). -->
 
   <xsl:include href="http://www.interwoven.com/livesite/xsl/HTMLTemplates.xsl"/>
   <xsl:include href="http://www.interwoven.com/livesite/xsl/StringTemplates.xsl"/>
@@ -155,6 +155,7 @@
                               <xsl:call-template name="PODCAST_TRIGGER">
                                 <xsl:with-param name="LABEL" select="$CTA_TEXT"/>
                                 <xsl:with-param name="SHOW_NAME" select="$PAGE_TITLE"/>
+                                <xsl:with-param name="CTA_LINK" select="$CTA_LINK"/>
                               </xsl:call-template>
                             </xsl:when>
                           </xsl:choose>
@@ -268,6 +269,7 @@
                           <xsl:call-template name="PODCAST_TRIGGER">
                             <xsl:with-param name="LABEL" select="$CTA_TEXT"/>
                             <xsl:with-param name="SHOW_NAME" select="$PAGE_TITLE"/>
+                                <xsl:with-param name="CTA_LINK" select="$CTA_LINK"/>
                           </xsl:call-template>
                         </xsl:when>
                       </xsl:choose>
@@ -300,48 +302,28 @@
 
   <!-- Start listening button (CTA Type "generic").
 
-       The newest episode comes from the episode query on this component
-       (External, MetaQueryExternal, same query as the page's story
-       tiles, newest first): the first result with a Captivate episode
-       URL.
+       Podcast pages (CTA Link empty, a placeholder like "Link", or a
+       Captivate URL): the button always plays the first story tile.
+       - In the page source it links to #episode-title-1, the first story
+         tile's heading on the same page, so the source never holds a
+         broken or out-of-date link.
+       - Once the page has loaded, the link is set to the first story
+         tile's episode page (e.g. /en/insights/2026/09/slug).
+       - Clicking it presses the first tile's "Play episode" button, so
+         the tiles' own player opens at the bottom of the window (handled
+         by the story tiles component's script). Closing the player
+         returns focus here.
+       No separate script file is needed.
 
-       - The button is a real link to that episode's page on rbccm.com
-         (/en/insights/yyyy/mm/slug, built from the result's path), so
-         the page source always holds a working, current link. If the
-         path can't be turned into a page URL, the link is the Captivate
-         player URL instead.
-       - Clicking it presses that episode's "Play episode" button in the
-         story tiles, so the tiles' own player opens at the bottom of the
-         window (handled by the story tiles component's script). If the
-         episode isn't in the tiles, the first tile with audio plays. If
-         there are no tiles, the link goes to the episode page.
-       - With no query, or no episode in the results, the button is left
-         out (an HTML comment says why) so there is never a broken link.
-
-       The CTA Link field is not used. -->
+       Other pages (CTA Link is a real page URL, starting with / or http
+       and not a Captivate link): same output as before, linking to
+       CTA Link. -->
   <xsl:template name="PODCAST_TRIGGER">
     <xsl:param name="LABEL"/>
     <xsl:param name="SHOW_NAME"/>
+    <xsl:param name="CTA_LINK"/>
 
-    <xsl:variable name="CAPTIVATE_PREFIX" select="'https://player.captivate.fm/episode/'"/>
-    <xsl:variable name="LATEST" select="(/Properties/Data/Result/records/metaResult[attr[starts-with(normalize-space(.), $CAPTIVATE_PREFIX)]])[1]"/>
-    <xsl:variable name="EPISODE_URL" select="normalize-space(($LATEST/attr[starts-with(normalize-space(.), $CAPTIVATE_PREFIX)])[1])"/>
-
-    <!-- templatedata/article/story/data/2026/09/slug -> /en/insights/2026/09/slug -->
-    <xsl:variable name="DCR_PATH" select="substring-after(normalize-space($LATEST/@path), '/data/')"/>
-    <xsl:variable name="PAGE_PATH">
-      <xsl:choose>
-        <xsl:when test="substring($DCR_PATH, string-length($DCR_PATH) - 3) = '.xml'"><xsl:value-of select="substring($DCR_PATH, 1, string-length($DCR_PATH) - 4)"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="$DCR_PATH"/></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="HREF">
-      <xsl:choose>
-        <xsl:when test="$PAGE_PATH != ''">/en/insights/<xsl:value-of select="$PAGE_PATH"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="$EPISODE_URL"/></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
+    <xsl:variable name="LINK" select="normalize-space($CTA_LINK)"/>
     <xsl:variable name="TITLE">
       <xsl:choose>
         <xsl:when test="normalize-space($SHOW_NAME) != ''">Start listening to <xsl:value-of select="normalize-space($SHOW_NAME)"/></xsl:when>
@@ -350,8 +332,11 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$EPISODE_URL != ''">
-        <a class="btn-play-audio generic-link" id="podcast-trigger" href="{$HREF}" data-episode="{$EPISODE_URL}" title="{$TITLE}" style="display: inline-block; color: #ffffff; text-decoration: none;"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span id="btn-label" class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/><xsl:if test="normalize-space($LABEL) = ''">Start listening</xsl:if></span></a>
+      <xsl:when test="(starts-with($LINK, '/') or starts-with($LINK, 'http')) and not(contains($LINK, 'captivate.fm'))">
+        <a class="generic-link" href="{$LINK}" style="color: #ffffff;"> <button type="button" aria-controls="podcast-player-container" aria-expanded="false" class="btn-play-audio" id="podcast-trigger" title="{$TITLE}"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span id="btn-label" class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/></span></button> </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a class="btn-play-audio generic-link" id="podcast-trigger" href="#episode-title-1" title="{$TITLE}" style="display: inline-block; color: #ffffff; text-decoration: none;"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span id="btn-label" class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/><xsl:if test="normalize-space($LABEL) = ''">Start listening</xsl:if></span></a>
         <script>
           (function () {
             var hero = document.getElementById('podcast-trigger');
@@ -364,38 +349,45 @@
               return src || '';
             }
 
-            // "Play episode" button of the tile with this episode, or of the
-            // first tile with audio if this episode isn't in the tiles.
-            function findTileButton(episode) {
+            // First story tile that has an episode: its card and "Play episode" button.
+            function firstTile() {
               var frames = document.querySelectorAll('.insights-stories .story-podcast-playing iframe');
-              var fallback = null;
               for (var i = 0; i !== frames.length; i++) {
-                var src = iframeSrc(frames[i]);
-                if (!src) continue;
-                var col = frames[i].parentNode.parentNode;
-                var button = col.querySelector('.story-card .audio-play');
-                if (!button) continue;
-                if (src === episode) return button;
-                if (!fallback) fallback = button;
+                if (!iframeSrc(frames[i])) continue;
+                var card = frames[i].parentNode.parentNode.querySelector('.story-card');
+                if (!card) continue;
+                var button = card.querySelector('.audio-play');
+                if (button) return { card: card, button: button };
               }
-              return fallback;
+              return null;
+            }
+
+            // Point the link at the first tile's episode page.
+            function setLink() {
+              var tile = firstTile();
+              if (!tile) return;
+              var link = tile.card.querySelector('a[href]');
+              if (!link) return;
+              hero.setAttribute('href', link.getAttribute('href').replace('/templatedata/article/story/data/', '/'));
+            }
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', setLink);
+            } else {
+              setLink();
             }
 
             hero.addEventListener('click', function (e) {
-              var tileButton = findTileButton(hero.getAttribute('data-episode'));
-              if (!tileButton) return; // no tiles: follow the link to the episode page
+              var tile = firstTile();
+              if (!tile) return; // no tiles: follow the link
               e.preventDefault();
-              tileButton.click();
+              tile.button.click();
               // Send focus back to this button when the player is closed.
               if (window.jQuery) {
-                window.jQuery(tileButton).closest('.story-card').siblings('.story-podcast-playing').data('triggerButton', window.jQuery(hero));
+                window.jQuery(tile.card).siblings('.story-podcast-playing').data('triggerButton', window.jQuery(hero));
               }
             });
           })();
         </script>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:comment> Start listening hidden: the episode query is missing or returned no Captivate episode </xsl:comment>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
