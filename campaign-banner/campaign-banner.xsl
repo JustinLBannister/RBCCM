@@ -304,7 +304,8 @@
 
        Podcast pages (CTA Link empty, a placeholder like "Link", or a
        Captivate URL): the button always plays the first story tile.
-       - In the page source it links to #episode-title-1, the first story
+       Same markup as before (a generic-link around the button).
+       - In the page source the link is #episode-title-1, the first story
          tile's heading on the same page, so the source never holds a
          broken or out-of-date link.
        - Once the page has loaded, the link is set to the first story
@@ -336,10 +337,13 @@
         <a class="generic-link" href="{$LINK}" style="color: #ffffff;"> <button type="button" aria-controls="podcast-player-container" aria-expanded="false" class="btn-play-audio" id="podcast-trigger" title="{$TITLE}"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span id="btn-label" class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/></span></button> </a>
       </xsl:when>
       <xsl:otherwise>
-        <a class="btn-play-audio generic-link" id="podcast-trigger" href="#episode-title-1" title="{$TITLE}" style="display: inline-block; color: #ffffff; text-decoration: none;"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span id="btn-label" class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/><xsl:if test="normalize-space($LABEL) = ''">Start listening</xsl:if></span></a>
+        <a href="#episode-title-1" style="color: #ffffff;"><button type="button" class="btn-play-audio"><span class="icon-circle"><img src="/assets/rbccm/images/campaign/podcast.svg" alt=""/></span><span class="btn-play-audio-text"><xsl:value-of select="$LABEL" disable-output-escaping="yes"/><xsl:if test="normalize-space($LABEL) = ''">Start listening</xsl:if></span></button></a>
         <script>
           (function () {
-            var hero = document.getElementById('podcast-trigger');
+            // The Start listening link sits right before this script.
+            var heroLink = document.currentScript ? document.currentScript.previousElementSibling : null;
+            if (!heroLink) return;
+            var hero = heroLink.querySelector('button');
             if (!hero) return;
 
             function iframeSrc(frame) {
@@ -368,7 +372,7 @@
               if (!tile) return;
               var link = tile.card.querySelector('a[href]');
               if (!link) return;
-              hero.setAttribute('href', link.getAttribute('href').replace('/templatedata/article/story/data/', '/'));
+              heroLink.setAttribute('href', link.getAttribute('href').replace('/templatedata/article/story/data/', '/'));
             }
             if (document.readyState === 'loading') {
               document.addEventListener('DOMContentLoaded', setLink);
