@@ -1,0 +1,29 @@
+<!-- Episode query for the Campaign Banner (M&A Fall 2022 skin).
+
+     Add this <External> block to the banner component on each podcast
+     page. TeamSite runs it when the page is served and puts the results
+     at /Properties/Data/Result/records/metaResult, newest first. The
+     skin takes the first result that has a Captivate episode URL: the
+     Start listening button links to that episode's page and its player
+     plays that episode.
+
+     Use the same query as the page's story tiles, so the newest result
+     is the first story tile. Only the sitelocation value changes per
+     page:
+
+       Biopharma                   sitelocation:biopharma
+       Macro Minutes               (copy from that page's story tiles)
+       Markets in Motion           (copy from that page's story tiles)
+       Powering Sustainable Ideas  (copy from that page's story tiles)
+
+     qPagesize 5 leaves room for a newest item that has no podcast URL. -->
+<External>
+  <Parameters>
+    <Datum ID="qQuery" Name="qQuery" Type="String" Label="Episode query (same as the story tiles)">((TeamSite/Templating/DCR/Type:article/story) OR (TeamSite/Templating/DCR/Type:rbccm/episode)) AND ((TeamSite/Metadata/sitelocation:biopharma) ) AND (TeamSite/Metadata/publishdate:&gt;2020-00-00)</Datum>
+    <Datum ID="qSort" Name="qSort" Type="String" Label="Sort">-TeamSite/Metadata/publishdate</Datum>
+    <Datum ID="qPagesize" Name="qPagesize" Type="String" Label="Maximum Items">5</Datum>
+    <Datum ID="qOffset" Name="qOffset" Type="String" Label="Offset">0</Datum>
+  </Parameters>
+  <Object Scope="local">com.rbccm.livesite.external.core.MetaQueryExternal</Object>
+  <Method>findByQuery</Method>
+</External>
