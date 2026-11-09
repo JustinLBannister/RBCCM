@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component inventory</title>
+<style>
+  :root { --ink: #1a1f2b; --muted: #5b6475; --line: #dde3ea; --blue: #0051A5; --navy: #002144; --bg: #f5f7fa; --chip: #e7eef1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Roboto, -apple-system, "Segoe UI", Arial, sans-serif; }
+  header { background: var(--navy); color: #fff; padding: 28px 24px; }
+  header h1 { margin: 0 0 4px; font-size: 26px; font-weight: 500; }
+  header p { margin: 0; color: #c9d4e3; font-size: 13px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 20px; }
+  .stat { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-width: 150px; }
+  .stat b { display: block; font-size: 26px; color: var(--navy); font-weight: 500; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  input[type=search] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; margin: 0 0 20px; }
+  h2 { font-size: 18px; font-weight: 500; margin: 32px 0 12px; color: var(--navy); }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: #fafbfc; }
+  td.name { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; white-space: nowrap; }
+  td.count { width: 70px; }
+  .badge { display: inline-block; min-width: 26px; padding: 1px 8px; border-radius: 999px; background: var(--blue); color: #fff; font-size: 13px; text-align: center; font-weight: 500; }
+  .tag { display: inline-block; padding: 0 6px; border-radius: 4px; background: var(--chip); color: var(--navy); font-size: 12px; }
+  .uses { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .links { font-size: 13px; color: var(--muted); }
+  a { color: var(--blue); }
+  .pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .page { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .page h3 { margin: 0; font-size: 16px; font-weight: 500; }
+  .page .url { margin: 2px 0 8px; color: var(--muted); font-size: 12px; word-break: break-all; }
+  .page ol { margin: 8px 0 0; padding-left: 22px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+  .note { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+  .unused { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .unused li { background: #fff; border: 1px dashed var(--line); border-radius: 6px; padding: 4px 10px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 640px) {
+    table, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+    td { border: 0; padding: 4px 14px; }
+    tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+    td.name { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Component inventory</h1>
+  <p>From build/pages.config.mjs &middot; generated 2026-11-09 19:28 UTC &middot; rebuilt by every npm run build</p>
+</header>
+<main>
+  <div class="stats">
+    <div class="stat"><b>4</b><span>pages</span></div>
+    <div class="stat"><b>22</b><span>components in use</span></div>
+    <div class="stat"><b>4</b><span>not on a page yet</span></div>
+    <div class="stat"><b>25</b><span>component folders</span></div>
+  </div>
+
+  <input type="search" id="filter" placeholder="Filter by component or page" aria-label="Filter by component or page">
+
+  <h2>By component</h2>
+  <table>
+    <thead><tr><th>Component</th><th>Pages</th><th>Used on</th></tr></thead>
+    <tbody>
+<tr data-search="rbccm-animate us-credentials strategy-and-economics maas-mata etf-innovators">
+  <td class="name">rbccm-animate</td>
+  <td class="count"><span class="badge">4</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-cta-band us-credentials strategy-and-economics maas-mata etf-innovators">
+  <td class="name">rbccm-cta-band</td>
+  <td class="count"><span class="badge">4</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-hero us-credentials strategy-and-economics maas-mata etf-innovators">
+  <td class="name">rbccm-hero</td>
+  <td class="count"><span class="badge">4</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="tag">CSS only</span> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-awards us-credentials maas-mata">
+  <td class="name">rbccm-awards</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-button us-credentials etf-innovators">
+  <td class="name">rbccm-button</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-capability-cards us-credentials maas-mata">
+  <td class="name">rbccm-capability-cards</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-platforms us-credentials strategy-and-economics">
+  <td class="name">rbccm-platforms</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-two-up-cards us-credentials maas-mata">
+  <td class="name">rbccm-two-up-cards</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>us-credentials</strong> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></li><li><strong>maas-mata</strong> <span class="tag">CSS only</span> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-video-poster maas-mata etf-innovators">
+  <td class="name">rbccm-video-poster</td>
+  <td class="count"><span class="badge">2</span></td>
+  <td><ul class="uses"><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="filtered-content etf-innovators">
+  <td class="name">filtered-content</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-accordions strategy-and-economics">
+  <td class="name">rbccm-accordions</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-expertise strategy-and-economics">
+  <td class="name">rbccm-expertise</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-featured-insights strategy-and-economics">
+  <td class="name">rbccm-featured-insights</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-host-profile etf-innovators">
+  <td class="name">rbccm-host-profile</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-in-the-media strategy-and-economics">
+  <td class="name">rbccm-in-the-media</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-insight-list etf-innovators">
+  <td class="name">rbccm-insight-list</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-intro-statement maas-mata">
+  <td class="name">rbccm-intro-statement</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-leading-experts strategy-and-economics">
+  <td class="name">rbccm-leading-experts</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>strategy-and-economics</strong> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-marketo-footer etf-innovators">
+  <td class="name">rbccm-marketo-footer</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>etf-innovators</strong> <span class="links"><a href="etf-innovators.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-marketo-modal maas-mata">
+  <td class="name">rbccm-marketo-modal</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-numbered-features maas-mata">
+  <td class="name">rbccm-numbered-features</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+<tr data-search="rbccm-section-group maas-mata">
+  <td class="name">rbccm-section-group</td>
+  <td class="count"><span class="badge">1</span></td>
+  <td><ul class="uses"><li><strong>maas-mata</strong> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></li></ul></td>
+</tr>
+    </tbody>
+  </table>
+
+  <h2>By page</h2>
+  <div class="pages">
+<section class="page" data-search="us-credentials rbccm-button rbccm-hero rbccm-awards rbccm-capability-cards rbccm-two-up-cards rbccm-platforms rbccm-cta-band rbccm-animate">
+  <h3>us-credentials <span class="badge">8</span> <span class="links"><a href="https://www.rbccm.com/en/about-us/us-credentials" target="_blank" rel="noopener">live</a> &middot; <a href="us-credentials.html">preview</a></span></h3>
+  <p class="url">https://www.rbccm.com/en/about-us/us-credentials</p>
+  <ol><li>rbccm-button</li><li>rbccm-hero</li><li>rbccm-awards</li><li>rbccm-capability-cards</li><li>rbccm-two-up-cards</li><li>rbccm-platforms</li><li>rbccm-cta-band</li><li>rbccm-animate</li></ol>
+  
+</section>
+<section class="page" data-search="strategy-and-economics rbccm-hero rbccm-accordions rbccm-expertise rbccm-leading-experts rbccm-cta-band rbccm-platforms rbccm-in-the-media rbccm-featured-insights rbccm-animate">
+  <h3>strategy-and-economics <span class="badge">9</span> <span class="links"><a href="https://www.rbccm.com/en/insights/strategy-economics" target="_blank" rel="noopener">live</a> &middot; <a href="strategy-and-economics.html">preview</a></span></h3>
+  <p class="url">https://www.rbccm.com/en/insights/strategy-economics</p>
+  <ol><li>rbccm-hero</li><li>rbccm-accordions</li><li>rbccm-expertise</li><li>rbccm-leading-experts</li><li>rbccm-cta-band</li><li>rbccm-platforms</li><li>rbccm-in-the-media</li><li>rbccm-featured-insights</li><li>rbccm-animate</li></ol>
+  
+</section>
+<section class="page" data-search="maas-mata rbccm-animate rbccm-hero rbccm-video-poster rbccm-section-group rbccm-intro-statement rbccm-awards rbccm-two-up-cards rbccm-capability-cards rbccm-numbered-features rbccm-cta-band rbccm-marketo-modal">
+  <h3>maas-mata <span class="badge">11</span> <span class="links"><a href="https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions" target="_blank" rel="noopener">live</a> &middot; <a href="maas-mata.html">preview</a></span></h3>
+  <p class="url">https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions</p>
+  <ol><li>rbccm-animate</li><li>rbccm-hero <span class="tag">CSS only</span></li><li>rbccm-video-poster</li><li>rbccm-section-group</li><li>rbccm-intro-statement</li><li>rbccm-awards</li><li>rbccm-two-up-cards <span class="tag">CSS only</span></li><li>rbccm-capability-cards</li><li>rbccm-numbered-features</li><li>rbccm-cta-band</li><li>rbccm-marketo-modal</li></ol>
+  
+</section>
+<section class="page" data-search="etf-innovators rbccm-button rbccm-hero rbccm-video-poster filtered-content rbccm-cta-band rbccm-host-profile rbccm-insight-list rbccm-marketo-footer rbccm-animate">
+  <h3>etf-innovators <span class="badge">9</span> <span class="links"><a href="etf-innovators.html">preview</a></span></h3>
+  
+  <ol><li>rbccm-button</li><li>rbccm-hero</li><li>rbccm-video-poster</li><li>filtered-content</li><li>rbccm-cta-band</li><li>rbccm-host-profile</li><li>rbccm-insight-list</li><li>rbccm-marketo-footer</li><li>rbccm-animate</li></ol>
+  
+</section>
+  </div>
+
+  <h2>Not on a page yet</h2>
+  <ul class="unused"><li data-search="rbccm-brightcove-bg-layer">rbccm-brightcove-bg-layer</li><li data-search="rbccm-disclaimer">rbccm-disclaimer</li><li data-search="rbccm-json-schema">rbccm-json-schema</li><li data-search="rbccm-leadership">rbccm-leadership</li></ul>
+</main>
+<script>
+  document.getElementById('filter').addEventListener('input', function (e) {
+    var q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('[data-search]').forEach(function (el) {
+      el.hidden = q !== '' && el.getAttribute('data-search').indexOf(q) === -1;
+    });
+  });
+</script>
+</body>
+</html>

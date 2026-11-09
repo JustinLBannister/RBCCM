@@ -5,6 +5,13 @@
      Brightcove video in a modal (the MAAS+MATA "Execution Console"
      image under the hero).
 
+     Two skins share these fields:
+       rbccm-video-poster.xsl                  default (MAAS+MATA strip)
+       rbccm-video-poster (double-dash) etf-innovators.xsl
+                                               ETF Innovators "Featured"
+                                               section (heading, text,
+                                               16:9 poster, pill)
+
      No video ID = image only, no play button, no modal.
      Only the Brightcove video ID normally changes; account and
      player are RBC-wide constants (blank uses them).
@@ -29,11 +36,11 @@
        each poster on a page its own value. -->
   <Datum ID="SectionID" Type="String" Name="ID (unique per page - blank = rbccm-video-poster-1)">rbccm-video-poster-1</Datum>
 
-  <Datum ID="SpaceAbove" Type="String" Name="Space above on desktop, in px (blank = 75; mobile is always 0)">75</Datum>
+  <Datum ID="SpaceAbove" Type="String" Name="Space above on desktop, in px (blank = 75; mobile is always 0; not used by the ETF Innovators skin)">75</Datum>
 
   <!-- How far the next section slides up underneath the image. 200
        on MAAS+MATA; 0 for no overlap. -->
-  <Datum ID="OverlapBelow" Type="String" Name="Overlap into the next section, in px (blank = 200; 0 = none)">200</Datum>
+  <Datum ID="OverlapBelow" Type="String" Name="Overlap into the next section, in px (blank = 200; 0 = none; not used by the ETF Innovators skin)">200</Datum>
 
   <Datum ID="BrightcoveAccount" Type="String" Name="Brightcove account ID (RBC-wide constant - leave as is)">6021289101001</Datum>
 
@@ -49,7 +56,16 @@
        Content tab: copy, links, media
        ============================================================ -->
 
-  <Datum ID="PosterImage" Type="String" Name="Poster image URL (shown at 1100 x 366; narrow screens crop to the centre)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
+  <!-- ETF Innovators skin only: heading + description above the
+       poster, and the pill in its top right corner. Blank hides each
+       one. The default skin ignores all three. -->
+  <Datum ID="SectionHeading" Type="String" Name="ETF Innovators : section heading (optional, e.g. Featured)"></Datum>
+
+  <Datum ID="SectionDescription" Type="Textarea" Name="ETF Innovators : section description (optional - HTML allowed)"></Datum>
+
+  <Datum ID="BadgeText" Type="String" Name="ETF Innovators : pill text, top right of the poster (optional, e.g. Season Promo)"></Datum>
+
+  <Datum ID="PosterImage" Type="String" Name="Poster image URL (default skin: shown at 1100 x 366, narrow screens crop to the centre; ETF Innovators: 16:9, e.g. 2200 x 1238)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
 
   <Datum ID="PosterImageWebp" Type="String" Name="Poster image WebP version (optional - same image saved as .webp, usually a fraction of the PNG size; browsers that support WebP load this one instead)"></Datum>
 

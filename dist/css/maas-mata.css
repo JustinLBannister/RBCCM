@@ -1,4 +1,4 @@
-/*! RBCCM maas-mata.css | v1 | built 2026-10-28T14:40:48.283Z
+/*! RBCCM maas-mata.css | v1 | built 2026-11-04T19:41:28.832Z
  *  rbccm-hero, rbccm-video-poster, rbccm-section-group, rbccm-intro-statement, rbccm-awards, rbccm-two-up-cards, rbccm-capability-cards, rbccm-numbered-features, rbccm-cta-band, rbccm-marketo-modal */
 
 /* ==== rbccm-hero/rbccm-hero.css ==== */
@@ -41,6 +41,9 @@
                              (insight card also needs rbccm-hero.js)
      US Credentials          .rbccm-hero.rbccm-hero--us-credentials
                              skin rbccm-hero--us-credentials.xsl
+     ETF Innovators          .rbccm-hero.rbccm-hero--etf-innovators
+                             skin rbccm-hero--etf-innovators.xsl
+                             (yellow button styled in this file)
      Option on any variant:  .rbccm-hero--header-center (HeaderAlignment)
      (candidate) Insights hub, About Us, others as they migrate.
 
@@ -1592,6 +1595,325 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   [data-hero-rise] { animation: none !important; }
 }
 
+
+/* =========================================================================
+   Variant: ETF Innovators
+   -------------------------------------------------------------------------
+   US Credentials' navy surface + background image (desktop and mobile
+   versions on custom properties), with the S+E left-aligned copy
+   column: breadcrumbs, one-line h1, paragraph, one yellow button. The
+   photo fills the right side of the art; a name tag sits over it,
+   bottom right on the container's edge. 8px warm-yellow rule along
+   the bottom, as on MAAS+MATA.
+   Mobile (under 992) follows the US Credentials mobile pattern: one
+   portrait image, copy over its top, the subject at the bottom, name
+   tag bottom left.
+   Sizes are measured from the page comps (no Figma specs yet).
+   ========================================================================= */
+.rbccm-hero--etf-innovators {
+  --rbccm-hero-crumb-color: #fff;
+  background: #001E3C;
+  border-bottom: 8px solid var(--rbccm-hero-yellow);
+  color: #fff;
+  min-height: 93vh;          /* mobile / tablet; desktop is 470px below */
+  overflow: hidden;
+  padding: 85px 0 120px;     /* 65 nav + 20; bottom clears the name tag */
+}
+@media (min-width: 768px) {
+  .rbccm-hero--etf-innovators { padding-top: 118px; }   /* 98 nav (from 768) + 20 */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators {
+    min-height: 470px;
+    padding-bottom: 56px;      /* top stays 118 (98 nav + 20) from 768 */
+  }
+}
+
+/* Art: covers the whole section at every width, top to the yellow rule
+   (its top strip sits under the fixed nav). Mobile anchors to the
+   bottom so the subject stays below the copy; desktop anchors right,
+   so the copy sits over the dark left side. */
+.rbccm-hero--etf-innovators .rbccm-hero__bg-image {
+  background-image: var(--rbccm-hero-bg-mobile);
+  /* 83% across: the mobile art is close to square, so phones crop its
+     sides; this keeps the subject (right of centre in the art) in view
+     where the mobile comp has her. */
+  background-position: 83% bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+/* Mobile / tablet: a light navy fade behind the copy, clear by the
+   subject. The art itself is meant to be dark enough behind the copy,
+   so this only helps legibility. */
+.rbccm-hero--etf-innovators .rbccm-hero__bg-image::after {
+  background: linear-gradient(180deg, rgba(0, 30, 60, 0.6) 0%, rgba(0, 30, 60, 0.35) 45%, rgba(0, 30, 60, 0) 70%);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+@media (min-width: 992px) {
+  /* The 16:9 desktop art fills the width, so the vertical position
+     picks the slice (she sits centre-right in the art). */
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image {
+    background-image: var(--rbccm-hero-bg-desktop);
+    background-position: center 31%;
+  }
+  /* Desktop: navy behind the copy, fading out before the photo. */
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, rgba(0, 33, 66, 0.85) 0%, rgba(0, 33, 66, 0.55) 40%, rgba(0, 33, 66, 0) 65%);
+  }
+}
+
+/* Copy column: left-aligned at every width. */
+.rbccm-hero--etf-innovators .rbccm-hero__container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 0 23px;
+  text-align: left;
+  width: 100%;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__breadcrumbs {
+  align-self: stretch;
+  margin-bottom: 14px;     /* + 16 gap = 30 to the headline */
+}
+.rbccm-hero--etf-innovators .rbccm-hero__breadcrumb-list { justify-content: flex-start; }
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__breadcrumbs { margin-bottom: 24px; }
+}
+
+/* Title: one line, RBC Display. letter-spacing / text-transform reset
+   so picking h1 can't pull in the site's heading styles. */
+.rbccm-hero--etf-innovators .rbccm-hero__title {
+  color: #fff;
+  font-family: var(--rbccm-hero-serif);
+  font-size: 50px;           /* mobile spec: 50 / 100%, weight 500 */
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 100%;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__title {
+    font-size: 75px;           /* desktop spec: 75 / 100%, weight 500 */
+    line-height: 100%;
+  }
+}
+
+/* Mobile spec: Roboto 16 / 150%, -0.16px tracking, ligatures off. */
+.rbccm-hero--etf-innovators .rbccm-hero__subtitle {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.16px;
+  line-height: 150%;
+  margin: 0;
+  max-width: 510px;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__subtitle strong { font-weight: 700; }
+/* Tablet (768-991): a wider paragraph, 600px, and the art anchored
+   83% / 80% so the subject stays in frame on the wider crop. */
+@media (min-width: 768px) and (max-width: 991px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__subtitle { max-width: 600px; }
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image { background-position: 83% 80%; }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__subtitle {
+    font-size: 20px;           /* desktop spec: Roboto 20 / 130% */
+    letter-spacing: 0;
+    line-height: 130%;
+    max-width: 554px;
+  }
+}
+
+.rbccm-hero--etf-innovators .rbccm-hero__actions {
+  display: flex;
+  margin-top: 6px;           /* + 16 gap = 22 under the paragraph (mobile spec) */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__actions { margin-top: 8px; }   /* 24 */
+}
+
+/* ---- Yellow button (baked in, like the MAAS+MATA ones) ----------------
+   The skin outputs rbccm-button class names; these rules are scoped to
+   this hero, so rbccm-button.css isn't needed. !important where the
+   site's unified.css / unified2.css .btn and a rules would otherwise
+   reshape the pill. */
+.rbccm-hero--etf-innovators .rbccm-button {
+  align-items: center !important;
+  background: var(--rbccm-hero-yellow) !important;
+  border: 1px solid var(--rbccm-hero-yellow) !important;
+  border-radius: 100px !important;
+  box-sizing: border-box;
+  color: #003168 !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  gap: 10px;
+  height: 46px !important;
+  justify-content: center !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  padding: 0 24px !important;
+  position: relative !important;
+  text-decoration: none !important;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.rbccm-hero--etf-innovators .rbccm-button > * { position: relative !important; z-index: 1 !important; }
+.rbccm-hero--etf-innovators .rbccm-button:hover,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible {
+  background: #E5B520 !important;
+  border-color: #E5B520 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #003168 !important;
+  text-decoration: none !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.rbccm-hero--etf-innovators .rbccm-button__icon {
+  fill: #003168;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+/* Line arrow (the skin's default icon): stroke only, in the text colour. */
+.rbccm-hero--etf-innovators .rbccm-button__icon--line,
+.rbccm-hero--etf-innovators .rbccm-button__icon.rbccm-button__icon--line {
+  fill: none;
+  height: 11px;
+  width: 15px;
+}
+/* Mobile spec: 40px pill, 0 25px padding, ~7px gap, Roboto 14 / 500 /
+   20.445px. Desktop spec: 45px, 12 / 25 padding, 10px gap, 16 / 500 /
+   29.26px (below). */
+@media (max-width: 991px) {
+  .rbccm-hero--etf-innovators .rbccm-button {
+    font-size: 14px !important;
+    gap: 7px;
+    height: 40px !important;
+    line-height: 20.445px !important;
+    padding: 0 25px !important;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-button {
+    font-size: 16px !important;
+    gap: 10px;
+    height: 45px !important;
+    line-height: 29.26px !important;
+    padding: 12px 25px !important;
+  }
+  .rbccm-hero--etf-innovators .rbccm-button__icon {
+    height: 20px;
+    width: 20px;
+  }
+}
+/* Shine sweep + arrow flyby, as on the MAAS+MATA primary button. */
+.rbccm-hero--etf-innovators .rbccm-button::before {
+  animation: none !important;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%) !important;
+  bottom: 0 !important;
+  content: "" !important;
+  left: -60% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: 0 !important;
+  transform: skewX(-18deg) !important;
+  transition: left 600ms ease-out, opacity 600ms ease-out !important;
+  width: 40% !important;
+  z-index: 0 !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:hover::before,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible::before {
+  left: 120% !important;
+  opacity: 1 !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:hover .rbccm-button__icon,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible .rbccm-button__icon {
+  animation: rbccm-hero-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--etf-innovators .rbccm-button::before { transition: none !important; }
+  .rbccm-hero--etf-innovators .rbccm-button:hover::before,
+  .rbccm-hero--etf-innovators .rbccm-button:focus-visible::before { opacity: 0 !important; }
+  .rbccm-hero--etf-innovators .rbccm-button:hover .rbccm-button__icon,
+  .rbccm-hero--etf-innovators .rbccm-button:focus-visible .rbccm-button__icon { animation: none !important; }
+}
+
+/* ---- Name tag ----------------------------------------------------------
+   Translucent box over the photo. Mobile spec (under 992): bottom left on
+   the gutter, at least 172px wide, 8.762 / 14.02 padding, 2.629 gap,
+   8.762 radius, rgba(5, 21, 42, 0.19) with a 6.57px backdrop blur; name
+   Roboto 13.143 / 500 / 15.772, title 11.391 / 400 / 13.143 at 85% white.
+   (The spec's scaleX(-1) is a flipped layer in the design file, not a
+   real transform.) Desktop: bottom right on the container's right edge
+   (1180 max - 23 gutter), slightly larger type until it has a spec. */
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag {
+  -webkit-backdrop-filter: blur(6.572px);
+  backdrop-filter: blur(6.572px);
+  align-items: flex-start;
+  background: rgba(5, 21, 42, 0.19);
+  border-radius: 8.762px;
+  bottom: 28px;              /* mobile comp: 28px above the yellow rule */
+  display: flex;
+  flex-direction: column;
+  gap: 2.629px;
+  left: 23px;
+  margin: 0;
+  max-width: calc(100% - 46px);
+  min-width: 172px;
+  padding: 8.762px 14.02px;
+  position: absolute;
+  z-index: 1;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag {
+    bottom: 55px;
+    left: auto;
+    padding: 10px 16px;
+    right: max(23px, calc((100% - 1180px) / 2 + 23px));
+  }
+}
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag-name {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 13.143px;
+  font-weight: 500;
+  line-height: 15.772px;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag-title {
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11.391px;
+  font-weight: 400;
+  line-height: 13.143px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag-name { font-size: 15px; line-height: 130%; }
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag-title { font-size: 13px; line-height: 130%; }
+}
+
 /* ==== rbccm-video-poster/rbccm-video-poster.css ==== */
 /* =========================================================================
    RBCCM Video Poster
@@ -1604,6 +1926,9 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    The image is fixed at 1100 x 366 and centred inside the box
    (object-fit: cover, object-position: center), so narrow screens show
    the middle of it.
+
+   Variants: default (MAAS+MATA strip, rbccm-video-poster.xsl) and
+   ETF Innovators (rbccm-video-poster--etf-innovators.xsl, block below).
 
    Spacing (set per instance by the XSL as inline custom properties):
      --rbccm-vp-space-above  desktop space above the box (default 75px;
@@ -1708,6 +2033,182 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   .rbccm-video-poster .rbccm-video-poster__play:focus-visible {
     transition: none !important;
     transform: translate(-50%, -50%) !important;
+  }
+}
+
+/* Modal layering: above everything on the page, including the fixed
+   site nav and the other components' overlays (the site goes up to
+   z-index 10000). The JS moves each modal to the end of <body> so no
+   wrapper can trap it, and tags its backdrop. Bootstrap's own values
+   are 1040 / 1050. */
+.modal.rbccm-video-poster__modal { z-index: 100001 !important; }
+.modal-backdrop.rbccm-video-poster__backdrop { z-index: 100000 !important; }
+
+/* =========================================================================
+   Variant: ETF Innovators ("Featured" section)
+   Skin: rbccm-video-poster--etf-innovators.xsl
+   -------------------------------------------------------------------------
+   Navy section, heading + description, then the poster as a 16:9 box at
+   the full content width (global 1140), pill top right. Type is from the
+   mobile and desktop specs; desktop spacing, poster radius and pill
+   padding are measured from the page comp. Gutter 23px at every width.
+   ========================================================================= */
+.rbccm-video-poster-section--etf-innovators {
+  align-items: center;
+  background: #092549;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 23px;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster-section--etf-innovators { padding: 80px 23px; }
+}
+.rbccm-video-poster-section__inner--etf-innovators {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;                 /* header -> poster */
+  margin: 0 auto;
+  max-width: 1140px;         /* global content width */
+  width: 100%;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster-section__inner--etf-innovators { gap: 25px; }
+}
+.rbccm-video-poster-section__header--etf-innovators {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;                 /* heading -> description (desktop 7) */
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster-section__header--etf-innovators { gap: 7px; }
+}
+/* letter-spacing / text-transform reset so the site's h2 rules can't
+   reach in. */
+.rbccm-video-poster-section__heading--etf-innovators {
+  color: #fff;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0 !important;
+  line-height: 120%;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+}
+/* Desktop spec: 42 / 125%. */
+@media (min-width: 992px) {
+  .rbccm-video-poster-section__heading--etf-innovators {
+    font-size: 42px;
+    line-height: 125%;
+  }
+}
+.rbccm-video-poster-section__description--etf-innovators {
+  color: rgba(255, 255, 255, 0.85);
+  font-family: Roboto, Arial, sans-serif;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Poster box: 16:9 at the column width (329 x 185 at 375), white behind
+   the image, 7px radius (20 on desktop). No overlap into the next
+   section. Doubled class so it beats the default box rules at every
+   width. */
+.rbccm-video-poster.rbccm-video-poster--etf-innovators {
+  align-self: stretch;
+  aspect-ratio: 16 / 9;
+  background: #fff;
+  border-radius: 7.015px;
+  height: auto;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  z-index: auto;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster.rbccm-video-poster--etf-innovators { border-radius: 20px; }
+}
+.rbccm-video-poster--etf-innovators .rbccm-video-poster__image {
+  border-radius: inherit;
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  object-position: center;
+  top: 0;
+  transform: none;
+  width: 100%;
+}
+
+/* Play button, mobile spec: 25.254 circle, 0.701 white border, 20% white,
+   1.754 blur. The tap target is grown to 44px with an invisible ring so
+   the small circle stays easy to hit. Desktop: the default 56px button. */
+.rbccm-video-poster--etf-innovators .rbccm-video-poster__play {
+  -webkit-backdrop-filter: blur(1.754px);
+  backdrop-filter: blur(1.754px);
+  border: 0.701px solid #fff;
+  border-radius: 25.254px;
+  height: 25.254px;
+  width: 25.254px;
+}
+.rbccm-video-poster--etf-innovators .rbccm-video-poster__play::before {
+  border-radius: 50%;
+  content: "";
+  inset: -10px;
+  position: absolute;
+}
+.rbccm-video-poster--etf-innovators .rbccm-video-poster__play-icon {
+  height: 100%;
+  width: 100%;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster--etf-innovators .rbccm-video-poster__play {
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border-width: 2px;
+    border-radius: 55.993px;
+    height: 55.993px;
+    width: 55.993px;
+  }
+  .rbccm-video-poster--etf-innovators .rbccm-video-poster__play::before { display: none; }
+}
+
+/* Pill, top right. Mobile spec: Roboto 11 / 500 / 13, #05152A on warm
+   yellow, 4.5 / 8.094 / 4.5 / 9 padding. Desktop spec: 15.245 / 500 /
+   17.591, 0.305px tracking (padding and inset from the comp). */
+.rbccm-video-poster__badge--etf-innovators {
+  align-items: center;
+  background: #FFC72C;
+  border-radius: 100px;
+  color: #05152A;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 13px;
+  padding: 4.5px 8.094px 4.5px 9px;
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  z-index: 4;
+}
+@media (min-width: 992px) {
+  .rbccm-video-poster__badge--etf-innovators {
+    font-size: 15.245px;
+    letter-spacing: 0.305px;
+    line-height: 17.591px;
+    padding: 7px 16px;
+    right: 24px;
+    top: 24px;
   }
 }
 
@@ -2540,6 +3041,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
                         title, subtitle, body copy, and a text CTA link.
                         Clicking the play button opens a modal video.
 
+     --video-single     Layout add-on for --video-callouts: one video
+                        card, with the section heading + description
+                        beside it in the left column (section 3b).
+
    Shared shell
    =========================================================================
    Both presets share:
@@ -3342,6 +3847,127 @@ a.rbccm-two-up-cards__card--link:focus-visible {
   transform: translateX(4px);
 }
 
+
+/* =========================================================================
+   3b. Layout: --video-single   (one video card, header beside it)
+   =========================================================================
+   Used with --video-callouts, which supplies every colour, type and card
+   style above. This block only changes the layout: __split holds the
+   header and the one-card grid. Below 872 they stack (header centred
+   above the card, as in --video-callouts). From 872 they sit in two equal
+   columns: header left, vertically centred and left-aligned; card right,
+   up to 546px wide (1140 max - 48 gap, halved). */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1140px;
+}
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__grid {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: none;
+}
+/* The card is the thumbnail alone (no text below it): 16:9 in place of
+   the fixed 243px strip, rounded on all four corners. */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-media {
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 15px;
+}
+/* The skin puts the CTA arrow (16x16 viewBox) in the play circle in
+   place of the 56x56 triangle: white, drawn at 24px. */
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-play {
+  color: #fff;
+}
+.rbccm-two-up-cards--video-single .rbccm-two-up-cards__card-play svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Header text link ("Watch the video"), same destination as the card.
+   Matches rbccm-featured-insights "View all insights": Roboto 16/500,
+   #0051A5, 20px arrow, underline fades in and the arrow nudges on
+   hover. `a.` prefix + !important beat the site's Bootstrap a:hover. */
+a.rbccm-two-up-cards__header-link,
+a.rbccm-two-up-cards__header-link:link,
+a.rbccm-two-up-cards__header-link:visited,
+a.rbccm-two-up-cards__header-link:hover,
+a.rbccm-two-up-cards__header-link:focus,
+a.rbccm-two-up-cards__header-link:active {
+  color: #0051A5 !important;
+}
+a.rbccm-two-up-cards__header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  width: fit-content;
+  margin-top: 8px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16.5px;
+  letter-spacing: 1px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+a.rbccm-two-up-cards__header-link:hover,
+a.rbccm-two-up-cards__header-link:focus-visible {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+a.rbccm-two-up-cards__header-link:focus {
+  outline: none;
+}
+a.rbccm-two-up-cards__header-link:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 3px;
+}
+.rbccm-two-up-cards__header-link svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+.rbccm-two-up-cards__header-link:hover svg,
+.rbccm-two-up-cards__header-link:focus-visible svg {
+  animation: rbccm-tuc-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-tuc-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+@media (min-width: 872px) {
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 48px;
+  }
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__header {
+    align-items: flex-start;
+    max-width: none;
+    text-align: left;
+  }
+  .rbccm-two-up-cards--video-single .rbccm-two-up-cards__grid {
+    grid-auto-rows: auto;
+  }
+}
+
+/* Section background colour set (SectionBgColor; the skin adds --has-bg):
+   the card's 5% grey tint is made for a white section, so on a coloured
+   one the card gets a solid white background to stand out. */
+.rbccm-two-up-cards--video-callouts.rbccm-two-up-cards--has-bg .rbccm-two-up-cards__card {
+  background: #fff;
+}
+
 /* =========================================================================
    4. Video modal
    =========================================================================
@@ -3472,6 +4098,13 @@ a.rbccm-two-up-cards__card--link:focus-visible {
   }
   .rbccm-two-up-cards__card-play svg {
     transform: none !important;
+  }
+  a.rbccm-two-up-cards__header-link {
+    transition: none !important;
+  }
+  .rbccm-two-up-cards__header-link:hover svg,
+  .rbccm-two-up-cards__header-link:focus-visible svg {
+    animation: none !important;
   }
 }
 
@@ -5423,6 +6056,148 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
   }
 }
 
+
+/* =========================================================================
+   Variant: ETF Innovators ("Powering the performance of global ETFs.")
+   Skin: rbccm-cta-band--etf-innovators.xsl
+   -------------------------------------------------------------------------
+   White section holding a rounded bright blue card. Every element carries
+   the --etf-innovators modifier. Mobile (spec): card padding 32/24, 10px
+   gaps, heading 28/33.6, body 16/24.8, 40px yellow button sized to its
+   label (25px padding each side). Desktop (spec): card padding 56/64,
+   24px radius; left rail up to 613px, gap 14, heading 42/50.4, body
+   17/27.2; the right column flexes and holds the button at its right edge.
+   The base rules use !important on type, so these do too.
+   ========================================================================= */
+.rbccm-cta-band--etf-innovators {
+  --rbccm-cta-band-bg-color:     #FFFFFF;
+  --rbccm-cta-band-card-bg:      #0051A5;
+  --rbccm-cta-band-card-radius:  20px;
+  --rbccm-cta-band-card-padding: 32px 24px;
+  padding: 40px 23px;            /* mobile spec 40 / 20; 23 gutter */
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--etf-innovators {
+    --rbccm-cta-band-card-padding: 56px 64px;
+    --rbccm-cta-band-card-radius:  24px;
+    padding: 60px 23px;          /* desktop spec 60 / 0; 23 gutter */
+  }
+}
+
+/* Card: column on mobile, row on desktop. */
+.rbccm-cta-band__inner.rbccm-cta-band__inner--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band__inner.rbccm-cta-band__inner--etf-innovators {
+    align-items: center;
+    flex-direction: row;
+    gap: 40px;                 /* minimum space between the columns */
+    justify-content: space-between;
+  }
+}
+
+/* Heading + paragraph container (left aligned at every width). */
+.rbccm-cta-band__intro.rbccm-cta-band__intro--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 10px;
+  text-align: left;
+}
+/* Desktop: left rail up to 613px (shrinks only if the card gets
+   narrower than that plus the button). */
+@media (min-width: 992px) {
+  .rbccm-cta-band__intro.rbccm-cta-band__intro--etf-innovators {
+    align-self: auto;
+    flex: 0 1 613px;
+    gap: 14px;
+    max-width: 613px;
+  }
+}
+
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__heading.rbccm-cta-band__heading--etf-innovators {
+  color: #FFFFFF !important;
+  font-size: 28px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 33.6px !important;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--etf-innovators .rbccm-cta-band__heading.rbccm-cta-band__heading--etf-innovators {
+    font-size: 42px !important;
+    line-height: 50.4px !important;
+  }
+}
+
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__body.rbccm-cta-band__body--etf-innovators {
+  color: #FFFFFF !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 24.8px !important;
+  max-width: none;
+}
+@media (min-width: 992px) {
+  .rbccm-cta-band--etf-innovators .rbccm-cta-band__body.rbccm-cta-band__body--etf-innovators {
+    font-size: 17px !important;
+    line-height: 27.2px !important;
+  }
+}
+
+/* Button row + button. The button sizes to its label (25px each side). */
+.rbccm-cta-band__actions.rbccm-cta-band__actions--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  flex-direction: column;
+  gap: 0;
+  justify-content: flex-start;
+}
+/* Desktop: the right column takes the remaining space and holds the
+   button against its right edge, centred vertically. */
+@media (min-width: 992px) {
+  .rbccm-cta-band__actions.rbccm-cta-band__actions--etf-innovators {
+    align-items: flex-end;
+    align-self: auto;
+    flex: 1 1 auto;
+    min-width: max-content;
+  }
+}
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__btn.rbccm-cta-band__btn--etf-innovators {
+  align-self: auto;
+  background: #FFC72C !important;
+  border: 0;
+  border-radius: 100px;
+  color: #003168 !important;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  gap: 10px;
+  height: 40px;
+  justify-content: flex-start;
+  line-height: 18px;
+  padding: 0 25px;
+  white-space: nowrap;
+}
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__btn.rbccm-cta-band__btn--etf-innovators:hover,
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__btn.rbccm-cta-band__btn--etf-innovators:focus-visible {
+  background: #E5B325 !important;
+}
+.rbccm-cta-band--etf-innovators .rbccm-cta-band__btn.rbccm-cta-band__btn--etf-innovators:focus-visible {
+  outline: 2px solid #FFFFFF;
+  outline-offset: 3px;
+}
+.rbccm-cta-band__btn-icon.rbccm-cta-band__btn-icon--etf-innovators {
+  fill: none;
+  height: 11px;
+  width: 15px;
+}
+
 /* ==== rbccm-marketo-modal/rbccm-marketo-modal.css ==== */
 /* =========================================================================
    RBCCM Marketo Modal
@@ -5440,7 +6215,8 @@ p.rbccm-cta-band__eyebrow,  div.rbccm-cta-band__eyebrow {
      heading   RBC Display 500 36/36, -0.6px, #082043; last word(s) #0051A5;
                45 x 2 yellow rule
      subhead   Roboto 400 16/24, #494949
-     fields    2 columns (First/Last, Company/Title), Email full width,
+     fields    2 columns (First/Last, Company/Title, Email/Phone), Asset
+               class full width (row of checkboxes),
                32px column gap, 24px row gap; #979797 underline, 11/0
                field padding; label Roboto 500 13/15, 0.52px, #858585,
                sits in the field until it has focus or a value
@@ -5473,9 +6249,49 @@ dialog.rbccm-marketo-modal {
   min-height: 563px;                  /* Figma 563; grows (not scrolls) when Marketo adds error lines */
   max-height: calc(100% - 32px);
   max-width: min(600px, calc(100% - 32px));
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;                   /* the body scrolls, so the X and the progress bar stay put */
   padding: 48px 40px;
+  width: 100%;
+}
+dialog.rbccm-marketo-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+.rbccm-marketo-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;              /* the progress bar stands in for it */
+}
+.rbccm-marketo-modal__body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Scroll progress ---------------------------------------------------- */
+/* Only when the body is taller than the dialog (is-scrollable, from the
+   JS): a 4px grey track down the right edge with a yellow fill for how
+   much of the form has been seen. Below the X, so they never overlap. */
+.rbccm-marketo-modal__progress {
+  background: #E1E5EA;
+  border-radius: 2px;
+  bottom: 32px;
+  display: none;
+  overflow: hidden;
+  position: absolute;
+  right: 14px;
+  top: 70px;                          /* X: 18 top + 36 tall, plus 16 */
+  width: 4px;
+}
+dialog.rbccm-marketo-modal.is-scrollable .rbccm-marketo-modal__progress {
+  display: block;
+}
+.rbccm-marketo-modal__progress-fill {
+  background: #FFC72C;
+  border-radius: 2px;
+  display: block;
+  height: 0;
+  transition: height 0.1s linear;
   width: 100%;
 }
 dialog.rbccm-marketo-modal *,
@@ -5666,12 +6482,15 @@ dialog.rbccm-marketo-modal.is-fallback-open {
   float: none !important;
   width: 100% !important;
 }
-/* Design order: First | Last, Company | Title, Email, consent, buttons. */
+/* Design order: First | Last, Company | Title, Email | Phone, Asset class,
+   consent, buttons. */
 @media (min-width: 600px) {
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--firstname,
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--lastname,
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company,
-  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title {
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--email,
+  .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--phone {
     grid-column: auto;
   }
 }
@@ -5680,6 +6499,8 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--company   { order: 3; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--title     { order: 4; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--email     { order: 5; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--phone     { order: 6; }
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--assetclass { order: 7; }
 .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--checkbox  { order: 20; }
 
 /* ---- Text fields: underline + floating label ---------------------------- */
@@ -5769,6 +6590,86 @@ dialog.rbccm-marketo-modal.is-fallback-open {
 .rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid textarea.mktoField:focus,
 .rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid select.mktoField:focus {
   box-shadow: 0 1px 0 0 #C8102E !important;
+}
+
+/* ---- Multi-select (e.g. Asset Class): label + row of checkboxes ------- */
+/* The JS hides Marketo's list box and adds one checkbox per option. The
+   select stays in the form for submit and validation. The label sits
+   above in the text fields' raised style (display: block !important for
+   the same form 1574 reason as above). */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoLabel {
+  color: #858585 !important;
+  display: block !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.52px !important;
+  line-height: 15px !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoFieldWrap {
+  position: relative;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect select.mktoField {
+  border: 0 !important;
+  bottom: 0;
+  height: 1px !important;
+  left: 0;
+  margin: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 !important;
+  pointer-events: none;
+  position: absolute !important;
+  width: 1px !important;
+}
+/* Marketo's own message would sit on the hidden select; our inline
+   message (rbccm-marketo-modal__error) covers this field. */
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--multiselect .mktoError {
+  display: none !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+}
+.rbccm-marketo-modal .mktoForm label.rbccm-marketo-modal__multi-option {
+  align-items: center;
+  color: #252525 !important;
+  cursor: pointer;
+  display: flex !important;
+  float: none !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  gap: 10px;
+  line-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-option input {
+  accent-color: var(--Blue-Bright-Blue, #0051A5);
+  flex: 0 0 auto;
+  float: none !important;
+  height: 18px !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  padding: 0 !important;
+  position: static !important;
+  width: 18px !important;
+}
+.rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__multi-option input:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+.rbccm-marketo-modal .mktoForm .mktoFieldWrap.is-invalid .rbccm-marketo-modal__multi-option input {
+  outline: 1px solid #C8102E;
+  outline-offset: 0;
 }
 
 /* ---- Consent checkbox --------------------------------------------------- */
@@ -6048,6 +6949,9 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
   .rbccm-marketo-modal__header {
     padding: 27px 0 32px;
   }
+  .rbccm-marketo-modal__progress {
+    right: 8px;                       /* in the 20px side padding */
+  }
   .rbccm-marketo-modal h2.rbccm-marketo-modal__heading {
     font-size: 30px !important;
     line-height: 32px !important;
@@ -6060,6 +6964,7 @@ dialog.rbccm-marketo-modal:has(.rbccm-marketo-modal__thanks:not([hidden])) {
     animation: none;
   }
   .rbccm-marketo-modal .mktoForm .rbccm-marketo-modal__field--text .mktoLabel,
+  .rbccm-marketo-modal__progress-fill,
   .rbccm-marketo-modal__submit-arrow {
     transition: none;
   }
