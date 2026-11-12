@@ -1,4 +1,4 @@
-/*! RBCCM maas-mata.js | v1 | built 2026-11-04T19:41:28.833Z
+/*! RBCCM maas-mata.js | v1 | built 2026-11-12T14:58:31.576Z
  *  rbccm-animate, rbccm-video-poster, rbccm-section-group, rbccm-awards, rbccm-capability-cards, rbccm-marketo-modal */
 
 /* ==== rbccm-animate/rbccm-animate.js ==== */
@@ -248,6 +248,13 @@
      wrapper (transforms, z-index from TeamSite or the scroll
      animations) can trap it under the page; the CSS puts the modal and
      its backdrop above everything else, fixed nav included.
+   - Other videos: any link with data-video-src (a Brightcove player
+     URL) opens the page's video modal playing THAT video instead of
+     the poster's own (data-video-modal="<modal id>" picks a modal;
+     otherwise the first one). data-video-label names the dialog. The
+     poster's video is back on its play button after closing. Used by
+     the ETF hero's "Watch the latest interview" button (filtered-content
+     sets the attributes). Cmd/Ctrl/Shift-click still follows the link.
    ========================================================================= */
 (function () {
   'use strict';
@@ -276,8 +283,16 @@
     iframe.removeAttribute('src');
 
     var trigger = null;
-    function play() { iframe.setAttribute('src', withAutoplay(src)); }
-    function stop() { iframe.removeAttribute('src'); }
+    var override = '';                            /* another link's video */
+    var baseLabel = modal.getAttribute('aria-label');
+    var baseTitle = iframe.getAttribute('title');
+    function play() { iframe.setAttribute('src', withAutoplay(override || src)); }
+    function stop() {
+      iframe.removeAttribute('src');
+      override = '';
+      if (baseLabel != null) modal.setAttribute('aria-label', baseLabel);
+      if (baseTitle != null) iframe.setAttribute('title', baseTitle);
+    }
     function focusClose() { if (closeBtn) closeBtn.focus(); }
     /* Bootstrap adds its backdrop at its own z-index (1040); lift the
        newest one to sit just under this modal. */
@@ -302,6 +317,19 @@
     var hasBS5    = !!(window.bootstrap && window.bootstrap.Modal);
     var $         = window.jQuery;
     var hasBS3or4 = !!($ && $.fn && $.fn.modal);
+
+    /* Open this modal with another video (see "Other videos" above). */
+    modal.rbccmPlayVideo = function (url, label, el) {
+      override = url;
+      if (label) {
+        modal.setAttribute('aria-label', label);
+        iframe.setAttribute('title', label);
+      }
+      trigger = el || null;
+      if (hasBS5) window.bootstrap.Modal.getOrCreateInstance(modal).show();
+      else if (hasBS3or4) $(modal).modal('show');
+      else openModal();
+    };
 
     if (hasBS5) {
       modal.addEventListener('show.bs.modal', function (e) {
@@ -370,6 +398,23 @@
   function init() {
     Array.prototype.forEach.call(document.querySelectorAll('.rbccm-video-poster__modal'), wire);
   }
+
+  /* Links with data-video-src play in the video modal. Delegated, so it
+     also covers links that get the attributes after load. */
+  document.addEventListener('click', function (ev) {
+    if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    var el = ev.target && ev.target.closest ? ev.target.closest('[data-video-src]') : null;
+    if (!el) return;
+    var url = el.getAttribute('data-video-src') || '';
+    if (!/^(https?:)?\/\//i.test(url)) return;
+    var id = el.getAttribute('data-video-modal');
+    var modal = id ? document.getElementById(id) : document.querySelector('.rbccm-video-poster__modal');
+    if (!modal) return;
+    wire(modal);
+    if (!modal.rbccmPlayVideo) return;
+    ev.preventDefault();
+    modal.rbccmPlayVideo(url, el.getAttribute('data-video-label') || '', el);
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 }());
