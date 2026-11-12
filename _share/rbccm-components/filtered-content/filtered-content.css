@@ -1,0 +1,2974 @@
+/* =========================================================================
+   rbccm-filtered-content - SINGLE CONSOLIDATED COMPONENT
+   -------------------------------------------------------------------------
+   Merges + BEM-renames:
+     - filter-by.css                 (filter UI + pagination + empty state)
+     - conference-insights-tiles.css (tile grid + skeleton + card shell)
+
+   BEM prefix unified to `rbccm-filtered-content__*` throughout.
+   Preset-specific overrides live under a `--conference-insights`,
+   `--in-the-media-and-press-releases`, or `--deals-and-transactions`
+   root modifier. All three preset item stylings ship together in this
+   file - no external CSS needed.
+   ========================================================================= */
+
+/* ---------- PART 1: filter shell (ported from filter-by.css) ---------- */
+
+/* =========================================================================
+   Filter Component (shared)
+   -------------------------------------------------------------------------
+   Reusable BEM filter block for any list of items on the site. Drives a
+   client-side filter UI (month + region + keyword search) against any
+   collection of DOM elements matching the block's `data-target` selector.
+
+   Currently consumed by:
+     - conference-insights (light bg)
+   Migration candidates:
+     - upcoming-conferences (dark bg - use --dark modifier)
+
+   Modifiers:
+     .rbccm-filtered-content__filter                    -> light background (default)
+     .rbccm-filtered-content--dark              -> dark background (white text, transparent inputs)
+
+   Layout pattern ported from live .rbccm-upcoming-conferences__filters:
+     Mobile: everything stacks vertically
+     Desktop (>=768px): "Filter by: [Month] [Region]" compact group on the
+     left, search input pushed to the right, Clear button at the end.
+
+   SVG chevrons render as SIBLING elements inside .__select-wrapper (not
+   background-image data-URIs) - more reliable across browsers.
+
+   Data contract on filtered elements:
+     data-month        "YYYY-MM"
+     data-region       space-separated region codes (e.g. "global gb au")
+     data-search-text  lowercased haystack of searchable text
+
+   Block: rbccm-filtered-content__filter
+   ========================================================================= */
+
+/* The .__filter block used to carry its own vertical padding via CSS
+   custom props, which stacked with the outer .rbccm-filtered-content's
+   padding (also authored via the same custom props) - content editors
+   had no way to tune one without moving both, and defaults doubled up
+   (80px on mobile, ~86px on desktop). The outer section now owns all
+   vertical padding; the filter chrome sits inside it and just centers
+   its own content.
+
+   Horizontal 16px gutter kept so the chrome doesn't kiss the section
+   edges on narrow viewports where the outer section's own 16px isn't
+   enough (e.g. if authors override the outer padding to 0). */
+.rbccm-filtered-content__filter {
+  padding: 0;
+  margin-bottom: 50px;
+}
+
+.rbccm-filtered-content__filter-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+
+/* ---------- Row ----------
+   Mobile: single column stack. Desktop: horizontal row, "Filter by:"
+   group left, search right, reset button end. */
+.rbccm-filtered-content__filter-row {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__filter-row {
+    align-items: center;
+    flex-direction: row;
+    gap: 16px;
+    justify-content: flex-start;
+  }
+}
+
+
+/* ---------- Filter group ("Filter by:" label + Month + Region) ---------- */
+.rbccm-filtered-content__group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__group {
+    flex: 0 0 auto;
+  }
+}
+
+
+/* ---------- "Filter by:" label ----------
+   Matching padding to the select buttons (11px top / 6px bottom)
+   so the label's baseline lines up with the button text's visual
+   center - RBC Display's ascender-heavy metrics push text up, so
+   symmetric padding would leave the label sitting lower. */
+.rbccm-filtered-content__group-label {
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-block;
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 11px 0 6px 0;
+}
+
+
+/* ---------- Hide-filter modifier (opt-in per instance) --------------
+   Preset-agnostic modifier that removes a filter control from the row
+   without deleting its markup. Applied via `--hidden-*` classes on the
+   filter root, so bringing a control back is a one-word HTML change
+   rather than a DOM restore. `!important` beats the auto-populate
+   pass in the JS, which clears inline `display` on rebind. */
+.rbccm-filtered-content--hidden-month  .rbccm-filtered-content__select-wrapper[data-filter="month"],
+.rbccm-filtered-content--hidden-region .rbccm-filtered-content__select-wrapper[data-filter="region"],
+.rbccm-filtered-content--hidden-topic  .rbccm-filtered-content__select-wrapper[data-filter="topic"],
+.rbccm-filtered-content--hidden-type   .rbccm-filtered-content__select-wrapper[data-filter="type"],
+.rbccm-filtered-content--hidden-year   .rbccm-filtered-content__select-wrapper[data-filter="year"],
+.rbccm-filtered-content--hidden-search .rbccm-filtered-content__search {
+  display: none !important;
+}
+
+
+/* ---------- Select wrap (holds select + chevron SVG) ---------- */
+.rbccm-filtered-content__select-wrapper {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
+/* Mobile-only: Topic dropdown drops to its own full-width row so the
+   button reads clearly ("Topic v") AND its longer option labels
+   ("Power, Utilities & Infrastructure", "Markets & Economics") aren't
+   truncated when the panel opens. Year and Region share the first row
+   since their button labels are short and their options are the ISO
+   bucket names (Global / US / Canada / Europe / APAC - all fit fine). */
+@media (max-width: 767px) {
+  .rbccm-filtered-content__select-wrapper[data-filter="topic"] {
+    flex: 1 1 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__select-wrapper {
+    flex: 0 0 auto;
+    width: 160px;
+  }
+}
+
+
+/* ---------- Select button (custom dropdown trigger) ----------
+   The button visually mimics a native <select> but drives a custom
+   listbox popup so we can style the panel + options to spec. */
+.rbccm-filtered-content__select {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #A8A8A8;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #252525;
+  cursor: pointer;
+  display: flex;
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 6.5px 20px 6.5px 10px; /* extra right for caret, tighter left */
+  text-align: left;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.rbccm-filtered-content__select-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.rbccm-filtered-content__select:hover,
+.rbccm-filtered-content__select:focus,
+.rbccm-filtered-content__select[aria-expanded="true"] {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  outline: none;
+}
+
+
+/* ---------- Chevron (right side of select) ---------- */
+.rbccm-filtered-content__select-chevron {
+  color: var(--Blue-Dark-Blue, #003168);
+  pointer-events: none;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.15s ease;
+}
+
+/* When the button is expanded, flip the chevron to point up. */
+.rbccm-filtered-content__select[aria-expanded="true"] + .rbccm-filtered-content__select-chevron {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+
+/* ---------- Select panel (popup listbox) ----------
+   Absolutely positioned below the button. Per design spec: white bg,
+   subtle border, soft drop shadow, 10px vertical padding, no gap
+   between options. */
+.rbccm-filtered-content__select-panel {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #929292;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  list-style: none;
+  margin: 4px 0 0 0;
+  min-width: 100%;
+  padding: 10px 0;
+  position: absolute;
+  top: 100%;
+  width: max-content;
+  max-width: min(320px, 100vw - 32px);
+  z-index: 30;
+}
+
+.rbccm-filtered-content__select-panel[hidden] {
+  display: none;
+}
+
+
+/* ---------- Select options ---------- */
+.rbccm-filtered-content__select-option {
+  align-items: flex-start;
+  background: #FFF;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.rbccm-filtered-content__select-option:hover,
+.rbccm-filtered-content__select-option:focus-visible {
+  background: rgba(0, 81, 165, 0.08);
+}
+
+.rbccm-filtered-content__select-option[aria-selected="true"] {
+  color: var(--Blue-Bright-Blue, #0051A5);
+  font-weight: 500;
+}
+
+/* Per-option counts (data-option-counts="true", deals preset). Built for
+   parity with the transactions page filter, which also hides its counts
+   (.ycnt / .tcnt). Remove this display: none to show them. */
+.rbccm-filtered-content__select-option-count {
+  display: none;
+  margin-left: auto;
+  color: #555;
+}
+
+
+/* ---------- Range filter (deals Amount) ----------
+   Ships hidden: the wrapper carries an inline style="display: none;" in
+   the skin + test markup, matching the transactions page where the
+   Amount slider is built but hidden. These styles are ready for when the
+   inline style is removed. Two stacked range inputs share one track. */
+.rbccm-filtered-content__range {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.rbccm-filtered-content__range-label {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.rbccm-filtered-content__range-track {
+  height: 20px;
+  position: relative;
+  width: 180px;
+}
+.rbccm-filtered-content__range-track::before {
+  background: #A8A8A8;
+  border-radius: 2px;
+  content: '';
+  height: 4px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 8px;
+}
+.rbccm-filtered-content__range-input {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 20px;
+  left: 0;
+  margin: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.rbccm-filtered-content__range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: var(--Blue-Bright-Blue, #0051A5);
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  height: 16px;
+  pointer-events: all;
+  width: 16px;
+}
+.rbccm-filtered-content__range-input::-moz-range-thumb {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  height: 12px;
+  pointer-events: all;
+  width: 12px;
+}
+.rbccm-filtered-content__range-input:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 2px;
+}
+.rbccm-filtered-content__range-value {
+  color: #555;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.rbccm-filtered-content__range.is-active .rbccm-filtered-content__range-value {
+  color: var(--Blue-Bright-Blue, #0051A5);
+}
+.rbccm-filtered-content__range-clear {
+  background: none;
+  border: 0;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+
+/* ---------- Search (input + magnifying-glass icon) ----------
+   Design spec: flex row with 10px gap, 11px vertical / 10px horizontal
+   padding, 5px radius, 1px border, stretches to parent height. */
+.rbccm-filtered-content__search {
+  align-items: center;
+  align-self: stretch;
+  background: #ffffff;
+  border: 1px solid #A8A8A8;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 7px 10px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.rbccm-filtered-content__search:hover,
+.rbccm-filtered-content__search:focus-within {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__search {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 260px;
+    max-width: 420px;
+    margin-left: auto;
+  }
+}
+
+
+/* ---------- Tablet breakpoint (768px - 1024px) ----------
+   Layout switches to two rows:
+     Row 1: filter dropdowns (Month + Region + Industry + any others)
+            fill the full row, sharing space equally
+     Row 2: Search input + Clear button fill the second row
+   Desktop (1025px+) uses the single-row layout above. Mobile (<768px)
+   stays in the fully-stacked column layout. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+  }
+
+  .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .rbccm-filtered-content__search {
+    flex: 1 1 auto;
+    margin-left: 0;
+    max-width: none;
+  }
+}
+
+.rbccm-filtered-content__search-icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  flex-shrink: 0;
+}
+
+.rbccm-filtered-content__search-input {
+  background: transparent;
+  border: 0;
+  color: #252525;
+  flex: 1;
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  outline: none;
+  /* Asymmetric top padding shifts placeholder + typed text down ~2px
+     to visually center the ascender-heavy RBC Display serif inside the
+     flex-centered search bar. In a flex parent with align-items:center,
+     adding padding-top of N grows the input's box and recenters it,
+     netting a downward text shift of ~N/2. */
+  padding: 4px 0 0 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.rbccm-filtered-content__search-input::placeholder {
+  color: #6f6f6f;
+  opacity: 1;
+}
+
+
+/* ---------- Reset button ---------- */
+.rbccm-filtered-content__reset {
+  background: transparent;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  cursor: pointer;
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 11px 20px 6px 20px;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.rbccm-filtered-content__reset:hover,
+.rbccm-filtered-content__reset:focus-visible {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Active-filter chip row --------------------------------
+   Auto-injected row that appears BELOW the filter inputs when at
+   least one filter is set. Renders one chip per active dropdown /
+   search value; each chip carries a dismiss "X" that clears just
+   that filter. Hidden when no filters are active so the row
+   collapses out of layout (no empty gap). Modeled on AutoTrader's
+   active-filter row. */
+.rbccm-filtered-content__chip-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+.rbccm-filtered-content__chip-row[hidden] {
+  display: none !important;
+}
+
+/* Chip -- border-radius + colors mirror the .__empty-clear button
+   so the two "filter management" controls read as siblings visually.
+   Dim prefix ("Type:", "Year:") and the remove X share the same
+   navy tone as the border and label text. */
+.rbccm-filtered-content__chip {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 10px;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-flex;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 8px;
+  line-height: 1;
+  padding: 6px 8px 6px 14px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+/* Full-chip hover -- matches the .__empty-clear button's inverse
+   treatment (navy fill, everything inside goes white). Hovering the
+   chip anywhere, or focusing the inner remove button, triggers the
+   swap; the X button no longer needs its own separate hover state. */
+.rbccm-filtered-content__chip:hover,
+.rbccm-filtered-content__chip:has(.rbccm-filtered-content__chip-remove:focus-visible) {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+}
+
+/* Text label -- dim prefix and value inherit the chip's navy color. */
+.rbccm-filtered-content__chip-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+/* "dim" = "dimension" (Type, Year, Region, etc.). Matches the value's
+   color + weight so the prefix reads as one continuous label rather
+   than a faded meta tag. */
+.rbccm-filtered-content__chip-dim {
+  color: inherit;
+  font-weight: inherit;
+}
+
+/* X button. Colour inherits from the chip (navy). Hover / focus
+   flips to the .__empty-clear button's inverse treatment: navy fill
+   with white glyph. */
+.rbccm-filtered-content__chip-remove {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  height: 22px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+  width: 22px;
+}
+/* X button focus ring only -- background flip is owned by the chip's
+   :hover / :has() rule above, so the X inherits the white glyph
+   automatically when the chip goes navy. */
+.rbccm-filtered-content__chip-remove:focus-visible {
+  outline: none;
+}
+.rbccm-filtered-content__chip-remove svg {
+  display: block;
+  height: 10px;
+  width: 10px;
+}
+
+
+/* ---------- Screen-reader-only utility ---------- */
+.rbccm-filtered-content__screen-reader-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+
+/* ---------- Empty-state (populated by JS) ----------
+   Rendered when the active filter matches zero items. Pattern ported from
+   .rbccm-upcoming-conferences__empty: circular icon + heading + two
+   messages + "Clear filters" button, stacked and centered. */
+.rbccm-filtered-content__empty {
+  align-items: center;
+  align-self: stretch;
+  display: none;
+  flex-direction: column;
+  gap: 32px;
+  padding: 60px 16px;
+  text-align: center;
+}
+
+.rbccm-filtered-content__empty.is-visible {
+  display: flex;
+}
+
+.rbccm-filtered-content__empty[hidden] {
+  display: none;
+}
+
+.rbccm-filtered-content__empty-icon-wrapper {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background: rgba(0, 49, 104, 0.10);
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 100px;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: flex;
+  flex-shrink: 0;
+  height: 80px;
+  justify-content: center;
+  padding: 19px 19px 18px 18px;
+  width: 80px;
+}
+
+.rbccm-filtered-content__empty-icon {
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  height: 43px;
+  width: 43px;
+}
+
+.rbccm-filtered-content__empty-heading {
+  color: var(--Blue-Dark-Blue, #003168);
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0;
+}
+
+.rbccm-filtered-content__empty-message {
+  color: var(--Blue-Dark-Blue, #003168);
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 120%;
+  margin: 0;
+  max-width: 640px;
+}
+
+.rbccm-filtered-content__empty-message--emphasis {
+  font-weight: 500;
+  line-height: normal;
+}
+
+.rbccm-filtered-content__empty-clear {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 10px;
+  color: var(--Blue-Dark-Blue, #003168);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  height: 50px;
+  justify-content: center;
+  line-height: 24px;
+  padding: 0 40px;
+  transition: background 0.15s ease, color 0.15s ease;
+  min-width: 212px;
+}
+
+.rbccm-filtered-content__empty-clear:hover,
+.rbccm-filtered-content__empty-clear:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Pagination (populated by JS) ---------- */
+.rbccm-filtered-content__pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  justify-content: center;
+  margin: 32px 0;
+}
+
+.rbccm-filtered-content__pagination:empty {
+  display: none;
+}
+
+.rbccm-filtered-content__page-button {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: #252525;
+  cursor: pointer;
+  display: inline-flex;
+  /* Production font stack - matches the font name registered on the
+     live site. If testing locally, swap the primary to "RBC Display"
+     (with space) since Google Fonts / local test HTML loads it that way. */
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  height: 40px;
+  justify-content: center;
+  min-width: 40px;
+  /* Asymmetric top padding shifts the digit down ~2px to visually
+     center RBC Display's ascender-heavy metrics inside the square. */
+  padding: 4px 10px 0 10px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Arrow buttons: no visible border in rest state, but keep the 50%
+   border-radius so a hover/focus circle appears cleanly. Horizontal
+   padding stays asymmetric so each chevron nudges toward its
+   "pointing" edge - prev sits closer to the left, next sits closer
+   to the right. */
+.rbccm-filtered-content__page-button--previous,
+.rbccm-filtered-content__page-button--next {
+  border-color: transparent;
+  background: transparent;
+}
+
+.rbccm-filtered-content__page-button--previous {
+  padding: 0 10px 0 6px;
+}
+
+.rbccm-filtered-content__page-button--next {
+  padding: 0 6px 0 10px;
+}
+
+/* On hover/focus, the border re-emerges (same rule as number buttons
+   above) - giving the arrows a subtle circular ring for feedback. */
+
+.rbccm-filtered-content__page-button:hover,
+.rbccm-filtered-content__page-button:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+.rbccm-filtered-content__page-button--active,
+.rbccm-filtered-content__page-button--active:hover,
+.rbccm-filtered-content__page-button--active:focus,
+.rbccm-filtered-content__page-button--active:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  cursor: default;
+}
+
+.rbccm-filtered-content__page-button[disabled] {
+  cursor: default;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Chevron icon inside prev/next buttons. SVGs are emitted pre-mirrored
+   from JS (left chevron for prev, right chevron for next); this rule
+   only sets base color + block layout. Stroke uses currentColor so
+   hover/focus/dark/disabled states adapt automatically. */
+.rbccm-filtered-content__page-button-icon {
+  color: var(--Blue-Dark-Blue, #003168);
+  display: block;
+  flex: none;
+  transition: color 0.2s ease;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button-icon {
+  color: currentColor;
+}
+
+/* ---------- Arrow button hover / focus ----------
+   Rest state: transparent bg + transparent border (chevron floats).
+   Hover / keyboard focus: circle fills blue, chevron flips to white,
+   with a smooth cross-fade - matches the leadership-slider desktop
+   arrow treatment. Skipping the visible ring at rest keeps the arrows
+   quiet in the pagination row until they're interacted with. */
+.rbccm-filtered-content__page-button--previous,
+.rbccm-filtered-content__page-button--next {
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.rbccm-filtered-content__page-button--previous:hover,
+.rbccm-filtered-content__page-button--next:hover,
+.rbccm-filtered-content__page-button--previous:focus-visible,
+.rbccm-filtered-content__page-button--next:focus-visible {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-filtered-content__page-button--previous:hover .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content__page-button--next:hover .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content__page-button--previous:focus-visible .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content__page-button--next:focus-visible .rbccm-filtered-content__page-button-icon {
+  color: #ffffff;
+}
+
+/* Ellipsis - styled as a circle matching the number buttons so the
+   three-item pagination row (current - ellipsis - last) reads as a
+   consistent shape sequence. Uses opacity: 0.4 to match the disabled
+   arrow-button treatment - reads as inactive/decorative using the
+   same "unavailable" language readers already learned from the
+   pagination arrows. Non-interactive (aria-hidden, no button
+   semantics). Inherits dark-blue border/text so dark-theme
+   variants get the right base color automatically. */
+.rbccm-filtered-content__page-ellipsis {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: inline-flex;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  height: 40px;
+  justify-content: center;
+  line-height: normal;
+  min-width: 40px;
+  opacity: 0.4;
+  padding: 0;
+  user-select: none;
+  width: 40px;
+}
+
+
+/* ---------- Responsive pagination scale ----------
+   Desktop (default above) sits at 40px circles / 16px numerals / 26px
+   gap. That range hosts 9-11 circles comfortably. Below the desktop
+   breakpoint we scale everything down so a richer set of circles still
+   fits without wrapping to two rows.
+
+   Mobile (<768px)  -> ~28px circles / 12px numerals / 12px gap (~70% of
+                      desktop). Max 7 circles fit inside a 375px viewport
+                      accounting for gap and container padding.
+   Tablet (768-1023) -> ~34px circles / 14px numerals / 18px gap (~85% of
+                      desktop). Max 9 circles fit inside a 768-1023px
+                      viewport comfortably.
+
+   SVG chevrons + border thickness inherit the scale by being drawn
+   inline; setting the button dimensions is enough. */
+@media (max-width: 1023px) {
+  .rbccm-filtered-content__pagination {
+    gap: 18px;
+    margin: 24px 0;
+  }
+  .rbccm-filtered-content__page-button,
+  .rbccm-filtered-content__page-ellipsis {
+    font-size: 14px;
+    height: 34px;
+    min-width: 34px;
+    width: auto;
+  }
+  .rbccm-filtered-content__page-ellipsis {
+    width: 34px;
+  }
+  .rbccm-filtered-content__page-button-icon {
+    height: 14px;
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .rbccm-filtered-content__pagination {
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .rbccm-filtered-content__page-button,
+  .rbccm-filtered-content__page-ellipsis {
+    font-size: 12px;
+    height: 28px;
+    min-width: 28px;
+    padding: 3px 6px 0 6px;
+    width: auto;
+  }
+  .rbccm-filtered-content__page-ellipsis {
+    padding: 0;
+    width: 28px;
+  }
+  .rbccm-filtered-content__page-button--previous {
+    padding: 0 6px 0 4px;
+  }
+  .rbccm-filtered-content__page-button--next {
+    padding: 0 4px 0 6px;
+  }
+  .rbccm-filtered-content__page-button-icon {
+    height: 12px;
+    width: auto;
+  }
+}
+
+
+/* =========================================================================
+   Modifier: --dark
+   -------------------------------------------------------------------------
+   Overrides for dark backgrounds (upcoming-conferences pattern).
+   ========================================================================= */
+
+.rbccm-filtered-content--dark {
+  background: transparent;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__group-label {
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__select {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__select option {
+  background: #002144;
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__select-chevron {
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__select:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__select:focus {
+  border-color: #FFC72C;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__search {
+  background: transparent;
+  border-color: #FFF;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__search:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__search:focus-within {
+  border-color: #FFC72C;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__search-icon {
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__search-input {
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__reset {
+  border-color: #FFC72C;
+  color: #FFC72C;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__reset:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__reset:focus-visible {
+  background: #FFC72C;
+  color: #002144;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button:focus-visible {
+  border-color: #FFC72C;
+  color: #FFC72C;
+}
+
+/* Dark theme arrow hover/focus: fill yellow, dark-blue chevron.
+   Mirrors the light-theme "fill circle + invert chevron" treatment
+   using the RBC brand yellow accent. */
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--previous:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--next:hover,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--previous:focus-visible,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--next:focus-visible {
+  background: #FFC72C;
+  border-color: #FFC72C;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--previous:hover .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--next:hover .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--previous:focus-visible .rbccm-filtered-content__page-button-icon,
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--next:focus-visible .rbccm-filtered-content__page-button-icon {
+  color: #002144;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-button--active {
+  background: #FFC72C;
+  border-color: #FFC72C;
+  color: #002144;
+}
+
+.rbccm-filtered-content--dark .rbccm-filtered-content__page-ellipsis {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+/* Empty-state DARK variant.
+   Applied automatically by JS when the parent filter has --dark. */
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-icon-wrapper {
+  background: rgba(45, 106, 168, 0.20);
+  border-color: #1D86F0;
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-heading,
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-message {
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-clear {
+  border-color: #FFFDFD;
+  color: #FFFDFD;
+}
+
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-clear:hover,
+.rbccm-filtered-content__empty--dark .rbccm-filtered-content__empty-clear:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFDFD;
+}
+
+
+
+/* ---------- PART 2: tile grid + card shell (ported from conference-insights-tiles.css) ---------- */
+
+/* =========================================================================
+   Conference Insights Tiles
+   -------------------------------------------------------------------------
+   BEM-first, no Bootstrap. CSS Grid layout.
+   Mobile-first: single column. Desktop (>=768px): 3 columns with the
+   --featured tile spanning all 3 and flipping to horizontal layout.
+
+   Markup mirrors the live featured-conferences insight cards.
+   Hover effects, typography, and colors ported from
+   .rbccm-featured-conferences__insight* for visual parity:
+     - No border, no border-radius, no box-shadow (flat card)
+     - Background #FFFDFD, body text #000
+     - Hover (gated by `@media (hover: hover)`):
+         - image scales to 1.08
+         - divider widens 30.9px -> 56px
+         - meta gets a bottom border
+     - :focus-visible mirrors hover for keyboard users
+
+   Block: rbccm-filtered-content
+   ========================================================================= */
+
+/* ---------- Block ----------
+   Padding is authored via CSS custom properties so Teamsite authors can
+   override just the top or bottom (mobile and desktop each) from the
+   component Datums without editing this file:
+     --rbccm-filtered-content-padding-top-mobile   mobile padding-top     (default 40px)
+     --rbccm-filtered-content-padding-bottom-mobile   mobile padding-bottom  (default 40px)
+     --rbccm-filtered-content-padding-top-desktop   desktop padding-top    (default 64px, in the 992px block below)
+     --rbccm-filtered-content-padding-bottom-desktop   desktop padding-bottom (default 64px, in the 992px block below) */
+.rbccm-filtered-content {
+  padding: var(--rbccm-filtered-content-padding-top-mobile, 40px) 16px var(--rbccm-filtered-content-padding-bottom-mobile, 40px);
+  background: #ffffff;
+}
+
+.rbccm-filtered-content__inner {
+  max-width: 1140px;
+  margin: 0 auto 10px;
+}
+
+
+/* ---------- Row / grid ----------
+   Semantic <ul> so screen readers announce "list of N". List styling
+   (bullets, padding) reset to match the previous <div> visual.
+
+   Mirrors the legacy responsive cadence:
+     - Mobile (<768px):  1 column
+     - Tablet (>=768px):  2 columns
+     - Desktop (>=992px): 3 columns
+   Row-gap 32px (between rows), column-gap 30px (between columns).
+   Featured card always spans the full row at every breakpoint via
+   grid-column: 1 / -1. */
+.rbccm-filtered-content__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  list-style: none;
+  margin: 0 0 32px 0;
+  padding: 0;
+  /* Fade the real tile row in once the Filter By component has finished
+     initializing (see [data-filter-ready] below). Prevents the "all
+     tiles flash -> some hide -> visible tiles reveal" jump on page load. */
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+/* Once the filter JS attaches `data-filter-ready="true"` to the tiles
+   container, cross-fade the real row in and unmount the skeleton. */
+.rbccm-filtered-content[data-filter-ready="true"] .rbccm-filtered-content__list {
+  opacity: 1;
+}
+
+.rbccm-filtered-content[data-filter-ready="true"] .rbccm-filtered-content__skeleton {
+  display: none;
+}
+
+
+/* ---------- Skeleton ----------
+   Facebook-style tile placeholders shown before the filter JS finishes
+   initializing. Same layout as the real tile row (1 featured card on
+   top, then 3-up at desktop) so nothing shifts when real content lands.
+   The shimmer is a moving diagonal gradient overlaid on each card via
+   ::before pseudo. */
+
+.rbccm-filtered-content__skeleton {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin: 0 0 32px 0;
+}
+
+.rbccm-filtered-content__skeleton-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__skeleton-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Each skeleton card is a stack of gray blocks representing an image,
+   a title, and two description bars. Shimmer sweeps across via an
+   inner ::before pseudo. */
+.rbccm-filtered-content__skeleton-card {
+  /* Darker base so the shimmer sweep reads clearly on top. */
+  background: #e0e0e0;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+}
+
+/* Featured card: horizontal layout (image left, text right) at desktop. */
+.rbccm-filtered-content__skeleton-card--featured {
+  min-height: 280px;
+}
+
+@media (min-width: 992px) {
+  .rbccm-filtered-content__skeleton-card--featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
+
+/* Image placeholder */
+.rbccm-filtered-content__skeleton-image {
+  background: #cfcfcf;
+  height: 240px;
+  width: 100%;
+}
+
+.rbccm-filtered-content__skeleton-card--featured .rbccm-filtered-content__skeleton-image {
+  height: 100%;
+  min-height: 240px;
+}
+
+/* Text area with faux title + description bars */
+.rbccm-filtered-content__skeleton-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rbccm-filtered-content__skeleton-title {
+  background: #c0c0c0;
+  border-radius: 4px;
+  height: 20px;
+  width: 75%;
+  margin-top: 12px;
+}
+
+.rbccm-filtered-content__skeleton-desc {
+  background: #cfcfcf;
+  border-radius: 4px;
+  height: 10px;
+  width: 100%;
+}
+
+.rbccm-filtered-content__skeleton-desc--short {
+  width: 60%;
+}
+
+.rbccm-filtered-content__skeleton-meta {
+  background: #cfcfcf;
+  border-radius: 4px;
+  height: 10px;
+  width: 30%;
+  margin-top: 12px;
+}
+
+/* Shimmer sweep - bright band sweeps left-to-right across the whole
+   card. Continuous linear motion (not ease-in-out) so it never
+   "pauses" at the edges - feels alive the whole loop. */
+.rbccm-filtered-content__skeleton-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0)    0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0)    100%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  animation: rbccm-filtered-content-skeleton-shimmer 1.4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes rbccm-filtered-content-skeleton-shimmer {
+  0%   { background-position: 100% 0; }   /* band starts off-screen left */
+  100% { background-position: -100% 0; }  /* band ends off-screen right */
+}
+
+/* Reduced motion - kill the shimmer and just show static gray cards. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__skeleton-card::before {
+    display: none;
+  }
+  .rbccm-filtered-content__list {
+    transition: none;
+  }
+}
+
+/* ---------- Lazy-load skeleton rows ----------
+   While a per-year archive fetch is in flight (JS toggles
+   `.is-lazy-loading` on the root section), hide the current items
+   and show skeleton row placeholders in their slots. Skeleton rows
+   share the ITM item's visual shape (border-top separator + row
+   height) so the container doesn't jump when real items land.
+
+   Reuses the shimmer keyframe above; no new animation. */
+.rbccm-filtered-content.is-lazy-loading .rbccm-filtered-content__item {
+  display: none !important;
+}
+.rbccm-filtered-content__skeleton-row {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #CCC;
+  padding: 14px 0;
+  min-height: 110px;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+/* Two stacked bars - a wide "title" (blue-ish) and a narrower
+   "footer" row - to hint at the real ITM item shape. */
+.rbccm-filtered-content__skeleton-row-bar {
+  background: #e5e7eb;
+  border-radius: 4px;
+  height: 14px;
+  margin: 12px 0;
+}
+.rbccm-filtered-content__skeleton-row-bar--title { width: 80%; height: 18px; }
+.rbccm-filtered-content__skeleton-row-bar--footer { width: 35%; margin-top: auto; }
+.rbccm-filtered-content__skeleton-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0)    0%,
+    rgba(255,255,255,0.85) 50%,
+    rgba(255,255,255,0)    100%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  animation: rbccm-filtered-content-skeleton-shimmer 1.4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__skeleton-row::before { animation: none; }
+}
+
+/* Each <li> is a transparent wrapper - display: contents removes the li box
+   from the visual layout so the <a> card inside remains the direct CSS Grid
+   child and every existing card style (featured span, hover, focus) keeps
+   working unchanged. The list semantics stay in the accessibility tree. */
+.rbccm-filtered-content__item {
+  display: contents;
+}
+
+/* When the filter JS hides this <li>, the display: contents rule above
+   would beat the browser's default [hidden] { display: none }, so we need
+   an explicit high-specificity override for the filter-hidden state. */
+.rbccm-filtered-content__item[hidden] {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 30px; /* row-gap column-gap */
+  }
+  /* NOTE: at tablet the featured card flows in the 2-col grid like any
+     other card - no full-row span, no horizontal layout. Full-width
+     featured treatment kicks in at desktop (>=992px) below. */
+}
+
+@media (min-width: 992px) {
+  .rbccm-filtered-content__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Featured card spans the full row above the standard 3-up. */
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ---------- Card ----------
+   Each preset's card carries its own modifier: --insight (conference
+   insights, styled here), --article (in the media, PART 3) and --deal
+   (deals, PART 3). Bare __card only gets the shared link reset, hidden
+   state and keyboard focus border, so styles here never leak into the
+   other presets.
+
+   1px gray border + pure white background so the cards read clearly on the
+   white page background (the featured-conferences cards live in a tinted
+   panel, so they get away without a border - these don't).
+   Roboto declared at the card level so label, title, desc, and meta all
+   inherit it without each declaring font-family individually.
+   min-height: 555px (media 240 + body 315) - gives the card a fixed visual
+   minimum so the meta has room to push to the bottom even when the
+   description is short. */
+.rbccm-filtered-content__card--insight {
+  align-items: flex-start;
+  background: #FFF;
+  border: 1px solid #A8A8A8;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  min-height: 555px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+/* Bootstrap 3 default `a:focus, a:hover { color:#23527c; text-decoration:
+   underline; }` (specificity 0,1,1) beats a plain class rule (0,1,0), so
+   we prefix with `a` to bump ours to (0,2,1) and cover every focus /
+   hover / visited combo. Without this, focused/hovered tiles get the
+   default blue-underline anchor treatment on the title + description.
+
+   outline-offset: 0 also resets Bootstrap's default -2px inset outline
+   offset so any focus ring lands flush with the card border instead of
+   inside it (avoids visual overlap with our 1px border). */
+a.rbccm-filtered-content__card,
+a.rbccm-filtered-content__card:link,
+a.rbccm-filtered-content__card:visited,
+a.rbccm-filtered-content__card:hover,
+a.rbccm-filtered-content__card:focus,
+a.rbccm-filtered-content__card:focus-visible,
+a.rbccm-filtered-content__card:active {
+  color: #000;
+  text-decoration: none;
+  outline-offset: 0;
+}
+
+/* Hidden by load-more - kept out of layout. */
+.rbccm-filtered-content__card[hidden] {
+  display: none !important;
+}
+
+
+/* ---------- Media ----------
+   240px tall, full card width. Hover scales 1.08; the wrapper clips
+   overflow so the layout doesn't shift. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-media {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 240px;
+  overflow: hidden;
+}
+
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+
+
+/* ---------- Body ----------
+   Holds label / divider / title / desc / meta. Meta pins to the bottom
+   via margin-top: auto.
+   min-height: 315px ensures the body has enough vertical room for the
+   meta's auto-margin to actually create the visible gap between desc and
+   meta. Without this, short descriptions would collapse the gap. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-body {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 315px;
+  padding: 20px;
+}
+
+
+/* ---------- Label (eyebrow) ----------
+   Matches live-site rbccm.com insights tiles: Roboto Light / 14px /
+   140% line-height / 2px letter-spacing / uppercase / #006AC3. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-label {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+}
+
+
+/* ---------- Divider (yellow line) ----------
+   Width animates from 30.9px -> 56px on hover. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-divider {
+  background: #FFC72C;
+  flex-shrink: 0;
+  height: 2px;
+  margin: 0;
+  transition: width 0.3s ease;
+  width: 30.9px;
+}
+
+
+/* ---------- Title ----------
+   Matches live-site rbccm.com insights tiles: Roboto Medium (as its own
+   loaded font-family, weight 400) / 20px / 125% line-height / normal
+   letter-spacing / #000. Serves as the H2 anchor for each card. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-title {
+  color: #000;
+  font-family: "Roboto Medium", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 125%;
+  letter-spacing: normal;
+  margin: 10px 0 10px 0;
+}
+
+
+/* ---------- Description ----------
+   The meta uses margin-top: auto to pin itself to the bottom of the body;
+   when the description is short, that auto absorbs the leftover space.
+   When the description grows long enough to consume all of that space,
+   the 16px bottom margin here guarantees a minimum breathing gap so the
+   text doesn't collide with the "X min read" anchor line. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-description {
+  color: #555;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px 0;
+}
+
+
+/* ---------- Meta (read time + arrow) ----------
+   `display: inline-flex` + `width: fit-content` shrinks the meta to wrap
+   its content, so the hover border-bottom only runs the length of the text
+   + arrow rather than the full card width. 7px gap between text and arrow. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-metadata {
+  align-items: center;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 7px;
+  letter-spacing: normal;
+  line-height: 20px;
+  margin: auto 0 0 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+  width: fit-content;
+}
+
+
+/* ---------- Bottom row ----------
+   Wrapper that pins the meta ("14 min listen >") to the bottom-left and
+   the abbreviated month + year ("Jul 2026") to the bottom-right. Baseline-
+   aligned so the two sit on the same reading line. Only appears when the
+   feed produced a dateLabel; tiles without a date render the meta bare and
+   this wrapper isn't emitted. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-bottom {
+  /* `last baseline` aligns the LAST text baseline of each flex child.
+     For the meta (single line) that's its own baseline; for the
+     taxonomy stack (two lines) that's the "region - date" line. Result:
+     "14 min listen" sits on the exact same reading line as "US - Jun
+     2026". Falls back to flex-end in older engines - visually near-
+     identical, off by ~3px because of the meta's padding-bottom + hover
+     underline reservation. */
+  align-items: flex-end;
+  align-items: last baseline;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: auto 0 0 0;
+  width: 100%;
+}
+
+/* Reset the meta's own auto margin when it's inside the bottom-row
+   wrapper - the wrapper now handles the "push to bottom" behavior. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-bottom .rbccm-filtered-content__card-metadata {
+  margin: 0;
+}
+
+
+/* ---------- Taxonomy stack ----------
+   Right side of the bottom row: primary topic ("Healthcare") on top,
+   region + date ("US - Jul 2026") muted below. Right-aligned so the
+   text edge lines up with the card's right padding. Small line-height
+   so the two lines feel like one unit, not two paragraphs. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-taxonomy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 2px;
+  text-align: right;
+}
+
+/* Topic - same tone as the region - date line so the taxonomy stack
+   reads as a single muted block. #353535 at 70% opacity resolves to
+   ~#717171 against white; matches the muted body copy elsewhere on
+   the page and keeps enough contrast for WCAG AA at 13px. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-topic {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Region - same treatment as topic. Carries its " - " separator inline
+   so hiding the whole span removes the orphan dot for free. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-region {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Date - the piece we're keeping visible for now; region and topic are
+   suppressed via the temporary hide rule below. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-date {
+  color: rgba(53, 53, 53, 0.7);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+
+/* ---------- TEMPORARY: hide topic + region + date ----------
+   Topic, region and date each ship as their own span so any of them can
+   come back by removing its line from this rule. All three are hidden for
+   now (no dates on these tiles, matching rbccm-featured-insights), so the
+   bottom row shows only the read time. To restore everything: delete this
+   entire block. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-topic,
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-region,
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-date {
+  display: none;
+}
+
+
+/* ---------- Arrow ----------
+   Render at the SVG's intrinsic 4x10 dimensions (set inline on the
+   element). Only fill and flex-shrink applied here. */
+.rbccm-filtered-content__card--insight .rbccm-filtered-content__card-arrow {
+  fill: var(--Blue-Bright-Blue, #0051A5);
+  flex-shrink: 0;
+}
+
+
+/* ---------- Hover / focus effects ----------
+   Gated by `@media (hover: hover)` so touch-only devices skip the image
+   scale and divider stretch (where hover state doesn't make sense).
+   `:focus-visible` mirrors hover for keyboard users. */
+@media (hover: hover) {
+  .rbccm-filtered-content__card--insight:hover {
+    border-color: var(--Blue-Bright-Blue, #0051A5);
+    outline: none;
+  }
+  .rbccm-filtered-content__card--insight:hover .rbccm-filtered-content__card-media img,
+  .rbccm-filtered-content__card--insight:focus-visible .rbccm-filtered-content__card-media img {
+    transform: scale(1.08);
+  }
+  .rbccm-filtered-content__card--insight:hover .rbccm-filtered-content__card-divider,
+  .rbccm-filtered-content__card--insight:focus-visible .rbccm-filtered-content__card-divider {
+    width: 56px;
+  }
+  .rbccm-filtered-content__card--insight:hover .rbccm-filtered-content__card-metadata,
+  .rbccm-filtered-content__card--insight:focus-visible .rbccm-filtered-content__card-metadata {
+    border-bottom-color: currentColor;
+  }
+}
+
+
+/* ---------- Keyboard focus indicator (a11y) ----------
+   Suppress the default :focus outline (which fires on mouse clicks too)
+   and swap the card's existing 1px gray border to brand blue on
+   :focus-visible (keyboard / programmatic focus only). Sits outside
+   @media (hover: hover) so it applies to touch devices too. Using
+   border-color instead of outline keeps the visual to a single 1px line
+   - no stacked outline + border doubling effect, no offset to fiddle with. */
+.rbccm-filtered-content__card:focus {
+  outline: none;
+}
+
+.rbccm-filtered-content__card:focus-visible {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+  outline: none;
+}
+
+
+/* ---------- Reduced-motion (a11y) ----------
+   Respect the OS `prefers-reduced-motion` setting: skip the image scale,
+   divider width animation, and border-color transition so motion-sensitive
+   users get an instantaneous state change instead of an animation. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__card,
+  .rbccm-filtered-content__card-media img,
+  .rbccm-filtered-content__card-divider,
+  .rbccm-filtered-content__card-metadata {
+    transition: none !important;
+  }
+  .rbccm-filtered-content__card:hover .rbccm-filtered-content__card-media img,
+  .rbccm-filtered-content__card:focus-visible .rbccm-filtered-content__card-media img {
+    transform: none !important;
+  }
+}
+
+
+/* ---------- Featured card layout (>=992px only: image left, text right) ----------
+   At mobile and tablet the featured card behaves like any other card in the
+   grid. Only at desktop, when it has the full row to itself, does it flip
+   to the horizontal half-and-half layout.
+
+   Featured spacing (matches rbccm-featured-insights):
+     - Body padding: 30px all around
+     - Content vertically centered in the body as one group
+     - Label/divider -> title: 20px
+     - Title -> description: 12px
+     - Description -> meta row: 17px
+   The meta and bottom row lose their `margin: auto 0 0 0` here so they
+   flow with the centered group instead of pinning to the bottom. */
+@media (min-width: 992px) {
+  /* Image on the right, copy on the left, and 280px tall including the
+     border (border-box), matching rbccm-featured-insights. */
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured {
+    box-sizing: border-box;
+    flex-direction: row-reverse;
+    align-items: stretch;
+    min-height: 0; /* drop the 555px floor; horizontal featured sizes to content */
+    max-height: 280px;
+  }
+
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-media {
+    flex: 0 0 50%;
+    height: auto;
+    min-height: 240px;
+  }
+
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-body {
+    flex: 1 1 50%;
+    justify-content: center;
+    min-height: 0; /* let featured body size to its centered content */
+    padding: 30px;
+  }
+
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-title {
+    font-size: 24px;
+    line-height: 30px;
+    margin: 20px 0 12px 0;
+  }
+
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-description {
+    margin: 0 0 17px 0;
+  }
+
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-metadata {
+    margin: 0;
+  }
+
+  /* The bottom row's auto top margin pins it to the card bottom on
+     standard cards; drop it here so the whole group stays centered. */
+  .rbccm-filtered-content:not(.is-filtered):not(.is-past-first-page) .rbccm-filtered-content__card--featured .rbccm-filtered-content__card-bottom {
+    margin: 0;
+  }
+}
+
+
+/* ---------- Controls row (See More + View All) ---------- */
+.rbccm-filtered-content__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .rbccm-filtered-content__controls {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.rbccm-filtered-content__see-more,
+.rbccm-filtered-content__view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: 14px 28px;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* See More: outline / secondary */
+.rbccm-filtered-content__see-more {
+  background: transparent;
+  color: var(--Blue-Dark-Blue, #003168);
+  border: 1px solid var(--Blue-Dark-Blue, #003168);
+}
+
+.rbccm-filtered-content__see-more:hover,
+.rbccm-filtered-content__see-more:focus {
+  background: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+/* View All: primary - Blue-Bright-Blue token with dark-blue hover state */
+.rbccm-filtered-content__view-all {
+  background: var(--Blue-Bright-Blue, #0051A5);
+  color: #ffffff;
+  border: 1px solid var(--Blue-Bright-Blue, #0051A5);
+}
+
+.rbccm-filtered-content__view-all:hover,
+.rbccm-filtered-content__view-all:focus {
+  background: var(--Blue-Dark-Blue, #003168);
+  border-color: var(--Blue-Dark-Blue, #003168);
+  color: #ffffff;
+  outline: none;
+}
+
+
+/* ---------- Desktop padding bump ---------- */
+@media (min-width: 992px) {
+  .rbccm-filtered-content {
+    padding: var(--rbccm-filtered-content-padding-top-desktop, 64px) 16px var(--rbccm-filtered-content-padding-bottom-desktop, 64px);
+  }
+}
+
+
+
+/* ---------- PART 3: preset-specific overrides ---------- */
+
+/* Conference Insights preset - filter layout mirrors the ITM 2-row pattern
+   so 3 dropdowns + long search placeholder + Clear filters always fits at
+   the 1140 container. Without this override, base filter-by's max-width
+   420 search combined with margin-left: auto pushes Clear to wrap on
+   narrower desktop widths.
+
+   Desktop (>=1025):  [Filter by:  Year  Region  Topic] .......... [Clear]
+                     [.................... Search (full width) .........]
+   Tablet (<=1024):   Same stacked-column layout as mobile - Type-less
+                     for CI so we don't repeat the mobile Type-only rule.
+   Mobile (<768):    Base stacked layout (untouched).
+*/
+@media (max-width: 1024px) {
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__search {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__reset {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+@media (min-width: 1025px) {
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__group {
+    order: 1;
+    flex: 1 1 auto;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__reset {
+    order: 2;
+    margin-left: auto;
+  }
+  .rbccm-filtered-content--conference-insights .rbccm-filtered-content__search {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+}
+
+/* In the Media & Press Releases - filter layout overrides.
+
+   Base filter (CI preset) puts Search inline on the right of the dropdown
+   row (min 260px, max 420px). ITM's redesign wants a 2-row layout on
+   desktop:
+     Row 1:  [Filter by:  Type  Year  Month  Region] ........... [Clear filters]
+     Row 2:  [.................. Search bar (full width) .....................]
+
+   Achieved via CSS `order`. DOM keeps a mobile-friendly source order
+   (filter-group -> search -> clear), then reflows on desktop.
+
+   On tablet (768-1024px), filter-group fills its own full-width row,
+   search stretches full-width, and Clear drops to a third row pushed
+   right - matches the redesign mock.
+
+   Also: Type dropdown drops to its own full-width row on mobile so
+   the longer "Media coverage / Press releases" labels aren't cramped
+   (mirrors the same treatment the base CSS already gives Topic).
+*/
+
+/* Mobile + Tablet (<=1024px) - everything stacks vertically like mobile.
+   Type drops to its own row for label breathing room; Year/Month/Region
+   share the next row equally; Search + Clear each take their own
+   full-width rows. Overrides the base filter-row's `flex-direction: row`
+   which normally kicks in at 768px. */
+@media (max-width: 1024px) {
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__select-wrapper[data-filter="type"] {
+    flex: 1 1 100%;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__search {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__reset {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Desktop (>=1025px) - Search drops to its own full-width row below
+   dropdowns. filter-group order 1 stretches (flex: 1 1 auto) to fill
+   the space between "Filter by:" and "Clear filters"; its child
+   select-wraps override the base 160px pin and share the row width
+   equally via flex: 1 1 0. Reset order 2 pushed right via margin-left:
+   auto. Search order 3 wraps to a second row because it's flex: 1 1 100%. */
+@media (min-width: 1025px) {
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__group {
+    order: 1;
+    flex: 1 1 auto;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__reset {
+    order: 2;
+    margin-left: auto;
+  }
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__search {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+}
+
+/* ---------- In the Media & Press Releases - item template ----------
+   Authored Figma spec:
+     [outlet ......... date]      (topbar, 28px)
+     [Article title, blue serif]
+     [Featured: person ...]       (optional bottom row)
+
+   Wrapper is a plain <div> - only the title text is a link, matching
+   the rbccm-itm-card structural pattern. That lets us use
+   :has(.__card-title a:hover) on the wrapper for a row-level hover
+   effect (subtle bg tint) while keeping the Figma design as-is.
+*/
+
+/* List - single column stack at every breakpoint (overrides the CSS
+   grid used by the CI tile preset; was 2 columns from 768px until
+   2026-10-13). Border-top on each card creates the row separator; the
+   last visible item gets a matching border-bottom to close off. */
+.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+/* Item wraps the card and is the actual grid child. Make it a flex
+   column so the inner card can flex-grow to fill the grid-stretched
+   track height (height: 100% alone on the card doesn't resolve unless
+   the li has a definite height). */
+.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item {
+  display: flex;
+  flex-direction: column;
+}
+/* Close the list with a border-bottom on the last visible item. JS's
+   paginate() tags it with `is-last-visible-row` after every apply so
+   this rule stays accurate across pagination (DOM-order :last-child
+   would match hidden items on any page > 1). */
+.rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__item.is-last-visible-row .rbccm-filtered-content__card--article {
+  border-bottom: 1px solid #CCC;
+}
+
+/* Every breakpoint is one column, the same grid the base list uses
+   (grid-template-columns: 1fr). Row gap 0 so the border-top on each
+   card is the row separator. */
+@media (min-width: 768px) {
+  .rbccm-filtered-content--in-the-media-and-press-releases .rbccm-filtered-content__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Card / row wrapper. Content stays inside the card's box (no bleed
+   margins) so it fits cleanly inside a grid track on desktop. */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--article {
+  align-items: flex-start;
+  align-self: stretch;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #CCC;
+  box-sizing: border-box;
+  color: inherit;
+  display: flex;
+  flex: 1 1 auto;              /* fill the item's flex-column height (grid-stretched track) so row cards match height */
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  gap: 16px;
+  justify-content: flex-start; /* content anchors to top; footer pushed down by margin-top: auto */
+  min-height: 0;
+  padding: 10px 0;
+  margin: 0;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+/* Title anchor - the only clickable element in the row. Underline is
+   drawn via ::after (not text-decoration) so it can sit ~1px below the
+   text and sweep in from the left on hover / keyboard focus. Anchor
+   is inline-block so the pseudo spans only the title text width, not
+   the full flex column. */
+/* Card-title link -- real text-decoration: underline that "grows" via
+   an animated text-decoration-thickness. Uses the real underline
+   property (not an ::after bar or a background gradient), so wrapped
+   titles get an underline on EVERY line. On hover / focus the
+   thickness transitions 0 -> 2px, which reads as the stroke growing
+   in per line. Color also fades in from transparent to currentColor
+   so the entrance feels intentional rather than a sudden pop. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-title a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-underline-offset: 3px;
+  transition:
+    text-decoration-color 0.25s ease,
+    text-decoration-thickness 0.25s ease;
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-title a:hover,
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-title a:focus-visible {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto; /* browser default -- matches the "See all media appearances" link, which also relies on auto */
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__card--article .rbccm-filtered-content__card-title a {
+    transition: none;
+  }
+}
+
+/* Top row - outlet on the left, publish date on the right. Fixed 28
+   height per spec so the row reads as a compact meta strip above the
+   title. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-topbar {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  height: 28px;
+  justify-content: space-between;
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-source {
+  align-items: flex-start;
+  color: var(--Blue-Dark-Blue, #003168);
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  leading-trim: both;
+  text-edge: cap;
+  letter-spacing: 0.5px;
+  line-height: 16.5px; /* 150% */
+  margin: 0;
+  text-transform: uppercase;
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-date {
+  align-items: flex-start;
+  color: #383838;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  leading-trim: both;
+  text-edge: cap;
+  line-height: 16.5px; /* 150% */
+  margin: 0;
+}
+
+/* Article title - bright-blue serif, 18/130% weight 700. flex: 1 lets
+   the title box grow to fill any remaining vertical space between the
+   topbar (pinned top) and footer (pinned bottom via margin-top: auto),
+   so rows of unequal title length share the same footer baseline. */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--article .rbccm-filtered-content__card-title {
+  align-items: flex-start;
+  align-self: stretch;
+  color: var(--Blue-Bright-Blue, #0051A5);
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  font-family: "RBC Display", RBCDisplay, Georgia, Times, serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%; /* 23.4px */
+  margin: 0;
+}
+
+/* Description sits between title and footer. Takes flex-grow so any
+   leftover vertical space in a grid-stretched card is absorbed here
+   (footer stays bottom-pinned via margin-top: auto). Typography is
+   the base __card-description look, tweaked for ITM's tighter row. */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--article .rbccm-filtered-content__card-description {
+  color: #383838;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 140%;
+  margin: 8px 0 0 0;
+  flex: 1 1 auto;
+}
+
+/* Bottom row - "Featured:" label + person name on the left, region pill
+   + type eyebrow on the right (via .__card-metadata). Uses space-between
+   so the meta group pins right regardless of whether Featured is set. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-footer {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto; /* stick to bottom of the (grid-stretched) card so rows align at the footer */
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-featured {
+  align-items: baseline;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+/* Right-aligned meta cluster: region pill + type eyebrow. margin-left:
+   auto pins it right even when there's no Featured on the left. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-footer-metadata {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 8px;
+  margin-left: auto;
+}
+/* Region pill - grey rounded pill inline in the meta cluster. Sized
+   to match "Featured: Frances Donald" (11/16.5 Roboto, no uppercase,
+   no extra letter-spacing) so both sides of the footer read at the
+   same visual cadence. Reset the CI-tile base __card-region rules. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-region {
+  background: var(--grey-100, #F3F4F6);
+  border-radius: 100px;
+  color: var(--grey-700, #374151);
+  display: inline-block;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 16.5px;
+  padding: 1px 8px;
+  text-transform: none;
+  vertical-align: middle;
+  /* Reset base collision from CI tile preset. */
+  align-items: initial;
+  flex-direction: initial;
+  leading-trim: initial;
+  text-edge: initial;
+  margin: 0;
+}
+/* Type eyebrow - navy dot + label. Same 11/16.5 Roboto sizing as
+   Featured on the left, so the whole footer reads at one scale. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-eyebrow {
+  align-items: center;
+  color: #003168;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  gap: 6px;
+  letter-spacing: normal;
+  line-height: 16.5px;
+  text-transform: none;
+  vertical-align: middle;
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-eyebrow::before {
+  background: #002144;
+  border-radius: 50%;
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  height: 8px;
+  width: 8px;
+}
+/* Both label ("Featured:") and name (person) share the same typography
+   spec - 11/16.5 Roboto, #383838 - differ only on font-weight. Full
+   specs are declared on both rather than relying on inheritance so the
+   render is stable against any global body rules. */
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-featured-label {
+  color: #383838;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16.5px; /* 150% */
+}
+.rbccm-filtered-content__card--article .rbccm-filtered-content__card-featured-name {
+  color: #383838;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16.5px; /* 150% */
+}
+
+
+/* =========================================================================
+   Deals & Transactions preset
+   -------------------------------------------------------------------------
+   Filter chrome: Year + Transaction type dropdowns + Clear filters only.
+   No search input. No amount range slider (v1 - can add later as a `range`
+   dimension type in JS + `<input type="range">` dual-handle markup).
+
+   Row is short enough (~570px at 1140 container) that the base filter-row
+   layout accommodates it without wrapping - no CSS overrides needed for
+   filter chrome layout.
+
+   Item template TBD - transaction rows are table-style (Client - Sector -
+   Amount - Date - Type). Waiting on the spec.
+*/
+/* Desktop (>=1025) - Year + Transaction type dropdowns stretch to fill the
+   space between "Filter by:" and "Clear filters" (Clear pinned right via
+   margin-left: auto). Same intent as the CI/ITM layouts but without the
+   search row underneath. */
+@media (min-width: 1025px) {
+  /* Match CI/ITM: "Filter by:" label + Clear filters at their natural
+     widths, the two middle dropdowns stretch and share whatever space
+     is left between them. Group grows to fill the row (flex: 1 1 auto),
+     each select-wrap shares the group's space equally (flex: 1 1 0),
+     Clear filters pinned right via margin-left: auto. */
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__group {
+    order: 1;
+    flex: 1 1 auto;
+  }
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__reset {
+    order: 2;
+    margin-left: auto;
+  }
+}
+
+/* Tablet + Mobile (<=1024) - column stack like CI/ITM. Two dropdowns share
+   their row equally; Clear filters gets its own full-width row below. */
+@media (max-width: 1024px) {
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__reset {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* ---------- Deals - item template ----------
+   Visual spec ported from the live `.tombstone .deal-*` treatment
+   (colors, typography, sizing) with BEM subclass names substituted:
+     .deal-date       -> .__card-date
+     .img-contain     -> .__card-logo (inside .__card-media)
+     .deal-value      -> .__card-value      (24px RBCDisplayBold, deal amount)
+     .deal-title      -> .__card-title      (18px Roboto Medium, deal name)
+     .deal-desc       -> .__card-description       (14px Roboto Medium, role)
+     .deal-status     -> .__card-status     (blue #006ac3, specialty|type / status)
+     .deal-link       -> .__card-link       (blue #006ac3, "Read more" with hover underline)
+   All rules scoped under the deals preset modifier so they don't
+   collide with the CI tile styles that use the same __card-title /
+   __card-description / __card-media class names.
+*/
+
+/* List layout - 3-column grid on desktop matches the live tombstones
+   layout, single column on mobile. Different from CI (2-col grid via
+   featured hero + 3-up) and ITM (single-column stack). */
+.rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+@media (max-width: 991px) {
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__list {
+    grid-template-columns: 1fr;
+  }
+}
+.rbccm-filtered-content--deals-and-transactions .rbccm-filtered-content__item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card wrapper - 1px grey border, white bg, min-height 380 matching
+   the live tombstone height. Whole card is an anchor. */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--deal {
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid #d3d3d3;
+  box-sizing: border-box;
+  color: inherit;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 380px;
+  padding: 20px;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+.rbccm-filtered-content__card.rbccm-filtered-content__card--deal:hover,
+.rbccm-filtered-content__card.rbccm-filtered-content__card--deal:focus-visible {
+  text-decoration: none;
+  outline: none;
+}
+
+/* Date row at the top. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-header {
+  margin: 0;
+}
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-date {
+  color: #333;
+  font-family: "RBCDisplay", Georgia, Times, serif;
+  font-size: 15px;
+  line-height: 20px;
+  margin: 0 0 15px 0;
+}
+
+/* Logo area - background-image contain-fit, 100px tall like live. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-media {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  flex-shrink: 0;
+  height: 130px;
+  justify-content: center;
+  margin: 0;
+  overflow: hidden;
+  padding: 10px 0 30px 0;
+  max-height: 130px;
+  width: 100%;
+}
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-logo {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100px;
+  width: 80%;
+}
+
+/* Info wrapper - amount + deal title + role. min-height keeps the
+   bottom row anchored to the same y across cards regardless of how
+   many info lines a given deal has. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-info {
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+}
+
+/* Deal amount - the primary visual. 24px serif bold. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-value {
+  color: #252525;
+  font-family: "RBCDisplayBold", "RBCDisplay", Georgia, Times, serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 110%;
+  margin: 10px 0 15px 0;
+}
+
+/* Deal title - 14px Roboto Medium (often blank on live deals). */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-title {
+  color: #252525;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 120%;
+  margin: 0 0 15px 0;
+  /* Reset CI tile base styles that would otherwise fight (h2 semantics,
+     bright-blue color, etc.). */
+  align-items: initial;
+  align-self: initial;
+  display: block;
+  flex-direction: initial;
+}
+
+/* Role line ("Financial Advisor / Pending") - sits in the bottom row,
+   blue, above Read more, matching the live tombstone. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-description {
+  color: #006AC3;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 110%;
+  margin: 0 0 15px 0;
+}
+
+/* Bottom row - role line ABOVE Read more link (stacked). Override
+   the CI-tile base __card-bottom rule that uses flex/space-between -
+   deals stacks vertically instead. margin-top: auto pins to bottom
+   of the card so rows align across the grid. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-bottom {
+  align-items: initial;
+  display: block;
+  gap: initial;
+  justify-content: initial;
+  margin-top: auto;
+  position: relative;
+  width: auto;
+}
+/* Type / status line ("Mergers and Acquisitions / Closed") - kept in the
+   markup for a possible return, hidden for now. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-status {
+  display: none;
+  color: #006AC3;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 110%;
+  margin: 0 0 15px 0;
+}
+/* Read more - CI insights-tile hover pattern: border-bottom reserved
+   as transparent 1px in rest state so no layout shift, then fades in
+   to currentColor when the parent card is hovered / keyboard-focused.
+   Same mechanic as .__card-metadata on the CI tile. Card border also
+   deepens to bright blue on hover, mirroring the CI tile treatment. */
+.rbccm-filtered-content__card--deal .rbccm-filtered-content__card-link {
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-block;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 110%;
+  margin: 0;
+  padding-bottom: 2px;
+  transition: border-color 0.2s ease;
+}
+@media (hover: hover) {
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--deal:hover {
+    border-color: var(--Blue-Bright-Blue, #0051A5);
+  }
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--deal:hover .rbccm-filtered-content__card-link {
+    border-bottom-color: currentColor;
+  }
+}
+
+/* Keyboard focus gets the hover treatment on every device (it sat inside
+   the hover-only query above, and the base rule removes the outline, so
+   focused cards had no visible state). */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--deal:focus-visible {
+  border-color: var(--Blue-Bright-Blue, #0051A5);
+}
+.rbccm-filtered-content__card.rbccm-filtered-content__card--deal:focus-visible .rbccm-filtered-content__card-link {
+  border-bottom-color: currentColor;
+}
+
+
+/* ---------- Section heading (all presets) ----------
+   SectionHeading Datum, blank hides it. Matches the Conference Insights
+   page heading: RBC Display 500, dark blue, 24px mobile / 29px desktop,
+   1.2 line-height. Same 1140 column as the filter chrome. */
+.rbccm-filtered-content__heading {
+  color: var(--Blue-Dark-Blue, #003168);
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin: 0 auto 32px;
+  max-width: 1140px;
+  text-transform: none;
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content__heading {
+    font-size: 29px;
+  }
+}
+
+
+/* ---------- Featured deal (deals preset) ----------
+   Authored block that replaces the static "deal snapshot" on the
+   transactions page. Sits between the heading and the filter bar and is
+   never filtered. Visual language follows the deal cards (1px #d3d3d3
+   border, white) and the CI featured tile (eyebrow date, yellow rule,
+   serif title). Mobile: image on top. Desktop (>=992): image left half,
+   text right half, vertically centered. */
+.rbccm-filtered-content__featured.rbccm-filtered-content__featured--deal {
+  background: #FFF;
+  border: 1px solid #d3d3d3;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto 40px;
+  max-width: 1140px;
+  overflow: hidden;
+}
+.rbccm-filtered-content__featured-media.rbccm-filtered-content__featured-media--deal {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.rbccm-filtered-content__featured-image.rbccm-filtered-content__featured-image--deal {
+  display: block;
+  height: 240px;
+  object-fit: cover;
+  width: 100%;
+}
+.rbccm-filtered-content__featured-body.rbccm-filtered-content__featured-body--deal {
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.rbccm-filtered-content__featured-date.rbccm-filtered-content__featured-date--deal {
+  color: #006AC3;
+  font-family: "Roboto Light", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 140%;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+.rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal {
+  color: #002144;
+  font-family: "Roboto Medium", Arial, sans-serif !important;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 125%;
+  margin: 0 0 12px;
+  padding: 0;
+  text-transform: none;
+}
+/* Yellow rule above the title (was a separate empty span). */
+.rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal::before {
+  background: #FFC72C;
+  content: '';
+  display: block;
+  height: 2px;
+  margin: 0 0 16px;
+  width: 30.9px;
+}
+.rbccm-filtered-content__featured-text.rbccm-filtered-content__featured-text--deal {
+  color: #252525;
+  font-family: Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 140%;
+  margin: 0 0 12px;
+}
+/* Link: same blue + reserved-border hover underline as the deal cards'
+   "Read more". Bootstrap's a:hover underline is (0,1,1), so the a-prefixed
+   selectors keep text-decoration off. */
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:hover,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus {
+  align-items: center;
+  align-self: flex-start;
+  border-bottom: 1px solid transparent;
+  color: #006AC3;
+  display: inline-flex;
+  font-family: "Roboto Medium", Roboto, Arial, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 7px;
+  line-height: 20px;
+  margin-top: 8px;
+  padding-bottom: 2px;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:hover,
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus-visible {
+  border-bottom-color: currentColor;
+}
+a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal:focus-visible {
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 3px;
+}
+.rbccm-filtered-content__featured-link-arrow.rbccm-filtered-content__featured-link-arrow--deal {
+  flex-shrink: 0;
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content__featured.rbccm-filtered-content__featured--deal {
+    flex-direction: row;
+  }
+  /* Row: text side holds 740px minimum, the image side takes the rest. */
+  .rbccm-filtered-content__featured-media.rbccm-filtered-content__featured-media--deal {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .rbccm-filtered-content__featured-image.rbccm-filtered-content__featured-image--deal {
+    height: 100%;
+    min-height: 320px;
+  }
+  .rbccm-filtered-content__featured-body.rbccm-filtered-content__featured-body--deal {
+    box-sizing: border-box;
+    flex: 0 0 740px;
+    min-width: 740px;
+    justify-content: center;
+    padding: 30px;
+  }
+  .rbccm-filtered-content__featured-title.rbccm-filtered-content__featured-title--deal {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  a.rbccm-filtered-content__featured-link.rbccm-filtered-content__featured-link--deal {
+    transition: none;
+  }
+}
+
+
+/* =========================================================================
+   ETF Innovators preset (.rbccm-filtered-content--etf-innovators)
+   -------------------------------------------------------------------------
+   "Explore the full series" grid on the ETF Innovators page. Episodes come
+   from the insights feeds via the etf-innovators adapter in the JS.
+     - 23px side gutter at every width; content inherits the global 1140
+       max-width from the base rules
+     - heading 36/120 mobile, 42/125 desktop (same as the Featured heading)
+     - filter bar: same chrome and layout as In the Media (Filter by:,
+       Company + Year dropdowns, Clear filters), between two #E6E9EF
+       hairlines
+     - cards: 16:9-ish thumbnail with "Full Episode" pill and play badge,
+       category eyebrow, title, speaker line, date + watch time
+     - 1 column mobile, 2 tablet, 3 desktop
+   ========================================================================= */
+.rbccm-filtered-content--etf-innovators {
+  padding: 48px 23px;          /* mobile spec: 48 top/bottom; 23 gutter (spec 20) */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators {
+    padding: 80px 23px;
+  }
+}
+
+/* ---------- Heading ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__heading {
+  color: #003168;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 120%;
+  margin-bottom: 32px;         /* heading -> filter bar */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__heading {
+    font-size: 42px;
+    line-height: 125%;
+    margin-bottom: 36px;
+  }
+}
+
+/* ---------- Filter bar ----------
+   Same chrome as In the Media: "Filter by:" label, rectangular
+   dropdowns and the Clear filters button all come from the base rules.
+   Layout mirrors the ITM preset: stacked up to 1024px (dropdowns share a
+   row, Clear filters full width below), one row on desktop with the
+   dropdowns sharing the space and Clear filters pinned right. */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter {
+  margin: 0 auto 40px;         /* filter bar -> cards, all widths */
+}
+/* Hairlines above and below the bar, 12px padding, controls centred. */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter-inner {
+  border-bottom: 1px solid #E6E9EF;
+  border-top: 1px solid #E6E9EF;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 62px;
+  padding: 12px 0;
+}
+@media (max-width: 1024px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__filter-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__reset {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+@media (min-width: 1025px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group {
+    flex: 1 1 auto;
+    order: 1;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__group .rbccm-filtered-content__select-wrapper {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__reset {
+    margin-left: auto;
+    order: 2;
+  }
+}
+
+/* ---------- Grid ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+  gap: 40px 30px;
+  grid-template-columns: 1fr;
+  margin-bottom: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+    gap: 40.401px 29.382px;    /* row, column - tablet 2 up and desktop 3 up */
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.rbccm-filtered-content__item.rbccm-filtered-content__item--etf-innovators {
+  display: flex;
+  min-width: 0;
+}
+.rbccm-filtered-content__item.rbccm-filtered-content__item--etf-innovators[hidden] {
+  display: none;
+}
+
+/* ---------- Card ---------- */
+.rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12.855px;               /* media -> card content, mobile + desktop */
+  text-decoration: none;
+  width: 100%;
+}
+.rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:focus-visible {
+  border-radius: 14px;
+  outline: 2px solid var(--Blue-Bright-Blue, #0051A5);
+  outline-offset: 4px;
+}
+
+.rbccm-filtered-content__card-media.rbccm-filtered-content__card-media--etf-innovators {
+  align-self: stretch;
+  aspect-ratio: 347 / 207;     /* spec frame: 347 x 207 */
+  background: lightgray;       /* shows until the thumbnail loads */
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.rbccm-filtered-content__card-image.rbccm-filtered-content__card-image--etf-innovators {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  transition: transform 0.4s ease;
+  width: 100%;
+}
+
+.rbccm-filtered-content__card-pill.rbccm-filtered-content__card-pill--etf-innovators {
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 91.82px;
+  box-sizing: border-box;
+  color: #003168;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11.018px;
+  font-style: normal;
+  font-weight: 500;
+  height: 22.037px;
+  justify-content: center;
+  left: 14px;                  /* media padding: 10.561 top, 14 left */
+  line-height: 12.855px;
+  padding: 4.591px 9.797px 4.446px 10.1px;
+  position: absolute;
+  top: 10.561px;
+  white-space: nowrap;
+}
+
+.rbccm-filtered-content__card-play.rbccm-filtered-content__card-play--etf-innovators {
+  -webkit-backdrop-filter: blur(2.361px);
+  backdrop-filter: blur(2.361px);
+  background: rgba(255, 255, 255, 0.20);
+  border-radius: 34px;
+  box-shadow: inset 0 0 0 0.944px #FFFFFF;   /* the 0.944px white border, drawn inside so the 34px frame stays exact */
+  bottom: 14.688px;            /* media padding: 14.688 bottom, 14 left */
+  box-sizing: border-box;
+  color: #FFFFFF;
+  height: 34px;
+  left: 14px;
+  position: absolute;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  width: 34px;
+}
+/* Triangle drawn in the full 34 x 34 frame (same coordinates as the
+   spec SVG). */
+.rbccm-filtered-content__card-play-icon.rbccm-filtered-content__card-play-icon--etf-innovators {
+  display: block;
+  height: 34px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 34px;
+}
+
+.rbccm-filtered-content__card-body.rbccm-filtered-content__card-body--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.rbccm-filtered-content__card-label.rbccm-filtered-content__card-label--etf-innovators {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 1.212px;
+  line-height: 11.937px;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+.rbccm-filtered-content__card-title.rbccm-filtered-content__card-title--etf-innovators {
+  color: #003168;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 25.25px;
+  margin: 0 0 12px;            /* title -> name */
+  text-transform: none;
+  transition: color 0.2s ease;
+}
+.rbccm-filtered-content__card-speaker.rbccm-filtered-content__card-speaker--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 14.691px;
+  margin: 0 0 8px;             /* name -> date + watch time */
+}
+.rbccm-filtered-content__card-metadata.rbccm-filtered-content__card-metadata--etf-innovators {
+  color: #6B6B6B;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 12.855px;
+  margin: 0;
+}
+
+@media (hover: hover) {
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-image--etf-innovators {
+    transform: scale(1.04);
+  }
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-play--etf-innovators {
+    background: var(--Blue-Bright-Blue, #0051A5);
+    box-shadow: inset 0 0 0 0.944px var(--Blue-Bright-Blue, #0051A5);
+  }
+  .rbccm-filtered-content__card.rbccm-filtered-content__card--etf-innovators:hover .rbccm-filtered-content__card-title--etf-innovators {
+    color: var(--Blue-Bright-Blue, #0051A5);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-filtered-content__card-image.rbccm-filtered-content__card-image--etf-innovators,
+  .rbccm-filtered-content__card-play.rbccm-filtered-content__card-play--etf-innovators,
+  .rbccm-filtered-content__card-title.rbccm-filtered-content__card-title--etf-innovators {
+    transition: none;
+  }
+}
+
+/* ---------- Pagination ---------- */
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__inner {
+  margin-bottom: 0;
+}
+.rbccm-filtered-content--etf-innovators .rbccm-filtered-content__pagination {
+  margin: 32px 0 0;            /* cards -> pagination; section padding below */
+}
+@media (min-width: 992px) {
+  .rbccm-filtered-content--etf-innovators .rbccm-filtered-content__pagination {
+    margin-top: 40px;
+  }
+}

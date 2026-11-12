@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rbccm-section-group - local test</title>
+<link rel="stylesheet" href="../rbccm-video-poster/rbccm-video-poster.css">
+<style>
+  body { margin: 0; font-family: Roboto, Arial, sans-serif; }
+  .demo-note { background: #FFF8DC; color: #333; font-size: 13px; line-height: 1.5; padding: 12px 23px; }
+  .demo-note code { background: #fff; padding: 1px 5px; border-radius: 3px; }
+  .demo-hero { background: #061730; color: #fff; text-align: center; padding: 80px 23px 0; }
+  .demo-hero h1 { margin: 0; font: 400 40px/1.2 Georgia, serif; }
+  /* Stand-in sections: transparent, so the wrapper's gradient shows. */
+  .demo-sec { max-width: 1140px; margin: 0 auto; padding: 60px 23px; color: #fff; text-align: center; }
+  .demo-sec h2 { margin: 0 0 12px; font: 400 32px/1.2 Georgia, serif; }
+  .demo-sec p { margin: 0; color: #D8D8D8; }
+  .demo-light { background: #fff; color: #002144; text-align: center; padding: 60px 23px; }
+  /* Test outline so you can see the wrapper the script built. */
+  .demo-outline [data-rbccm-section-group] { outline: 2px dashed #FFC72C; outline-offset: -2px; }
+</style>
+</head>
+<body class="demo-outline">
+
+<div class="demo-note">
+  Each block below sits in its own <code>.iw_component</code> div, like TeamSite outputs them, with no wrapper in the source.
+  <code>rbccm-section-group.js</code> wraps everything between the <strong>Group start</strong> and <strong>Group end</strong> components
+  in one <code>div.rbccm-section-group.rbccm-maas-mata__dark-strip</code> (dashed yellow outline, test page only), so the gradient runs
+  continuously behind all three sections. The video poster's 200px overlap lands in the wrapper's 222px top space.
+</div>
+
+<div id="page-body">
+<div class="iw_component" id="iw-1">
+  <div class="demo-hero"><h1>Hero stand-in</h1></div>
+</div>
+<div class="iw_component" id="iw-2">
+  <div style="background:#061730"><div class="rbccm-video-poster" style="--rbccm-vp-space-above:75px;--rbccm-vp-overlap:200px;"><img class="rbccm-video-poster__image" src="../maas-mata-page/maas-execution-console-reveal.png" alt="MAAS Execution Console preview"></div></div>
+</div>
+<div class="iw_component" id="iw-3">
+  <link rel="stylesheet" type="text/css" href="rbccm-section-group.css"><span class="rbccm-section-group__marker" hidden="hidden" aria-hidden="true" data-group-start="dark-strip" data-group-class="rbccm-section-group rbccm-section-group--dark-strip rbccm-maas-mata__dark-strip" data-group-style="--rbccm-sg-pad-top: 222px;"></span>
+
+</div>
+<div class="iw_component" id="iw-4">
+  <section class="demo-sec"><h2>A new standard for multi-asset trading</h2><p>Section 1 inside the group (transparent background).</p></section>
+</div>
+<div class="iw_component" id="iw-5">
+  <section class="demo-sec"><h2>Awards</h2><p>Section 2 inside the group.</p></section>
+</div>
+<div class="iw_component" id="iw-6">
+  <section class="demo-sec"><h2>Platforms</h2><p>Section 3 inside the group.</p></section>
+</div>
+<div class="iw_component" id="iw-7">
+  <span class="rbccm-section-group__marker" hidden="hidden" aria-hidden="true" data-group-end="dark-strip"></span><script src="rbccm-section-group.js"></script>
+
+</div>
+<div class="iw_component" id="iw-8">
+  <div class="demo-light"><h2>Next section (outside the group)</h2></div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+/* =========================================================================
+   RBCCM Insight List
+   Deploy path: /assets/rbccm/css/components/rbccm-insight-list.css
+   =========================================================================
+   A section heading and intro, then a list of up to four stories. Each
+   story: image, category label, title, summary, meta line and a button.
+
+   Variants (one skin each)
+     .rbccm-insight-list--etf-innovators
+       ETF Innovators "More on ETFs". White section. Stories are always
+       one per row: stacked (image above text) on mobile, image left and
+       text right from 768.
+
+   Every element carries the variant modifier. Mobile follows the Figma
+   spec; desktop values marked "comp" are measured from the 1440 desktop
+   comp until its CSS spec arrives. Global content width 1140, 23px
+   gutter (the comp's 1100 content width is not used).
+
+   Type uses !important where site-wide rules (tag-level h2/h3 styles
+   and the global Roboto rule) would otherwise win, same as the other
+   components.
+   ========================================================================= */
+
+.rbccm-insight-list {
+  box-sizing: border-box;
+  width: 100%;
+}
+.rbccm-insight-list *,
+.rbccm-insight-list *::before,
+.rbccm-insight-list *::after {
+  box-sizing: border-box;
+}
+
+/* Scroll-in animation pre-hide (same as the other components; the
+   rbccm-animate script adds the classes that reveal them). */
+.rbccm-insight-list [data-animate] {
+  opacity: 0;
+}
+.rbccm-anim-ready .rbccm-insight-list [data-animate].animate__animated {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-insight-list [data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+
+/* =========================================================================
+   Variant: ETF Innovators
+   ========================================================================= */
+.rbccm-insight-list--etf-innovators {
+  background: #FFFFFF;
+  padding: 40px 23px;          /* mobile spec */
+}
+@media (min-width: 992px) {
+  .rbccm-insight-list--etf-innovators {
+    padding: 60px 23px;        /* comp */
+  }
+}
+
+/* Header, then the list, 32 apart. */
+.rbccm-insight-list__inner.rbccm-insight-list__inner--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 0 auto;
+  max-width: 1140px;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-list__inner.rbccm-insight-list__inner--etf-innovators {
+    gap: 48px;                 /* intro -> first story */
+  }
+}
+
+/* ---------- Header: heading + intro, 16 apart (6 on desktop) ---------- */
+.rbccm-insight-list__header.rbccm-insight-list__header--etf-innovators {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                   /* mobile spec */
+}
+@media (min-width: 992px) {
+  .rbccm-insight-list__header.rbccm-insight-list__header--etf-innovators {
+    gap: 6px;
+  }
+}
+.rbccm-insight-list--etf-innovators .rbccm-insight-list__heading.rbccm-insight-list__heading--etf-innovators {
+  color: #003168 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-list--etf-innovators .rbccm-insight-list__heading.rbccm-insight-list__heading--etf-innovators {
+    font-size: 42px !important;    /* comp; page's desktop title */
+    line-height: 125% !important;
+  }
+}
+/* Intro: not in the spec; matches the page's other intro paragraphs. */
+.rbccm-insight-list__intro.rbccm-insight-list__intro--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0;
+}
+
+/* ---------- List: one story per row, 32 apart, at every width ---------- */
+.rbccm-insight-list__list.rbccm-insight-list__list--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Story: image, then content, 13.981 apart ----------
+   From 768: image left, content right, 32 apart, content centred
+   against the image. */
+.rbccm-insight-list__item.rbccm-insight-list__item--etf-innovators {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 13.981px;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-list__item.rbccm-insight-list__item--etf-innovators {
+    align-items: center;
+    flex-direction: row;
+    gap: 32px;                 /* comp */
+  }
+}
+.rbccm-insight-list__item.rbccm-insight-list__item--etf-innovators::before {
+  content: none;               /* no site-wide list bullets */
+}
+.rbccm-insight-list__image.rbccm-insight-list__image--etf-innovators {
+  align-self: stretch;
+  aspect-ratio: 329 / 187.24;  /* 187.24 tall in the 329 mobile frame */
+  background: #E0E0E0;
+  border-radius: 19.972px;
+  overflow: hidden;
+}
+/* Desktop comp: 367 x 217. From 768 the image is always 367 wide (it
+   doesn't shrink with the row); the photo covers the whole block. */
+@media (min-width: 768px) {
+  .rbccm-insight-list__image.rbccm-insight-list__image--etf-innovators {
+    align-self: center;
+    aspect-ratio: 367 / 217;
+    flex: 0 0 367px;
+    min-width: 367px;
+    width: 367px;
+  }
+}
+.rbccm-insight-list__img.rbccm-insight-list__img--etf-innovators {
+  display: block;
+  height: 100% !important;     /* fill the block; beat site-wide img { height: auto } */
+  max-width: none !important;
+  object-fit: cover;
+  object-position: 50% 50%;
+  width: 100% !important;
+}
+
+/* Content: category, title, summary, meta, button, 12 apart. */
+.rbccm-insight-list__content.rbccm-insight-list__content--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-list__content.rbccm-insight-list__content--etf-innovators {
+    align-self: center;
+    flex: 1 1 auto;
+  }
+}
+
+.rbccm-insight-list__category.rbccm-insight-list__category--etf-innovators {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11.983px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 1.438px;
+  line-height: 13.981px;
+  margin: 0;
+  text-transform: uppercase;
+}
+.rbccm-insight-list--etf-innovators .rbccm-insight-list__title.rbccm-insight-list__title--etf-innovators {
+  color: #082043 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 19.972px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 25.564px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-list--etf-innovators .rbccm-insight-list__title.rbccm-insight-list__title--etf-innovators {
+    font-size: 28px !important;    /* comp */
+    line-height: 128% !important;
+  }
+}
+.rbccm-insight-list__summary.rbccm-insight-list__summary--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21.72px;
+  margin: 0;
+}
+/* Intro and summary are divs so a pasted <p> doesn't nest inside a <p>;
+   paragraphs inside them get no extra margin. */
+.rbccm-insight-list__intro--etf-innovators p,
+.rbccm-insight-list__summary--etf-innovators p {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+.rbccm-insight-list__intro--etf-innovators p + p,
+.rbccm-insight-list__summary--etf-innovators p + p {
+  margin-top: 0.75em;
+}
+.rbccm-insight-list__meta.rbccm-insight-list__meta--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 14.979px;
+  margin: 0;
+}
+
+/* ---------- Button ----------
+   Blue pill, 37 tall, 22 side padding, label + 14px arrow 5 apart.
+   Same hover as the page's other buttons (CTA band): a shine sweeps
+   across the pill and the arrow flies out and back. */
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators {
+  align-items: center;
+  background: #0051A5;
+  border-radius: 100px;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  gap: 5px;
+  height: 37px;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0 22px;
+  position: relative;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:hover,
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:focus-visible {
+  background: #003168;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #FFFFFF !important;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 3px;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  bottom: 0;
+  content: "";
+  left: -60%;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: skewX(-18deg);
+  width: 40%;
+  z-index: 0;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators > * {
+  position: relative;
+  z-index: 1;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:hover::before,
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:focus-visible::before {
+  animation: rbccm-insight-list-shine 600ms ease-out;
+}
+.rbccm-insight-list__button-label.rbccm-insight-list__button-label--etf-innovators {
+  color: #FFFFFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.rbccm-insight-list__button-icon.rbccm-insight-list__button-icon--etf-innovators {
+  color: #FFFFFF;
+  display: block;
+  flex: 0 0 auto;
+  height: 14px;
+  width: 14px;
+  will-change: transform, opacity;
+}
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:hover .rbccm-insight-list__button-icon--etf-innovators,
+.rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators:focus-visible .rbccm-insight-list__button-icon--etf-innovators {
+  animation: rbccm-insight-list-arrow 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+}
+
+@keyframes rbccm-insight-list-shine {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+@keyframes rbccm-insight-list-arrow {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(24px);  opacity: 0; }
+  46%  { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators {
+    transition: none;
+  }
+  .rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators::before,
+  .rbccm-insight-list__button.rbccm-insight-list__button--etf-innovators .rbccm-insight-list__button-icon--etf-innovators {
+    animation: none !important;
+  }
+}

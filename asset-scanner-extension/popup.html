@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RBCCM Asset Scanner</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>Asset scanner</h1>
+    <p id="page" class="muted">Scan the CSS and JS this page loads.</p>
+  </header>
+
+  <div class="actions">
+    <button id="scan" class="primary">Scan this page</button>
+    <button id="csv" disabled>Download CSV</button>
+    <button id="copy" disabled>Copy for sheet</button>
+  </div>
+
+  <div id="summary" class="summary" hidden></div>
+  <p id="status" class="muted" role="status"></p>
+
+  <div class="table-wrap">
+    <table id="table" hidden>
+      <thead><tr><th>#</th><th>Type</th><th>Category</th><th>File</th><th>Version</th><th>KB</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <section class="collect">
+    <h2>Compare pages</h2>
+    <p class="muted">Add each page you scan, then export one sheet showing which assets every page loads.</p>
+    <div class="actions">
+      <button id="add" disabled>Add this page</button>
+      <button id="matrix" disabled>Download comparison</button>
+      <button id="all" disabled>Download all rows</button>
+      <button id="clear" class="link" disabled>Clear</button>
+    </div>
+    <ul id="collected"></ul>
+  </section>
+
+  <script src="lib.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

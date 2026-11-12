@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Insight grid - hover to feature (concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #002144;
+    --blue: #005daa;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e3e6ea;
+    --yellow: #ffd200;
+    --radius: 20px;
+    /* Motion: even ease in and out, so tiles glide rather than snap */
+    --speed: 650ms;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --fade: 0.7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font: 16px/1.5 Roboto, Arial, sans-serif;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  .page { max-width: 1140px; margin: 0 auto; padding: 32px 23px 80px; }
+
+  /* ---------- concept controls (not part of the design) ---------- */
+  .concept {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px;
+    margin: 0 0 32px; padding: 16px 20px;
+    border: 1px dashed #b8c2cf; border-radius: 12px; background: #f6f8fb;
+    font-size: 14px; color: #3a3a3a;
+  }
+  .concept__title { margin: 0; font-size: 14px; font-weight: 700; color: var(--navy); }
+  .concept__note { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 13px; }
+  .concept fieldset { display: flex; gap: 16px; margin: 0; padding: 0; border: 0; }
+  .concept legend { float: left; margin-right: 10px; font-weight: 500; }
+  .concept label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .concept select { font: inherit; padding: 2px 6px; }
+
+  /* ---------- toolbar ---------- */
+  .toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 0 16px; margin: 0 0 32px; border-bottom: 1px solid var(--line);
+  }
+  .toolbar button {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px;
+    background: #f3f5f8; color: var(--navy); font: 500 14px/1 Roboto, Arial, sans-serif; cursor: pointer;
+  }
+  .toolbar .sort { background: #fff; color: var(--muted); font-weight: 400; }
+  .toolbar .sort strong { color: var(--navy); font-weight: 500; }
+
+  /* ---------- grid ---------- */
+  .ig {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px 24px;
+    margin: 0 0 48px;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .ig { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ig-tile.is-featured { grid-column: 1 / -1; }
+  }
+  /* Desktop: a 4 x 2 block. The featured tile fills one half (2 x 2), the
+     other four tiles fill the other half. Positions come from --c / --r,
+     set by the script. */
+  @media (min-width: 992px) {
+    .ig { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto auto; }
+    .ig-tile,
+    .ig-tile.is-featured {
+      grid-column: var(--c) / span var(--cs);
+      grid-row: var(--r) / span var(--rs);
+    }
+  }
+
+  /* ---------- tile ---------- */
+  .ig-tile {
+    display: flex; flex-direction: column; min-width: 0;
+    cursor: pointer;
+  }
+  .ig-tile__media {
+    position: relative; flex: none;
+    aspect-ratio: 16 / 10.6;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--tint, #d5dbe6) 0%, #eef1f5 100%);
+    transition: filter 200ms ease;
+  }
+  .ig-tile:hover .ig-tile__media { filter: brightness(0.96); }
+  .ig-tile.is-featured .ig-tile__media { aspect-ratio: 16 / 9; }
+  @media (min-width: 992px) {
+    .ig-tile.is-featured .ig-tile__media { aspect-ratio: auto; flex: 1 1 auto; min-height: 220px; }
+  }
+
+  .ig-tile__badge {
+    position: absolute; top: 14px; left: 14px;
+    padding: 4px 11px; border-radius: 999px;
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 500; line-height: 1.4;
+  }
+  .ig-tile__play {
+    position: absolute; left: 14px; bottom: 14px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 8px rgba(0, 33, 68, 0.15);
+  }
+  .ig-tile__play::after {
+    content: ""; position: absolute; top: 50%; left: 54%;
+    border-style: solid; border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent var(--navy);
+    transform: translate(-50%, -50%);
+  }
+  .ig-tile.is-featured .ig-tile__play {
+    left: 50%; top: 50%; bottom: auto; width: 52px; height: 52px;
+    transform: translate(-50%, -50%);
+  }
+  .ig-tile.is-featured .ig-tile__play::after { border-width: 7px 0 7px 11px; }
+
+  .ig-tile__body { display: flex; flex-direction: column; flex: 1 1 auto; }
+  .ig-tile.is-featured .ig-tile__body { flex: none; }
+
+  .ig-tile__cat {
+    margin: 18px 0 6px;
+    color: var(--blue); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .ig-tile__title {
+    margin: 0 0 10px;
+    color: var(--navy); font-size: 20px; font-weight: 400; line-height: 1.3;
+  }
+  /* Small tiles: two lines max, so every row keeps the same height and
+     the page below doesn't shift when tiles trade places. */
+  .ig-tile:not(.is-featured) .ig-tile__title {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+    overflow: hidden; min-height: 2.6em;
+  }
+  .ig-tile.is-featured .ig-tile__title { font-size: 32px; line-height: 1.2; }
+  .ig-tile__title a { color: inherit; text-decoration: none; }
+  .ig-tile__title a:hover, .ig-tile__title a:focus-visible { text-decoration: underline; }
+  .ig-tile__summary { display: none; margin: 0 0 14px; color: #494949; font-size: 15px; }
+  .ig-tile.is-featured .ig-tile__summary { display: block; }
+  .ig-tile__meta { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
+
+  .ig-tile__foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line);
+  }
+  .ig-tile__action { color: var(--blue); font-size: 14px; font-weight: 500; text-decoration: none; }
+  .ig-tile.is-featured .ig-tile__action { font-size: 17px; }
+  .ig-tile__action:hover, .ig-tile__action:focus-visible { text-decoration: underline; }
+  .ig-tile__share {
+    display: inline-flex; padding: 4px; border: 0; background: none; color: var(--blue); cursor: pointer;
+  }
+
+  /* ---------- spotlight banner ---------- */
+  .spotlight {
+    display: flex; align-items: center; gap: 32px;
+    margin: 0 0 48px; padding: 28px 34px;
+    border-radius: var(--radius); background: var(--navy); color: #fff;
+  }
+  .spotlight__art { flex: none; width: 130px; height: 86px; border-radius: 12px; background: #1f4f8f; }
+  .spotlight__text { flex: 1 1 auto; }
+  .spotlight__eyebrow {
+    margin: 0 0 4px; color: var(--yellow);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .spotlight__title { margin: 0; font-size: 23px; font-weight: 400; line-height: 1.3; }
+  .spotlight__cta {
+    flex: none; display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 24px; border-radius: 999px; background: var(--yellow);
+    color: var(--navy); font-size: 14px; font-weight: 500; text-decoration: none;
+  }
+  @media (max-width: 767px) {
+    .spotlight { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ---------- pagination ---------- */
+  .pager { display: flex; justify-content: center; align-items: center; gap: 10px; }
+  .pager a, .pager span {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 40px; height: 40px; border: 1px solid #c9d3df; border-radius: 50%;
+    color: var(--navy); font-size: 14px; text-decoration: none;
+  }
+  .pager [aria-current] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .pager span { border-color: transparent; }
+
+  /* ---------- the morph ---------- */
+  /* Only the tiles take part (the rest of the page stays live). Each
+     snapshot keeps its real size and is revealed by the moving box, so
+     text never stretches while it resizes. */
+  html { view-transition-name: none; }
+  ::view-transition-group(*) {
+    animation-duration: var(--speed);
+    animation-timing-function: var(--ease);
+  }
+  ::view-transition-image-pair(*) { overflow: clip; }
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    width: 100%; height: 100%;
+    object-fit: none; object-position: left top;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation-timing-function: ease-in-out; }
+  ::view-transition-old(*) { animation-duration: calc(var(--speed) * var(--fade)); }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <div class="concept" role="group" aria-label="Concept settings">
+    <p class="concept__title">Concept: hover a tile to feature it</p>
+    <fieldset>
+      <legend>Behaviour</legend>
+      <label><input type="radio" name="mode" value="grow" checked> Grow in place</label>
+      <label><input type="radio" name="mode" value="swap"> Swap with the featured tile</label>
+    </fieldset>
+    <label>Motion
+      <select id="motion">
+        <option value="gentle" selected>Gentle</option>
+        <option value="medium">Medium</option>
+        <option value="snappy">Snappy (first version)</option>
+      </select>
+    </label>
+    <label>Hover delay
+      <select id="delay">
+        <option value="0">none</option>
+        <option value="180">0.18s</option>
+        <option value="300" selected>0.3s</option>
+        <option value="450">0.45s</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="reset"> Go back to the original when the pointer leaves</label>
+    <p class="concept__note">Desktop only (992px and wider, with a mouse). Smaller screens keep the stacked layout. Keyboard focus on a tile features it too.</p>
+  </div>
+
+  <h2 class="sr-only">All insights</h2>
+  <div class="toolbar">
+    <button type="button">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v12" stroke="currentColor" stroke-width="1.4"/></svg>
+      Show filters
+    </button>
+    <button type="button" class="sort">Sort&nbsp; <strong>Newest first</strong>
+      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+  </div>
+
+  <!-- Block 1: featured on the left -->
+  <ul class="ig" data-side="left">
+    <li class="ig-tile is-featured" style="--tint:#c7d3e3">
+      <div class="ig-tile__media"><span class="ig-tile__badge">RBC Economics</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Energy transition</p>
+        <h3 class="ig-tile__title"><a href="#">How transport operators are tackling the decarbonization challenge</a></h3>
+        <p class="ig-tile__summary">Fleet renewal, alternative fuels and new financing structures are reshaping the sector. Our analysts map where capital is moving and who stands to gain.</p>
+        <p class="ig-tile__meta">Derek Neldner &middot; Oct 10, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Listen &middot; 22 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#cfd9e8">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Markets in Motion</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Technology</p>
+        <h3 class="ig-tile__title"><a href="#">Semiconductor supply chains after the tariff reset</a></h3>
+        <p class="ig-tile__summary">Chipmakers are rerouting capacity as tariff lines shift. Where the bottlenecks sit now, and which suppliers carry the most risk into 2027.</p>
+        <p class="ig-tile__meta">Emma Laurent &middot; Oct 9, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Listen &middot; 22 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#d6e2d9">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Strategic Alternatives</span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Healthcare</p>
+        <h3 class="ig-tile__title"><a href="#">Biotech funding windows are reopening</a></h3>
+        <p class="ig-tile__summary">Follow-on offerings and venture rounds are picking up after a quiet stretch. What is driving the return, and which stages benefit first.</p>
+        <p class="ig-tile__meta">Daniel Reyes &middot; Oct 8, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Watch &middot; 5 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#e4dacb">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Markets in Motion</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Rates</p>
+        <h3 class="ig-tile__title"><a href="#">What a slower cut cycle means for credit</a></h3>
+        <p class="ig-tile__summary">Spreads have priced in a fast easing path. If cuts come slower, here is where refinancing pressure shows up first.</p>
+        <p class="ig-tile__meta">Emma Laurent &middot; Oct 6, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Listen &middot; 18 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#dad2e6">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Real-Time Geopolitics</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Geopolitics</p>
+        <h3 class="ig-tile__title"><a href="#">Strait of Hormuz: three scenarios for shipping risk</a></h3>
+        <p class="ig-tile__summary">From brief disruption to a sustained closure: what each scenario means for oil, freight rates and insurers.</p>
+        <p class="ig-tile__meta">Helima Croft &middot; Sep 7, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Watch &middot; 6 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+  </ul>
+
+  <section class="spotlight" aria-label="Program spotlight">
+    <div class="spotlight__art" aria-hidden="true"></div>
+    <div class="spotlight__text">
+      <p class="spotlight__eyebrow">Program spotlight &middot; Real-Time Geopolitics</p>
+      <p class="spotlight__title">Helima Croft and guests on the events moving commodities, with new episodes every week.</p>
+    </div>
+    <a class="spotlight__cta" href="#">Listen to the latest <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+  </section>
+
+  <!-- Block 2: featured on the right -->
+  <ul class="ig" data-side="right">
+    <li class="ig-tile" style="--tint:#cdd8e4">
+      <div class="ig-tile__media"><span class="ig-tile__badge">RBC Imagine</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Artificial intelligence</p>
+        <h3 class="ig-tile__title"><a href="#">AI capex: where the next dollar goes</a></h3>
+        <p class="ig-tile__summary">Hyperscaler budgets keep climbing. We follow the spend from chips to power to cooling, and flag where returns lag.</p>
+        <p class="ig-tile__meta">Lori Calvasina &middot; Sep 12, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Watch &middot; 5 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#d3dfe0">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Strategic Alternatives</span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Infrastructure</p>
+        <h3 class="ig-tile__title"><a href="#">Grid investment is the AI trade nobody priced</a></h3>
+        <p class="ig-tile__summary">Data centres need power the grid can't yet deliver. Transmission, storage and utilities could be the quieter winners.</p>
+        <p class="ig-tile__meta">Derek Neldner &middot; Sep 3, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Read &middot; 8 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile is-featured" style="--tint:#c6d4e6">
+      <div class="ig-tile__media"><span class="ig-tile__badge">RBC Economics</span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Consumer</p>
+        <h3 class="ig-tile__title"><a href="#">The Canadian consumer under higher-for-longer</a></h3>
+        <p class="ig-tile__summary">Mortgage renewals, savings buffers and spending intentions: a full read on how households are holding up and where the strain will show first.</p>
+        <p class="ig-tile__meta">Frances Donald &middot; Sep 10, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Read &middot; 7 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#e2d8cc">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Macro Minutes</span><span class="ig-tile__play" aria-hidden="true"></span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Commodities</p>
+        <h3 class="ig-tile__title"><a href="#">Copper and the electrification gap</a></h3>
+        <p class="ig-tile__summary">Demand from grids and EVs is outrunning new mine supply. How wide the gap gets, and what closes it.</p>
+        <p class="ig-tile__meta">Helima Croft &middot; Aug 28, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Listen &middot; 9 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+    <li class="ig-tile" style="--tint:#d8d4e4">
+      <div class="ig-tile__media"><span class="ig-tile__badge">Strategic Alternatives</span></div>
+      <div class="ig-tile__body">
+        <p class="ig-tile__cat">Private credit</p>
+        <h3 class="ig-tile__title"><a href="#">Private credit's first real stress test</a></h3>
+        <p class="ig-tile__summary">Defaults are edging up in the middle market. How lenders are responding, and what it means for sponsors looking to refinance.</p>
+        <p class="ig-tile__meta">Daniel Reyes &middot; Aug 21, 2026</p>
+        <div class="ig-tile__foot"><a class="ig-tile__action" href="#">Read &middot; 6 min</a><button class="ig-tile__share" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="13.5" cy="4" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="9" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8l5-3M6.5 10l5 3" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      </div>
+    </li>
+  </ul>
+
+  <nav class="pager" aria-label="Pages">
+    <a href="#" aria-current="page">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a><span>&hellip;</span><a href="#">16</a>
+  </nav>
+</main>
+
+<script>
+/* Hover-to-feature grid (concept)
+   Each .ig block is 4 columns x 2 rows on desktop. One tile is featured
+   (2 x 2, one half of the block); the other four fill the other half.
+   Hovering a small tile (after a short delay) makes it the featured one:
+     grow  - it expands where it is; the rest move to the other half
+     swap  - it takes the featured slot; the featured tile takes its place
+   The move is animated with the View Transitions API where supported;
+   elsewhere it just snaps. */
+(function () {
+  'use strict';
+
+  var DESKTOP = window.matchMedia('(min-width: 992px) and (hover: hover) and (pointer: fine)');
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var settings = { mode: 'grow', delay: 300, reset: false };
+  var MOTION = {
+    gentle: { speed: '650ms', ease: 'cubic-bezier(0.4, 0, 0.2, 1)', fade: '0.7' },
+    medium: { speed: '520ms', ease: 'cubic-bezier(0.3, 0.1, 0.2, 1)', fade: '0.6' },
+    snappy: { speed: '420ms', ease: 'cubic-bezier(0.22, 0.8, 0.24, 1)', fade: '0.5' }
+  };
+  var pointer = { x: -1, y: -1 };
+  var busy = false;
+
+  var grids = [];
+
+  /* Track the pointer ourselves and work out entering / leaving each grid
+     from its position. The browser's own pointerleave can't be trusted
+     here: the transition overlay fires a leave while the pointer is
+     still over the grid, and then no second leave arrives when it really
+     goes. */
+  document.addEventListener('pointermove', function (e) {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    grids.forEach(function (g) { g.track(); });
+  }, { passive: true });
+  // Scrolling can carry a grid out from under a still pointer too.
+  window.addEventListener('scroll', function () {
+    if (pointer.x < 0) return;
+    grids.forEach(function (g) { g.track(); });
+  }, { passive: true });
+
+  function animate(update) {
+    if (!document.startViewTransition || REDUCED.matches) {
+      update();
+      return Promise.resolve();
+    }
+    busy = true;
+    var vt = document.startViewTransition(update);
+    function done() { busy = false; }
+    return vt.finished.then(done, done);
+  }
+
+  function place(tile, c, r, cs, rs) {
+    tile.style.setProperty('--c', c);
+    tile.style.setProperty('--r', r);
+    tile.style.setProperty('--cs', cs);
+    tile.style.setProperty('--rs', rs);
+  }
+
+  /* Is the pointer really over this element? During a transition the
+     browser lays an overlay across the page, which fires pointerleave on
+     the grid even though the pointer hasn't moved. */
+  function pointerInside(el) {
+    var r = el.getBoundingClientRect();
+    return pointer.x >= r.left && pointer.x <= r.right && pointer.y >= r.top && pointer.y <= r.bottom;
+  }
+
+  function tileOf(node) {
+    return node && node.closest ? node.closest('.ig-tile') : null;
+  }
+
+  function Grid(el, index) {
+    var self = this;
+    this.el = el;
+    this.tiles = [].slice.call(el.querySelectorAll('.ig-tile'));
+    this.tiles.forEach(function (t, i) { t.style.viewTransitionName = 'ig-' + index + '-' + i; });
+    this.featured = el.querySelector('.ig-tile.is-featured') || this.tiles[0];
+    this.side = el.getAttribute('data-side') === 'right' ? 'right' : 'left';
+    this.small = this.tiles.filter(function (t) { return t !== self.featured; });
+    this.initial = { featured: this.featured, side: this.side, small: this.small.slice() };
+    this.timer = 0;
+    this.resetTimer = 0;
+    this.pending = null;
+    this.suppress = null;
+    this.isIn = false;
+    this.render();
+
+    el.addEventListener('pointerover', this.onOver.bind(this));
+    el.addEventListener('pointerout', this.onOut.bind(this));
+    el.addEventListener('focusin', this.onFocus.bind(this));
+  }
+
+  Grid.prototype.track = function () {
+    var now = pointerInside(this.el);
+    if (now === this.isIn) return;
+    this.isIn = now;
+    if (now) clearTimeout(this.resetTimer);
+    else this.onLeave();
+  };
+
+  Grid.prototype.render = function () {
+    var f = this.featured;
+    var fc = this.side === 'left' ? 1 : 3;
+    var oc = this.side === 'left' ? 3 : 1;
+    this.tiles.forEach(function (t) { t.classList.toggle('is-featured', t === f); });
+    place(f, fc, 1, 2, 2);
+    this.small.forEach(function (t, i) { place(t, oc + (i % 2), 1 + Math.floor(i / 2), 1, 1); });
+  };
+
+  Grid.prototype.promote = function (tile) {
+    var self = this;
+    if (busy || tile === this.featured) return;
+    animate(function () {
+      /* The old featured tile takes the hovered tile's slot in the small
+         half. In grow mode the halves also trade sides: the small tiles
+         keep their row and column within the half, so they all slide
+         across together instead of crossing paths. */
+      self.small[self.small.indexOf(tile)] = self.featured;
+      if (settings.mode !== 'swap') {
+        self.side = self.side === 'left' ? 'right' : 'left';
+      }
+      self.featured = tile;
+      self.render();
+    }).then(function () { self.settle(); });
+  };
+
+  /* After a move, a different tile can end up under a still pointer
+     (always in swap mode). Ignore it until the pointer leaves it, so the
+     grid doesn't bounce back and forth. */
+  Grid.prototype.settle = function () {
+    var under = tileOf(document.elementFromPoint(pointer.x, pointer.y));
+    this.suppress = under && under !== this.featured && this.el.contains(under) ? under : null;
+  };
+
+  Grid.prototype.restore = function () {
+    var self = this;
+    var i = this.initial;
+    if (busy) return;
+    if (this.featured === i.featured && this.side === i.side &&
+        this.small.every(function (t, n) { return t === i.small[n]; })) return;
+    animate(function () {
+      self.featured = i.featured;
+      self.side = i.side;
+      self.small = i.small.slice();
+      self.render();
+    });
+  };
+
+  Grid.prototype.onOver = function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    if (!DESKTOP.matches) return;
+    var tile = tileOf(e.target);
+    if (!tile || tile === this.pending) return;
+    clearTimeout(this.timer);
+    this.pending = null;
+    if (busy || tile === this.featured || tile === this.suppress) return;
+    var self = this;
+    this.pending = tile;
+    this.timer = setTimeout(function () {
+      self.pending = null;
+      self.promote(tile);
+    }, settings.delay);
+  };
+
+  Grid.prototype.onOut = function (e) {
+    var tile = tileOf(e.target);
+    if (!tile || (e.relatedTarget && tile.contains(e.relatedTarget))) return;
+    if (tile === this.pending) {
+      clearTimeout(this.timer);
+      this.pending = null;
+    }
+    if (tile === this.suppress) this.suppress = null;
+  };
+
+  Grid.prototype.onLeave = function () {
+    var self = this;
+    clearTimeout(this.timer);
+    this.pending = null;
+    this.suppress = null;
+    if (!settings.reset) return;
+    clearTimeout(this.resetTimer);
+    function check() {
+      if (pointerInside(self.el)) return;  // came back
+      if (busy) {                          // wait for the current move to finish
+        self.resetTimer = setTimeout(check, 150);
+        return;
+      }
+      self.restore();
+    }
+    this.resetTimer = setTimeout(check, 400);
+  };
+
+  Grid.prototype.onFocus = function (e) {
+    if (!DESKTOP.matches) return;
+    var tile = tileOf(e.target);
+    if (tile && e.target.matches(':focus-visible')) this.promote(tile);
+  };
+
+  grids = [].map.call(document.querySelectorAll('.ig'), function (el, i) { return new Grid(el, i); });
+
+  /* Concept controls */
+  [].forEach.call(document.querySelectorAll('input[name="mode"]'), function (input) {
+    input.addEventListener('change', function () { if (input.checked) settings.mode = input.value; });
+  });
+  document.getElementById('motion').addEventListener('change', function (e) {
+    var m = MOTION[e.target.value] || MOTION.gentle;
+    var root = document.documentElement.style;
+    root.setProperty('--speed', m.speed);
+    root.setProperty('--ease', m.ease);
+    root.setProperty('--fade', m.fade);
+  });
+  document.getElementById('delay').addEventListener('change', function (e) {
+    settings.delay = parseInt(e.target.value, 10) || 0;
+  });
+  document.getElementById('reset').addEventListener('change', function (e) {
+    settings.reset = e.target.checked;
+    if (settings.reset) grids.forEach(function (g) { g.restore(); });
+  });
+
+  /* Clicking a tile's empty area opens its story (the title link). */
+  document.addEventListener('click', function (e) {
+    var tile = tileOf(e.target);
+    if (!tile || e.target.closest('a, button')) return;
+    var link = tile.querySelector('.ig-tile__title a');
+    if (link) link.click();
+  });
+})();
+</script>
+</body>
+</html>

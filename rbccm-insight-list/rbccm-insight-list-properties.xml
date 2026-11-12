@@ -1,0 +1,146 @@
+<!--
+  RBCCM Insight List - Properties + Data
+  ==============================================================
+  A section heading and intro, then a list of up to four stories.
+  Each story: image, category label, title, summary, meta line and
+  a button to the story.
+
+  Skins (picked in TeamSite's Skin dropdown):
+    rbccm-insight-list (double-dash) etf-innovators.xsl
+      ETF Innovators "More on ETFs". White section; one column on
+      mobile, two from 768.
+
+  Picking a story: each Item{N}Story is TeamSite's article picker.
+  When a story is picked, its title, summary, image and link fill
+  in from the story. Anything typed in that item's own Title,
+  Summary, Image or Link field overrides the picked story. Category
+  and Meta are always typed.
+
+  Every text field is optional; blank ones don't render. A story
+  hides when it has no title (typed or picked). A blank Link hides
+  the button; a blank Button label shows "Read the story".
+
+  Image: Type="Image" needs the nested Image / Path / Description
+  skeleton (TeamSite rejects the Datum without it). Description is
+  the alt text; blank makes the image decorative (the title sits
+  right under it).
+
+  Deploy alongside:
+    /assets/rbccm/css/components/rbccm-insight-list.css
+-->
+<Properties ComponentID="rbccm-insight-list">
+
+  <Datum ID="SectionID" Type="String" Name="Section ID (unique per page; also used for the heading id)">more-on-etfs</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria label (optional - blank uses the section heading)"></Datum>
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-insight-list.css</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-11-09-1000</Datum>
+
+</Properties>
+
+<Data>
+
+  <Datum ID="SectionHeading" Type="String" Name="Section heading (blank hides it)">More on ETFs</Datum>
+  <Datum ID="SectionIntro" Type="Textarea" Name="Section intro (blank hides it)">The latest ETF research and insights from RBC Capital Markets.</Datum>
+  <Datum ID="SummaryLimit" Type="String" Name="Summary character limit (default 90; longer summaries are cut at a whole word with ...; 0 or full = no limit)">90</Datum>
+
+  <!-- ============================================================
+       Story 1
+       ============================================================ -->
+  <Datum ID="Item1Story" Type="DCR" Name="Story 1 : pick the story (fills title, summary, image and link; typed fields below override)">
+    <DCR Category="article" Type="story"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Item1Category" Type="String" Name="Story 1 : category label (e.g. Strategic Alternatives)">Strategic Alternatives</Datum>
+  <Datum ID="Item1Title" Type="String" Name="Story 1 : title (blank uses the picked story)">What is driving the next phase of ETF innovation?</Datum>
+  <Datum ID="Item1Summary" Type="Textarea" Name="Story 1 : summary (blank uses the picked story)">What's driving the shift as ETFs take on a more central role in portfolio construction.</Datum>
+  <Datum ID="Item1Meta" Type="String" Name="Story 1 : meta line (e.g. Valerie Grimba &#183; May 2026 &#183; 17 min listen)">Valerie Grimba &#183; May 2026 &#183; 17 min listen</Datum>
+  <Datum ID="Item1Image" Type="Image" Name="Story 1 : image - pick from DAM (blank uses the picked story's thumbnail)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/etf-innovators/more-on-etfs-1.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <Datum ID="Item1Link" Type="String" Name="Story 1 : link (blank uses the picked story; blank with no story hides the button)">#</Datum>
+  <Datum ID="Item1ButtonLabel" Type="String" Name="Story 1 : button label (blank shows: Read the story)"></Datum>
+
+  <!-- ============================================================
+       Story 2
+       ============================================================ -->
+  <Datum ID="Item2Story" Type="DCR" Name="Story 2 : pick the story (fills title, summary, image and link; typed fields below override)">
+    <DCR Category="article" Type="story"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Item2Category" Type="String" Name="Story 2 : category label">Strategic Alternatives</Datum>
+  <Datum ID="Item2Title" Type="String" Name="Story 2 : title (blank uses the picked story)">ETF Innovators: BMO Global Asset Management's income-driven ETF</Datum>
+  <Datum ID="Item2Summary" Type="Textarea" Name="Story 2 : summary (blank uses the picked story)">Dynamic income strategies are transforming portfolio construction for investors.</Datum>
+  <Datum ID="Item2Meta" Type="String" Name="Story 2 : meta line">Valerie Grimba &#183; Feb 2026 &#183; 8 min listen</Datum>
+  <Datum ID="Item2Image" Type="Image" Name="Story 2 : image - pick from DAM (blank uses the picked story's thumbnail)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/etf-innovators/more-on-etfs-2.webp</Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <Datum ID="Item2Link" Type="String" Name="Story 2 : link (blank uses the picked story)">#</Datum>
+  <Datum ID="Item2ButtonLabel" Type="String" Name="Story 2 : button label (blank shows: Read the story)"></Datum>
+
+  <!-- ============================================================
+       Story 3 (blank title + no picked story hides it)
+       ============================================================ -->
+  <Datum ID="Item3Story" Type="DCR" Name="Story 3 : pick the story (optional)">
+    <DCR Category="article" Type="story"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Item3Category" Type="String" Name="Story 3 : category label"></Datum>
+  <Datum ID="Item3Title" Type="String" Name="Story 3 : title (blank uses the picked story)"></Datum>
+  <Datum ID="Item3Summary" Type="Textarea" Name="Story 3 : summary (blank uses the picked story)"></Datum>
+  <Datum ID="Item3Meta" Type="String" Name="Story 3 : meta line"></Datum>
+  <Datum ID="Item3Image" Type="Image" Name="Story 3 : image - pick from DAM (blank uses the picked story's thumbnail)">
+    <Image>
+      <Path></Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <Datum ID="Item3Link" Type="String" Name="Story 3 : link (blank uses the picked story)"></Datum>
+  <Datum ID="Item3ButtonLabel" Type="String" Name="Story 3 : button label (blank shows: Read the story)"></Datum>
+
+  <!-- ============================================================
+       Story 4 (blank title + no picked story hides it)
+       ============================================================ -->
+  <Datum ID="Item4Story" Type="DCR" Name="Story 4 : pick the story (optional)">
+    <DCR Category="article" Type="story"/>
+    <DCR-Category Name="article">
+      <DCR-Type Name=".*"/>
+    </DCR-Category>
+    <DCR-Category Name="rbccm">
+      <DCR-Type Name="episode"/>
+    </DCR-Category>
+  </Datum>
+  <Datum ID="Item4Category" Type="String" Name="Story 4 : category label"></Datum>
+  <Datum ID="Item4Title" Type="String" Name="Story 4 : title (blank uses the picked story)"></Datum>
+  <Datum ID="Item4Summary" Type="Textarea" Name="Story 4 : summary (blank uses the picked story)"></Datum>
+  <Datum ID="Item4Meta" Type="String" Name="Story 4 : meta line"></Datum>
+  <Datum ID="Item4Image" Type="Image" Name="Story 4 : image - pick from DAM (blank uses the picked story's thumbnail)">
+    <Image>
+      <Path></Path>
+      <Description></Description>
+    </Image>
+  </Datum>
+  <Datum ID="Item4Link" Type="String" Name="Story 4 : link (blank uses the picked story)"></Datum>
+  <Datum ID="Item4ButtonLabel" Type="String" Name="Story 4 : button label (blank shows: Read the story)"></Datum>
+
+</Data>

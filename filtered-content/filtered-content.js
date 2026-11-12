@@ -2932,6 +2932,7 @@
       meta: meta,
       dateTs: when.ts || 0,
       feedTs: isNaN(feedTs) ? 0 : feedTs,
+      video: ov.video || src.video || '',       /* Brightcove player URL (<video>), for #latest-episode */
       searchText: (title + ' ' + speaker + ' ' + company + ' ' + category).toLowerCase()
     };
   }
@@ -3003,7 +3004,8 @@
                 tags: etfText(n, 'tags'),
                 readtime: child(n, 'readtime').trim(),
                 watchtime: child(n, 'watchtime').trim(),
-                type: child(n, 'type').trim()
+                type: child(n, 'type').trim(),
+                video: child(n, 'video').trim()
               }, slug);
             });
           });
@@ -3171,6 +3173,7 @@
             if (el) frag.appendChild(el);
           });
           listContainer.appendChild(frag);
+          linkLatest(entries[0]);
         }
         finalize(filterSection, listContainer);
       }).catch(function (err) {
@@ -3181,6 +3184,33 @@
       /* No adapter or unknown preset -> bind against author-provided items only. */
       finalize(filterSection, listContainer);
     }
+  }
+
+  /* "Latest" links: any link on the page to #latest-episode (e.g. the
+     ETF hero's "Watch the latest interview" button) is pointed at the
+     newest item, i.e. card 1 of the unfiltered, newest-first list. The
+     button's screen reader label gains the title, unless it already has
+     its own. Links stay on #latest-episode if the list can't load.
+     When the item has a video (the feed's <video> Brightcove URL), the
+     link also gets data-video-src / data-video-label: the video poster
+     script then plays it in the page's video modal on click, and the
+     href stays the episode page (new tab, crawlers, no JS). */
+  function linkLatest(entry) {
+    if (!entry || !entry.href || entry.href === '#') return;
+    var links = document.querySelectorAll('a[href="#latest-episode"]');
+    Array.prototype.forEach.call(links, function (a) {
+      var label = (a.textContent || '').replace(/\s+/g, ' ').trim();
+      a.setAttribute('href', entry.href);
+      a.setAttribute('data-latest-episode', 'true');
+      if (!a.hasAttribute('aria-label') && entry.title) {
+        a.setAttribute('aria-label', label + ': ' + entry.title);
+      }
+      if (/^(https?:)?\/\//i.test(entry.video || '')) {
+        a.setAttribute('data-video-src', entry.video);
+        a.setAttribute('data-video-label', entry.title || label);
+        a.setAttribute('aria-haspopup', 'dialog');
+      }
+    });
   }
 
   function finalize(filterSection, listContainer) {

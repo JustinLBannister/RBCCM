@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filtered Content — Local Test</title>
+
+  <!-- Single consolidated component stylesheet (filter + tile grid + card) -->
+  <!-- ?assets=production loads the live v31 copies from _production/ so
+       local changes can be checked against what is on rbccm.com. -->
+  <script data-preview-skip>
+    window.FC_ASSET_BASE = /[?&]assets=production\b/.test(location.search) ? '_production/' : '';
+    document.write('<link rel="stylesheet" href="' + window.FC_ASSET_BASE + 'filtered-content.css">');
+  </script>
+
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f8; }
+    .local-test-header { padding: 12px 16px; background: #e7edf1; border-bottom: 1px solid #d0d8df; font-size: 13px; color: #555; }
+    .local-test-section-label { margin: 16px 16px 0; padding: 8px 12px; background: #003168; color: #fff; font-size: 14px; font-weight: 600; border-radius: 4px; display: inline-block; }
+    .local-test-hint { margin: 4px 16px 0; font-size: 12px; color: #777; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <div class="local-test-header demo-note">
+    <strong>rbccm-filtered-content</strong> — single consolidated component. Loads <code>filtered-content.css</code> + <code>filtered-content.js</code> (both merged from old filter-by + conference-insights-tiles with BEM rename). Two preset instances below.
+  </div>
+
+
+  <!-- ============================================================
+       PRESET: ETF Innovators (insights feeds + episodes JSON)
+       Markup below is the skin's output for the ETF instance. The two
+       extra root attributes are local-only: trimmed copies of the
+       2023-2026 feeds in _local-data/, and rbccm.com as the origin
+       for thumbnails and links. Paths are root-relative so the page
+       preview in dist/ (served from the repo root) finds them too.
+       ============================================================ -->
+  <p class="local-test-section-label" data-variant="ETF Innovators">Preset: etf-innovators</p>
+  <p class="local-test-hint demo-hint">Episodes from the insights feeds (links containing etf-innovators / etf_innovators); company, category and overrides from etf-innovators-episodes.json. 6 per page, 3 under 768px.</p>
+
+  <section class="rbccm-filtered-content rbccm-filtered-content--etf-innovators" id="etf-innovators-episodes" data-container="#etf-innovators-episodes" data-page-size="6" data-page-size-filtered="6" data-page-size-mobile="3" data-episodes-url="/filtered-content/etf-innovators-episodes.json" data-feed-url-template="/filtered-content/_local-data/{year}-insights.xml" data-asset-origin="https://www.rbccm.com" data-empty-message-subject="episodes" data-empty-heading="No episodes found" data-empty-message="We couldn't find any episodes that match your current filters." data-empty-message-emphasis="Try a different company or year." data-empty-clear-label="Clear filters" aria-label="ETF Innovators episodes"><h2 class="rbccm-filtered-content__heading">Explore the full series</h2><div class="rbccm-filtered-content__filter"><div class="rbccm-filtered-content__filter-inner"><div class="rbccm-filtered-content__filter-row"><div class="rbccm-filtered-content__group"><span class="rbccm-filtered-content__group-label">Filter by:</span><div class="rbccm-filtered-content__select-wrapper" data-filter="company"><button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Company"><span class="rbccm-filtered-content__select-label">Company</span></button>
+      <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+    </div><div class="rbccm-filtered-content__select-wrapper" data-filter="year"><button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year"><span class="rbccm-filtered-content__select-label">Year</span></button>
+      <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/></svg>
+    </div></div><button type="button" class="rbccm-filtered-content__reset">Clear filters</button></div></div></div><div class="rbccm-filtered-content__inner"><ul class="rbccm-filtered-content__list"></ul></div></section>
+
+
+  <!-- ============================================================
+       PRESET 1: Conference Insights (light theme, live-feed adapter)
+       ============================================================ -->
+  <p class="local-test-section-label" data-variant="Conference Insights">Preset: conference-insights</p>
+  <p class="local-test-hint demo-hint">Sample tiles below exercise the filter engine (Year / Region / Topic / Search dropdowns auto-populate). Pagination shows when &gt;4 tiles. The live CI feed adapter (PART 3 of the JS) will populate against a <code>#rbccm-conference-insights-tiles</code> container — for local static testing, the sample tiles below are pre-authored inside <code>#rbccm-filtered-content-ci</code>.</p>
+
+  <section class="rbccm-filtered-content rbccm-filtered-content--conference-insights"
+           id="rbccm-filtered-content-ci"
+           data-container="#rbccm-filtered-content-ci"
+           data-page-size="4"
+           data-page-size-filtered="6"
+           data-empty-heading="No articles found"
+           data-empty-message="We couldn't find any articles that match your current filters."
+           data-empty-message-emphasis="Try adjusting your filters or search terms."
+           data-empty-clear-label="Clear filters"
+           aria-label="Filter conference insights">
+
+    <!-- ---------- Filter row ---------- -->
+    <div class="rbccm-filtered-content__filter">
+      <div class="rbccm-filtered-content__filter-inner">
+        <div class="rbccm-filtered-content__filter-row">
+
+          <div class="rbccm-filtered-content__group">
+            <span class="rbccm-filtered-content__group-label">Filter by:</span>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="year">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
+                <span class="rbccm-filtered-content__select-label">Year</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="region">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Region">
+                <span class="rbccm-filtered-content__select-label">Region</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="topic">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Topic">
+                <span class="rbccm-filtered-content__select-label">Topic</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+
+          <label class="rbccm-filtered-content__search">
+            <svg class="rbccm-filtered-content__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/>
+            </svg>
+            <span class="rbccm-filtered-content__screen-reader-only">Search articles</span>
+            <input type="search" class="rbccm-filtered-content__search-input" data-filter="search" placeholder="Search conference insights articles" aria-label="Search articles by title or keyword">
+          </label>
+
+          <button type="button" class="rbccm-filtered-content__reset">Clear filters</button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- Tile list ---------- -->
+    <div class="rbccm-filtered-content__inner">
+      <ul class="rbccm-filtered-content__list">
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2026" data-region="global" data-topic="technology-innovation financial-institutions"
+            data-search-text="the future of ai in financial services anthropic banking capital markets">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight rbccm-filtered-content__card--featured" href="#" aria-label="Insights: The Future of AI in Financial Services. 2 min read.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">The Future of AI in Financial Services</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Anthropic's Chief Commercial Officer discusses the transformative impact of artificial intelligence on banking and capital markets.</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>2 min read</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">Global · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jun 2026</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2026" data-region="us" data-topic="energy energy-transition"
+            data-search-text="from supply shock to supply opportunity global energy forum">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight" href="#" aria-label="Insights: From supply shock to supply opportunity. 25 min watch.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=600&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">From supply shock to supply opportunity</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Global Energy Forum insights reveal an industry navigating supply disruption while building a more diversified energy future.</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>25 min watch</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">US · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jun 2026</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2026" data-region="canada" data-topic="industrials"
+            data-search-text="2026 canadian industrials conference takeaways infrastructure toronto">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight" href="#" aria-label="Insights: 2026 Canadian industrials conference takeaways. 3 min read.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">2026 Canadian industrials conference takeaways</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Canada's ambitious infrastructure plans created buzz among delegates at RBC's Canadian Industrials Conference in Toronto.</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>3 min read</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">Canada · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jun 2026</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2026" data-region="us" data-topic="healthcare"
+            data-search-text="mfn price battle court legislature healthcare policy regulation">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight" href="#" aria-label="Insights: Why the MFN price battle is heading for court. 14 min listen.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">Why the MFN price battle is heading for court</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Where does U.S. healthcare policy and regulation stand — and what will be the impact of any political shake-up in November?</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>14 min listen</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">US · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jun 2026</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2025" data-region="europe" data-topic="markets-economics"
+            data-search-text="uk focus conference lse deputy chief executive investors">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight" href="#" aria-label="Insights: Why invest in the UK. 4 min read.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">Why invest in the U.K.? Five takeaways from the 2025 U.K. Focus Conference</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Investors heard from Charlie Walker at LSE, Adam McConkey at Lombard Odier, and Anne Christine Farstad at MFS on the U.K.'s key drivers and opportunities.</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>4 min read</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">Europe · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jan 2025</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--insight"
+            data-year="2025" data-region="apac" data-topic="technology-innovation"
+            data-search-text="infrastructure revolution data center securitization australia asia pacific">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--insight" href="#" aria-label="Insights: The infrastructure revolution — data center securitization. 3 min read.">
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--insight">
+              <img loading="lazy" alt="" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=60">
+            </div>
+            <div class="rbccm-filtered-content__card-body rbccm-filtered-content__card-body--insight">
+              <div class="rbccm-filtered-content__card-label rbccm-filtered-content__card-label--insight">Insights</div>
+              <div class="rbccm-filtered-content__card-divider rbccm-filtered-content__card-divider--insight" aria-hidden="true"></div>
+              <h2 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--insight">The infrastructure revolution: data center securitization</h2>
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--insight">Global data center and digital infrastructure securitization accelerates with Australia positioned to lead Asia-Pacific growth.</p>
+              <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--insight">
+                <p class="rbccm-filtered-content__card-metadata rbccm-filtered-content__card-metadata--insight"><span>3 min read</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__card-arrow rbccm-filtered-content__card-arrow--insight" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true"><path d="M0.995898 9.03271L3.46359 5.25064C3.51814 5.16868 3.56143 5.07118 3.59098 4.96374C3.62053 4.85631 3.63574 4.74108 3.63574 4.6247C3.63574 4.50832 3.62053 4.39309 3.59098 4.28566C3.56143 4.17823 3.51814 4.08072 3.46359 3.99876L0.995898 0.260776C0.941794 0.178145 0.877424 0.112559 0.806501 0.067801C0.735579 0.0230433 0.659508 0 0.582677 0C0.505846 0 0.429775 0.0230433 0.358852 0.067801C0.28793 0.112559 0.22356 0.178145 0.169455 0.260776C0.0610566 0.425955 0.000213623 0.649398 0.000213623 0.882305C0.000213623 1.11521 0.0610566 1.33865 0.169455 1.50383L2.22974 4.6247L0.169455 7.74557C0.0619338 7.90978 0.0013175 8.13141 0.000674486 8.36269C0.000231743 8.47871 0.0149126 8.59373 0.0438757 8.70114C0.0728388 8.80855 0.115515 8.90625 0.169455 8.98863C0.221613 9.07421 0.284449 9.14328 0.354334 9.19187C0.424218 9.24045 0.499765 9.26757 0.57661 9.27167C0.653455 9.27577 0.730073 9.25676 0.80204 9.21574C0.874007 9.17473 0.939896 9.11252 0.995898 9.03271Z" fill="currentColor"/></svg></p>
+                <div class="rbccm-filtered-content__card-taxonomy rbccm-filtered-content__card-taxonomy--insight">
+                  <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--insight">APAC · </span>
+                  <span class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--insight">Jan 2026</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PRESET 2: In the Media & Press Releases (item CSS pending)
+       ============================================================ -->
+  <p class="local-test-section-label" style="margin-top:48px;" data-variant="In the Media">Preset: in-the-media-and-press-releases</p>
+  <p class="local-test-hint demo-hint">Filter chrome and pagination render the same way. Item template stubbed as bare <code>&lt;li&gt;</code>s with data attrs — waiting on your ITM item CSS to drop in styling. When your CSS + item markup lands, this preset renders a Type + Year + Month + Region + Search filter over the /press_release DCR feed.</p>
+
+  <!-- ITM preset -- Cordelia's requested simplification: Type + Year only.
+       Month, Region and Search stay in the markup but are hidden via the
+       `--hidden-*` modifier classes on the root so bringing them back is
+       just a one-word class removal, no DOM restore needed. -->
+  <section class="rbccm-filtered-content rbccm-filtered-content--in-the-media-and-press-releases rbccm-filtered-content--hidden-month rbccm-filtered-content--hidden-region rbccm-filtered-content--hidden-search"
+           id="rbccm-filtered-content-itm"
+           data-container="#rbccm-filtered-content-itm"
+           data-page-size="10"
+           data-page-size-filtered="10"
+           data-empty-heading="No coverage found"
+           data-empty-message="We couldn't find any media coverage that matches your current filters."
+           data-empty-message-emphasis="Try adjusting your filters or search terms."
+           data-empty-clear-label="Clear filters"
+           aria-label="Filter media coverage">
+
+    <div class="rbccm-filtered-content__filter">
+      <div class="rbccm-filtered-content__filter-inner">
+        <div class="rbccm-filtered-content__filter-row">
+
+          <div class="rbccm-filtered-content__group">
+            <span class="rbccm-filtered-content__group-label">Filter by:</span>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="type">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Type">
+                <span class="rbccm-filtered-content__select-label">Type</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="year">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
+                <span class="rbccm-filtered-content__select-label">Year</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="month">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Month">
+                <span class="rbccm-filtered-content__select-label">Month</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="region">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Region">
+                <span class="rbccm-filtered-content__select-label">Region</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+
+          <label class="rbccm-filtered-content__search">
+            <svg class="rbccm-filtered-content__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M11.742 10.3421C12.7103 9.02083 13.144 7.38264 12.9563 5.7553C12.7686 4.12796 11.9734 2.63149 10.7297 1.56528C9.4861 0.499068 7.88573 -0.0582491 6.24882 0.00482408C4.61191 0.0678972 3.05917 0.746709 1.90125 1.90545C0.743334 3.0642 0.0656328 4.61742 0.00373101 6.25438C-0.0581708 7.89134 0.500292 9.49131 1.56739 10.7342C2.63449 11.9771 4.13153 12.7712 5.759 12.9577C7.38648 13.1442 9.02436 12.7094 10.345 11.7401H10.344C10.3733 11.7801 10.406 11.8185 10.442 11.8551L14.292 15.7051C14.4795 15.8928 14.7339 15.9983 14.9991 15.9983C15.2644 15.9984 15.5188 15.8932 15.7065 15.7056C15.8941 15.5181 15.9996 15.2638 15.9997 14.9985C15.9998 14.7332 15.8945 14.4788 15.707 14.2911L11.857 10.4411C11.8212 10.4049 11.7828 10.3725 11.742 10.3421ZM12 6.49815C12 7.22042 11.8577 7.93562 11.5813 8.60291C11.3049 9.2702 10.8998 9.87651 10.3891 10.3872C9.87835 10.898 9.27203 11.3031 8.60474 11.5795C7.93745 11.8559 7.22225 11.9981 6.49998 11.9981C5.77771 11.9981 5.06251 11.8559 4.39522 11.5795C3.72793 11.3031 3.12162 10.898 2.61089 10.3872C2.10017 9.87651 1.69505 9.2702 1.41864 8.60291C1.14224 7.93562 0.999982 7.22042 0.999982 6.49815C0.999982 5.03946 1.57945 3.64051 2.6109 2.60906C3.64235 1.57761 5.04129 0.998147 6.49998 0.998147C7.95867 0.998147 9.35762 1.57761 10.3891 2.60906C11.4205 3.64051 12 5.03946 12 6.49815Z" fill="currentColor"/>
+            </svg>
+            <span class="rbccm-filtered-content__screen-reader-only">Search media coverage and/or news releases</span>
+            <input type="search" class="rbccm-filtered-content__search-input" data-filter="search" placeholder="Search media coverage and/or news releases" aria-label="Search media coverage and/or news releases by title or keyword">
+          </label>
+
+          <button type="button" class="rbccm-filtered-content__reset">Clear filters</button>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="rbccm-filtered-content__inner">
+      <ul class="rbccm-filtered-content__list">
+
+        <!-- ITM item preview — matches the authored spec: outlet + date top row,
+             blue serif title, "Featured: name" bottom row. Border-top provides
+             row separator. -->
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--article"
+            data-type="media" data-year="2025" data-month="06" data-region="us"
+            data-search-text="helima croft on middle east security gulf oil infrastructure cnbc">
+          <div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">
+            <div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">
+              <div class="rbccm-filtered-content__card-source rbccm-filtered-content__card-source--article">CNBC</div>
+              <div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">June 28, 2025</div>
+            </div>
+            <h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a href="#">"Helima Croft on Middle East Security &amp; Gulf Oil Infrastructure"</a></h3>
+            <div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">
+              <div class="rbccm-filtered-content__card-featured rbccm-filtered-content__card-featured--article">
+                <span class="rbccm-filtered-content__card-featured-label rbccm-filtered-content__card-featured-label--article">Featured:</span>
+                <span class="rbccm-filtered-content__card-featured-name rbccm-filtered-content__card-featured-name--article">Helima Croft</span>
+              </div>
+              <div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">
+                <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--article">US</span>
+                <span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article rbccm-filtered-content__card-eyebrow--media">Media coverage</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--article"
+            data-type="media" data-year="2025" data-month="06" data-region="ca"
+            data-search-text="canada tariff escalation rbc models frances donald financial times">
+          <div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">
+            <div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">
+              <div class="rbccm-filtered-content__card-source rbccm-filtered-content__card-source--article">Financial Times</div>
+              <div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">June 19, 2025</div>
+            </div>
+            <h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a href="#">"Canada Faces Drag From U.S. Tariff Escalation, RBC Models Show"</a></h3>
+            <div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">
+              <div class="rbccm-filtered-content__card-featured rbccm-filtered-content__card-featured--article">
+                <span class="rbccm-filtered-content__card-featured-label rbccm-filtered-content__card-featured-label--article">Featured:</span>
+                <span class="rbccm-filtered-content__card-featured-name rbccm-filtered-content__card-featured-name--article">Frances Donald</span>
+              </div>
+              <div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">
+                <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--article">Canada</span>
+                <span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article rbccm-filtered-content__card-eyebrow--media">Media coverage</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--article"
+            data-type="media" data-year="2025" data-month="06" data-region="us"
+            data-search-text="s&amp;p 500 vulnerable to earnings miss rbc equity strategist lori calvasina wall street journal">
+          <div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">
+            <div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">
+              <div class="rbccm-filtered-content__card-source rbccm-filtered-content__card-source--article">The Wall Street Journal</div>
+              <div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">June 05, 2025</div>
+            </div>
+            <h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a href="#">"S&amp;P 500 Vulnerable to Earnings Miss, RBC Equity Strategist Warns"</a></h3>
+            <div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">
+              <div class="rbccm-filtered-content__card-featured rbccm-filtered-content__card-featured--article">
+                <span class="rbccm-filtered-content__card-featured-label rbccm-filtered-content__card-featured-label--article">Featured:</span>
+                <span class="rbccm-filtered-content__card-featured-name rbccm-filtered-content__card-featured-name--article">Lori Calvasina</span>
+              </div>
+              <div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">
+                <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--article">US</span>
+                <span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article rbccm-filtered-content__card-eyebrow--media">Media coverage</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--article"
+            data-type="press" data-year="2026" data-month="05" data-region="ca"
+            data-search-text="rbc capital markets announces senior appointments canada leadership team">
+          <div class="rbccm-filtered-content__card rbccm-filtered-content__card--article">
+            <div class="rbccm-filtered-content__card-topbar rbccm-filtered-content__card-topbar--article">
+              <div class="rbccm-filtered-content__card-source rbccm-filtered-content__card-source--article">RBC Capital Markets</div>
+              <div class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--article">May 12, 2026</div>
+            </div>
+            <h3 class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--article"><a href="#">"RBC Capital Markets announces senior leadership appointments"</a></h3>
+            <div class="rbccm-filtered-content__card-footer rbccm-filtered-content__card-footer--article">
+              <div class="rbccm-filtered-content__card-featured rbccm-filtered-content__card-featured--article">
+                <span class="rbccm-filtered-content__card-featured-label rbccm-filtered-content__card-featured-label--article">Featured:</span>
+                <span class="rbccm-filtered-content__card-featured-name rbccm-filtered-content__card-featured-name--article">Executive leadership team</span>
+              </div>
+              <div class="rbccm-filtered-content__card-footer-metadata rbccm-filtered-content__card-footer-metadata--article">
+                <span class="rbccm-filtered-content__card-region rbccm-filtered-content__card-region--article">Canada</span>
+                <span class="rbccm-filtered-content__card-eyebrow rbccm-filtered-content__card-eyebrow--article rbccm-filtered-content__card-eyebrow--press">News release</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PRESET 3: Deals & Transactions
+       Year + Transaction type dropdowns + Clear filters only.
+       No search input. Item template stubbed pending spec.
+       ============================================================ -->
+  <p class="local-test-section-label" style="margin-top:48px;" data-variant="Deals">Preset: deals-and-transactions</p>
+  <p class="local-test-hint demo-hint">Year + Transaction type + Clear filters, no search. Amount range and per-option counts are built but hidden with display: none (same as the transactions page). Pending deals carry data-unfiltered-only: they show in the default list and drop out once any filter is set. 6 per page. The live page fills this list from the deals feed; these four are static samples.</p>
+
+  <section class="rbccm-filtered-content rbccm-filtered-content--deals-and-transactions"
+           id="rbccm-filtered-content-deals"
+           data-container="#rbccm-filtered-content-deals"
+           data-page-size="6"
+           data-page-size-filtered="6"
+           data-option-counts="true"
+           data-empty-heading="No transactions found"
+           data-empty-message="We couldn't find any transactions that match your current filters."
+           data-empty-message-emphasis="Try adjusting your filters."
+           data-empty-clear-label="Clear filters"
+           aria-label="Filter deals and transactions">
+
+    <!-- Section heading + featured deal: same markup the skin emits (SectionHeading + Featured* Datums). -->
+    <h2 class="rbccm-filtered-content__heading">Select deals and client execution</h2><div class="rbccm-filtered-content__featured rbccm-filtered-content__featured--deal"><div class="rbccm-filtered-content__featured-media rbccm-filtered-content__featured-media--deal"><img class="rbccm-filtered-content__featured-image rbccm-filtered-content__featured-image--deal" loading="lazy" src="https://www.rbccm.com/assets/rbccm/images/deals/20260922-apollo-deal-spotlight.webp" alt=""/></div><div class="rbccm-filtered-content__featured-body rbccm-filtered-content__featured-body--deal"><p class="rbccm-filtered-content__featured-date rbccm-filtered-content__featured-date--deal">Sep 10, 2026</p><h2 class="rbccm-filtered-content__featured-title rbccm-filtered-content__featured-title--deal">RBC Capital Markets acts as sole financial advisor to Apollo on its $9 billion strategic investment in ONEOK</h2><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">TULSA, Okla., Sept. 10, 2026 (GLOBE NEWSWIRE) - ONEOK, Inc. today announced the closing of the previously announced $9 billion minority equity investment by funds and affiliates managed by Apollo.</p><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">Under the terms of the agreement, Apollo has invested $9 billion in exchange for a nonvoting Class B minority interest in a newly formed holding company, ONEOK Holdings, L.L.C., which is structurally subordinate to the company&#8217;s debt.</p><p class="rbccm-filtered-content__featured-text rbccm-filtered-content__featured-text--deal">The minority equity investment has been reviewed with ONEOK&#39;s credit rating agencies, all of which consider the transaction credit-enhancing.</p><a class="rbccm-filtered-content__featured-link rbccm-filtered-content__featured-link--deal" href="https://ir.oneok.com/news-and-events/press-releases/2026/09-10-2026-211556751" target="_blank" rel="noopener"><span class="rbccm-filtered-content__featured-link-label rbccm-filtered-content__featured-link-label--deal">Read the full press release</span><svg xmlns="http://www.w3.org/2000/svg" class="rbccm-filtered-content__featured-link-arrow rbccm-filtered-content__featured-link-arrow--deal" width="4" height="10" viewBox="0 0 4 10" fill="none" aria-hidden="true" focusable="false"><path d="M0.996 9.033L3.464 5.251C3.518 5.169 3.561 5.071 3.591 4.964C3.621 4.856 3.636 4.741 3.636 4.625C3.636 4.508 3.621 4.393 3.591 4.286C3.561 4.178 3.518 4.081 3.464 3.999L0.996 0.261C0.942 0.178 0.877 0.113 0.807 0.068C0.736 0.023 0.66 0 0.583 0C0.506 0 0.43 0.023 0.359 0.068C0.288 0.113 0.224 0.178 0.169 0.261C0.061 0.426 0 0.649 0 0.882C0 1.115 0.061 1.339 0.169 1.504L2.23 4.625L0.169 7.746C0.062 7.91 0.001 8.131 0.001 8.363C0 8.479 0.015 8.594 0.044 8.701C0.073 8.809 0.116 8.906 0.169 8.989C0.222 9.074 0.284 9.143 0.354 9.192C0.424 9.24 0.5 9.268 0.577 9.272C0.653 9.276 0.73 9.257 0.802 9.216C0.874 9.175 0.94 9.113 0.996 9.033Z" fill="currentColor"/></svg></a></div></div>
+
+    <div class="rbccm-filtered-content__filter">
+      <div class="rbccm-filtered-content__filter-inner">
+        <div class="rbccm-filtered-content__filter-row">
+
+          <div class="rbccm-filtered-content__group">
+            <span class="rbccm-filtered-content__group-label">Filter by:</span>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="year">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Year">
+                <span class="rbccm-filtered-content__select-label">Year</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+
+            <div class="rbccm-filtered-content__select-wrapper" data-filter="transaction-type">
+              <button type="button" class="rbccm-filtered-content__select" aria-haspopup="listbox" aria-expanded="false" aria-label="Filter by Transaction type">
+                <span class="rbccm-filtered-content__select-label">Transaction type</span>
+              </button>
+              <svg class="rbccm-filtered-content__select-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                <path d="M1.00086 1H10.5929L5.79686 6.481L1.00086 1ZM0.247858 1.659L5.04386 7.139C5.13772 7.24641 5.25347 7.3325 5.38335 7.39148C5.51322 7.45046 5.65422 7.48098 5.79686 7.48098C5.9395 7.48098 6.08049 7.45046 6.21037 7.39148C6.34024 7.3325 6.456 7.24641 6.54986 7.139L11.3459 1.659C11.9119 1.012 11.4519 0 10.5929 0H1.00086C0.808614 -0.000164 0.620396 0.055088 0.458746 0.159141C0.297096 0.263194 0.168865 0.411637 0.089409 0.586693C0.009953 0.761749 -0.017360 0.955998 0.010742 1.14618C0.038844 1.33636 0.121169 1.51441 0.247858 1.659Z" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- NO search input for deals preset -->
+
+          <!-- Amount range (millions): built for parity with the transactions
+               page, hidden there and here with display: none. -->
+          <div class="rbccm-filtered-content__range" data-filter-range="amount" data-min="0" data-max="50000" data-step="250" style="display: none;">
+            <span class="rbccm-filtered-content__range-label">Amount:</span>
+            <div class="rbccm-filtered-content__range-track">
+              <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--min" aria-label="Minimum amount">
+              <input type="range" class="rbccm-filtered-content__range-input rbccm-filtered-content__range-input--max" aria-label="Maximum amount">
+            </div>
+            <span class="rbccm-filtered-content__range-value" aria-live="polite"></span>
+            <button type="button" class="rbccm-filtered-content__range-clear" aria-label="Clear amount filter" hidden>&#215;</button>
+          </div>
+
+          <button type="button" class="rbccm-filtered-content__reset">Clear filters</button>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="rbccm-filtered-content__inner">
+      <ul class="rbccm-filtered-content__list">
+
+        <!-- Deals stub items — deals-tombstone order per Figma:
+               1. Date            "Mar 2026"
+               2. Media / logos   client marks
+               3. Amount (h2)     "C$10 billion"
+               4. Description     "<Client> has agreed to be…"
+               5. Status line     "Financial Advisor / Pending"
+               6. Read more       CTA -->
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
+            data-year="2026" data-transaction-type="mergers-and-acquisitions" data-amount="10000" data-unfiltered-only="true"
+            data-search-text="boralex brookfield la caisse acquisition financial advisor">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Financial Advisor" aria-label="Link to Financial Advisor">
+            <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
+              <p class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--deal">Mar 2026</p>
+            </div>
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--deal">
+              <div class="rbccm-filtered-content__card-logo rbccm-filtered-content__card-logo--deal" style="background-image:url('https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=600&q=60')"></div>
+            </div>
+            <div class="rbccm-filtered-content__card-info rbccm-filtered-content__card-info--deal">
+              <p class="rbccm-filtered-content__card-value rbccm-filtered-content__card-value--deal">C$10 billion</p>
+              <p class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--deal">Boralex has agreed to be acquired by Brookfield and La Caisse</p>
+              <p class="rbccm-filtered-content__card-status rbccm-filtered-content__card-status--deal">Mergers and Acquisitions / Pending</p>
+            </div>
+            <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--deal">
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--deal">Financial Advisor / Pending</p>
+              <p class="rbccm-filtered-content__card-link rbccm-filtered-content__card-link--deal">Read more</p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
+            data-year="2026" data-transaction-type="equity-capital-markets" data-amount="850"
+            data-search-text="global tech ipo joint bookrunner rbc capital markets">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Joint Bookrunner" aria-label="Link to Joint Bookrunner">
+            <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
+              <p class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--deal">Feb 2026</p>
+            </div>
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--deal">
+              <div class="rbccm-filtered-content__card-logo rbccm-filtered-content__card-logo--deal" style="background-image:url('https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=600&q=60')"></div>
+            </div>
+            <div class="rbccm-filtered-content__card-info rbccm-filtered-content__card-info--deal">
+              <p class="rbccm-filtered-content__card-value rbccm-filtered-content__card-value--deal">US$850 million</p>
+              <p class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--deal">Global Tech Nasdaq IPO</p>
+              <p class="rbccm-filtered-content__card-status rbccm-filtered-content__card-status--deal">Equity Capital Markets / Closed</p>
+            </div>
+            <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--deal">
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--deal">Joint Bookrunner</p>
+              <p class="rbccm-filtered-content__card-link rbccm-filtered-content__card-link--deal">Read more</p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
+            data-year="2025" data-transaction-type="debt-capital-markets" data-amount="1200"
+            data-search-text="canadian utility senior notes issuance rbc lead arranger">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Lead Arranger" aria-label="Link to Lead Arranger">
+            <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
+              <p class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--deal">Nov 2025</p>
+            </div>
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--deal">
+              <div class="rbccm-filtered-content__card-logo rbccm-filtered-content__card-logo--deal" style="background-image:url('https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=600&q=60')"></div>
+            </div>
+            <div class="rbccm-filtered-content__card-info rbccm-filtered-content__card-info--deal">
+              <p class="rbccm-filtered-content__card-value rbccm-filtered-content__card-value--deal">C$1.2 billion</p>
+              <p class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--deal">Canadian Utility Co. Senior Notes</p>
+              <p class="rbccm-filtered-content__card-status rbccm-filtered-content__card-status--deal">Senior Unsecured Notes / Closed</p>
+            </div>
+            <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--deal">
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--deal">Lead Arranger</p>
+              <p class="rbccm-filtered-content__card-link rbccm-filtered-content__card-link--deal">Read more</p>
+            </div>
+          </a>
+        </li>
+
+        <li class="rbccm-filtered-content__item rbccm-filtered-content__item--deal"
+            data-year="2025" data-transaction-type="mergers-and-acquisitions" data-amount="3100"
+            data-search-text="pharma merger cross border sell side advisor divestiture">
+          <a class="rbccm-filtered-content__card rbccm-filtered-content__card--deal" href="#" title="Link to Sell-side Advisor" aria-label="Link to Sell-side Advisor">
+            <div class="rbccm-filtered-content__card-header rbccm-filtered-content__card-header--deal">
+              <p class="rbccm-filtered-content__card-date rbccm-filtered-content__card-date--deal">Aug 2025</p>
+            </div>
+            <div class="rbccm-filtered-content__card-media rbccm-filtered-content__card-media--deal">
+              <div class="rbccm-filtered-content__card-logo rbccm-filtered-content__card-logo--deal" style="background-image:url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=60')"></div>
+            </div>
+            <div class="rbccm-filtered-content__card-info rbccm-filtered-content__card-info--deal">
+              <p class="rbccm-filtered-content__card-value rbccm-filtered-content__card-value--deal">US$3.1 billion</p>
+              <p class="rbccm-filtered-content__card-title rbccm-filtered-content__card-title--deal">Cross-border Pharma Divestiture</p>
+              <p class="rbccm-filtered-content__card-status rbccm-filtered-content__card-status--deal">Mergers and Acquisitions / Closed</p>
+            </div>
+            <div class="rbccm-filtered-content__card-bottom rbccm-filtered-content__card-bottom--deal">
+              <p class="rbccm-filtered-content__card-description rbccm-filtered-content__card-description--deal">Sell-side Advisor</p>
+              <p class="rbccm-filtered-content__card-link rbccm-filtered-content__card-link--deal">Read more</p>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- Consolidated JS -->
+  <script data-preview-skip>document.write('<script src="' + window.FC_ASSET_BASE + 'filtered-content.js"><\/script>');</script>
+  <script>
+  /* ETF Innovators FPO cards for opening this page straight from disk
+     (file://), where the browser blocks the feed and JSON requests. Same
+     11 episodes the adapter builds from the feeds (snapshot 2026-11-04),
+     drawn with the adapter's own card template before the coordinator
+     runs, so the filters and pagination bind to them as usual. Served
+     over http (preview server) the adapter fetches for real instead. */
+  (function () {
+    if (location.protocol !== 'file:') return;
+    var engine = window.__rbccmFilteredContent || {};
+    var adapter = engine.PRESET_ADAPTERS && engine.PRESET_ADAPTERS['etf-innovators'];
+    var list = document.querySelector('#etf-innovators-episodes .rbccm-filtered-content__list');
+    if (!adapter || !list) return;
+    var FPO = [
+    {"title": "T. Rowe Price on innovation-driven active ETFs", "href": "https://www.rbccm.com/en/insights/2026/06/etf-innovators-t-rowe-price-on-innovation-driven-active-etfs", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/etf-innovators-t-rowe-price-th.webp", "pillLabel": "Full Episode", "category": "Active ETFs", "speaker": "Tim Coyne, T. Rowe Price", "company": "T. Rowe Price", "companySlug": "t-rowe-price", "year": "2026", "meta": "Jun 2026 \u00b7 9 min watch", "searchText": "t. rowe price on innovation-driven active etfs tim coyne, t. rowe price t. rowe price active etfs"},
+    {"title": "AllianceBernstein's outcome-first ETF approach", "href": "https://www.rbccm.com/en/insights/2026/05/etf-innovators-alliancebernsteins-outcome-first-etf-approach", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/20260526-etf-innovators-alliancebernsteins-outcome-first-etf-approach-th.webp", "pillLabel": "Full Episode", "category": "Outcome ETFs", "speaker": "Noel Archard, AllianceBernstein", "company": "AllianceBernstein", "companySlug": "alliancebernstein", "year": "2026", "meta": "May 2026 \u00b7 8 min watch", "searchText": "alliancebernstein's outcome-first etf approach noel archard, alliancebernstein alliancebernstein outcome etfs"},
+    {"title": "How Russell Investments is bridging the investing gap", "href": "https://www.rbccm.com/en/insights/2026/05/etf-innovators-how-russell-investments-is-bridging-the-investing-gap", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/20260521-etf-innovators-how-russell-investments-th.webp", "pillLabel": "Full Episode", "category": "Portfolio construction", "speaker": "Zach Buchwald, Russell Investments", "company": "Russell Investments", "companySlug": "russell-investments", "year": "2026", "meta": "May 2026 \u00b7 9 min watch", "searchText": "how russell investments is bridging the investing gap zach buchwald, russell investments russell investments portfolio construction"},
+    {"title": "Mackenzie Investments on the new era of active ETFs", "href": "https://www.rbccm.com/en/insights/2026/05/etf-innovators-mackenzie-investments-on-the-new-era", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/20260526-etf-innovators-mackenzie-investments-on-the-new-era-th.webp", "pillLabel": "Full Episode", "category": "Active ETFs", "speaker": "Luke Gould, Mackenzie Investments", "company": "Mackenzie Investments", "companySlug": "mackenzie-investments", "year": "2026", "meta": "May 2026 \u00b7 6 min watch", "searchText": "mackenzie investments on the new era of active etfs luke gould, mackenzie investments mackenzie investments active etfs"},
+    {"title": "BMO Global Asset Management\u2019s income-driven ETF", "href": "https://www.rbccm.com/en/insights/2026/01/etf-innovators-bmo-global-asset-management", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/202601-etf-innovators-bmo-global-asset-management-th.webp", "pillLabel": "Full Episode", "category": "Income", "speaker": "Bill Bamber, BMO Global Asset Management", "company": "BMO Global Asset Management", "companySlug": "bmo-global-asset-management", "year": "2026", "meta": "Jan 2026 \u00b7 7 min watch", "searchText": "bmo global asset management\u2019s income-driven etf bill bamber, bmo global asset management bmo global asset management income"},
+    {"title": "How Capital Group powers active ETFs", "href": "https://www.rbccm.com/en/insights/2025/12/etf-innovators-how-capital-group-powers-active-etfs", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2026/202601-etf-innovators-how-capital-group-powers-active-etfs-th.webp", "pillLabel": "Full Episode", "category": "Active ETFs", "speaker": "Scott Davis, Capital Group", "company": "Capital Group", "companySlug": "capital-group", "year": "2025", "meta": "Dec 2025 \u00b7 8 min watch", "searchText": "how capital group powers active etfs scott davis, capital group capital group active etfs"},
+    {"title": "CI Global Asset Management on global active management", "href": "https://www.rbccm.com/en/insights/2023/12/etf-innovators-featuring-marc-andre-lewis", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2023/etf_innovators_featuring_helen_hayes_ishares_canada-th.jpg", "pillLabel": "Full Episode", "category": "Income", "speaker": "Marc-Andr\u00e9 Lewis, EVP and CIO at CI Global Asset Management", "company": "CI Global Asset Management", "companySlug": "ci-global-asset-management", "year": "2023", "meta": "Dec 2023 \u00b7 9 min watch", "searchText": "ci global asset management on global active management marc-andr\u00e9 lewis, evp and cio at ci global asset management ci global asset management income"},
+    {"title": "From Vanguard's first ETF to the one-ticket portfolio", "href": "https://www.rbccm.com/en/insights/2023/10/etf-innovators-featuring-kathy-bock-head-vanguard-canada", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2023/etf_innovators_featuring_helen_hayes_ishares_canada-th.jpg", "pillLabel": "Full Episode", "category": "Portfolio design", "speaker": "Kathy Bock, Head, Vanguard Canada", "company": "Vanguard", "companySlug": "vanguard", "year": "2023", "meta": "Oct 2023 \u00b7 8 min watch", "searchText": "from vanguard's first etf to the one-ticket portfolio kathy bock, head, vanguard canada vanguard portfolio design"},
+    {"title": "Purpose Investments on building first-of-their-kind ETFs", "href": "https://www.rbccm.com/en/insights/2023/08/etf-innovators-featuring-som-seif-ceo-purpose-investments", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2023/etf_innovators_featuring_helen_hayes_ishares_canada-th.jpg", "pillLabel": "Full Episode", "category": "Digital assets", "speaker": "Som Seif, CEO, Purpose Investments", "company": "Purpose Investments", "companySlug": "purpose-investments", "year": "2023", "meta": "Aug 2023 \u00b7 9 min watch", "searchText": "purpose investments on building first-of-their-kind etfs som seif, ceo, purpose investments purpose investments digital assets"},
+    {"title": "Horizons ETFs on differentiated ETFs for Canadian investors", "href": "https://www.rbccm.com/en/insights/2023/06/etf_innovators_featuring_rohit_mehta", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2023/etf_innovators_featuring_helen_hayes_ishares_canada-th.jpg", "pillLabel": "Full Episode", "category": "Income", "speaker": "Rohit Mehta, President & CEO, Horizons ETFs", "company": "Horizons ETFs", "companySlug": "horizons-etfs", "year": "2023", "meta": "Jun 2023 \u00b7 7 min watch", "searchText": "horizons etfs on differentiated etfs for canadian investors rohit mehta, president & ceo, horizons etfs horizons etfs income"},
+    {"title": "iShares Canada on the renewed interest in fixed income ETFs", "href": "https://www.rbccm.com/en/insights/2023/05/etf_innovators_featuring_helen_hayes_ishares_canada", "thumbnail": "https://www.rbccm.com/assets/rbccm/images/insights/2023/etf_innovators_featuring_helen_hayes_ishares_canada-th.jpg", "pillLabel": "Full Episode", "category": "Fixed income", "speaker": "Helen Hayes, iShares Canada", "company": "iShares", "companySlug": "ishares", "year": "2023", "meta": "May 2023 \u00b7 6 min watch", "searchText": "ishares canada on the renewed interest in fixed income etfs helen hayes, ishares canada ishares fixed income"}
+    ];
+    for (var i = 0; i < FPO.length; i++) list.appendChild(adapter.render(FPO[i], i));
+  })();
+  </script>
+</body>
+</html>

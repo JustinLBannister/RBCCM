@@ -1,0 +1,124 @@
+<!--
+  RBCCM Host Profile - Properties + Data
+  ==============================================================
+  One person, presented as a host: section heading, photo, name,
+  role, up to three bio paragraphs, a LinkedIn link and a list of
+  up to six media appearances (outlet, date, topic, button).
+
+  Skins (picked in TeamSite's Skin dropdown):
+    rbccm-host-profile (double-dash) etf-innovators.xsl
+      ETF Innovators "Meet the host". Light blue section; photo
+      left and text right on desktop, stacked on mobile; media
+      appearances as white cards, two per row on desktop.
+
+  Every text field is optional; blank ones don't render. An
+  appearance hides when its outlet is blank.
+
+  Photo: Type="Image" needs the nested Image / Path / Description
+  skeleton (TeamSite rejects the Datum without it). Description is
+  the alt text; blank uses the name.
+
+  Media appearances can fill from the In the Media feed: set
+  MediaFeedMatch (e.g. Valerie Grimba) and the script shows the newest
+  matching items; the typed appearances are the fallback. The topic is
+  hidden by the CSS for now; the second line shows date and source.
+
+  Deploy alongside:
+    /assets/rbccm/css/components/rbccm-host-profile.css
+    /assets/rbccm/js/components/rbccm-host-profile.js
+-->
+<Properties ComponentID="rbccm-host-profile">
+
+  <Datum ID="SectionID" Type="String" Name="Section ID (unique per page; also used for the heading id)">meet-the-host</Datum>
+  <Datum ID="SectionAriaLabel" Type="String" Name="Section aria label (optional - blank uses the section heading)"></Datum>
+  <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-host-profile.css</Datum>
+  <Datum ID="JsPath" Type="String" Name="JS path (technical - set once at deploy; fills media appearances from the In the Media feed)">/assets/rbccm/js/components/rbccm-host-profile.js</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-11-04-1400</Datum>
+
+</Properties>
+
+<Data>
+
+  <Datum ID="SectionHeading" Type="String" Name="Section heading (blank hides it)">Meet the host</Datum>
+
+  <Datum ID="Photo" Type="Image" Name="Photo - pick from DAM (about 760 x 734; shown with rounded corners)">
+    <Image>
+      <Path>/assets/rbccm/images/insights/etf-innovators/valerie-grimba.webp</Path>
+      <Description>Valerie Grimba</Description>
+    </Image>
+  </Datum>
+
+  <Datum ID="Name" Type="String" Name="Name">Valerie Grimba</Datum>
+  <Datum ID="Role" Type="String" Name="Role / title (blue line under the name)">Director, Global ETF Strategy, RBC Capital Markets</Datum>
+
+  <!-- Bio: up to three paragraphs. Textarea; inline HTML (bold,
+       italic, links) is kept. Blank paragraphs are skipped. -->
+  <Datum ID="Bio1" Type="Textarea" Name="Bio : paragraph 1">Valerie runs the Global ETF Strategy team at RBC Capital Markets, helping institutional clients understand and implement ETF strategies and bridging the gap between clients and ETF trade execution. She sits at the center of a desk that serves as designated broker to roughly 300 ETF mandates and acts as authorized participant across more than 90% of the Canadian ETF market &amp;#8212; working with everyone from the largest pension funds to family offices.</Datum>
+  <Datum ID="Bio2" Type="Textarea" Name="Bio : paragraph 2 (blank hides it)">With over 15 years of global institutional sales and trading experience, Valerie&amp;#8217;s career has spanned trading floors across Canada, the U.S. and Australasia, including roles at Bear Stearns, CIBC World Markets and Macquarie before joining RBC.</Datum>
+  <Datum ID="Bio3" Type="Textarea" Name="Bio : paragraph 3 (blank hides it)"></Datum>
+
+  <Datum ID="LinkedInUrl" Type="String" Name="LinkedIn profile URL (blank hides the icon)">https://www.linkedin.com/</Datum>
+  <Datum ID="LinkedInLabel" Type="String" Name="LinkedIn screen reader label (blank uses: name on LinkedIn)"></Datum>
+
+  <Datum ID="MediaHeading" Type="String" Name="Media appearances heading (blank hides it)">Latest media appearances</Datum>
+
+  <!-- Media appearances from the In the Media feed. When MediaFeedMatch
+       is set, the page reads the feed (this year, then earlier years
+       until it has enough) and shows the newest items whose title
+       contains that text, e.g. "RBC TV: Valerie Grimba on CNBC". The
+       typed appearances below show until the feed loads, and stay if
+       the feed has no matches or can't be read. Blank MediaFeedMatch
+       turns the feed off (typed appearances only). -->
+  <Datum ID="MediaFeedMatch" Type="String" Name="Media feed : name to match in the In the Media titles (blank = typed appearances only)">Valerie Grimba</Datum>
+  <Datum ID="MediaFeedUrlTemplate" Type="String" Name="Media feed : per-year feed URL (technical - use {year})">/en/about-us/data/{year}?qPagesize=500</Datum>
+  <Datum ID="MediaFeedCount" Type="String" Name="Media feed : how many appearances to show (default 4)">4</Datum>
+
+  <!-- Appearance 1 -->
+  <Datum ID="Media1Outlet" Type="String" Name="Appearance 1 : outlet (blank hides this appearance)">Bloomberg</Datum>
+  <Datum ID="Media1Date" Type="String" Name="Appearance 1 : date (shown as typed, e.g. Aug 2026)">Aug 2026</Datum>
+  <Datum ID="Media1Source" Type="String" Name="Appearance 1 : source (optional, e.g. RBC TV, RBC Radio)">RBC TV</Datum>
+  <Datum ID="Media1Topic" Type="String" Name="Appearance 1 : topic (optional; hidden for now)">ETF flows</Datum>
+  <Datum ID="Media1Url" Type="String" Name="Appearance 1 : link URL (opens in a new tab)">#</Datum>
+  <Datum ID="Media1Action" Type="String" Name="Appearance 1 : button label (e.g. Watch, Read, Listen)">Watch</Datum>
+
+  <!-- Appearance 2 -->
+  <Datum ID="Media2Outlet" Type="String" Name="Appearance 2 : outlet (blank hides this appearance)">CNBC</Datum>
+  <Datum ID="Media2Date" Type="String" Name="Appearance 2 : date (shown as typed, e.g. Aug 2026)">Jun 2026</Datum>
+  <Datum ID="Media2Source" Type="String" Name="Appearance 2 : source (optional, e.g. RBC TV, RBC Radio)">RBC TV</Datum>
+  <Datum ID="Media2Topic" Type="String" Name="Appearance 2 : topic (optional; hidden for now)">Structured outcomes</Datum>
+  <Datum ID="Media2Url" Type="String" Name="Appearance 2 : link URL (opens in a new tab)">#</Datum>
+  <Datum ID="Media2Action" Type="String" Name="Appearance 2 : button label (e.g. Watch, Read, Listen)">Watch</Datum>
+
+  <!-- Appearance 3 -->
+  <Datum ID="Media3Outlet" Type="String" Name="Appearance 3 : outlet (blank hides this appearance)">Bloomberg TV</Datum>
+  <Datum ID="Media3Date" Type="String" Name="Appearance 3 : date (shown as typed, e.g. Aug 2026)">Mar 2026</Datum>
+  <Datum ID="Media3Source" Type="String" Name="Appearance 3 : source (optional, e.g. RBC TV, RBC Radio)">RBC TV</Datum>
+  <Datum ID="Media3Topic" Type="String" Name="Appearance 3 : topic (optional; hidden for now)">The 60/40 question</Datum>
+  <Datum ID="Media3Url" Type="String" Name="Appearance 3 : link URL (opens in a new tab)">#</Datum>
+  <Datum ID="Media3Action" Type="String" Name="Appearance 3 : button label (e.g. Watch, Read, Listen)">Watch</Datum>
+
+  <!-- Appearance 4 -->
+  <Datum ID="Media4Outlet" Type="String" Name="Appearance 4 : outlet (blank hides this appearance)">ETF Stream</Datum>
+  <Datum ID="Media4Date" Type="String" Name="Appearance 4 : date (shown as typed, e.g. Aug 2026)">Nov 2025</Datum>
+  <Datum ID="Media4Source" Type="String" Name="Appearance 4 : source (optional, e.g. RBC TV, RBC Radio)"></Datum>
+  <Datum ID="Media4Topic" Type="String" Name="Appearance 4 : topic (optional; hidden for now)">Panel</Datum>
+  <Datum ID="Media4Url" Type="String" Name="Appearance 4 : link URL (opens in a new tab)">#</Datum>
+  <Datum ID="Media4Action" Type="String" Name="Appearance 4 : button label (e.g. Watch, Read, Listen)">Read</Datum>
+
+  <!-- Appearance 5 -->
+  <Datum ID="Media5Outlet" Type="String" Name="Appearance 5 : outlet (blank hides this appearance)"></Datum>
+  <Datum ID="Media5Date" Type="String" Name="Appearance 5 : date (shown as typed, e.g. Aug 2026)"></Datum>
+  <Datum ID="Media5Source" Type="String" Name="Appearance 5 : source (optional, e.g. RBC TV, RBC Radio)"></Datum>
+  <Datum ID="Media5Topic" Type="String" Name="Appearance 5 : topic (optional; hidden for now)"></Datum>
+  <Datum ID="Media5Url" Type="String" Name="Appearance 5 : link URL (opens in a new tab)"></Datum>
+  <Datum ID="Media5Action" Type="String" Name="Appearance 5 : button label (e.g. Watch, Read, Listen)"></Datum>
+
+  <!-- Appearance 6 -->
+  <Datum ID="Media6Outlet" Type="String" Name="Appearance 6 : outlet (blank hides this appearance)"></Datum>
+  <Datum ID="Media6Date" Type="String" Name="Appearance 6 : date (shown as typed, e.g. Aug 2026)"></Datum>
+  <Datum ID="Media6Source" Type="String" Name="Appearance 6 : source (optional, e.g. RBC TV, RBC Radio)"></Datum>
+  <Datum ID="Media6Topic" Type="String" Name="Appearance 6 : topic (optional; hidden for now)"></Datum>
+  <Datum ID="Media6Url" Type="String" Name="Appearance 6 : link URL (opens in a new tab)"></Datum>
+  <Datum ID="Media6Action" Type="String" Name="Appearance 6 : button label (e.g. Watch, Read, Listen)"></Datum>
+
+</Data>

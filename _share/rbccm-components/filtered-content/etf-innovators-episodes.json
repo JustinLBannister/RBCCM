@@ -1,0 +1,63 @@
+{
+  "_readme": [
+    "ETF Innovators episode grid (filtered-content, preset etf-innovators).",
+    "The live insights feeds are the source: every year from settings.firstYear to the current year, kept to links matching settings.linkMatch.",
+    "This file only adds what the feed does not have, and overrides it where needed.",
+    "companies: names for the Company filter. Each is found in the episode title, then tags, then description. match is an optional pattern when the name alone will not match.",
+    "categoryRules: the eyebrow label above the title. Checked in order against tags + title, then description; first match wins.",
+    "overrides: keyed by the last part of the episode URL. Any field set here wins over the feed: title, company, category, speaker, date (e.g. May 2026), watch (e.g. 8 min), thumbnail, hidden (true hides the episode).",
+    "An override with a title and url for a slug that is not in the feed adds that episode by hand (also needs date and thumbnail).",
+    "Keys starting with an underscore are notes and are ignored."
+  ],
+  "settings": {
+    "firstYear": 2023,
+    "linkMatch": "etf[-_]innovators",
+    "titlePrefix": "^ETF Innovators\\s*:?\\s*",
+    "pillLabel": "Full Episode",
+    "dateFrom": "url"
+  },
+  "companies": [
+    { "name": "AllianceBernstein" },
+    { "name": "BMO Global Asset Management", "match": "BMO" },
+    { "name": "Capital Group" },
+    { "name": "CI Global Asset Management", "match": "CI Global|\\bCI\\b" },
+    { "name": "Horizons ETFs", "match": "Horizons" },
+    { "name": "iShares", "match": "iShares|BlackRock" },
+    { "name": "Mackenzie Investments", "match": "Mackenzie" },
+    { "name": "Purpose Investments", "match": "Purpose Investments|\\bPurpose\\b" },
+    { "name": "Russell Investments", "match": "Russell" },
+    { "name": "T. Rowe Price", "match": "T\\. ?Rowe" },
+    { "name": "Vanguard" }
+  ],
+  "categoryRules": [
+    { "label": "Outcome ETFs", "match": "outcome" },
+    { "label": "Fixed income", "match": "fixed income" },
+    { "label": "Income", "match": "covered call|income" },
+    { "label": "Portfolio construction", "match": "portfolio construction|manager of managers" },
+    { "label": "Digital assets", "match": "crypto|bitcoin" },
+    { "label": "Portfolio design", "match": "asset allocation" },
+    { "label": "Active ETFs", "match": "active" }
+  ],
+  "overrides": {
+    "etf-innovators-featuring-marc-andre-lewis": {
+      "_note": "Draft title: the 2023 feed title is only the guest name. Confirm with the content team.",
+      "title": "CI Global Asset Management on global active management"
+    },
+    "etf-innovators-featuring-kathy-bock-head-vanguard-canada": {
+      "_note": "Title from the design comp. Confirm with the content team.",
+      "title": "From Vanguard's first ETF to the one-ticket portfolio"
+    },
+    "etf-innovators-featuring-som-seif-ceo-purpose-investments": {
+      "_note": "Draft title from the episode description. Confirm with the content team.",
+      "title": "Purpose Investments on building first-of-their-kind ETFs"
+    },
+    "etf_innovators_featuring_rohit_mehta": {
+      "_note": "Draft title from the episode description. Confirm with the content team.",
+      "title": "Horizons ETFs on differentiated ETFs for Canadian investors"
+    },
+    "etf_innovators_featuring_helen_hayes_ishares_canada": {
+      "_note": "Draft title from the episode description. Confirm with the content team.",
+      "title": "iShares Canada on the renewed interest in fixed income ETFs"
+    }
+  }
+}

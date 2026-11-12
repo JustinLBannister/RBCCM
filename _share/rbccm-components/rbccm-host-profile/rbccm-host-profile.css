@@ -1,0 +1,405 @@
+/* =========================================================================
+   RBCCM Host Profile
+   Deploy path: /assets/rbccm/css/components/rbccm-host-profile.css
+   =========================================================================
+   One person presented as a host: section heading, photo, name, role,
+   bio, LinkedIn icon and a list of media appearances.
+
+   Variants (one skin each)
+     .rbccm-host-profile--etf-innovators
+       ETF Innovators "Meet the host". Light blue section (#F1F5FB).
+       Desktop: photo (379 x 379) left, text right, 32px apart; media
+       appearances as white cards, two per row. Mobile: stacked, one
+       card per row.
+
+   Every element carries the variant modifier. Mobile and desktop follow
+   the Figma specs. The desktop frame is 1440 with 170px side padding
+   (1100 content); this uses the global 1140 content width and 23px
+   gutter instead, like the other sections.
+
+   Type uses !important where site-wide rules (tag-level h2/h3/h4 styles
+   and the global Roboto rule) would otherwise win, same as the CTA band.
+   ========================================================================= */
+
+.rbccm-host-profile {
+  box-sizing: border-box;
+  width: 100%;
+}
+.rbccm-host-profile *,
+.rbccm-host-profile *::before,
+.rbccm-host-profile *::after {
+  box-sizing: border-box;
+}
+
+/* Scroll-in animation pre-hide (same as the other components; the
+   rbccm-animate script adds the classes that reveal them). */
+.rbccm-host-profile [data-animate] {
+  opacity: 0;
+}
+.rbccm-anim-ready .rbccm-host-profile [data-animate].animate__animated {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-host-profile [data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+
+/* =========================================================================
+   Variant: ETF Innovators
+   ========================================================================= */
+.rbccm-host-profile--etf-innovators {
+  background: #F1F5FB;
+  padding: 40px 23px;          /* mobile spec */
+}
+@media (min-width: 992px) {
+  .rbccm-host-profile--etf-innovators {
+    padding: 60px 23px;        /* desktop spec: 60 top and bottom */
+  }
+}
+
+/* Heading above the columns. */
+.rbccm-host-profile__inner.rbccm-host-profile__inner--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;                   /* spec: heading -> photo row */
+  margin: 0 auto;
+  max-width: 1140px;
+}
+
+/* ---------- Section heading ---------- */
+.rbccm-host-profile--etf-innovators .rbccm-host-profile__heading.rbccm-host-profile__heading--etf-innovators {
+  color: #003168 !important;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-host-profile--etf-innovators .rbccm-host-profile__heading.rbccm-host-profile__heading--etf-innovators {
+    font-size: 42px !important;
+    line-height: 125% !important;
+  }
+}
+
+/* ---------- Columns: photo left, content right (stacked on mobile) ----------
+   Side by side from 768. The photo is a fixed 379 x 379 square from 768
+   up and never shrinks (same idea as the insight list images). */
+.rbccm-host-profile__body.rbccm-host-profile__body--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;                   /* photo -> content */
+}
+@media (min-width: 768px) {
+  .rbccm-host-profile__body.rbccm-host-profile__body--etf-innovators {
+    align-items: flex-start;
+    flex-direction: row;
+  }
+}
+
+/* Mobile spec: square (368 in the 375 frame), full width up to 767. */
+.rbccm-host-profile__photo-wrap.rbccm-host-profile__photo-wrap--etf-innovators {
+  aspect-ratio: 1 / 1;
+  background: #5B5F66;
+  border-radius: 20px;
+  overflow: hidden;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .rbccm-host-profile__photo-wrap.rbccm-host-profile__photo-wrap--etf-innovators {
+    aspect-ratio: 1 / 1;
+    flex: 0 0 379px;
+    height: 379px;
+    min-height: 379px;
+    min-width: 379px;
+    width: 379px;
+  }
+}
+.rbccm-host-profile__photo.rbccm-host-profile__photo--etf-innovators {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  width: 100%;
+}
+
+/* Content: top group, then media appearances, 32 apart. */
+.rbccm-host-profile__content.rbccm-host-profile__content--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-host-profile__content.rbccm-host-profile__content--etf-innovators {
+    flex: 1 1 auto;
+  }
+}
+
+/* Tablet (768-1199): photo and the top group side by side, then the
+   media appearances on their own row across the whole section (2 x 2).
+   The content wrapper steps aside (display: contents) so the top group
+   and the appearances can sit in different grid rows. From 1200 the
+   appearances go back into the right-hand column. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .rbccm-host-profile__body.rbccm-host-profile__body--etf-innovators {
+    align-items: start;
+    column-gap: 32px;
+    display: grid;
+    grid-template-columns: 379px minmax(0, 1fr);
+    row-gap: 32px;
+  }
+  .rbccm-host-profile__photo-wrap.rbccm-host-profile__photo-wrap--etf-innovators {
+    flex: none;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .rbccm-host-profile__content.rbccm-host-profile__content--etf-innovators {
+    display: contents;
+  }
+  .rbccm-host-profile__summary.rbccm-host-profile__summary--etf-innovators {
+    align-self: start;
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .rbccm-host-profile__appearances.rbccm-host-profile__appearances--etf-innovators {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* Top group: name + role, copy, LinkedIn. 16 apart on mobile, 24 on
+   desktop. */
+.rbccm-host-profile__summary.rbccm-host-profile__summary--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+@media (min-width: 992px) {
+  .rbccm-host-profile__summary.rbccm-host-profile__summary--etf-innovators {
+    gap: 24px;
+  }
+}
+.rbccm-host-profile__title-group.rbccm-host-profile__title-group--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;                   /* name -> role */
+}
+
+/* ---------- Name, role, bio ---------- */
+.rbccm-host-profile--etf-innovators .rbccm-host-profile__name.rbccm-host-profile__name--etf-innovators {
+  color: #003168 !important;
+  font-family: RBCDisplay, Georgia, Times, serif !important;
+  font-size: 32px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-host-profile--etf-innovators .rbccm-host-profile__name.rbccm-host-profile__name--etf-innovators {
+    font-size: 36px !important;
+    line-height: 125% !important;
+  }
+}
+
+.rbccm-host-profile__role.rbccm-host-profile__role--etf-innovators {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  margin: 0;
+}
+
+.rbccm-host-profile__bio.rbccm-host-profile__bio--etf-innovators {
+  display: flex;
+  flex-direction: column;
+  gap: 22.5px;                 /* one blank line between paragraphs */
+}
+.rbccm-host-profile__bio-text.rbccm-host-profile__bio-text--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0;
+}
+.rbccm-host-profile__bio-text.rbccm-host-profile__bio-text--etf-innovators a {
+  color: #0051A5;
+  text-decoration: underline;
+}
+
+/* ---------- LinkedIn ---------- */
+.rbccm-host-profile__linkedin.rbccm-host-profile__linkedin--etf-innovators {
+  border-radius: 6px;
+  color: #007EBB;
+  display: inline-flex;
+  height: 40px;
+  transition: opacity 0.2s ease;
+  width: 40px;
+}
+@media (min-width: 992px) {
+  .rbccm-host-profile__linkedin.rbccm-host-profile__linkedin--etf-innovators {
+    height: 45px;
+    width: 45px;
+  }
+}
+.rbccm-host-profile__linkedin.rbccm-host-profile__linkedin--etf-innovators:hover {
+  opacity: 0.85;
+}
+.rbccm-host-profile__linkedin.rbccm-host-profile__linkedin--etf-innovators:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 3px;
+}
+.rbccm-host-profile__linkedin-icon.rbccm-host-profile__linkedin-icon--etf-innovators {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* ---------- Media appearances ---------- */
+.rbccm-host-profile__appearances.rbccm-host-profile__appearances--etf-innovators {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                   /* heading -> cards */
+}
+.rbccm-host-profile--etf-innovators .rbccm-host-profile__appearances-heading.rbccm-host-profile__appearances-heading--etf-innovators {
+  color: #0051A5 !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: 3px !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: uppercase !important;
+}
+
+/* 1 column x 4 rows on mobile, 2 x 2 from 768 (full section width on
+   tablet, right-hand column from 1200). */
+.rbccm-host-profile__appearance-list.rbccm-host-profile__appearance-list--etf-innovators {
+  align-self: stretch;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .rbccm-host-profile__appearance-list.rbccm-host-profile__appearance-list--etf-innovators {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.rbccm-host-profile__appearance.rbccm-host-profile__appearance--etf-innovators {
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #DDE3EC;
+  border-radius: 14px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin: 0;
+  padding: 17px 19px;
+}
+.rbccm-host-profile__appearance-text.rbccm-host-profile__appearance-text--etf-innovators {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 6.188px;
+  min-width: 0;
+  padding-bottom: 1.891px;
+}
+.rbccm-host-profile__appearance-outlet.rbccm-host-profile__appearance-outlet--etf-innovators {
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 19px;
+  margin: 0;
+}
+.rbccm-host-profile__appearance-meta.rbccm-host-profile__appearance-meta--etf-innovators {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 15px;
+  margin: 0;
+}
+
+/* Meta line parts: date, source (RBC TV / RBC Radio), topic. A dot sits
+   between the parts that show. */
+.rbccm-host-profile__appearance-meta--etf-innovators > span + span::before {
+  content: " \00B7  ";
+  white-space: pre;
+}
+
+/* TOPIC HIDDEN FOR NOW (pending an internal decision). To show it again,
+   delete this rule; the dot before it comes back on its own. */
+.rbccm-host-profile__appearance-topic.rbccm-host-profile__appearance-topic--etf-innovators {
+  display: none;
+}
+
+/* Button: spec is 5px 15px outside a 20px-tall 0 10px frame, so 30px tall
+   with 25px each side. */
+.rbccm-host-profile__appearance-link.rbccm-host-profile__appearance-link--etf-innovators {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #0051A5;
+  border-radius: 100px;
+  color: #0051A5;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  height: 30px;
+  justify-content: center;
+  line-height: 15px;
+  padding: 0 25px;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+.rbccm-host-profile__appearance-link.rbccm-host-profile__appearance-link--etf-innovators:hover,
+.rbccm-host-profile__appearance-link.rbccm-host-profile__appearance-link--etf-innovators:focus-visible {
+  background: #0051A5;
+  color: #FFFFFF;
+}
+.rbccm-host-profile__appearance-link.rbccm-host-profile__appearance-link--etf-innovators:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-host-profile__appearance-link.rbccm-host-profile__appearance-link--etf-innovators,
+  .rbccm-host-profile__linkedin.rbccm-host-profile__linkedin--etf-innovators {
+    transition: none;
+  }
+}

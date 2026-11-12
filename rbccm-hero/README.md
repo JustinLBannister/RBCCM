@@ -1,6 +1,6 @@
 # RBCCM Hero
 
-Shared page hero. One CSS file, one BEM block (`.rbccm-hero`), three variants, each with its own TeamSite skin. All three skins share one Properties file.
+Shared page hero. One CSS file, one BEM block (`.rbccm-hero`), four variants, each with its own TeamSite skin. All four skins share one Properties file.
 
 ## Files
 
@@ -9,23 +9,26 @@ Shared page hero. One CSS file, one BEM block (`.rbccm-hero`), three variants, e
 | `rbccm-hero--maas-mata.xsl` | Skin: MAAS+MATA (centred eyebrow, 2-line title, subtitle, 2 buttons, glow halo) |
 | `rbccm-hero--strategy-and-economics.xsl` | Skin: S+E (split layout, title + body left, "Latest insight" card right, optional bg video) |
 | `rbccm-hero--us-credentials.xsl` | Skin: US Credentials (centred 2-line title + subtitle on navy, optional bg video, no buttons) |
+| `rbccm-hero--etf-innovators.xsl` | Skin: ETF Innovators (left-aligned title + paragraph + yellow button over a background photo, name tag on the photo) |
 | `rbccm-hero-properties.xml` | Fields for all three skins. Each field's label says which variants use it. |
 | `rbccm-hero-sample-dcr.xml` | Sample data for running a skin locally with any XSLT 1.0 tool. Not shipped. |
 | `rbccm-hero.css` | Base block + all variant modifiers. Ships to `/assets/rbccm/css/components/rbccm-hero.css`. |
 | `rbccm-hero.js` | S+E insight card hydrator (auto-latest / pinned URL). |
-| `rbccm-hero.html` | Local preview of all three variants (uses the shared variant picker). |
+| `rbccm-hero.html` | Local preview of all the variants (uses the shared variant picker). |
+| `photos/` | FPO art for the ETF preview, cut from the page comp. Not deployed. |
 | `_retired/rbccm-hero.xsl` | Old combined Preset-driven skin. Not used; had no US Credentials branch. |
 
 The variant is picked by the skin, not a field. There is no Preset field.
 
-## Fields (48)
+## Fields (52)
 
 | Group | Fields | Used by |
 |---|---|---|
-| Setup | CacheVersion, SectionID, SectionAriaLabel, CssPath, ButtonCssPath, JsPath, HeaderAlignment | all (JsPath: S+E; ButtonCssPath optional, leave blank: rbccm-hero.css styles the MAAS+MATA buttons itself) |
-| Hero content | EyebrowText/Tag, TitleLine1Text, TitleLine2Text, TitleTag, SubtitleText/Tag | all. S+E uses line 1 + subtitle only (no eyebrow, no line 2). |
+| Setup | CacheVersion, SectionID, SectionAriaLabel, CssPath, ButtonCssPath, JsPath, HeaderAlignment | all (JsPath: S+E; ButtonCssPath optional, leave blank: rbccm-hero.css styles the MAAS+MATA and ETF buttons itself) |
+| Hero content | EyebrowText/Tag, TitleLine1Text, TitleLine2Text, TitleTag, SubtitleText/Tag | all. S+E and ETF use line 1 + subtitle only (no eyebrow, no line 2). |
 | Background video | BgVideoMp4, BgBrightcoveVideoId, BgBrightcoveAccount, BgBrightcovePlayer | S+E, US Credentials |
-| MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA |
+| MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA. ETF uses button 1 (always yellow, Style is ignored); set its Href to `#latest-episode` and the episodes list points it at the newest episode (see filtered-content README). |
+| ETF | EtfBgImageDesktop / EtfBgImageMobile, EtfNameTagName / EtfNameTagTitle | ETF Innovators |
 | Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual), SeInsightTitleLimit / SeInsightBodyLimit | S+E |
 
 In TeamSite, settings (paths, IDs, alignment, tag pickers, button style/icon, Brightcove IDs, feed URLs) sit on the Appearance tab (`<Properties>`); copy, links, media and the S+E insight card sit on the Content tab (`<Data>`).
@@ -52,5 +55,5 @@ Once every hero page has been re-saved with the new fields filled in, the fallba
 ## Deploy
 
 1. Push `rbccm-hero.css` (and `rbccm-hero.js` for S+E) to `/assets/rbccm/.../components/`.
-2. Upload the three skins and `rbccm-hero-properties.xml` to TeamSite.
+2. Upload the skins and `rbccm-hero-properties.xml` to TeamSite.
 3. Bump CacheVersion on each hero after saving.

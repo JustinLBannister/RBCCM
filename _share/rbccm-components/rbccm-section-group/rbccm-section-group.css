@@ -1,0 +1,61 @@
+/* =========================================================================
+   RBCCM Section Group
+   Deploy path: /assets/rbccm/css/components/rbccm-section-group.css
+   =========================================================================
+   Styles for the wrapper rbccm-section-group.js builds between a Group
+   start and a Group end component.
+
+   The wrapper always gets .rbccm-section-group plus the classes typed in
+   the start marker's "Wrapper classes" field. The default for MAAS+MATA
+   is:
+     rbccm-section-group rbccm-section-group--dark-strip rbccm-maas-mata__dark-strip
+   The last class keeps any existing maas-mata.css rules that target the
+   dark-strip working; --dark-strip below carries the gradient itself so
+   the wrapper looks right even on a page without maas-mata.css.
+
+   --rbccm-sg-pad-top (set from the start marker's "Space above" field)
+   is the room at the top of the wrapper. On MAAS+MATA it's 222px: the
+   video poster above overlaps 200px down into it.
+   ========================================================================= */
+
+.rbccm-section-group {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: var(--rbccm-sg-pad-top, 0px);
+}
+
+/* MAAS+MATA dark strip - same gradient + text colour as
+   .rbccm-maas-mata__dark-strip in maas-mata.css. */
+.rbccm-section-group--dark-strip {
+  background: linear-gradient(
+    180deg,
+    #0B2A56 0%,
+    #09254A 35%,
+    #082043 70%,
+    #0A2A55 100%
+  );
+  color: #fff;
+}
+
+/* MAAS+MATA deep band (innovation era + demo CTA) - same gradient as
+   .rbccm-maas-mata__deep-band in maas-mata.css. Use with wrapper classes
+   "rbccm-section-group--deep-band rbccm-maas-mata__deep-band" and
+   Space above 0. */
+.rbccm-section-group--deep-band {
+  background: linear-gradient(
+    180deg,
+    #0D2E5C 0%,
+    #0A2648 8%,
+    #082043 18%,
+    #071A38 55%,
+    #061730 100%
+  );
+  color: #fff;
+}
+
+/* Markers never show (the hidden attribute already hides them; this
+   covers site CSS that resets [hidden]). */
+.rbccm-section-group__marker {
+  display: none !important;
+}

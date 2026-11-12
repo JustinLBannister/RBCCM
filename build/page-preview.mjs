@@ -11,6 +11,8 @@
 
    Per component:
      - markup comes from <folder>/<folder>.html, else <folder>/local-test.html
+       (a <folder>.html that is an XSL skin is skipped; <script
+       data-preview-skip> tags in it are dropped)
      - the component's own <link>/<script> files are dropped (the bundle
        replaces them); a local file the bundle doesn't include is reported
        as a warning, since the page would miss it too
@@ -118,7 +120,12 @@ function scopeCss(css, scope) {
 /* ---------- one preview page -> section --------------------------------- */
 function previewFileFor(root, dir) {
   for (const f of [`${dir}/${dir}.html`, `${dir}/local-test.html`]) {
-    if (fs.existsSync(path.join(root, f))) return f;
+    const full = path.join(root, f);
+    if (!fs.existsSync(full)) continue;
+    // filtered-content/filtered-content.html is the TeamSite skin (XSL),
+    // not a preview page; fall through to local-test.html.
+    if (/<xsl:stylesheet\b/.test(fs.readFileSync(full, 'utf8').slice(0, 4000))) continue;
+    return f;
   }
   return null;
 }
@@ -127,7 +134,10 @@ function extract(root, file, scope, bundled, warnings) {
   const dir = path.posix.dirname(file);
   let html = fs.readFileSync(path.join(root, file), 'utf8')
     .replace(/<\/html>[\s\S]*$/i, '</html>')
-    .replace(/<!--[\s\S]*?-->/g, '');
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // Local-only loaders (e.g. a test page that document.writes its own
+    // unbundled CSS/JS) would load the component twice next to the bundle.
+    .replace(/<script\b[^>]*\bdata-preview-skip\b[^>]*>[\s\S]*?<\/script>/gi, '');
   const styles = [];
   const libCss = [];
   const missing = new Set();

@@ -10,6 +10,7 @@
      npm run watch                       rebuild on save
      npm run watch -- us-credentials     watch one page
      npm run list                        show pages, components, file status
+     npm run inventory                   component counts: which pages use what
 
    One-off page from a list of components (not saved to the config;
    the variant picker on rbccm-global/local-test.html writes this
@@ -23,6 +24,8 @@
      dist/js/<page>.js    + .min.js
      dist/<page>.html     preview: the page's components on the bundle
                           alone (see build/page-preview.mjs)
+     dist/inventory.html  every component, how many pages use it and
+                          which (see build/inventory.mjs)
      dist/build-report.json
 
    Minifying uses esbuild (devDependency). If it isn't installed yet the
@@ -38,6 +41,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { writePagePreview } from './page-preview.mjs';
+import { writeInventory } from './inventory.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = path.join(ROOT, 'build', 'pages.config.mjs');
@@ -48,6 +52,7 @@ const DEPLOY_JS = '/assets/rbccm/js/bundles';
 const args = process.argv.slice(2);
 const WATCH = args.includes('--watch');
 const LIST = args.includes('--list');
+const INVENTORY = args.includes('--inventory');
 const pageArgs = args.filter(a => !a.startsWith('--'));
 const argValue = name => {
   const hit = args.find(a => a.startsWith(`--${name}=`));
@@ -367,6 +372,14 @@ async function buildAll(names) {
   }
   if (fs.existsSync(DIST)) fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
+  // Inventory covers every page in the config, whichever were built.
+  try {
+    const inv = writeInventory({ root: ROOT, dist: DIST, config, resolvePage, skipPages: ADHOC_PAGE ? [ADHOC_PAGE] : [] });
+    console.log(c.dim(`\ninventory ${inv.file} (${inv.inventory.components.length} components across ${inv.inventory.pages.length} pages)`));
+  } catch (e) {
+    console.warn(c.yellow('inventory: ' + e.message));
+  }
+
   if (!WATCH && results.some(r => !r.errors.length)) {
     console.log(c.dim('\nInclude tags (cache-bust = content hash):'));
     for (const r of results) {
@@ -389,6 +402,20 @@ async function list() {
       console.log(`  ${p.name.padEnd(28)} ${status}`);
     }
   }
+}
+
+/* ---------- inventory --------------------------------------------------- */
+// Terminal table + dist/inventory.html, without building anything.
+async function inventory() {
+  const config = await loadConfig();
+  const { file, inventory: inv } = writeInventory({ root: ROOT, dist: DIST, config, resolvePage, skipPages: ADHOC_PAGE ? [ADHOC_PAGE] : [] });
+  console.log(c.bold(`${inv.components.length} components across ${inv.pages.length} pages\n`));
+  for (const comp of inv.components) {
+    const where = comp.uses.map(u => u.loads === 'all' ? u.page : `${u.page} (${u.loads})`).join(', ');
+    console.log(`  ${comp.name.padEnd(28)} ${String(comp.count).padStart(2)}  ${c.dim(where)}`);
+  }
+  if (inv.unused.length) console.log(c.dim(`\nNot on a page yet (${inv.unused.length}): ${inv.unused.join(', ')}`));
+  console.log(c.dim(`\nWrote ${file}`));
 }
 
 /* ---------- watch ------------------------------------------------------- */
@@ -438,8 +465,26 @@ async function watch(names) {
   });
 }
 
+/* ---------- node version ------------------------------------------------ */
+// Node's bundled Brotli decoder has an out-of-bounds write
+// (CVE-2026-111497, "HTTP2Shell"). Fixed in 22.23.4, 24.22.1 and 26.12.1;
+// older and odd-numbered lines get no fix. The build itself never decodes
+// Brotli, so this only warns.
+function checkNodeVersion() {
+  const [major, minor, patch] = process.versions.node.split('.').map(Number);
+  const fixed = { 22: [23, 4], 24: [22, 1], 26: [12, 1] }[major];
+  const ok = major > 26 && major % 2 === 0
+    || (fixed && (minor > fixed[0] || (minor === fixed[0] && patch >= fixed[1])));
+  if (!ok) {
+    console.warn(c.yellow(`Node ${process.versions.node} has the Brotli decoder bug (CVE-2026-111497). ` +
+      'Update to Node 22.23.4+, 24.22.1+ or 26.12.1+ from https://nodejs.org'));
+  }
+}
+
 /* ---------- main -------------------------------------------------------- */
+checkNodeVersion();
 const targetPages = ADHOC_PAGE ? [ADHOC_PAGE, ...pageArgs] : pageArgs;
 if (LIST) await list();
+else if (INVENTORY) await inventory();
 else if (WATCH) await watch(targetPages);
 else process.exitCode = (await buildAll(targetPages)) ? 0 : 1;

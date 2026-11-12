@@ -27,6 +27,8 @@
    MAAS+MATA page stylesheet). They are placed where `extraPosition`
    says: 'before' (default) or 'after' the components.
 
+   `url` (optional) is the live page. dist/inventory.html links to it.
+
    `preview` (optional) shapes dist/<page>.html, the page preview each
    build writes (details in build/page-preview.mjs):
      variants  which data-variant of a component's preview page to show
@@ -44,6 +46,7 @@ export default {
 
   pages: {
     'us-credentials': {
+      url: 'https://www.rbccm.com/en/about-us/us-credentials',
       components: [
         'rbccm-button',
         'rbccm-hero',
@@ -67,6 +70,7 @@ export default {
     },
 
     'strategy-and-economics': {
+      url: 'https://www.rbccm.com/en/insights/strategy-economics',
       components: [
         'rbccm-hero',
         'rbccm-accordions',
@@ -91,6 +95,7 @@ export default {
     // (.../electronic-trading/multi-asset-agency-solutions). Live loads no
     // hero or two-up-cards JS here, so those are CSS only.
     'maas-mata': {
+      url: 'https://www.rbccm.com/en/expertise/global-markets/electronic-trading/multi-asset-agency-solutions',
       components: [
         { name: 'rbccm-animate', css: [], js: ['rbccm-animate/rbccm-animate.js'] },
         { name: 'rbccm-hero', css: ['rbccm-hero/rbccm-hero.css'], js: [] },
@@ -106,6 +111,33 @@ export default {
       ],
       preview: {
         file: 'maas-mata-page/maas-mata-components.html'
+      }
+    },
+
+    // ETF Innovators (in progress, not live yet: add `url` once the page
+    // has its address). More on ETFs is rbccm-insight-list, after the
+    // host profile.
+    'etf-innovators': {
+      components: [
+        'rbccm-button',
+        'rbccm-hero',
+        'rbccm-video-poster',
+        'filtered-content',
+        'rbccm-cta-band',
+        'rbccm-host-profile',
+        'rbccm-insight-list',
+        'rbccm-marketo-footer',
+        { name: 'rbccm-animate', css: [], js: ['rbccm-animate/rbccm-animate.js'] }
+      ],
+      preview: {
+        variants: {
+          'rbccm-hero': 'ETF Innovators',
+          'rbccm-video-poster': 'ETF Innovators',
+          'filtered-content': 'ETF Innovators',
+          'rbccm-cta-band': 'ETF Innovators',
+          'rbccm-host-profile': 'ETF Innovators',
+          'rbccm-insight-list': 'ETF Innovators'
+        }
       }
     }
   }

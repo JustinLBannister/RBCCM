@@ -63,6 +63,8 @@ An override with a `title` and `url` for an episode not in the feed adds it by h
 
 If the JSON fails to load, the grid still renders from the feed alone, without company, category or overrides.
 
+**Latest episode link.** Once the episodes load, any link on the page to `#latest-episode` is pointed at card 1 of the unfiltered list (the newest episode). The ETF hero's "Watch the latest interview" button uses this: set its button URL to `#latest-episode`. Its screen reader label becomes "Watch the latest interview: {episode title}" unless the button has its own aria label. If the list can't load, the link stays on `#latest-episode`. When the episode has a video (the feed's `<video>` Brightcove URL), the link also gets `data-video-src` and `data-video-label`, and a normal click plays the episode in the page's video modal (rbccm-video-poster). Cmd/Ctrl-click, new tab and crawlers still get the episode page.
+
 **Instance settings.** Preset `etf-innovators`, Section heading "Explore the full series", Items per page 6 / 6, Items per page on mobile 3, Show Type / Month / Region / Search `false`, Show Year `true`, Filter by label "Filter by:".
 
 ---

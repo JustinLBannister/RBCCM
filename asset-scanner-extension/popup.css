@@ -1,0 +1,61 @@
+:root {
+  --ink: #1f2933;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --navy: #003168;
+  --blue: #0051a5;
+  --bg: #ffffff;
+  --row: #f8fafc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e5e7eb;
+    --muted: #9ca3af;
+    --line: #374151;
+    --navy: #9cc3ff;
+    --blue: #7fb2ff;
+    --bg: #111827;
+    --row: #1f2937;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.45 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: 14px 16px 16px;
+  width: 640px;
+}
+h1 { color: var(--navy); font-size: 16px; margin: 0 0 2px; }
+h2 { color: var(--navy); font-size: 14px; margin: 0 0 2px; }
+.muted { color: var(--muted); margin: 0; }
+#page { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 12px;
+}
+button:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+button:disabled { cursor: default; opacity: 0.45; }
+button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+button.primary:hover { color: #fff; filter: brightness(1.1); }
+button.link { border-color: transparent; color: var(--muted); }
+button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.summary { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 6px; }
+.summary b { color: var(--navy); }
+.table-wrap { max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; }
+.table-wrap:has(table[hidden]) { display: none; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+th { background: var(--row); color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+td.file { word-break: break-all; }
+td.num { text-align: right; white-space: nowrap; }
+.collect { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+#collected { margin: 0; padding-left: 18px; }
+#collected li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

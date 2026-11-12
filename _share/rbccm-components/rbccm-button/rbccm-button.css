@@ -1,0 +1,206 @@
+/* =========================================================================
+   RBCCM Button - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-button.css
+
+   Purpose
+   -------------------------------------------------------------------------
+   Site-wide pill-shape button system used across MAAS+MATA, Strategy &
+   Economics, and other RBCCM marketing pages. Extracted from
+   .rbccm-maas-mata__btn* (see Task #144, "MAAS+MATA hero - exact Figma
+   typography spec + Figma button icons").
+
+   Variants
+   -------------------------------------------------------------------------
+     .rbccm-button--primary    Blue #0051A5 fill, white text, shine-sweep +
+                               arrow-flyby animations on hover / focus
+     .rbccm-button--secondary  Transparent bg, grey text + border. No shine.
+     .rbccm-button--yellow     Warm-yellow fill, deep-navy text, shine-sweep
+                               + arrow-flyby. Slightly larger type (~19.5px).
+     .rbccm-button--ghost      Transparent bg, grey border, light text - for
+                               use on dark strips.
+
+   Markup contract
+   -------------------------------------------------------------------------
+     <a class="rbccm-button rbccm-button--primary" href="#">
+       <span class="rbccm-button__label">Request a demo</span>
+       <svg class="rbccm-button__icon" ...><path d="..."/></svg>
+     </a>
+
+   The __label wrapper is optional; text can sit directly inside the anchor.
+   The SVG __icon is optional; buttons without an icon just skip it. When
+   present, the icon fires the arrow-flyby animation on hover / focus.
+
+   Accessibility
+   -------------------------------------------------------------------------
+   All animations respect prefers-reduced-motion: reduce. Arrow-flyby +
+   shine-sweep both stop firing under that setting; visual states still
+   swap on hover but without motion.
+   ========================================================================= */
+
+/* ---- Base pill shell -------------------------------------------------- */
+.rbccm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  padding: 12px 35px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 29.26px;
+  text-decoration: none;
+  box-sizing: border-box;
+  /* isolation so ::before shine layer stacks predictably. */
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Keep label + icon above any ::before shine layer. */
+.rbccm-button > * { position: relative; z-index: 1; }
+
+/* Base icon transition (settles smoothly out of flyby). */
+.rbccm-button__icon {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  transition: transform 200ms ease, opacity 200ms ease;
+  will-change: transform, opacity;
+}
+
+
+/* ---- Variant: primary (blue fill, white text) ------------------------- */
+.rbccm-button--primary {
+  background: #0051A5;
+  color: #fff;
+  font-weight: 500;
+}
+.rbccm-button--primary:hover { background: #003168; }
+.rbccm-button--primary .rbccm-button__icon { fill: #fff; }
+
+/* Mobile type shrinks per Figma. */
+@media (max-width: 991px) {
+  .rbccm-button--primary { font-size: 14px; }
+}
+
+
+/* ---- Variant: yellow (Figma "Request a demo") ------------------------- */
+.rbccm-button--yellow {
+  background: #FFC72C;
+  color: #061730;
+  font-size: 19.507px;
+  font-weight: 500;
+  transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+.rbccm-button--yellow:hover,
+.rbccm-button--yellow:focus-visible {
+  background: #E5B520;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.rbccm-button--yellow .rbccm-button__icon { fill: #061730; }
+
+
+/* ---- Variant: secondary (outlined, no shine) -------------------------- */
+.rbccm-button--secondary {
+  background: transparent;
+  color: #494949;
+  border-color: #D8D8D8;
+  font-weight: 400;
+}
+.rbccm-button--secondary:hover { border-color: #494949; }
+.rbccm-button--secondary .rbccm-button__icon {
+  fill: #494949;
+  width: 12px;
+  height: 13px;
+}
+
+
+/* ---- Variant: ghost (dark-strip use) ---------------------------------- */
+.rbccm-button--ghost {
+  background: transparent;
+  color: #D8D8D8;
+  border: 1px solid #D8D8D8;
+  font-size: 18px;
+  font-weight: 400;
+}
+.rbccm-button--ghost:hover,
+.rbccm-button--ghost:focus-visible {
+  color: #fff;
+  border-color: #fff;
+}
+
+
+/* ---- Shine-sweep animation (primary + yellow) -------------------------
+   Soft white diagonal band travels across the button on hover / focus.
+   Zero-width at rest. Sits above the fill but below text/icon via z-index.
+*/
+.rbccm-button--primary::before,
+.rbccm-button--yellow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  transform: skewX(-18deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+.rbccm-button--primary::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+}
+.rbccm-button--yellow::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+}
+.rbccm-button--primary:hover::before,
+.rbccm-button--primary:focus-visible::before,
+.rbccm-button--yellow:hover::before,
+.rbccm-button--yellow:focus-visible::before {
+  animation: rbccm-button-shine-sweep 600ms ease-out;
+}
+@keyframes rbccm-button-shine-sweep {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+
+
+/* ---- Arrow flyby animation --------------------------------------------
+   On hover / focus, the __icon slides right and fades, reappears from
+   the left, snaps back to rest. Fires once per interaction. overflow:hidden
+   on the button clips the flight path so the arrow doesn't visibly escape.
+*/
+.rbccm-button--primary:hover .rbccm-button__icon,
+.rbccm-button--primary:focus-visible .rbccm-button__icon,
+.rbccm-button--yellow:hover .rbccm-button__icon,
+.rbccm-button--yellow:focus-visible .rbccm-button__icon {
+  animation: rbccm-button-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+}
+@keyframes rbccm-button-arrow-flyby {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(32px);  opacity: 0; }
+  46%  { transform: translateX(-32px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+
+/* ---- Reduced motion --------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-button--primary::before,
+  .rbccm-button--primary:hover::before,
+  .rbccm-button--primary:focus-visible::before,
+  .rbccm-button--yellow::before,
+  .rbccm-button--yellow:hover::before,
+  .rbccm-button--yellow:focus-visible::before,
+  .rbccm-button--primary:hover .rbccm-button__icon,
+  .rbccm-button--primary:focus-visible .rbccm-button__icon,
+  .rbccm-button--yellow:hover .rbccm-button__icon,
+  .rbccm-button--yellow:focus-visible .rbccm-button__icon {
+    animation: none;
+  }
+}

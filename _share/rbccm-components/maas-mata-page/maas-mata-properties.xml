@@ -1,0 +1,285 @@
+<!-- ============================================================
+     MAAS + MATA Landing Page — Properties + Data
+     ============================================================
+     One-component skin for the MAAS + MATA landing page. Every
+     author-editable string / image / repeater is exposed here.
+     Rendered by maas-mata.xsl (single .xsl file, inline CSS + JS).
+
+     Sections (mirrors current live DOM):
+       1  Hero              eyebrow, two-tone title, subtitle, CTA
+       2  Chart Card        static image + Brightcove video modal
+       3  New Standard      3-colour headline + body + yellow CTA
+       4  Awards            eyebrow + 3 fixed slots (year/title/issuer)
+       5  Platforms         two cards (MATA analytics, MAAS execution)
+       6  Innovation Era    3 numbered features (fixed slots)
+       7  MATA Capabilities eyebrow + heading + 3-card grid +
+                            fixed "Index events" wide card
+       8  Demo CTA          eyebrow + "Talk with an <highlight>."
+
+     Newsletter is NOT in this component. The site-wide Marketo
+     component is dropped on the page separately. Market Insights
+     was also removed in the current live layout.
+
+     Appearance (section-level):
+       ColorScheme, background overrides, per-section padding
+
+     SCHEMA NOTE (per story-tiles-featured convention):
+       Only ID, Name, Type are permitted on a Datum.
+       Only ID, Name, Replicatable, CloneGroupID on a Group.
+       MinReplicates / Required are enforced in the XSL, not here.
+
+     Deploy alongside the skin:
+       /assets/rbccm/css/pages/maas-mata.css
+       /assets/rbccm/js/pages/maas-mata.js
+       /assets/rbccm/js/pages/rbccm-json-bind.js (shared runtime)
+     ============================================================ -->
+<Properties ComponentID="maas-mata-v1">
+
+  <!-- ═══ 0. ASSET VERSION ═══════════════════════════════════
+       Cache-buster appended as ?v=<value> to every CSS/JS URL
+       emitted by the XSL. Bump this value whenever a new
+       maas-mata.css, maas-mata.js, or rbccm-json-bind.js is
+       deployed. Format: YYYY-MM-DD-HHMM (24-hour, sorts
+       chronologically, unique per minute). Any short unique
+       string also works — semver, git sha, etc. -->
+  <Datum ID="AssetVersion" Type="String" Name="Asset version (cache-buster) — bump on any CSS/JS deploy. Format: YYYY-MM-DD-HHMM">2026-09-14-1120</Datum>
+
+  <!-- ═══ 1. HERO ════════════════════════════════════════════
+       Eyebrow renders above a yellow 45x2 underline. Title is
+       a two-line H1 with per-line colour (line 1 dark navy,
+       line 2 bright blue). Subtitle wraps to 3 lines on mobile
+       and full width on desktop. -->
+  <Datum ID="HeroEyebrow" Type="String" Name="Hero eyebrow">Multi Asset Analytics &amp; Execution</Datum>
+  <Datum ID="HeroTitleLine1" Type="String" Name="Hero title — line 1 (dark navy)">Trade with clarity.</Datum>
+  <Datum ID="HeroTitleLine2" Type="String" Name="Hero title — line 2 (bright blue)">Execute with control.</Datum>
+  <Datum ID="HeroSubtitle" Type="Textarea" Name="Hero subtitle">RBC Capital Markets&#8217; Multi Asset Agency Solutions (MAAS) connects intelligence to execution, working alongside &lt;strong&gt;MATA&lt;/strong&gt; &#8212; our Multi-Asset Trade Analytics platform &#8212; so insight and action stay connected across asset classes.</Datum>
+  <Datum ID="HeroCtaLabel" Type="String" Name="Hero CTA label">Request demo</Datum>
+  <Datum ID="HeroCtaHref" Type="String" Name="Hero CTA URL">#demo</Datum>
+
+
+  <!-- ═══ 2. CHART CARD (image + optional Brightcove modal) ═══
+       Static screenshot per client direction. Single image
+       scales down for mobile via CSS. Blank Brightcove Video
+       Id hides the play button. -->
+  <Datum ID="ChartImage" Type="String" Name="Chart image URL (upload to /assets/rbccm/images/... then paste the path here)">/assets/rbccm/images/expertise/global-markets/electronic-trading/multi-asset-agency-solutions/maas-execution-console-reveal.png</Datum>
+  <Datum ID="ChartImageAlt" Type="String" Name="Chart image alt text">MAAS Execution Console — cross-asset portfolio chart with +$15,500.90 delta and live quote strip.</Datum>
+  <!-- Brightcove account + player are RBC-wide constants — same on
+       every video hosted on the site. Only the Video ID changes when
+       a new video ships. -->
+  <Datum ID="ChartBrightcoveAccount" Type="String" Name="Brightcove account ID (RBC-wide constant — do not change)">6021289101001</Datum>
+  <Datum ID="ChartBrightcovePlayer"  Type="String" Name="Brightcove player ID (RBC-wide constant — do not change)">VyvCc9BZx</Datum>
+  <Datum ID="ChartBrightcoveVideoId" Type="String" Name="Brightcove video ID (this is the one that changes per video; blank falls back to the FPO clip)">6385114247112</Datum>
+
+
+  <!-- ═══ 3. NEW STANDARD ═════════════════════════════════════
+       Headline is split into 3 colour stops:
+         Lead     grey    "A new standard for"
+         Highlight white   "multi-asset"
+         Accent   yellow  "trading"
+       Body is 3 fixed paragraph Datums (see NewStandardParagraph1..3
+       below). -->
+  <!-- Lead accepts &lt;br&gt; to force the mobile 2-line break
+       ("A new" / "standard for"). At 600+ the br is CSS-hidden so
+       the copy flows full-width — the space BEFORE the br is what
+       keeps the words separated in that flowed layout. Emitted via
+       data-json-html + XSL disable-output-escaping so the tag
+       survives to the DOM. -->
+  <Datum ID="NewStandardHeadingLead" Type="String" Name="New-standard headline — lead (grey; include a space before &lt;br&gt;)">A new &lt;br&gt;standard for</Datum>
+  <Datum ID="NewStandardHeadingHighlight" Type="String" Name="New-standard headline — highlight (white)">multi-asset</Datum>
+  <!-- Accent includes the closing period so it inherits the yellow. -->
+  <Datum ID="NewStandardHeadingAccent" Type="String" Name="New-standard headline — accent (yellow; include closing punctuation)">electronic trading.</Datum>
+  <Datum ID="NewStandardCtaLabel" Type="String" Name="New-standard CTA label">See MAAS in action</Datum>
+  <Datum ID="NewStandardCtaHref" Type="String" Name="New-standard CTA URL">#platform</Datum>
+
+
+  <!-- ═══ 5. PLATFORMS ═══════════════════════════════════════
+       Section-level eyebrow + heading precede the two cards
+       (defined below as fixed slot Datums). -->
+  <Datum ID="PlatformsEyebrow" Type="String" Name="Platforms eyebrow">Two platforms, one connected workflow</Datum>
+  <Datum ID="PlatformsHeading" Type="String" Name="Platforms heading">Better insight for stronger execution</Datum>
+
+
+  <!-- ═══ 6. INNOVATION ERA ══════════════════════════════════
+       Light-cream section. Heading + intro copy precede a
+       numbered features repeater (defined below). -->
+  <Datum ID="InnovationEraHeading" Type="String" Name="Innovation-era heading">Innovation for the next execution era</Datum>
+  <Datum ID="InnovationEraBody" Type="Textarea" Name="Innovation-era intro copy">Technology, scale and multi-asset expertise — engineered to help you execute with confidence.</Datum>
+
+
+  <!-- ═══ 7. MATA CAPABILITIES ═══════════════════════════════
+       Yellow eyebrow + white heading + subtitle above a
+       3-card grid + one wider "Index events" info card. The
+       3 grid cards live below as fixed slot Datums. Index Events
+       is authored here as a fixed card. -->
+  <!-- Optional eyebrow. Leave blank to hide the row entirely; the XSL
+       skips the div when this Datum is empty. -->
+  <Datum ID="MataCapEyebrow" Type="String" Name="MATA capabilities eyebrow (leave blank to hide)"></Datum>
+  <Datum ID="MataCapHeading" Type="String" Name="MATA capabilities heading">Sharper insight. Smarter trades.</Datum>
+  <Datum ID="MataCapSubheading" Type="Textarea" Name="MATA capabilities subheading">Explore MATA capabilities across core asset classes, with specialized index intelligence for event-driven trading decisions.</Datum>
+
+  <!-- Index Events fixed card (renders full width below the
+       3-card grid). Icon is a SelectSingle so authors can swap
+       between the pre-built SVG symbols in the sprite. -->
+  <Datum ID="IndexEventsIcon" Type="SelectSingle" Name="Index Events icon">
+    <Option><Display>Equities (trend arrow)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (crossed arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (chart bars)</Display><Value>futures</Value></Option>
+    <Option Selected="true"><Display>Info (magnifying glass)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="IndexEventsTitle" Type="String" Name="Index Events title">Index events</Datum>
+  <Datum ID="IndexEventsSubtitle" Type="String" Name="Index Events subtitle">120+ Global Indices</Datum>
+  <Datum ID="IndexEventsBody" Type="Textarea" Name="Index Events body">Anticipate index changes before rebalances with analytics shaped by RBC Capital Markets' Program Trading team, including expected additions, deletions, upweights and downweights, corporate action analysis, spread analytics and symbol-level share impact estimates.</Datum>
+
+
+  <!-- ═══ 8. DEMO CTA ════════════════════════════════════════
+       Headline is split — prefix in white, highlight word in
+       yellow. Yellow pill CTA below. -->
+  <Datum ID="DemoEyebrow" Type="String" Name="Demo eyebrow">See the platform</Datum>
+  <Datum ID="DemoHeadlinePrefix" Type="String" Name="Demo headline — prefix (white)">Talk with an </Datum>
+  <Datum ID="DemoHeadlineHighlight" Type="String" Name="Demo headline — highlight (yellow)">expert</Datum>
+  <Datum ID="DemoBody" Type="Textarea" Name="Demo body">Connect with our product teams to arrange a custom demo.</Datum>
+  <Datum ID="DemoCtaLabel" Type="String" Name="Demo CTA label">Request a demo</Datum>
+  <Datum ID="DemoCtaHref" Type="String" Name="Demo CTA URL">#demo</Datum>
+
+
+  <!-- ═══ APPEARANCE (section-level, optional) ═══════════════
+       ColorScheme flips the whole page tone. BackgroundColor
+       is a full-page override (rare — the deep-band gradient
+       usually reads correctly on any background). -->
+  <Datum ID="ColorScheme" Type="SelectSingle" Name="Color Scheme">
+    <Option Selected="true">
+      <Display>Default (mixed light + dark bands)</Display>
+      <Value>default</Value>
+    </Option>
+    <Option>
+      <Display>Dark (all bands dark navy)</Display>
+      <Value>dark</Value>
+    </Option>
+  </Datum>
+
+
+  <!-- Page <title> + meta description live on the parent page
+       skin, not on this component. Author them there. -->
+
+
+  <!-- ═══ 3b. NEW STANDARD BODY (3 fixed paragraphs) ═════════ -->
+  <Datum ID="NewStandardParagraph1" Type="Textarea" Name="New-standard paragraph 1">Trading desks are evolving, and the gap between real-time intelligence and multi-asset execution is closing fast.</Datum>
+  <Datum ID="NewStandardParagraph2" Type="Textarea" Name="New-standard paragraph 2">MAAS is our execution platform. It works hand in hand with &lt;strong&gt;MATA&lt;/strong&gt;, our analytics platform &#8212; together, two complementary capabilities that connect pre-trade intelligence to disciplined execution across all major asset classes and index events.</Datum>
+  <Datum ID="NewStandardParagraph3" Type="Textarea" Name="New-standard paragraph 3">Because in complex markets, the traders who win aren't just faster - they're better informed, better connected, and better positioned to execute.</Datum>
+
+
+  <!-- ═══ 4. AWARDS (3 fixed slots) ══════════════════════════ -->
+  <Datum ID="AwardsEyebrow" Type="String" Name="Awards eyebrow">See why the world's top institutions choose MAAS</Datum>
+  <Datum ID="Award1Year" Type="String" Name="Award 1 — year">2026</Datum>
+  <Datum ID="Award1Title" Type="String" Name="Award 1 — title">Best Trading Analytics Platform</Datum>
+  <Datum ID="Award1Issuer" Type="String" Name="Award 1 — issuer">TradingTech Insights Awards USA</Datum>
+  <Datum ID="Award2Year" Type="String" Name="Award 2 — year">2025</Datum>
+  <Datum ID="Award2Title" Type="String" Name="Award 2 — title">Overall Best Provider, Algorithmic Trading</Datum>
+  <Datum ID="Award2Issuer" Type="String" Name="Award 2 — issuer">The Trade</Datum>
+  <Datum ID="Award3Year" Type="String" Name="Award 3 — year">2025</Datum>
+  <Datum ID="Award3Title" Type="String" Name="Award 3 — title">Best Provider, Multi-User Clients</Datum>
+  <Datum ID="Award3Issuer" Type="String" Name="Award 3 — issuer">The Trade</Datum>
+
+
+  <!-- ═══ 5b. PLATFORM CARDS (2 fixed slots) ═════════════════ -->
+  <Datum ID="Platform1Theme" Type="SelectSingle" Name="Platform 1 — theme">
+    <Option Selected="true"><Display>Dark (navy card)</Display><Value>dark</Value></Option>
+    <Option><Display>Light (white card)</Display><Value>light</Value></Option>
+  </Datum>
+  <Datum ID="Platform1Eyebrow" Type="String" Name="Platform 1 — eyebrow">MATA - Analytics</Datum>
+  <Datum ID="Platform1Title" Type="String" Name="Platform 1 — title">Transform data into trading intelligence</Datum>
+  <Datum ID="Platform1Body" Type="Textarea" Name="Platform 1 — body">Turn cross-asset insight into actionable pre-trade intelligence, helping you evaluate executions decisions before you move.</Datum>
+  <Datum ID="Platform1Bullet1" Type="String" Name="Platform 1 — bullet 1">Quantify expected execution costs before commitment</Datum>
+  <Datum ID="Platform1Bullet2" Type="String" Name="Platform 1 — bullet 2">Compare strategies side by side to evaluate potential outcomes</Datum>
+  <Datum ID="Platform1Bullet3" Type="String" Name="Platform 1 — bullet 3">Explore interactive outlier views to focus on higher-risk or harder-to-trade orders</Datum>
+  <Datum ID="Platform1Bullet4" Type="String" Name="Platform 1 — bullet 4">Monitor market conditions and portfolio exposures</Datum>
+  <Datum ID="Platform1Bullet5" Type="String" Name="Platform 1 — bullet 5">Model scenarios across asset classes</Datum>
+  <!-- Optional 6th slot. Leave blank to hide. Card heights equalize
+       across the row (align-items: stretch on __platforms-grid) so
+       adding a 6th bullet to one card just makes both cards taller. -->
+  <Datum ID="Platform1Bullet6" Type="String" Name="Platform 1 — bullet 6 (optional; leave blank to hide)"></Datum>
+
+  <Datum ID="Platform2Theme" Type="SelectSingle" Name="Platform 2 — theme">
+    <Option><Display>Dark (navy card)</Display><Value>dark</Value></Option>
+    <Option Selected="true"><Display>Light (white card)</Display><Value>light</Value></Option>
+  </Datum>
+  <Datum ID="Platform2Eyebrow" Type="String" Name="Platform 2 — eyebrow">MAAS - Execution</Datum>
+  <Datum ID="Platform2Title" Type="String" Name="Platform 2 — title">Drive stronger performance outcomes</Datum>
+  <Datum ID="Platform2Body" Type="Textarea" Name="Platform 2 — body">Turn trading insight into disciplined execution, with advanced technology designed to adapt as market conditions change.</Datum>
+  <Datum ID="Platform2Bullet1" Type="String" Name="Platform 2 — bullet 1">Access adaptive algorithms built for live market conditions</Datum>
+  <Datum ID="Platform2Bullet2" Type="String" Name="Platform 2 — bullet 2">Select AI-powered strategies tailored to execution objectives</Datum>
+  <Datum ID="Platform2Bullet3" Type="String" Name="Platform 2 — bullet 3">Route orders intelligently to help minimize market impact</Datum>
+  <Datum ID="Platform2Bullet4" Type="String" Name="Platform 2 — bullet 4">Support consistency across asset classes through shared execution logic, connected workflows and platform-wide controls</Datum>
+  <Datum ID="Platform2Bullet5" Type="String" Name="Platform 2 — bullet 5">Benchmark performance against pre-trade expectations</Datum>
+  <!-- Optional 6th slot. Leave blank to hide. -->
+  <Datum ID="Platform2Bullet6" Type="String" Name="Platform 2 — bullet 6 (optional; leave blank to hide)">Trade equities, futures, currencies and rates from a single execution framework</Datum>
+
+
+  <!-- ═══ 6b. INNOVATION FEATURES (3 fixed slots) ════════════ -->
+  <Datum ID="Feature1Number" Type="String" Name="Feature 1 — number">01</Datum>
+  <Datum ID="Feature1Title" Type="String" Name="Feature 1 — title">Model with depth</Datum>
+  <Datum ID="Feature1Body" Type="Textarea" Name="Feature 1 — body">Proprietary market impact models, predictive analytics and execution algorithms built by RBC Capital Markets' program trading team.</Datum>
+  <Datum ID="Feature2Number" Type="String" Name="Feature 2 — number">02</Datum>
+  <Datum ID="Feature2Title" Type="String" Name="Feature 2 — title">Connect with ease</Datum>
+  <Datum ID="Feature2Body" Type="Textarea" Name="Feature 2 — body">Intuitive web interfaces and robust APIs that connect into existing trading infrastructure and institutional workflows. The power of the platform — without rebuilding your stack or retraining your team.</Datum>
+  <Datum ID="Feature3Number" Type="String" Name="Feature 3 — number">03</Datum>
+  <Datum ID="Feature3Title" Type="String" Name="Feature 3 — title">Optimize with experts</Datum>
+  <Datum ID="Feature3Body" Type="Textarea" Name="Feature 3 — body">Dedicated coverage, ongoing strategy optimization and collaborative development designed to evolve with your needs and market conditions.</Datum>
+
+
+  <!-- ═══ 7b. MATA CAPABILITY CARDS (3 fixed slots) ══════════ -->
+  <Datum ID="Card1Icon" Type="SelectSingle" Name="Card 1 — icon">
+    <Option Selected="true"><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card1Title" Type="String" Name="Card 1 — title">Equities</Datum>
+  <Datum ID="Card1Subtitle" Type="String" Name="Card 1 — subtitle">Cash Equities, ETFs &amp; ADRs</Datum>
+  <Datum ID="Card1Body" Type="Textarea" Name="Card 1 — body">Evaluate how to execute before you move, with expected cost estimates, strategy comparisons, close analytics and interactive outlier views.</Datum>
+
+  <Datum ID="Card2Icon" Type="SelectSingle" Name="Card 2 — icon">
+    <Option><Display>Equities (chart)</Display><Value>equities</Value></Option>
+    <Option Selected="true"><Display>FX (arrows)</Display><Value>fx</Value></Option>
+    <Option><Display>Futures (clock)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (i-circle)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card2Title" Type="String" Name="Card 2 — title">FX</Datum>
+  <Datum ID="Card2Subtitle" Type="String" Name="Card 2 — subtitle">G10 &amp; EM Currency Pairs</Datum>
+  <Datum ID="Card2Body" Type="Textarea" Name="Card 2 — body">Analyze real-time market liquidity conditions, assess expected execution costs across currency pairs, and monitor live order performance and benchmarks during execution.</Datum>
+
+  <Datum ID="Card3Icon" Type="SelectSingle" Name="Card 3 — icon">
+    <Option><Display>Equities (trend arrow)</Display><Value>equities</Value></Option>
+    <Option><Display>FX (crossed arrows)</Display><Value>fx</Value></Option>
+    <Option Selected="true"><Display>Futures (chart bars)</Display><Value>futures</Value></Option>
+    <Option><Display>Info (magnifying glass)</Display><Value>info</Value></Option>
+  </Datum>
+  <Datum ID="Card3Title" Type="String" Name="Card 3 — title">Futures</Datum>
+  <Datum ID="Card3Subtitle" Type="String" Name="Card 3 — subtitle">Index, Commodity &amp; Rate Futures</Datum>
+  <Datum ID="Card3Body" Type="Textarea" Name="Card 3 — body">Track roll dynamics, historical roll volume and open interest progression, then use execution cost analysis and strategy optimization to evaluate approaches across futures.</Datum>
+
+
+  <!-- ═══ 8a. SEO: JSON-LD structured data ═══════════════════
+       Single Textarea holding the entire JSON-LD @graph block.
+       When SEO (Joon) delivers a new schema, paste the whole
+       thing here — no field-by-field re-entry. The XSL wraps
+       this value in a <script type="application/ld+json"> tag
+       verbatim. Escape any literal < or & to &lt; / &amp; only
+       if the schema contains them (most JSON-LD doesn't).
+       ═══════════════════════════════════════════════════════════ -->
+  <!-- IMPORTANT: keep the CDATA wrapper below when editing this Datum.
+       TeamSite otherwise entity-encodes square brackets and injects
+       stray template markers into JSON strings, which breaks the
+       structured data. CDATA tells TeamSite "hand this back verbatim,
+       don't touch it." Paste the full JSON block from SEO between
+       the <![CDATA[ and ]]> markers. -->
+  <Datum ID="SeoJsonLd" Type="Textarea" Name="SEO: JSON-LD structured data (paste full @graph block from SEO, keep CDATA wrapper)"><![CDATA[
+]]></Datum>
+
+</Properties>
+
+<!-- No repeater Groups in this component; every content field lives in
+     Properties above. Empty Data block kept because TeamSite's
+     component schema expects it to be present. -->
+<Data>
+</Data>

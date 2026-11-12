@@ -1,6 +1,6 @@
 # CTA Band
 
-Shared component. Three TeamSite skins, one per variant, sharing one Properties file. All three render a centered stack (optional eyebrow → heading → body → button row) on a dark navy surface; the skin picks the typography ramp, the number of buttons, and whether heading + body sit inside a tight `.__intro` wrapper.
+Shared component. Four TeamSite skins, one per variant, sharing one Properties file. All three render a centered stack (optional eyebrow → heading → body → button row) on a dark navy surface; the skin picks the typography ramp, the number of buttons, and whether heading + body sit inside a tight `.__intro` wrapper.
 
 Extracted from the "Talk with an expert." section on MAAS+MATA, the "Log in to RBC insights" band on S&E, and the "Ready to turn insights into results?" band on US Credentials. All three shared ~95% of the same visual system — this component collapses them into one.
 
@@ -8,11 +8,11 @@ Extracted from the "Talk with an expert." section on MAAS+MATA, the "Log in to R
 
 ## Files
 
-- `rbccm-cta-band--maas-mata.xsl`, `rbccm-cta-band--strategy-and-economics.xsl`, `rbccm-cta-band--us-credentials.xsl` — TeamSite skins, one per variant (picked in the Skin dropdown; there is no preset field). Render from Datums and emit `data-json` attributes so the runtime binder can hydrate live content in preview mode.
+- `rbccm-cta-band--maas-mata.xsl`, `rbccm-cta-band--strategy-and-economics.xsl`, `rbccm-cta-band--us-credentials.xsl`, `rbccm-cta-band--etf-innovators.xsl` — TeamSite skins, one per variant (picked in the Skin dropdown; there is no preset field). Render from Datums and emit `data-json` attributes so the runtime binder can hydrate live content in preview mode.
 - `_retired/rbccm-cta-band.xsl` — old Preset-driven skin, not used. Its Preset read picked up every dropdown label, so the variant class came out broken.
-- `rbccm-cta-band-properties.xml` — Datums shared by all three skins. Appearance tab: BgTransparent, CssPath, CacheVersion, section attrs. Content tab: eyebrow, heading, body, CTAs.
+- `rbccm-cta-band-properties.xml` — Datums shared by all four skins. Appearance tab: BgTransparent, CssPath, CacheVersion, section attrs. Content tab: eyebrow, heading, body, CTAs.
 - `rbccm-cta-band.css` — Component styles. Self-contained. Ships to `/assets/rbccm/css/components/rbccm-cta-band.css`.
-- `rbccm-cta-band.html` — Local preview showing all four cases side-by-side: maas-mata standalone, maas-mata nested (`--bg-transparent`), strategy-and-economics, us-credentials.
+- `rbccm-cta-band.html` — Local preview with a variant picker: maas-mata standalone, maas-mata nested (`--bg-transparent`), strategy-and-economics, us-credentials, etf-innovators.
 
 ---
 
@@ -23,6 +23,8 @@ Extracted from the "Talk with an expert." section on MAAS+MATA, the "Log in to R
 **`strategy-and-economics`** — S&E "Log in to RBC insights" pattern. Small serif heading (28px, single color — no highlight span), body copy, two buttons (primary yellow + secondary outlined ghost). Heading + body are wrapped in `.__intro` so their internal gap (12px) is tighter than the outer `.__inner` gap (32px). Deep navy `#092044`.
 
 **`us-credentials`** — US Credentials "Ready to turn insights into results?" pattern. Same big serif ramp as maas-mata, but the heading uses `display: flex; flex-direction: column;` at desktop so the yellow highlight span always drops beneath the white lead line regardless of copy length. No eyebrow slot (leave the Datum blank). Same navy gradient as maas-mata.
+
+**`etf-innovators`** — ETF Innovators "Powering the performance of global ETFs." White section holding a rounded bright blue card (`#0051A5`, 20px radius). Heading + body sit in `.__intro` (left aligned), one yellow pill button with a line arrow. Mobile stacks with 10px gaps and a full-width button; desktop puts the text left and the button right. Every element carries the `--etf-innovators` modifier. Uses HeadingLead, Body and the primary button fields; Eyebrow, the secondary button and BgTransparent are ignored.
 
 The skin also owns the heading DOM shape:
 - `maas-mata` / `us-credentials`: heading emits two spans (lead + highlight). The us-credentials preset skips the nbsp between spans since flex-column owns the split.
@@ -150,7 +152,7 @@ Sample JSON shape (strategy-and-economics variant):
 ## Deploy checklist
 
 1. Push `rbccm-cta-band.css` to `/assets/rbccm/css/components/rbccm-cta-band.css`.
-2. Register the three skins in TeamSite (`rbccm-cta-band--*.xsl`) with `rbccm-cta-band-properties.xml`.
+2. Register the four skins in TeamSite (`rbccm-cta-band--*.xsl`) with `rbccm-cta-band-properties.xml`.
 3. Bump the site-level `AssetVersion` so browsers pull the fresh CSS.
 4. On MAAS+MATA pages, drop the legacy `.rbccm-maas-mata__demo*` CSS from `maas-mata.css` (already done in this repo) and link `rbccm-cta-band.css` alongside it — the demo band renders through this component now.
 5. Optional: add sample content to the CMS instance for each skin so authors have a template to start from.
