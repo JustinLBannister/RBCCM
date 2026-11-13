@@ -12,8 +12,10 @@
     An optional DealsQuery field overrides it. (The component's Query
     box can't be used: LiveSite runs that query but doesn't pass its
     text to the skin.) The query is sent to the deals feed page
-    (DealsFeedUrl, default /en/expertise/transactions/data/deals-preview.page)
-    as qQuery, with qPagesize 1000. Never pick this skin on the live Transactions page; the
+    (DealsFeedUrl, default /en/expertise/transactions/data/deals.page, the
+    feed the live list uses; deals-preview.page leaves out the
+    transaction type, which hides the Transaction type filter) as
+    qQuery, with qPagesize 1000. Never pick this skin on the live Transactions page; the
     other presets render exactly as on the main skin. Every page using
     this skin gets a robots noindex, nofollow tag added to its head.
 
@@ -556,7 +558,7 @@
         <xsl:attribute name="data-deals-feed">
           <xsl:choose>
             <xsl:when test="$DEALS_FEED_RAW != ''"><xsl:value-of select="$DEALS_FEED_RAW"/></xsl:when>
-            <xsl:otherwise>/en/expertise/transactions/data/deals-preview.page</xsl:otherwise>
+            <xsl:otherwise>/en/expertise/transactions/data/deals.page</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
         <!-- The query: a DealsQuery field if the component has one, else

@@ -128,7 +128,7 @@ To set up a preview page:
 3. Clear the featured deal title if the preview shouldn't show the live featured deal.
 4. Bump the cache buster.
 
-The component's Query box doesn't change the list: LiveSite runs that query but doesn't pass its text to the skin. To show a different set of deals, add a `DealsQuery` String field to the component and type the query there. The skin sends the query (with `qPagesize=1000`) to the deals feed page (`DealsFeedUrl`, blank = `/en/expertise/transactions/data/deals-preview.page`), so it depends on that feed page accepting `qQuery` from the URL, which it does today.
+The component's Query box doesn't change the list: LiveSite runs that query but doesn't pass its text to the skin. To show a different set of deals, add a `DealsQuery` String field to the component and type the query there. The skin sends the query (with `qPagesize=1000`) to the deals feed page (`DealsFeedUrl`, blank = `/en/expertise/transactions/data/deals.page`, the live list's feed; `deals-preview.page` leaves out the transaction type, so the Transaction type filter would hide itself), so it depends on that feed page accepting `qQuery` from the URL, which it does today.
 
 Pending deals show in the unfiltered list only (as on Transactions), so with mostly pending deals the Year and Transaction type dropdowns are nearly empty.
 
