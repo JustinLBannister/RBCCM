@@ -119,19 +119,16 @@ Opened straight from disk (`file://`), the browser blocks the feed requests, so 
 
 ## Deals preview skin
 
-`filtered-content--deals-preview.html` lets a preview page list deals the live Transactions list leaves out, such as deals that have been saved in TeamSite but don't have a publish date yet. It is the main skin as live on Transactions (2026-10-20) plus one addition for the deals preset: the deal list is loaded with **this component's own Query and Maximum Items**.
+`filtered-content--deals-preview.html` lets a preview page list deals the live Transactions list leaves out: by default, deals saved in TeamSite that have no publish date yet (`TeamSite/Templating/DCR/Type:rbccm/deals AND TeamSite/Metadata/publishdate:=0000-00-00`). It is the main skin as live on Transactions (2026-10-20) plus one addition for the deals preset: the deal list is loaded from the deals feed page with that query.
 
 To set up a preview page:
 
-1. Copy the Transactions page (noindex it).
+1. Copy the Transactions page. The skin adds a robots noindex, nofollow tag to the page itself, so the page settings don't need it.
 2. On its filtered-content component, pick the **deals-preview** skin and keep the `deals-and-transactions` preset.
-3. In the component's **Query**, type the deals to show. Deals with no publish date yet:
-   `TeamSite/Templating/DCR/Type:rbccm/deals AND TeamSite/Metadata/publishdate:=0000-00-00`
-   (deals are `rbccm/deals`; `article/news` is the news-story type and returns news, not deals).
-4. **Maximum Items** caps how many come back.
-5. Clear the featured deal title if the preview shouldn't show the live featured deal.
+3. Clear the featured deal title if the preview shouldn't show the live featured deal.
+4. Bump the cache buster.
 
-The skin sends the Query and Maximum Items to the deals feed page (`DealsFeedUrl`, blank = `/en/expertise/transactions/data/deals-preview.page`) as `qQuery` and `qPagesize`, so it depends on that feed page accepting them from the URL, which it does today.
+The component's Query box doesn't change the list: LiveSite runs that query but doesn't pass its text to the skin. To show a different set of deals, add a `DealsQuery` String field to the component and type the query there. The skin sends the query (with `qPagesize=1000`) to the deals feed page (`DealsFeedUrl`, blank = `/en/expertise/transactions/data/deals-preview.page`), so it depends on that feed page accepting `qQuery` from the URL, which it does today.
 
 Pending deals show in the unfiltered list only (as on Transactions), so with mostly pending deals the Year and Transaction type dropdowns are nearly empty.
 

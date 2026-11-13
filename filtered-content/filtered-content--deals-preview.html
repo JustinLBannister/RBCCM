@@ -5,14 +5,17 @@
 
     Same as the main filtered-content skin (as live on Transactions,
     2026-10-20), plus one thing for the deals preset: the deal list is
-    loaded with THIS component's Query and Maximum Items, so a preview
-    page can show deals the live list leaves out. Example Query for
-    deals that have no publish date yet:
+    loaded with a query of its own, so a preview page can show deals
+    the live list leaves out. By default: deals that have no publish
+    date yet,
       TeamSite/Templating/DCR/Type:rbccm/deals AND TeamSite/Metadata/publishdate:=0000-00-00
-    The query is sent to the deals feed page (DealsFeedUrl, default
-    /en/expertise/transactions/data/deals-preview.page) as qQuery /
-    qPagesize. Never pick this skin on the live Transactions page; the
-    other presets render exactly as on the main skin.
+    An optional DealsQuery field overrides it. (The component's Query
+    box can't be used: LiveSite runs that query but doesn't pass its
+    text to the skin.) The query is sent to the deals feed page
+    (DealsFeedUrl, default /en/expertise/transactions/data/deals-preview.page)
+    as qQuery, with qPagesize 1000. Never pick this skin on the live Transactions page; the
+    other presets render exactly as on the main skin. Every page using
+    this skin gets a robots noindex, nofollow tag added to its head.
 
     Main skin notes:
 
@@ -523,6 +526,24 @@
 
     </section>
 
+    <!-- Preview pages stay out of search results: this skin is only used
+         on preview pages, so it adds a robots noindex, nofollow tag to
+         the page head (for pages whose own settings can't set it). Google
+         reads tags added this way when it renders the page. -->
+    <script>
+(function () {
+  var head = document.head;
+  if (!head) return;
+  var tag = head.querySelector('meta[name="robots"]');
+  if (!tag) {
+    tag = document.createElement('meta');
+    tag.setAttribute('name', 'robots');
+    head.appendChild(tag);
+  }
+  tag.setAttribute('content', 'noindex, nofollow');
+})();
+    </script>
+
     <!-- Deals preview: point the deals adapter at the feed page with this
          component's Query + Maximum Items (qQuery / qPagesize). The
          script builds the URL in the browser so the query is properly
@@ -538,8 +559,26 @@
             <xsl:otherwise>/en/expertise/transactions/data/deals-preview.page</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <xsl:attribute name="data-deals-query"><xsl:value-of select="normalize-space(//Datum[@ID='qQuery'])"/></xsl:attribute>
-        <xsl:attribute name="data-deals-max"><xsl:value-of select="normalize-space(//Datum[@ID='qPagesize'])"/></xsl:attribute>
+        <!-- The query: a DealsQuery field if the component has one, else
+             the Query box (only if the runtime passes it to the skin,
+             which the live site doesn't), else the built-in default:
+             deals with no publish date yet. -->
+        <xsl:variable name="DEALS_QUERY_FIELD" select="normalize-space(/Properties/Data/Datum[@ID='DealsQuery'])"/>
+        <xsl:variable name="DEALS_QUERY_BOX" select="normalize-space(//Datum[@ID='qQuery'])"/>
+        <xsl:variable name="DEALS_MAX_BOX" select="normalize-space(//Datum[@ID='qPagesize'])"/>
+        <xsl:attribute name="data-deals-query">
+          <xsl:choose>
+            <xsl:when test="$DEALS_QUERY_FIELD != ''"><xsl:value-of select="$DEALS_QUERY_FIELD"/></xsl:when>
+            <xsl:when test="$DEALS_QUERY_BOX != ''"><xsl:value-of select="$DEALS_QUERY_BOX"/></xsl:when>
+            <xsl:otherwise>TeamSite/Templating/DCR/Type:rbccm/deals AND TeamSite/Metadata/publishdate:=0000-00-00</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name="data-deals-max">
+          <xsl:choose>
+            <xsl:when test="$DEALS_MAX_BOX != ''"><xsl:value-of select="$DEALS_MAX_BOX"/></xsl:when>
+            <xsl:otherwise>1000</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
 (function () {
   var s = document.currentScript;
   if (!s) return;
