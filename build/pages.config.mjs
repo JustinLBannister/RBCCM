@@ -139,6 +139,27 @@ export default {
           'rbccm-insight-list': 'ETF Innovators'
         }
       }
+    },
+
+    // 2027 Outlook (in progress, not live yet: add `url` once the page
+    // has its address). rbccm-insight-cards is used four times (Featured
+    // insight, Macro views, Perspectives, Latest insights), so the
+    // preview is the whole page assembled from the skins in page order:
+    //   python3 outlook-2027/build-components-test.py
+    // The hero's Outlook skin carries its own inline script, so the hero
+    // is CSS only here. Still to come: the two new platform cards.
+    'outlook-2027': {
+      components: [
+        { name: 'rbccm-hero', css: ['rbccm-hero/rbccm-hero.css'], js: [] },
+        'rbccm-insight-cards',
+        'rbccm-strategic-themes',
+        'rbccm-platforms',
+        'rbccm-marketo-footer',
+        { name: 'rbccm-animate', css: [], js: ['rbccm-animate/rbccm-animate.js'] }
+      ],
+      preview: {
+        file: 'outlook-2027/outlook-2027-components.html'
+      }
     }
   }
 };

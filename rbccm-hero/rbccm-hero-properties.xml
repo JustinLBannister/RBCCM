@@ -1,13 +1,14 @@
 <!--
   RBCCM Hero - Properties + Data
   ==============================================================
-  One Properties file shared by the four hero skins. The skin
+  One Properties file shared by the five hero skins. The skin
   picked in TeamSite's Skin dropdown decides the variant:
 
     rbccm-hero (double-dash) maas-mata.xsl               MAAS+MATA
     rbccm-hero (double-dash) strategy-and-economics.xsl  Strategy and Economics
     rbccm-hero (double-dash) us-credentials.xsl          US Credentials
     rbccm-hero (double-dash) etf-innovators.xsl          ETF Innovators
+    rbccm-hero (double-dash) outlook-2027.xsl            Outlook 2027
 
   Each field's label says which variants use it. A skin ignores
   fields it doesn't use.
@@ -29,6 +30,7 @@
     S+E             title h1,   body p   (insight title: always h2)
     US Credentials  eyebrow h1, title p,  subtitle p
     ETF Innovators  title h1,   subtitle p (no eyebrow)
+    Outlook 2027    title h1,   subtitle p (no eyebrow)
 
   Legacy field IDs (2026-09 cleanup)
   ==============================================================
@@ -97,7 +99,7 @@
     auto
   </Datum>
 
-  <Datum ID="TitleTag" Type="SelectSingle" Name="Title tag (optional - Auto = p, or h1 on S+E, ETF and on US Creds without an eyebrow)">
+  <Datum ID="TitleTag" Type="SelectSingle" Name="Title tag (optional - Auto = p, or h1 on S+E, ETF, Outlook and on US Creds without an eyebrow)">
     <Option Selected="true"><Display>Auto (variant default)</Display><Value>auto</Value></Option>
     <Option><Display>h1</Display><Value>h1</Value></Option>
     <Option><Display>h2</Display><Value>h2</Value></Option>
@@ -133,9 +135,9 @@
        controls and crops the video to cover. Loaded only when the hero
        uses Brightcove; blank (or missing on older instances) uses the
        standard path. -->
-  <Datum ID="BgBrightcoveLayerCssPath" Type="String" Name="Brightcove background stylesheet path : S+E (technical - set once at deploy; blank uses the standard path)">/assets/rbccm/css/components/rbccm-brightcove-bg-layer.css</Datum>
+  <Datum ID="BgBrightcoveLayerCssPath" Type="String" Name="Brightcove background stylesheet path : S+E, Outlook (technical - set once at deploy; blank uses the standard path)">/assets/rbccm/css/components/rbccm-brightcove-bg-layer.css</Datum>
 
-  <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : button 1 style (ETF: always yellow, ignores this)">
+  <Datum ID="MmCta1Style" Type="SelectSingle" Name="MAAS+MATA : button 1 style (ETF, Outlook: always yellow, ignores this)">
     <Option Selected="true"><Display>Primary (blue fill)</Display><Value>primary</Value></Option>
     <Option><Display>Secondary (outlined)</Display><Value>secondary</Value></Option>
     <Option><Display>Yellow (warm-yellow fill)</Display><Value>yellow</Value></Option>
@@ -143,7 +145,7 @@
     primary
   </Datum>
 
-  <Datum ID="MmCta1Icon" Type="SelectSingle" Name="MAAS+MATA, ETF : button 1 icon">
+  <Datum ID="MmCta1Icon" Type="SelectSingle" Name="MAAS+MATA, ETF, Outlook : button 1 icon">
     <Option Selected="true"><Display>Arrow</Display><Value>arrow</Value></Option>
     <Option><Display>Play</Display><Value>play</Value></Option>
     <Option><Display>None</Display><Value>none</Value></Option>
@@ -189,11 +191,11 @@
 
 <Data>
 
-  <!-- Breadcrumbs : US Creds, S+E, ETF. Type the list items only; the skin
+  <!-- Breadcrumbs : US Creds, S+E, ETF, Outlook. Type the list items only; the skin
        wraps them in the breadcrumb list, e.g.
          <li><a href="/en/">Home</a></li><li><a href="/en/about-us">About Us</a></li>
        Blank hides the breadcrumbs. -->
-  <Datum ID="HeroBreadcrumbs" Type="Textarea" Name="Breadcrumbs : US Creds, S+E, ETF (list items only, e.g. &lt;li&gt;&lt;a href=&quot;/en/&quot;&gt;Home&lt;/a&gt;&lt;/li&gt; - blank hides them)"></Datum>
+  <Datum ID="HeroBreadcrumbs" Type="Textarea" Name="Breadcrumbs : US Creds, S+E, ETF, Outlook (list items only, e.g. &lt;li&gt;&lt;a href=&quot;/en/&quot;&gt;Home&lt;/a&gt;&lt;/li&gt; - blank hides them)"></Datum>
 
   <!-- ============================================================
        Content tab: copy, links, media
@@ -201,9 +203,9 @@
 
   <Datum ID="EyebrowText" Type="String" Name="Eyebrow : MAAS+MATA, US Creds (optional - blank hides it)"></Datum>
 
-  <Datum ID="TitleLine1Text" Type="String" Name="Title line 1 : all variants (required)"></Datum>
+  <Datum ID="TitleLine1Text" Type="String" Name="Title line 1 : all variants (required - Outlook: a 4-digit year, e.g. 2027, gets a yellow last digit)"></Datum>
 
-  <Datum ID="TitleLine2Text" Type="String" Name="Title line 2, accent colour : MAAS+MATA, US Creds (optional)"></Datum>
+  <Datum ID="TitleLine2Text" Type="String" Name="Title line 2 : MAAS+MATA, US Creds (accent colour), Outlook (second line, e.g. Outlook) (optional)"></Datum>
 
   <!-- HTML allowed (strong, em, br); rendered unescaped. -->
   <Datum ID="SubtitleText" Type="Textarea" Name="Subtitle / body copy : all variants (optional - blank hides it; HTML allowed)"></Datum>
@@ -216,8 +218,9 @@
        768 / 992):
          3 IDs: mobile (under 768), tablet (768-991), desktop (992+)
          2 IDs: mobile, desktop (tablet uses the desktop cut)
-       The other hero variants use a single ID only. -->
-  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional - Strategy &amp; Economics: 3 IDs separated by commas = mobile, tablet, desktop)"></Datum>
+       Outlook 2027 takes the same list. The other hero variants use a
+       single ID only. -->
+  <Datum ID="BgBrightcoveVideoId" Type="String" Name="Brightcove video ID (optional - Strategy &amp; Economics, Outlook: 3 IDs separated by commas = mobile, tablet, desktop)"></Datum>
 
   <!-- US Creds background images (replace the video when any is set).
        Two sets, picked by the page URL: the parameter in the field below
@@ -254,13 +257,19 @@
 
   <Datum ID="EtfNameTagTitle" Type="String" Name="ETF : name tag - job title (optional, e.g. Director, Global ETF Strategy)"></Datum>
 
-  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA, ETF : button 1 label (optional - blank hides the button)">Request a demo</Datum>
+  <!-- Outlook year roll: when title line 1 is a 4-digit year, its last
+       digit is yellow and rolls up from the year before (2026 to 2027)
+       once the hero loads. "no" keeps the yellow digit without the roll.
+       The background video gets a pause / play button automatically. -->
+  <Datum ID="OlYearRoll" Type="String" Name="Outlook : year roll on the title's last digit (type no to turn it off; blank or yes = on)">yes</Datum>
 
-  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA, ETF : button 1 URL (required if label is set - full URL or /en/ path; #request-demo opens the demo form modal; #latest-episode goes to the newest ETF Innovators episode)">#request-demo</Datum>
+  <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA, ETF, Outlook : button 1 label (optional - blank hides the button)">Request a demo</Datum>
 
-  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA, ETF : button 1 accessible name (optional - screen-reader label)"></Datum>
+  <Datum ID="MmCta1Href" Type="String" Name="MAAS+MATA, ETF, Outlook : button 1 URL (required if label is set - full URL or /en/ path; #request-demo opens the demo form modal; #latest-episode goes to the newest ETF Innovators episode)">#request-demo</Datum>
 
-  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA, ETF : button 1 tooltip (optional - blank hides the tooltip)"></Datum>
+  <Datum ID="MmCta1AriaLabel" Type="String" Name="MAAS+MATA, ETF, Outlook : button 1 accessible name (optional - screen-reader label)"></Datum>
+
+  <Datum ID="MmCta1Title" Type="String" Name="MAAS+MATA, ETF, Outlook : button 1 tooltip (optional - blank hides the tooltip)"></Datum>
 
   <Datum ID="MmCta2Label" Type="String" Name="MAAS+MATA : button 2 label (optional - blank hides the button)">Watch the video</Datum>
 
