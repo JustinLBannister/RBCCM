@@ -108,6 +108,7 @@ Use it to check the bundle before uploading. With the server running:
 - http://localhost:8743/dist/strategy-and-economics.html
 - http://localhost:8743/dist/maas-mata.html
 - http://localhost:8743/dist/etf-innovators.html
+- http://localhost:8743/dist/outlook-2027.html
 
 Each component shows one variant; `preview` in `build/pages.config.mjs`
 picks which. If a component's preview page needs a file the bundle doesn't
@@ -120,8 +121,24 @@ read saved copies of the In the Media feed in `rbccm-host-profile/_local-data/`,
 so both fill in locally.
 
 Pages set up today: `us-credentials`, `strategy-and-economics`, `maas-mata`,
-and `etf-innovators` (not live yet, so it has no `url`; all its sections are
-in, with placeholder photos for the host and the two stories).
+`etf-innovators` and `outlook-2027`. The last two are not live yet, so they
+have no `url`. ETF Innovators has all its sections in, with placeholder
+photos for the host and the two stories.
+
+Outlook 2027 uses `rbccm-insight-cards` four times (Featured insight, Macro
+views, Perspectives, Latest insights) plus `rbccm-strategic-themes`, so its
+preview is one whole page, `outlook-2027/outlook-2027-components.html`,
+put together from the skins in page order. That page is included, so
+`npm run build` works as is. Images, links and video are placeholders, and
+the platforms row shows the four existing cards (the two new ones are
+still to come). Only if you change an Outlook skin or its sample content,
+rebuild that page first (needs Python 3 with `lxml`), then run the build:
+
+```bash
+python3 outlook-2027/build-components-test.py
+npm run build -- outlook-2027
+```
+
 Add a page by adding an entry to `build/pages.config.mjs` (instructions are
 at the top of that file).
 
@@ -157,7 +174,8 @@ live link the inventory shows.
   globally.
 - **Not in the picker yet:** Accordions, Expertise, Leading experts, In the
   media, Featured insights, Marketo modal/footer, Brightcove background
-  layer, JSON Schema, Filtered content, Host profile, Insight list. Their
+  layer, JSON Schema, Filtered content, Host profile, Insight list, Insight
+  cards, Strategic themes. Their
   folders are here and they can still be built by name.
 - **XSL skins and properties** are pasted into TeamSite; the preview pages
   are local only.

@@ -1,0 +1,4922 @@
+/*! RBCCM outlook-2027.css | v1 | built 2026-11-16T17:10:20.762Z
+ *  rbccm-hero, rbccm-insight-cards, rbccm-strategic-themes, rbccm-platforms, rbccm-marketo-footer */
+
+/* ==== rbccm-hero/rbccm-hero.css ==== */
+/* =========================================================================
+   RBCCM Hero - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-hero.css
+
+   Purpose
+   -------------------------------------------------------------------------
+   Shared hero shell + per-page variant modifiers. Each RBCCM page that
+   ships a big top-of-page hero authors its own markup with the shared
+   .rbccm-hero block + a --{page-slug} modifier that owns the variant's
+   layout, typography ramp, background treatment, and section-specific
+   accents.
+
+   The BASE block owns:
+     - Vertical padding response (compensates for the fixed site nav)
+     - Container max-width + centring
+     - Font-family locks (RBCDisplay + Roboto -- defends against
+       unified.css sibling rules that reset h1/h2 tag-level)
+     - Overflow clipping so decorative bg/halos don't bleed to siblings
+     - Reset of margin/padding on inner elements when a tag-selector
+       from the CMS global stylesheet would otherwise interfere
+
+   Each VARIANT modifier owns:
+     - Layout (centred vs split-column vs full-bleed image, etc.)
+     - Background treatment (glow halo, chart image, gradient, plain)
+     - Typography ramp (H1 size + weight + colour flip)
+     - Aside/media slot styling
+     - CTA button row layout
+
+   Variants (one TeamSite skin each, all sharing this file)
+   -------------------------------------------------------------------------
+     MAAS+MATA               .rbccm-hero.rbccm-hero--maas-mata
+                             skin rbccm-hero--maas-mata.xsl
+                             (buttons are styled in this file; no
+                             rbccm-button.css needed)
+     Strategy & Economics    .rbccm-hero.rbccm-hero--strategy-and-economics
+                             skin rbccm-hero--strategy-and-economics.xsl
+                             (insight card also needs rbccm-hero.js)
+     US Credentials          .rbccm-hero.rbccm-hero--us-credentials
+                             skin rbccm-hero--us-credentials.xsl
+     ETF Innovators          .rbccm-hero.rbccm-hero--etf-innovators
+                             skin rbccm-hero--etf-innovators.xsl
+                             (yellow button styled in this file)
+     Outlook 2027            .rbccm-hero.rbccm-hero--outlook-2027
+                             skin rbccm-hero--outlook-2027.xsl
+                             (background video + pause button; yellow
+                             button styled in this file)
+     Option on any variant:  .rbccm-hero--header-center (HeaderAlignment)
+     (candidate) Insights hub, About Us, others as they migrate.
+
+   Adding a new variant
+   -------------------------------------------------------------------------
+   1. Copy the closest skin to rbccm-hero--{page-slug}.xsl and change its
+      hardcoded variant class to .rbccm-hero--{page-slug}
+   2. Add a new modifier block at the bottom of this file with the
+      variant's layout + typography + bg treatment
+   3. List it above
+   4. Load rbccm-hero.css BEFORE the page's own CSS so page rules can
+      still override if needed
+   ========================================================================= */
+
+/* ---------- Base block -------------------------------------------------- */
+.rbccm-hero {
+  --rbccm-hero-ink:        #082043;
+  --rbccm-hero-navy:       #003168;
+  --rbccm-hero-navy-dark:  #002144;
+  --rbccm-hero-blue:       #0051A5;
+  --rbccm-hero-yellow:     #FFC72C;
+  --rbccm-hero-serif:      RBCDisplay, Georgia, Times, serif;
+  --rbccm-hero-sans:       Roboto, Arial, sans-serif;
+
+  /* Vertical padding compensates for the fixed site navbar (~55px)
+     sitting on top of the hero. Variants can override via inline
+     `style="--rbccm-hero-pt-m: 120px; --rbccm-hero-pt-d: 160px;"`
+     or by re-declaring in their modifier block. */
+  padding-top:    var(--rbccm-hero-pt-m, 95px);
+  padding-bottom: var(--rbccm-hero-pb-m, 75px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.rbccm-hero *,
+.rbccm-hero *::before,
+.rbccm-hero *::after { box-sizing: border-box; }
+
+@media (min-width: 992px) {
+  .rbccm-hero {
+    padding-top:    var(--rbccm-hero-pt-d, 130px);
+    padding-bottom: var(--rbccm-hero-pb-d, 120px);
+  }
+}
+
+/* Container -- max width + horizontal gutter. Individual variants can
+   override to full-bleed by targeting .rbccm-hero__container inside
+   their modifier scope. */
+.rbccm-hero__container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+@media (min-width: 992px) {
+  .rbccm-hero__container { padding: 0 24px; }
+}
+
+/* Safety net for direct children of the hero that sit OUTSIDE the
+   container -- keeps them above decorative ::before backdrops that
+   variants layer at z-index 0. */
+.rbccm-hero > * { position: relative; z-index: 1; }
+
+/* Font-family lock on the big serif visual headings. unified.css
+   sets its own font-family + letter-spacing on h1/h2 via tag
+   selectors, which suppresses RBCDisplay and opens tracking. The
+   lock targets the semantic classes (not h1/h2 raw tags), because
+   MAAS+MATA authors the H1 on the eyebrow (Roboto uppercase, SEO)
+   and the visual "title" as a <p>. Locking the tag would force
+   serif onto the sans eyebrow. */
+.rbccm-hero .rbccm-hero__title,
+.rbccm-hero .rbccm-hero__title-line {
+  font-family: var(--rbccm-hero-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Reset margin/padding on inner elements where a CMS global tag
+   rule would otherwise apply !important margins. Tag-agnostic --
+   authors can use <h1> or <p> for either element depending on
+   their page's semantic needs. Variants own the visual margin via
+   their own class rules. */
+h1.rbccm-hero__eyebrow, p.rbccm-hero__eyebrow,
+h1.rbccm-hero__title,   p.rbccm-hero__title,
+h1.rbccm-hero__subtitle, p.rbccm-hero__subtitle,
+h1.rbccm-hero__body,    p.rbccm-hero__body {
+  padding: 0;
+}
+
+
+/* =========================================================================
+   Variant: MAAS + MATA
+   -------------------------------------------------------------------------
+   Centred hero. Eyebrow with yellow underline, 2-line H1 (last line
+   flips to bright blue), subtitle, dual CTA row. Soft blue glow halo
+   at top-centre via ::before. Faint graph-paper backdrop across the
+   whole hero (ported from `.rbccm-maas-mata` page-root pattern:
+   1.2px vertical + horizontal rules @ 23.35px pitch, plus a small
+   "cross" accent at every intersection). If the consumer page also
+   paints the graph paper site-wide (as maas-mata.css does today),
+   the two stacks are visually identical and layer harmlessly.
+   ========================================================================= */
+.rbccm-hero--maas-mata {
+  /* Clears the fixed site navbar; 170px from 992 up (below). */
+  padding-top: 140px;
+  background-color: #fff;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 49, 104, 0.025) 0,
+      rgba(0, 49, 104, 0.025) 1.2px,
+      transparent 1.2px,
+      transparent 23.35px,
+      rgba(0, 49, 104, 0.01) 23.35px,
+      rgba(0, 49, 104, 0.01) 24.55px,
+      transparent 24.55px,
+      transparent 46.70px,
+      rgba(0, 49, 104, 0.01) 46.70px,
+      rgba(0, 49, 104, 0.01) 47.90px,
+      transparent 47.90px,
+      transparent 70.05px,
+      rgba(0, 49, 104, 0.01) 70.05px,
+      rgba(0, 49, 104, 0.01) 71.25px,
+      transparent 71.25px,
+      transparent 93.40px,
+      rgba(0, 49, 104, 0.01) 93.40px,
+      rgba(0, 49, 104, 0.01) 94.60px,
+      transparent 94.60px,
+      transparent 116.75px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(0, 49, 104, 0.025) 0,
+      rgba(0, 49, 104, 0.025) 1.2px,
+      transparent 1.2px,
+      transparent 23.35px,
+      rgba(0, 49, 104, 0.01) 23.35px,
+      rgba(0, 49, 104, 0.01) 24.55px,
+      transparent 24.55px,
+      transparent 46.70px,
+      rgba(0, 49, 104, 0.01) 46.70px,
+      rgba(0, 49, 104, 0.01) 47.90px,
+      transparent 47.90px,
+      transparent 70.05px,
+      rgba(0, 49, 104, 0.01) 70.05px,
+      rgba(0, 49, 104, 0.01) 71.25px,
+      transparent 71.25px,
+      transparent 93.40px,
+      rgba(0, 49, 104, 0.01) 93.40px,
+      rgba(0, 49, 104, 0.01) 94.60px,
+      transparent 94.60px,
+      transparent 116.75px
+    ),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='116.75' height='116.75' viewBox='0 0 116.75 116.75'><rect x='54.1975' y='57.778' width='8.355' height='1.194' fill='%23003168' fill-opacity='0.05'/><rect x='57.778' y='54.1975' width='1.194' height='8.355' fill='%23003168' fill-opacity='0.05'/></svg>");
+  background-size: auto, auto, 116.75px 116.75px;
+  background-position: 0 0, 0 0, -57.775px -57.775px;
+  background-repeat: repeat, repeat, repeat;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata { padding-top: 170px; }
+}
+.rbccm-hero--maas-mata .rbccm-hero__container { text-align: center; }
+/* Same as the MAAS+MATA page: 75px below the button at every size
+   (the base block's desktop 120 is for the other variants). */
+.rbccm-hero--maas-mata {
+  --rbccm-hero-pb-d: 75px;
+}
+
+/* Glow halo -- soft light-blue disc, blurred, sitting at top-centre
+   like a backdrop. Kept OUT of the accessibility tree via ::before. */
+.rbccm-hero--maas-mata::before {
+  content: "";
+  position: absolute;
+  top: -369px;
+  left: 50%;
+  width: 702px;
+  height: 702px;
+  margin-left: -351px;
+  border-radius: 50%;
+  background: rgba(0, 81, 165, 0.04);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Eyebrow -- blue, letter-spaced, text as typed (not uppercased,
+   same as the MAAS+MATA page), with a 45x2 yellow underline beneath
+   via ::after. Bottom margin of 80px lands the eyebrow-to-H1
+   measurement per Figma. It's the page's h1, so !important beats the
+   site's h1 tag rules (size, weight, case, tracking). */
+.rbccm-hero--maas-mata .rbccm-hero__eyebrow {
+  color: var(--rbccm-hero-blue) !important;
+  font-family: var(--rbccm-hero-sans) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 120% !important;
+  letter-spacing: 3px !important;
+  text-transform: none !important;
+  margin: 0 0 80px !important;
+}
+.rbccm-hero--maas-mata .rbccm-hero__eyebrow::after {
+  content: "";
+  display: block;
+  width: 45px;
+  height: 2px;
+  background: var(--rbccm-hero-yellow);
+  margin: 15px auto 0;
+}
+
+/* Title -- RBCDisplay 50/75px, 2 lines. Last line flips to blue via
+   __title-line:last-child. */
+.rbccm-hero--maas-mata .rbccm-hero__title {
+  font-family: var(--rbccm-hero-serif);
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 100%;
+  color: var(--rbccm-hero-ink);
+  margin: 0 auto 12px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata .rbccm-hero__title {
+    font-size: 75px;
+    margin: 0 0 20px;
+  }
+}
+.rbccm-hero--maas-mata .rbccm-hero__title-line { display: block; }
+.rbccm-hero--maas-mata .rbccm-hero__title-line:last-child { color: var(--rbccm-hero-blue); }
+
+/* Subtitle -- Roboto, centered, cap width. Values match the MAAS+MATA
+   page (620 / 832 caps, 33 / 48 desktop margins). !important on type:
+   site p rules otherwise add letter-spacing and change the size. */
+.rbccm-hero--maas-mata .rbccm-hero__subtitle {
+  color: var(--rbccm-hero-ink) !important;
+  font-family: var(--rbccm-hero-sans) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 120% !important;
+  letter-spacing: 0 !important;
+  max-width: 620px;
+  margin: 0 auto 32px !important;
+}
+.rbccm-hero--maas-mata .rbccm-hero__subtitle strong { font-weight: 700; }
+@media (min-width: 992px) {
+  .rbccm-hero--maas-mata .rbccm-hero__subtitle {
+    font-size: 21.945px !important;
+    max-width: 832px;
+    margin: 33px auto 48px !important;
+  }
+}
+
+/* CTA row -- two buttons centered, 12px gap. Wraps on narrow. */
+.rbccm-hero--maas-mata .rbccm-hero__actions {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- MAAS+MATA buttons (baked in) ---------------------------------------
+   The hero's buttons are styled right here, copied from maas-mata.css
+   (.rbccm-maas-mata__btn / --primary / --secondary, their icon, the
+   shine sweep + arrow flyby, and the TeamSite defence block), so the
+   hero doesn't need rbccm-button.css. The skin still outputs the
+   rbccm-button class names; these rules are scoped to the MAAS+MATA
+   hero so they don't touch rbccm-button anywhere else.
+   !important where maas-mata.css used it: unified.css / unified2.css
+   .btn, a and a:hover rules otherwise reshape the pill. */
+.rbccm-hero--maas-mata .rbccm-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px;
+  height: 50px !important;
+  padding: 12px 35px !important;
+  border-radius: 100px !important;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 18px;
+  line-height: 29.26px;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  box-sizing: border-box;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.rbccm-hero--maas-mata .rbccm-button > * { position: relative !important; z-index: 1 !important; }
+.rbccm-hero--maas-mata .rbccm-button:hover,
+.rbccm-hero--maas-mata .rbccm-button:focus { text-decoration: none !important; }
+.rbccm-hero--maas-mata .rbccm-button:focus-visible {
+  outline: 2px solid #0051A5;
+  outline-offset: 3px;
+}
+
+/* Primary: #0051A5 pill, white 18/29.26 wt 500 text, white arrow. */
+.rbccm-hero--maas-mata .rbccm-button--primary {
+  background: #0051A5 !important;
+  color: #fff !important;
+  border: 1px solid #0051A5 !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  line-height: 29.26px !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary:hover,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible {
+  background: #003168 !important;
+  border-color: #003168 !important;
+  color: #fff !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary .rbccm-button__icon {
+  fill: #fff;
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  transition: transform 200ms ease, opacity 200ms ease !important;
+  will-change: transform, opacity;
+}
+
+/* Secondary: outlined, grey text + border, small grey icon. */
+.rbccm-hero--maas-mata .rbccm-button--secondary {
+  background: transparent !important;
+  color: #494949 !important;
+  border: 1px solid #D8D8D8 !important;
+  font-weight: 400 !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--secondary:hover,
+.rbccm-hero--maas-mata .rbccm-button--secondary:focus-visible {
+  border-color: #494949 !important;
+  color: #494949 !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--secondary .rbccm-button__icon {
+  fill: #494949;
+  width: 12px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+/* Shine sweep on primary: a soft white diagonal band crosses the pill
+   on hover / keyboard focus (transition-based, like the live page, so
+   it retriggers on every hover). */
+.rbccm-hero--maas-mata .rbccm-button--primary::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: -60% !important;
+  width: 40% !important;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%) !important;
+  transform: skewX(-18deg) !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  z-index: 0 !important;
+  transition: left 600ms ease-out, opacity 600ms ease-out !important;
+  animation: none !important;
+}
+.rbccm-hero--maas-mata .rbccm-button--primary:hover::before,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible::before {
+  left: 120% !important;
+  opacity: 1 !important;
+}
+
+/* Arrow flyby: slides out right, reappears from the left, settles. */
+.rbccm-hero--maas-mata .rbccm-button--primary:hover .rbccm-button__icon,
+.rbccm-hero--maas-mata .rbccm-button--primary:focus-visible .rbccm-button__icon {
+  animation: rbccm-hero-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+}
+@keyframes rbccm-hero-arrow-flyby {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(32px);  opacity: 0; }
+  46%  { transform: translateX(-32px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--maas-mata .rbccm-button--primary::before { transition: none !important; }
+  .rbccm-hero--maas-mata .rbccm-button--primary:hover::before,
+  .rbccm-hero--maas-mata .rbccm-button--primary:focus-visible::before { opacity: 0 !important; }
+  .rbccm-hero--maas-mata .rbccm-button--primary:hover .rbccm-button__icon,
+  .rbccm-hero--maas-mata .rbccm-button--primary:focus-visible .rbccm-button__icon { animation: none !important; }
+}
+
+
+/* =========================================================================
+   Variant: Strategy & Economics
+   -------------------------------------------------------------------------
+   Mobile-first spec (per Justin's Figma-derived measurements).
+   Outer bg: soft blue-grey #E7EEF1. Content stacks: H1 + body copy,
+   then a dark-navy "Latest insight" card below. Fixed 781px mobile
+   height, 23px horizontal padding, content capped at 1320px inside.
+   Desktop layout override lands at >=992px (grid split, insight
+   card moves to the right column) -- kept as a light layer atop the
+   mobile base so nothing shifts unexpectedly.
+   ========================================================================= */
+.rbccm-hero--strategy-and-economics {
+  background: #E7EEF1;
+  color: var(--rbccm-hero-ink);
+  /* Vertical rhythm from the Figma spec:
+       frame height    781px
+       content height  568.1875px
+       remainder       ~212.8125px  -> split ~106px top / ~106px bottom
+     Using padding rather than a fixed height so the section grows
+     with content if the copy runs longer than Figma expected. Outer
+     23px horizontal gutter matches the Figma spec exactly.
+
+     Top padding also carries the shared nav compensation: the base
+     .rbccm-hero block sets 95px top on mobile to clear the fixed
+     nav, but the shorthand below would clobber it, so we add the
+     95 back in (95 + 106 = 201px total). Bottom stays at 106px. */
+  padding: 171px 23px 106px;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* 8px warm-yellow rule at the bottom, per Figma. Applied on the
+     base variant so it carries through both mobile and desktop. */
+  border-bottom: 8px solid var(--Yellow-Warm-Yellow, #FFC72C);
+  /* position: relative is inherited from the shared block base; keeps
+     the bg-video slot anchored to this section. */
+}
+
+/* Optional background video slot. When an author includes an
+   `.rbccm-hero__bg-video` element inside the section, it fills the
+   entire section as an absolute-cover backdrop and the solid
+   #E7EEF1 fallback stays behind it (visible until the video paints,
+   and if the source ever fails). aria-hidden on the wrapper keeps
+   assistive tech from announcing decorative motion. In production
+   this element hosts a Brightcove Player iframe with autoplay,
+   muted, loop, playsinline, controls disabled - same URL contract
+   as featured-conferences.js already uses. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video video,
+.rbccm-hero--strategy-and-economics .rbccm-hero__bg-video iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Anchor the crop to the top-right so the "interesting" corner of
+     the frame stays in view when the container aspect-ratio changes
+     across breakpoints. */
+  object-position: top right;
+  border: 0;
+  display: block;
+  /* Figma doesn't ship a spec for the video opacity so we set it
+     here. Chosen to let the video read as a subtle motion backdrop
+     without competing with the H1 lede + insight card in the
+     foreground. Bump toward 1.0 for a more prominent video; drop
+     toward 0.1 for a barely-there ambient feel. */
+  opacity: 0.1;
+}
+/* Brightcove background (in-page player, see the skin and
+   rbccm-brightcove-bg-layer.css, which hides the player chrome and crops
+   the video to cover). The S&E cuts read too faint at the MP4's 0.1, so
+   the layer is 0.2 on mobile (behind the stacked title and card) and
+   0.4 from tablet up. The opacity sits on the layer, so the poster
+   fallback matches; the video inside goes back to 1 to undo the 0.1
+   from the shared video rule above. */
+.rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer {
+  opacity: 0.2;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer {
+    opacity: 0.4;
+  }
+}
+.rbccm-hero--strategy-and-economics .rbccm-brightcove-bg-layer video {
+  opacity: 1;
+}
+
+/* Content column lifted above the video. Base container already
+   sits at z-index 1 (from the shared block's `> *` z-index safety
+   net), so this rule just makes the intent explicit. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Inner column: fills the outer flex, stacks its own child (the
+   1320-capped content column) centred. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__container {
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 0;
+}
+
+/* Content column - the actual copy + card stack. Fills 100% on
+   mobile (no cap until desktop authors a max-width). 51px gap
+   between the text block and the insight card. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 51px;
+  align-self: stretch;
+}
+
+/* Top block: H1 + paragraph, 24px gap between them. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__lede {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 13px;
+  align-self: stretch;
+}
+
+/* H1 -- RBC Display 39px / 120% / weight 500, colour #003168.
+   Left-aligned, no bottom margin (gap on the parent handles rhythm). */
+.rbccm-hero--strategy-and-economics .rbccm-hero__title {
+  color: var(--rbccm-hero-navy);
+  font-family: var(--rbccm-hero-serif);
+  font-size: 39px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%; /* 46.8px */
+  margin: 0;
+}
+
+/* Body copy -- Roboto 16/150%, #444, ligatures off per spec. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__body {
+  color: #444;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+  align-self: stretch;
+  margin: 0;
+}
+
+/* -------- Insight card -------- */
+/* Dark navy card. 30/20 padding, 10px radius, subtle grey border,
+   soft box shadow.
+   ..............................................................
+   !important on padding + background is defensive: this is a
+   semantic <article> element, and the RBCCM site-wide CSS
+   applies a bare `footer { ... }` rule at unified2.css:2970 --
+   assume similar bare `article { ... }` rules could land next
+   and paint over the card. Hardening now prevents a future
+   drive-by regression. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-card {
+  display: flex;
+  padding: 30px 20px !important;
+  margin: 0 !important;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 10px;
+  border: 1px solid #D7D7D7;
+  background: #051B38 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Pill row wrapper. 12px bottom padding pushes the H3 down. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow-row {
+  display: flex;
+  padding-bottom: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow-inner {
+  display: flex;
+  padding-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+/* Yellow pill with a 4x4 navy dot + tiny uppercase label. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow {
+  display: flex;
+  padding: 2px 8px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 100px;
+  background: var(--rbccm-hero-yellow);
+  color: var(--rbccm-hero-navy);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 13.5px; /* 150% */
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-eyebrow::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  aspect-ratio: 1 / 1;
+  border-radius: 33554400px;
+  background: var(--rbccm-hero-navy);
+}
+
+/* Card H3 -- RBC Display 22 / 25.65 line-height, white. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-title {
+  display: flex;
+  padding-bottom: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  color: #FFF;
+  font-family: var(--rbccm-hero-serif);
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 25.65px;
+  margin: 0;
+}
+
+/* Card body copy -- Roboto 12 / 18.6, warm light grey. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-body {
+  display: flex;
+  padding-bottom: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  color: #D7D7D7;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18.6px; /* 155% */
+  margin: 0;
+}
+
+/* Divider row: date left, read-more right. Top hairline in warm
+   light grey at 77% alpha.
+   ..............................................................
+   !important on padding + background is defensive against RBCCM's
+   site-wide `footer { padding: 30px 0; background-color: #003168; }`
+   rule (unified2.css). Our footer here is a semantic <footer> tag
+   inside the insight card, so bare element selectors from the
+   site cascade override anything we set without !important. Same
+   pattern applied to margin so a site `footer { margin: ... }`
+   rule can't push us out of the card. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-footer {
+  display: flex;
+  padding: 10px 0 0 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-top: 1px solid rgba(215, 215, 215, 0.77);
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #D7D7D7;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Read more link -- warm-yellow 11/700, uppercase-ish tracking,
+   with a small chevron+shaft SVG icon on the right. Underline uses
+   the same soft-fade pattern as the ITM card-title / "See all"
+   links + the leading-experts CTAs: text-decoration always present
+   in the layout but starts transparent + 0 thickness, then fades
+   to currentColor + auto thickness over 250ms on hover / focus. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* !important on color to beat the site-wide `a { color: #003168 }`
+     style RBCCM applies globally. Same reason for text-decoration --
+     the site paints an underline on every anchor and we want the
+     soft-fade pattern instead. Background pinned to transparent so
+     no bare `a { background }` rule can turn the link into a block. */
+  color: var(--rbccm-hero-yellow) !important;
+  background: transparent !important;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16.5px; /* 150% */
+  letter-spacing: 1px;
+  text-decoration: underline !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
+  text-underline-offset: 3px;
+  transition:
+    opacity 0.15s ease,
+    text-decoration-color 0.25s ease,
+    text-decoration-thickness 0.25s ease;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover,
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible {
+  color: var(--rbccm-hero-yellow) !important;
+  /* Keep the link + arrow at full opacity on hover -- underline
+     fade and arrow bounce do the interaction lift on their own. */
+  opacity: 1 !important;
+  text-decoration-color: currentColor !important;
+  text-decoration-thickness: auto !important;
+}
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+/* Arrow right-bounce on hover / keyboard focus. Same 450ms nudge as the
+   In-the-Media "See all" link (rbccm-itm-arrow-bounce) so the S&E hero
+   card and the ITM footer feel like the same interaction. Uses its own
+   keyframe name so the two components stay independently deployable. */
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover .rbccm-hero__insight-link-icon,
+.rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible .rbccm-hero__insight-link-icon {
+  animation: rbccm-hero-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-hero-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:hover .rbccm-hero__insight-link-icon,
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link:focus-visible .rbccm-hero__insight-link-icon {
+    animation: none !important;
+  }
+  /* Kill the underline fade for motion-sensitive users -- they still
+     get the visible underline on hover / focus, just no soft entrance. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-link {
+    transition: none !important;
+  }
+}
+
+/* -------- Desktop layout (>=992): full Figma spec --------
+   Section switches from mobile's padded stack to a horizontal band.
+   Row centres a 1100px content bar with space-between so the H1
+   column sits left, the insight card right. Between 992 and 1099
+   the columns flex naturally (lede holds a 562 floor, card takes
+   the leftover); at 1100+ a second query below relaxes to fixed
+   widths + a wider 75px gap that only fits at full width.
+
+   H1 scales up to 65px w/ -1.08px tracking; body copy to 21/27.2.
+
+   A soft blur ellipse (Figma "Ellipse 56") sits behind the text
+   column so text stays readable if the section carries a video
+   backdrop rather than the solid #E7EEF1 fill. */
+@media (min-width: 992px) {
+
+  .rbccm-hero--strategy-and-economics {
+    display: flex;
+    height: auto;
+    /* Vertical rhythm mirrors the mobile approach: no fixed height,
+       padding derived from the Figma frame vs. content-column delta.
+       116px top / 116px bottom is half the difference between the
+       525px frame and its child row, so the visible geometry matches
+       Figma at exactly-Figma widths and the section grows naturally
+       if the copy or card runs taller than expected.
+
+       Top padding also carries the shared nav compensation: the base
+       .rbccm-hero block sets 130px top on desktop to clear the fixed
+       nav, but the shorthand below would clobber it, so we add the
+       130 back in (130 + 86 = 216px total). Bottom stays at 116px.
+       Section owns the outer horizontal gutter (23px, same as mobile);
+       container underneath sits at padding:0 and just centres the row. */
+    padding: 216px 23px 116px;
+    align-items: center;
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  /* Content container behaves as the flex host for the row.
+     No horizontal padding here -- the parent section (or the page
+     shell above it) owns the outer gutter, so this element just
+     centres its child. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__container {
+    max-width: none;
+    width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: none;
+  }
+
+  /* Row: fills available width up to a 1100px cap so it responds
+     down through mid-widths instead of hard-locking to 1100.
+     Between 992 and 1099 the columns flex naturally: the lede holds
+     a 562px minimum on the left, and the insight card takes whatever
+     width is left over up to the 1100 cap. The mobile 51px gap
+     carries through so the columns never touch as they flex. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1140px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 51px;
+    align-self: auto;
+  }
+
+  /* Left column: 540px floor + basis, 32px gap between H1 and body.
+     flex: 1 0 540px grows above 540 to fill leftover space at wider
+     viewports but never shrinks below 540, so the type never
+     compresses even in the mid-range 992-1099 window. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__lede {
+    flex: 1 0 540px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* H1: RBC Display 65 / 100% / weight 500 / -1.08px tracking. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__title {
+    font-size: 65px;
+    line-height: 100%; /* 65px */
+    letter-spacing: -1.08px;
+  }
+
+  /* Body copy: Roboto 21 / 27.2px line-height. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__body {
+    font-size: 21px;
+    line-height: 27.2px; /* 129.524% */
+    /* Optional desktop max-width for widow control. XSL emits
+       `--rbccm-hero-se-body-max-width: {value}` from the
+       SeBodyMaxWidth Datum on the __body element; blank Datum falls
+       back to 100% (no cap). Mobile / tablet always render at 100%. */
+    max-width: var(--rbccm-hero-se-body-max-width, 100%);
+  }
+
+  /* Right column: 482px base, grows to fill remaining space up to
+     the 1100px row cap. min-width: 0 lets it shrink freely inside
+     the flex row so nothing overflows between 992 and 1100. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-card {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 482px;
+    padding: 40px 30px;
+    align-self: auto;
+  }
+
+  /* Extra right-padding on the title + body so they don't run to
+     the card edge -- leaves optical breathing room at desktop widths
+     where the card is fixed at 482. Title gets 40px, body 30px. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-title {
+    padding-right: 40px;
+  }
+  .rbccm-hero--strategy-and-economics .rbccm-hero__insight-body {
+    padding-right: 30px;
+  }
+
+  /* Blur ellipse behind the text column -- Figma "Ellipse 56".
+     527 x 200 rounded blob (border-radius: 527px is huge on purpose;
+     Figma exported it that way to guarantee a pill regardless of
+     dimensions), tinted #E7EEF2 with a 50px blur so it reads as a
+     soft glow. Anchored bottom-left of the section per the design.
+     Only shown at desktop (mobile stack doesn't need it). Absolute
+     positioned; the __blur element sits directly inside the section. */
+  .rbccm-hero--strategy-and-economics .rbccm-hero__blur {
+    position: absolute;
+    left: 148px;
+    bottom: 79px;
+    width: 527px;
+    height: 200px;
+    border-radius: 527px;
+    background: #E7EEF2;
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+
+/* -------- Desktop layout (>=1100): full-width Figma spec --------
+   Above 1100 the row hits its 1100 max-width and stops growing.
+   The lede + card flex declarations from 992+ already do the right
+   thing here (lede holds 540 floor, both grow to share leftover
+   space), so all this breakpoint changes is the parent gap -- 51 ->
+   75px, the Figma spec at full width. */
+@media (min-width: 1100px) {
+  .rbccm-hero--strategy-and-economics .rbccm-hero__grid {
+    gap: 75px;
+  }
+}
+
+
+/* =========================================================================
+   Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base defaults are left; --header-center centers the visible
+   text stack. Scope is variant-specific because each hero preset has
+   its own layout: MAAS+MATA lays out a single centered column already
+   (the modifier is largely a no-op there but still stamps text-align);
+   S+E has a 2-col grid and the modifier only re-anchors the left
+   __lede column's title + body, not the whole grid.
+   ========================================================================= */
+.rbccm-hero--maas-mata.rbccm-hero--header-center .rbccm-hero__container {
+  text-align: center;
+}
+
+.rbccm-hero--strategy-and-economics.rbccm-hero--header-center .rbccm-hero__lede {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-hero--strategy-and-economics.rbccm-hero--header-center .rbccm-hero__title,
+.rbccm-hero--strategy-and-economics.rbccm-hero--header-center .rbccm-hero__body {
+  text-align: center;
+}
+
+
+/* =========================================================================
+   Strategy and Economics -- page-shell adjustment
+   -------------------------------------------------------------------------
+   TeamSite emits a `<div class="ls-row content-section-pull-up" id="content">`
+   as the default main-content rail on every page. On S+E the whole page
+   is composed of dedicated section components (accordions, expertise,
+   leading-experts, featured-insights, cta-band, platforms, in-the-media),
+   so this rail sits empty between the ITM section and the Marketo
+   subscribe footer -- and its default `.content-section-pull-up` padding
+   / margin (from site-wide unified.css) inflates a ~40px+ gap that reads
+   as unintentional whitespace.
+
+   Fix: when the S+E hero is present on the page, auto-hide any
+   `.content-section-pull-up` rail whose `.ls-area-body` has no children.
+   The `:has(.rbccm-hero--strategy-and-economics)` scope on `.ls-canvas`
+   restricts this rule to S+E; the inner `:has(.ls-area-body:empty)`
+   check leaves it untouched on any page that actually drops a
+   component into the rail.
+
+   Placed here (in rbccm-hero.css) instead of a stand-alone stylesheet
+   because the S+E hero is the marker for "this is the S+E page" -- and
+   the hero's CSS is unconditionally included on every S+E page.
+   ========================================================================= */
+/* Selector notes:
+   - `.ls-canvas:has(.rbccm-hero--strategy-and-economics)` scopes the
+     override to S+E pages only.
+   - `#content.content-section-pull-up` targets the specific main-content
+     rail. Site-wide unified2.css applies `margin-top: 40px` to
+     `.content-section-pull-up` (a group selector shared with team-
+     profiles arrows + page-banner breadcrumbs); on the S+E page the
+     hero already carries its own bottom padding, so that 40px reads
+     as unintentional whitespace between the hero and the first
+     content component below. Zero it out.
+   - Not hiding the rail here (an earlier version did that on the
+     assumption the rail would be empty). The rail is where TeamSite
+     drops the page's actual content components -- if the whole
+     stack was moved into this rail, hiding it would nuke the page. */
+.ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up {
+  margin-top: 0 !important;
+}
+
+
+/* =========================================================================
+   Variant: US Credentials
+   -------------------------------------------------------------------------
+   Blend of the two existing variants:
+     - MAAS+MATA-style CENTERED text stack (2-line title with accent
+       colour on line 2 + subtitle) - no CTA row.
+     - S+E-style optional bg VIDEO backdrop (native <video> or
+       Brightcove iframe), rendered under a solid navy fallback so
+       the section reads even before video paints.
+   Dark navy surface throughout. Yellow warm-yellow accent on the
+   second title line matches the design comp.
+   ========================================================================= */
+.rbccm-hero--us-credentials {
+  background: #001E3C;
+  color: #fff;
+  /* Padding = Figma spec + fixed-nav clearance on the top edge:
+       Mobile  Figma  80 / 0 / 60 / 0
+               +nav   65 top
+               total  145 / 0 / 60 / 0
+       Desktop Figma  130 / 0 / 80 / 0
+               +nav   98 top
+               total  228 / 0 / 80 / 0
+     Horizontal 0 on the section; inner .__container carries its
+     own 23px gutter so copy never touches the viewport edge. */
+  /* 2026-10 v3 mobile: 31 top / 60 bottom below the nav (65).
+     (Was 46 top; 15px less set 2026-10-22.) */
+  padding: 96px 0 60px;
+  overflow: hidden;
+  text-align: center;
+  /* position: relative inherited from the shared block base - keeps
+     the bg-video slot anchored to this section. */
+}
+/* v3 desktop: 120 top / 80 bottom below the nav (98); the art layer is
+   the 490px band between the nav and the hero's bottom edge. */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials { padding: 218px 0 80px; }
+}
+
+/* Bg-video slot - identical mechanics to the S+E variant so the
+   Datum shape carries over (Uc*BgVideoMp4 or Uc*BgBrightcove*).
+   The wrapper fills the section as an absolute-cover backdrop; the
+   #001E3C fallback stays visible until the media paints, and if the
+   source ever fails. aria-hidden on the wrapper (XSL side) keeps
+   assistive tech from announcing decorative motion. Opacity kept
+   at 0.4 - higher than S+E (0.1) because US Creds uses the video
+   as a decorative "constellation" backdrop that should register
+   visually, not just ambient motion. Tune per art direction. */
+.rbccm-hero--us-credentials .rbccm-hero__bg-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rbccm-hero--us-credentials .rbccm-hero__bg-video video,
+.rbccm-hero--us-credentials .rbccm-hero__bg-video iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  border: 0;
+  display: block;
+  opacity: 0.4;
+}
+
+/* Background image sets (2026-10 design v3: stills replace the video).
+   The skin puts all four URLs on the section as custom properties and
+   sets data-hero-bg from the page URL (?hero=global-markets -> gm,
+   otherwise gib). Only the active pair is referenced here, so only the
+   image in use downloads. Mobile art (under 768px) is portrait with the
+   subject at the bottom under the copy; desktop art has the subject on
+   the right, so each anchors to its subject when cropped. Full opacity:
+   the art is designed to sit behind the copy (dark where the text is). */
+.rbccm-hero--us-credentials[data-hero-bg="gib"] {
+  --rbccm-hero-bg-mobile: var(--rbccm-hero-bg-gib-mobile);
+  --rbccm-hero-bg-desktop: var(--rbccm-hero-bg-gib-desktop);
+}
+.rbccm-hero--us-credentials[data-hero-bg="gm"] {
+  --rbccm-hero-bg-mobile: var(--rbccm-hero-bg-gm-mobile);
+  --rbccm-hero-bg-desktop: var(--rbccm-hero-bg-gm-desktop);
+}
+/* The art starts below the fixed nav (65 mobile, 98 desktop), as in
+   the comps, instead of running under it.
+
+   Phones (under 600): the hero's height follows the art's shape
+   (750 x 1068 = 142.4vw tall) instead of a fixed 534px, so the
+   composition matches the comp at every phone width: the dark top of
+   the art stays behind the copy and the subject stays below it. A
+   fixed height let the art scale up with the width, crop its dark top
+   and bring the robots / globe up behind the text on wider phones.
+   Longer copy still makes the hero taller (the art is anchored to the
+   top, so any extra crops off the bottom).
+
+   600-991 (big phones, small tablets): following the art would make the
+   hero 900px+ tall, so it is capped at 760px of art and the art anchors
+   to the bottom to keep the subject in view; the navy glow below grows
+   with the width to keep the copy readable where the subject rises.
+
+   The desktop art takes over at 992, where the layout changes. */
+.rbccm-hero--us-credentials[data-hero-bg] {
+  min-height: calc(65px + 142.4vw);
+}
+.rbccm-hero--us-credentials .rbccm-hero__bg-image {
+  background-image: var(--rbccm-hero-bg-mobile);
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 65px;
+  z-index: 0;
+}
+@media (min-width: 600px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    min-height: calc(65px + min(142.4vw, 760px));
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-position: center bottom;
+  }
+}
+/* 768-991: the site nav is already its two-row desktop size here (99px,
+   119px just above 768 where "Sign In" wraps), not the 65px phone nav,
+   so the copy and the art start lower. */
+@media (min-width: 768px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials {
+    padding: 126px 0 60px;     /* 27px under the 99px nav (was 161; set 2026-10-22) */
+  }
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    min-height: calc(99px + min(142.4vw, 760px));
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    top: 99px;
+  }
+}
+/* Navy glow between the art and the copy (Figma "Ellipse 55" on the
+   v3 mobile frame): 443 x 434, rgba(5, 27, 56, 0.81), blur 150px,
+   centred horizontally (left -34 in the 375 frame) with its top 53px
+   above the art. It darkens the art behind the headline and fades out
+   toward the edges; it is not in the exported images. Sized in vw so
+   it scales with the art (exactly the comp's px values at 375), and
+   capped at its 600px-wide size so it doesn't swallow the subject on
+   tablets. The hero's overflow: hidden clips the blur. */
+.rbccm-hero--us-credentials .rbccm-hero__bg-image::after {
+  background: rgba(5, 27, 56, 0.81);
+  border-radius: 50%;
+  content: "";
+  filter: blur(min(40vw, 240px));
+  height: min(115.73vw, 694px);
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: max(-14.13vw, -85px);
+  transform: translateX(-50%);
+  width: min(118.13vw, 709px);
+}
+@media (min-width: 992px) {
+  /* Desktop: 98 nav + a 475px art band (the comp's 490 less 15, to sit
+     the copy 15px higher; the 1440 x 490 art scales ~3% and crops a few
+     px top/bottom at 1440), with the copy pinned to the bottom:
+     always 80px under the paragraph, at least 120px above the h1 (the
+     section's padding). The browser sets the copy a little shorter than
+     Figma's 280px text box, so the spare height goes above it, not
+     below. Longer copy grows the hero and keeps both paddings. */
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 573px;
+  }
+  /* Desktop: the glow becomes the v3 desktop frame's gradient behind
+     the copy: 953 x 490 at 1440, #002142 solid -> 55% -> 0% left to
+     right. It is kept wide enough to stay behind the copy on wider
+     screens, where the copy rail moves right with the centred
+     container (50% + 233px = 953 at 1440). */
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0.55) 50%, rgba(0, 33, 66, 0) 100%);
+    border-radius: 0;
+    filter: none;
+    height: 100%;
+    left: 0;
+    top: 0;
+    transform: none;
+    width: max(953px, calc(50% + 233px));
+  }
+  /* Desktop: the hero starts at the top of the page under the fixed
+     nav (99px), so the art layer starts 98px down: the 490px band below
+     the nav, where the 1440 x 490 art fits at its comp size. With top: 0
+     the art scales up ~1.2x to fill the strip hidden under the nav. */
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-image: var(--rbccm-hero-bg-desktop);
+    background-position: right center;
+    top: 98px;
+  }
+}
+/* Wider than the 1440 art (1441+), GIB robots: keep cover so the art
+   grows with the screen and always reaches the left edge (no navy
+   strip), pinned top right. Its copy gradient is off 1240-1439 and
+   back at 1440+, scaled with the art (see below). The globe has its own rules (bottom left, gradient on). */
+@media (min-width: 1441px) {
+  .rbccm-hero--us-credentials .rbccm-hero__bg-image {
+    background-position: right top;
+  }
+}
+/* GIB (default) 1240-1439: no copy gradient. The robots sit far
+   enough right at these widths that the art's own dark left side
+   carries the copy. */
+@media (min-width: 1240px) and (max-width: 1439px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gib"] .rbccm-hero__bg-image::after {
+    opacity: 0;
+  }
+}
+/* GIB 1440+: the gradient is back as a narrow band on the far left
+   (10.18% of the width, about 147px at 1440), growing with the art as
+   the screen widens. */
+@media (min-width: 1440px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gib"] .rbccm-hero__bg-image::after {
+    opacity: 1;
+    width: 10.18%;
+  }
+}
+/* Global Markets (globe) desktop, 992+: always cover, pinned bottom
+   left (keeps the globe's left side and lower half, crops from the
+   right / top), and the
+   standard desktop copy gradient at every width. The globe and
+   starfield hold up to scaling, so it skips the 1441+ fixed-size art and
+   navy extension above, which stays for the GIB robots. The
+   [data-hero-bg="gm"] attribute outranks the 1441+ rules. */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials[data-hero-bg="gm"] .rbccm-hero__bg-image {
+    background-color: transparent;
+    background-position: left bottom;
+    background-size: cover;
+  }
+  /* Wider than the base gradient (50% + 933px vs 233px) so the globe
+     fades out more gradually behind and beyond the copy. */
+  .rbccm-hero--us-credentials[data-hero-bg="gm"] .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, #002142 0%, rgba(0, 33, 66, 0.55) 50%, rgba(0, 33, 66, 0) 100%);
+    width: max(953px, calc(50% + 933px));
+  }
+}
+
+/* Content sits above the video. Base shared block already assigns
+   z-index: 1 to `> *`, so `position: relative` here is a re-affirm.
+   Container is a flex column so eyebrow / title / subtitle stack
+   with a single `gap` rule - each child gets its own bottom margin
+   zeroed. */
+.rbccm-hero--us-credentials .rbccm-hero__container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  /* v3 mobile: the container runs the full hero width inside 23px side
+     gutters, so the breadcrumbs can span it left-aligned. The copy
+     itself is capped (284px, 475px from 600) by the rule below. */
+  max-width: none;
+  padding: 0 23px;
+  margin: 0 auto;
+  gap: 16px;                 /* v3 mobile: title -> paragraph */
+  box-sizing: border-box;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__container {
+    gap: 24px;                 /* v3 desktop: title -> paragraph */
+    max-width: 1180px;       /* desktop unchanged until the v3 desktop specs */
+  }
+}
+
+/* Optional eyebrow - mirrors MAAS+MATA but on dark bg so colour
+   flips to warm-yellow. Only renders if the Datum is non-empty. */
+.rbccm-hero--us-credentials .rbccm-hero__eyebrow {
+  color: var(--rbccm-hero-yellow);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 120%;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 40px;
+}
+.rbccm-hero--us-credentials .rbccm-hero__eyebrow::after {
+  content: "";
+  display: block;
+  width: 45px;
+  height: 2px;
+  background: var(--rbccm-hero-yellow);
+  margin: 15px auto 0;
+}
+
+/* Title - 2 lines, RBCDisplay serif. Line 1 white; line 2 accent
+   warm-yellow via :last-child. Mobile 50/desktop 75 matches the
+   MAAS+MATA type ramp. Bottom margin is 0 - parent container's
+   flex `gap: 48px` owns the title->subtitle spacing. */
+/* v3 mobile: 35px / 100%. letter-spacing and text-transform reset so
+   picking h1 (or any tag) in the Title tag field can't pull in the
+   site's global heading styles. */
+.rbccm-hero--us-credentials .rbccm-hero__title {
+  font-family: var(--rbccm-hero-serif);
+  font-size: 35px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 100%;
+  color: #fff;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  text-transform: none;
+}
+/* v3 desktop: 50px / 100%. The comp's text column is 477px; the h1 is
+   capped at 380px because that is what gives the comp's line breaks in
+   RBC Display in the browser ("Your capital / needs strategy. / Our
+   insights / deliver results."): "needs strategy." is 343px and "Your
+   capital needs" 415px, so anything from 343 to 414 works. */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__title {
+    font-size: 50px;
+    line-height: 100%;
+    max-width: 380px;
+  }
+}
+.rbccm-hero--us-credentials .rbccm-hero__title-line { display: block; }
+.rbccm-hero--us-credentials .rbccm-hero__title-line:last-child {
+  color: var(--rbccm-hero-yellow);
+}
+
+/* Subtitle - Roboto, centered white. Desktop caps at 558 per the
+   design spec so the paragraph wraps to ~2-3 lines. */
+.rbccm-hero--us-credentials .rbccm-hero__subtitle {
+  color: #fff;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  width: 100%;
+  max-width: 558px;
+  margin: 0 auto;
+}
+.rbccm-hero--us-credentials .rbccm-hero__subtitle strong { font-weight: 700; }
+/* v3 desktop: Roboto 16px / 130%, 459px wide. (The comp says 18px;
+   16px was chosen 2026-10-19. Rule kept separate so it can go back to
+   18 by changing this one value.) */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    font-size: 16px;
+    line-height: 130%;
+    max-width: 459px;
+  }
+}
+
+/* Mobile / tablet copy width: at most 284px, centred; large phones and
+   small tablets (600+) up to 475px. Set on the copy, not the container,
+   so the breadcrumbs above it can go full width. */
+@media (max-width: 991px) {
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow,
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    max-width: 284px;
+  }
+}
+@media (min-width: 600px) and (max-width: 991px) {
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow,
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    max-width: 475px;
+  }
+}
+/* v3 desktop (992+, with the desktop art, type and gradient): copy
+   left-aligned over the dark left side of the art, at the container's
+   left edge (same rail as the page content). */
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials .rbccm-hero__container {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__title,
+  .rbccm-hero--us-credentials .rbccm-hero__subtitle {
+    margin: 0;
+    text-align: left;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__eyebrow::after {
+    margin: 15px 0 0;
+  }
+}
+
+/* ---- Breadcrumbs (US Creds, S+E) ------------------------------------
+   <nav class="rbccm-hero__breadcrumbs" aria-label="Breadcrumb"> wrapping
+   the editor's <li> items from the HeroBreadcrumbs field (plain <li> /
+   <a>, no classes needed). Matches the Imagine hero's
+   .rbccm-hero__breadcrumbs spec: 13px, line-height 160%, a muted "|"
+   (82%, the spec's #ffffffd0) with a 4px gap + 4px / 6px margin, no
+   hover underline; about 30px down to the headline. Colour per hero: white on US Creds' dark
+   art, navy on S+E's light hero. Separators are CSS, so screen readers
+   don't read them. Selectors are specific enough to beat the site's
+   bare li / a colour rules. */
+.rbccm-hero .rbccm-hero__breadcrumbs {
+  margin: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list {
+  align-items: center;
+  color: var(--rbccm-hero-crumb-color, #fff);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: "Roboto Light", Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  gap: 0.25rem;
+  letter-spacing: 0;
+  line-height: 160%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* The field's rich-text editor wraps the items in its own <ul>. The skins
+   unwrap it (so the markup is one valid list); this is a safety net for
+   older skin versions or other editor wrappers (<p> / <div>): they drop
+   out of the layout so the items still sit in this row, and the item
+   rules below match items at any depth. */
+.rbccm-hero .rbccm-hero__breadcrumb-list ul,
+.rbccm-hero .rbccm-hero__breadcrumb-list ol,
+.rbccm-hero .rbccm-hero__breadcrumb-list p,
+.rbccm-hero .rbccm-hero__breadcrumb-list div {
+  display: contents;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list li {
+  align-items: center;         /* pipe and link share one centre line */
+  background: none;
+  color: inherit;
+  display: inline-flex;
+  font-size: 13px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list li + li::before {
+  color: inherit;
+  content: "|";
+  font-size: 13px;
+  line-height: 1;
+  margin: 0 6px 0 4px;
+  opacity: 0.82;               /* the Imagine spec's #ffffffd0 muted pipe */
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list a,
+.rbccm-hero .rbccm-hero__breadcrumb-list a:visited {
+  color: inherit;
+  font-size: 13px;
+  line-height: 160%;
+  text-decoration: none;
+}
+/* Underline on hover (and keyboard focus), in the link's own colour. */
+.rbccm-hero .rbccm-hero__breadcrumb-list a:hover,
+.rbccm-hero .rbccm-hero__breadcrumb-list a:focus-visible {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.rbccm-hero .rbccm-hero__breadcrumb-list a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* US Creds: white, the first item in the copy column (.__container).
+   Left-aligned at every width. Mobile / tablet: they span the full-width
+   container (23px from the hero edge) above the centred, capped copy; the column's 16px gap +
+   14px margin = 30px to the headline.
+   Desktop (992+, background images): the hero's top padding drops to
+   128px (98 nav + 30) and the copy column fills the hero, its items
+   pushed to the bottom. The breadcrumbs take margin-bottom: auto, so
+   they sit at the top of the column, 30px under the nav, and the copy
+   stays pinned 80px from the bottom exactly as without breadcrumbs.
+   Without breadcrumbs the copy is simply pinned to the bottom. */
+.rbccm-hero--us-credentials {
+  --rbccm-hero-crumb-color: #fff;
+}
+.rbccm-hero--us-credentials .rbccm-hero__breadcrumbs {
+  align-self: stretch;         /* full column width, so the list can sit left */
+  margin-bottom: 14px;
+}
+.rbccm-hero--us-credentials .rbccm-hero__breadcrumb-list {
+  justify-content: flex-start;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--us-credentials[data-hero-bg] {
+    padding-top: 128px;
+  }
+  .rbccm-hero--us-credentials[data-hero-bg] .rbccm-hero__container {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  .rbccm-hero--us-credentials .rbccm-hero__breadcrumbs {
+    margin-bottom: auto;
+  }
+}
+
+/* S+E: navy like its headline, left-aligned. The breadcrumbs are a
+   direct child of the section, before .__container (copy + card row),
+   30px above it. The section is a centring flex row, so it stacks as a
+   column instead (identical without breadcrumbs: the video and blur
+   layers are absolute, the container is the only flow child). On
+   desktop the breadcrumbs share the row's 1140px cap so they line up
+   with the headline. */
+.rbccm-hero--strategy-and-economics {
+  --rbccm-hero-crumb-color: var(--rbccm-hero-navy);
+  flex-direction: column;
+}
+.rbccm-hero--strategy-and-economics > .rbccm-hero__container {
+  align-self: stretch;
+  /* Full width. The shared container rule's margin: 0 auto would
+     otherwise win over the stretch in this column and shrink the row to
+     its content (centred, narrower than the breadcrumbs) when the copy
+     is short. */
+  width: 100%;
+}
+.rbccm-hero--strategy-and-economics > .rbccm-hero__breadcrumbs {
+  align-self: stretch;
+  margin-bottom: 30px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--strategy-and-economics > .rbccm-hero__breadcrumbs {
+    align-self: center;
+    max-width: 1140px;
+    width: 100%;
+  }
+}
+/* With breadcrumbs (the skin adds --has-breadcrumbs when the field is
+   filled) they sit at the top of the hero, 30px under the fixed nav
+   (65px below 768, 98px from 768), and the copy + card row stays where
+   the design puts it: the top padding shrinks to nav + 30 and the
+   breadcrumbs' bottom margin takes up the difference (breadcrumb row =
+   20.8px tall: 13px x 160%).
+     below 768   padding 95,  row at 171 (95 + 20.8 + 55.2)
+     768 - 991   padding 128, row at 178.8 (needs the 30px minimum gap,
+                 so the row sits 8px lower than without breadcrumbs)
+     992+        padding 128, row at 216 (128 + 20.8 + 67.2)
+   Without breadcrumbs nothing here applies. */
+.rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs {
+  padding-top: 95px;
+}
+.rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+  margin-bottom: 55.2px;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs {
+    padding-top: 128px;
+  }
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+    margin-bottom: 30px;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--strategy-and-economics.rbccm-hero--has-breadcrumbs > .rbccm-hero__breadcrumbs {
+    margin-bottom: 67.2px;
+  }
+}
+
+/* ---- Hero entrance: visible from the first paint ---
+   The hero holds the largest text on the page, which is what Largest
+   Contentful Paint (LCP) measures. It used to start at opacity 0 and
+   wait for rbccm-animate.js to run after the page finished parsing,
+   plus animate.css from the CDN, so on mobile the headline showed up
+   seconds late and LCP failed. Elements marked data-hero-rise are
+   never hidden: CSS alone slides them up 16px as the page first
+   paints, with the same stagger as before. No JS involved. */
+[data-hero-rise] {
+  animation: rbccm-hero-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+[data-hero-rise][data-animate-delay="150"] { animation-delay: 150ms; }
+[data-hero-rise][data-animate-delay="300"] { animation-delay: 300ms; }
+[data-hero-rise][data-animate-delay="325"] { animation-delay: 325ms; }
+[data-hero-rise][data-animate-delay="450"] { animation-delay: 450ms; }
+[data-hero-rise][data-animate-delay="600"] { animation-delay: 600ms; }
+@keyframes rbccm-hero-rise {
+  from { transform: translate3d(0, 16px, 0); }
+  to   { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-rise] { animation: none !important; }
+}
+
+
+/* =========================================================================
+   Variant: ETF Innovators
+   -------------------------------------------------------------------------
+   US Credentials' navy surface + background image (desktop and mobile
+   versions on custom properties), with the S+E left-aligned copy
+   column: breadcrumbs, one-line h1, paragraph, one yellow button. The
+   photo fills the right side of the art; a name tag sits over it,
+   bottom right on the container's edge. 8px warm-yellow rule along
+   the bottom, as on MAAS+MATA.
+   Mobile (under 992) follows the US Credentials mobile pattern: one
+   portrait image, copy over its top, the subject at the bottom, name
+   tag bottom left.
+   Sizes are measured from the page comps (no Figma specs yet).
+   ========================================================================= */
+.rbccm-hero--etf-innovators {
+  --rbccm-hero-crumb-color: #fff;
+  background: #001E3C;
+  border-bottom: 8px solid var(--rbccm-hero-yellow);
+  color: #fff;
+  min-height: 93vh;          /* mobile / tablet; desktop is 470px below */
+  overflow: hidden;
+  padding: 85px 0 120px;     /* 65 nav + 20; bottom clears the name tag */
+}
+@media (min-width: 768px) {
+  .rbccm-hero--etf-innovators { padding-top: 118px; }   /* 98 nav (from 768) + 20 */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators {
+    min-height: 470px;
+    padding-bottom: 56px;      /* top stays 118 (98 nav + 20) from 768 */
+  }
+}
+
+/* Art: covers the whole section at every width, top to the yellow rule
+   (its top strip sits under the fixed nav). Mobile anchors to the
+   bottom so the subject stays below the copy; desktop anchors right,
+   so the copy sits over the dark left side. */
+.rbccm-hero--etf-innovators .rbccm-hero__bg-image {
+  background-image: var(--rbccm-hero-bg-mobile);
+  /* 83% across: the mobile art is close to square, so phones crop its
+     sides; this keeps the subject (right of centre in the art) in view
+     where the mobile comp has her. */
+  background-position: 83% bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+/* Mobile / tablet: a light navy fade behind the copy, clear by the
+   subject. The art itself is meant to be dark enough behind the copy,
+   so this only helps legibility. */
+.rbccm-hero--etf-innovators .rbccm-hero__bg-image::after {
+  background: linear-gradient(180deg, rgba(0, 30, 60, 0.6) 0%, rgba(0, 30, 60, 0.35) 45%, rgba(0, 30, 60, 0) 70%);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+@media (min-width: 992px) {
+  /* The 16:9 desktop art fills the width, so the vertical position
+     picks the slice (she sits centre-right in the art). */
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image {
+    background-image: var(--rbccm-hero-bg-desktop);
+    background-position: center 31%;
+  }
+  /* Desktop: navy behind the copy, fading out before the photo. */
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image::after {
+    background: linear-gradient(90deg, rgba(0, 33, 66, 0.85) 0%, rgba(0, 33, 66, 0.55) 40%, rgba(0, 33, 66, 0) 65%);
+  }
+}
+
+/* Copy column: left-aligned at every width. */
+.rbccm-hero--etf-innovators .rbccm-hero__container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 0 23px;
+  text-align: left;
+  width: 100%;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__breadcrumbs {
+  align-self: stretch;
+  margin-bottom: 14px;     /* + 16 gap = 30 to the headline */
+}
+.rbccm-hero--etf-innovators .rbccm-hero__breadcrumb-list { justify-content: flex-start; }
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__breadcrumbs { margin-bottom: 24px; }
+}
+
+/* Title: one line, RBC Display. letter-spacing / text-transform reset
+   so picking h1 can't pull in the site's heading styles. */
+.rbccm-hero--etf-innovators .rbccm-hero__title {
+  color: #fff;
+  font-family: var(--rbccm-hero-serif);
+  font-size: 50px;           /* mobile spec: 50 / 100%, weight 500 */
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 100%;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__title {
+    font-size: 75px;           /* desktop spec: 75 / 100%, weight 500 */
+    line-height: 100%;
+  }
+}
+
+/* Mobile spec: Roboto 16 / 150%, -0.16px tracking, ligatures off. */
+.rbccm-hero--etf-innovators .rbccm-hero__subtitle {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.16px;
+  line-height: 150%;
+  margin: 0;
+  max-width: 510px;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__subtitle strong { font-weight: 700; }
+/* Tablet (768-991): a wider paragraph, 600px, and the art anchored
+   83% / 80% so the subject stays in frame on the wider crop. */
+@media (min-width: 768px) and (max-width: 991px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__subtitle { max-width: 600px; }
+  .rbccm-hero--etf-innovators .rbccm-hero__bg-image { background-position: 83% 80%; }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__subtitle {
+    font-size: 20px;           /* desktop spec: Roboto 20 / 130% */
+    letter-spacing: 0;
+    line-height: 130%;
+    max-width: 554px;
+  }
+}
+
+.rbccm-hero--etf-innovators .rbccm-hero__actions {
+  display: flex;
+  margin-top: 6px;           /* + 16 gap = 22 under the paragraph (mobile spec) */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__actions { margin-top: 8px; }   /* 24 */
+}
+
+/* ---- Yellow button (baked in, like the MAAS+MATA ones) ----------------
+   The skin outputs rbccm-button class names; these rules are scoped to
+   this hero, so rbccm-button.css isn't needed. !important where the
+   site's unified.css / unified2.css .btn and a rules would otherwise
+   reshape the pill. */
+.rbccm-hero--etf-innovators .rbccm-button {
+  align-items: center !important;
+  background: var(--rbccm-hero-yellow) !important;
+  border: 1px solid var(--rbccm-hero-yellow) !important;
+  border-radius: 100px !important;
+  box-sizing: border-box;
+  color: #003168 !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  gap: 10px;
+  height: 46px !important;
+  justify-content: center !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  padding: 0 24px !important;
+  position: relative !important;
+  text-decoration: none !important;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.rbccm-hero--etf-innovators .rbccm-button > * { position: relative !important; z-index: 1 !important; }
+.rbccm-hero--etf-innovators .rbccm-button:hover,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible {
+  background: #E5B520 !important;
+  border-color: #E5B520 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #003168 !important;
+  text-decoration: none !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.rbccm-hero--etf-innovators .rbccm-button__icon {
+  fill: #003168;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+/* Line arrow (the skin's default icon): stroke only, in the text colour. */
+.rbccm-hero--etf-innovators .rbccm-button__icon--line,
+.rbccm-hero--etf-innovators .rbccm-button__icon.rbccm-button__icon--line {
+  fill: none;
+  height: 11px;
+  width: 15px;
+}
+/* Mobile spec: 40px pill, 0 25px padding, ~7px gap, Roboto 14 / 500 /
+   20.445px. Desktop spec: 45px, 12 / 25 padding, 10px gap, 16 / 500 /
+   29.26px (below). */
+@media (max-width: 991px) {
+  .rbccm-hero--etf-innovators .rbccm-button {
+    font-size: 14px !important;
+    gap: 7px;
+    height: 40px !important;
+    line-height: 20.445px !important;
+    padding: 0 25px !important;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-button {
+    font-size: 16px !important;
+    gap: 10px;
+    height: 45px !important;
+    line-height: 29.26px !important;
+    padding: 12px 25px !important;
+  }
+  .rbccm-hero--etf-innovators .rbccm-button__icon {
+    height: 20px;
+    width: 20px;
+  }
+}
+/* Shine sweep + arrow flyby, as on the MAAS+MATA primary button. */
+.rbccm-hero--etf-innovators .rbccm-button::before {
+  animation: none !important;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%) !important;
+  bottom: 0 !important;
+  content: "" !important;
+  left: -60% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: 0 !important;
+  transform: skewX(-18deg) !important;
+  transition: left 600ms ease-out, opacity 600ms ease-out !important;
+  width: 40% !important;
+  z-index: 0 !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:hover::before,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible::before {
+  left: 120% !important;
+  opacity: 1 !important;
+}
+.rbccm-hero--etf-innovators .rbccm-button:hover .rbccm-button__icon,
+.rbccm-hero--etf-innovators .rbccm-button:focus-visible .rbccm-button__icon {
+  animation: rbccm-hero-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--etf-innovators .rbccm-button::before { transition: none !important; }
+  .rbccm-hero--etf-innovators .rbccm-button:hover::before,
+  .rbccm-hero--etf-innovators .rbccm-button:focus-visible::before { opacity: 0 !important; }
+  .rbccm-hero--etf-innovators .rbccm-button:hover .rbccm-button__icon,
+  .rbccm-hero--etf-innovators .rbccm-button:focus-visible .rbccm-button__icon { animation: none !important; }
+}
+
+/* ---- Name tag ----------------------------------------------------------
+   Translucent box over the photo. Mobile spec (under 992): bottom left on
+   the gutter, at least 172px wide, 8.762 / 14.02 padding, 2.629 gap,
+   8.762 radius, rgba(5, 21, 42, 0.19) with a 6.57px backdrop blur; name
+   Roboto 13.143 / 500 / 15.772, title 11.391 / 400 / 13.143 at 85% white.
+   (The spec's scaleX(-1) is a flipped layer in the design file, not a
+   real transform.) Desktop: bottom right on the container's right edge
+   (1180 max - 23 gutter), slightly larger type until it has a spec. */
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag {
+  -webkit-backdrop-filter: blur(6.572px);
+  backdrop-filter: blur(6.572px);
+  align-items: flex-start;
+  background: rgba(5, 21, 42, 0.19);
+  border-radius: 8.762px;
+  bottom: 28px;              /* mobile comp: 28px above the yellow rule */
+  display: flex;
+  flex-direction: column;
+  gap: 2.629px;
+  left: 23px;
+  margin: 0;
+  max-width: calc(100% - 46px);
+  min-width: 172px;
+  padding: 8.762px 14.02px;
+  position: absolute;
+  z-index: 1;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag {
+    bottom: 55px;
+    left: auto;
+    padding: 10px 16px;
+    right: max(23px, calc((100% - 1180px) / 2 + 23px));
+  }
+}
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag-name {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-size: 13.143px;
+  font-weight: 500;
+  line-height: 15.772px;
+}
+.rbccm-hero--etf-innovators .rbccm-hero__name-tag-title {
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--rbccm-hero-sans);
+  font-size: 11.391px;
+  font-weight: 400;
+  line-height: 13.143px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag-name { font-size: 15px; line-height: 130%; }
+  .rbccm-hero--etf-innovators .rbccm-hero__name-tag-title { font-size: 13px; line-height: 130%; }
+}
+
+
+/* =========================================================================
+   Variant: Outlook 2027
+   -------------------------------------------------------------------------
+   Navy hero with a full-bleed background video (Brightcove in-page
+   player or MP4, as on S+E), the ETF Innovators copy column and yellow
+   button, and a 6px warm-yellow rule along the bottom.
+     - Title: two lines. When line 1 is a year, its last digit is yellow
+       and rolls up from the year before once the hero has risen in.
+     - Pause / play button, bottom right, whenever there's a video.
+       Pausing adds .rbccm-hero--video-paused (the icon flips to play).
+   Desktop sizes are measured from the Outlook 2027 page PDF (1440 frame,
+   98px nav over the hero top); mobile follows the ETF hero until there
+   is a mobile spec.
+   ========================================================================= */
+.rbccm-hero--outlook-2027 {
+  --rbccm-hero-crumb-color: #fff;
+  background: #011538;
+  border-bottom: 6px solid var(--rbccm-hero-yellow);
+  color: #fff;
+  overflow: hidden;
+  padding: 85px 0 96px;      /* 65 nav + 20; bottom clears the pause button */
+}
+@media (min-width: 768px) {
+  .rbccm-hero--outlook-2027 { padding-top: 118px; }   /* 98 nav (from 768) + 20 */
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 {
+    padding-bottom: 111px;
+    padding-top: 137px;        /* 98 nav + 39 to the breadcrumbs */
+  }
+}
+
+/* Background video: covers the section. The lines in the footage sit on
+   the right, so the crop keeps the right edge in view. */
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video video {
+  border: 0;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  width: 100%;
+}
+/* Navy behind the copy so it stays legible over any frame: from the top
+   on mobile / tablet (copy over the video), from the left on desktop. */
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-shade {
+  background: linear-gradient(180deg, rgba(1, 21, 56, 0.75) 0%, rgba(1, 21, 56, 0.45) 55%, rgba(1, 21, 56, 0.2) 100%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__bg-shade {
+    background: linear-gradient(90deg, rgba(1, 21, 56, 0.8) 0%, rgba(1, 21, 56, 0.45) 38%, rgba(1, 21, 56, 0) 62%);
+  }
+}
+
+/* Copy column: left-aligned, global 1140 content width inside the 23px
+   gutter. Spacing comes from each element's margin (no gap). */
+.rbccm-hero--outlook-2027 .rbccm-hero__container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 1186px;         /* 1140 + 2 x 23 */
+  padding: 0 23px;
+  text-align: left;
+  width: 100%;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__breadcrumbs {
+  align-self: stretch;
+  margin-bottom: 40px;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__breadcrumb-list { justify-content: flex-start; }
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__breadcrumbs { margin-bottom: 118px; }
+}
+
+/* Title: two lines, RBC Display 80 / 100% on desktop. letter-spacing /
+   text-transform reset so picking h1 can't pull in the site's heading
+   styles. */
+.rbccm-hero--outlook-2027 .rbccm-hero__title {
+  color: #fff;
+  font-family: var(--rbccm-hero-serif);
+  font-size: 56px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 100%;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__title-line { display: block; }
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__title { font-size: 80px; }
+}
+
+.rbccm-hero--outlook-2027 .rbccm-hero__sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ---- Year roll ---------------------------------------------------------
+   The last digit sits in a window one line tall that also opens 0.6em
+   upward: the old digit (6) rises out of the top and fades while the new
+   one (7, yellow) rises into place, 900ms after the title starts rising
+   in. Without the roll (OlYearRoll "no") the digit is simply yellow. */
+.rbccm-hero--outlook-2027 .rbccm-hero__year-digit--new {
+  color: var(--rbccm-hero-yellow);
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__year-roll {
+  display: inline-block;
+  height: 1.6em;
+  line-height: 1;
+  margin-top: -0.6em;
+  overflow: hidden;
+  padding-top: 0.6em;
+  vertical-align: top;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__year-strip {
+  animation: rbccm-hero-year-roll 1000ms cubic-bezier(0.65, 0, 0.25, 1) 900ms both;
+  display: block;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit {
+  display: block;
+  height: 1em;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit:first-child {
+  animation: rbccm-hero-year-fade 1000ms ease-in 900ms both;
+}
+@keyframes rbccm-hero-year-roll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-1em); }
+}
+@keyframes rbccm-hero-year-fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__year-strip {
+    animation: none;
+    transform: translateY(-1em);
+  }
+  .rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit:first-child {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Subtitle: Roboto 16 / 150% on mobile (as on ETF), 20 / 130% on
+   desktop, 24px under the title. The desktop width matches the comp's
+   line break ("...market, and / industry forces..."). */
+.rbccm-hero--outlook-2027 .rbccm-hero__subtitle {
+  color: #fff;
+  font-family: var(--rbccm-hero-sans);
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.16px;
+  line-height: 150%;
+  margin: 16px 0 0;
+  max-width: 510px;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__subtitle strong { font-weight: 700; }
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__subtitle {
+    font-size: 20px;
+    letter-spacing: 0;
+    line-height: 130%;
+    margin-top: 24px;
+    max-width: 440px;
+  }
+}
+
+.rbccm-hero--outlook-2027 .rbccm-hero__actions {
+  display: flex;
+  margin-top: 22px;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__actions { margin-top: 24px; }
+}
+
+/* ---- Yellow button: same as the ETF hero's ----------------------------- */
+.rbccm-hero--outlook-2027 .rbccm-button {
+  align-items: center !important;
+  background: var(--rbccm-hero-yellow) !important;
+  border: 1px solid var(--rbccm-hero-yellow) !important;
+  border-radius: 100px !important;
+  box-sizing: border-box;
+  color: #003168 !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  gap: 7px;
+  height: 40px !important;
+  justify-content: center !important;
+  letter-spacing: 0 !important;
+  line-height: 20.445px !important;
+  overflow: hidden !important;
+  padding: 0 25px !important;
+  position: relative !important;
+  text-decoration: none !important;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-button {
+    font-size: 16px !important;
+    gap: 10px;
+    height: 45px !important;
+    line-height: 29.26px !important;
+    padding: 12px 25px !important;
+  }
+}
+.rbccm-hero--outlook-2027 .rbccm-button > * { position: relative !important; z-index: 1 !important; }
+.rbccm-hero--outlook-2027 .rbccm-button:hover,
+.rbccm-hero--outlook-2027 .rbccm-button:focus-visible {
+  background: #E5B520 !important;
+  border-color: #E5B520 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #003168 !important;
+  text-decoration: none !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.rbccm-hero--outlook-2027 .rbccm-button__icon {
+  fill: #003168;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+.rbccm-hero--outlook-2027 .rbccm-button__icon--line,
+.rbccm-hero--outlook-2027 .rbccm-button__icon.rbccm-button__icon--line {
+  fill: none;
+  height: 11px;
+  width: 15px;
+}
+/* Shine sweep + arrow flyby, as on the ETF and MAAS+MATA buttons. */
+.rbccm-hero--outlook-2027 .rbccm-button::before {
+  animation: none !important;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%) !important;
+  bottom: 0 !important;
+  content: "" !important;
+  left: -60% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: 0 !important;
+  transform: skewX(-18deg) !important;
+  transition: left 600ms ease-out, opacity 600ms ease-out !important;
+  width: 40% !important;
+  z-index: 0 !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-button:hover::before,
+.rbccm-hero--outlook-2027 .rbccm-button:focus-visible::before {
+  left: 120% !important;
+  opacity: 1 !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-button:hover .rbccm-button__icon,
+.rbccm-hero--outlook-2027 .rbccm-button:focus-visible .rbccm-button__icon {
+  animation: rbccm-hero-arrow-flyby 550ms cubic-bezier(0.55, 0, 0.1, 1) both !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-hero--outlook-2027 .rbccm-button::before { transition: none !important; }
+  .rbccm-hero--outlook-2027 .rbccm-button:hover::before,
+  .rbccm-hero--outlook-2027 .rbccm-button:focus-visible::before { opacity: 0 !important; }
+  .rbccm-hero--outlook-2027 .rbccm-button:hover .rbccm-button__icon,
+  .rbccm-hero--outlook-2027 .rbccm-button:focus-visible .rbccm-button__icon { animation: none !important; }
+}
+
+/* ---- Pause / play button -----------------------------------------------
+   32px translucent white circle with a thin white ring, bottom right:
+   desktop 60px from the right edge and 46px above the yellow rule (the
+   comp), mobile on the 23px gutter. Shows pause while the video plays,
+   play once it's paused. !important where the site's button rules would
+   otherwise restyle it. */
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle {
+  -webkit-appearance: none;
+  -webkit-backdrop-filter: blur(4px);
+  align-items: center;
+  appearance: none;
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 50% !important;
+  bottom: 24px;
+  box-shadow: none !important;
+  color: #fff !important;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  margin: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  position: absolute;
+  right: 23px;
+  transition: background 200ms ease;
+  width: 32px;
+  z-index: 2;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__video-toggle {
+    bottom: 46px;
+    right: 60px;
+  }
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle:hover {
+  background: rgba(255, 255, 255, 0.45) !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-icon {
+  display: block;
+  fill: currentColor;
+  height: 12px;
+  width: 12px;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-icon--play { display: none; }
+.rbccm-hero--outlook-2027.rbccm-hero--video-paused .rbccm-hero__video-toggle-icon--pause { display: none; }
+.rbccm-hero--outlook-2027.rbccm-hero--video-paused .rbccm-hero__video-toggle-icon--play { display: block; }
+
+/* ==== rbccm-insight-cards/rbccm-insight-cards.css ==== */
+/* =========================================================================
+   RBCCM Insight Cards
+   Deploy path: /assets/rbccm/css/components/rbccm-insight-cards.css
+   =========================================================================
+   A section of story cards: eyebrow, heading and intro, then up to five
+   stories. Each story: image with an optional pill and type icon,
+   category label, title, summary, meta line, an action link and a share
+   button. Optional filter pills, header button and notification strip.
+
+   Variants (one skin each)
+     .rbccm-insight-cards--outlook-2027
+       2027 Outlook page: Featured insight, Macro views, Capital Markets
+       perspectives and Latest insights.
+
+   Modifiers set by the skin on the section
+     --cards / --featured          layout
+     --white / --tint / --dark     background
+     --count-1 ... --count-5       number of stories shown
+     --feature-only / --side-cards / --side-rows   (featured layout)
+
+   Every element carries the variant modifier. Sizes are measured from
+   the page comp until its CSS spec arrives. Global content width 1140,
+   23px gutter.
+
+   Type uses !important where site-wide rules (tag-level h2/h3/p styles
+   and the global Roboto rule) would otherwise win, same as the other
+   components.
+   ========================================================================= */
+
+.rbccm-insight-cards {
+  box-sizing: border-box;
+  width: 100%;
+}
+.rbccm-insight-cards *,
+.rbccm-insight-cards *::before,
+.rbccm-insight-cards *::after {
+  box-sizing: border-box;
+}
+.rbccm-insight-cards [hidden] {
+  display: none !important;
+}
+
+/* Scroll-in animation pre-hide (same as the other components; the
+   rbccm-animate script adds the classes that reveal them). */
+.rbccm-insight-cards [data-animate] {
+  opacity: 0;
+}
+.rbccm-anim-ready .rbccm-insight-cards [data-animate].animate__animated {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-insight-cards [data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+
+/* =========================================================================
+   Variant: Outlook 2027
+   ========================================================================= */
+.rbccm-insight-cards--outlook-2027 {
+  background: #FFFFFF;
+  padding: 40px 23px;
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--tint {
+  background: #F1F5FB;
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark {
+  background: linear-gradient(180deg, #082043 0%, #061730 100%);
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--outlook-2027 {
+    padding: 72px 23px;
+  }
+}
+
+.rbccm-insight-cards__inner.rbccm-insight-cards__inner--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 0 auto;
+  max-width: 1140px;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards__inner.rbccm-insight-cards__inner--outlook-2027 {
+    gap: 40px;
+  }
+}
+
+/* ---------- Header: eyebrow, heading, intro; button on the right ---------- */
+.rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027 {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027 {
+    align-items: flex-end;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 32px;
+  }
+}
+.rbccm-insight-cards__header-text.rbccm-insight-cards__header-text--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027 {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  line-height: 16px;
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027 {
+  color: #FFC72C;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__heading.rbccm-insight-cards__heading--outlook-2027 {
+  color: #003168 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 32px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  max-width: 720px;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__heading.rbccm-insight-cards__heading--outlook-2027 {
+    font-size: 42px !important;
+  }
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark .rbccm-insight-cards__heading.rbccm-insight-cards__heading--outlook-2027 {
+  color: #FFFFFF !important;
+}
+.rbccm-insight-cards__intro.rbccm-insight-cards__intro--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0;
+  max-width: 560px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__intro.rbccm-insight-cards__intro--outlook-2027 {
+  color: #C3C3C3;
+}
+/* Intro and summary are divs so a pasted <p> doesn't nest inside a <p>;
+   paragraphs inside them get no extra margin. */
+.rbccm-insight-cards__intro--outlook-2027 p,
+.rbccm-insight-cards__card-summary--outlook-2027 p {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+.rbccm-insight-cards__intro--outlook-2027 p + p,
+.rbccm-insight-cards__card-summary--outlook-2027 p + p {
+  margin-top: 0.75em;
+}
+
+/* ---------- Pill buttons ----------
+   Header button, the action on a wide or featured story, and the
+   notification strip button share one shape. Same hover as the page's
+   other buttons: a shine sweeps across and the arrow flies out and
+   back. */
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  align-items: center;
+  background: #0051A5;
+  border-radius: 100px;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  height: 40px;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0 22px;
+  position: relative;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:hover,
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible {
+  background: #003168;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #FFFFFF !important;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:focus-visible,
+.rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 3px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:focus-visible {
+  outline-color: #FFC72C;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027::before,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027::before,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::before,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  bottom: 0;
+  content: "";
+  left: -60%;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: skewX(-18deg);
+  width: 40%;
+  z-index: 0;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027 > *,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027 > *,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 > *,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 > * {
+  position: relative;
+  z-index: 1;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:hover::before,
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible::before,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:hover::before,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:focus-visible::before,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover::before,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible::before,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover::before,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible::before {
+  animation: rbccm-insight-cards-shine 600ms ease-out;
+}
+.rbccm-insight-cards__header-button-label.rbccm-insight-cards__header-button-label--outlook-2027,
+.rbccm-insight-cards__notify-button-label.rbccm-insight-cards__notify-button-label--outlook-2027 {
+  color: inherit;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+}
+.rbccm-insight-cards__header-button-icon.rbccm-insight-cards__header-button-icon--outlook-2027,
+.rbccm-insight-cards__notify-button-icon.rbccm-insight-cards__notify-button-icon--outlook-2027,
+.rbccm-insight-cards__card-action-icon.rbccm-insight-cards__card-action-icon--outlook-2027 {
+  color: inherit;
+  display: block;
+  flex: 0 0 auto;
+  height: 14px;
+  width: 14px;
+  will-change: transform, opacity;
+}
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:hover .rbccm-insight-cards__header-button-icon--outlook-2027,
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible .rbccm-insight-cards__header-button-icon--outlook-2027,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:hover .rbccm-insight-cards__notify-button-icon--outlook-2027,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:focus-visible .rbccm-insight-cards__notify-button-icon--outlook-2027,
+.rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover .rbccm-insight-cards__card-action-icon--outlook-2027,
+.rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible .rbccm-insight-cards__card-action-icon--outlook-2027 {
+  animation: rbccm-insight-cards-arrow 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+}
+/* Yellow pill: the notification strip, and the buttons on dark. */
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027,
+.rbccm-insight-cards--dark .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027,
+.rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  background: #FFC72C;
+  color: #111928 !important;
+}
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:hover,
+.rbccm-insight-cards__notify-button.rbccm-insight-cards__notify-button--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:hover,
+.rbccm-insight-cards--dark .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover,
+.rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:focus-visible {
+  background: #FFD65C;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  color: #111928 !important;
+}
+
+/* ---------- Filter pills ---------- */
+.rbccm-insight-cards__filters.rbccm-insight-cards__filters--outlook-2027 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #FFFFFF;
+  border: 1px solid #D8D8D8;
+  border-radius: 100px;
+  color: #003168;
+  cursor: pointer;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+  margin: 0;
+  padding: 8px 16px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027:hover {
+  border-color: #003168;
+}
+.rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 2px;
+}
+.rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027.rbccm-insight-cards__filter--active {
+  background: #003168;
+  border-color: #003168;
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027 {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027:focus-visible {
+  outline-color: #FFC72C;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__filter.rbccm-insight-cards__filter--outlook-2027.rbccm-insight-cards__filter--active {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #003168;
+}
+/* Announces the filter result to screen readers only. */
+.rbccm-insight-cards__status.rbccm-insight-cards__status--outlook-2027 {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px !important;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ---------- List ----------
+   Cards layout: one column on mobile, two from 600, then by count. */
+.rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+  display: grid;
+  gap: 32px 16px;
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027 {
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  position: relative;
+}
+.rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027::before {
+  content: none;               /* no site-wide list bullets */
+}
+/* The story whose share popup is open sits above its neighbours. */
+.rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027.rbccm-insight-cards__item--share-open {
+  z-index: 5;
+}
+@media (min-width: 600px) {
+  .rbccm-insight-cards--cards .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rbccm-insight-cards--cards.rbccm-insight-cards--count-1 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--cards.rbccm-insight-cards--count-3 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027,
+  .rbccm-insight-cards--cards.rbccm-insight-cards--count-5 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .rbccm-insight-cards--cards.rbccm-insight-cards--count-4 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Card ---------- */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+.rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  aspect-ratio: 356 / 187;
+  background: #E0E0E0;
+  border-radius: 20px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+.rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027.rbccm-insight-cards__card-media--placeholder {
+  background: linear-gradient(180deg, #09254A 0%, #05152A 100%);
+}
+.rbccm-insight-cards__card-img.rbccm-insight-cards__card-img--outlook-2027 {
+  display: block;
+  height: 100% !important;     /* fill the block; beat site-wide img { height: auto } */
+  max-width: none !important;
+  object-fit: cover;
+  object-position: 50% 50%;
+  width: 100% !important;
+}
+/* Label on a story with no image, under a short yellow rule, centred
+   in the block. */
+.rbccm-insight-cards__card-placeholder.rbccm-insight-cards__card-placeholder--outlook-2027 {
+  color: #FFFFFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  left: 20px;
+  letter-spacing: 2px;
+  line-height: 14px;
+  position: absolute;
+  right: 20px;
+  text-transform: uppercase;
+  top: 50%;                    /* clear of the pill above and the type icon below */
+  transform: translateY(-50%);
+}
+.rbccm-insight-cards__card-placeholder.rbccm-insight-cards__card-placeholder--outlook-2027::before {
+  background: #FFC72C;
+  content: "";
+  display: block;
+  height: 2px;
+  margin-bottom: 12px;
+  width: 38px;
+}
+.rbccm-insight-cards__card-badge.rbccm-insight-cards__card-badge--outlook-2027 {
+  background: #05152A;
+  border-radius: 100px;
+  color: #FFFFFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  left: 14px;
+  line-height: 14px;
+  max-width: calc(100% - 28px);
+  overflow: hidden;
+  padding: 5px 11px;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 14px;
+  white-space: nowrap;
+}
+.rbccm-insight-cards--tint .rbccm-insight-cards__card-badge.rbccm-insight-cards__card-badge--outlook-2027 {
+  background: #FFFFFF;
+  color: #003168;
+}
+.rbccm-insight-cards__card-type.rbccm-insight-cards__card-type--outlook-2027 {
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 50%;
+  bottom: 14px;
+  color: #003168;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  left: 14px;
+  position: absolute;
+  width: 34px;
+}
+.rbccm-insight-cards__card-type-icon.rbccm-insight-cards__card-type-icon--outlook-2027 {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+/* Name and role over the image (the featured story's speaker). */
+.rbccm-insight-cards__card-speaker.rbccm-insight-cards__card-speaker--outlook-2027 {
+  bottom: 12%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  left: 7%;
+  margin: 0 !important;
+  position: absolute;
+}
+.rbccm-insight-cards__card-speaker-name.rbccm-insight-cards__card-speaker-name--outlook-2027 {
+  color: #FFC72C;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 120%;
+}
+.rbccm-insight-cards__card-speaker-role.rbccm-insight-cards__card-speaker-role--outlook-2027 {
+  color: #FFFFFF;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 120%;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-cards__card-speaker-name.rbccm-insight-cards__card-speaker-name--outlook-2027 { font-size: 24px; }
+  .rbccm-insight-cards__card-speaker-role.rbccm-insight-cards__card-speaker-role--outlook-2027 { font-size: 16px; }
+}
+
+.rbccm-insight-cards__card-content.rbccm-insight-cards__card-content--outlook-2027 {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+.rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  transition: opacity 0.2s ease;
+}
+/* While its share popup is open, the rest of the story recedes. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--share-open > .rbccm-insight-cards__card-media--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--share-open .rbccm-insight-cards__card-body--outlook-2027 {
+  opacity: 0.45;
+}
+.rbccm-insight-cards__card-category.rbccm-insight-cards__card-category--outlook-2027 {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 2px;
+  line-height: 14px;
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-category.rbccm-insight-cards__card-category--outlook-2027 {
+  color: #FFC72C;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  color: #082043 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 20px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+    font-size: 22px !important;
+  }
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  color: #FFFFFF !important;
+}
+.rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 155%;
+  margin: 0;
+}
+.rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  margin: auto 0 0 !important;  /* sits at the bottom so footers line up */
+  padding-top: 6px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  color: #C3C3C3;
+}
+
+/* Footer: action link on the left, share on the right. */
+.rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  align-items: center;
+  border-top: 1px solid #E0E0E0;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 12px;
+  min-height: 48px;
+  padding-top: 12px;
+  position: relative;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  border-top-color: rgba(255, 255, 255, 0.18);
+}
+.rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  color: #0051A5 !important;
+  text-decoration: none !important;
+}
+.rbccm-insight-cards__card-action-label.rbccm-insight-cards__card-action-label--outlook-2027 {
+  color: inherit;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  color: #FFFFFF !important;
+}
+/* In a column card the action is a text link and the whole card is its
+   click target (the share button sits above it). */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::after,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::after,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: 1;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027::after {
+  content: none;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover .rbccm-insight-cards__card-action-label--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover .rbccm-insight-cards__card-action-label--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027:hover .rbccm-insight-cards__card-action-label--outlook-2027 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-action-icon.rbccm-insight-cards__card-action-icon--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__card-action-icon.rbccm-insight-cards__card-action-icon--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-action-icon.rbccm-insight-cards__card-action-icon--outlook-2027 {
+  display: none;
+}
+/* The footer anchors the share popup, so it must not stack under the
+   stretched link. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  position: static;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  position: static;
+}
+
+.rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #0051A5;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 36px;
+  justify-content: center;
+  margin: 0 -9px 0 auto;       /* icon lines up with the card edge */
+  padding: 0;
+  position: relative;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  width: 36px;
+  z-index: 2;
+}
+.rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:hover,
+.rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:focus-visible,
+.rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027[aria-expanded="true"] {
+  background: #E8F0FA;
+  color: #003168;
+}
+.rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 2px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027 {
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:hover,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027:focus-visible {
+  outline-color: #FFC72C;
+}
+.rbccm-insight-cards__card-share-icon.rbccm-insight-cards__card-share-icon--outlook-2027 {
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+/* The word "Share" shows on the featured story only. */
+.rbccm-insight-cards__card-share-label.rbccm-insight-cards__card-share-label--outlook-2027 {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* ---------- One story (cards layout): a wide card ----------
+   Image left, text right from 768. On light blue and dark it sits in
+   a panel. */
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+  gap: 4px;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  aspect-ratio: 16 / 9;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+  flex: 0 0 auto;
+  gap: 12px;
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  font-size: 26px !important;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  font-size: 14px;
+  margin: 0 !important;
+  padding-top: 0;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  border-top: 0;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-action-label.rbccm-insight-cards__card-action-label--outlook-2027 {
+  font-size: 14px;
+  line-height: 16px;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027 {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  height: 40px;
+  margin: 0;
+  width: 40px;
+}
+.rbccm-insight-cards--tint.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px rgba(0, 49, 104, 0.05), 0 1px 4px rgba(25, 33, 61, 0.06);
+  padding: 20px;
+}
+.rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 20px;
+  padding: 20px;
+}
+.rbccm-insight-cards--tint.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027,
+.rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  border-radius: 15px;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+    align-items: center;
+    display: grid;
+    gap: 48px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+  .rbccm-insight-cards--tint.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027,
+  .rbccm-insight-cards--dark.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027 {
+    padding: 20px 48px 20px 20px;
+  }
+  .rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+    padding-top: 0;
+  }
+  .rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+    margin-top: 16px;
+  }
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--outlook-2027.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+    font-size: 36px !important;
+    line-height: 115% !important;
+  }
+}
+
+/* ---------- Featured layout ---------- */
+.rbccm-insight-cards__layout.rbccm-insight-cards__layout--outlook-2027 {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--side-cards .rbccm-insight-cards__layout.rbccm-insight-cards__layout--outlook-2027 {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+  .rbccm-insight-cards--side-rows .rbccm-insight-cards__layout.rbccm-insight-cards__layout--outlook-2027 {
+    align-items: start;
+    gap: 32px;
+    grid-template-columns: minmax(0, 1.28fr) minmax(0, 1fr);
+  }
+}
+
+/* Featured story. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  aspect-ratio: 660 / 363;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+  flex: 0 0 auto;
+  gap: 12px;
+  padding-top: 20px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-category.rbccm-insight-cards__card-category--outlook-2027 {
+  font-size: 13px;
+  line-height: 16px;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  color: #003168 !important;
+  font-size: 26px !important;
+}
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  color: #FFFFFF !important;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  font-size: 16px;
+  line-height: 160%;
+  max-width: 640px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  font-size: 14px;
+  margin: 0 !important;
+  padding-top: 4px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  border-top: 0;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 16px;
+  padding-top: 0;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action.rbccm-insight-cards__card-action--outlook-2027 {
+  height: 46px;
+  padding: 0 28px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-action-label.rbccm-insight-cards__card-action-label--outlook-2027 {
+  font-size: 16px;
+  line-height: 18px;
+}
+/* Share as an outlined pill with its label. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027 {
+  border: 1.5px solid currentColor;
+  border-radius: 100px;
+  gap: 8px;
+  height: 46px;
+  margin: 0;
+  padding: 0 24px;
+  width: auto;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-share-label.rbccm-insight-cards__card-share-label--outlook-2027 {
+  clip: auto;
+  color: inherit;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  height: auto;
+  line-height: 18px;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  width: auto;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+    font-size: 32px !important;
+  }
+  /* On its own: text beside the image. */
+  .rbccm-insight-cards--feature-only .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature {
+    align-items: center;
+    display: grid;
+    gap: 48px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+  .rbccm-insight-cards--feature-only .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+    padding-top: 0;
+  }
+}
+
+/* Beside the featured story. */
+.rbccm-insight-cards__side.rbccm-insight-cards__side--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rbccm-insight-cards--side-cards .rbccm-insight-cards__side.rbccm-insight-cards__side--outlook-2027 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+  gap: 28px 16px;
+}
+@media (min-width: 600px) and (max-width: 991.98px) {
+  .rbccm-insight-cards--side-cards .rbccm-insight-cards__side.rbccm-insight-cards__side--outlook-2027 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.rbccm-insight-cards--side-cards .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  aspect-ratio: 399 / 188;
+}
+
+/* "Also selected" rows: thumbnail left, text right, a rule under each. */
+.rbccm-insight-cards__side-heading.rbccm-insight-cards__side-heading--outlook-2027 {
+  border-bottom: 1px solid #E0E0E0;
+  color: #003168;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 120%;
+  margin: 0 !important;
+  padding-bottom: 16px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__side-heading.rbccm-insight-cards__side-heading--outlook-2027 {
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--side-rows .rbccm-insight-cards__side.rbccm-insight-cards__side--outlook-2027 .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+  gap: 0;
+}
+.rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027.rbccm-insight-cards__item--side-row {
+  border-bottom: 1px solid #E0E0E0;
+  padding: 16px 0;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027.rbccm-insight-cards__item--side-row {
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 120px minmax(0, 1fr);
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-badge.rbccm-insight-cards__card-badge--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-speaker.rbccm-insight-cards__card-speaker--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-placeholder.rbccm-insight-cards__card-placeholder--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row.rbccm-insight-cards__card--type-article .rbccm-insight-cards__card-type.rbccm-insight-cards__card-type--outlook-2027 {
+  display: none;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-type.rbccm-insight-cards__card-type--outlook-2027 {
+  bottom: auto;
+  height: 28px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-type-icon.rbccm-insight-cards__card-type-icon--outlook-2027 {
+  height: 12px;
+  width: 12px;
+}
+/* Meta on the left, action and share on the right, on one line. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-content.rbccm-insight-cards__card-content--outlook-2027 {
+  align-items: end;
+  display: grid;
+  gap: 8px 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
+  gap: 6px;
+  padding-top: 0;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-category.rbccm-insight-cards__card-category--outlook-2027 {
+  font-size: 11px;
+  letter-spacing: 1.3px;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
+  font-size: 18px !important;
+  line-height: 125% !important;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  font-size: 12px;
+  margin: 0 !important;
+  padding-top: 2px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+  border-top: 0;
+  gap: 4px;
+  margin: 0 0 -9px;
+  min-height: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-action-label.rbccm-insight-cards__card-action-label--outlook-2027 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-share.rbccm-insight-cards__card-share--outlook-2027 {
+  margin: 0 -9px 0 0;
+}
+/* Narrow screens: smaller thumbnail, and the action and share drop to
+   their own line under the text so the title keeps its width. */
+@media (max-width: 599.98px) {
+  .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row {
+    align-items: start;
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-content.rbccm-insight-cards__card-content--outlook-2027 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
+    justify-content: space-between;
+    margin: 0 0 -9px;
+  }
+}
+
+/* ---------- Notification strip ---------- */
+.rbccm-insight-cards__notify.rbccm-insight-cards__notify--outlook-2027 {
+  align-items: flex-start;
+  background: #0051A5;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+@media (min-width: 768px) {
+  .rbccm-insight-cards__notify.rbccm-insight-cards__notify--outlook-2027 {
+    align-items: center;
+    flex-direction: row;
+    gap: 24px;
+    justify-content: space-between;
+  }
+}
+.rbccm-insight-cards__notify-text.rbccm-insight-cards__notify-text--outlook-2027 {
+  border-left: 2px solid #FFC72C;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-left: 12px;
+}
+.rbccm-insight-cards__notify-eyebrow.rbccm-insight-cards__notify-eyebrow--outlook-2027 {
+  color: #FFFFFF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  line-height: 16px;
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+.rbccm-insight-cards__notify-title.rbccm-insight-cards__notify-title--outlook-2027 {
+  color: #FFFFFF;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 125%;
+  margin: 0 !important;
+}
+@media (min-width: 992px) {
+  .rbccm-insight-cards__notify-title.rbccm-insight-cards__notify-title--outlook-2027 {
+    font-size: 22px;
+  }
+}
+
+/* ---------- Share popup ----------
+   Opens above the share button it was called from; the script moves
+   it into that story's footer. */
+.rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027 {
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
+  bottom: calc(100% + 8px);
+  box-shadow: 0 12px 32px rgba(0, 33, 68, 0.14);
+  color: #082043;
+  opacity: 0;
+  padding: 14px 12px 12px;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  width: 220px;
+  z-index: 20;
+}
+.rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027.rbccm-insight-cards__share--open {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Featured and wide stories: the button is on the left. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027,
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027 {
+  left: 0;
+  right: auto;
+}
+/* Column cards and rows: anchor to the card, above the footer. */
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-card .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027,
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027 {
+  bottom: 52px;
+}
+.rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027 {
+  bottom: 30px;
+}
+.rbccm-insight-cards--count-1.rbccm-insight-cards--cards .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--card .rbccm-insight-cards__share.rbccm-insight-cards__share--outlook-2027 {
+  bottom: calc(100% + 8px);
+}
+.rbccm-insight-cards__share-head.rbccm-insight-cards__share-head--outlook-2027 {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 0 4px 0 8px;
+}
+.rbccm-insight-cards__share-title.rbccm-insight-cards__share-title--outlook-2027 {
+  color: #082043;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 16px;
+  margin: 0 !important;
+}
+.rbccm-insight-cards__share-close.rbccm-insight-cards__share-close--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: #494949;
+  cursor: pointer;
+  display: inline-flex;
+  height: 24px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 24px;
+}
+.rbccm-insight-cards__share-close.rbccm-insight-cards__share-close--outlook-2027:hover,
+.rbccm-insight-cards__share-close.rbccm-insight-cards__share-close--outlook-2027:focus-visible {
+  background: #E8F0FA;
+  color: #0051A5;
+}
+.rbccm-insight-cards__share-list.rbccm-insight-cards__share-list--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__share-item.rbccm-insight-cards__share-item--outlook-2027 {
+  margin: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__share-item.rbccm-insight-cards__share-item--outlook-2027::before {
+  content: none;
+}
+.rbccm-insight-cards__share-option.rbccm-insight-cards__share-option--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #082043 !important;
+  cursor: pointer;
+  display: flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 10px;
+  line-height: 18px;
+  margin: 0;
+  padding: 9px 8px;
+  text-align: left;
+  text-decoration: none !important;
+  width: 100%;
+}
+.rbccm-insight-cards__share-option.rbccm-insight-cards__share-option--outlook-2027:hover,
+.rbccm-insight-cards__share-option.rbccm-insight-cards__share-option--outlook-2027:focus-visible {
+  background: #E8F0FA;
+  color: #0051A5 !important;
+}
+.rbccm-insight-cards__share-option.rbccm-insight-cards__share-option--outlook-2027:focus-visible,
+.rbccm-insight-cards__share-close.rbccm-insight-cards__share-close--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 1px;
+}
+.rbccm-insight-cards__share-option-icon.rbccm-insight-cards__share-option-icon--outlook-2027 {
+  color: #003168;
+  display: block;
+  flex: 0 0 auto;
+  height: 18px;
+  width: 18px;
+}
+.rbccm-insight-cards__share-option-label.rbccm-insight-cards__share-option-label--outlook-2027 {
+  color: inherit;
+}
+.rbccm-insight-cards__share-flash.rbccm-insight-cards__share-flash--outlook-2027 {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  margin: 6px 8px 0 !important;
+}
+.rbccm-insight-cards__share-flash.rbccm-insight-cards__share-flash--outlook-2027:empty {
+  display: none;
+}
+
+@keyframes rbccm-insight-cards-shine {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+@keyframes rbccm-insight-cards-arrow {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(24px);  opacity: 0; }
+  46%  { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-insight-cards--outlook-2027 *,
+  .rbccm-insight-cards--outlook-2027 *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==== rbccm-strategic-themes/rbccm-strategic-themes.css ==== */
+/* =========================================================================
+   RBCCM Strategic Themes
+   Deploy path: /assets/rbccm/css/components/rbccm-strategic-themes.css
+   =========================================================================
+   An eyebrow and heading, then up to five themes. Each theme: its
+   number, title, description, a button and a graphic.
+
+   Variants (one skin each)
+     .rbccm-strategic-themes--outlook-2027
+       2027 Outlook "Strategic themes".
+
+   Three states, set by rbccm-strategic-themes.js on the section:
+     (no class)   No script: every theme in a plain numbered list.
+     --enhanced --tabs
+                  One theme at a time; the numbered tabs switch it.
+                  Phones, tablets, short windows, reduced motion.
+     --enhanced --pinned
+                  Desktop: the section is as tall as one screen per
+                  theme, the stage sticks to the top, and scrolling
+                  steps through the themes.
+   And on each theme: --active (the one showing) and --shown (its
+   graphic is on screen, so its animation runs).
+
+   Every element the skin prints carries the variant modifier. The parts
+   of the drawn graphics (__gfx-*) are added by the script and are styled
+   under the graphic's own variant class. Sizes follow the team's page
+   preview until the CSS spec arrives. Global content width 1140, 23px
+   gutter.
+
+   Type uses !important where site-wide rules (tag-level h2/h3/p styles
+   and the global Roboto rule) would otherwise win, same as the other
+   components.
+   ========================================================================= */
+
+.rbccm-strategic-themes {
+  box-sizing: border-box;
+  width: 100%;
+}
+.rbccm-strategic-themes *,
+.rbccm-strategic-themes *::before,
+.rbccm-strategic-themes *::after {
+  box-sizing: border-box;
+}
+.rbccm-strategic-themes [hidden] {
+  display: none !important;
+}
+
+
+/* =========================================================================
+   Variant: Outlook 2027 - shared by all three states
+   ========================================================================= */
+.rbccm-strategic-themes--outlook-2027 {
+  --rbccm-themes-offset: 0px;  /* fixed site header height; set by the script */
+  --rbccm-themes-stage: calc(100vh - var(--rbccm-themes-offset));
+  background: #F1F5FB;
+  padding: 40px 23px;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 {
+    padding: 72px 23px;
+  }
+}
+.rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
+  margin: 0 auto;
+  max-width: 1140px;
+}
+.rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+/* ---------- Header ---------- */
+.rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rbccm-strategic-themes__eyebrow.rbccm-strategic-themes__eyebrow--outlook-2027 {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  line-height: 16px;
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+.rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+  color: #003168 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 32px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  max-width: 640px;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+    font-size: 42px !important;
+  }
+}
+
+/* ---------- Numbered tabs: progress bar, number, short title ---------- */
+.rbccm-strategic-themes__tabs.rbccm-strategic-themes__tabs--outlook-2027 {
+  display: grid;
+  gap: 10px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  color: #5C6670;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 0 4px;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027:hover,
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027.rbccm-strategic-themes__tab--active {
+  color: #003168;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 4px;
+}
+.rbccm-strategic-themes__tab-bar.rbccm-strategic-themes__tab-bar--outlook-2027 {
+  background: rgba(0, 49, 104, 0.12);
+  border-radius: 2px;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+.rbccm-strategic-themes__tab-fill.rbccm-strategic-themes__tab-fill--outlook-2027 {
+  background: #FFC72C;
+  display: block;
+  height: 100%;
+  width: 0;
+}
+.rbccm-strategic-themes__tab-num.rbccm-strategic-themes__tab-num--outlook-2027 {
+  color: inherit;
+  display: block;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+}
+.rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+  color: inherit;
+  display: block;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 130%;
+  overflow-wrap: anywhere;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027.rbccm-strategic-themes__tab--active .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+  font-weight: 600;
+}
+/* Phones: bar and number only (the title stays for screen readers). */
+@media (max-width: 599.98px) {
+  .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+}
+
+/* ---------- Themes ---------- */
+.rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+.rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027::before {
+  content: none;               /* no site-wide list bullets */
+}
+.rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.rbccm-strategic-themes__count.rbccm-strategic-themes__count--outlook-2027 {
+  line-height: 1;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
+  color: #FFC72C;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes__count-total.rbccm-strategic-themes__count-total--outlook-2027 {
+  color: #9AA0AB;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+  color: #082043 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 26px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 115% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+    font-size: 32px !important;
+  }
+}
+.rbccm-strategic-themes__desc.rbccm-strategic-themes__desc--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 155%;
+  margin: 0;
+  max-width: 480px;
+}
+/* The description is a div so a pasted <p> doesn't nest inside a <p>. */
+.rbccm-strategic-themes__desc--outlook-2027 p {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+.rbccm-strategic-themes__desc--outlook-2027 p + p {
+  margin-top: 0.75em;
+}
+
+/* Button: blue pill. Same hover as the page's other buttons: a shine
+   sweeps across and the arrow flies out and back. */
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 {
+  align-items: center;
+  background: #0051A5;
+  border-radius: 100px;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  gap: 10px;
+  height: 44px;
+  isolation: isolate;
+  margin-top: 6px;
+  overflow: hidden;
+  padding: 0 28px;
+  position: relative;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible {
+  background: #003168;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #FFFFFF !important;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 3px;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  bottom: 0;
+  content: "";
+  left: -60%;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: skewX(-18deg);
+  width: 40%;
+  z-index: 0;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 > * {
+  position: relative;
+  z-index: 1;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover::before,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible::before {
+  animation: rbccm-themes-shine 600ms ease-out;
+}
+.rbccm-strategic-themes__button-label.rbccm-strategic-themes__button-label--outlook-2027 {
+  color: inherit;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+}
+.rbccm-strategic-themes__button-icon.rbccm-strategic-themes__button-icon--outlook-2027 {
+  color: inherit;
+  display: block;
+  flex: 0 0 auto;
+  height: 14px;
+  width: 14px;
+  will-change: transform, opacity;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover .rbccm-strategic-themes__button-icon--outlook-2027,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible .rbccm-strategic-themes__button-icon--outlook-2027 {
+  animation: rbccm-themes-arrow 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+}
+
+/* ---------- Picture: the drawn graphic, or an image ----------
+   The graphic's box is empty until the script draws into it, so it
+   takes no space without the script. */
+.rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  min-width: 0;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 {
+  aspect-ratio: 1;
+  container-type: inline-size;  /* lets the small labels scale with the box */
+  display: none;
+  position: relative;
+  width: 100%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--ready {
+  display: block;
+}
+.rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  aspect-ratio: 1;
+  border-radius: 20px;
+  display: block;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: cover;
+  width: 100% !important;
+}
+
+
+/* =========================================================================
+   State: no script - a plain numbered list
+   ========================================================================= */
+.rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  border-top: 1px solid rgba(0, 49, 104, 0.15);
+  display: grid;
+  gap: 24px;
+  padding-top: 28px;
+}
+.rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  max-width: 320px !important;
+}
+@media (min-width: 768px) {
+  .rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  }
+}
+
+
+/* =========================================================================
+   States with the script: one theme at a time
+   The themes share one grid cell, so the list is as tall as the tallest
+   theme and nothing jumps when the theme changes.
+   ========================================================================= */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+  display: grid;
+  gap: 0;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  grid-area: 1 / 1;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  opacity: 0;
+  visibility: hidden;          /* also takes its button out of the tab order */
+}
+/* The showing theme's text rises in, one line after another. */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > * {
+  animation: rbccm-themes-up 0.6s both;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(2) { animation-delay: 0.06s; }
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(3) { animation-delay: 0.12s; }
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(4) { animation-delay: 0.18s; }
+
+/* ---------- Tabs state: text, then the picture; side by side from 768 ---------- */
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr);
+}
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  visibility: hidden;
+}
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  margin: 0 auto;
+  max-width: 340px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    align-items: center;
+    gap: 48px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+    max-width: 460px;
+  }
+}
+
+/* ---------- Pinned state (desktop) ----------
+   The section is one screen tall per theme. The stage sticks under the
+   site header while the page scrolls through that height. Left: header,
+   tabs and the showing theme's text. Right: the pictures, which slide
+   sideways as the scroll moves from one theme to the next. */
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned {
+  height: calc(var(--rbccm-themes-count) * var(--rbccm-themes-stage));
+  padding: 0;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__stage.rbccm-strategic-themes__stage--outlook-2027 {
+  height: var(--rbccm-themes-stage);
+  overflow: hidden;
+  padding: clamp(24px, 6vh, 64px) 23px clamp(16px, 4vh, 40px);
+  position: sticky;
+  top: var(--rbccm-themes-offset);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: relative;          /* the pictures are placed against this */
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+  gap: clamp(16px, 3.6vh, 32px);
+  justify-content: center;
+  width: calc((100% - 64px) / 2.05);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+  gap: clamp(8px, 1.6vh, 16px);
+}
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+  font-size: clamp(30px, 5.5vh, 42px) !important;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  gap: clamp(10px, 2vh, 18px);
+  min-height: clamp(200px, 34vh, 300px);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
+  font-size: clamp(38px, 6.5vh, 50px);
+}
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+  font-size: clamp(26px, 4.4vh, 32px) !important;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  bottom: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc((100% - 64px) * 1.05 / 2.05);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  display: grid;
+  inset: 0;
+  opacity: 0.3;
+  place-items: center;
+  position: absolute;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  opacity: 1;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--shown) .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  visibility: hidden;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027,
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  min-width: 220px;
+  width: min(100%, calc(var(--rbccm-themes-stage) - 120px)) !important;
+}
+
+
+/* =========================================================================
+   The drawn graphics
+   Built by the script inside .rbccm-strategic-themes__graphic. Each
+   piece is placed in percentages of the square, so the graphic scales
+   with its box. Animations run only while the theme is --shown, and
+   start again each time it comes back.
+   ========================================================================= */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-svg {
+  display: block;
+  height: 100%;
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+  width: 100%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-caption {
+  bottom: 7%;
+  color: #003168;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: clamp(8px, 1.6vmin, 11px);
+  font-weight: 500;
+  gap: 2px 14px;
+  justify-content: center;
+  left: 0;
+  letter-spacing: 1.2px;
+  line-height: 130%;
+  padding: 0 8%;
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-fade {
+  animation: rbccm-themes-fade var(--t, 0.8s) var(--d, 0s) both;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-draw {
+  animation: rbccm-themes-draw var(--t, 1.6s) var(--d, 0s) var(--e, ease) both;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-pop {
+  animation: rbccm-themes-pop var(--t, 0.5s) var(--d, 0s) both;
+}
+
+/* ---- Defense: radar ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar {
+  border-radius: 13.1%;
+  height: 84%;
+  left: 8%;
+  overflow: hidden;
+  position: absolute;
+  top: 4%;
+  width: 84%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
+  background: conic-gradient(from 0deg, rgba(0, 81, 165, 0) 0deg, rgba(0, 81, 165, 0) 250deg, rgba(0, 81, 165, 0.08) 310deg, rgba(0, 81, 165, 0.32) 360deg);
+  inset: -21%;
+  position: absolute;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
+  animation: rbccm-themes-spin 4.5s linear infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-beam {
+  background: linear-gradient(180deg, rgba(0, 81, 165, 0), #0051A5 40%);
+  box-shadow: 0 0 6px rgba(0, 81, 165, 0.6);
+  height: 50%;
+  left: 50%;
+  margin-left: -1px;
+  position: absolute;
+  top: 0;
+  width: 2px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip {
+  position: absolute;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  border-radius: 50%;
+  inset: 0;
+  position: absolute;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-dot {
+  background: #FFC72C;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
+  box-shadow: 0 0 0 1.5px #FFC72C;
+  opacity: 0;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
+  animation: rbccm-themes-ring 4.5s var(--d, 0s) linear infinite;
+}
+
+/* ---- Minerals: element tiles ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tiles {
+  bottom: 19%;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  left: 11%;
+  position: absolute;
+  right: 11%;
+  top: 9%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(0, 49, 104, 0.15);
+  color: #003168;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
+  animation: rbccm-themes-highlight 6.3s var(--d, 0s) infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-num {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0.6;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-symbol {
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-name {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 1;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- AI: cell grid and value chain ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cells {
+  bottom: 40%;
+  display: grid;
+  gap: 7px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 10%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
+  background: rgba(0, 49, 104, 0.08);
+  border-radius: 5px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
+  animation: rbccm-themes-cell 2.8s var(--d, 0s) ease-in-out infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain {
+  background: rgba(0, 49, 104, 0.15);
+  height: 2px;
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 72%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-fill {
+  background: #0051A5;
+  inset: 0;
+  position: absolute;
+  transform-origin: left;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-fill {
+  animation: rbccm-themes-rule 1.4s 0.3s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
+  background: #FFC72C;
+  border-radius: 50%;
+  height: 10px;
+  left: 0;
+  margin-left: -5px;
+  position: absolute;
+  top: -4px;
+  width: 10px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
+  animation: rbccm-themes-travel 3.2s 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-nodes {
+  display: flex;
+  justify-content: space-between;
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 72%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 0;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node-dot {
+  background: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #003168;
+  flex: none;
+  height: 14px;
+  margin-top: -6px;
+  width: 14px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node-label {
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: clamp(8px, 1.4vmin, 10px);
+  font-size: clamp(7px, 2.1cqw, 10px);   /* four labels must fit side by side */
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 130%;
+  margin-top: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Energy: rising bar chart ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chart-title {
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  left: 10%;
+  letter-spacing: 1.4px;
+  line-height: 1;
+  position: absolute;
+  text-transform: uppercase;
+  top: 9%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bars {
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(0, 49, 104, 0.3);
+  bottom: 22%;
+  display: flex;
+  gap: 2.2%;
+  left: 10%;
+  position: absolute;
+  right: 10%;
+  top: 18%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bar {
+  border-radius: 5px 5px 0 0;
+  flex: 1;
+  transform-origin: bottom;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bar {
+  animation: rbccm-themes-rise 0.9s var(--d, 0s) cubic-bezier(0.3, 1.3, 0.5, 1) both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-curve {
+  height: 60%;
+  left: 10%;
+  overflow: visible;
+  position: absolute;
+  top: 18%;
+  width: 80%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak {
+  height: 12px;
+  left: 90%;
+  margin: -6px 0 0 -6px;
+  position: absolute;
+  top: 21.6%;
+  width: 12px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  box-shadow: 0 0 0 1.5px #FFC72C;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  animation: rbccm-themes-pulse 2.2s 3s infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--energy .rbccm-strategic-themes__gfx-caption {
+  bottom: 8%;
+}
+
+/* ---- Canada: maple leaf of dots ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  fill: #0051A5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot 4.8s var(--h, 0s) ease-in-out infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--canada .rbccm-strategic-themes__gfx-caption {
+  bottom: 3%;
+}
+
+
+/* =========================================================================
+   Keyframes
+   ========================================================================= */
+@keyframes rbccm-themes-up        { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes rbccm-themes-fade      { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rbccm-themes-draw      { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }
+@keyframes rbccm-themes-spin      { to { transform: rotate(360deg); } }
+@keyframes rbccm-themes-ring      { 0% { opacity: 0.9; transform: scale(1); } 55% { opacity: 0; transform: scale(2.6); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-pulse     { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-rise      { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes rbccm-themes-cell      { 0%, 100% { background: rgba(0, 49, 104, 0.08); } 45% { background: rgba(0, 81, 165, 0.9); } }
+@keyframes rbccm-themes-pop       { 0% { opacity: 0; transform: scale(0); } 70% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes rbccm-themes-rule      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes rbccm-themes-travel    { 0% { left: 0%; } 100% { left: 100%; } }
+@keyframes rbccm-themes-highlight { 0%, 14%, 100% { background: #FFFFFF; color: #003168; } 3%, 11% { background: #003168; color: #FFC72C; } }
+@keyframes rbccm-themes-dot       { 0%, 100% { fill: #0051A5; } 8% { fill: #FFC72C; } 20% { fill: #0051A5; } }
+@keyframes rbccm-themes-shine {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+@keyframes rbccm-themes-arrow {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(24px);  opacity: 0; }
+  46%  { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+/* Reduced motion: nothing moves. The graphics show in their finished
+   state and the tabs switch themes without animation. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-strategic-themes--outlook-2027 *,
+  .rbccm-strategic-themes--outlook-2027 *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==== rbccm-platforms/rbccm-platforms.css ==== */
+/* =========================================================================
+   RBCCM Platforms - shared component
+   Deploy path: /assets/rbccm/css/components/rbccm-platforms.css
+
+   Purpose
+   =========================================================================
+   Section header + 4-card grid (2x2 desktop, stacked mobile). Each card
+   is a navy tile with a thematic bg image (behind a subtle left-fade
+   gradient so title + body + gold "Explore" link stay legible over any
+   image). Whole card is an anchor -- entire tile is clickable.
+
+   Layout
+   =========================================================================
+   Section = flex column, gap 60 between the header block and the grid
+   block. Section padding 60/23 all breakpoints (bumps to 80/23 at 992).
+   Grid = 1 column mobile, 2 columns at >=768.
+
+   Photo hookup
+   =========================================================================
+   Each card gets a real <img class="rbccm-platforms__photo"> child.
+   Using an <img> element instead of a background gives us:
+     - real alt text for a11y (fed from the DAM Description)
+     - browser image loading semantics (lazy, priority, LCP)
+     - object-position control per card for focal framing
+   Per-card focal point overrides via inline style:
+     style="--rbccm-platforms-focal: 50% 50%"
+   For mobile/desktop asset swaps, wrap the <img> in a <picture>
+   with a <source media="(min-width: 992px)" srcset="...">.
+   Falls back to a light-gray fill on the card itself if the img is
+   missing / errors out.
+
+   Consumers
+   =========================================================================
+     Strategy and Economics - Platforms
+       .rbccm-platforms--strategy-and-economics-platforms
+   ========================================================================= */
+
+
+/* ---------- Base block --------------------------------------------------- */
+.rbccm-platforms {
+  --rbccm-platforms-navy:      #003168;
+  --rbccm-platforms-navy-deep: #002144;
+  --rbccm-platforms-gold:      #FFC72C;
+  --rbccm-platforms-white:     #FFFFFF;
+  --rbccm-platforms-gray:      #494949;
+  --rbccm-platforms-serif:     "RBC Display", RBCDisplay, Georgia, Times, serif;
+  --rbccm-platforms-sans:      Roboto, Arial, sans-serif;
+
+  --rbccm-platforms-bg-color:  transparent;
+
+  align-items: center;
+  background: var(--rbccm-platforms-bg-color);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 60px; /* between header block and grid block */
+  overflow: hidden;
+  padding: 60px 23px;
+  position: relative;
+  width: 100%;
+}
+.rbccm-platforms *,
+.rbccm-platforms *::before,
+.rbccm-platforms *::after { box-sizing: border-box; }
+
+/* Font-family lock on tag-pickable heading nodes. */
+.rbccm-platforms .rbccm-platforms__title,
+.rbccm-platforms .rbccm-platforms__card-title {
+  font-family: var(--rbccm-platforms-serif) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Tag-agnostic margin/padding reset on tag-pickable elements. */
+h1.rbccm-platforms__title, h2.rbccm-platforms__title,
+h3.rbccm-platforms__title, h4.rbccm-platforms__title,
+h5.rbccm-platforms__title, h6.rbccm-platforms__title,
+p.rbccm-platforms__title,  div.rbccm-platforms__title,
+h1.rbccm-platforms__subtitle, h2.rbccm-platforms__subtitle,
+h3.rbccm-platforms__subtitle, h4.rbccm-platforms__subtitle,
+h5.rbccm-platforms__subtitle, h6.rbccm-platforms__subtitle,
+p.rbccm-platforms__subtitle,  div.rbccm-platforms__subtitle,
+h1.rbccm-platforms__card-title, h2.rbccm-platforms__card-title,
+h3.rbccm-platforms__card-title, h4.rbccm-platforms__card-title,
+h5.rbccm-platforms__card-title, h6.rbccm-platforms__card-title,
+p.rbccm-platforms__card-title,  div.rbccm-platforms__card-title,
+h1.rbccm-platforms__card-body, h2.rbccm-platforms__card-body,
+h3.rbccm-platforms__card-body, h4.rbccm-platforms__card-body,
+h5.rbccm-platforms__card-body, h6.rbccm-platforms__card-body,
+p.rbccm-platforms__card-body,  div.rbccm-platforms__card-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+/* ---------- Container ---------------------------------------------------- */
+.rbccm-platforms__inner {
+  align-items: stretch;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 55px; /* header block -> grid block (mobile); desktop drops to 45 */
+  margin: 0 auto;
+  max-width: 1140px;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+
+/* ---------- Section header ---------------------------------------------- */
+.rbccm-platforms__header {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.rbccm-platforms .rbccm-platforms__title {
+  color: var(--rbccm-platforms-navy) !important;
+  font-family: var(--rbccm-platforms-serif) !important;
+  font-size: 36px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 120% !important; /* 43.2px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rbccm-platforms .rbccm-platforms__subtitle {
+  color: var(--rbccm-platforms-gray) !important;
+  font-family: var(--rbccm-platforms-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+/* ---------- Grid --------------------------------------------------------- */
+.rbccm-platforms__grid {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+
+/* ---------- Card --------------------------------------------------------- */
+/* Whole tile is an anchor. Layer stack (bottom to top):
+     1. solid navy fill    (background-color on .__card)
+     2. bg photo           (.__photo -- real <img>, object-fit cover,
+                            scales on hover)
+     3. content stack      (positioned relative + z-index 2)
+   Source images carry the navy fade in the pixels, so no gradient
+   overlay layer is needed. Card height fixed at 253 min (mobile),
+   200 min desktop. */
+.rbccm-platforms__card {
+  --rbccm-platforms-body-max-width: 340px; /* per-card override via inline style */
+
+  align-items: flex-start;
+  align-self: stretch;
+  /* No background-color: the source images carry the navy tone in
+     the pixels, so a solid fallback would flash a different navy
+     while the img loads. Card falls back to transparent. */
+  border: 1px solid rgba(0, 49, 104, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 1px 4px 0 rgba(25, 33, 61, 0.06);
+  color: var(--rbccm-platforms-white);
+  display: flex;
+  flex-direction: column;
+  height: auto; /* sizes to content -- 253 min floor below */
+  justify-content: space-between; /* content docks top, CTA docks bottom */
+  min-height: 253px;
+  overflow: hidden;
+  padding: 30px;
+  position: relative;
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+/* Real <img> layer -- pinned to fill the card, cropped to cover.
+   Author may override the focal point per card with
+   style="--rbccm-platforms-focal: 70% 50%".
+   Default focal is center center. */
+.rbccm-platforms__photo {
+  display: block;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: var(--rbccm-platforms-focal, 50% 50%);
+  position: absolute;
+  /* Rest state: 1.2x zoom-in anchored center-center so the tile art
+     reads at the intended visual weight regardless of card size.
+     Per-card override via --rbccm-platforms-scale. */
+  transform: scale(var(--rbccm-platforms-scale, 1.2));
+  transform-origin: center center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  z-index: 0;
+}
+
+/* Card content sits above the photo. Applies to the direct children
+   we render (content wrapper + CTA); the <img> is z-index 0. */
+.rbccm-platforms__card-content,
+.rbccm-platforms__card-cta {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hover / focus: lift card + scale photo. */
+.rbccm-platforms__card:hover,
+.rbccm-platforms__card:focus-visible {
+  color: var(--rbccm-platforms-white);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px 0 rgba(0, 33, 68, 0.25);
+}
+.rbccm-platforms__card:hover .rbccm-platforms__photo,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__photo {
+  /* Multiply base --scale by 1.04 so hover stays proportional
+     whether the rest scale is 1.2, 1.5, etc. */
+  transform: scale(calc(var(--rbccm-platforms-scale, 1.2) * 1.04));
+}
+.rbccm-platforms__card:focus-visible {
+  /* Navy (10.6:1 on the S+E section bg) instead of gold (1.36:1)
+     so the ring passes WCAG 1.4.11 non-text contrast. */
+  outline: 2px solid var(--rbccm-platforms-navy);
+  outline-offset: 3px;
+}
+
+
+/* ---------- Card content ------------------------------------------------ */
+/* Content wrapper -- flex column, gap 16 between h3 and body, grows to
+   push the CTA row to the bottom via flex: 1 0 0. */
+.rbccm-platforms__card-content {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.rbccm-platforms__card-title {
+  color: var(--rbccm-platforms-white) !important;
+  font-family: var(--rbccm-platforms-serif) !important;
+  font-feature-settings: 'ss01' on !important;
+  font-size: 30px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 110% !important; /* 33px */
+  margin: 0 !important;
+  max-width: 100%; /* headline can span the full card width */
+  padding: 0 !important;
+}
+
+.rbccm-platforms__card-body {
+  color: var(--rbccm-platforms-white) !important;
+  font-family: var(--rbccm-platforms-sans) !important;
+  font-feature-settings: 'liga' off, 'clig' off !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 150% !important; /* 24px */
+  margin: 0 !important;
+  /* Body flows full card width on mobile (cards stack full-width so
+     there's no right-side photo overlap risk). The per-card
+     max-width via --rbccm-platforms-body-max-width kicks in at 768+
+     when the 2-column grid starts and the photo pane returns. */
+  max-width: 100%;
+  padding: 0 !important;
+}
+
+
+/* ---------- Explore CTA ------------------------------------------------- */
+/* Visual cue only -- whole card is the anchor. Underline is off at
+   rest and appears on card hover / focus-within (see hover rule
+   below the arrow-flyby block).
+
+   `margin-top: auto` explicitly pins the CTA to the bottom of the
+   card's flex column regardless of how tall the content wrapper
+   above is. Belt-and-suspenders with the card's own
+   `justify-content: space-between`, so the CTA still docks bottom
+   if the wrapper's height changes or if extra siblings are added. */
+.rbccm-platforms__card-cta {
+  align-items: center;
+  color: var(--rbccm-platforms-gold);
+  display: inline-flex;
+  font-family: var(--rbccm-platforms-sans);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  gap: 10px;
+  justify-content: center;
+  /* Line-height tightened to 1 so the glyph fills the span box with
+     no half-leading above/below. The old 29.26 (from the Figma
+     Roboto spec) was leaving ~6.6px of empty space below the text
+     which pushed the visible bottom of "Explore" off the card's
+     bottom padding line. */
+  line-height: 1;
+  margin-top: auto;
+  /* Soft-fade underline -- same pattern as the ITM card-title / "See
+     all" links, the leading-experts CTAs, and the S&E hero Read more:
+     text-decoration always present in the layout but starts invisible
+     (transparent color + 0 thickness) and fades to currentColor + auto
+     thickness over 250ms when the parent card is hovered / focused. */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0;
+  text-decoration-skip-ink: auto;
+  text-decoration-style: solid;
+  text-underline-offset: 3px;
+  text-underline-position: from-font;
+  transition:
+    text-decoration-color 250ms ease,
+    text-decoration-thickness 250ms ease;
+}
+/* Underline the CTA text (not the arrow) when the whole card is
+   hovered or receives keyboard focus. Scoped to the inner text
+   span so the arrow SVG stays clean. */
+.rbccm-platforms__card:hover .rbccm-platforms__card-cta,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+}
+.rbccm-platforms__card-cta svg {
+  aspect-ratio: 1 / 1;
+  color: currentColor;
+  flex-shrink: 0;
+  height: 16px;
+  width: 16px;
+}
+/* Arrow right-bounce on hover / keyboard focus. Same 450ms translateX
+   nudge as the S&E hero's Read more, the accordion Read more, and the
+   leading-experts CTA arrows -- softer than the old fly-by that ran
+   the arrow off-screen and re-entered from the left. Unique keyframe
+   name keeps the platforms component independently deployable. */
+.rbccm-platforms__card:hover .rbccm-platforms__card-cta svg,
+.rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta svg {
+  animation: rbccm-plat-arrow-bounce 450ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rbccm-plat-arrow-bounce {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* -------- Tablet+ (>=768) : 2-column grid ------------------------------- */
+@media (min-width: 768px) {
+  .rbccm-platforms__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+
+/* -------- Desktop (>=992) ----------------------------------------------- */
+@media (min-width: 992px) {
+  .rbccm-platforms {
+    padding: 80px 23px;
+  }
+  .rbccm-platforms__inner {
+    gap: 45px;
+  }
+  .rbccm-platforms .rbccm-platforms__title {
+    font-size: 42px !important;
+    line-height: 125% !important; /* 52.5px */
+  }
+  /* Desktop card: 200px min-height floor (down from the mobile 253). */
+  .rbccm-platforms__card {
+    min-height: 200px;
+  }
+  /* Per-card body cap. Value pulled from the card's own
+     --rbccm-platforms-body-max-width custom prop (set inline per
+     card in the markup), so each of the 4 cards can have its own
+     cap (e.g. 340 / 274 / 295 / 274). Kicks in at desktop only --
+     mobile leaves body full-width since cards stack. */
+  .rbccm-platforms__card-body {
+    max-width: var(--rbccm-platforms-body-max-width);
+  }
+  /* Tighten the title -> body gap inside each card at desktop. */
+  .rbccm-platforms__card-content {
+    gap: 2px;
+  }
+}
+
+
+/* =========================================================================
+   Variant: Strategy and Economics - Platforms
+   Pale bg (#E7EEF1). Header alignment is now driven by the shared
+   HeaderAlignment Datum (see --header-center modifier below), so this
+   variant no longer hard-codes center on the header. Editors flip the
+   Datum to opt into center. Reuses the base's --rbccm-platforms-bg-color
+   custom property so the bg swap stays in one place.
+   ========================================================================= */
+.rbccm-platforms--strategy-and-economics-platforms {
+  --rbccm-platforms-bg-color: #E7EEF1;
+}
+
+
+/* =========================================================================
+   Header alignment modifier -- editor-toggleable via HeaderAlignment
+   Datum. Base is flex-start (left); --header-center centers the
+   header block (title + subtitle). Subtitle keeps its 720px max-width
+   from the base and centers within it via margin auto.
+   ========================================================================= */
+.rbccm-platforms--header-center .rbccm-platforms__header {
+  align-items: center;
+  text-align: center;
+}
+.rbccm-platforms--header-center .rbccm-platforms__title,
+.rbccm-platforms--header-center .rbccm-platforms__subtitle {
+  text-align: center !important;
+}
+.rbccm-platforms--header-center .rbccm-platforms__subtitle {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* =========================================================================
+   Reduced motion -- kill card lift + photo scale + arrow fly-by.
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-platforms__card,
+  .rbccm-platforms__photo,
+  .rbccm-platforms__card-cta {
+    transition: none !important;
+  }
+  .rbccm-platforms__card:hover,
+  .rbccm-platforms__card:focus-visible {
+    transform: none !important;
+  }
+  .rbccm-platforms__card:hover .rbccm-platforms__photo,
+  .rbccm-platforms__card:focus-visible .rbccm-platforms__photo {
+    /* Keep rest-state scale on hover so the photo doesn't jump for
+       motion-sensitive users. */
+    transform: scale(var(--rbccm-platforms-scale, 1.2)) !important;
+  }
+  .rbccm-platforms__card:hover .rbccm-platforms__card-cta svg,
+  .rbccm-platforms__card:focus-visible .rbccm-platforms__card-cta svg {
+    animation: none !important;
+  }
+}
+
+/* ==== rbccm-marketo-footer/rbccm-marketo-footer.css ==== */
+/* =========================================================================
+   RBCCM Marketo Footer
+   Deploy path: /assets/rbccm/css/components/rbccm-marketo-footer.css
+   =========================================================================
+   "Stay informed" band: heading + subheading + embedded Marketo form.
+   This file styles the section and the header only. The form renders
+   as Marketo outputs it (fields, consent checkbox, button, and their
+   styling come from the Marketo form/theme).
+
+   Header spec (mobile, Figma):
+     wrapper   flex column, gap 16px (Figma frame 315px wide)
+     heading   RBC Display 500, 24px / 28px, letter-spacing -0.789px, #003168
+     subhead   Roboto 300, 16px / 120%, #003168
+   ========================================================================= */
+
+.rbccm-marketo-footer {
+  background: var(--rbccm-marketo-footer-bg, #E7EEF1);
+  box-sizing: border-box;
+  padding: 50px 23px 30px 23px;
+  width: 100%;
+}
+.rbccm-marketo-footer *,
+.rbccm-marketo-footer *::before,
+.rbccm-marketo-footer *::after { box-sizing: border-box; }
+
+.rbccm-marketo-footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;                 /* header -> form (36px at 992+) */
+  margin: 0 auto;
+  max-width: 1140px;
+  width: 100%;
+}
+
+/* ---- Header ------------------------------------------------------------ */
+.rbccm-marketo-footer__header {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Tag-level resets win over site h2/p rules (margins, fonts). */
+.rbccm-marketo-footer h2.rbccm-marketo-footer__heading {
+  color: var(--Blue-Dark-Blue, #003168) !important;
+  font-family: "RBC Display", RBCDisplay, Georgia, serif !important;
+  font-size: 24px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.789px !important;
+  line-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rbccm-marketo-footer p.rbccm-marketo-footer__subheading {
+  color: var(--Blue-Dark-Blue, #003168) !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 300 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Desktop (992+) header spec (Figma):
+     heading   RBC Display 500, 32px / normal, letter-spacing -0.789px, #002750
+     subhead   Roboto 400, 18px / 23px, #002144 */
+@media (min-width: 992px) {
+  .rbccm-marketo-footer {
+    padding: 50px 23px;
+  }
+  .rbccm-marketo-footer__inner {
+    gap: 36px;
+  }
+  .rbccm-marketo-footer__header {
+    gap: 20px;
+  }
+  .rbccm-marketo-footer h2.rbccm-marketo-footer__heading {
+    color: #002750 !important;
+    font-size: 32px !important;
+    line-height: normal !important;
+  }
+  .rbccm-marketo-footer p.rbccm-marketo-footer__subheading {
+    color: #002144 !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    line-height: 23px !important;
+  }
+}
+
+/* ---- Form slot ----------------------------------------------------------
+   No styling of Marketo's markup. Just keep the slot full width. */
+.rbccm-marketo-footer__form {
+  width: 100%;
+}

@@ -1,0 +1,853 @@
+/* =========================================================================
+   RBCCM Strategic Themes
+   Deploy path: /assets/rbccm/css/components/rbccm-strategic-themes.css
+   =========================================================================
+   An eyebrow and heading, then up to five themes. Each theme: its
+   number, title, description, a button and a graphic.
+
+   Variants (one skin each)
+     .rbccm-strategic-themes--outlook-2027
+       2027 Outlook "Strategic themes".
+
+   Three states, set by rbccm-strategic-themes.js on the section:
+     (no class)   No script: every theme in a plain numbered list.
+     --enhanced --tabs
+                  One theme at a time; the numbered tabs switch it.
+                  Phones, tablets, short windows, reduced motion.
+     --enhanced --pinned
+                  Desktop: the section is as tall as one screen per
+                  theme, the stage sticks to the top, and scrolling
+                  steps through the themes.
+   And on each theme: --active (the one showing) and --shown (its
+   graphic is on screen, so its animation runs).
+
+   Every element the skin prints carries the variant modifier. The parts
+   of the drawn graphics (__gfx-*) are added by the script and are styled
+   under the graphic's own variant class. Sizes follow the team's page
+   preview until the CSS spec arrives. Global content width 1140, 23px
+   gutter.
+
+   Type uses !important where site-wide rules (tag-level h2/h3/p styles
+   and the global Roboto rule) would otherwise win, same as the other
+   components.
+   ========================================================================= */
+
+.rbccm-strategic-themes {
+  box-sizing: border-box;
+  width: 100%;
+}
+.rbccm-strategic-themes *,
+.rbccm-strategic-themes *::before,
+.rbccm-strategic-themes *::after {
+  box-sizing: border-box;
+}
+.rbccm-strategic-themes [hidden] {
+  display: none !important;
+}
+
+
+/* =========================================================================
+   Variant: Outlook 2027 - shared by all three states
+   ========================================================================= */
+.rbccm-strategic-themes--outlook-2027 {
+  --rbccm-themes-offset: 0px;  /* fixed site header height; set by the script */
+  --rbccm-themes-stage: calc(100vh - var(--rbccm-themes-offset));
+  background: #F1F5FB;
+  padding: 40px 23px;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 {
+    padding: 72px 23px;
+  }
+}
+.rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
+  margin: 0 auto;
+  max-width: 1140px;
+}
+.rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+/* ---------- Header ---------- */
+.rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rbccm-strategic-themes__eyebrow.rbccm-strategic-themes__eyebrow--outlook-2027 {
+  color: #0051A5;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  line-height: 16px;
+  margin: 0 !important;
+  text-transform: uppercase;
+}
+.rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+  color: #003168 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 32px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 120% !important;
+  margin: 0 !important;
+  max-width: 640px;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+    font-size: 42px !important;
+  }
+}
+
+/* ---------- Numbered tabs: progress bar, number, short title ---------- */
+.rbccm-strategic-themes__tabs.rbccm-strategic-themes__tabs--outlook-2027 {
+  display: grid;
+  gap: 10px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  color: #5C6670;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 0 4px;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027:hover,
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027.rbccm-strategic-themes__tab--active {
+  color: #003168;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 4px;
+}
+.rbccm-strategic-themes__tab-bar.rbccm-strategic-themes__tab-bar--outlook-2027 {
+  background: rgba(0, 49, 104, 0.12);
+  border-radius: 2px;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+.rbccm-strategic-themes__tab-fill.rbccm-strategic-themes__tab-fill--outlook-2027 {
+  background: #FFC72C;
+  display: block;
+  height: 100%;
+  width: 0;
+}
+.rbccm-strategic-themes__tab-num.rbccm-strategic-themes__tab-num--outlook-2027 {
+  color: inherit;
+  display: block;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 120%;
+}
+.rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+  color: inherit;
+  display: block;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 130%;
+  overflow-wrap: anywhere;
+}
+.rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027.rbccm-strategic-themes__tab--active .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+  font-weight: 600;
+}
+/* Phones: bar and number only (the title stays for screen readers). */
+@media (max-width: 599.98px) {
+  .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+}
+
+/* ---------- Themes ---------- */
+.rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+.rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027::before {
+  content: none;               /* no site-wide list bullets */
+}
+.rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.rbccm-strategic-themes__count.rbccm-strategic-themes__count--outlook-2027 {
+  line-height: 1;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
+  color: #FFC72C;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes__count-total.rbccm-strategic-themes__count-total--outlook-2027 {
+  color: #9AA0AB;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+  color: #082043 !important;
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif !important;
+  font-size: 26px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 115% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-transform: none !important;
+}
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+    font-size: 32px !important;
+  }
+}
+.rbccm-strategic-themes__desc.rbccm-strategic-themes__desc--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 155%;
+  margin: 0;
+  max-width: 480px;
+}
+/* The description is a div so a pasted <p> doesn't nest inside a <p>. */
+.rbccm-strategic-themes__desc--outlook-2027 p {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+.rbccm-strategic-themes__desc--outlook-2027 p + p {
+  margin-top: 0.75em;
+}
+
+/* Button: blue pill. Same hover as the page's other buttons: a shine
+   sweeps across and the arrow flies out and back. */
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 {
+  align-items: center;
+  background: #0051A5;
+  border-radius: 100px;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  gap: 10px;
+  height: 44px;
+  isolation: isolate;
+  margin-top: 6px;
+  overflow: hidden;
+  padding: 0 28px;
+  position: relative;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible {
+  background: #003168;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: #FFFFFF !important;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 3px;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  bottom: 0;
+  content: "";
+  left: -60%;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: skewX(-18deg);
+  width: 40%;
+  z-index: 0;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 > * {
+  position: relative;
+  z-index: 1;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover::before,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible::before {
+  animation: rbccm-themes-shine 600ms ease-out;
+}
+.rbccm-strategic-themes__button-label.rbccm-strategic-themes__button-label--outlook-2027 {
+  color: inherit;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+}
+.rbccm-strategic-themes__button-icon.rbccm-strategic-themes__button-icon--outlook-2027 {
+  color: inherit;
+  display: block;
+  flex: 0 0 auto;
+  height: 14px;
+  width: 14px;
+  will-change: transform, opacity;
+}
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:hover .rbccm-strategic-themes__button-icon--outlook-2027,
+.rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027:focus-visible .rbccm-strategic-themes__button-icon--outlook-2027 {
+  animation: rbccm-themes-arrow 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
+}
+
+/* ---------- Picture: the drawn graphic, or an image ----------
+   The graphic's box is empty until the script draws into it, so it
+   takes no space without the script. */
+.rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  min-width: 0;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 {
+  aspect-ratio: 1;
+  container-type: inline-size;  /* lets the small labels scale with the box */
+  display: none;
+  position: relative;
+  width: 100%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--ready {
+  display: block;
+}
+.rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  aspect-ratio: 1;
+  border-radius: 20px;
+  display: block;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: cover;
+  width: 100% !important;
+}
+
+
+/* =========================================================================
+   State: no script - a plain numbered list
+   ========================================================================= */
+.rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  border-top: 1px solid rgba(0, 49, 104, 0.15);
+  display: grid;
+  gap: 24px;
+  padding-top: 28px;
+}
+.rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  max-width: 320px !important;
+}
+@media (min-width: 768px) {
+  .rbccm-strategic-themes--outlook-2027:not(.rbccm-strategic-themes--enhanced) .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  }
+}
+
+
+/* =========================================================================
+   States with the script: one theme at a time
+   The themes share one grid cell, so the list is as tall as the tallest
+   theme and nothing jumps when the theme changes.
+   ========================================================================= */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+  display: grid;
+  gap: 0;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  grid-area: 1 / 1;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  opacity: 0;
+  visibility: hidden;          /* also takes its button out of the tab order */
+}
+/* The showing theme's text rises in, one line after another. */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > * {
+  animation: rbccm-themes-up 0.6s both;
+}
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(2) { animation-delay: 0.06s; }
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(3) { animation-delay: 0.12s; }
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > :nth-child(4) { animation-delay: 0.18s; }
+
+/* ---------- Tabs state: text, then the picture; side by side from 768 ---------- */
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr);
+}
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  visibility: hidden;
+}
+.rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  margin: 0 auto;
+  max-width: 340px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    align-items: center;
+    gap: 48px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+    max-width: 460px;
+  }
+}
+
+/* ---------- Pinned state (desktop) ----------
+   The section is one screen tall per theme. The stage sticks under the
+   site header while the page scrolls through that height. Left: header,
+   tabs and the showing theme's text. Right: the pictures, which slide
+   sideways as the scroll moves from one theme to the next. */
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned {
+  height: calc(var(--rbccm-themes-count) * var(--rbccm-themes-stage));
+  padding: 0;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__stage.rbccm-strategic-themes__stage--outlook-2027 {
+  height: var(--rbccm-themes-stage);
+  overflow: hidden;
+  padding: clamp(24px, 6vh, 64px) 23px clamp(16px, 4vh, 40px);
+  position: sticky;
+  top: var(--rbccm-themes-offset);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: relative;          /* the pictures are placed against this */
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+  gap: clamp(16px, 3.6vh, 32px);
+  justify-content: center;
+  width: calc((100% - 64px) / 2.05);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+  gap: clamp(8px, 1.6vh, 16px);
+}
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+  font-size: clamp(30px, 5.5vh, 42px) !important;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+  gap: clamp(10px, 2vh, 18px);
+  min-height: clamp(200px, 34vh, 300px);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
+  font-size: clamp(38px, 6.5vh, 50px);
+}
+.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+  font-size: clamp(26px, 4.4vh, 32px) !important;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+  bottom: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc((100% - 64px) * 1.05 / 2.05);
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  display: grid;
+  inset: 0;
+  opacity: 0.3;
+  place-items: center;
+  position: absolute;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  opacity: 1;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--shown) .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+  visibility: hidden;
+}
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027,
+.rbccm-strategic-themes--pinned .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+  min-width: 220px;
+  width: min(100%, calc(var(--rbccm-themes-stage) - 120px)) !important;
+}
+
+
+/* =========================================================================
+   The drawn graphics
+   Built by the script inside .rbccm-strategic-themes__graphic. Each
+   piece is placed in percentages of the square, so the graphic scales
+   with its box. Animations run only while the theme is --shown, and
+   start again each time it comes back.
+   ========================================================================= */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-svg {
+  display: block;
+  height: 100%;
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+  width: 100%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-caption {
+  bottom: 7%;
+  color: #003168;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: clamp(8px, 1.6vmin, 11px);
+  font-weight: 500;
+  gap: 2px 14px;
+  justify-content: center;
+  left: 0;
+  letter-spacing: 1.2px;
+  line-height: 130%;
+  padding: 0 8%;
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-fade {
+  animation: rbccm-themes-fade var(--t, 0.8s) var(--d, 0s) both;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-draw {
+  animation: rbccm-themes-draw var(--t, 1.6s) var(--d, 0s) var(--e, ease) both;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-pop {
+  animation: rbccm-themes-pop var(--t, 0.5s) var(--d, 0s) both;
+}
+
+/* ---- Defense: radar ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar {
+  border-radius: 13.1%;
+  height: 84%;
+  left: 8%;
+  overflow: hidden;
+  position: absolute;
+  top: 4%;
+  width: 84%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
+  background: conic-gradient(from 0deg, rgba(0, 81, 165, 0) 0deg, rgba(0, 81, 165, 0) 250deg, rgba(0, 81, 165, 0.08) 310deg, rgba(0, 81, 165, 0.32) 360deg);
+  inset: -21%;
+  position: absolute;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
+  animation: rbccm-themes-spin 4.5s linear infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-beam {
+  background: linear-gradient(180deg, rgba(0, 81, 165, 0), #0051A5 40%);
+  box-shadow: 0 0 6px rgba(0, 81, 165, 0.6);
+  height: 50%;
+  left: 50%;
+  margin-left: -1px;
+  position: absolute;
+  top: 0;
+  width: 2px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip {
+  position: absolute;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  border-radius: 50%;
+  inset: 0;
+  position: absolute;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-dot,
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-dot {
+  background: #FFC72C;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
+  box-shadow: 0 0 0 1.5px #FFC72C;
+  opacity: 0;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
+  animation: rbccm-themes-ring 4.5s var(--d, 0s) linear infinite;
+}
+
+/* ---- Minerals: element tiles ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tiles {
+  bottom: 19%;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  left: 11%;
+  position: absolute;
+  right: 11%;
+  top: 9%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(0, 49, 104, 0.15);
+  color: #003168;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
+  animation: rbccm-themes-highlight 6.3s var(--d, 0s) infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-num {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0.6;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-symbol {
+  font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 500;
+  line-height: 1;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-name {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 1;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- AI: cell grid and value chain ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cells {
+  bottom: 40%;
+  display: grid;
+  gap: 7px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 10%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
+  background: rgba(0, 49, 104, 0.08);
+  border-radius: 5px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
+  animation: rbccm-themes-cell 2.8s var(--d, 0s) ease-in-out infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain {
+  background: rgba(0, 49, 104, 0.15);
+  height: 2px;
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 72%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-fill {
+  background: #0051A5;
+  inset: 0;
+  position: absolute;
+  transform-origin: left;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-fill {
+  animation: rbccm-themes-rule 1.4s 0.3s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
+  background: #FFC72C;
+  border-radius: 50%;
+  height: 10px;
+  left: 0;
+  margin-left: -5px;
+  position: absolute;
+  top: -4px;
+  width: 10px;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
+  animation: rbccm-themes-travel 3.2s 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-nodes {
+  display: flex;
+  justify-content: space-between;
+  left: 12%;
+  position: absolute;
+  right: 12%;
+  top: 72%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 0;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node-dot {
+  background: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #003168;
+  flex: none;
+  height: 14px;
+  margin-top: -6px;
+  width: 14px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-node-label {
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: clamp(8px, 1.4vmin, 10px);
+  font-size: clamp(7px, 2.1cqw, 10px);   /* four labels must fit side by side */
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 130%;
+  margin-top: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Energy: rising bar chart ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chart-title {
+  color: #003168;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  left: 10%;
+  letter-spacing: 1.4px;
+  line-height: 1;
+  position: absolute;
+  text-transform: uppercase;
+  top: 9%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bars {
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(0, 49, 104, 0.3);
+  bottom: 22%;
+  display: flex;
+  gap: 2.2%;
+  left: 10%;
+  position: absolute;
+  right: 10%;
+  top: 18%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bar {
+  border-radius: 5px 5px 0 0;
+  flex: 1;
+  transform-origin: bottom;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-bar {
+  animation: rbccm-themes-rise 0.9s var(--d, 0s) cubic-bezier(0.3, 1.3, 0.5, 1) both;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-curve {
+  height: 60%;
+  left: 10%;
+  overflow: visible;
+  position: absolute;
+  top: 18%;
+  width: 80%;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak {
+  height: 12px;
+  left: 90%;
+  margin: -6px 0 0 -6px;
+  position: absolute;
+  top: 21.6%;
+  width: 12px;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  box-shadow: 0 0 0 1.5px #FFC72C;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  animation: rbccm-themes-pulse 2.2s 3s infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--energy .rbccm-strategic-themes__gfx-caption {
+  bottom: 8%;
+}
+
+/* ---- Canada: maple leaf of dots ---- */
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  fill: #0051A5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot 4.8s var(--h, 0s) ease-in-out infinite;
+}
+.rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--canada .rbccm-strategic-themes__gfx-caption {
+  bottom: 3%;
+}
+
+
+/* =========================================================================
+   Keyframes
+   ========================================================================= */
+@keyframes rbccm-themes-up        { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes rbccm-themes-fade      { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rbccm-themes-draw      { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }
+@keyframes rbccm-themes-spin      { to { transform: rotate(360deg); } }
+@keyframes rbccm-themes-ring      { 0% { opacity: 0.9; transform: scale(1); } 55% { opacity: 0; transform: scale(2.6); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-pulse     { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-rise      { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes rbccm-themes-cell      { 0%, 100% { background: rgba(0, 49, 104, 0.08); } 45% { background: rgba(0, 81, 165, 0.9); } }
+@keyframes rbccm-themes-pop       { 0% { opacity: 0; transform: scale(0); } 70% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes rbccm-themes-rule      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes rbccm-themes-travel    { 0% { left: 0%; } 100% { left: 100%; } }
+@keyframes rbccm-themes-highlight { 0%, 14%, 100% { background: #FFFFFF; color: #003168; } 3%, 11% { background: #003168; color: #FFC72C; } }
+@keyframes rbccm-themes-dot       { 0%, 100% { fill: #0051A5; } 8% { fill: #FFC72C; } 20% { fill: #0051A5; } }
+@keyframes rbccm-themes-shine {
+  0%   { left: -60%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+@keyframes rbccm-themes-arrow {
+  0%   { transform: translateX(0);     opacity: 1; }
+  45%  { transform: translateX(24px);  opacity: 0; }
+  46%  { transform: translateX(-24px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 1; }
+}
+
+/* Reduced motion: nothing moves. The graphics show in their finished
+   state and the tabs switch themes without animation. */
+@media (prefers-reduced-motion: reduce) {
+  .rbccm-strategic-themes--outlook-2027 *,
+  .rbccm-strategic-themes--outlook-2027 *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
