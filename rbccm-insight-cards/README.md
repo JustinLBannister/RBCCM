@@ -31,7 +31,7 @@ A section of hand-picked story cards under a heading, with a share button on eac
 
 - It does not pull the latest stories by itself. Stories are picked or typed; the order on the page is the order of the fields.
 - It shows five stories at most and has no carousel or paging.
-- The pill, category, filter label and speaker are never filled from the picked story. They are always typed.
+- The pill, category and filter label are never filled from the picked story. They are always typed. The name and role on the image are typed too, except on the featured story (Story 1 in the Featured layout), where a picked story fills them with its first author and that author's title and company.
 - A picked story supplies: the title (the story's short tile title if it has one, else its headline), the image (its thumbnail), the link (the story's own address), the type (text, audio or video), the meta line (the first author's name, when the story has several), the date (its publish date; a story still dated 0000-00-00 shows no date) and the action label ("Read", "Listen" or "Watch" plus the story's read or watch time, for example "Read &#183; 5 min").
 - Which wins is one setting for the section ("When a story is picked"). By default the picked story wins: the typed fields show when no story is picked, and fill in any piece the story does not have. Clear sample text from the typed fields once real stories are picked, so a sample author or date cannot appear on a story that has none. The other choice lets a typed field replace the story's.
 - On the smaller cards a summary only shows when it is typed. The featured story also uses the picked story's summary.
@@ -65,7 +65,8 @@ All stories are printed into the page by the skin, so they are present in the pa
 - The header button needs both a label and a link. So does the notification strip button.
 - A story with no title, typed or picked, is hidden completely. The stories that are left set the layout.
 - No image, typed or picked: the story shows a navy block with the "no image" label. With that label blank it is a plain navy block.
-- Type "None": no icon on the image. A blank action label then reads "Read".
+- Type "None": no icon on the image, even when a picked story has a type of its own. The picked story's type still sets the action label (Read, Listen or Watch); with no picked story a blank action label reads "Read".
+- Featured story with a picked story: the author's name moves onto the image, so the meta line under the summary shows only the date.
 - No link, typed or picked: the action link is hidden. The share button still shows and shares the page the visitor is on. A link of "#" is treated the same way when sharing.
 - A role typed without a name does not show.
 - Notification strip: hidden when both of its text fields are blank.
@@ -176,7 +177,7 @@ Action link          (share)
 - **Type** sets the icon on the image and the default action label: Article (book, "Read"), Podcast (headphones, "Listen"), Video (play, "Watch"). None shows no icon.
 - **Action link**: in a column card the whole card is the click target. Screen readers hear the action with the story's title ("Read: Global economic outlook").
 - **No image**: the story shows a navy block with the "no image" label (for example RBC Capital Markets Research), so the columns stay level.
-- **Name and role** can be placed over the image (the featured story's speaker).
+- **Name and role** can be placed over the image (the featured story's speaker). On the featured story a picked story fills them from its first author: the name, then "title, company" (the company is left off when the title already includes it).
 
 ---
 
@@ -242,7 +243,7 @@ An optional blue strip under the stories with a small heading, a line of text an
 | `Item{N}Link` | Blank uses the picked story's link. No link hides the action link. The share popup shares the same address. |
 | `Item{N}ActionLabel` | e.g. Read &#183; 5 min read. Blank shows Read, Listen or Watch by type, plus the picked story's read or watch time. |
 | `Item{N}Filter` | Filter label used by the filter pills, e.g. Research. |
-| `Item{N}SpeakerName`, `Item{N}SpeakerRole` | Optional name and role shown over the image. |
+| `Item{N}SpeakerName`, `Item{N}SpeakerRole` | Optional name and role shown over the image. On the featured story a picked story fills them from its first author (`author_name_new`, `author_title_new`, `author_company_new`). |
 | `NotifyEyebrow`, `NotifyText` | Notification strip text. Both blank hides the strip. |
 | `NotifyButtonLabel`, `NotifyLink` | Notification strip button. Needs both. |
 

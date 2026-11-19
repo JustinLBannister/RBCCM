@@ -61,6 +61,27 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- A typed label with a middle dot in it, e.g. "Read (dot) 5 min
+       read". TeamSite hands the dot's character code over as plain
+       text (the five characters and-hash-1-8-3 plus the semicolon), so
+       it would print as code. Each one is turned back into the dot. -->
+  <xsl:template name="rbccmDot">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&amp;#183;')">
+        <xsl:value-of select="substring-before($s, '&amp;#183;')"/>
+        <xsl:text>&#183;</xsl:text>
+        <xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="substring-after($s, '&amp;#183;')"/></xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($s, '&amp;middot;')">
+        <xsl:value-of select="substring-before($s, '&amp;middot;')"/>
+        <xsl:text>&#183;</xsl:text>
+        <xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="substring-after($s, '&amp;middot;')"/></xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Visible text of a rich-text field: tags stripped. Used to treat
        fields the editor left with only placeholder markup
        (<br data-mce-bogus="1">, <p>&nbsp;</p>) as blank. -->
@@ -528,6 +549,19 @@
     <xsl:variable name="HAS_STORY"   select="boolean($DCR/*)"/>
     <!-- The first author with a name (a story can carry several). -->
     <xsl:variable name="S_AUTHOR"    select="normalize-space(($DCR//author_name_new[normalize-space(.) != ''] | $DCR/*/author_name[normalize-space(.) != ''])[1])"/>
+    <!-- That author's title and company, for the name on the featured
+         story's image: "Chief Economist, RBC". The company is left off
+         when the title already says it. -->
+    <xsl:variable name="S_AUTHOR_AT"      select="($DCR//author[normalize-space(author_name_new) != ''])[1]"/>
+    <xsl:variable name="S_AUTHOR_TITLE"   select="normalize-space($S_AUTHOR_AT/author_title_new)"/>
+    <xsl:variable name="S_AUTHOR_COMPANY" select="normalize-space($S_AUTHOR_AT/author_company_new)"/>
+    <xsl:variable name="S_AUTHOR_ROLE">
+      <xsl:choose>
+        <xsl:when test="$S_AUTHOR_TITLE != '' and $S_AUTHOR_COMPANY != '' and not(contains($S_AUTHOR_TITLE, $S_AUTHOR_COMPANY))"><xsl:value-of select="concat($S_AUTHOR_TITLE, ', ', $S_AUTHOR_COMPANY)"/></xsl:when>
+        <xsl:when test="$S_AUTHOR_TITLE != ''"><xsl:value-of select="$S_AUTHOR_TITLE"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$S_AUTHOR_COMPANY"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="S_THUMB"     select="normalize-space($DCR/*/thumbnail)"/>
     <xsl:variable name="S_TYPE"      select="translate(normalize-space($DCR/*/story_type), $UPPER, $LOWER)"/>
     <xsl:variable name="S_DATE">
@@ -590,13 +624,38 @@
     <xsl:variable name="LINK_RAW"    select="normalize-space(//Datum[@ID=concat('Item', $n, 'Link')])"/>
     <xsl:variable name="ACTION_RAW"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'ActionLabel')])"/>
     <xsl:variable name="FILTER"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'Filter')])"/>
-    <xsl:variable name="SPEAKER"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerName')])"/>
-    <xsl:variable name="SPEAKER_ROLE" select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerRole')])"/>
+    <!-- Name and role on the image. Typed, or on the featured story
+         taken from the picked story's first author (which wins follows
+         the same story-first / typed-first setting as the other
+         fields). When the name comes from the story so does the role,
+         so the two always belong to the same person. -->
+    <xsl:variable name="SPEAKER_TYPED"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerName')])"/>
+    <xsl:variable name="SPEAKER_ROLE_TYPED" select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerRole')])"/>
+    <xsl:variable name="SPEAKER_FROM_STORY" select="$role = 'feature' and $S_AUTHOR != '' and ($STORY_FIRST or $SPEAKER_TYPED = '')"/>
+    <xsl:variable name="SPEAKER">
+      <xsl:choose>
+        <xsl:when test="$SPEAKER_FROM_STORY"><xsl:value-of select="$S_AUTHOR"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$SPEAKER_TYPED"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="SPEAKER_ROLE">
+      <xsl:choose>
+        <xsl:when test="$SPEAKER_FROM_STORY"><xsl:value-of select="$S_AUTHOR_ROLE"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$SPEAKER_ROLE_TYPED"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- The meta line under the summary leaves the author out when the
+         same name is already on the image. -->
+    <xsl:variable name="META_TEXT">
+      <xsl:if test="not(string($SPEAKER) != '' and string($SPEAKER) = string($META))"><xsl:value-of select="$META"/></xsl:if>
+    </xsl:variable>
 
     <xsl:variable name="TITLE"><xsl:call-template name="itemTitle"><xsl:with-param name="n" select="$n"/></xsl:call-template></xsl:variable>
 
     <!-- Type: video, podcast or article sets the icon on the image and
-         the default action label. Anything else: no icon. -->
+         the default action label. Anything else: no icon. Choosing
+         None always leaves the icon off, even when a picked story has
+         a type of its own (which still sets the action label). -->
     <xsl:variable name="TYPE_SRC">
       <xsl:choose>
         <xsl:when test="($STORY_FIRST and $S_TYPE != '') or $TYPE_RAW = '' or $TYPE_RAW = 'auto'"><xsl:value-of select="$S_TYPE"/></xsl:when>
@@ -657,7 +716,7 @@
     </xsl:variable>
     <xsl:variable name="ACTION">
       <xsl:choose>
-        <xsl:when test="$ACTION_RAW != '' and not($STORY_FIRST and $HAS_STORY)"><xsl:value-of select="$ACTION_RAW"/></xsl:when>
+        <xsl:when test="$ACTION_RAW != '' and not($STORY_FIRST and $HAS_STORY)"><xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="$ACTION_RAW"/></xsl:call-template></xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="$TYPE = 'video'">Watch</xsl:when>
@@ -717,15 +776,15 @@
             <xsl:if test="$BADGE != ''">
               <span class="rbccm-insight-cards__card-badge rbccm-insight-cards__card-badge--outlook-2027"><xsl:value-of select="$BADGE"/></span>
             </xsl:if>
-            <xsl:if test="$TYPE != 'none'">
+            <xsl:if test="$TYPE != 'none' and $TYPE_RAW != 'none'">
               <span class="rbccm-insight-cards__card-type rbccm-insight-cards__card-type--outlook-2027" aria-hidden="true">
                 <xsl:call-template name="iconType"><xsl:with-param name="type" select="$TYPE"/></xsl:call-template>
               </span>
             </xsl:if>
-            <xsl:if test="$SPEAKER != ''">
+            <xsl:if test="string($SPEAKER) != ''">
               <p class="rbccm-insight-cards__card-speaker rbccm-insight-cards__card-speaker--outlook-2027">
                 <span class="rbccm-insight-cards__card-speaker-name rbccm-insight-cards__card-speaker-name--outlook-2027"><xsl:value-of select="$SPEAKER"/></span>
-                <xsl:if test="$SPEAKER_ROLE != ''">
+                <xsl:if test="string($SPEAKER_ROLE) != ''">
                   <span class="rbccm-insight-cards__card-speaker-role rbccm-insight-cards__card-speaker-role--outlook-2027"><xsl:value-of select="$SPEAKER_ROLE"/></span>
                 </xsl:if>
               </p>
@@ -755,11 +814,11 @@
               <xsl:if test="$HAS_SUMMARY">
                 <div class="rbccm-insight-cards__card-summary rbccm-insight-cards__card-summary--outlook-2027"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SUMMARY"/></xsl:call-template></div>
               </xsl:if>
-              <xsl:if test="string($META) != '' or $DATE_OK">
+              <xsl:if test="string($META_TEXT) != '' or $DATE_OK">
                 <p class="rbccm-insight-cards__card-meta rbccm-insight-cards__card-meta--outlook-2027">
-                  <xsl:value-of select="$META"/>
+                  <xsl:value-of select="$META_TEXT"/>
                   <xsl:if test="$DATE_OK">
-                    <xsl:if test="string($META) != ''"><xsl:text> &#183; </xsl:text></xsl:if>
+                    <xsl:if test="string($META_TEXT) != ''"><xsl:text> &#183; </xsl:text></xsl:if>
                     <time class="rbccm-insight-cards__card-date rbccm-insight-cards__card-date--outlook-2027"><xsl:attribute name="datetime"><xsl:value-of select="$DATE"/></xsl:attribute><xsl:value-of select="$DATE_TEXT"/></time>
                   </xsl:if>
                 </p>
