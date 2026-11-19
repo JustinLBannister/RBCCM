@@ -118,6 +118,7 @@
     <xsl:param name="bodyTag"/>
     <xsl:param name="ctaText"/>
     <xsl:param name="ctaHref"/>
+    <xsl:param name="photoScale"/>
 
     <a class="rbccm-platforms__card">
       <xsl:attribute name="href">
@@ -138,9 +139,10 @@
 
       <!-- Optional per-card inline style: focal point + body cap.
            Concatenated into one style attr when either is set. -->
-      <xsl:if test="$focalPoint != '' or $bodyMaxWidth != ''">
+      <xsl:if test="$focalPoint != '' or $bodyMaxWidth != '' or $photoScale != ''">
         <xsl:attribute name="style">
           <xsl:if test="$focalPoint != ''">--rbccm-platforms-focal: <xsl:value-of select="$focalPoint"/>;</xsl:if>
+          <xsl:if test="$photoScale != ''"> --rbccm-platforms-scale: <xsl:value-of select="$photoScale"/>;</xsl:if>
           <xsl:if test="$bodyMaxWidth != ''"> --rbccm-platforms-body-max-width: <xsl:value-of select="$bodyMaxWidth"/>;</xsl:if>
         </xsl:attribute>
       </xsl:if>
@@ -275,6 +277,27 @@
           <xsl:otherwise>Explore</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+      <!-- Photo. Each platform has one photo, named after its key. A
+           wording can have its own: the Outlook 2027 Real-Time
+           Geopolitics tile carries a portrait. -->
+      <xsl:when test="$field = 'photo'">
+        <xsl:text>/assets/rbccm/images/insights/strategy-economics/platforms/</xsl:text>
+        <xsl:choose>
+          <xsl:when test="$at = 'real-time-geopolitics@outlook-2027'">real-time-geopolitics-outlook-2027</xsl:when>
+          <xsl:otherwise><xsl:value-of select="$key"/></xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>.webp</xsl:text>
+      </xsl:when>
+      <!-- Which part of the photo stays in view when the tile crops it,
+           and how far the photo is zoomed at rest (blank = the usual
+           1.2). The portrait sits top right and is shown unzoomed, so
+           the head and shoulders are never cut. -->
+      <xsl:when test="$field = 'focal'">
+        <xsl:if test="$at = 'real-time-geopolitics@outlook-2027'">85% 0%</xsl:if>
+      </xsl:when>
+      <xsl:when test="$field = 'scale'">
+        <xsl:if test="$at = 'real-time-geopolitics@outlook-2027'">1</xsl:if>
+      </xsl:when>
       <!-- Description width on desktop, where a wording was tuned to
            break a certain way. Blank uses the default (340px). -->
       <xsl:when test="$field = 'width'">
@@ -312,7 +335,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:if test="string($title) != ''">
-      <xsl:variable name="platformPhoto" select="concat('/assets/rbccm/images/insights/strategy-economics/platforms/', $platform, '.webp')"/>
+      <xsl:variable name="platformPhoto"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'photo'"/></xsl:call-template></xsl:variable>
       <xsl:variable name="photo">
         <xsl:choose>
           <xsl:when test="$known"><xsl:value-of select="$platformPhoto"/></xsl:when>
@@ -332,7 +355,16 @@
           <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:variable name="focalPoint"    select="normalize-space((//Datum[@ID=concat('Card', $n, 'FocalPoint')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'FocalPoint')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+      <xsl:variable name="focalPointTyped" select="normalize-space((//Datum[@ID=concat('Card', $n, 'FocalPoint')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'FocalPoint')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+      <xsl:variable name="focalPoint">
+        <xsl:choose>
+          <xsl:when test="$focalPointTyped != ''"><xsl:value-of select="$focalPointTyped"/></xsl:when>
+          <xsl:when test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'focal'"/></xsl:call-template></xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="photoScale">
+        <xsl:if test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'scale'"/></xsl:call-template></xsl:if>
+      </xsl:variable>
       <xsl:variable name="bodyMaxWidthTyped" select="normalize-space((//Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
       <xsl:variable name="bodyMaxWidth">
         <xsl:choose>
@@ -381,7 +413,8 @@
         <xsl:with-param name="photo" select="$photo"/>
         <xsl:with-param name="photoMobile" select="$photoMobile"/>
         <xsl:with-param name="photoAlt" select="$photoAlt"/>
-        <xsl:with-param name="focalPoint" select="$focalPoint"/>
+        <xsl:with-param name="focalPoint" select="string($focalPoint)"/>
+        <xsl:with-param name="photoScale" select="string($photoScale)"/>
         <xsl:with-param name="bodyMaxWidth" select="$bodyMaxWidth"/>
         <xsl:with-param name="titleText" select="$title"/>
         <xsl:with-param name="titleTag" select="$titleTag"/>

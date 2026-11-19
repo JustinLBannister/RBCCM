@@ -272,18 +272,22 @@ platform_fields = {
     'SectionTitleText': u'Access insights from across <br>RBC Capital Markets’ global platform',
     'SectionSubtitleText': '',
 }
-for n, (photo, title, body, href) in enumerate(PLATFORMS, 1):
-    platform_fields.update({
-        'Card%dPhotoDesktop' % n: PLATFORM_PHOTOS + photo + '.webp',
-        'Card%dPhotoMobile' % n: PLATFORM_PHOTOS + photo + '.webp',
-        'Card%dTitleText' % n: title,
-        'Card%dBodyText' % n: body,
-        'Card%dBodyMaxWidth' % n: '',
-        'Card%dCtaText' % n: 'Explore',
-        'Card%dCtaHref' % n: href,
-    })
-S.append(('Platforms (rbccm-platforms, Outlook 2027 preset, six cards)', render(
-    'rbccm-platforms/rbccm-platforms.xsl', 'rbccm-platforms/rbccm-platforms-properties.xml', platform_fields)))
+# Each tile picks its platform from the list written into the skin, in
+# its Outlook 2027 wording, the same way an editor does in TeamSite. The
+# title, description, link, button label and photo all come from the
+# skin; PLATFORMS above is kept as the record of what they should say
+# and is checked against the output below.
+for n, (key, title, body, href) in enumerate(PLATFORMS, 1):
+    platform_fields['Card%dPlatform' % n] = key + '@outlook-2027'
+platforms_html = render('rbccm-platforms/rbccm-platforms.xsl', 'rbccm-platforms/rbccm-platforms-properties.xml', platform_fields)
+for key, title, body, href in PLATFORMS:
+    for expected in (title, body, href):
+        if expected not in platforms_html:
+            print('WARNING: platforms skin does not print %r for %s' % (expected, key))
+# The photos live on the site; locally they are read from the repo.
+platforms_html = platforms_html.replace(
+    'https://www.rbccm.com/assets/rbccm/images/insights/strategy-economics/platforms/', PLATFORM_PHOTOS)
+S.append(('Platforms (rbccm-platforms, Outlook 2027 preset, six cards)', platforms_html))
 
 S.append(('Stay informed (rbccm-marketo-footer)', render(
     'rbccm-marketo-footer/rbccm-marketo-footer.xsl', 'rbccm-marketo-footer/rbccm-marketo-footer-properties.xml', {
