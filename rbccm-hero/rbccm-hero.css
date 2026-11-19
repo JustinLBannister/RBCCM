@@ -1948,8 +1948,30 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   }
 }
 
-/* Background video: covers the section. The lines in the footage sit on
-   the right, so the crop keeps the right edge in view. */
+/* Background video: covers the section. The footage is a wide strip
+   (about 3.6:1) with the curtain of lines a little left of its centre,
+   so the framing is set here, per width, with three values:
+     --rbccm-hero-video-x       which part of the strip is in view
+                                (0% = its left edge, 100% = its right edge)
+     --rbccm-hero-video-zoom    how far the footage is enlarged
+     --rbccm-hero-video-origin  the point the enlargement grows from
+   Mobile / tablet: the curtain sits behind the copy and the zoom grows
+   down from the top, so the wave lands under the button (mobile comp).
+   Desktop: the strip's left edge is in view, which puts the curtain on
+   the right half, clear of the copy, and the zoom grows in from the
+   right edge (desktop comp). */
+.rbccm-hero--outlook-2027 {
+  --rbccm-hero-video-x: 46%;
+  --rbccm-hero-video-zoom: 1.5;
+  --rbccm-hero-video-origin: center top;
+}
+@media (min-width: 992px) {
+  .rbccm-hero--outlook-2027 {
+    --rbccm-hero-video-x: 0%;
+    --rbccm-hero-video-zoom: 1.2;
+    --rbccm-hero-video-origin: right center;
+  }
+}
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video {
   inset: 0;
   overflow: hidden;
@@ -1962,8 +1984,24 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   display: block;
   height: 100%;
   object-fit: cover;
-  object-position: right center;
   width: 100%;
+}
+/* The Brightcove player's own video and poster are named as well, so
+   this framing wins over the background layer stylesheet's default
+   (top right). */
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video video,
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-tech,
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster img {
+  object-position: var(--rbccm-hero-video-x) center !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
+  background-position: var(--rbccm-hero-video-x) center !important;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video video,
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-tech,
+.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
+  transform: scale(var(--rbccm-hero-video-zoom));
+  transform-origin: var(--rbccm-hero-video-origin);
 }
 /* Navy behind the copy so it stays legible over any frame: from the top
    on mobile / tablet (copy over the video), from the left on desktop. */
