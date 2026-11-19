@@ -41,8 +41,10 @@ const INCLUDE = [
   'outlook-2027'
 ];
 
-/* Left out wherever they appear: a folder or file with one of these names. */
-const SKIP_NAMES = ['.DS_Store', 'node_modules', '_retired', 'snapshots', '.claude'];
+/* Left out wherever they appear: a folder or file with one of these
+   names, and anything whose name starts with a dot (editor and system
+   files). */
+const SKIP_NAMES = ['node_modules', '_retired', 'snapshots'];
 
 /* Left out by path (relative to the repo root). A trailing slash means
    the whole folder. */
@@ -62,8 +64,7 @@ const SKIP_EXT = ['.docx', '.pdf', '.pptx', '.key', '.zip', '.tmp'];
 function skip(rel) {
   const parts = rel.split('/');
   const base = parts[parts.length - 1];
-  if (parts.some((p) => SKIP_NAMES.includes(p))) return true;
-  if (base.startsWith('.~lock')) return true;
+  if (parts.some((p) => SKIP_NAMES.includes(p) || p.startsWith('.'))) return true;
   if (SKIP_EXT.includes(path.extname(base).toLowerCase())) return true;
   return SKIP_PATHS.some((p) => (p.endsWith('/') ? (rel + '/').startsWith(p) : rel === p));
 }

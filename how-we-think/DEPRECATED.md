@@ -1,7 +1,7 @@
 # DEPRECATED — migrated into `tabbed-panels`
 
 This standalone component has been consolidated into
-[`/tabbed-panels/`](/Users/bannister/Documents/Freelance/RBCCM/tabbed-panels/)
+[`/tabbed-panels/`](../tabbed-panels/)
 as the **`how-we-think`** preset.
 
 ## What changed

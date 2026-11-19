@@ -19,7 +19,7 @@ Because `fetch()` from a `file://` URL is blocked by browsers, serve the
 folder over a tiny HTTP server first:
 
 ```bash
-cd /Users/bannister/Documents/Freelance/RBCCM
+cd path/to/RBCCM
 python3 -m http.server 8000
 ```
 
