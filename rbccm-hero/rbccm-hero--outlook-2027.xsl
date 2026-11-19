@@ -230,7 +230,6 @@
     <xsl:variable name="OL_IS_YEAR" select="string-length($OL_LINE1) = 4 and translate($OL_LINE1, '0123456789', '') = ''"/>
     <xsl:variable name="OL_ROLL_RAW" select="translate(normalize-space(//Datum[@ID='OlYearRoll']/text()[last()]), 'NO', 'no')"/>
     <xsl:variable name="OL_ROLL" select="$OL_IS_YEAR and $OL_ROLL_RAW != 'no'"/>
-    <xsl:variable name="OL_YEAR_HEAD" select="substring($OL_LINE1, 1, 3)"/>
     <xsl:variable name="OL_YEAR_LAST" select="substring($OL_LINE1, 4, 1)"/>
     <xsl:variable name="OL_YEAR_PREV" select="(number($OL_YEAR_LAST) + 9) mod 10"/>
 
@@ -357,12 +356,14 @@
                      screen readers and for anything that reads the page
                      source. The digits people see are drawn by CSS from
                      data-text, so the rolling digit adds no stray
-                     characters to the heading. -->
+                     characters to the heading. Each of the first three
+                     digits is its own span so they can fade in one
+                     after the other. -->
                 <xsl:when test="$OL_IS_YEAR">
                   <span class="rbccm-hero__title-line rbccm-hero__title-line--year">
                     <span class="rbccm-hero__sr-only"><xsl:value-of select="$OL_LINE1"/></span>
                     <span class="rbccm-hero__year" aria-hidden="true">
-                      <span class="rbccm-hero__year-head"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_HEAD"/></xsl:attribute></span>
+                      <span class="rbccm-hero__year-head"><span class="rbccm-hero__year-lead"><xsl:attribute name="data-text"><xsl:value-of select="substring($OL_LINE1, 1, 1)"/></xsl:attribute></span><span class="rbccm-hero__year-lead"><xsl:attribute name="data-text"><xsl:value-of select="substring($OL_LINE1, 2, 1)"/></xsl:attribute></span><span class="rbccm-hero__year-lead"><xsl:attribute name="data-text"><xsl:value-of select="substring($OL_LINE1, 3, 1)"/></xsl:attribute></span></span>
                       <xsl:choose>
                         <xsl:when test="$OL_ROLL">
                           <span class="rbccm-hero__year-roll"><span class="rbccm-hero__year-strip"><span class="rbccm-hero__year-digit"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_PREV"/></xsl:attribute></span><span class="rbccm-hero__year-digit rbccm-hero__year-digit--new"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_LAST"/></xsl:attribute></span></span></span>
