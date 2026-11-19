@@ -1000,7 +1000,8 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
      assumption the rail would be empty). The rail is where TeamSite
      drops the page's actual content components -- if the whole
      stack was moved into this rail, hiding it would nuke the page. */
-.ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up {
+.ls-canvas:has(.rbccm-hero--strategy-and-economics) #content.content-section-pull-up,
+.ls-canvas:has(.rbccm-hero--outlook-2027) #content.content-section-pull-up {
   margin-top: 0 !important;
 }
 
@@ -2041,6 +2042,13 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    text is just the plain year (the screen-reader span beside it). */
 .rbccm-hero--outlook-2027 .rbccm-hero__year [data-text]::before {
   content: attr(data-text);
+}
+/* The site sets a font on every element (a "*" rule), so the spans that
+   draw the year would drop back to the body font. Take the title's. */
+.rbccm-hero--outlook-2027 .rbccm-hero__year,
+.rbccm-hero--outlook-2027 .rbccm-hero__year span {
+  font-family: inherit;
+  letter-spacing: inherit;
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__year-digit--new {
   color: var(--rbccm-hero-yellow);

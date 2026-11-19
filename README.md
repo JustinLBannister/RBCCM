@@ -26,6 +26,14 @@ Installs two small dev tools: esbuild (writes the `.min` files) and acorn
 the registry (corporate proxy), the build still runs; it just skips the
 `.min` files and prints a warning.
 
+If it fails with `ENOENT ... package.json`, the terminal is one folder too
+high. Unzipping on Windows ("Extract All") puts the package inside a second
+folder of the same name, so step into it and run the command again:
+
+```bash
+cd rbccm-components
+```
+
 ## Preview the components
 
 The preview pages load sample data over HTTP, so serve the folder rather than
