@@ -65,6 +65,24 @@
        copy of the design, often tens of KB per field. They are invisible
        but bloat the page and expose internal file details, so they are
        removed here; all other HTML is output as entered. -->
+  <!-- Visible text of a rich-text field: tags stripped. TeamSite's
+       editor leaves placeholder markup in a field that was emptied
+       (<br data-mce-bogus="1">, <p>&amp;nbsp;</p>), which would otherwise
+       print as an empty paragraph and push the content below it down.
+       A field with no visible text is treated as blank. -->
+  <xsl:template name="stripTags">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '&lt;') and contains(substring-after($s, '&lt;'), '&gt;')">
+        <xsl:value-of select="substring-before($s, '&lt;')"/>
+        <xsl:call-template name="stripTags">
+          <xsl:with-param name="s" select="substring-after(substring-after($s, '&lt;'), '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="rbccmRich">
     <xsl:param name="s"/>
     <xsl:variable name="clean"><xsl:call-template name="rbccmStripFigma"><xsl:with-param name="s" select="string($s)"/></xsl:call-template></xsl:variable>
@@ -169,7 +187,8 @@
           <xsl:attribute name="class">rbccm-platforms__card-title</xsl:attribute>
           <xsl:value-of select="$titleText"/>
         </xsl:element>
-        <xsl:if test="normalize-space($bodyText) != ''">
+        <xsl:variable name="bodyVisible"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="string($bodyText)"/></xsl:call-template></xsl:variable>
+        <xsl:if test="normalize-space(translate($bodyVisible, '&#160;', '')) != '' and normalize-space($bodyVisible) != '&amp;nbsp;'">
           <xsl:element name="{$bodyTag}">
             <xsl:attribute name="class">rbccm-platforms__card-body</xsl:attribute>
             <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$bodyText"/></xsl:call-template>
@@ -189,6 +208,22 @@
   </xsl:template>
 
   <!-- Per-slot lookup + renderCard dispatcher (reads Card{N}FieldName). -->
+  <!-- ===== The platforms list (what the editor fills in) =====
+       A repeatable list in the component's data: one "Platform" entry
+       per tile, each a single dropdown that picks a platform and its
+       wording. Entries are added, removed and reordered with the
+       list's own controls, and the tiles print in that order.
+
+       When the list has at least one entry with a platform picked, the
+       list is the whole section. With none (a new, empty list, or a
+       copy saved before the list existed) the six card slots are used
+       instead: each either typed by hand or, on copies made while the
+       cards had their own dropdown, picked there.
+
+       Inside a list TeamSite can drop a field's ID, so the dropdown is
+       matched on its ID or on its label starting with "Platform". -->
+  <xsl:variable name="PLATFORM_LIST" select="//Group[@ID='PlatformTile' or @Name='Platform'][contains(normalize-space((Datum[@ID='PlatformPick' or starts-with(@Name, 'Platform')]/Option[@Selected='true']/Value | Datum[@ID='PlatformPick' or starts-with(@Name, 'Platform')]/text()[last()][not(../Option[@Selected='true'])])[1]), '@')]"/>
+
   <!-- ===== The platforms =====
        The six platforms are the same on every page, so they live here
        once. A tile's "platform" dropdown picks one, and its title,
@@ -316,9 +351,17 @@
        list's. A tile with no title is not printed. -->
   <xsl:template name="renderSlot">
     <xsl:param name="n"/>
-    <xsl:variable name="picked" select="normalize-space((//Datum[@ID=concat('Card', $n, 'Platform')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'Platform')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-    <xsl:variable name="platform" select="substring-before(concat($picked, '@'), '@')"/>
-    <xsl:variable name="versionRaw" select="substring-after($picked, '@')"/>
+    <!-- From the platforms list: the entry's own choice. A card slot
+         reads its Card{N}Platform dropdown instead (older copies). -->
+    <xsl:param name="listed"/>
+    <xsl:variable name="picked">
+      <xsl:choose>
+        <xsl:when test="string($listed) != ''"><xsl:value-of select="$listed"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space((//Datum[@ID=concat('Card', $n, 'Platform')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'Platform')]/text()[last()][not(../Option[@Selected='true'])])[1])"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="platform" select="substring-before(concat(string($picked), '@'), '@')"/>
+    <xsl:variable name="versionRaw" select="substring-after(string($picked), '@')"/>
     <xsl:variable name="version">
       <xsl:choose>
         <xsl:when test="$versionRaw != ''"><xsl:value-of select="$versionRaw"/></xsl:when>
@@ -439,6 +482,8 @@
     <xsl:variable name="TITLE_TEXT"       select="normalize-space((//Datum[@ID='SectionTitleText']/Option[@Selected='true']/Value | //Datum[@ID='SectionTitleText']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="TITLE_TAG_RAW"    select="normalize-space((//Datum[@ID='SectionTitleTag']/Option[@Selected='true']/Value | //Datum[@ID='SectionTitleTag']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="SUBTITLE_TEXT"       select="normalize-space((//Datum[@ID='SectionSubtitleText']/Option[@Selected='true']/Value | //Datum[@ID='SectionSubtitleText']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="SUBTITLE_VISIBLE"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$SUBTITLE_TEXT"/></xsl:call-template></xsl:variable>
+    <xsl:variable name="HAS_SUBTITLE" select="normalize-space(translate($SUBTITLE_VISIBLE, '&#160;', '')) != '' and normalize-space($SUBTITLE_VISIBLE) != '&amp;nbsp;'"/>
     <xsl:variable name="SUBTITLE_TAG_RAW"    select="normalize-space((//Datum[@ID='SectionSubtitleTag']/Option[@Selected='true']/Value | //Datum[@ID='SectionSubtitleTag']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="SECTION_BG_COLOR"    select="normalize-space((//Datum[@ID='SectionBgColor']/Option[@Selected='true']/Value | //Datum[@ID='SectionBgColor']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="HEADER_ALIGN_RAW" select="normalize-space((//Datum[@ID='HeaderAlignment']/Option[@Selected='true']/Value | //Datum[@ID='HeaderAlignment']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
@@ -517,7 +562,7 @@
 
         <div class="rbccm-platforms__inner">
 
-          <xsl:if test="$TITLE_TEXT != '' or $SUBTITLE_TEXT != ''">
+          <xsl:if test="$TITLE_TEXT != '' or $HAS_SUBTITLE">
             <header class="rbccm-platforms__header">
               <xsl:if test="$TITLE_TEXT != ''">
                 <xsl:element name="{$TITLE_TAG}">
@@ -528,7 +573,7 @@
                   <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$TITLE_TEXT"/></xsl:call-template>
                 </xsl:element>
               </xsl:if>
-              <xsl:if test="$SUBTITLE_TEXT != ''">
+              <xsl:if test="$HAS_SUBTITLE">
                 <xsl:element name="{$SUBTITLE_TAG}">
                   <xsl:attribute name="class">rbccm-platforms__subtitle</xsl:attribute>
                   <xsl:attribute name="data-animate">fadeInUp</xsl:attribute>
@@ -542,12 +587,26 @@
           <!-- data-stagger-parent lets rbccm-animate.js reveal each
                .rbccm-platforms__card in sequence as the grid appears. -->
           <div class="rbccm-platforms__grid" data-stagger-parent="fadeInUp" data-stagger-step="200">
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="5"/></xsl:call-template>
-            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="6"/></xsl:call-template>
+            <xsl:choose>
+              <!-- The platforms list, in the order the editor put it. -->
+              <xsl:when test="$PLATFORM_LIST">
+                <xsl:for-each select="$PLATFORM_LIST">
+                  <xsl:call-template name="renderSlot">
+                    <xsl:with-param name="n" select="0"/>
+                    <xsl:with-param name="listed" select="normalize-space((Datum[@ID='PlatformPick' or starts-with(@Name, 'Platform')]/Option[@Selected='true']/Value | Datum[@ID='PlatformPick' or starts-with(@Name, 'Platform')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:when>
+              <!-- No list: the six card slots. -->
+              <xsl:otherwise>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="1"/></xsl:call-template>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="5"/></xsl:call-template>
+              <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="6"/></xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
           </div>
 
         </div>

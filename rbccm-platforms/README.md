@@ -10,8 +10,9 @@ A section title and subtitle above up to six photo tiles, each one linking to a 
 ### What the editor can change
 - The section title and subtitle, their HTML tags, and the header alignment (Left or Center).
 - The section background colour. Blank uses the preset default: light blue (`#E7EEF1`) for Strategy and Economics, white for Outlook 2027.
-- Each card (Card 1 to Card 6): a **platform** dropdown. Pick a platform and the tile's title, description, link, button label and photo fill in by themselves. The title, link and photo of a platform are the same everywhere. Its description was written differently for three pages, so the dropdown lists each wording by page: for example "Markets in Motion - Outlook 2027", "Markets in Motion - US Credentials" and "Markets in Motion - Strategy and Economics". Strategic Alternatives reads the same everywhere and has one entry. The tiles show in card order, so to reorder them change which platform each card has.
-- A card left on Typed uses its own fields, as before: the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example "Explore" or "Listen") and CTA URL. Use this for a tile that is not one of the six, or that needs its own wording on one page. A card shows when it has a platform picked or a typed title.
+- **Platforms list.** A repeatable list: each entry is one dropdown that picks a platform, and the tile's title, description, link, button label and photo fill in by themselves. Add an entry for each tile; the tiles show in the order of the list, so reordering the list reorders the tiles. The title, link and photo of a platform are the same everywhere. Its description was written differently for three pages, so the dropdown lists each wording by page: for example "Markets in Motion - Outlook 2027", "Markets in Motion - US Credentials" and "Markets in Motion - Strategy and Economics". Strategic Alternatives reads the same everywhere and has one entry.
+- When the list has at least one platform chosen it is the whole section, and the Card 1 to Card 6 fields are ignored.
+- With the list left empty, Card 1 to Card 6 are used, each typed by hand as before: the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example "Explore" or "Listen") and CTA URL. Use this for a section whose tiles are not the six platforms. A card shows when it has a typed title. The list and the typed cards cannot be mixed in one section.
 - Per card fine-tuning: the title tag and body tag, the photo focal point (which part of the photo stays in view) and the body max-width at desktop (default 340px).
 - The Preset field: Strategy and Economics - Platforms, or Outlook 2027 - Platforms.
 - Technical fields exist (Section ID, Section ARIA label, CSS path, JS path, Last updated). They are set at deploy; Last updated is bumped on each save.
@@ -34,7 +35,8 @@ A section title and subtitle above up to six photo tiles, each one linking to a 
 
 ### Empty and edge cases
 - A card with no platform picked and a blank title is hidden, whatever else is filled in.
-- A picked platform ignores that card's typed title, body, link, button label and photos. Focal point, body max-width and the tag fields still apply.
+- A list entry left on "Choose a platform" is skipped. The list has no upper limit; the design shows up to six.
+- Copies saved while each card had its own platform dropdown keep working: the skin still reads those when the list is empty.
 - A tile title, tile body or the subtitle set to h1 prints with its default tag instead (h3, p and p). Those dropdowns list h1 first, and TeamSite saves the first option when nobody chooses, so an untouched tile would otherwise become a second h1 on the page.
 - Outlook 2027 preset: the section title is at most 740px wide, so a long title wraps onto two lines.
 - Outlook 2027 preset: to choose where the section title breaks on desktop, type a space and then `<br>` at that point in the title (for example `from across <br>RBC Capital Markets`). It breaks there from 992px wide and is ignored on narrower screens, where the title wraps by itself. Keep the space before it, so the two words stay apart when the break is ignored.

@@ -96,19 +96,21 @@ def set_datum(tree, key, value):
     else:
         d.text = value
 
-def set_stories(tree, stories):
-    """The component's story list: one Story group per story, built from
-    the blank group the properties file ships with."""
-    blank = tree.xpath("//Group[@ID='Story']")
+def set_list(tree, group_id, entries):
+    """A repeatable list in a component's data (insight cards' Story,
+    platforms' PlatformTile): one group per entry, built from the blank
+    group the properties file ships with. Each entry maps a field ID to
+    its value."""
+    blank = tree.xpath("//Group[@ID=$g]", g=group_id)
     if not blank:
         return
     blank = blank[0]
     parent = blank.getparent()
     at = parent.index(blank)
     parent.remove(blank)
-    for i, story in enumerate(stories):
+    for i, entry in enumerate(entries):
         group = copy.deepcopy(blank)
-        for field, value in story.items():
+        for field, value in entry.items():
             d = group.xpath('Datum[@ID=$k]', k=field)[0]
             path = d.find('Image/Path')
             options = d.findall('Option')
@@ -126,7 +128,10 @@ def render(skin, props_file, overrides):
     overrides = dict(overrides)
     stories = overrides.pop('stories', None)
     if stories is not None:
-        set_stories(tree, stories)
+        set_list(tree, 'Story', stories)
+    platforms = overrides.pop('platforms', None)
+    if platforms is not None:
+        set_list(tree, 'PlatformTile', [{'PlatformPick': value} for value in platforms])
     for key, value in overrides.items():
         set_datum(tree, key, value)
     out = str(load_xsl(os.path.join(ROOT, skin))(tree))
@@ -272,13 +277,13 @@ platform_fields = {
     'SectionTitleText': u'Access insights from across <br>RBC Capital Markets’ global platform',
     'SectionSubtitleText': '',
 }
-# Each tile picks its platform from the list written into the skin, in
-# its Outlook 2027 wording, the same way an editor does in TeamSite. The
-# title, description, link, button label and photo all come from the
-# skin; PLATFORMS above is kept as the record of what they should say
-# and is checked against the output below.
-for n, (key, title, body, href) in enumerate(PLATFORMS, 1):
-    platform_fields['Card%dPlatform' % n] = key + '@outlook-2027'
+# The tiles are the component's platforms list: one entry per tile, each
+# choosing a platform in its Outlook 2027 wording, the same way an
+# editor does in TeamSite. The title, description, link, button label
+# and photo all come from the skin; PLATFORMS above is kept as the
+# record of what they should say and is checked against the output
+# below.
+platform_fields['platforms'] = [key + '@outlook-2027' for key, title, body, href in PLATFORMS]
 platforms_html = render('rbccm-platforms/rbccm-platforms.xsl', 'rbccm-platforms/rbccm-platforms-properties.xml', platform_fields)
 for key, title, body, href in PLATFORMS:
     for expected in (title, body, href):
