@@ -2111,8 +2111,8 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 /* ---- Year roll ---------------------------------------------------------
    The last digit sits in a window one line tall that also opens 0.6em
    upward: the old digit (6) rises out of the top and fades while the new
-   one (7, yellow) rises into place, 750ms after the title starts rising
-   in. Without the roll (OlYearRoll "no") the digit is simply yellow. */
+   one (7, yellow) rises into place, 2s after the hero first shows (the
+   concept video's timing). Without the roll (OlYearRoll "no") the digit is simply yellow. */
 /* The year people see is drawn from data-text, so the heading's own
    text is just the plain year (the screen-reader span beside it). */
 .rbccm-hero--outlook-2027 .rbccm-hero__year [data-text]::before {
@@ -2138,7 +2138,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   vertical-align: top;
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__year-strip {
-  animation: rbccm-hero-year-roll 1000ms cubic-bezier(0.65, 0, 0.25, 1) 1150ms both;
+  animation: rbccm-hero-year-roll 650ms cubic-bezier(0.65, 0, 0.25, 1) 2000ms both;
   display: block;
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit {
@@ -2146,7 +2146,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   height: 1em;
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit:first-child {
-  animation: rbccm-hero-year-fade 1000ms ease-in 1150ms both;
+  animation: rbccm-hero-year-fade 650ms ease-in 2000ms both;
 }
 @keyframes rbccm-hero-year-roll {
   from { transform: translateY(0); }
@@ -2291,23 +2291,110 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   .rbccm-hero--outlook-2027 .rbccm-button:focus-visible .rbccm-button__icon { animation: none !important; }
 }
 
-/* ---- Entrance timing -----------------------------------------------------
-   The copy rises in a little later, and with wider gaps, than on the
-   other heroes: title 400ms, paragraph 600ms, button 800ms (the skin's
-   150 / 300 / 450 marks are remapped here, so the skin stays as it is).
-   The pause / play button fades in last, at 1200ms. */
-.rbccm-hero--outlook-2027 [data-hero-rise][data-animate-delay="150"] { animation-delay: 400ms; }
-.rbccm-hero--outlook-2027 [data-hero-rise][data-animate-delay="300"] { animation-delay: 600ms; }
-.rbccm-hero--outlook-2027 [data-hero-rise][data-animate-delay="450"] { animation-delay: 800ms; }
-.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle {
-  animation: rbccm-hero-toggle-in 600ms ease 1200ms backwards;
+/* ---- Entrance (from the concept video) ------------------------------------
+   Everything fades in, in order, over about 1.8s, and the year rolls
+   from 6 to 7 at 2s:
+       0ms  breadcrumbs fade in
+      50ms  title line 1 (the year) is revealed left to right
+     500ms  title line 2 is revealed left to right
+     800ms  paragraph fades up
+    1000ms  button fades up
+    1450ms  pause / play button fades in
+    2000ms  year roll (650ms)
+   and the background video fades up from plain navy once it starts
+   playing. The skin's rise marks (150 / 300 / 450) are restyled here,
+   so the skin stays as it is. The left-to-right reveal is a soft mask
+   that only exists while it runs; where masks aren't supported the
+   line just rises. */
+.rbccm-hero--outlook-2027 .rbccm-hero__breadcrumbs {
+  animation: rbccm-hero-fade 300ms ease backwards;
 }
-@keyframes rbccm-hero-toggle-in {
+.rbccm-hero--outlook-2027 .rbccm-hero__title[data-hero-rise] {
+  animation: none;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__title-line {
+  animation: rbccm-hero-reveal 450ms cubic-bezier(0.3, 0, 0.3, 1) 50ms backwards;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__title-line + .rbccm-hero__title-line {
+  animation-delay: 500ms;
+  animation-duration: 350ms;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__subtitle[data-hero-rise] {
+  animation: rbccm-hero-fade-rise 300ms ease 800ms backwards;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__actions[data-hero-rise] {
+  animation: rbccm-hero-fade-rise 300ms ease 1000ms backwards;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle {
+  animation: rbccm-hero-fade 300ms ease 1450ms backwards;
+}
+@keyframes rbccm-hero-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes rbccm-hero-fade-rise {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+/* The mask is three times the line's width: solid, then a fade one
+   line wide, then clear. It slides from its clear end to its solid
+   end, so the letters fade in one after another. */
+@keyframes rbccm-hero-reveal {
+  from {
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 33.3%, transparent 66.6%, transparent 100%);
+    -webkit-mask-position: 100% 0;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 300% 100%;
+    mask-image: linear-gradient(90deg, #000 0%, #000 33.3%, transparent 66.6%, transparent 100%);
+    mask-position: 100% 0;
+    mask-repeat: no-repeat;
+    mask-size: 300% 100%;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 33.3%, transparent 66.6%, transparent 100%);
+    -webkit-mask-position: 0% 0;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 300% 100%;
+    mask-image: linear-gradient(90deg, #000 0%, #000 33.3%, transparent 66.6%, transparent 100%);
+    mask-position: 0% 0;
+    mask-repeat: no-repeat;
+    mask-size: 300% 100%;
+    transform: none;
+  }
+}
+/* Background video: starts hidden and fades up when the player reports
+   it has started. If it never starts (autoplay blocked, so the poster
+   is showing instead), it fades up anyway after 3s: that is the delayed
+   fade on the first rule. Once started, the value moves a hair (0.999)
+   so a new fade begins straight away from wherever the first one is;
+   if the 3s fade has already finished, nothing visible happens. A
+   plain MP4 background has no "started" mark, so it is simply shown,
+   as it is in browsers without @starting-style. */
+.rbccm-hero--outlook-2027 .rbccm-brightcove-bg-layer__player {
+  opacity: 1;
+  transition: opacity 600ms ease 3000ms;
+}
+@starting-style {
+  .rbccm-hero--outlook-2027 .rbccm-brightcove-bg-layer__player { opacity: 0; }
+}
+.rbccm-hero--outlook-2027 .rbccm-brightcove-bg-layer__player.vjs-has-started {
+  opacity: 0.999;
+  transition-delay: 0s;
+}
 @media (prefers-reduced-motion: reduce) {
-  .rbccm-hero--outlook-2027 .rbccm-hero__video-toggle { animation: none; }
+  .rbccm-hero--outlook-2027 .rbccm-hero__breadcrumbs,
+  .rbccm-hero--outlook-2027 .rbccm-hero__title-line,
+  .rbccm-hero--outlook-2027 .rbccm-hero__video-toggle {
+    animation: none;
+  }
+  .rbccm-hero--outlook-2027 .rbccm-brightcove-bg-layer__player,
+  .rbccm-hero--outlook-2027 .rbccm-brightcove-bg-layer__player.vjs-has-started {
+    opacity: 1;
+    transition: none;
+  }
 }
 
 /* ---- Pause / play button -----------------------------------------------

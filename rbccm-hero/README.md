@@ -67,7 +67,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
   - Auto: the typed card fields show first and are replaced once the feed loads. They stay if the feed fails, nothing matches, or scripts are off. A pinned article URL takes the place of the keyword search.
   - Manual: always the typed fields.
   - A body over its limit is shown as plain text, so bold, italics and links are dropped. A blank pill label, date or link label hides that piece.
-- Scripts off: the title, copy, buttons and images still show. Brightcove backgrounds on S+E and 2027 Outlook do not load, and the 2027 Outlook pause / play button does nothing. The entrance slide of the copy is CSS only and still runs.
+- Scripts off: the title, copy, buttons and images still show. Brightcove backgrounds on S+E and 2027 Outlook do not load, and the 2027 Outlook pause / play button does nothing. The entrance of the copy (a slide, or on 2027 Outlook a fade) is CSS only and still runs.
 - Pages saved before the 2026-09 field cleanup still show their old content (see "Legacy field IDs" below).
 
 ### Accessibility
@@ -80,7 +80,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
 - Background images and videos are decorative: hidden from screen readers, with no alt text field. Brightcove backgrounds on S+E and 2027 Outlook are kept out of the Tab order.
 - 2027 Outlook: screen readers hear the plain year, and the heading's text in the page source is the plain title ("2027 Outlook"); the rolling digits are drawn by the stylesheet and add nothing to it. The ring round the pause / play button shows how far through the background video is: it fills as the video plays and holds where it is while paused. The ring is decoration and is not read out. The pause / play button is a real button, its name switches between "Pause background video" and "Play background video", and it has a visible focus outline.
 - Buttons, the insight card link and breadcrumb links have visible keyboard focus styles.
-- Reduced motion: the entrance slide and the button hover animations are turned off. On 2027 Outlook the background video starts paused and the year does not roll. The S+E and US Credentials background videos keep playing.
+- Reduced motion: the entrance slide and the button hover animations are turned off. On 2027 Outlook nothing fades in, the background video starts paused and the year does not roll. The S+E and US Credentials background videos keep playing.
 
 ### Open questions
 - `#request-demo` and `#latest-episode`: the hero only prints the link. The parts that open the demo form and find the newest episode are not in this folder.
@@ -135,9 +135,11 @@ Tag pickers default to **Auto**, which uses each variant's SEO default (MAAS+MAT
 
 ## Outlook 2027
 
-- **Title:** line 1 and line 2 on two lines (e.g. `2027` / `Outlook`). When line 1 is a four-digit year, its last digit is yellow and rolls up from the year before (the 6 rises out and fades as the 7 rises in) about a second after the page loads. `OlYearRoll` set to `no` keeps the yellow digit without the roll. Screen readers hear the plain year.
+- **Title:** line 1 and line 2 on two lines (e.g. `2027` / `Outlook`). When line 1 is a four-digit year, its last digit is yellow and rolls up from the year before (the 6 rises out and fades as the 7 rises in) about two seconds after the page loads. `OlYearRoll` set to `no` keeps the yellow digit without the roll. Screen readers hear the plain year.
 - **Background video:** an MP4 (`BgVideoMp4`) or Brightcove (`BgBrightcoveVideoId`; one ID, or mobile, tablet, desktop cuts separated by commas, as on S+E). Brightcove loads the in-page player with every control hidden by `rbccm-brightcove-bg-layer.css`.
 - **Pause / play:** whenever there is a background video, a round button sits bottom right. It pauses and resumes the video, and its screen reader label says what it will do ("Pause background video" / "Play background video"). Visitors who have asked their device to reduce motion get the video paused from the start, and the year doesn't roll.
+- **Entrance:** follows the design team's concept video. The breadcrumbs fade in, the two title lines are revealed left to right, then the paragraph, the button and the pause / play button fade in, in that order, over about 1.8 seconds. The year rolls at 2 seconds. The background video fades up from plain navy once it starts playing (or after 3 seconds if it never starts).
+- **Video framing:** the lines in the footage always begin a set distance to the right of the copy, run off the top of the hero and land their wave about 60% of the way down (about 72% on mobile and tablet). The values are at the top of the Outlook video rules in `rbccm-hero.css`.
 - **Sizes:** desktop is measured from the Outlook 2027 page PDF (1440 frame); mobile follows the ETF hero until there is a mobile spec.
 
 ## Legacy field IDs (2026-09 cleanup)
