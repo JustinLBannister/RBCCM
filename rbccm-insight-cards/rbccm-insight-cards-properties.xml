@@ -116,6 +116,10 @@
        apostrophes out of the labels. Everything after the first words
        is free to reword.
 
+       Every ID in this file must be different from every other, the
+       group's included (TeamSite rejects the file otherwise), which is
+       why the picker is StoryPick and not Story.
+
        Schema: a Group takes only ID, Name, Replicatable and
        CloneGroupID. The picker's DCR element stays empty (a default
        path there becomes a dependency TeamSite tries to resolve at
@@ -125,7 +129,7 @@
          Name="Story"
          Replicatable="true"
          CloneGroupID="rbccm-insight-cards-story">
-    <Datum ID="Story" Type="DCR" Name="Pick the story (fills the title, image, link, type, author, date and read or watch time)">
+    <Datum ID="StoryPick" Type="DCR" Name="Pick the story (fills the title, image, link, type, author, date and read or watch time)">
       <DCR Category="article" Type="story"/>
       <DCR-Category Name="article">
         <DCR-Type Name=".*"/>

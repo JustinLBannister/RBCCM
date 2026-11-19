@@ -114,8 +114,8 @@
        in the properties file must keep starting with those words. -->
   <xsl:variable name="STORY_LIST" select="//Group[@ID='Story' or @Name='Story'][
         normalize-space(Datum[@ID='Title' or starts-with(@Name, 'Title')]) != ''
-        or normalize-space(Datum[@ID='Story' or starts-with(@Name, 'Pick the story')]/DCR/*/summarytitle) != ''
-        or normalize-space(Datum[@ID='Story' or starts-with(@Name, 'Pick the story')]/DCR/*/title) != '']"/>
+        or normalize-space(Datum[@ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR/*/summarytitle) != ''
+        or normalize-space(Datum[@ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR/*/title) != '']"/>
 
   <!-- One typed field of story n, as text (used for the filter pills). -->
   <xsl:template name="itemText">
@@ -133,7 +133,7 @@
     <xsl:param name="n"/>
     <xsl:variable name="SRC" select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
     <xsl:variable name="typed" select="normalize-space($SRC[@ID=concat('Item', $n, 'Title') or @ID='Title' or starts-with(@Name, 'Title')])"/>
-    <xsl:variable name="record" select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='Story' or starts-with(@Name, 'Pick the story')]/DCR"/>
+    <xsl:variable name="record" select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR"/>
     <xsl:variable name="storyFirst" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
     <xsl:variable name="picked">
       <xsl:choose>
@@ -576,7 +576,7 @@
     <!-- This story's fields: its group in the list, or its fixed slot
          on a copy saved before the list existed. -->
     <xsl:variable name="SRC"         select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
-    <xsl:variable name="DCR"         select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='Story' or starts-with(@Name, 'Pick the story')]/DCR"/>
+    <xsl:variable name="DCR"         select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR"/>
     <xsl:variable name="STORY_FIRST" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
     <xsl:variable name="HAS_STORY"   select="boolean($DCR/*)"/>
     <!-- The first author with a name (a story can carry several). -->
