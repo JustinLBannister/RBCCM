@@ -33,7 +33,7 @@ Presents a short set of themes one at a time, each with its number, a title, a d
 - It does not advance on a timer. The visitor moves through the themes by scrolling, with the numbered tabs, or with the previous and next buttons beside each theme's button.
 - Pause only stops the movement that repeats in the drawn graphics (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
 - The ring round the pause button shows how far the showing graphic is through its loop (for example one turn of the radar sweep). It holds while paused and starts again with each theme. It is decoration and is not read out.
-- The pause button shows only on themes with a drawn graphic, and not for visitors with reduced motion turned on, where nothing moves anyway.
+- The pause button shows only on themes with a drawn graphic. It shows with reduced motion turned on too, because the graphics play by default there as well.
 - It shows five themes at most.
 - The graphics are fixed designs. Their shapes, colours and the element tiles can't be edited in TeamSite; only the words on them can.
 - A new kind of graphic needs a developer. An image can be used in the meantime.
@@ -90,7 +90,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - The drawn graphics are decoration and hidden from screen readers. An image's alt text comes from the image Description; if that is blank the image is treated as decoration.
 - The sideways swipe is touch only. The tabs do the same job for everyone else.
 - The tabs and the buttons show a focus outline.
-- Reduced motion: the tabs version is used with no animation, and the graphics show in their finished state.
+- Reduced motion: the tabs version is used and the glides between themes are off. The drawn graphics still play by default, and the pause button stops them.
 - A change of theme is not announced to screen readers; the chosen tab is marked as current.
 
 ### Open questions
@@ -134,7 +134,7 @@ On the site these load from `/assets/rbccm/css/components/rbccm-strategic-themes
 | Window at least 992px wide and 600px tall | **Pinned scroll.** The section is one screen tall per theme. It sticks under the site header while the page scrolls through it. Each theme holds, then glides to the next: the text changes on the left and the graphics slide across on the right. The bar above each numbered tab fills as you go. Pressing a tab scrolls to that theme. |
 | Narrower than 992px, at least 600px tall | **Pinned scroll, stacked.** The heading and intro scroll away, then the tabs stick under the site header with the showing theme's text below them and its picture in the height that is left. Scrolling steps through the themes the same way. |
 | Windows shorter than 600px, or no room for the picture | **Tabs.** One theme shows at a time. Pressing a numbered tab switches it; a sideways swipe moves one theme. |
-| Reduced motion (the visitor's device setting) | **Tabs**, with no animation. The graphics show in their finished state. |
+| Reduced motion (the visitor's device setting) | **Tabs**, with no glide between themes. The drawn graphics still play; pause stops them. |
 | No script | A plain numbered list of every theme: number, title, description and button. Images show; the drawn graphics don't. |
 
 The page falls back to the tabs version by itself when pinning can't work, for example when there is only one theme or when the section sits inside a container that clips or scrolls.

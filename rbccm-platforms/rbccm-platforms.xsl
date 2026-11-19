@@ -88,10 +88,16 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- A heading tag from a tag dropdown. noH1: for the tiles and the
+       subtitle, which must never be the page's h1. (Their dropdowns
+       list h1 first, and TeamSite saves the first option when nobody
+       chooses, so an untouched tile would otherwise come out as h1.) -->
   <xsl:template name="pickTag">
     <xsl:param name="raw"/>
     <xsl:param name="default"/>
+    <xsl:param name="noH1" select="false()"/>
     <xsl:choose>
+      <xsl:when test="$noH1 and $raw = 'h1'"><xsl:value-of select="$default"/></xsl:when>
       <xsl:when test="$raw = 'h1' or $raw = 'h2' or $raw = 'h3' or $raw = 'h4' or $raw = 'h5' or $raw = 'h6' or $raw = 'p' or $raw = 'div' or $raw = 'span'">
         <xsl:value-of select="$raw"/>
       </xsl:when>
@@ -181,37 +187,193 @@
   </xsl:template>
 
   <!-- Per-slot lookup + renderCard dispatcher (reads Card{N}FieldName). -->
+  <!-- ===== The platforms =====
+       The six platforms are the same on every page, so they live here
+       once. A tile's "platform" dropdown picks one, and its title,
+       description, link, button label and photo come from this list.
+
+       The title, link and photo of a platform never vary. Its
+       description, button label and description width do: three pages
+       were written with their own wording, so each wording is kept as
+       a named version and the dropdown offers "Markets in Motion -
+       Outlook 2027", "Markets in Motion - US Credentials" and so on.
+       The dropdown's value is key@version, e.g.
+       markets-in-motion@us-credentials.
+
+       key                      title                   link
+       strategic-alternatives   Strategic Alternatives  /en/insights/podcasts/strategic-alternatives
+       rbc-imagine              RBC Imagine             /en/insights/imagine
+       rbc-economics            RBC Economics           https://www.rbc.com/en/economics
+       real-time-geopolitics    Real-Time Geopolitics   /en/insights/real-time-geopolitics
+       markets-in-motion        Markets in Motion       /en/insights/podcasts/markets-in-motion
+       macro-minutes            Macro Minutes           /en/insights/podcasts/macro-minutes
+
+       versions                 which platforms have one
+       outlook-2027             all six
+       us-credentials           RBC Imagine, RBC Economics, Markets in Motion
+       strategy-and-economics   RBC Economics, Real-Time Geopolitics, Markets in Motion, Macro Minutes
+       (Strategic Alternatives reads the same everywhere, so it has one.)
+
+       Photo: /assets/rbccm/images/insights/strategy-economics/platforms/{key}.webp
+       (the same file on desktop and mobile).
+
+       To change a platform everywhere, change it here. To add a
+       wording, add its row under "body" (and under "cta" / "width" if
+       they differ) and an option to every Card{N}Platform dropdown in
+       the properties file. -->
+  <xsl:template name="platformText">
+    <xsl:param name="key"/>
+    <xsl:param name="version"/>
+    <xsl:param name="field"/>
+    <xsl:variable name="at" select="concat($key, '@', $version)"/>
+    <xsl:choose>
+      <xsl:when test="$field = 'title'">
+        <xsl:choose>
+          <xsl:when test="$key = 'strategic-alternatives'">Strategic Alternatives</xsl:when>
+          <xsl:when test="$key = 'rbc-imagine'">RBC Imagine</xsl:when>
+          <xsl:when test="$key = 'rbc-economics'">RBC Economics</xsl:when>
+          <xsl:when test="$key = 'real-time-geopolitics'">Real-Time Geopolitics</xsl:when>
+          <xsl:when test="$key = 'markets-in-motion'">Markets in Motion</xsl:when>
+          <xsl:when test="$key = 'macro-minutes'">Macro Minutes</xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$field = 'href'">
+        <xsl:choose>
+          <xsl:when test="$key = 'strategic-alternatives'">/en/insights/podcasts/strategic-alternatives</xsl:when>
+          <xsl:when test="$key = 'rbc-imagine'">/en/insights/imagine</xsl:when>
+          <xsl:when test="$key = 'rbc-economics'">https://www.rbc.com/en/economics</xsl:when>
+          <xsl:when test="$key = 'real-time-geopolitics'">/en/insights/real-time-geopolitics</xsl:when>
+          <xsl:when test="$key = 'markets-in-motion'">/en/insights/podcasts/markets-in-motion</xsl:when>
+          <xsl:when test="$key = 'macro-minutes'">/en/insights/podcasts/macro-minutes</xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$field = 'body'">
+        <xsl:choose>
+          <!-- Outlook 2027 -->
+          <xsl:when test="$key = 'strategic-alternatives'">Uncover new ways to drive growth and create value with insights from our capital markets experts.</xsl:when>
+          <xsl:when test="$at = 'rbc-imagine@outlook-2027'">Discover the forces of change reshaping industries, economies and societies &#8211; and turn disruption into strategic direction.</xsl:when>
+          <xsl:when test="$at = 'rbc-economics@outlook-2027'">In-depth analysis and perspectives on the economic and market forces shaping the year ahead.</xsl:when>
+          <xsl:when test="$at = 'real-time-geopolitics@outlook-2027'">Timely insight into the geopolitical developments influencing economies, markets, and industries.</xsl:when>
+          <xsl:when test="$at = 'markets-in-motion@outlook-2027'">Perspectives on the trends, catalysts, and market developments shaping U.S. equities.</xsl:when>
+          <xsl:when test="$at = 'macro-minutes@outlook-2027'">Concise analysis of the latest economic and market developments from RBC&#8217;s strategists.</xsl:when>
+          <!-- US Credentials -->
+          <xsl:when test="$at = 'rbc-imagine@us-credentials'">Forward-looking insights into the disruptive forces redefining business and society.</xsl:when>
+          <xsl:when test="$at = 'rbc-economics@us-credentials'">The macro backdrop and rates outlook behind every capital decision.</xsl:when>
+          <xsl:when test="$at = 'markets-in-motion@us-credentials'">Timely reads on the macro and market forces moving U.S. capital markets today.</xsl:when>
+          <!-- Strategy and Economics -->
+          <xsl:when test="$at = 'rbc-economics@strategy-and-economics'">In-depth analysis and insights on the forces shaping businesses and markets.</xsl:when>
+          <xsl:when test="$at = 'real-time-geopolitics@strategy-and-economics'">Decode the evolving power dynamics around energy, commodities and security.</xsl:when>
+          <xsl:when test="$at = 'markets-in-motion@strategy-and-economics'">Nuanced, data-driven perspectives on the trends moving U.S. equity markets.</xsl:when>
+          <xsl:when test="$at = 'macro-minutes@strategy-and-economics'">High-conviction insights on the latest market and economic developments from RBC's desk strategists.</xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <!-- Button label: "Listen" only on the two podcasts as Strategy
+           and Economics words them; "Explore" everywhere else. -->
+      <xsl:when test="$field = 'cta'">
+        <xsl:choose>
+          <xsl:when test="$at = 'markets-in-motion@strategy-and-economics' or $at = 'macro-minutes@strategy-and-economics'">Listen</xsl:when>
+          <xsl:otherwise>Explore</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!-- Description width on desktop, where a wording was tuned to
+           break a certain way. Blank uses the default (340px). -->
+      <xsl:when test="$field = 'width'">
+        <xsl:choose>
+          <xsl:when test="$at = 'rbc-economics@us-credentials' or $at = 'rbc-economics@strategy-and-economics'">274px</xsl:when>
+          <xsl:when test="$at = 'markets-in-motion@us-credentials' or $at = 'markets-in-motion@strategy-and-economics' or $at = 'macro-minutes@strategy-and-economics' or $at = 'rbc-imagine@us-credentials'">295px</xsl:when>
+        </xsl:choose>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- One tile. Its platform dropdown picks a platform (and wording)
+       from the list above; left on "Typed", the tile uses its own
+       typed fields as it always has. Focal point and the tag dropdowns
+       apply either way, and a typed description width replaces the
+       list's. A tile with no title is not printed. -->
   <xsl:template name="renderSlot">
     <xsl:param name="n"/>
-    <xsl:variable name="title" select="normalize-space((//Datum[@ID=concat('Card', $n, 'TitleText')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'TitleText')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-    <xsl:if test="$title != ''">
-      <xsl:variable name="photo"         select="normalize-space(//Datum[@ID=concat('Card', $n, 'PhotoDesktop')]/Image/Path)"/>
-      <xsl:variable name="photoMobile"   select="normalize-space(//Datum[@ID=concat('Card', $n, 'PhotoMobile')]/Image/Path)"/>
+    <xsl:variable name="picked" select="normalize-space((//Datum[@ID=concat('Card', $n, 'Platform')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'Platform')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="platform" select="substring-before(concat($picked, '@'), '@')"/>
+    <xsl:variable name="versionRaw" select="substring-after($picked, '@')"/>
+    <xsl:variable name="version">
+      <xsl:choose>
+        <xsl:when test="$versionRaw != ''"><xsl:value-of select="$versionRaw"/></xsl:when>
+        <xsl:otherwise>outlook-2027</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="listBody"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'body'"/></xsl:call-template></xsl:variable>
+    <!-- Known: a platform in the list, in a wording the list has. -->
+    <xsl:variable name="known" select="string($listBody) != ''"/>
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="field" select="'title'"/></xsl:call-template></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space((//Datum[@ID=concat('Card', $n, 'TitleText')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'TitleText')]/text()[last()][not(../Option[@Selected='true'])])[1])"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="string($title) != ''">
+      <xsl:variable name="platformPhoto" select="concat('/assets/rbccm/images/insights/strategy-economics/platforms/', $platform, '.webp')"/>
+      <xsl:variable name="photo">
+        <xsl:choose>
+          <xsl:when test="$known"><xsl:value-of select="$platformPhoto"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID=concat('Card', $n, 'PhotoDesktop')]/Image/Path)"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="photoMobile">
+        <xsl:choose>
+          <xsl:when test="$known"><xsl:value-of select="$platformPhoto"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID=concat('Card', $n, 'PhotoMobile')]/Image/Path)"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="photoAltRaw"   select="normalize-space(//Datum[@ID=concat('Card', $n, 'PhotoDesktop')]/Image/Description)"/>
       <xsl:variable name="photoAlt">
         <xsl:choose>
-          <xsl:when test="$photoAltRaw != ''"><xsl:value-of select="$photoAltRaw"/></xsl:when>
+          <xsl:when test="not($known) and $photoAltRaw != ''"><xsl:value-of select="$photoAltRaw"/></xsl:when>
           <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="focalPoint"    select="normalize-space((//Datum[@ID=concat('Card', $n, 'FocalPoint')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'FocalPoint')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-      <xsl:variable name="bodyMaxWidth"  select="normalize-space((//Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+      <xsl:variable name="bodyMaxWidthTyped" select="normalize-space((//Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'BodyMaxWidth')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+      <xsl:variable name="bodyMaxWidth">
+        <xsl:choose>
+          <xsl:when test="$bodyMaxWidthTyped != ''"><xsl:value-of select="$bodyMaxWidthTyped"/></xsl:when>
+          <xsl:when test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'width'"/></xsl:call-template></xsl:when>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="titleTagRaw"   select="normalize-space((//Datum[@ID=concat('Card', $n, 'TitleTag')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'TitleTag')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-      <xsl:variable name="body"          select="//Datum[@ID=concat('Card', $n, 'BodyText')]"/>
+      <xsl:variable name="bodyTyped"     select="//Datum[@ID=concat('Card', $n, 'BodyText')]"/>
+      <xsl:variable name="body">
+        <xsl:choose>
+          <xsl:when test="$known"><xsl:value-of select="$listBody"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="$bodyTyped"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:variable name="bodyTagRaw"    select="normalize-space((//Datum[@ID=concat('Card', $n, 'BodyTag')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'BodyTag')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-      <xsl:variable name="ctaText"       select="normalize-space((//Datum[@ID=concat('Card', $n, 'CtaText')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'CtaText')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
-      <xsl:variable name="ctaHref"       select="normalize-space((//Datum[@ID=concat('Card', $n, 'CtaHref')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'CtaHref')]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+      <xsl:variable name="ctaText">
+        <xsl:choose>
+          <xsl:when test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="version" select="string($version)"/><xsl:with-param name="field" select="'cta'"/></xsl:call-template></xsl:when>
+          <xsl:otherwise><xsl:value-of select="normalize-space((//Datum[@ID=concat('Card', $n, 'CtaText')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'CtaText')]/text()[last()][not(../Option[@Selected='true'])])[1])"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="ctaHref">
+        <xsl:choose>
+          <xsl:when test="$known"><xsl:call-template name="platformText"><xsl:with-param name="key" select="$platform"/><xsl:with-param name="field" select="'href'"/></xsl:call-template></xsl:when>
+          <xsl:otherwise><xsl:value-of select="normalize-space((//Datum[@ID=concat('Card', $n, 'CtaHref')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Card', $n, 'CtaHref')]/text()[last()][not(../Option[@Selected='true'])])[1])"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
       <xsl:variable name="titleTag">
         <xsl:call-template name="pickTag">
           <xsl:with-param name="raw" select="$titleTagRaw"/>
           <xsl:with-param name="default" select="'h3'"/>
+          <xsl:with-param name="noH1" select="true()"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="bodyTag">
         <xsl:call-template name="pickTag">
           <xsl:with-param name="raw" select="$bodyTagRaw"/>
           <xsl:with-param name="default" select="'p'"/>
+          <xsl:with-param name="noH1" select="true()"/>
         </xsl:call-template>
       </xsl:variable>
 
@@ -264,6 +426,7 @@
       <xsl:call-template name="pickTag">
         <xsl:with-param name="raw" select="$SUBTITLE_TAG_RAW"/>
         <xsl:with-param name="default" select="'p'"/>
+        <xsl:with-param name="noH1" select="true()"/>
       </xsl:call-template>
     </xsl:variable>
 

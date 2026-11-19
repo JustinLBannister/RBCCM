@@ -15,8 +15,9 @@
       the year before (2026 to 2027) once the hero has loaded.
       OlYearRoll "no" keeps the yellow digit without the roll.
     - a pause / play button for the background video (bottom right),
-      so the motion can be stopped. People who have asked their
-      device to reduce motion get the video paused from the start.
+      so the motion can be stopped. The video always starts playing,
+      whatever the device's reduced-motion setting; the button is how
+      a visitor turns it off.
 
   Companion skins: rbccm-hero (double-dash) maas-mata.xsl,
                    rbccm-hero (double-dash) strategy-and-economics.xsl,
@@ -446,8 +447,7 @@
   if (!wrap) return;
   var native = wrap.querySelector('video');
   var bcEl = wrap.querySelector('video-js');
-  var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-  var paused = reduce;
+  var paused = false;
   var ring = btn.querySelector('.rbccm-hero__video-toggle-ring-fill');
   var frame = 0;
 

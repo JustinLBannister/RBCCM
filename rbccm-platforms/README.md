@@ -10,13 +10,14 @@ A section title and subtitle above up to six photo tiles, each one linking to a 
 ### What the editor can change
 - The section title and subtitle, their HTML tags, and the header alignment (Left or Center).
 - The section background colour. Blank uses the preset default: light blue (`#E7EEF1`) for Strategy and Economics, white for Outlook 2027.
-- Each card (Card 1 to Card 6): the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example "Explore" or "Listen") and CTA URL. Cards 5 and 6 are optional and only show when they have a title.
+- Each card (Card 1 to Card 6): a **platform** dropdown. Pick a platform and the tile's title, description, link, button label and photo fill in by themselves. The title, link and photo of a platform are the same everywhere. Its description was written differently for three pages, so the dropdown lists each wording by page: for example "Markets in Motion - Outlook 2027", "Markets in Motion - US Credentials" and "Markets in Motion - Strategy and Economics". Strategic Alternatives reads the same everywhere and has one entry. The tiles show in card order, so to reorder them change which platform each card has.
+- A card left on Typed uses its own fields, as before: the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example "Explore" or "Listen") and CTA URL. Use this for a tile that is not one of the six, or that needs its own wording on one page. A card shows when it has a platform picked or a typed title.
 - Per card fine-tuning: the title tag and body tag, the photo focal point (which part of the photo stays in view) and the body max-width at desktop (default 340px).
 - The Preset field: Strategy and Economics - Platforms, or Outlook 2027 - Platforms.
 - Technical fields exist (Section ID, Section ARIA label, CSS path, JS path, Last updated). They are set at deploy; Last updated is bumped on each save.
 
 ### What it does not do
-- It does not pull content from anywhere. Every tile is typed and picked by hand.
+- It does not pull content from a feed or a record. The six platforms are written into the skin (`platformText` in `rbccm-platforms.xsl`); changing one there changes it on every page that picks it, after the skin is uploaded.
 - It shows six tiles at most. There is no seventh slot, no carousel and no paging.
 - A tile has no separate button. The whole tile is the link; the CTA copy is only the visible label.
 - It does not darken the photo. The source images have to carry the navy tone behind the text themselves.
@@ -32,7 +33,9 @@ A section title and subtitle above up to six photo tiles, each one linking to a 
 - No enforced character limit. The field labels mark the section title and each card's photos, title, body, CTA copy and CTA URL as required.
 
 ### Empty and edge cases
-- A card with a blank title is hidden, whatever else is filled in.
+- A card with no platform picked and a blank title is hidden, whatever else is filled in.
+- A picked platform ignores that card's typed title, body, link, button label and photos. Focal point, body max-width and the tag fields still apply.
+- A tile title, tile body or the subtitle set to h1 prints with its default tag instead (h3, p and p). Those dropdowns list h1 first, and TeamSite saves the first option when nobody chooses, so an untouched tile would otherwise become a second h1 on the page.
 - Outlook 2027 preset: the section title is at most 740px wide, so a long title wraps onto two lines.
 - Outlook 2027 preset: to choose where the section title breaks on desktop, type a space and then `<br>` at that point in the title (for example `from across <br>RBC Capital Markets`). It breaks there from 992px wide and is ignored on narrower screens, where the title wraps by itself. Keep the space before it, so the two words stay apart when the break is ignored.
 - A blank subtitle is hidden. A blank section title is hidden too, although its label says not to blank it.

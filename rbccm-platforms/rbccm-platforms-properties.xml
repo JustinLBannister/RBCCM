@@ -84,7 +84,7 @@
   <!-- Once a preset is picked, only that variant's Datums render -
        unused Datums for other presets are ignored. -->
   <Datum ID="Preset" Type="SelectSingle" Name="Preset - component variant (required - pick one)">
-    <Option>
+    <Option Selected="true">
       <Display>Strategy and Economics - Platforms</Display>
       <Value>strategy-and-economics-platforms</Value>
     </Option>
@@ -103,7 +103,7 @@
 
   <Datum ID="SectionTitleTag" Type="SelectSingle" Name="Section title tag (optional - controls the HTML tag for SEO / a11y)">
     <Option><Display>h1</Display><Value>h1</Value></Option>
-    <Option><Display>h2</Display><Value>h2</Value></Option>
+    <Option Selected="true"><Display>h2</Display><Value>h2</Value></Option>
     <Option><Display>h3</Display><Value>h3</Value></Option>
     <Option><Display>h4</Display><Value>h4</Value></Option>
     <Option><Display>h5</Display><Value>h5</Value></Option>
@@ -115,7 +115,7 @@
   </Datum>
 
   <Datum ID="SectionSubtitleTag" Type="SelectSingle" Name="Section subtitle tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
   <!-- Optional section background colour. Blank inherits the variant's
        default (e.g. Strategy and Economics = #E7EEF1; default preset =
@@ -123,63 +123,165 @@
        hsl(), a named colour, or a CSS custom property reference. -->
   <Datum ID="SectionBgColor" Type="String" Name="Section background colour e.g. '#E7EEF1' or 'transparent' (optional - blank inherits the preset default)"></Datum>
 
+  <Datum ID="Card1Platform" Type="SelectSingle" Name="Card 1 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card1FocalPoint" Type="String" Name="Card 1 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card1TitleTag" Type="SelectSingle" Name="Card 1 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card1BodyTag" Type="SelectSingle" Name="Card 1 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
   <Datum ID="Card1BodyMaxWidth" Type="String" Name="Card 1 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
+  <Datum ID="Card2Platform" Type="SelectSingle" Name="Card 2 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card2FocalPoint" Type="String" Name="Card 2 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card2TitleTag" Type="SelectSingle" Name="Card 2 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card2BodyTag" Type="SelectSingle" Name="Card 2 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
-  <Datum ID="Card2BodyMaxWidth" Type="String" Name="Card 2 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">274px</Datum>
+  <Datum ID="Card2BodyMaxWidth" Type="String" Name="Card 2 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
+  <Datum ID="Card3Platform" Type="SelectSingle" Name="Card 3 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card3FocalPoint" Type="String" Name="Card 3 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card3TitleTag" Type="SelectSingle" Name="Card 3 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card3BodyTag" Type="SelectSingle" Name="Card 3 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
-  <Datum ID="Card3BodyMaxWidth" Type="String" Name="Card 3 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">295px</Datum>
+  <Datum ID="Card3BodyMaxWidth" Type="String" Name="Card 3 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
+  <Datum ID="Card4Platform" Type="SelectSingle" Name="Card 4 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card4FocalPoint" Type="String" Name="Card 4 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card4TitleTag" Type="SelectSingle" Name="Card 4 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card4BodyTag" Type="SelectSingle" Name="Card 4 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
-  <Datum ID="Card4BodyMaxWidth" Type="String" Name="Card 4 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)">295px</Datum>
+  <Datum ID="Card4BodyMaxWidth" Type="String" Name="Card 4 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
+  <Datum ID="Card5Platform" Type="SelectSingle" Name="Card 5 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card5FocalPoint" Type="String" Name="Card 5 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card5TitleTag" Type="SelectSingle" Name="Card 5 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card5BodyTag" Type="SelectSingle" Name="Card 5 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
   <Datum ID="Card5BodyMaxWidth" Type="String" Name="Card 5 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
+  <Datum ID="Card6Platform" Type="SelectSingle" Name="Card 6 : platform (pick one and its title, description, link, button and photo fill in by themselves; the name after the dash is which page wording it uses. Typed uses the fields below)">
+    <Option Selected="true"><Display>Typed (use this card's own fields below)</Display><Value>typed</Value></Option>
+    <Option><Display>Strategic Alternatives</Display><Value>strategic-alternatives@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - Outlook 2027</Display><Value>rbc-imagine@outlook-2027</Value></Option>
+    <Option><Display>RBC Imagine - US Credentials</Display><Value>rbc-imagine@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Outlook 2027</Display><Value>rbc-economics@outlook-2027</Value></Option>
+    <Option><Display>RBC Economics - US Credentials</Display><Value>rbc-economics@us-credentials</Value></Option>
+    <Option><Display>RBC Economics - Strategy and Economics</Display><Value>rbc-economics@strategy-and-economics</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Outlook 2027</Display><Value>real-time-geopolitics@outlook-2027</Value></Option>
+    <Option><Display>Real-Time Geopolitics - Strategy and Economics</Display><Value>real-time-geopolitics@strategy-and-economics</Value></Option>
+    <Option><Display>Markets in Motion - Outlook 2027</Display><Value>markets-in-motion@outlook-2027</Value></Option>
+    <Option><Display>Markets in Motion - US Credentials</Display><Value>markets-in-motion@us-credentials</Value></Option>
+    <Option><Display>Markets in Motion - Strategy and Economics</Display><Value>markets-in-motion@strategy-and-economics</Value></Option>
+    <Option><Display>Macro Minutes - Outlook 2027</Display><Value>macro-minutes@outlook-2027</Value></Option>
+    <Option><Display>Macro Minutes - Strategy and Economics</Display><Value>macro-minutes@strategy-and-economics</Value></Option>
+    typed
+  </Datum>
   <Datum ID="Card6FocalPoint" Type="String" Name="Card 6 : photo focal point - CSS object-position (optional - blank inherits default 50% 50%)"></Datum>
 
   <Datum ID="Card6TitleTag" Type="SelectSingle" Name="Card 6 : title tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option Selected="true"><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>h3</Datum>
 
   <Datum ID="Card6BodyTag" Type="SelectSingle" Name="Card 6 : body tag (optional - controls the HTML tag for SEO / a11y)">
-    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
+    <Option><Display>h1</Display><Value>h1</Value></Option><Option><Display>h2</Display><Value>h2</Value></Option><Option><Display>h3</Display><Value>h3</Value></Option><Option><Display>h4</Display><Value>h4</Value></Option><Option><Display>h5</Display><Value>h5</Value></Option><Option><Display>h6</Display><Value>h6</Value></Option><Option Selected="true"><Display>p</Display><Value>p</Value></Option><Option><Display>div</Display><Value>div</Value></Option><Option><Display>span</Display><Value>span</Value></Option>p</Datum>
 
   <Datum ID="Card6BodyMaxWidth" Type="String" Name="Card 6 : body max-width at desktop e.g. '340px' (optional - blank inherits default 340px)"></Datum>
 
@@ -198,94 +300,94 @@
   <!-- ==== Card 1 : Real-Time Geopolitics ==== -->
   <Datum ID="Card1PhotoDesktop" Type="Image" Name="Card 1 : desktop photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/real-time-geopolitics.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
   <Datum ID="Card1PhotoMobile" Type="Image" Name="Card 1 : mobile photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/real-time-geopolitics.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
-  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (required - do not blank)">Real-Time Geopolitics</Datum>
+  <Datum ID="Card1TitleText" Type="String" Name="Card 1 : title (required - do not blank)"></Datum>
 
-  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body (required - do not blank; HTML allowed)">Decode the evolving power dynamics around energy, commodities and security.</Datum>
+  <Datum ID="Card1BodyText" Type="Textarea" Name="Card 1 : body (used when the platform above is Typed; HTML allowed)"></Datum>
 
-  <Datum ID="Card1CtaText" Type="String" Name="Card 1 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card1CtaText" Type="String" Name="Card 1 : CTA copy (required - do not blank)"></Datum>
 
-  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA URL (required - full URL or /en/ path)">/en/insights/real-time-geopolitics</Datum>
+  <Datum ID="Card1CtaHref" Type="String" Name="Card 1 : CTA URL (required - full URL or /en/ path)"></Datum>
 
   <!-- ==== Card 2 : RBC Economics ==== -->
   <Datum ID="Card2PhotoDesktop" Type="Image" Name="Card 2 : desktop photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/rbc-economics.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
   <Datum ID="Card2PhotoMobile" Type="Image" Name="Card 2 : mobile photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/rbc-economics.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
-  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (required - do not blank)">RBC Economics</Datum>
+  <Datum ID="Card2TitleText" Type="String" Name="Card 2 : title (required - do not blank)"></Datum>
 
-  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body (required - do not blank; HTML allowed)">In-depth analysis and insights on the forces shaping businesses and markets.</Datum>
+  <Datum ID="Card2BodyText" Type="Textarea" Name="Card 2 : body (used when the platform above is Typed; HTML allowed)"></Datum>
 
-  <Datum ID="Card2CtaText" Type="String" Name="Card 2 : CTA copy (required - do not blank)">Explore</Datum>
+  <Datum ID="Card2CtaText" Type="String" Name="Card 2 : CTA copy (required - do not blank)"></Datum>
 
-  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA URL (required - full URL or /en/ path)">https://www.rbc.com/en/economics</Datum>
+  <Datum ID="Card2CtaHref" Type="String" Name="Card 2 : CTA URL (required - full URL or /en/ path)"></Datum>
 
   <!-- ==== Card 3 : Markets in Motion ==== -->
   <Datum ID="Card3PhotoDesktop" Type="Image" Name="Card 3 : desktop photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/markets-in-motion.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
   <Datum ID="Card3PhotoMobile" Type="Image" Name="Card 3 : mobile photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/markets-in-motion.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
-  <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title (required - do not blank)">Markets in Motion</Datum>
+  <Datum ID="Card3TitleText" Type="String" Name="Card 3 : title (required - do not blank)"></Datum>
 
-  <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body (required - do not blank; HTML allowed)">Nuanced, data-driven perspectives on the trends moving U.S. equity markets.</Datum>
+  <Datum ID="Card3BodyText" Type="Textarea" Name="Card 3 : body (used when the platform above is Typed; HTML allowed)"></Datum>
 
-  <Datum ID="Card3CtaText" Type="String" Name="Card 3 : CTA copy (required - do not blank)">Listen</Datum>
+  <Datum ID="Card3CtaText" Type="String" Name="Card 3 : CTA copy (required - do not blank)"></Datum>
 
-  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA URL (required - full URL or /en/ path)">/en/insights/podcasts/markets-in-motion</Datum>
+  <Datum ID="Card3CtaHref" Type="String" Name="Card 3 : CTA URL (required - full URL or /en/ path)"></Datum>
 
   <!-- ==== Card 4 : Macro Minutes ==== -->
   <Datum ID="Card4PhotoDesktop" Type="Image" Name="Card 4 : desktop photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/macro-minutes.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
   <Datum ID="Card4PhotoMobile" Type="Image" Name="Card 4 : mobile photo - pick from DAM (required - do not blank)">
     <Image>
-      <Path>/assets/rbccm/images/insights/strategy-economics/platforms/macro-minutes.webp</Path>
+      <Path></Path>
       <Description/>
     </Image>
   </Datum>
 
-  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title (required - do not blank)">Macro Minutes</Datum>
+  <Datum ID="Card4TitleText" Type="String" Name="Card 4 : title (required - do not blank)"></Datum>
 
-  <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body (required - do not blank; HTML allowed)">High-conviction insights on the latest market and economic developments from RBC's desk strategists.</Datum>
+  <Datum ID="Card4BodyText" Type="Textarea" Name="Card 4 : body (used when the platform above is Typed; HTML allowed)"></Datum>
 
-  <Datum ID="Card4CtaText" Type="String" Name="Card 4 : CTA copy (required - do not blank)">Listen</Datum>
+  <Datum ID="Card4CtaText" Type="String" Name="Card 4 : CTA copy (required - do not blank)"></Datum>
 
-  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA URL (required - full URL or /en/ path)">/en/insights/podcasts/macro-minutes</Datum>
+  <Datum ID="Card4CtaHref" Type="String" Name="Card 4 : CTA URL (required - full URL or /en/ path)"></Datum>
 
 
   <!-- ==== Card 5 : Macro Minutes ==== -->

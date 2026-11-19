@@ -1050,11 +1050,17 @@
 
 /* Reduced motion: nothing moves. The graphics show in their finished
    state and the tabs switch themes without animation. */
+/* Reduced motion: the glides between themes and the other one-off
+   movement are switched off, but the drawn graphics keep playing. They
+   start by default and the pause button beside each theme stops them. */
 @media (prefers-reduced-motion: reduce) {
   .rbccm-strategic-themes--outlook-2027 *,
   .rbccm-strategic-themes--outlook-2027 *::before {
-    animation: none !important;
     transition: none !important;
+  }
+  .rbccm-strategic-themes--outlook-2027 *:not([data-strategic-themes-graphic]):not([data-strategic-themes-graphic] *),
+  .rbccm-strategic-themes--outlook-2027 *:not([data-strategic-themes-graphic]):not([data-strategic-themes-graphic] *)::before {
+    animation: none !important;
   }
 }
 

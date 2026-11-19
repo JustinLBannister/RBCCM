@@ -32,8 +32,8 @@
    starts it again; the scroll and the layout do not change. Moving to
    another theme, by any route, starts the movement again, so a theme
    never arrives paused. Pause shows on themes that have a drawn
-   graphic, and not for visitors who asked for reduced motion, where
-   nothing moves anyway. The ring round the pause button shows how far
+   graphic. The graphics always start moving, whatever the device's
+   reduced-motion setting; pause is how a visitor turns them off. The ring round the pause button shows how far
    through its loop the showing graphic is (its longest repeating
    animation), and holds while paused.
 
@@ -354,7 +354,7 @@
     }
 
     /* Previous and next go pale at each end. Pause shows on a theme
-       with a drawn graphic, unless the visitor asked for reduced motion. */
+       with a drawn graphic. */
     function syncControls() {
       items.forEach(function (item) {
         var prev = control(item, 'prev');
@@ -363,7 +363,7 @@
         if (prev) prev.setAttribute('aria-disabled', active <= 0 ? 'true' : 'false');
         if (next) next.setAttribute('aria-disabled', active >= count - 1 ? 'true' : 'false');
         if (pause) {
-          pause.hidden = motionQuery.matches || !item.querySelector('[data-strategic-themes-graphic]');
+          pause.hidden = !item.querySelector('[data-strategic-themes-graphic]');
           pause.setAttribute('aria-pressed', still ? 'true' : 'false');
         }
       });
@@ -537,7 +537,7 @@
         /* No loop to follow (or not started yet): an empty ring. */
         ring.style.strokeDashoffset = String(100 - (progress || 0) * 100);
       }
-      if (!still && !motionQuery.matches) ringFrame = window.requestAnimationFrame(drawRing);
+      if (!still) ringFrame = window.requestAnimationFrame(drawRing);
     }
 
     function startRing() {

@@ -80,7 +80,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
 - Background images and videos are decorative: hidden from screen readers, with no alt text field. Brightcove backgrounds on S+E and 2027 Outlook are kept out of the Tab order.
 - 2027 Outlook: screen readers hear the plain year, and the heading's text in the page source is the plain title ("2027 Outlook"); the rolling digits are drawn by the stylesheet and add nothing to it. The ring round the pause / play button shows how far through the background video is: it fills as the video plays and holds where it is while paused. The ring is decoration and is not read out. The pause / play button is a real button, its name switches between "Pause background video" and "Play background video", and it has a visible focus outline.
 - Buttons, the insight card link and breadcrumb links have visible keyboard focus styles.
-- Reduced motion: the entrance slide and the button hover animations are turned off. On 2027 Outlook nothing fades in, the background video starts paused and the year does not roll. The S+E and US Credentials background videos keep playing.
+- Reduced motion: the entrance slide and the button hover animations are turned off. On 2027 Outlook nothing fades in and the year does not roll, but the background video still starts playing; the pause button is how a visitor stops it. The S+E and US Credentials background videos keep playing.
 
 ### Open questions
 - `#request-demo` and `#latest-episode`: the hero only prints the link. The parts that open the demo form and find the newest episode are not in this folder.
