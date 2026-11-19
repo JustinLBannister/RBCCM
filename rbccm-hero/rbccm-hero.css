@@ -1948,37 +1948,52 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   }
 }
 
-/* Background video: covers the section. The footage is a wide strip
-   (about 3.6:1) with the curtain of lines a little left of its centre,
-   so the framing is set here, per width, with three values:
-     --rbccm-hero-video-x       which part of the strip is in view
-                                (0% = its left edge, 100% = its right edge)
-     --rbccm-hero-video-zoom    how far the footage is enlarged
-     --rbccm-hero-video-origin  the point the enlargement grows from
-   Mobile / tablet: the curtain sits behind the copy and the zoom grows
-   down from the top, so the wave lands under the button (mobile comp).
-   Desktop: the strip's left edge is in view, which puts the curtain on
-   the right half, clear of the copy, and the zoom grows in from the
-   right edge (desktop comp). */
+/* Background video. The footage is a wide strip (about 3.6:1) with a
+   curtain of lines that begins roughly a third of the way along it. It
+   is placed so the lines always begin a set distance to the right of
+   the copy's left edge, at any screen width, instead of drifting under
+   the title on wide screens. Four values set the framing:
+     --rbccm-hero-video-lines-at  how far right of the copy's left edge
+                                  the lines begin
+     --rbccm-hero-video-zoom      how much taller than the hero the
+                                  footage is drawn (1 = same height)
+     --rbccm-hero-video-y         where the spare height goes: 0 shows
+                                  the top of the footage (lines sit
+                                  lower), 0.5 is centred, 1 shows the
+                                  bottom (lines sit higher)
+     --rbccm-hero-video-x         fallback only, for browsers without
+                                  container units: which part of the
+                                  strip is in view (0% = its left edge)
+   On very wide screens the footage is enlarged further, so it still
+   reaches the left edge of the hero. */
 .rbccm-hero--outlook-2027 {
-  --rbccm-hero-video-x: 46%;
+  --rbccm-hero-video-lines-at: 190px;
   --rbccm-hero-video-zoom: 1.5;
-  --rbccm-hero-video-origin: center top;
+  --rbccm-hero-video-y: 0;
+  --rbccm-hero-video-x: 40%;
+}
+@media (min-width: 768px) {
+  .rbccm-hero--outlook-2027 { --rbccm-hero-video-lines-at: 330px; }
 }
 @media (min-width: 992px) {
   .rbccm-hero--outlook-2027 {
-    --rbccm-hero-video-x: 0%;
+    --rbccm-hero-video-lines-at: 555px;
     --rbccm-hero-video-zoom: 1.2;
-    --rbccm-hero-video-origin: right center;
+    --rbccm-hero-video-x: 0%;
   }
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video {
+  container-type: size;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   position: absolute;
   z-index: 0;
 }
+/* Fallback framing: cover the hero and crop to the chosen part of the
+   strip. The Brightcove player's own video and poster are named as
+   well, so this wins over the background layer stylesheet's default
+   (top right). */
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video video {
   border: 0;
   display: block;
@@ -1986,9 +2001,6 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   object-fit: cover;
   width: 100%;
 }
-/* The Brightcove player's own video and poster are named as well, so
-   this framing wins over the background layer stylesheet's default
-   (top right). */
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video video,
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-tech,
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster img {
@@ -1997,11 +2009,28 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
   background-position: var(--rbccm-hero-video-x) center !important;
 }
-.rbccm-hero--outlook-2027 .rbccm-hero__bg-video video,
-.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-tech,
-.rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
-  transform: scale(var(--rbccm-hero-video-zoom));
-  transform-origin: var(--rbccm-hero-video-origin);
+/* Pinned framing. 3.5815 is the footage's width / height; 0.337 is how
+   far along the strip the lines begin. --_at is where the lines begin
+   on screen (the copy's left edge, 23px gutter or the 1140 column, plus
+   the set distance); --_w is the drawn width of the footage. */
+@supports (container-type: size) {
+  .rbccm-hero--outlook-2027 .rbccm-hero__bg-video video,
+  .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-tech,
+  .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
+    --_at: calc(max(23px, (100cqw - 1140px) / 2) + var(--rbccm-hero-video-lines-at));
+    --_w: max(calc(100cqh * 3.5815 * var(--rbccm-hero-video-zoom)), calc(var(--_at) / 0.337));
+    bottom: auto !important;
+    height: calc(var(--_w) / 3.5815) !important;
+    left: calc(var(--_at) - var(--_w) * 0.337) !important;
+    max-width: none !important;
+    position: absolute !important;
+    right: auto !important;
+    top: calc((100cqh - var(--_w) / 3.5815) * var(--rbccm-hero-video-y)) !important;
+    width: var(--_w) !important;
+  }
+  .rbccm-hero--outlook-2027 .rbccm-hero__bg-video .video-js .vjs-poster {
+    background-size: cover !important;
+  }
 }
 /* Navy behind the copy so it stays legible over any frame: from the top
    on mobile / tablet (copy over the video), from the left on desktop. */
