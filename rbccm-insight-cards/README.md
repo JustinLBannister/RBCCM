@@ -216,11 +216,12 @@ An optional blue strip under the stories with a small heading, a line of text an
 
 | Field | Notes |
 |---|---|
-| `SectionID` | Section id; the heading gets `<id>-heading`. Must be different on each instance on the page. |
+| `Preset` | Section. One choice that sets the layout, background, phone layout and section id together: Featured insight (Featured, white, stacked), Macro views (Cards, white, swipe with the next story peeking in), Capital Markets perspectives (Cards, dark navy, swipe one at a time) or Latest insights (Cards, light blue, stacked). Custom leaves those to `Layout`, `Theme` and `MobileLayout`. |
+| `SectionID` | Optional. Leave blank: the Section choice sets the id, or with Custom it is built from the section heading ("Macro views" becomes `macro-views`). A typed id is used only when Section is Custom. The heading gets `<id>-heading`. |
 | `SectionAriaLabel` | Optional. Blank uses the section heading. |
 | `CssPath`, `JsPath`, `CacheVersion` | Stylesheet and script paths; bump `CacheVersion` after each upload. |
-| `Layout` | Cards or Featured. |
-| `Theme` | White, Light blue or Dark navy. |
+| `Layout` | Cards or Featured. Used when Section is Custom. |
+| `Theme` | White, Light blue or Dark navy. Used when Section is Custom. |
 | `ShowShare` | Yes (default) or No. |
 | `ShowFilters` | No (default) or Yes. Cards layout only. Not shown on phones. Switched off in the stylesheet for now. |
 | `StoryPriority` | When a story is picked: the picked story wins (default; typed fields show when no story is picked or fill what the story lacks), or the typed fields win. |
@@ -255,7 +256,7 @@ An optional blue strip under the stories with a small heading, a line of text an
 
 1. Upload `rbccm-insight-cards.css` to `/assets/rbccm/css/components/` and `rbccm-insight-cards.js` to `/assets/rbccm/js/components/`.
 2. Register `rbccm-insight-cards--outlook-2027.xsl` in TeamSite with `rbccm-insight-cards-properties.xml`.
-3. Add one instance per section and give each its own `SectionID`.
+3. Add one instance per section and pick its Section (Featured insight, Macro views, Capital Markets perspectives or Latest insights). That sets the layout, background, phone layout and id.
 4. Set the Layout and Background, then pick the stories (or fill the fields by hand) and upload and pick the story images.
 5. Check each action link goes to the right story, and that Copy link in the share popup copies that story's address.
 6. Bump `CacheVersion`.

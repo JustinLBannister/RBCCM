@@ -255,7 +255,7 @@
     <xsl:variable name="LINK_RAW"  select="normalize-space(//Datum[@ID=concat('Theme', $n, 'Link')])"/>
     <xsl:variable name="BTN_RAW"   select="normalize-space(//Datum[@ID=concat('Theme', $n, 'ButtonLabel')])"/>
     <xsl:variable name="BTN_DEFAULT" select="normalize-space(//Datum[@ID='ButtonLabel'])"/>
-    <xsl:variable name="GRAPHIC_RAW" select="translate(normalize-space(//Datum[@ID=concat('Theme', $n, 'Graphic')]/text()[last()]), $UPPER, $LOWER)"/>
+    <xsl:variable name="GRAPHIC_RAW" select="translate(normalize-space((//Datum[@ID=concat('Theme', $n, 'Graphic')]/Option[@Selected='true']/Value | //Datum[@ID=concat('Theme', $n, 'Graphic')]/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
     <xsl:variable name="CAPTION"   select="normalize-space(//Datum[@ID=concat('Theme', $n, 'GraphicCaption')])"/>
     <xsl:variable name="IMG"       select="normalize-space(//Datum[@ID=concat('Theme', $n, 'Image')]/Image/Path)"/>
     <xsl:variable name="IMG_ALT"   select="normalize-space(//Datum[@ID=concat('Theme', $n, 'Image')]/Image/Description)"/>

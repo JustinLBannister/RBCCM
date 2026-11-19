@@ -78,7 +78,7 @@
   <xsl:template name="datumValue">
     <xsl:param name="n"/>
     <xsl:param name="raw" select="false()"/>
-    <xsl:variable name="t" select="normalize-space($n[1]/text()[last()])"/>
+    <xsl:variable name="t" select="normalize-space(($n[1]/Option[@Selected='true']/Value | $n[1]/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:choose>
       <xsl:when test="$raw"><xsl:value-of select="$n[1]"/></xsl:when>
       <xsl:when test="$t != ''"><xsl:value-of select="$t"/></xsl:when>
@@ -199,10 +199,10 @@
 
   <xsl:template match="/">
 
-    <xsl:variable name="SECTION_ID"     select="normalize-space(//Datum[@ID='SectionID']/text()[last()])"/>
-    <xsl:variable name="SECTION_ARIA"   select="normalize-space(//Datum[@ID='SectionAriaLabel']/text()[last()])"/>
-    <xsl:variable name="CSS_PATH"       select="normalize-space(//Datum[@ID='CssPath']/text()[last()])"/>
-    <xsl:variable name="CACHE_VERSION"  select="normalize-space(//Datum[@ID='CacheVersion']/text()[last()])"/>
+    <xsl:variable name="SECTION_ID"     select="normalize-space((//Datum[@ID='SectionID']/Option[@Selected='true']/Value | //Datum[@ID='SectionID']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="SECTION_ARIA"   select="normalize-space((//Datum[@ID='SectionAriaLabel']/Option[@Selected='true']/Value | //Datum[@ID='SectionAriaLabel']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="CSS_PATH"       select="normalize-space((//Datum[@ID='CssPath']/Option[@Selected='true']/Value | //Datum[@ID='CssPath']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="CACHE_VERSION"  select="normalize-space((//Datum[@ID='CacheVersion']/Option[@Selected='true']/Value | //Datum[@ID='CacheVersion']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
 
     <!-- Content Datums (shared IDs) -->
     <xsl:variable name="OL_LINE1">
@@ -228,16 +228,16 @@
          digit is yellow; unless OlYearRoll is "no", it rolls up from the
          digit before (6 to 7; 0 rolls up from 9). -->
     <xsl:variable name="OL_IS_YEAR" select="string-length($OL_LINE1) = 4 and translate($OL_LINE1, '0123456789', '') = ''"/>
-    <xsl:variable name="OL_ROLL_RAW" select="translate(normalize-space(//Datum[@ID='OlYearRoll']/text()[last()]), 'NO', 'no')"/>
+    <xsl:variable name="OL_ROLL_RAW" select="translate(normalize-space((//Datum[@ID='OlYearRoll']/Option[@Selected='true']/Value | //Datum[@ID='OlYearRoll']/text()[last()][not(../Option[@Selected='true'])])[1]), 'NO', 'no')"/>
     <xsl:variable name="OL_ROLL" select="$OL_IS_YEAR and $OL_ROLL_RAW != 'no'"/>
     <xsl:variable name="OL_YEAR_LAST" select="substring($OL_LINE1, 4, 1)"/>
     <xsl:variable name="OL_YEAR_PREV" select="(number($OL_YEAR_LAST) + 9) mod 10"/>
 
     <!-- Button: the MAAS+MATA button 1 fields. Blank label = no button. -->
-    <xsl:variable name="OL_CTA_LABEL" select="normalize-space(//Datum[@ID='MmCta1Label']/text()[last()])"/>
-    <xsl:variable name="OL_CTA_HREF"  select="normalize-space(//Datum[@ID='MmCta1Href']/text()[last()])"/>
-    <xsl:variable name="OL_CTA_ARIA"  select="normalize-space(//Datum[@ID='MmCta1AriaLabel']/text()[last()])"/>
-    <xsl:variable name="OL_CTA_TITLE" select="normalize-space(//Datum[@ID='MmCta1Title']/text()[last()])"/>
+    <xsl:variable name="OL_CTA_LABEL" select="normalize-space((//Datum[@ID='MmCta1Label']/Option[@Selected='true']/Value | //Datum[@ID='MmCta1Label']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="OL_CTA_HREF"  select="normalize-space((//Datum[@ID='MmCta1Href']/Option[@Selected='true']/Value | //Datum[@ID='MmCta1Href']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="OL_CTA_ARIA"  select="normalize-space((//Datum[@ID='MmCta1AriaLabel']/Option[@Selected='true']/Value | //Datum[@ID='MmCta1AriaLabel']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
+    <xsl:variable name="OL_CTA_TITLE" select="normalize-space((//Datum[@ID='MmCta1Title']/Option[@Selected='true']/Value | //Datum[@ID='MmCta1Title']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="OL_CTA_ICON">
       <xsl:call-template name="datum"><xsl:with-param name="id" select="'MmCta1Icon'"/></xsl:call-template>
     </xsl:variable>
@@ -254,7 +254,7 @@
     </xsl:variable>
     <xsl:variable name="OL_BG_IDS" select="translate($OL_BG_VIDEO_ID, ' ', '')"/>
     <xsl:variable name="OL_BG_PLAYER_JS">https://players.brightcove.net/<xsl:value-of select="$OL_BG_ACCT"/>/<xsl:value-of select="$OL_BG_PLAYER"/>_default/index.min.js</xsl:variable>
-    <xsl:variable name="OL_BG_LAYER_CSS_RAW" select="normalize-space(//Datum[@ID='BgBrightcoveLayerCssPath']/text()[last()])"/>
+    <xsl:variable name="OL_BG_LAYER_CSS_RAW" select="normalize-space((//Datum[@ID='BgBrightcoveLayerCssPath']/Option[@Selected='true']/Value | //Datum[@ID='BgBrightcoveLayerCssPath']/text()[last()][not(../Option[@Selected='true'])])[1])"/>
     <xsl:variable name="OL_BG_LAYER_CSS">
       <xsl:choose>
         <xsl:when test="$OL_BG_LAYER_CSS_RAW != ''"><xsl:value-of select="$OL_BG_LAYER_CSS_RAW"/></xsl:when>

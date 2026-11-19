@@ -45,18 +45,33 @@
 -->
 <Properties ComponentID="rbccm-insight-cards">
 
-  <Datum ID="SectionID" Type="String" Name="Section ID (unique per page; also used for the heading id)">macro-views</Datum>
+  <Datum ID="SectionID" Type="String" Name="Section ID (optional - leave blank: the Section choice below sets it, or it is built from the section heading)"></Datum>
   <Datum ID="SectionAriaLabel" Type="String" Name="Section aria label (optional - blank uses the section heading)"></Datum>
   <Datum ID="CssPath" Type="String" Name="CSS path (technical - set once at deploy)">/assets/rbccm/css/components/rbccm-insight-cards.css</Datum>
   <Datum ID="JsPath" Type="String" Name="JS path (technical - powers the share popup and filter pills)">/assets/rbccm/js/components/rbccm-insight-cards.js</Datum>
   <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save - format YYYY-MM-DD-HHMM)">2026-11-13-1900</Datum>
 
-  <Datum ID="Layout" Type="SelectSingle" Name="Layout (Cards = columns by number of stories; Featured = Story 1 large, others beside it)">
+  <!-- One choice for the four 2027 Outlook sections. Each sets the
+       layout, background, phone layout and section ID:
+         Featured insight               Featured, white, stacked
+         Macro views                    Cards, white, swipe with the next story peeking in
+         Capital Markets perspectives   Cards, dark navy, swipe one at a time
+         Latest insights                Cards, light blue, stacked
+       Custom leaves those to the three settings that follow. -->
+  <Datum ID="Preset" Type="SelectSingle" Name="Section (sets the layout, background, phone layout and section ID together; Custom uses the three settings below)">
+    <Option Selected="true"><Display>Custom (use the three settings below)</Display><Value>custom</Value></Option>
+    <Option><Display>Featured insight</Display><Value>featured-insight</Value></Option>
+    <Option><Display>Macro views</Display><Value>macro-views</Value></Option>
+    <Option><Display>Capital Markets perspectives</Display><Value>capital-markets-perspectives</Value></Option>
+    <Option><Display>Latest insights</Display><Value>latest-insights</Value></Option>
+    custom
+  </Datum>
+  <Datum ID="Layout" Type="SelectSingle" Name="Layout - used when Section is Custom (Cards = columns by number of stories; Featured = first story large, others beside it)">
     <Option Selected="true"><Display>Cards</Display><Value>cards</Value></Option>
     <Option><Display>Featured</Display><Value>featured</Value></Option>
     cards
   </Datum>
-  <Datum ID="Theme" Type="SelectSingle" Name="Background (White, Light blue or Dark navy)">
+  <Datum ID="Theme" Type="SelectSingle" Name="Background - used when Section is Custom (White, Light blue or Dark navy)">
     <Option Selected="true"><Display>White</Display><Value>white</Value></Option>
     <Option><Display>Light blue</Display><Value>tint</Value></Option>
     <Option><Display>Dark navy</Display><Value>dark</Value></Option>
@@ -72,7 +87,7 @@
     <Option><Display>Yes</Display><Value>yes</Value></Option>
     no
   </Datum>
-  <Datum ID="MobileLayout" Type="SelectSingle" Name="On phones (Cards layout, two or more stories) : stack the stories, or one row to swipe through with arrows and dots">
+  <Datum ID="MobileLayout" Type="SelectSingle" Name="On phones - used when Section is Custom (Cards layout, two or more stories) : stack the stories, or one row to swipe through with arrows and dots">
     <Option Selected="true"><Display>Stacked</Display><Value>stack</Value></Option>
     <Option><Display>Swipe - one story at a time</Display><Value>carousel</Value></Option>
     <Option><Display>Swipe - next story peeks in</Display><Value>carousel-peek</Value></Option>
@@ -168,9 +183,9 @@
   <!-- ============================================================
        Notification strip under the stories (blank text hides it)
        ============================================================ -->
-  <Datum ID="NotifyEyebrow" Type="String" Name="Notification strip : small heading (e.g. Never miss an Outlook episode)">Never miss an Outlook episode</Datum>
-  <Datum ID="NotifyText" Type="String" Name="Notification strip : text">Stay up to date with the latest conversations and insights.</Datum>
-  <Datum ID="NotifyButtonLabel" Type="String" Name="Notification strip : button label (e.g. Get notified)">Get notified</Datum>
-  <Datum ID="NotifyLink" Type="String" Name="Notification strip : button link (blank hides the button)">#</Datum>
+  <Datum ID="NotifyEyebrow" Type="String" Name="Notification strip : small heading (e.g. Never miss an Outlook episode)"></Datum>
+  <Datum ID="NotifyText" Type="String" Name="Notification strip : text"></Datum>
+  <Datum ID="NotifyButtonLabel" Type="String" Name="Notification strip : button label (e.g. Get notified)"></Datum>
+  <Datum ID="NotifyLink" Type="String" Name="Notification strip : button link (blank hides the button)"></Datum>
 
 </Data>

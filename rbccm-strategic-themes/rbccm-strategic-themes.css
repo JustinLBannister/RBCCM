@@ -1057,3 +1057,21 @@
     transition: none !important;
   }
 }
+
+/* ---------- The site's page wrapper ----------
+   The pinned scroll relies on position: sticky, which does nothing
+   inside a box that hides its overflow. The site sets overflow-x:
+   hidden on #ls-canvas (the wrapper round every page), and that makes
+   it such a box, so the section would always fall back to tabs. On a
+   page that has this section the wrapper clips sideways overflow
+   instead of hiding it: nothing can stick out to the side, as before,
+   but sticky works. flow-root keeps the wrapper containing its floats,
+   which hidden overflow also did. Browsers without overflow: clip keep
+   the site's rule and show the tabs version. */
+@supports (overflow: clip) {
+  #ls-canvas:has(.rbccm-strategic-themes--outlook-2027) {
+    display: flow-root;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+}

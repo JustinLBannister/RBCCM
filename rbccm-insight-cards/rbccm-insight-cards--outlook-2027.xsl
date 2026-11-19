@@ -98,6 +98,39 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Text turned into an id: lower case, spaces to hyphens, and
+       punctuation dropped. "Latest insights &amp; highlights" becomes
+       latest-insights-highlights. -->
+  <xsl:template name="rbccmSlug">
+    <xsl:param name="s"/>
+    <xsl:variable name="DROP">&amp;/\.,:;!?()[]{}'"`+*#@%^=|&lt;&gt;~_&#8216;&#8217;&#8220;&#8221;&#8211;&#8212;&#183;&#215;&#160;</xsl:variable>
+    <xsl:variable name="lower" select="translate(normalize-space($s), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:call-template name="rbccmOneHyphen">
+      <xsl:with-param name="s" select="translate($lower, concat(' ', $DROP), '-')"/>
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template name="rbccmOneHyphen">
+    <xsl:param name="s"/>
+    <xsl:choose>
+      <xsl:when test="contains($s, '--')">
+        <xsl:call-template name="rbccmOneHyphen"><xsl:with-param name="s" select="concat(substring-before($s, '--'), '-', substring-after($s, '--'))"/></xsl:call-template>
+      </xsl:when>
+      <xsl:when test="starts-with($s, '-')"><xsl:call-template name="rbccmOneHyphen"><xsl:with-param name="s" select="substring($s, 2)"/></xsl:call-template></xsl:when>
+      <xsl:when test="substring($s, string-length($s)) = '-' and $s != ''"><xsl:call-template name="rbccmOneHyphen"><xsl:with-param name="s" select="substring($s, 1, string-length($s) - 1)"/></xsl:call-template></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$s"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- ===== Reading a dropdown =====
+       TeamSite records a dropdown's choice by marking that option
+       Selected="true"; it does not rewrite the default written after
+       the options in the properties file. So every dropdown is read as
+       "the selected option's value, or failing that the text after the
+       options":
+         (D/Option[@Selected='true']/Value | D/text()[last()][not(../Option[@Selected='true'])])[1]
+       Reading only the text after the options leaves the dropdown
+       stuck on its default. -->
+
   <!-- ===== Where the stories come from =====
        Stories are a list in the component's data: one "Story" group
        per story, added with the list's own add button, each with a
@@ -134,7 +167,7 @@
     <xsl:variable name="SRC" select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
     <xsl:variable name="typed" select="normalize-space($SRC[@ID=concat('Item', $n, 'Title') or @ID='Title' or starts-with(@Name, 'Title')])"/>
     <xsl:variable name="record" select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR"/>
-    <xsl:variable name="storyFirst" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
+    <xsl:variable name="storyFirst" select="normalize-space((//Datum[@ID='StoryPriority']/Option[@Selected='true']/Value | //Datum[@ID='StoryPriority']/text()[last()][not(../Option[@Selected='true'])])[1]) != 'typed'"/>
     <xsl:variable name="picked">
       <xsl:choose>
         <xsl:when test="normalize-space($record/*/summarytitle) != ''"><xsl:value-of select="normalize-space($record/*/summarytitle)"/></xsl:when>
@@ -193,21 +226,32 @@
     <xsl:variable name="JS_PATH"       select="normalize-space(//Datum[@ID='JsPath'])"/>
     <xsl:variable name="CACHE_VERSION" select="normalize-space(//Datum[@ID='CacheVersion'])"/>
 
-    <!-- Dropdowns: the chosen value is the Datum's last text node. -->
-    <xsl:variable name="LAYOUT_RAW"  select="translate(normalize-space(//Datum[@ID='Layout']/text()[last()]), $UPPER, $LOWER)"/>
-    <xsl:variable name="THEME_RAW"   select="translate(normalize-space(//Datum[@ID='Theme']/text()[last()]), $UPPER, $LOWER)"/>
-    <xsl:variable name="SHARE_RAW"   select="translate(normalize-space(//Datum[@ID='ShowShare']/text()[last()]), $UPPER, $LOWER)"/>
-    <xsl:variable name="FILTERS_RAW" select="translate(normalize-space(//Datum[@ID='ShowFilters']/text()[last()]), $UPPER, $LOWER)"/>
-    <xsl:variable name="MOBILE_RAW"  select="translate(normalize-space(//Datum[@ID='MobileLayout']/text()[last()]), $UPPER, $LOWER)"/>
+    <!-- Section: one dropdown that sets the layout, background, phone
+         layout and section ID together for the four 2027 Outlook
+         sections. "Custom" (or a copy saved before this existed) uses
+         the separate Layout, Background and On phones settings. -->
+    <xsl:variable name="PRESET" select="translate(normalize-space((//Datum[@ID='Preset']/Option[@Selected='true']/Value | //Datum[@ID='Preset']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="IS_PRESET" select="$PRESET = 'featured-insight' or $PRESET = 'macro-views' or $PRESET = 'capital-markets-perspectives' or $PRESET = 'latest-insights'"/>
+    <!-- Dropdowns: see "Reading a dropdown" above. -->
+    <xsl:variable name="LAYOUT_RAW"  select="translate(normalize-space((//Datum[@ID='Layout']/Option[@Selected='true']/Value | //Datum[@ID='Layout']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="THEME_RAW"   select="translate(normalize-space((//Datum[@ID='Theme']/Option[@Selected='true']/Value | //Datum[@ID='Theme']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="SHARE_RAW"   select="translate(normalize-space((//Datum[@ID='ShowShare']/Option[@Selected='true']/Value | //Datum[@ID='ShowShare']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="FILTERS_RAW" select="translate(normalize-space((//Datum[@ID='ShowFilters']/Option[@Selected='true']/Value | //Datum[@ID='ShowFilters']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="MOBILE_RAW"  select="translate(normalize-space((//Datum[@ID='MobileLayout']/Option[@Selected='true']/Value | //Datum[@ID='MobileLayout']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
 
     <xsl:variable name="LAYOUT">
       <xsl:choose>
+        <xsl:when test="$PRESET = 'featured-insight'">featured</xsl:when>
+        <xsl:when test="$IS_PRESET">cards</xsl:when>
         <xsl:when test="$LAYOUT_RAW = 'featured'">featured</xsl:when>
         <xsl:otherwise>cards</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="THEME">
       <xsl:choose>
+        <xsl:when test="$PRESET = 'capital-markets-perspectives'">dark</xsl:when>
+        <xsl:when test="$PRESET = 'latest-insights'">tint</xsl:when>
+        <xsl:when test="$IS_PRESET">white</xsl:when>
         <xsl:when test="$THEME_RAW = 'tint'">tint</xsl:when>
         <xsl:when test="$THEME_RAW = 'dark'">dark</xsl:when>
         <xsl:otherwise>white</xsl:otherwise>
@@ -218,6 +262,9 @@
     <!-- Phones: stack the stories (default), or one row to swipe. -->
     <xsl:variable name="MOBILE">
       <xsl:choose>
+        <xsl:when test="$PRESET = 'macro-views'">carousel-peek</xsl:when>
+        <xsl:when test="$PRESET = 'capital-markets-perspectives'">carousel</xsl:when>
+        <xsl:when test="$IS_PRESET">stack</xsl:when>
         <xsl:when test="$MOBILE_RAW = 'carousel-peek'">carousel-peek</xsl:when>
         <xsl:when test="$MOBILE_RAW = 'carousel'">carousel</xsl:when>
         <xsl:otherwise>stack</xsl:otherwise>
@@ -279,9 +326,15 @@
     <!-- Swipe row on phones: Cards layout with two or more stories. -->
     <xsl:variable name="HAS_CAROUSEL" select="$MOBILE != 'stack' and $LAYOUT = 'cards' and $COUNT &gt; 1"/>
 
+    <!-- The section's id (and its heading's). In order: the Section
+         dropdown's own name; a typed Section ID; the section heading
+         turned into an id ("Macro views" becomes macro-views). -->
+    <xsl:variable name="HEADING_ID"><xsl:call-template name="rbccmSlug"><xsl:with-param name="s" select="$HEADING"/></xsl:call-template></xsl:variable>
     <xsl:variable name="ID_BASE">
       <xsl:choose>
+        <xsl:when test="$IS_PRESET"><xsl:value-of select="$PRESET"/></xsl:when>
         <xsl:when test="$SECTION_ID != ''"><xsl:value-of select="$SECTION_ID"/></xsl:when>
+        <xsl:when test="string($HEADING_ID) != ''"><xsl:value-of select="$HEADING_ID"/></xsl:when>
         <xsl:otherwise>rbccm-insight-cards</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -297,6 +350,7 @@
         <xsl:text>rbccm-insight-cards rbccm-insight-cards--outlook-2027 rbccm-insight-cards--</xsl:text><xsl:value-of select="$LAYOUT"/>
         <xsl:text> rbccm-insight-cards--</xsl:text><xsl:value-of select="$THEME"/>
         <xsl:text> rbccm-insight-cards--count-</xsl:text><xsl:value-of select="$COUNT"/>
+        <xsl:if test="$IS_PRESET"><xsl:text> rbccm-insight-cards--</xsl:text><xsl:value-of select="$PRESET"/></xsl:if>
         <xsl:if test="$LAYOUT = 'featured'">
           <xsl:choose>
             <xsl:when test="$SIDE_COUNT = 0 or not($H1)"> rbccm-insight-cards--feature-only</xsl:when>
@@ -577,7 +631,7 @@
          on a copy saved before the list existed. -->
     <xsl:variable name="SRC"         select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
     <xsl:variable name="DCR"         select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='StoryPick' or starts-with(@Name, 'Pick the story')]/DCR"/>
-    <xsl:variable name="STORY_FIRST" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
+    <xsl:variable name="STORY_FIRST" select="normalize-space((//Datum[@ID='StoryPriority']/Option[@Selected='true']/Value | //Datum[@ID='StoryPriority']/text()[last()][not(../Option[@Selected='true'])])[1]) != 'typed'"/>
     <xsl:variable name="HAS_STORY"   select="boolean($DCR/*)"/>
     <!-- The first author with a name (a story can carry several). -->
     <xsl:variable name="S_AUTHOR"    select="normalize-space(($DCR//author_name_new[normalize-space(.) != ''] | $DCR/*/author_name[normalize-space(.) != ''])[1])"/>
@@ -621,16 +675,8 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="BADGE"       select="normalize-space($SRC[@ID=concat('Item', $n, 'Badge') or @ID='Badge' or starts-with(@Name, 'Pill')])"/>
-    <!-- A dropdown's choice is the text after its options, or (as some
-         lists save it) the option marked selected. -->
     <xsl:variable name="TYPE_AT"     select="$SRC[@ID=concat('Item', $n, 'Type') or @ID='Type' or starts-with(@Name, 'Type')]"/>
-    <xsl:variable name="TYPE_PICKED">
-      <xsl:choose>
-        <xsl:when test="normalize-space($TYPE_AT/text()[last()]) != ''"><xsl:value-of select="normalize-space($TYPE_AT/text()[last()])"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="normalize-space($TYPE_AT/Option[@Selected='true']/Value)"/></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="TYPE_RAW"    select="translate(string($TYPE_PICKED), $UPPER, $LOWER)"/>
+    <xsl:variable name="TYPE_RAW"    select="translate(normalize-space(($TYPE_AT/Option[@Selected='true']/Value | $TYPE_AT/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
     <xsl:variable name="CATEGORY"    select="normalize-space($SRC[@ID=concat('Item', $n, 'Category') or @ID='Category' or starts-with(@Name, 'Category')])"/>
     <xsl:variable name="SUMMARY_RAW" select="$SRC[@ID=concat('Item', $n, 'Summary') or @ID='Summary' or starts-with(@Name, 'Summary')]"/>
     <xsl:variable name="META_TYPED"  select="normalize-space($SRC[@ID=concat('Item', $n, 'Meta') or @ID='Meta' or starts-with(@Name, 'Meta')])"/>

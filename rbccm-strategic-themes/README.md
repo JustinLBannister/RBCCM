@@ -71,7 +71,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - A graphic with no words typed: it is drawn without words. The AI graphic then shows four unlabelled points on its chain.
 - Energy words typed without a colon: there is no chart title and all the words go under the chart.
 - No themes at all: only the eyebrow and heading show.
-- The page template clips or scrolls the section: the tabs version is used instead of pinned scroll, at every width.
+- The page template clips or scrolls the section: the tabs version is used instead of pinned scroll, at every width. The site wrapper (`#ls-canvas`) does this by default, so the stylesheet switches it to clipping sideways overflow on any page that has this section, which lets the pinned scroll run.
 - The window is resized or reduced motion is switched on: the mode is chosen again.
 - Blank "Fixed site header height": the script measures the header from the page.
 - No script: every theme shows in a plain numbered list with its number, title, description and button. Images show; the drawn graphics and the tabs do not.

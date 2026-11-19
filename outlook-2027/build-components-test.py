@@ -69,6 +69,16 @@ def load_props(path):
     raw = re.sub(r'<\?xml[^>]*\?>', '', raw)
     return ET.fromstring(('<w>' + raw + '</w>').encode('utf-8'))
 
+def pick_option(options, value):
+    """Choose a dropdown option the way TeamSite saves it: the chosen
+    option is marked Selected. The text after the options is set too."""
+    for o in options:
+        if (o.findtext('Value') or '').strip() == value:
+            o.set('Selected', 'true')
+        elif 'Selected' in o.attrib:
+            del o.attrib['Selected']
+    options[-1].tail = value
+
 def set_datum(tree, key, value):
     """Text field, dropdown (value after its options) or image (Path)."""
     found = tree.xpath('//Datum[@ID=$k]', k=key)
@@ -82,7 +92,7 @@ def set_datum(tree, key, value):
     if path is not None:
         path.text = value
     elif options:
-        options[-1].tail = value
+        pick_option(options, value)
     else:
         d.text = value
 
@@ -105,7 +115,7 @@ def set_stories(tree, stories):
             if path is not None:
                 path.text = value
             elif options:
-                options[-1].tail = value
+                pick_option(options, value)
             else:
                 d.text = value
         parent.insert(at + i, group)
