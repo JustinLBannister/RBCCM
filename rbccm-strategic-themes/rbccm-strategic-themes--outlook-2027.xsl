@@ -106,6 +106,7 @@
 
     <xsl:variable name="EYEBROW" select="normalize-space(//Datum[@ID='Eyebrow'])"/>
     <xsl:variable name="HEADING" select="normalize-space(//Datum[@ID='SectionHeading'])"/>
+    <xsl:variable name="INTRO"   select="normalize-space(//Datum[@ID='SectionIntro'])"/>
     <xsl:variable name="TABS_LABEL_RAW" select="normalize-space(//Datum[@ID='TabsLabel'])"/>
     <xsl:variable name="TABS_LABEL">
       <xsl:choose>
@@ -162,8 +163,8 @@
         <div class="rbccm-strategic-themes__inner rbccm-strategic-themes__inner--outlook-2027">
           <div class="rbccm-strategic-themes__main rbccm-strategic-themes__main--outlook-2027">
 
-            <xsl:if test="$EYEBROW != '' or $HEADING != ''">
-              <div class="rbccm-strategic-themes__header rbccm-strategic-themes__header--outlook-2027">
+            <xsl:if test="$EYEBROW != '' or $HEADING != '' or $INTRO != ''">
+              <header class="rbccm-strategic-themes__header rbccm-strategic-themes__header--outlook-2027">
                 <xsl:if test="$EYEBROW != ''">
                   <p class="rbccm-strategic-themes__eyebrow rbccm-strategic-themes__eyebrow--outlook-2027"><xsl:value-of select="$EYEBROW"/></p>
                 </xsl:if>
@@ -173,7 +174,10 @@
                     <xsl:value-of select="$HEADING"/>
                   </h2>
                 </xsl:if>
-              </div>
+                <xsl:if test="$INTRO != ''">
+                  <p class="rbccm-strategic-themes__intro rbccm-strategic-themes__intro--outlook-2027"><xsl:value-of select="$INTRO"/></p>
+                </xsl:if>
+              </header>
             </xsl:if>
 
             <!-- Numbered tabs. Printed hidden; the script shows them, so
@@ -234,7 +238,7 @@
   </xsl:template>
 
   <!-- One theme. Typed fields win; otherwise the picked story's
-       description / link (or url) are used. The DCR wrapper element
+       description and public address (/en/insights/YYYY/MM/slug) are used. The DCR wrapper element
        varies by story type, so it is wildcarded (DCR/*/field), same as
        rbccm-insight-list. -->
   <xsl:template name="THEME">
@@ -275,11 +279,31 @@
     <xsl:variable name="DESC_TEXT"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$DESC"/></xsl:call-template></xsl:variable>
     <xsl:variable name="HAS_DESC" select="normalize-space(translate($DESC_TEXT, '&#160;', '')) != '' and normalize-space($DESC_TEXT) != '&amp;nbsp;'"/>
 
+    <xsl:variable name="S_LINK">
+      <!-- The story's address. Story pages publish to
+           /en/insights/YYYY/MM/slug, which mirrors where the story is
+           saved (templatedata/article/story/data/YYYY/MM/slug). The
+           record itself only carries the internal viewer address in
+           can_url (.../story.page?dcr=templatedata/...), so the clean
+           address is built from that path. A story set to an External
+           URL links there. -->
+      <xsl:variable name="CAN" select="normalize-space($DCR/*/can_url)"/>
+      <xsl:variable name="SAVED_AT" select="substring-after($CAN, 'templatedata/article/story/data/')"/>
+      <xsl:choose>
+        <xsl:when test="normalize-space($DCR/*/content/link) != ''"><xsl:value-of select="normalize-space($DCR/*/content/link)"/></xsl:when>
+        <xsl:when test="normalize-space($DCR/*/link) != ''"><xsl:value-of select="normalize-space($DCR/*/link)"/></xsl:when>
+        <xsl:when test="$SAVED_AT != '' and contains($SAVED_AT, '.xml')"><xsl:value-of select="concat('/en/insights/', substring-before($SAVED_AT, '.xml'))"/></xsl:when>
+        <xsl:when test="$SAVED_AT != '' and contains($SAVED_AT, '&amp;')"><xsl:value-of select="concat('/en/insights/', substring-before($SAVED_AT, '&amp;'))"/></xsl:when>
+        <xsl:when test="$SAVED_AT != ''"><xsl:value-of select="concat('/en/insights/', $SAVED_AT)"/></xsl:when>
+        <xsl:when test="$CAN != '' and not(contains($CAN, 'dcr='))"><xsl:value-of select="$CAN"/></xsl:when>
+        <xsl:when test="normalize-space($DCR/*/url) != ''"><xsl:value-of select="normalize-space($DCR/*/url)"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$CAN"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="LINK">
       <xsl:choose>
         <xsl:when test="$LINK_RAW != ''"><xsl:value-of select="$LINK_RAW"/></xsl:when>
-        <xsl:when test="normalize-space($DCR/*/link) != ''"><xsl:value-of select="normalize-space($DCR/*/link)"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="normalize-space($DCR/*/url)"/></xsl:otherwise>
+        <xsl:otherwise><xsl:value-of select="$S_LINK"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="BTN">
@@ -301,14 +325,38 @@
         <xsl:if test="$HAS_DESC">
           <div class="rbccm-strategic-themes__desc rbccm-strategic-themes__desc--outlook-2027"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$DESC"/></xsl:call-template></div>
         </xsl:if>
-        <xsl:if test="normalize-space($LINK) != ''">
-          <a class="rbccm-strategic-themes__button rbccm-strategic-themes__button--outlook-2027">
-            <xsl:attribute name="href"><xsl:value-of select="$LINK"/></xsl:attribute>
-            <!-- Screen readers hear which theme: "Watch the episode: {title}". -->
-            <xsl:attribute name="aria-label"><xsl:value-of select="concat($BTN, ': ', $title)"/></xsl:attribute>
-            <span class="rbccm-strategic-themes__button-label rbccm-strategic-themes__button-label--outlook-2027"><xsl:value-of select="$BTN"/></span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__button-icon rbccm-strategic-themes__button-icon--outlook-2027" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" focusable="false"><path d="M0.875 7.00006C0.875 6.88403 0.921094 6.77275 1.00314 6.69071C1.08519 6.60866 1.19647 6.56256 1.3125 6.56256H11.6314L8.87775 3.80981C8.7956 3.72766 8.74945 3.61624 8.74945 3.50006C8.74945 3.38389 8.7956 3.27247 8.87775 3.19031C8.9599 3.10816 9.07132 3.06201 9.1875 3.06201C9.30368 3.06201 9.4151 3.10816 9.49725 3.19031L12.9973 6.69031C13.038 6.73095 13.0703 6.77923 13.0924 6.83238C13.1144 6.88554 13.1258 6.94252 13.1258 7.00006C13.1258 7.05761 13.1144 7.11459 13.0924 7.16774C13.0703 7.22089 13.038 7.26917 12.9973 7.30981L9.49725 10.8098C9.4151 10.892 9.30368 10.9381 9.1875 10.9381C9.07132 10.9381 8.9599 10.892 8.87775 10.8098C8.7956 10.7277 8.74945 10.6162 8.74945 10.5001C8.74945 10.3839 8.7956 10.2725 8.87775 10.1903L11.6314 7.43756H1.3125C1.19647 7.43756 1.08519 7.39147 1.00314 7.30942C0.921094 7.22738 0.875 7.1161 0.875 7.00006Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
-          </a>
+        <!-- Button row: the theme's button, then previous, next and
+             pause. The three small buttons are printed hidden and shown
+             by the script, so a page without it has no dead buttons.
+             Pause stops and restarts the movement in the graphic. -->
+        <xsl:if test="normalize-space($LINK) != '' or $total &gt; 1">
+          <div class="rbccm-strategic-themes__actions rbccm-strategic-themes__actions--outlook-2027">
+          <xsl:if test="normalize-space($LINK) != ''">
+            <a class="rbccm-strategic-themes__button rbccm-strategic-themes__button--outlook-2027">
+              <xsl:attribute name="href"><xsl:value-of select="$LINK"/></xsl:attribute>
+              <!-- Screen readers hear which theme: "Watch the episode: {title}". -->
+              <xsl:attribute name="aria-label"><xsl:value-of select="concat($BTN, ': ', $title)"/></xsl:attribute>
+              <span class="rbccm-strategic-themes__button-label rbccm-strategic-themes__button-label--outlook-2027"><xsl:value-of select="$BTN"/></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__button-icon rbccm-strategic-themes__button-icon--outlook-2027" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" focusable="false"><path d="M0.875 7.00006C0.875 6.88403 0.921094 6.77275 1.00314 6.69071C1.08519 6.60866 1.19647 6.56256 1.3125 6.56256H11.6314L8.87775 3.80981C8.7956 3.72766 8.74945 3.61624 8.74945 3.50006C8.74945 3.38389 8.7956 3.27247 8.87775 3.19031C8.9599 3.10816 9.07132 3.06201 9.1875 3.06201C9.30368 3.06201 9.4151 3.10816 9.49725 3.19031L12.9973 6.69031C13.038 6.73095 13.0703 6.77923 13.0924 6.83238C13.1144 6.88554 13.1258 6.94252 13.1258 7.00006C13.1258 7.05761 13.1144 7.11459 13.0924 7.16774C13.0703 7.22089 13.038 7.26917 12.9973 7.30981L9.49725 10.8098C9.4151 10.892 9.30368 10.9381 9.1875 10.9381C9.07132 10.9381 8.9599 10.892 8.87775 10.8098C8.7956 10.7277 8.74945 10.6162 8.74945 10.5001C8.74945 10.3839 8.7956 10.2725 8.87775 10.1903L11.6314 7.43756H1.3125C1.19647 7.43756 1.08519 7.39147 1.00314 7.30942C0.921094 7.22738 0.875 7.1161 0.875 7.00006Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+            </a>
+          </xsl:if>
+            <xsl:if test="$total &gt; 1">
+              <div class="rbccm-strategic-themes__controls rbccm-strategic-themes__controls--outlook-2027" role="group" aria-label="Move between themes" hidden="hidden" data-strategic-themes-controls="">
+                <button type="button" class="rbccm-strategic-themes__control rbccm-strategic-themes__control--outlook-2027 rbccm-strategic-themes__control--prev" aria-label="Previous theme" data-strategic-themes-control="prev">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__control-icon rbccm-strategic-themes__control-icon--outlook-2027" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 5 8 12 15 19"/></svg>
+                </button>
+                <button type="button" class="rbccm-strategic-themes__control rbccm-strategic-themes__control--outlook-2027 rbccm-strategic-themes__control--next" aria-label="Next theme" data-strategic-themes-control="next">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__control-icon rbccm-strategic-themes__control-icon--outlook-2027" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 5 16 12 9 19"/></svg>
+                </button>
+                <button type="button" class="rbccm-strategic-themes__control rbccm-strategic-themes__control--outlook-2027 rbccm-strategic-themes__control--pause" aria-label="Pause the animation" aria-pressed="false" data-strategic-themes-control="pause">
+                  <!-- Ring round the button: how far through its loop the graphic is. -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__control-ring rbccm-strategic-themes__control-ring--outlook-2027" viewBox="0 0 36 36" aria-hidden="true" focusable="false"><circle class="rbccm-strategic-themes__control-ring-track rbccm-strategic-themes__control-ring-track--outlook-2027" cx="18" cy="18" r="17" fill="none"/><circle class="rbccm-strategic-themes__control-ring-fill rbccm-strategic-themes__control-ring-fill--outlook-2027" cx="18" cy="18" r="17" fill="none" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0" data-strategic-themes-ring=""/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__control-icon rbccm-strategic-themes__control-icon--outlook-2027 rbccm-strategic-themes__control-icon--pause" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="9" y1="6" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="18"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-strategic-themes__control-icon rbccm-strategic-themes__control-icon--outlook-2027 rbccm-strategic-themes__control-icon--play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+              </div>
+            </xsl:if>
+          </div>
         </xsl:if>
       </div>
 

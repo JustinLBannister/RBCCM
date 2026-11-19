@@ -353,19 +353,22 @@
             <xsl:attribute name="data-animate-delay">150</xsl:attribute>
             <xsl:if test="$OL_LINE1 != ''">
               <xsl:choose>
-                <!-- Year: screen readers get the plain year; the
-                     yellow (rolling) digit is visual only. -->
+                <!-- Year: the plain year is the heading's only text, for
+                     screen readers and for anything that reads the page
+                     source. The digits people see are drawn by CSS from
+                     data-text, so the rolling digit adds no stray
+                     characters to the heading. -->
                 <xsl:when test="$OL_IS_YEAR">
                   <span class="rbccm-hero__title-line rbccm-hero__title-line--year">
                     <span class="rbccm-hero__sr-only"><xsl:value-of select="$OL_LINE1"/></span>
                     <span class="rbccm-hero__year" aria-hidden="true">
-                      <xsl:value-of select="$OL_YEAR_HEAD"/>
+                      <span class="rbccm-hero__year-head"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_HEAD"/></xsl:attribute></span>
                       <xsl:choose>
                         <xsl:when test="$OL_ROLL">
-                          <span class="rbccm-hero__year-roll"><span class="rbccm-hero__year-strip"><span class="rbccm-hero__year-digit"><xsl:value-of select="$OL_YEAR_PREV"/></span><span class="rbccm-hero__year-digit rbccm-hero__year-digit--new"><xsl:value-of select="$OL_YEAR_LAST"/></span></span></span>
+                          <span class="rbccm-hero__year-roll"><span class="rbccm-hero__year-strip"><span class="rbccm-hero__year-digit"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_PREV"/></xsl:attribute></span><span class="rbccm-hero__year-digit rbccm-hero__year-digit--new"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_LAST"/></xsl:attribute></span></span></span>
                         </xsl:when>
                         <xsl:otherwise>
-                          <span class="rbccm-hero__year-digit rbccm-hero__year-digit--new"><xsl:value-of select="$OL_YEAR_LAST"/></span>
+                          <span class="rbccm-hero__year-digit rbccm-hero__year-digit--new"><xsl:attribute name="data-text"><xsl:value-of select="$OL_YEAR_LAST"/></xsl:attribute></span>
                         </xsl:otherwise>
                       </xsl:choose>
                     </span>
@@ -420,9 +423,12 @@
       </div>
 
       <!-- Pause / play for the background video. The label says what
-           the button will do; the script swaps it and the icon. -->
+           the button will do; the script swaps it and the icon, and
+           draws the video's progress as the ring round the button. -->
       <xsl:if test="$OL_HAS_VIDEO">
         <button type="button" class="rbccm-hero__video-toggle" aria-label="Pause background video" data-label-pause="Pause background video" data-label-play="Play background video">
+          <!-- Ring round the button: how far through the video is. -->
+          <svg class="rbccm-hero__video-toggle-ring" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle class="rbccm-hero__video-toggle-ring-track" cx="16" cy="16" r="15.25" fill="none"/><circle class="rbccm-hero__video-toggle-ring-fill" cx="16" cy="16" r="15.25" fill="none" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/></svg>
           <svg class="rbccm-hero__video-toggle-icon rbccm-hero__video-toggle-icon--pause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><rect x="2" y="1" width="2.6" height="10" rx="0.8"/><rect x="7.4" y="1" width="2.6" height="10" rx="0.8"/></svg>
           <svg class="rbccm-hero__video-toggle-icon rbccm-hero__video-toggle-icon--play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 1.4v9.2a.6.6 0 00.92.5l7.1-4.6a.6.6 0 000-1L3.92.9A.6.6 0 003 1.4z"/></svg>
         </button>
@@ -441,6 +447,23 @@
   var bcEl = wrap.querySelector('video-js');
   var reduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
   var paused = reduce;
+  var ring = btn.querySelector('.rbccm-hero__video-toggle-ring-fill');
+  var frame = 0;
+
+  /* The ring round the button shows how far through the video is. It
+     fills as the video plays and holds where it is while paused. If
+     the length is not known yet, the ring is drawn whole. */
+  function draw() {
+    frame = 0;
+    var media = native || wrap.querySelector('video');
+    if (ring) {
+      var length = media ? media.duration : 0;
+      var known = isFinite(length) ? length !== 0 : false;
+      var part = known ? Math.min(1, Math.max(0, media.currentTime / length)) : 1;
+      ring.style.strokeDashoffset = String(100 - part * 100);
+    }
+    if (!paused) frame = window.requestAnimationFrame(draw);
+  }
 
   function bcPlayer() {
     if (!bcEl) return null;
@@ -461,6 +484,7 @@
     }
     hero.classList.toggle('rbccm-hero--video-paused', paused);
     btn.setAttribute('aria-label', btn.getAttribute(paused ? 'data-label-play' : 'data-label-pause'));
+    if (!frame) draw();
   }
   btn.addEventListener('click', function () {
     paused = !paused;

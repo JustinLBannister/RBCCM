@@ -6,10 +6,76 @@ Extracted from the "Talk with an expert." section on MAAS+MATA, the "Log in to R
 
 ---
 
+## For editors and BAs
+
+### Purpose
+A closing call-to-action band: an optional eyebrow, a heading (a white lead with an optional yellow highlight), a short body and one or two buttons. It is used on US Credentials and MAAS+MATA (both live) and on Strategy & Economics and ETF Innovators (in progress, not live yet).
+
+The variant is chosen by picking the skin in TeamSite, not by a field:
+- MAAS+MATA: large serif heading with the yellow highlight running on from the white lead, optional eyebrow, one yellow button. Can be made transparent to sit inside the page's dark strip.
+- Strategy & Economics (S+E): smaller heading, body, two buttons (yellow primary and outlined secondary).
+- US Credentials: large serif heading with the yellow highlight on its own line at desktop, one yellow button.
+- ETF Innovators: a white section holding a rounded blue card, text on the left and one yellow button on the right at desktop.
+
+### What the editor can change
+- The copy: Eyebrow, Heading lead (white), Heading highlight (yellow) and Body copy. Bold, italics and links are allowed in the body.
+- The primary button: label, URL and an optional screen reader label.
+- The secondary button: label, URL and an optional screen reader label.
+- Transparent background: type `yes` or `no`.
+- The Section id for anchor links and the Section aria-label.
+- Technical fields exist (CSS path, Last updated). CSS path is set at deploy; Last updated is bumped on each save.
+
+### What it does not do
+- It does not let the editor pick the heading level. The heading is always an h2.
+- It has no image, video or icon choice. The arrow on the primary button is fixed.
+- It shows two buttons at most, and one at most on the ETF Innovators skin.
+- It does not open a form or a modal by itself. The buttons are plain links, and the component has no script.
+- It has no colour choices apart from the transparent background.
+- The ETF Innovators skin ignores the Eyebrow, the secondary button and the Transparent background field.
+- It does not pull content from anywhere. Everything is typed.
+
+### Limits
+- Four skins.
+- Buttons: none to two; none or one on ETF Innovators. They stack on small screens and sit side by side from 640px wide (678px on S+E).
+- One heading, split into a lead and an optional highlight.
+- No enforced character limit.
+
+### Empty and edge cases
+- Blank eyebrow, body or button label: that piece is hidden. With no button labels the button row is not printed.
+- Blank Heading highlight: the heading is one colour.
+- Blank Heading lead and highlight: the MAAS+MATA, S+E and US Credentials skins still print an empty heading; the ETF Innovators skin leaves the heading out. Always fill the lead.
+- A button with a label but no URL still shows, with an empty link.
+- Secondary button: its label says S+E skin only, but the MAAS+MATA and US Credentials skins also print it when the label is filled. Leave it blank there.
+- Eyebrow: the MAAS+MATA, S+E and US Credentials skins all print it when filled.
+- Transparent background: only `yes` (any letter case) turns it on. Anything else keeps the skin's own background.
+- Scripts off: no change. The component has no script.
+
+### Accessibility
+- The heading is an h2 on every skin and cannot be changed.
+- The section is named for screen readers by the Section aria-label field. If that is blank it uses the eyebrow, then the heading (the ETF Innovators skin goes straight to the heading).
+- Buttons are links. Screen readers read the visible label unless the screen reader label field is filled. The field notes advise using it only when the visible label is generic, starting with the visible words and adding where the link goes, for example "Learn more about RBC Capital Markets".
+- The arrow icon is hidden from screen readers.
+- Buttons have visible keyboard focus styles.
+- Reduced motion: the button shine and arrow animations are turned off.
+
+### Open questions
+- Whether a secondary button is wanted on the MAAS+MATA and US Credentials skins, since they print it when filled.
+- There is no stated guidance on heading or body length.
+
+---
+
+## TeamSite locations
+
+| What | Where |
+|---|---|
+| CSS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components/rbccm-cta-band.css` |
+| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |
+
+On the site this loads from `/assets/rbccm/css/components/rbccm-cta-band.css`.
+
 ## Files
 
 - `rbccm-cta-band--maas-mata.xsl`, `rbccm-cta-band--strategy-and-economics.xsl`, `rbccm-cta-band--us-credentials.xsl`, `rbccm-cta-band--etf-innovators.xsl` — TeamSite skins, one per variant (picked in the Skin dropdown; there is no preset field). Render from Datums and emit `data-json` attributes so the runtime binder can hydrate live content in preview mode.
-- `_retired/rbccm-cta-band.xsl` — old Preset-driven skin, not used. Its Preset read picked up every dropdown label, so the variant class came out broken.
 - `rbccm-cta-band-properties.xml` — Datums shared by all four skins. Appearance tab: BgTransparent, CssPath, CacheVersion, section attrs. Content tab: eyebrow, heading, body, CTAs.
 - `rbccm-cta-band.css` — Component styles. Self-contained. Ships to `/assets/rbccm/css/components/rbccm-cta-band.css`.
 - `rbccm-cta-band.html` — Local preview with a variant picker: maas-mata standalone, maas-mata nested (`--bg-transparent`), strategy-and-economics, us-credentials, etf-innovators.

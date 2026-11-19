@@ -2,7 +2,8 @@
 <!--
   RBCCM Platforms - XSL skin
   ==============================================================
-  Renders a Preset-driven 4-card grid of platform tiles. Each
+  Renders a Preset-driven grid of four to six platform tiles
+  (cards 5 and 6 print only when they have a title). Each
   card is a whole-tile anchor with a background photo (real
   &lt;img&gt;), a title + body, and a gold "Explore" link at the
   bottom.
@@ -17,6 +18,7 @@
 
   Current presets:
     strategy-and-economics-platforms
+    outlook-2027-platforms
 
   Photo hookup (mobile + desktop DAM pickers)
   ==============================================================
@@ -280,6 +282,7 @@
     <xsl:variable name="VARIANT_CLASS">
       <xsl:choose>
         <xsl:when test="$PRESET = 'strategy-and-economics-platforms'">rbccm-platforms--strategy-and-economics-platforms</xsl:when>
+        <xsl:when test="$PRESET = 'outlook-2027-platforms'">rbccm-platforms--outlook-2027-platforms</xsl:when>
         <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
@@ -319,7 +322,7 @@
         <div class="rbccm-platforms__inner">
 
           <xsl:if test="$TITLE_TEXT != '' or $SUBTITLE_TEXT != ''">
-            <div class="rbccm-platforms__header">
+            <header class="rbccm-platforms__header">
               <xsl:if test="$TITLE_TEXT != ''">
                 <xsl:element name="{$TITLE_TAG}">
                   <xsl:attribute name="class">rbccm-platforms__title</xsl:attribute>
@@ -337,7 +340,7 @@
                   <xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SUBTITLE_TEXT"/></xsl:call-template>
                 </xsl:element>
               </xsl:if>
-            </div>
+            </header>
           </xsl:if>
 
           <!-- data-stagger-parent lets rbccm-animate.js reveal each
@@ -347,6 +350,8 @@
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="2"/></xsl:call-template>
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="3"/></xsl:call-template>
             <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="4"/></xsl:call-template>
+            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="5"/></xsl:call-template>
+            <xsl:call-template name="renderSlot"><xsl:with-param name="n" select="6"/></xsl:call-template>
           </div>
 
         </div>

@@ -2037,6 +2037,11 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    upward: the old digit (6) rises out of the top and fades while the new
    one (7, yellow) rises into place, 900ms after the title starts rising
    in. Without the roll (OlYearRoll "no") the digit is simply yellow. */
+/* The year people see is drawn from data-text, so the heading's own
+   text is just the plain year (the screen-reader span beside it). */
+.rbccm-hero--outlook-2027 .rbccm-hero__year [data-text]::before {
+  content: attr(data-text);
+}
 .rbccm-hero--outlook-2027 .rbccm-hero__year-digit--new {
   color: var(--rbccm-hero-yellow);
 }
@@ -2204,7 +2209,10 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 
 /* ---- Pause / play button -----------------------------------------------
-   32px translucent white circle with a thin white ring, bottom right:
+   32px translucent white circle, bottom right. Its ring shows how far
+   through the video is: a faint full circle with a white arc that fills
+   from the top as the video plays and holds where it is while paused
+   (drawn by the skin's script). Position:
    desktop 60px from the right edge and 46px above the yellow rule (the
    comp), mobile on the 23px gutter. Shows pause while the video plays,
    play once it's paused. !important where the site's button rules would
@@ -2216,7 +2224,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   appearance: none;
   backdrop-filter: blur(4px);
   background: rgba(255, 255, 255, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  border: 0 !important;         /* the ring below is the border */
   border-radius: 50% !important;
   bottom: 24px;
   box-shadow: none !important;
@@ -2246,6 +2254,26 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 .rbccm-hero--outlook-2027 .rbccm-hero__video-toggle:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-ring {
+  display: block;
+  height: 100%;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: rotate(-90deg);    /* start at the top */
+  width: 100%;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-ring-track {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.5;
+}
+.rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-ring-fill {
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-width: 2;
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__video-toggle-icon {
   display: block;

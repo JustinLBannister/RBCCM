@@ -33,6 +33,8 @@
    =========================================================================
      Strategy and Economics - Platforms
        .rbccm-platforms--strategy-and-economics-platforms
+     Outlook 2027 - Platforms
+       .rbccm-platforms--outlook-2027-platforms
    ========================================================================= */
 
 
@@ -402,6 +404,37 @@ p.rbccm-platforms__card-body,  div.rbccm-platforms__card-body {
    ========================================================================= */
 .rbccm-platforms--strategy-and-economics-platforms {
   --rbccm-platforms-bg-color: #E7EEF1;
+}
+
+
+/* =========================================================================
+   Variant: Outlook 2027 - Platforms
+   White section, up to six cards. Below 992 the cards are shorter than
+   the base 253: they size to their text with a 185 floor and 20px of
+   padding.
+   ========================================================================= */
+.rbccm-platforms--outlook-2027-platforms {
+  --rbccm-platforms-bg-color: #FFFFFF;
+}
+/* The heading wraps onto two lines instead of running the full width. */
+.rbccm-platforms--outlook-2027-platforms .rbccm-platforms__title {
+  max-width: 740px;
+}
+/* A line break typed in the title (a plain <br>) applies from 992px
+   wide. Below that it is ignored and the title wraps by itself. */
+.rbccm-platforms--outlook-2027-platforms .rbccm-platforms__title br {
+  display: none;
+}
+@media (min-width: 992px) {
+  .rbccm-platforms--outlook-2027-platforms .rbccm-platforms__title br {
+    display: inline;
+  }
+}
+@media (max-width: 991.98px) {
+  .rbccm-platforms--outlook-2027-platforms .rbccm-platforms__card {
+    min-height: 185px;
+    padding: 20px;
+  }
 }
 
 

@@ -2,8 +2,8 @@
    RBCCM Strategic Themes
    Deploy path: /assets/rbccm/css/components/rbccm-strategic-themes.css
    =========================================================================
-   An eyebrow and heading, then up to five themes. Each theme: its
-   number, title, description, a button and a graphic.
+   An eyebrow, heading and intro line, then up to five themes. Each
+   theme: its number, title, description, a button and a graphic.
 
    Variants (one skin each)
      .rbccm-strategic-themes--outlook-2027
@@ -13,11 +13,13 @@
      (no class)   No script: every theme in a plain numbered list.
      --enhanced --tabs
                   One theme at a time; the numbered tabs switch it.
-                  Phones, tablets, short windows, reduced motion.
+                  Short windows and reduced motion.
      --enhanced --pinned
-                  Desktop: the section is as tall as one screen per
-                  theme, the stage sticks to the top, and scrolling
-                  steps through the themes.
+                  The section is as tall as one screen per theme, the
+                  stage sticks to the top, and scrolling steps through
+                  the themes. From 992 the text sits left and the
+                  picture right; below that the header scrolls away
+                  and the tabs, text and picture stack in the stage.
    And on each theme: --active (the one showing) and --shown (its
    graphic is on screen, so its animation runs).
 
@@ -51,13 +53,20 @@
    ========================================================================= */
 .rbccm-strategic-themes--outlook-2027 {
   --rbccm-themes-offset: 0px;  /* fixed site header height; set by the script */
+  --rbccm-themes-lead: 0px;    /* header that scrolls away before the stage sticks (below 992); set by the script */
   --rbccm-themes-stage: calc(100vh - var(--rbccm-themes-offset));
   background: #F1F5FB;
-  padding: 40px 23px;
+  padding: 60px 23px;          /* 100px above and below from 992 */
+}
+/* Phones: the screen height with the browser's bars showing. */
+@supports (height: 100svh) {
+  .rbccm-strategic-themes--outlook-2027 {
+    --rbccm-themes-stage: calc(100svh - var(--rbccm-themes-offset));
+  }
 }
 @media (min-width: 992px) {
   .rbccm-strategic-themes--outlook-2027 {
-    padding: 72px 23px;
+    padding: 100px 23px;
   }
 }
 .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
@@ -105,6 +114,16 @@
   .rbccm-strategic-themes--outlook-2027 .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
     font-size: 42px !important;
   }
+}
+.rbccm-strategic-themes__intro.rbccm-strategic-themes__intro--outlook-2027 {
+  color: #494949;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0 !important;
+  max-width: 480px;
 }
 
 /* ---------- Numbered tabs: progress bar, number, short title ---------- */
@@ -166,26 +185,22 @@
   color: inherit;
   display: block;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  letter-spacing: 0.3px;
   line-height: 130%;
   overflow-wrap: anywhere;
+  text-transform: uppercase;
 }
 .rbccm-strategic-themes__tab.rbccm-strategic-themes__tab--outlook-2027.rbccm-strategic-themes__tab--active .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
-  font-weight: 600;
+  font-weight: 700;
 }
-/* Phones: bar and number only (the title stays for screen readers). */
+/* Phones: five tabs across, so they sit closer together. */
 @media (max-width: 599.98px) {
-  .rbccm-strategic-themes__tab-title.rbccm-strategic-themes__tab-title--outlook-2027 {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
+  .rbccm-strategic-themes__tabs.rbccm-strategic-themes__tabs--outlook-2027 {
+    gap: 8px;
   }
 }
 
@@ -340,6 +355,120 @@
   animation: rbccm-themes-arrow 550ms cubic-bezier(0.55, 0, 0.1, 1) both;
 }
 
+/* ---------- Button row: the theme's button, then previous, next, pause ----------
+   The round buttons are printed hidden and shown by the script.
+   Previous and next step one theme and go pale at each end. Pause
+   stops the movement that repeats in the drawn graphics (see "Paused"
+   under the graphics) and starts it again; nothing else changes. It
+   shows on themes that have a drawn graphic. */
+.rbccm-strategic-themes__actions.rbccm-strategic-themes__actions--outlook-2027 {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 6px;
+}
+.rbccm-strategic-themes__actions.rbccm-strategic-themes__actions--outlook-2027 .rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 {
+  margin-top: 0;
+}
+.rbccm-strategic-themes__controls.rbccm-strategic-themes__controls--outlook-2027 {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 1.5px solid #003168;
+  border-radius: 50%;
+  color: #003168;
+  cursor: pointer;
+  display: grid;
+  flex: 0 0 auto;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  width: 36px;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027:hover {
+  background: #003168;
+  color: #FFFFFF;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: 3px;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027[aria-disabled="true"],
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027[aria-disabled="true"]:hover {
+  background: transparent;
+  color: #003168;
+  cursor: default;
+  opacity: 0.35;
+}
+/* Pause: its border is a ring that shows how far through its loop the
+   graphic is (a faint circle, with an arc that fills from the top). The
+   script draws it; it holds still while paused. */
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027.rbccm-strategic-themes__control--pause {
+  background: rgba(0, 49, 104, 0.12);
+  border-color: transparent;
+  color: #252525;
+  position: relative;
+}
+.rbccm-strategic-themes__control-ring.rbccm-strategic-themes__control-ring--outlook-2027 {
+  display: block;
+  height: calc(100% + 3px);
+  left: -1.5px;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  top: -1.5px;
+  transform: rotate(-90deg);    /* start at the top */
+  width: calc(100% + 3px);
+}
+.rbccm-strategic-themes__control-ring-track.rbccm-strategic-themes__control-ring-track--outlook-2027 {
+  stroke: rgba(0, 49, 104, 0.25);
+  stroke-width: 1.5;
+}
+.rbccm-strategic-themes__control-ring-fill.rbccm-strategic-themes__control-ring-fill--outlook-2027 {
+  stroke: #003168;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027.rbccm-strategic-themes__control--pause:hover {
+  background: #5C6670;
+  color: #FFFFFF;
+}
+.rbccm-strategic-themes__control-icon.rbccm-strategic-themes__control-icon--outlook-2027 {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+/* Phones: the theme's button and the round buttons share one line. */
+@media (max-width: 599.98px) {
+  .rbccm-strategic-themes__actions.rbccm-strategic-themes__actions--outlook-2027 {
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .rbccm-strategic-themes__actions.rbccm-strategic-themes__actions--outlook-2027 .rbccm-strategic-themes__button.rbccm-strategic-themes__button--outlook-2027 {
+    padding: 0 20px;
+  }
+  .rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027 {
+    height: 34px;
+    width: 34px;
+  }
+}
+.rbccm-strategic-themes__control-icon.rbccm-strategic-themes__control-icon--outlook-2027.rbccm-strategic-themes__control-icon--play,
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027[aria-pressed="true"] .rbccm-strategic-themes__control-icon.rbccm-strategic-themes__control-icon--outlook-2027.rbccm-strategic-themes__control-icon--pause {
+  display: none;
+}
+.rbccm-strategic-themes__control.rbccm-strategic-themes__control--outlook-2027[aria-pressed="true"] .rbccm-strategic-themes__control-icon.rbccm-strategic-themes__control-icon--outlook-2027.rbccm-strategic-themes__control-icon--play {
+  display: block;
+}
+
 /* ---------- Picture: the drawn graphic, or an image ----------
    The graphic's box is empty until the script draws into it, so it
    takes no space without the script. */
@@ -436,56 +565,20 @@
   }
 }
 
-/* ---------- Pinned state (desktop) ----------
+/* ---------- Pinned state ----------
    The section is one screen tall per theme. The stage sticks under the
-   site header while the page scrolls through that height. Left: header,
-   tabs and the showing theme's text. Right: the pictures, which slide
-   sideways as the scroll moves from one theme to the next. */
+   site header while the page scrolls through that height, and the
+   pictures slide sideways as the scroll moves from one theme to the
+   next. */
 .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned {
-  height: calc(var(--rbccm-themes-count) * var(--rbccm-themes-stage));
+  height: calc(var(--rbccm-themes-count) * var(--rbccm-themes-stage) + var(--rbccm-themes-lead));
   padding: 0;
 }
 .rbccm-strategic-themes--pinned .rbccm-strategic-themes__stage.rbccm-strategic-themes__stage--outlook-2027 {
-  height: var(--rbccm-themes-stage);
+  height: calc(var(--rbccm-themes-stage) + var(--rbccm-themes-lead));
   overflow: hidden;
-  padding: clamp(24px, 6vh, 64px) 23px clamp(16px, 4vh, 40px);
   position: sticky;
-  top: var(--rbccm-themes-offset);
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
-  align-items: center;
-  display: flex;
-  height: 100%;
-  position: relative;          /* the pictures are placed against this */
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
-  gap: clamp(16px, 3.6vh, 32px);
-  justify-content: center;
-  width: calc((100% - 64px) / 2.05);
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
-  gap: clamp(8px, 1.6vh, 16px);
-}
-.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
-  font-size: clamp(30px, 5.5vh, 42px) !important;
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
-  gap: clamp(10px, 2vh, 18px);
-  min-height: clamp(200px, 34vh, 300px);
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
-  font-size: clamp(38px, 6.5vh, 50px);
-}
-.rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
-  font-size: clamp(26px, 4.4vh, 32px) !important;
-}
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
-  bottom: 0;
-  overflow: hidden;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: calc((100% - 64px) * 1.05 / 2.05);
+  top: calc(var(--rbccm-themes-offset) - var(--rbccm-themes-lead));
 }
 .rbccm-strategic-themes--pinned .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
   display: grid;
@@ -502,12 +595,106 @@
 .rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--shown) .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
   visibility: hidden;
 }
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027,
-.rbccm-strategic-themes--pinned .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
-  min-width: 220px;
-  width: min(100%, calc(var(--rbccm-themes-stage) - 120px)) !important;
+
+/* From 992. Left: header, tabs and the showing theme's text. Right:
+   the pictures. */
+@media (min-width: 992px) {
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__stage.rbccm-strategic-themes__stage--outlook-2027 {
+    /* 100px above and below, less in a short window so nothing is cut off. */
+    padding: clamp(24px, 12vh, 100px) 23px;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027 {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    position: relative;          /* the pictures are placed against this */
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+    gap: clamp(16px, 3.6vh, 32px);
+    justify-content: center;
+    width: calc((100% - 64px) / 2.05);
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+    gap: clamp(8px, 1.6vh, 16px);
+  }
+  .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__heading.rbccm-strategic-themes__heading--outlook-2027 {
+    font-size: clamp(30px, 5.5vh, 42px) !important;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+    gap: clamp(10px, 2vh, 18px);
+    min-height: clamp(200px, 34vh, 300px);
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
+    font-size: clamp(38px, 6.5vh, 50px);
+  }
+  .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--pinned .rbccm-strategic-themes__title.rbccm-strategic-themes__title--outlook-2027 {
+    font-size: clamp(26px, 4.4vh, 32px) !important;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+    bottom: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: calc((100% - 64px) * 1.05 / 2.05);
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027,
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+    min-width: 220px;
+    width: min(100%, calc(var(--rbccm-themes-stage) - 120px)) !important;
+  }
 }
 
+/* Below 992. The header scrolls away first (the script measures it
+   into --rbccm-themes-lead), then the stage sticks with the tabs at
+   the top, the showing theme's text under them and the picture in
+   whatever height is left. Every theme shares the same two rows, so
+   the text row is as tall as the longest theme and the pictures line
+   up as they slide. */
+@media (max-width: 991.98px) {
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__stage.rbccm-strategic-themes__stage--outlook-2027 {
+    /* 60 above the heading; up to 60 below the picture, less on a short
+       screen so the picture keeps its room. */
+    padding: 60px 23px clamp(16px, 7vh, 60px);
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__inner.rbccm-strategic-themes__inner--outlook-2027,
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+    height: 100%;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+    gap: 20px;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+    flex: 1 1 auto;
+    gap: 16px 0;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 0;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    display: grid;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    grid-template-rows: auto minmax(0, 1fr);
+    row-gap: 16px;
+  }
+  @supports (grid-template-rows: subgrid) {
+    .rbccm-strategic-themes--pinned .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+      grid-template-rows: subgrid;
+    }
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+    container-type: size;
+    margin: 0 -23px;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027,
+  .rbccm-strategic-themes--pinned .rbccm-strategic-themes__image.rbccm-strategic-themes__image--outlook-2027 {
+    width: min(100% - 46px, 300px) !important;
+    width: min(100cqw - 46px, 100cqh, 460px) !important;
+  }
+}
 
 /* =========================================================================
    The drawn graphics
@@ -816,6 +1003,25 @@
 /* =========================================================================
    Keyframes
    ========================================================================= */
+/* ---------- Paused (--still, set by the pause button) ----------
+   The parts that repeat for as long as a theme shows stop where they
+   are: the radar sweep and pings, the tile highlights, the cell wave,
+   the dot on the chain, the pulse on the chart and the flicker in the
+   leaf. The script clears the pause when the theme changes, so the
+   next theme plays. */
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  animation-play-state: paused;
+}
+/* The leaf's dots carry two animations: pop in (still runs), then flicker. */
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  animation-play-state: running, paused;
+}
+
 @keyframes rbccm-themes-up        { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 @keyframes rbccm-themes-fade      { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rbccm-themes-draw      { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }

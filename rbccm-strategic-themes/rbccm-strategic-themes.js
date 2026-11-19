@@ -8,19 +8,34 @@
 
    Two interactive states (classes on the section):
 
-     --pinned   Desktop. The section is one screen tall per theme and
-                its stage sticks under the site header. Scrolling moves
+     --pinned   The section is one screen tall per theme and its
+                stage sticks under the site header. Scrolling moves
                 through the themes: each one holds, then glides to the
                 next. The tab bars fill as you go; pressing a tab
-                scrolls to that theme.
+                scrolls to that theme. From 992px the text and picture
+                sit side by side. Below that the header scrolls away
+                first and the stage sticks from the tabs down, with the
+                picture in the height that is left.
 
-     --tabs     Everything else: narrower than 992px, a window shorter
-                than 600px, a visitor who asked for reduced motion, a
-                single theme, or a page where sticky positioning can't
-                work (an ancestor that clips or scrolls). One theme
-                shows at a time and the tabs switch it. Left and right
-                arrow keys on a tab, and a sideways swipe on the
-                themes, do the same.
+     --tabs     Everything else: a window shorter than 600px, a narrow
+                window with no room left for the picture, a visitor who
+                asked for reduced motion, a single theme, or a page
+                where sticky positioning can't work (an ancestor that
+                clips or scrolls). One theme shows at a time and the
+                tabs switch it. Left and right arrow keys on a tab, and
+                a sideways swipe on the themes, do the same.
+
+   Each theme has round buttons beside its own button
+   ([data-strategic-themes-control]): previous, next and pause.
+   Previous and next step one theme. Pause stops the movement that
+   repeats in the drawn graphics (class --still on the section) and
+   starts it again; the scroll and the layout do not change. Moving to
+   another theme, by any route, starts the movement again, so a theme
+   never arrives paused. Pause shows on themes that have a drawn
+   graphic, and not for visitors who asked for reduced motion, where
+   nothing moves anyway. The ring round the pause button shows how far
+   through its loop the showing graphic is (its longest repeating
+   animation), and holds while paused.
 
    The state is re-chosen on resize. On each theme:
      --active   the theme that is showing (text visible, tab marked)
@@ -45,7 +60,9 @@
 
   var BLOCK = 'rbccm-strategic-themes';
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  var PIN_QUERY = '(min-width: 992px) and (min-height: 600px)';
+  var PIN_QUERY = '(min-height: 600px)';
+  var WIDE_QUERY = '(min-width: 992px)';
+  var MIN_PICTURE = 140;       /* narrow pinned layout: least height for the picture */
   var MOTION_QUERY = '(prefers-reduced-motion: reduce)';
   var uid = 0;
 
@@ -323,21 +340,60 @@
     [].forEach.call(root.querySelectorAll('[data-strategic-themes-graphic]'), drawGraphic);
 
     var pinQuery = window.matchMedia(PIN_QUERY);
+    var wideQuery = window.matchMedia(WIDE_QUERY);
     var motionQuery = window.matchMedia(MOTION_QUERY);
     var mode = '';
     var active = -1;
     var offset = 0;
+    var lead = 0;
     var frame = 0;
+    var still = false;         /* the visitor paused the graphics */
+
+    function control(item, kind) {
+      return item ? item.querySelector('[data-strategic-themes-control="' + kind + '"]') : null;
+    }
+
+    /* Previous and next go pale at each end. Pause shows on a theme
+       with a drawn graphic, unless the visitor asked for reduced motion. */
+    function syncControls() {
+      items.forEach(function (item) {
+        var prev = control(item, 'prev');
+        var next = control(item, 'next');
+        var pause = control(item, 'pause');
+        if (prev) prev.setAttribute('aria-disabled', active <= 0 ? 'true' : 'false');
+        if (next) next.setAttribute('aria-disabled', active >= count - 1 ? 'true' : 'false');
+        if (pause) {
+          pause.hidden = motionQuery.matches || !item.querySelector('[data-strategic-themes-graphic]');
+          pause.setAttribute('aria-pressed', still ? 'true' : 'false');
+        }
+      });
+    }
 
     function setActive(index) {
       if (index === active) return;
+      /* A round button that has focus is about to be hidden with its
+         theme: note which one, and hand focus to the same button on
+         the theme that is coming in. */
+      var held = document.activeElement;
+      var kind = held && items[active] && items[active].contains(held) && held.getAttribute('data-strategic-themes-control');
       active = index;
+      /* A pause lasts for the theme it was pressed on. */
+      if (still) {
+        still = false;
+        root.classList.remove(BLOCK + '--still');
+        startRing();
+      }
       items.forEach(function (item, i) { item.classList.toggle(BLOCK + '__item--active', i === index); });
       tabs.forEach(function (tab, i) {
         tab.classList.toggle(BLOCK + '__tab--active', i === index);
         if (i === index) tab.setAttribute('aria-current', 'true');
         else tab.removeAttribute('aria-current');
       });
+      syncControls();
+      if (kind) {
+        var same = control(items[index], kind);
+        if (same) same.focus({ preventScroll: true });
+      }
     }
 
     function setShown(test) {
@@ -360,7 +416,7 @@
       if (mode !== 'pinned') return;
       var rect = root.getBoundingClientRect();
       var range = Math.max(1, rect.height - stage.offsetHeight);
-      var progress = clamp((offset - rect.top) / range, 0, 1);
+      var progress = clamp((offset - lead - rect.top) / range, 0, 1);
       var along = progress * (count - 1);
       var index = Math.min(count - 2, Math.floor(along));
       var t = clamp((along - index - 0.2) / 0.6, 0, 1);
@@ -380,30 +436,122 @@
       if (!frame) frame = window.requestAnimationFrame(update);
     }
 
+    /* Pinned state: the page position at which theme index is showing. */
+    function themeTop(index) {
+      var rect = root.getBoundingClientRect();
+      var range = Math.max(1, rect.height - stage.offsetHeight);
+      return window.pageYOffset + rect.top - offset + lead + (index / (count - 1)) * range + 1;
+    }
+
     function go(index) {
       index = clamp(index, 0, count - 1);
       if (mode !== 'pinned') { show(index); return; }
-      var rect = root.getBoundingClientRect();
-      var range = Math.max(1, rect.height - stage.offsetHeight);
-      var top = window.pageYOffset + rect.top - offset + (index / (count - 1)) * range + 1;
-      window.scrollTo({ top: top, behavior: 'smooth' });
+      window.scrollTo({ top: themeTop(index), behavior: 'smooth' });
+    }
+
+    function setMode(next) {
+      if (next === mode) return;
+      mode = next;
+      root.classList.add(BLOCK + '--enhanced');
+      root.classList.toggle(BLOCK + '--pinned', mode === 'pinned');
+      root.classList.toggle(BLOCK + '--tabs', mode === 'tabs');
+      if (tabsBox) tabsBox.hidden = false;
+      slides.forEach(function (slide) { if (slide) slide.style.transform = ''; });
+      if (mode === 'tabs') show(active < 0 ? 0 : active);
+    }
+
+    /* Narrow pinned layout: the header scrolls away and the stage
+       sticks from the tabs down. lead is how far the tabs sit below
+       the top of the stage, less a small gap above them. */
+    function measureLead() {
+      lead = 0;
+      if (mode === 'pinned' && !wideQuery.matches && tabsBox) {
+        lead = Math.max(0, Math.round(tabsBox.getBoundingClientRect().top - stage.getBoundingClientRect().top) - 16);
+      }
+      root.style.setProperty('--rbccm-themes-lead', lead + 'px');
+    }
+
+    /* Narrow pinned layout: is there room under the text for the picture? */
+    function pictureFits() {
+      var visual = root.querySelector('.' + BLOCK + '__visual');
+      return !visual || visual.clientHeight >= MIN_PICTURE;
     }
 
     function chooseMode() {
       offset = measureOffset(root);
       root.style.setProperty('--rbccm-themes-offset', offset + 'px');
-      var next = count > 1 && pinQuery.matches && !motionQuery.matches && stickyCanWork(root) ? 'pinned' : 'tabs';
-      if (next !== mode) {
-        mode = next;
-        root.classList.add(BLOCK + '--enhanced');
-        root.classList.toggle(BLOCK + '--pinned', mode === 'pinned');
-        root.classList.toggle(BLOCK + '--tabs', mode === 'tabs');
-        if (tabsBox) tabsBox.hidden = false;
-        slides.forEach(function (slide) { if (slide) slide.style.transform = ''; });
-        if (mode === 'tabs') show(active < 0 ? 0 : active);
+      var canPin = count > 1 && pinQuery.matches && !motionQuery.matches && stickyCanWork(root);
+      setMode(canPin ? 'pinned' : 'tabs');
+      measureLead();
+      if (mode === 'pinned' && !wideQuery.matches && !pictureFits()) {
+        setMode('tabs');
+        measureLead();
       }
       if (mode === 'pinned') update();
+      syncControls();
     }
+
+    /* Pause: stop or restart the movement that repeats in the graphics. */
+    function togglePause() {
+      still = !still;
+      root.classList.toggle(BLOCK + '--still', still);
+      syncControls();
+      startRing();
+    }
+
+    /* The ring round the pause button: how far the showing graphic is
+       through its loop. The loop that is followed is the graphic's
+       longest repeating animation (the radar sweep, the tile
+       highlights and so on). It is looked up again when the theme
+       changes, because the animations start afresh each time. */
+    var ringFrame = 0;
+    var loop = null;
+    var loopItem = -1;
+    var loopFound = 0;
+
+    function findLoop(item) {
+      var box = item && item.querySelector('[data-strategic-themes-graphic]');
+      if (!box || !box.getAnimations) return null;
+      var best = null;
+      var longest = 0;
+      box.getAnimations({ subtree: true }).forEach(function (animation) {
+        var timing = animation.effect && animation.effect.getComputedTiming ? animation.effect.getComputedTiming() : null;
+        if (!timing || timing.iterations !== Infinity) return;
+        if (timing.duration > longest) { longest = timing.duration; best = animation; }
+      });
+      return best;
+    }
+
+    function drawRing() {
+      ringFrame = 0;
+      var item = items[active];
+      var ring = item && item.querySelector('[data-strategic-themes-ring]');
+      if (ring) {
+        var now = Date.now();
+        if (loopItem !== active || !loop || loop.playState === 'idle' || now - loopFound > 1000) {
+          loop = findLoop(item);
+          loopItem = active;
+          loopFound = now;
+        }
+        var progress = loop ? loop.effect.getComputedTiming().progress : null;
+        /* No loop to follow (or not started yet): an empty ring. */
+        ring.style.strokeDashoffset = String(100 - (progress || 0) * 100);
+      }
+      if (!still && !motionQuery.matches) ringFrame = window.requestAnimationFrame(drawRing);
+    }
+
+    function startRing() {
+      if (!ringFrame) ringFrame = window.requestAnimationFrame(drawRing);
+    }
+
+    root.addEventListener('click', function (e) {
+      var button = e.target.closest ? e.target.closest('[data-strategic-themes-control]') : null;
+      if (!button || !root.contains(button)) return;
+      var kind = button.getAttribute('data-strategic-themes-control');
+      if (kind === 'pause') { togglePause(); return; }
+      if (button.getAttribute('aria-disabled') === 'true') return;
+      go(active + (kind === 'next' ? 1 : -1));
+    });
 
     tabs.forEach(function (tab, i) {
       tab.addEventListener('click', function () { go(i); });
@@ -441,6 +589,8 @@
     window.addEventListener('load', chooseMode);
     if (motionQuery.addEventListener) motionQuery.addEventListener('change', chooseMode);
     chooseMode();
+    [].forEach.call(root.querySelectorAll('[data-strategic-themes-controls]'), function (box) { box.hidden = false; });
+    startRing();
   }
 
   function init() {

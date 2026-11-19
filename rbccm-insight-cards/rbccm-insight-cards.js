@@ -1,10 +1,10 @@
 /* =========================================================================
-   RBCCM Insight Cards - share popup + filter pills
+   RBCCM Insight Cards - share popup, filter pills, phone swipe row
    Deploy path: /assets/rbccm/js/components/rbccm-insight-cards.js
    =========================================================================
    Runs on every [data-insight-cards] section. The skin prints every
-   story into the page; this file only adds two things, and both stay
-   hidden if it never loads:
+   story into the page; this file only adds three things, and all of
+   them stay hidden if it never loads:
 
    1. Share popup
       Each story's share button ([data-insight-share]) is printed
@@ -25,6 +25,14 @@
       Shown when the skin printed them ([data-insight-filters]). Each
       pill shows the stories whose filter label matches; the first pill
       shows them all. The result is announced to screen readers.
+
+   3. Phone swipe row
+      When the skin marked the list as a swipe row
+      ([data-insight-carousel], MobileLayout field), the stories scroll
+      sideways on phones by CSS alone. This adds the arrows and one dot
+      per story ([data-insight-carousel-nav]), keeps the current dot
+      marked as the row scrolls, and scrolls to a story when its dot or
+      an arrow is pressed.
 
    Safe to include more than once (each section's skin outputs the
    script tag): sections are set up once and the page-level listeners
@@ -197,6 +205,100 @@
     }
   }
 
+  /* ---------- Phone swipe row: arrows and dots ---------- */
+
+  function setupCarousel(root) {
+    var list = root.querySelector('[data-insight-carousel]');
+    var nav = root.querySelector('[data-insight-carousel-nav]');
+    var dotsBox = nav && nav.querySelector('[data-insight-carousel-dots]');
+    if (!list || !dotsBox) return;
+
+    var steps = nav.querySelectorAll('[data-insight-carousel-step]');
+    var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var items = [];
+    var dots = [];
+    var current = -1;
+    var frame = 0;
+
+    /* Where the row sits when story i is at the start. The last
+       stories may not reach the start, so stop at the end of the row. */
+    function left(i) {
+      var max = Math.max(0, list.scrollWidth - list.clientWidth);
+      return Math.min(items[i].offsetLeft - items[0].offsetLeft, max);
+    }
+
+    function mark(index) {
+      if (index === current) return;
+      current = index;
+      for (var i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle(BLOCK + '__nav-dot--active', i === index);
+        if (i === index) dots[i].setAttribute('aria-current', 'true');
+        else dots[i].removeAttribute('aria-current');
+      }
+      for (var j = 0; j < steps.length; j++) {
+        var step = parseInt(steps[j].getAttribute('data-insight-carousel-step'), 10);
+        steps[j].disabled = step < 0 ? index <= 0 : index >= items.length - 1;
+      }
+    }
+
+    function sync() {
+      frame = 0;
+      if (!items.length) return;
+      var at = list.scrollLeft;
+      var best = 0;
+      for (var i = 1; i < items.length; i++) {
+        if (Math.abs(left(i) - at) < Math.abs(left(best) - at)) best = i;
+      }
+      mark(best);
+    }
+
+    function go(index) {
+      if (!items.length) return;
+      index = Math.max(0, Math.min(items.length - 1, index));
+      list.scrollTo({ left: left(index), behavior: motion.matches ? 'auto' : 'smooth' });
+    }
+
+    /* One dot per story that is showing. */
+    function build() {
+      var all = list.children;
+      var showing = [];
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].offsetWidth > 0) showing.push(all[i]);
+      }
+      items = showing;
+      if (items.length !== dots.length) {
+        dotsBox.innerHTML = '';
+        dots = items.map(function (item, index) {
+          var li = document.createElement('li');
+          li.className = BLOCK + '__nav-dot-item ' + BLOCK + '__nav-dot-item--outlook-2027';
+          var dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = BLOCK + '__nav-dot ' + BLOCK + '__nav-dot--outlook-2027';
+          dot.setAttribute('aria-label', 'Story ' + (index + 1) + ' of ' + items.length);
+          dot.addEventListener('click', function () { go(index); });
+          li.appendChild(dot);
+          dotsBox.appendChild(li);
+          return dot;
+        });
+      }
+      nav.hidden = items.length < 2;
+      current = -1;
+      sync();
+    }
+
+    for (var s = 0; s < steps.length; s++) {
+      steps[s].addEventListener('click', function () {
+        go(current + parseInt(this.getAttribute('data-insight-carousel-step'), 10));
+      });
+    }
+    list.addEventListener('scroll', function () {
+      if (!frame) frame = window.requestAnimationFrame(sync);
+    }, { passive: true });
+    window.addEventListener('resize', build);
+    window.addEventListener('load', build);
+    build();
+  }
+
   /* ---------- Set up each section once ---------- */
 
   function setup(root) {
@@ -212,6 +314,8 @@
 
     var filters = root.querySelector('[data-insight-filters]');
     if (filters) filters.hidden = false;
+
+    setupCarousel(root);
   }
 
   function init() {

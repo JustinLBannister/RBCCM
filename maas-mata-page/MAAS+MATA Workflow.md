@@ -78,7 +78,7 @@ At this point the live URL is still showing the old copy. Only people who visit 
 
 | Task | File | Where it lives |
 |---|---|---|
-| Change page structure or copy defaults | `MAAS MATA.component` | TeamSite: `//strplvact10001.fg.rbc.com/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Site Template/MAAS MATA.component` (component ID `1786807660057`). Currently one bulk block containing both the XSL skin and the Properties. Will split into per-section pieces later once other pages reuse them. |
+| Change page structure or copy defaults | `MAAS MATA.component` | TeamSite: `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Site Template/MAAS MATA.component` (component ID `1786807660057`). Currently one bulk block containing both the XSL skin and the Properties. Will split into per-section pieces later once other pages reuse them. |
 | Change styling | `maas-mata.css` | `/assets/rbccm/css/pages/maas-mata.css` |
 | Change page behavior (modals, carousels, scroll effects) | `maas-mata.js` | `/assets/rbccm/js/pages/maas-mata.js` |
 | Change how JSON binding itself works | `rbccm-json-bind.js` | `/assets/rbccm/js/pages/rbccm-json-bind.js`. This is the shared engine that swaps text and images from the JSON file into the page. Only touch this if you're changing how binding works for **every** page that uses it. For anything MAAS+MATA-specific, edit `maas-mata.js` instead. |

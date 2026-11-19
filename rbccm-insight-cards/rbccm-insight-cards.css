@@ -69,9 +69,21 @@
 .rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark {
   background: linear-gradient(180deg, #082043 0%, #061730 100%);
 }
+/* Space above and below, by background. Below 992: white 40, light
+   blue 40, dark navy 80. From 992: white 60, light blue 80, dark navy
+   100. */
+.rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark {
+  padding: 80px 23px;
+}
 @media (min-width: 992px) {
   .rbccm-insight-cards--outlook-2027 {
-    padding: 72px 23px;
+    padding: 60px 23px;
+  }
+  .rbccm-insight-cards--outlook-2027.rbccm-insight-cards--tint {
+    padding: 80px 23px;
+  }
+  .rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark {
+    padding: 100px 23px;
   }
 }
 
@@ -297,9 +309,12 @@
   color: #111928 !important;
 }
 
-/* ---------- Filter pills ---------- */
+/* ---------- Filter pills ----------
+   Switched off for now: the row is not shown at any width, so every
+   story shows. To bring it back, change display to flex here (and see
+   the phones rule further down, which hides it below 600). */
 .rbccm-insight-cards__filters.rbccm-insight-cards__filters--outlook-2027 {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -451,7 +466,7 @@
   width: 38px;
 }
 .rbccm-insight-cards__card-badge.rbccm-insight-cards__card-badge--outlook-2027 {
-  background: #05152A;
+  background: #003168;
   border-radius: 100px;
   color: #FFFFFF;
   font-family: Roboto, Arial, sans-serif;
@@ -467,10 +482,6 @@
   text-overflow: ellipsis;
   top: 14px;
   white-space: nowrap;
-}
-.rbccm-insight-cards--tint .rbccm-insight-cards__card-badge.rbccm-insight-cards__card-badge--outlook-2027 {
-  background: #FFFFFF;
-  color: #003168;
 }
 .rbccm-insight-cards__card-type.rbccm-insight-cards__card-type--outlook-2027 {
   align-items: center;
@@ -571,6 +582,18 @@
 }
 .rbccm-insight-cards--outlook-2027.rbccm-insight-cards--dark .rbccm-insight-cards__card-title.rbccm-insight-cards__card-title--outlook-2027 {
   color: #FFFFFF !important;
+}
+/* The title's link to the story: it looks like the title. */
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title-link.rbccm-insight-cards__card-title-link--outlook-2027,
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title-link.rbccm-insight-cards__card-title-link--outlook-2027:hover,
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title-link.rbccm-insight-cards__card-title-link--outlook-2027:focus {
+  color: inherit !important;
+  font: inherit !important;
+  text-decoration: none !important;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-title-link.rbccm-insight-cards__card-title-link--outlook-2027:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
   color: #494949;
@@ -1028,6 +1051,151 @@
   .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row .rbccm-insight-cards__card-footer.rbccm-insight-cards__card-footer--outlook-2027 {
     justify-content: space-between;
     margin: 0 0 -9px;
+  }
+}
+
+/* ---------- Phones: button under the stories, no filter pills ----------
+   The skin prints the header button a second time after the stories
+   (--below). Below 600 that copy shows and the header's own is hidden,
+   so the button is read and reached in the order it appears. The
+   filter pills are not shown on phones: every story shows. */
+.rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027.rbccm-insight-cards__header-button--below {
+  display: none;
+}
+@media (max-width: 599.98px) {
+  .rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027 .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027 {
+    display: none;
+  }
+  .rbccm-insight-cards__header-button.rbccm-insight-cards__header-button--outlook-2027.rbccm-insight-cards__header-button--below {
+    align-self: flex-start;
+    display: inline-flex;
+  }
+  .rbccm-insight-cards__filters.rbccm-insight-cards__filters--outlook-2027 {
+    display: none;
+  }
+  .rbccm-insight-cards--cards .rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027[hidden] {
+    display: block !important;
+  }
+}
+
+/* ---------- Phones: swipe row (--mobile-carousel) ----------
+   Cards layout with the MobileLayout field set to a swipe option. Below
+   600 the stories sit in one row that scrolls sideways and snaps to
+   each story, running to both screen edges. --mobile-peek shows part of
+   the next story. It swipes without the script; the script adds the
+   arrows and dots (__nav). */
+.rbccm-insight-cards__nav.rbccm-insight-cards__nav--outlook-2027 {
+  align-items: center;
+  display: none;
+  justify-content: center;
+  margin: -12px 0 -8px;
+}
+.rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027,
+.rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027 {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: #003168;
+  cursor: pointer;
+  display: grid;
+  flex: 0 0 auto;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+}
+.rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027 {
+  border-radius: 50%;
+  transition: opacity 0.15s ease;
+  width: 44px;
+}
+.rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+.rbccm-insight-cards__nav-arrow-icon.rbccm-insight-cards__nav-arrow-icon--outlook-2027 {
+  display: block;
+  height: 24px;
+  width: 24px;
+}
+.rbccm-insight-cards__nav-dots.rbccm-insight-cards__nav-dots--outlook-2027 {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__nav-dot-item.rbccm-insight-cards__nav-dot-item--outlook-2027 {
+  margin: 0;
+  padding: 0;
+}
+.rbccm-insight-cards__nav-dot-item.rbccm-insight-cards__nav-dot-item--outlook-2027::before {
+  content: none;               /* no site-wide list bullets */
+}
+.rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027 {
+  width: 36px;
+}
+.rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027::before {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  height: 10px;
+  width: 10px;
+}
+.rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027.rbccm-insight-cards__nav-dot--active::before {
+  background: currentColor;
+  outline: 1.5px solid currentColor;
+  outline-offset: 3px;
+}
+.rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027:focus-visible,
+.rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027:focus-visible {
+  outline: 2px solid #003168;
+  outline-offset: -6px;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027,
+.rbccm-insight-cards--dark .rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027 {
+  color: #FFFFFF;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027.rbccm-insight-cards__nav-dot--active::before {
+  outline-color: #FFC72C;
+}
+.rbccm-insight-cards--dark .rbccm-insight-cards__nav-arrow.rbccm-insight-cards__nav-arrow--outlook-2027:focus-visible,
+.rbccm-insight-cards--dark .rbccm-insight-cards__nav-dot.rbccm-insight-cards__nav-dot--outlook-2027:focus-visible {
+  outline-color: #FFC72C;
+}
+@media (max-width: 599.98px) {
+  .rbccm-insight-cards--mobile-carousel .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    display: flex;
+    gap: 23px;                 /* as wide as the gutter, so the next story stays off screen */
+    margin: -4px -23px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 4px 23px;
+    scroll-padding: 0 23px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .rbccm-insight-cards--mobile-carousel .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027::-webkit-scrollbar {
+    display: none;
+  }
+  .rbccm-insight-cards--mobile-carousel .rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027 {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+  .rbccm-insight-cards--mobile-carousel.rbccm-insight-cards--mobile-peek .rbccm-insight-cards__list.rbccm-insight-cards__list--outlook-2027 {
+    gap: 16px;
+  }
+  .rbccm-insight-cards--mobile-carousel.rbccm-insight-cards--mobile-peek .rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027 {
+    flex-basis: 80%;
+  }
+  /* These stories start off screen, so they do not wait for the
+     scroll-in animation. */
+  .rbccm-insight-cards--mobile-carousel .rbccm-insight-cards__item.rbccm-insight-cards__item--outlook-2027[data-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .rbccm-insight-cards--mobile-carousel .rbccm-insight-cards__nav.rbccm-insight-cards__nav--outlook-2027 {
+    display: flex;
   }
 }
 

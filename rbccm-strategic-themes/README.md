@@ -2,11 +2,118 @@
 
 An eyebrow and heading, then up to five themes. Each theme shows its number, a title, a description, a button and an animated graphic. Built for the "Strategic themes" section of the 2027 Outlook page.
 
-On a desktop the section pins to the screen and scrolling steps through the themes one at a time. On phones and tablets the same numbered tabs switch the theme when pressed.
+The section pins to the screen and scrolling steps through the themes one at a time, on desktops, tablets and phones. Where pinning cannot be used, the same numbered tabs switch the theme when pressed.
 
 Each theme can be picked from TeamSite's article picker, so the title, description and link come from the story itself. Typed fields override the picked story.
 
 ---
+
+## For editors and BAs
+
+### Purpose
+
+Presents a short set of themes one at a time, each with its number, a title, a description, a button to the story and an animated graphic. It is used on the 2027 Outlook page (in progress, not live yet) as the "Strategic themes" section.
+
+- Variant `outlook-2027`: the only skin.
+- Pinned scroll mode: when the window is at least 600px tall, the section sticks to the screen and scrolling steps through the themes. From 992px wide the text and picture sit side by side. Below that the heading scrolls away first, then the tabs, text and picture stay in view, stacked.
+- Tabs mode: in short windows, on a narrow screen with no room left for the picture, for visitors with reduced motion turned on, and wherever pinning cannot work, numbered tabs switch the theme.
+
+### What the editor can change
+
+- The eyebrow and heading.
+- Three to five themes: pick the story, or type the title, description and link; set a short title for the tab.
+- Each theme's graphic, the words on it, or an image in its place.
+- The button label, for all themes or for one.
+- The alt text of a theme's image (the image Description).
+- The screen reader name of the section ("Section aria label") and of the row of numbered tabs.
+- Technical fields (section ID, CSS and JS paths, the "Last updated" cache version, the fixed site header height) exist and are set at deploy.
+
+### What it does not do
+
+- It does not advance on a timer. The visitor moves through the themes by scrolling, with the numbered tabs, or with the previous and next buttons beside each theme's button.
+- Pause only stops the movement that repeats in the drawn graphics (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
+- The ring round the pause button shows how far the showing graphic is through its loop (for example one turn of the radar sweep). It holds while paused and starts again with each theme. It is decoration and is not read out.
+- The pause button shows only on themes with a drawn graphic, and not for visitors with reduced motion turned on, where nothing moves anyway.
+- It shows five themes at most.
+- The graphics are fixed designs. Their shapes, colours and the element tiles can't be edited in TeamSite; only the words on them can.
+- A new kind of graphic needs a developer. An image can be used in the meantime.
+- The pinned scroll is not used in windows shorter than 600px.
+- The editor cannot choose between pinned scroll and tabs. The script chooses from the visitor's screen and settings.
+- It does not show a graphic and an image together. When a theme has an image, the image is used and the graphic choice is ignored.
+- It does not use the picked story's image. A theme's image is always picked in the theme's own image field.
+- It does not open the story in a new tab.
+- It has no address for a single theme. A link to the page cannot open it on, say, theme 3.
+
+All theme text and links are printed into the page by the skin, so they are present in the page source for search engines and other crawlers that do not run scripts.
+
+### Limits
+
+- Themes: 1 to 5 will show. The fields ask for three to five. Only themes with a title count, and they are numbered in field order (01, 02 and so on).
+- Two or more themes: the numbered tabs show, and pinned scroll is used where the window allows. In pinned scroll the section is one screen tall for each theme, so five themes make it five screens tall.
+- One theme: it shows on its own with no tabs and no pinned scroll.
+- Graphics: 5 fixed designs (Defense, Minerals, AI, Energy, Canada) or None, one per theme.
+- Words on a graphic (guidance from this README and the field label, not enforced): up to three words for Minerals, Energy and Canada; four labels work best for AI; Defense shows none. Energy can also take a chart title before a colon.
+- Image in place of a graphic: shown as a square, cropped to fill. Square works best. No pixel size is stated.
+- Tabs: each tab shows its bar, number and short title at every width. On phones five tabs share the width, so a long word in a short title breaks across lines; keep short titles to one or two short words.
+- Tabs mode layout: text above the picture on phones, side by side from 768px. Pinned scroll below 992px: text above the picture, and the picture takes the height that is left (460px wide at most).
+- Text length: No enforced character limit. In pinned scroll the section is exactly one screen tall and anything that does not fit is cut off, so keep the heading, titles and descriptions short. On a phone the picture shrinks as the text grows; if less than 140px is left for it, the tabs version is used.
+- Variants: 1.
+
+### Empty and edge cases
+
+- A blank eyebrow or heading is simply not shown.
+- A theme with no title, typed or picked, is hidden and the rest renumber.
+- No description, typed or picked: the theme shows without one.
+- No link, typed or picked: the theme shows without a button.
+- Blank button label on a theme: the label for every theme is used. If that is blank too, the button reads "Watch the episode".
+- Blank short title: the tab uses the theme's title.
+- Graphic "None" and no image: the theme shows text only.
+- A graphic with no words typed: it is drawn without words. The AI graphic then shows four unlabelled points on its chain.
+- Energy words typed without a colon: there is no chart title and all the words go under the chart.
+- No themes at all: only the eyebrow and heading show.
+- The page template clips or scrolls the section: the tabs version is used instead of pinned scroll, at every width.
+- The window is resized or reduced motion is switched on: the mode is chosen again.
+- Blank "Fixed site header height": the script measures the header from the page.
+- No script: every theme shows in a plain numbered list with its number, title, description and button. Images show; the drawn graphics and the tabs do not.
+
+### Accessibility
+
+- Headings: section heading is an h2, each theme title is an h3. The editor cannot change the levels.
+- The section is named for screen readers by its heading, or by "Section aria label" when that is filled in.
+- The themes are a numbered list. The visible "01 / 05" counter is hidden from screen readers because the list already gives the position.
+- The numbered tabs are buttons in a group named "Themes" (or the name typed in the tabs field). The showing one is marked as current.
+- Keyboard: Tab reaches each numbered tab; Enter or Space shows that theme; Left and Right arrows move to the next tab and show its theme. Focus stays on the tabs; it is not moved into the theme.
+- Previous, next and pause are real buttons named "Previous theme", "Next theme" and "Pause the animation", in a group named "Move between themes". Previous and next are marked as unavailable at the first and last theme. Pause is a toggle and says whether it is pressed. When the theme changes, focus stays on the same button.
+- The graphics repeat for as long as their theme shows. Pause is the visitor's way to stop that movement.
+- Only the showing theme can be reached. The other themes' text and buttons are hidden from the keyboard and from screen readers until their tab is chosen.
+- Each button names its theme for screen readers: the button label, a colon, then the title ("Watch the episode: Defense Outlook").
+- The drawn graphics are decoration and hidden from screen readers. An image's alt text comes from the image Description; if that is blank the image is treated as decoration.
+- The sideways swipe is touch only. The tabs do the same job for everyone else.
+- The tabs and the buttons show a focus outline.
+- Reduced motion: the tabs version is used with no animation, and the graphics show in their finished state.
+- A change of theme is not announced to screen readers; the chosen tab is marked as current.
+
+### Open questions
+
+- Whether the live page template lets the section pin. The deploy checklist asks for this to be checked on the published page; if the template clips the section, visitors get the tabs version.
+- Whether fewer than three themes is acceptable. The fields ask for three to five, but one or two will still show.
+- Sizes follow the team's page preview; the final spec has not arrived.
+- No pixel size is stated for the optional theme image.
+- The prefilled links are "#". The real story links are still to be supplied.
+- Which story fields the article picker returns in TeamSite has not been confirmed here. The skin expects a title, description and link (or url).
+- The 2027 Outlook page has no address yet, so the live URL is not recorded.
+
+---
+
+## TeamSite locations
+
+| What | Where |
+|---|---|
+| CSS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components/rbccm-strategic-themes.css` |
+| JS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/js/components/rbccm-strategic-themes.js` |
+| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |
+
+On the site these load from `/assets/rbccm/css/components/rbccm-strategic-themes.css` and `/assets/rbccm/js/components/rbccm-strategic-themes.js`.
 
 ## Files
 
@@ -24,8 +131,9 @@ Each theme can be picked from TeamSite's article picker, so the title, descripti
 
 | Where | What the visitor gets |
 |---|---|
-| Desktop (window at least 992px wide and 600px tall) | **Pinned scroll.** The section is one screen tall per theme. It sticks under the site header while the page scrolls through it. Each theme holds, then glides to the next: the text changes on the left and the graphics slide across on the right. The bar above each numbered tab fills as you go. Pressing a tab scrolls to that theme. |
-| Phones, tablets, short windows | **Tabs.** One theme shows at a time. Pressing a numbered tab switches it; a sideways swipe moves one theme. On phones the tabs show the bar and number only. |
+| Window at least 992px wide and 600px tall | **Pinned scroll.** The section is one screen tall per theme. It sticks under the site header while the page scrolls through it. Each theme holds, then glides to the next: the text changes on the left and the graphics slide across on the right. The bar above each numbered tab fills as you go. Pressing a tab scrolls to that theme. |
+| Narrower than 992px, at least 600px tall | **Pinned scroll, stacked.** The heading and intro scroll away, then the tabs stick under the site header with the showing theme's text below them and its picture in the height that is left. Scrolling steps through the themes the same way. |
+| Windows shorter than 600px, or no room for the picture | **Tabs.** One theme shows at a time. Pressing a numbered tab switches it; a sideways swipe moves one theme. |
 | Reduced motion (the visitor's device setting) | **Tabs**, with no animation. The graphics show in their finished state. |
 | No script | A plain numbered list of every theme: number, title, description and button. Images show; the drawn graphics don't. |
 
@@ -73,25 +181,6 @@ A theme can use an **image** instead (square works best). With no graphic and no
 
 ---
 
-## What the editor can change
-
-- The eyebrow and heading.
-- Three to five themes: pick the story, or type the title, description and link; set a short title for the tab.
-- Each theme's graphic, the words on it, or an image in its place.
-- The button label, for all themes or for one.
-
-## What it does not do
-
-- It does not advance on a timer and has no previous, next or pause buttons. The visitor moves through the themes by scrolling or with the tabs.
-- It shows five themes at most.
-- The graphics are fixed designs. Their shapes, colours and the element tiles can't be edited in TeamSite; only the words on them can.
-- A new kind of graphic needs a developer. An image can be used in the meantime.
-- The pinned scroll is desktop only.
-
-All theme text and links are printed into the page by the skin, so they are present in the page source for search engines and other crawlers that do not run scripts.
-
----
-
 ## Fields
 
 | Field | Notes |
@@ -102,6 +191,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 | `StickyOffset` | Height in px of the site header that stays fixed at the top. Blank (recommended) measures it from the page. |
 | `Eyebrow` | Small label above the heading. Blank hides it. |
 | `SectionHeading` | Blank hides it. |
+| `SectionIntro` | One line under the heading. Blank hides it. |
 | `ButtonLabel` | Button label for every theme. Blank shows "Watch the episode". |
 | `TabsLabel` | Screen reader name for the row of tabs. Blank uses "Themes". |
 | `Theme1Story` to `Theme5Story` | Article picker. Fills the title, description and link from the picked story. |
@@ -122,5 +212,5 @@ All theme text and links are printed into the page by the skin, so they are pres
 2. Register `rbccm-strategic-themes--outlook-2027.xsl` in TeamSite with `rbccm-strategic-themes-properties.xml`.
 3. Pick the stories (or fill the fields by hand) and check each button goes to the right story.
 4. On the published page, at desktop size, check the section pins under the site header and steps through every theme. If it shows as tabs instead, the page template is clipping the section; see "How it behaves".
-5. Check a phone and a tablet: the tabs switch themes.
+5. Check a phone and a tablet: the heading scrolls away, the tabs stick under the site header, and scrolling steps through every theme. Check the last theme's button can still be reached.
 6. Bump `CacheVersion`.

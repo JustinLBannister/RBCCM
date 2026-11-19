@@ -19,8 +19,16 @@ transactions-preview/
 
 # Working material, not components and not needed for a local build
 outlook-2027/design/
-maas-mata-page/snapshots/
+snapshots/
 insights-json-builder/
 
 # Build output: recreated by `npm run build`
 /dist/
+
+# Share package: only the zip is tracked. `npm run share` rebuilds it
+# and the unzipped copy beside it.
+/_share/*
+!/_share/rbccm-components.zip
+
+# Storybook static export (`npm run build-storybook`)
+/storybook-static/

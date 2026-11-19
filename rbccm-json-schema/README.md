@@ -4,6 +4,54 @@ Standalone TeamSite component for injecting Google-readable JSON-LD structured d
 
 > Naming note: the folder is called `rbccm-json-schema` to match the CMS component label. The payload it emits is JSON-LD (schema.org structured data), not a JSON Schema validator (draft-2020-12). If a validator ever ships, it lives here too.
 
+## For editors and BAs
+
+### Purpose
+
+Adds structured data (JSON-LD) to a page: a block of machine-readable facts about the page that search engines and other crawlers read. It is not visible to visitors. Live pages carrying a pasted block today include MAAS+MATA and Expertise; it can go on any page that needs structured data.
+
+### What the editor can change
+
+- One field, **SEO: JSON-LD structured data**: the whole JSON block, pasted between the `<![CDATA[` and `]]>` markers.
+
+### What it does not do
+
+- It does not write the JSON. The block is supplied (by SEO or the developer) and pasted in.
+- It does not check the JSON. Whatever is in the field is printed to the page exactly as it is, mistakes included.
+- It does not update itself when the page changes. If a title, link, video or date on the page changes, the block has to be updated to match.
+- It does not show anything on the page.
+
+### Limits
+
+- One block per component. A page should carry one.
+- No enforced character limit.
+- Write an ampersand inside a name as `\u0026` (for example `Mergers \u0026 Acquisitions`). `&amp;` is printed literally and ends up in the name.
+
+### Empty and edge cases
+
+- Field left empty: nothing is printed, so an unfilled component is harmless.
+- Invalid JSON (a missing bracket or quote): it is still printed, and search engines ignore the whole block, not just the broken part. A single wrong character is enough.
+- Editing a few characters inside the field is where mistakes come from. Replace the whole block each time, then check the live page.
+- A page with a filled block is left alone by the automatic structured data script described below.
+
+### Accessibility
+
+- No effect. The block is not visible and is not read out by assistive technology.
+
+### Open questions
+
+- When the automatic structured data script (below) will be deployed. Until it is, a page has structured data only if this component is on it and filled in.
+- Who owns keeping each page's block in step with the page after content changes.
+
+---
+
+## TeamSite locations
+
+| What | Where |
+|---|---|
+| JS (automatic script, not deployed yet) | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/js/components/rbccm-json-schema-auto.js` |
+| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |
+
 ## Files
 
 | File | Purpose |

@@ -15,9 +15,15 @@ Page order (from the design):
   4 Strategic themes              rbccm-strategic-themes
   5 Capital Markets perspectives  rbccm-insight-cards, Cards, dark
   6 Latest insights               rbccm-insight-cards, Cards, light blue
-  7 Platforms                     rbccm-platforms (the four existing
-                                  cards; the two new cards aren't built)
+  7 Platforms                     rbccm-platforms, Outlook 2027 preset, six cards
   8 Stay informed                 rbccm-marketo-footer
+  9 Structured data               rbccm-json-schema (not visible)
+
+Structured data: the same copy is written as JSON-LD to
+outlook-2027/seo-jsonld-paste.json, the block to paste into the
+rbccm-json-schema component. It describes the page and its breadcrumb,
+and lists every story that has a real link. Stories whose link is still
+a placeholder are left out, so run this again once the links are real.
 
 Images are placeholders (FPO) from the team's page preview; links are
 placeholders.
@@ -29,12 +35,21 @@ Run:  python3 outlook-2027/build-components-test.py
 Then: npm run build   (writes dist/outlook-2027.html from this page)
 Not shipped.
 """
-import copy, os, re
+import copy, json, os, re
 import lxml.etree as ET
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(HERE, 'outlook-2027-components.html')
+JSONLD_OUT = os.path.join(HERE, 'seo-jsonld-paste.json')
+
+# The page as it will be published. Check the address before the block
+# is pasted; update PAGE_MODIFIED when the page content changes.
+SITE = 'https://www.rbccm.com'
+PAGE_URL = SITE + '/en/insights/outlook-2027'
+PAGE_NAME = '2027 Outlook'
+PAGE_DESCRIPTION = 'Gain perspective on the economic, market, and industry forces shaping opportunities in 2027.'
+PAGE_MODIFIED = '2026-11-18'
 
 DOT = u'·'
 TIMES = u'×'
@@ -94,12 +109,15 @@ def iw(i, html, label):
 
 # ---- Insight cards helpers ------------------------------------------------
 FIELDS = {'badge': 'Badge', 'type': 'Type', 'cat': 'Category', 'title': 'Title',
-          'summary': 'Summary', 'meta': 'Meta', 'img': 'Image', 'link': 'Link',
+          'summary': 'Summary', 'meta': 'Meta', 'date': 'Date', 'img': 'Image', 'link': 'Link',
           'action': 'ActionLabel', 'filter': 'Filter', 'speaker': 'SpeakerName',
           'role': 'SpeakerRole'}
 
+SECTIONS = []   # (section heading, stories) for the structured data
+
 def cards(stories, **section):
     """Datum overrides for one rbccm-insight-cards instance."""
+    SECTIONS.append((section.get('SectionHeading', ''), stories))
     d = {'Eyebrow': '', 'SectionIntro': '', 'HeaderButtonLabel': '', 'HeaderButtonLink': '',
          'NotifyEyebrow': '', 'NotifyText': '', 'NotifyButtonLabel': '', 'NotifyLink': '',
          'Layout': 'cards', 'Theme': 'white', 'ShowFilters': 'no', 'ShowShare': 'yes'}
@@ -124,7 +142,7 @@ S.append(('Hero (rbccm-hero, outlook-2027 skin)', render(
         'HeroBreadcrumbs': '<li><a href="/en/">Home</a></li><li><a href="/en/insights">Insights</a></li>',
         'TitleLine1Text': '2027',
         'TitleLine2Text': 'Outlook',
-        'SubtitleText': 'Gain perspective on the economic, market, and industry forces shaping opportunities in 2027.',
+        'SubtitleText': PAGE_DESCRIPTION,
         'OlYearRoll': 'yes',
         'MmCta1Label': 'Download the report',
         'MmCta1Href': '#',
@@ -144,63 +162,184 @@ S.append(('Featured insight (rbccm-insight-cards, Featured layout)', render(CARD
 
 S.append(('Macro views (rbccm-insight-cards, Cards, white, with the notification strip)', render(CARDS_SKIN, CARDS_PROPS, cards([
     dict(badge='RBC Economics', type='article', cat='Macro & rates', title='Global economic outlook',
-         meta='Frances Donald %s Oct 9, 2026' % DOT, img=FPO + 'macro-1-fpo.jpg', link='#', action='Read %s 5 min read' % DOT),
+         meta='Frances Donald', date='2026-10-09', img=FPO + 'macro-1-fpo.jpg', link='#', action='Read %s 5 min read' % DOT),
     dict(badge='Markets in Motion', type='podcast', cat='Macro & rates', title='Monetary policy and rates outlook',
-         meta='Emma Laurent %s Oct 5, 2026' % DOT, img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 22 min' % DOT),
+         meta='Emma Laurent', date='2026-10-05', img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 22 min' % DOT),
     dict(badge='Strategic Alternatives', type='article', cat='Equities', title='U.S. equity market outlook',
-         meta='Daniel Reyes %s Oct 1, 2026' % DOT, img=FPO + 'macro-3-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
+         meta='Daniel Reyes', date='2026-10-01', img=FPO + 'macro-3-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
     dict(badge='Strategic Alternatives', type='video', cat='Consumer', title='FX outlook',
-         meta='Daniel Reyes %s Sep 28, 2026' % DOT, img=FPO + 'macro-4-fpo.jpg', link='#', action='Watch %s 6 min' % DOT),
-], SectionID='macro-views', SectionHeading='Macro views',
+         meta='Daniel Reyes', date='2026-09-28', img=FPO + 'macro-4-fpo.jpg', link='#', action='Watch %s 6 min' % DOT),
+], SectionID='macro-views', MobileLayout='carousel-peek', SectionHeading='Macro views',
    NotifyEyebrow='Never miss an Outlook episode',
    NotifyText='Stay up to date with the latest conversations and insights.',
    NotifyButtonLabel='Get notified', NotifyLink='#'))))
 
-S.append(('Strategic themes (rbccm-strategic-themes; pins and steps through the themes on desktop)', render(
+S.append(('Strategic themes (rbccm-strategic-themes; pins and steps through the themes as the page scrolls)', render(
     'rbccm-strategic-themes/rbccm-strategic-themes--outlook-2027.xsl',
     'rbccm-strategic-themes/rbccm-strategic-themes-properties.xml', {
         'SectionID': 'strategic-themes',
     })))
 
 S.append(('Capital Markets perspectives (rbccm-insight-cards, Cards, dark)', render(CARDS_SKIN, CARDS_PROPS, cards([
-    dict(badge='Video', type='video', cat='Deals & financing', title='M&A Outlook',
-         meta='Dec 2026 %s 5 min watch' % DOT, img=FPO + 'perspectives-1-fpo.jpg', link='#', action='Watch %s 5 min' % DOT),
-    dict(badge='Article', type='article', cat='Deals & financing', title='Capital Solutions',
-         meta='Dec 2026', img=FPO + 'perspectives-2-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
-    dict(badge='Podcast', type='podcast', cat='Deals & financing', title='Lending / Loan Outlook',
-         meta='Dec 2026', img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 5 min' % DOT),
-], SectionID='capital-markets-perspectives', Theme='dark',
+    dict(type='video', cat='Deals & financing', title='M&A Outlook',
+         date='2026-09-13', img=FPO + 'perspectives-1-fpo.jpg', link='#', action='Watch %s 5 min' % DOT),
+    dict(type='article', cat='Deals & financing', title='Capital Solutions',
+         date='2026-10-26', img=FPO + 'perspectives-2-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
+    dict(type='podcast', cat='Deals & financing', title='Lending / Loan Outlook',
+         date='2026-11-02', img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 5 min' % DOT),
+], SectionID='capital-markets-perspectives', Theme='dark', MobileLayout='carousel',
    Eyebrow='Capital Markets perspectives',
    SectionHeading=u'Perspectives on what’s ahead for dealmaking and capital markets.'))))
 
-S.append(('Latest insights (rbccm-insight-cards, Cards, light blue, filter pills)', render(CARDS_SKIN, CARDS_PROPS, cards([
+S.append(('Latest insights (rbccm-insight-cards, Cards, light blue)', render(CARDS_SKIN, CARDS_PROPS, cards([
     dict(badge='Conference', cat='Conference', title='Macro & Markets Conference',
-         meta='London, UK %s December 2-3, 2026' % DOT, img=FPO + 'latest-1-fpo.jpg', link='#',
-         action='View conference', filter='Conferences'),
-    dict(badge='Research', type='article', cat='Research %s Sector' % DOT, title='[Research report title]',
-         meta='[Analyst] %s [Date] %s [X] min read' % (DOT, DOT), link='#',
-         action='Read the research', filter='Research'),
-    dict(badge='Event', cat='Breakfast', title='Global Economic & Market Outlook Breakfast',
+         meta='London, UK %s Dec 2-3, 2026' % DOT, img=FPO + 'latest-1-fpo.jpg', link='#',
+         action='Learn more'),
+    dict(badge='Breakfast', cat='Breakfast', title='Global Economic & Market Outlook Breakfast',
          meta='Toronto, CA %s January X, 2027' % DOT, img=FPO + 'macro-1-fpo.jpg', link='#',
-         action='Register', filter='Events'),
+         action='Listen %s 4 min' % DOT),
     dict(badge='Webinar', type='video', cat='Preview', title='New Years Previews',
          meta='On-demand webinars', img=FPO + 'macro-3-fpo.jpg', link='#',
-         action='Watch on demand', filter='Webinars'),
-], SectionID='latest-insights', Theme='tint', ShowFilters='yes',
+         action='Watch %s 12 min' % DOT),
+], SectionID='latest-insights', Theme='tint',
    SectionHeading='Latest insights & highlights',
    SectionIntro='Stay up to date with our latest insights, perspectives and featured events.',
    HeaderButtonLabel='Explore all insights', HeaderButtonLink='#'))))
 
-S.append(('Platforms (rbccm-platforms; four existing cards, the two new ones are not built)', render(
-    'rbccm-platforms/rbccm-platforms.xsl', 'rbccm-platforms/rbccm-platforms-properties.xml', {
-        'SectionID': 'outlook-platforms',
-        'SectionTitleText': u'Access insights from across RBC Capital Markets’ global platform',
-        'SectionSubtitleText': '',
-    })))
+PLATFORM_PHOTOS = '../rbccm-platforms/photos/'
+PLATFORMS = [
+    ('strategic-alternatives', 'Strategic Alternatives',
+     'Uncover new ways to drive growth and create value with insights from our capital markets experts.',
+     '/en/insights/podcasts/strategic-alternatives'),
+    ('rbc-imagine', 'RBC Imagine',
+     u'Discover the forces of change reshaping industries, economies and societies – and turn disruption into strategic direction.',
+     '/en/insights/imagine'),
+    ('rbc-economics', 'RBC Economics',
+     'In-depth analysis and perspectives on the economic and market forces shaping the year ahead.',
+     'https://www.rbc.com/en/economics'),
+    ('real-time-geopolitics', 'Real-Time Geopolitics',
+     'Timely insight into the geopolitical developments influencing economies, markets, and industries.',
+     '/en/insights/real-time-geopolitics'),
+    ('markets-in-motion', 'Markets in Motion',
+     'Perspectives on the trends, catalysts, and market developments shaping U.S. equities.',
+     '/en/insights/podcasts/markets-in-motion'),
+    ('macro-minutes', 'Macro Minutes',
+     u'Concise analysis of the latest economic and market developments from RBC’s strategists.',
+     '/en/insights/podcasts/macro-minutes'),
+]
+platform_fields = {
+    'SectionID': 'outlook-platforms',
+    'Preset': 'outlook-2027-platforms',
+    # The <br> breaks the heading before "RBC" from 992px wide only
+    # (typed the same way in TeamSite, with the space before it);
+    # narrower screens wrap by themselves.
+    'SectionTitleText': u'Access insights from across <br>RBC Capital Markets’ global platform',
+    'SectionSubtitleText': '',
+}
+for n, (photo, title, body, href) in enumerate(PLATFORMS, 1):
+    platform_fields.update({
+        'Card%dPhotoDesktop' % n: PLATFORM_PHOTOS + photo + '.webp',
+        'Card%dPhotoMobile' % n: PLATFORM_PHOTOS + photo + '.webp',
+        'Card%dTitleText' % n: title,
+        'Card%dBodyText' % n: body,
+        'Card%dBodyMaxWidth' % n: '',
+        'Card%dCtaText' % n: 'Explore',
+        'Card%dCtaHref' % n: href,
+    })
+S.append(('Platforms (rbccm-platforms, Outlook 2027 preset, six cards)', render(
+    'rbccm-platforms/rbccm-platforms.xsl', 'rbccm-platforms/rbccm-platforms-properties.xml', platform_fields)))
 
 S.append(('Stay informed (rbccm-marketo-footer)', render(
     'rbccm-marketo-footer/rbccm-marketo-footer.xsl', 'rbccm-marketo-footer/rbccm-marketo-footer-properties.xml', {
         'SectionID': 'stay-informed',
+    })))
+
+# ---- Structured data ------------------------------------------------------
+def absolute(url):
+    """A real address on the site or elsewhere; None for a placeholder."""
+    url = (url or '').strip()
+    if not url or url == '#' or url.startswith('..'):
+        return None
+    return SITE + url if url.startswith('/') else url
+
+def slug(text):
+    return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
+
+def strip_tags(text):
+    return re.sub(r'<[^>]+>', '', text or '').strip()
+
+def story_node(story):
+    url = absolute(story.get('link'))
+    if not url:
+        return None
+    kind = story.get('type', '')
+    node = {'@id': PAGE_URL + '#' + slug(story['title']), 'url': url, 'inLanguage': 'en-US'}
+    if kind == 'video':
+        node.update({'@type': 'VideoObject', 'name': story['title']})
+        if story.get('date'): node['uploadDate'] = story['date']
+        if absolute(story.get('img')): node['thumbnailUrl'] = absolute(story['img'])
+    else:
+        if kind == 'podcast':
+            node.update({'@type': 'PodcastEpisode', 'name': story['title']})
+        else:
+            node.update({'@type': 'Article', 'headline': story['title']})
+        if story.get('date'): node['datePublished'] = story['date']
+        if absolute(story.get('img')): node['image'] = absolute(story['img'])
+    if strip_tags(story.get('summary')): node['description'] = strip_tags(story['summary'])
+    node['isPartOf'] = {'@id': PAGE_URL + '#webpage'}
+    node['publisher'] = {'@id': SITE + '/#organization'}
+    return node
+
+def structured_data():
+    """(JSON text, stories listed, stories left out)."""
+    # Organization and WebSite: the same two entries every page carries.
+    shared = json.load(open(os.path.join(ROOT, 'rbccm-json-schema', 'pages', 'conference-insights.json'), encoding='utf-8'))
+    site = [n for n in shared['@graph'] if n.get('@type') in ('Organization', 'WebSite')]
+    nodes, left_out, seen = [], 0, set()
+    for _, stories in SECTIONS:
+        for story in stories:
+            node = story_node(story)
+            if node is None:
+                left_out += 1
+            elif node['@id'] not in seen:
+                seen.add(node['@id'])
+                nodes.append(node)
+    page = {
+        '@type': 'CollectionPage', '@id': PAGE_URL + '#webpage', 'url': PAGE_URL,
+        'name': PAGE_NAME, 'headline': PAGE_NAME, 'description': PAGE_DESCRIPTION,
+        'inLanguage': 'en-US', 'dateModified': PAGE_MODIFIED,
+        'isPartOf': {'@type': 'WebSite', '@id': SITE + '/#website'},
+        'publisher': {'@id': SITE + '/#organization'},
+        'breadcrumb': {'@id': PAGE_URL + '#breadcrumb'},
+    }
+    crumbs = {
+        '@type': 'BreadcrumbList', '@id': PAGE_URL + '#breadcrumb',
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE + '/en/'},
+            {'@type': 'ListItem', 'position': 2, 'name': 'Insights', 'item': SITE + '/en/insights'},
+            {'@type': 'ListItem', 'position': 3, 'name': PAGE_NAME, 'item': PAGE_URL},
+        ],
+    }
+    graph = site + [page, crumbs]
+    if nodes:
+        page['mainEntity'] = {'@id': PAGE_URL + '#insightlist'}
+        graph.append({
+            '@type': 'ItemList', '@id': PAGE_URL + '#insightlist', 'name': PAGE_NAME + ' insights',
+            'url': PAGE_URL, 'numberOfItems': len(nodes),
+            'itemListElement': [{'@type': 'ListItem', 'position': i, 'item': {'@id': n['@id']}}
+                                for i, n in enumerate(nodes, 1)],
+        })
+        graph.extend(nodes)
+    text = json.dumps({'@context': 'https://schema.org', '@graph': graph}, ensure_ascii=True)
+    # Safe inside the page and the TeamSite field: no raw & or <.
+    return text.replace('&', '\\u0026').replace('<', '\\u003c'), len(nodes), left_out
+
+JSONLD, LISTED, LEFT_OUT = structured_data()
+open(JSONLD_OUT, 'w', encoding='ascii').write(JSONLD + '\n')
+
+S.append(('Structured data (rbccm-json-schema; not visible)', render(
+    'rbccm-json-schema/rbccm-json-schema.xsl', 'rbccm-json-schema/rbccm-json-schema-properties.xml', {
+        'SeoJsonLd': JSONLD,
     })))
 
 body = '\n'.join(iw(i, html, label) for i, (label, html) in enumerate(S, 1))
@@ -253,3 +392,4 @@ doc = '''<!DOCTYPE html>
 '''
 open(OUT, 'w', encoding='utf-8').write(doc.encode('ascii', 'xmlcharrefreplace').decode('ascii'))
 print('Wrote', os.path.relpath(OUT, ROOT), '-', len(S), 'slots')
+print('Wrote', os.path.relpath(JSONLD_OUT, ROOT), '-', LISTED, 'stories listed,', LEFT_OUT, 'left out (placeholder links)')

@@ -1,0 +1,59 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import catalog from './catalog.json';
+
+<Meta title="Welcome" />
+
+<Unstyled>
+  <style>{`
+    .rbc-welcome { font-family: Roboto, Arial, sans-serif; color: #252525; }
+    .rbc-welcome__hero {
+      border-radius: 16px; padding: 56px 48px 60px; color: #FFFFFF;
+      background:
+        radial-gradient(60% 130% at 88% -10%, rgba(0, 106, 195, 0.55), rgba(0, 106, 195, 0) 62%),
+        linear-gradient(135deg, #061730 0%, #082043 52%, #003168 100%);
+    }
+    .rbc-welcome p.rbc-welcome__eyebrow { margin: 0 0 20px; color: #FFC72C; font-size: 13px; line-height: 16px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; }
+    .rbc-welcome__eyebrow::after { content: ""; display: block; width: 44px; height: 2px; margin-top: 14px; background: #FFC72C; }
+    .rbc-welcome h1.rbc-welcome__title { color: #FFFFFF !important; margin: 0 0 16px !important; border: 0 !important; padding: 0 !important; font-family: RBCDisplay, "RBC Display", Georgia, "Times New Roman", serif; font-size: 56px; line-height: 1.1; font-weight: 400; }
+    .rbc-welcome p.rbc-welcome__lead { margin: 0; max-width: 680px; font-size: 18px; line-height: 28px; color: rgba(255, 255, 255, 0.86); }
+    .rbc-welcome__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .rbc-welcome__btn { display: inline-flex; align-items: center; height: 44px; padding: 0 28px; border-radius: 100px; font-size: 15px; font-weight: 500; text-decoration: none; background: #FFC72C; color: #061730; }
+    .rbc-welcome__btn:hover { background: #E5B520; }
+    .rbc-welcome__btn--ghost { background: transparent; color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.6); }
+    .rbc-welcome__btn--ghost:hover { background: rgba(255, 255, 255, 0.14); }
+    .rbc-welcome__stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 24px 0 0; padding: 0; list-style: none; }
+    .rbc-welcome__stat { border: 1px solid #E0E0E0; border-radius: 12px; padding: 20px 24px; background: #FFFFFF; }
+    .rbc-welcome__num { display: block; font-family: RBCDisplay, "RBC Display", Georgia, serif; font-size: 40px; line-height: 44px; color: #003168; }
+    .rbc-welcome__label { font-size: 14px; color: #494949; }
+    .rbc-welcome h2.rbc-welcome__h2 { border: 0 !important; padding: 0 !important; margin: 48px 0 16px !important; font-family: RBCDisplay, "RBC Display", Georgia, serif; font-size: 30px; line-height: 38px; font-weight: 400; color: #003168; }
+    .rbc-welcome__h2::before { content: ""; display: block; width: 44px; height: 2px; margin-bottom: 16px; background: #FFC72C; }
+    .rbc-welcome__list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .rbc-welcome__item { border: 1px solid #E0E0E0; border-radius: 12px; padding: 20px 24px; background: #FFFFFF; }
+    .rbc-welcome__item strong { display: block; margin-bottom: 6px; font-size: 17px; font-weight: 500; color: #003168; }
+    .rbc-welcome__item span { font-size: 14px; line-height: 21px; color: #494949; }
+    @media (max-width: 600px) { .rbc-welcome__hero { padding: 36px 24px 40px; } .rbc-welcome__title { font-size: 40px; } }
+  `}</style>
+  <div className="rbc-welcome">
+    <div className="rbc-welcome__hero">
+      <p className="rbc-welcome__eyebrow">RBC Capital Markets</p>
+      <h1 className="rbc-welcome__title">Component library</h1>
+      <p className="rbc-welcome__lead">The building blocks for rbccm.com pages. Each one is a TeamSite component with its own skin, fields, styles and a local preview. See it running, read what an editor can and cannot change, and check it for accessibility issues.</p>
+      <div className="rbc-welcome__actions">
+        <a className="rbc-welcome__btn" href="./?path=/docs/components-heroes-and-intros-hero--docs" target="_top">Browse the components</a>
+        <a className="rbc-welcome__btn rbc-welcome__btn--ghost" href="./?path=/docs/getting-started--docs" target="_top">Getting Started</a>
+      </div>
+    </div>
+    <ul className="rbc-welcome__stats">
+      <li className="rbc-welcome__stat"><span className="rbc-welcome__num">{catalog.components}</span><span className="rbc-welcome__label">components</span></li>
+      <li className="rbc-welcome__stat"><span className="rbc-welcome__num">{catalog.variants}</span><span className="rbc-welcome__label">variants</span></li>
+      <li className="rbc-welcome__stat"><span className="rbc-welcome__num">{catalog.pages}</span><span className="rbc-welcome__label">pages built from them</span></li>
+    </ul>
+    <h2 className="rbc-welcome__h2">What is in here</h2>
+    <ul className="rbc-welcome__list">
+      <li className="rbc-welcome__item"><strong>Foundations</strong><span>The colours, type and layout rules the components share.</span></li>
+      <li className="rbc-welcome__item"><strong>Components</strong><span>Every component by purpose. Each variant is a story; the Requirements page says what an editor can change, the limits and the edge cases.</span></li>
+      <li className="rbc-welcome__item"><strong>Accessibility</strong><span>Open the Accessibility tab under any story for automated WCAG checks on that variant.</span></li>
+      <li className="rbc-welcome__item"><strong>Pages</strong><span>The pages built from the components, each on its own bundle.</span></li>
+    </ul>
+  </div>
+</Unstyled>

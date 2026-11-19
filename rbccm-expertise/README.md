@@ -2,6 +2,76 @@
 
 Shared pillar/column-list component. Section header + N pillars, each with an icon, title, and short body. On desktop pillars sit in a 4-column row separated by thin blue dividers; below 1245px the row collapses into a Slick carousel (1 pillar per view <768px, 2 pillars 768-1244px).
 
+## For editors and BAs
+
+### Purpose
+A section title and description above four short "pillars", each with an icon, a title and a line or two of body copy. Used on Strategy & Economics (in progress, not live yet) for "Areas of expertise".
+
+Variants:
+- Strategy and Economics - Areas of expertise: light-blue section with icons.
+- Why RBC Capital Markets: white section, bright-blue pillar titles, no icons. Not on a page in the build config yet.
+
+### What the editor can change
+- The variant ("Preset - component variant"), or the matching single-variant skin from the Skin dropdown.
+- The section header: "Section title", "Section description" (HTML allowed) and "Header alignment" (Left or Center).
+- Four pillars ("Pillar 1" to "Pillar 4"). For each: an icon picked from the library (Globe, Bank, Chart, Search or None), a title and a body (HTML allowed).
+- The HTML tag used for the section title, the section description and each pillar's title and body (h1 to h6, p, div or span).
+- "Last updated": bump it each time content is saved (format YYYY-MM-DD-HHMM). The Section ID, Section ARIA label and the CSS and JS paths are technical fields set once at deploy.
+
+### What it does not do
+- It does not take a fifth pillar. Four is the maximum and the intended number.
+- It does not take custom icons. The editor picks from four built-in icons or None; a new icon needs a developer.
+- It shows no icons in the Why RBC Capital Markets variant, whatever is picked in the icon fields.
+- Pillars are not links and have no button or link field. (A link can only be typed into the body as HTML.)
+- The carousel does not advance by itself. No autoplay is set; it moves when the visitor uses the arrows, the dots or the keyboard.
+- It does not pull content from anywhere. All copy is typed.
+
+### Limits
+- Pillars: built for exactly 4. The field notes say to keep all four filled.
+- Variants: 2 (three skins: one with the Preset picker, plus one fixed skin per variant).
+- Layout by screen width (set in the script):
+  - Under 640px: 1 pillar per view, with arrows and dots.
+  - 640 to 991px: 2 per view, with arrows and dots.
+  - 992 to 1244px: 3 per view, with arrows and dots.
+  - 1245px and up: all 4 in one row with dividers; arrows and dots are hidden.
+- Text length: No enforced character limit. The field notes describe the body as one line of copy; pillars in a row are made equal in height to the tallest one.
+- Icons: 4 plus None.
+
+### Empty and edge cases
+- A pillar with a blank title is left out completely, even if its body and icon are set. The field notes warn this weakens the section and throws off the dividers.
+- Blank pillar body: the body is left out and the title stands alone.
+- Icon set to None (or blank): no icon space is printed for that pillar.
+- Blank "Section title": the heading is left out. Blank "Section description": hidden.
+- One pillar only: no carousel is started and the arrows and dots are hidden.
+- Preset skin with a blank or unrecognised "Preset": the section does not render. The two fixed skins ignore the Preset field.
+- Hidden Figma data pasted in with copy is removed from the output.
+- Scripts off (or the carousel library fails to load): the pillars stack in one column at every width, all visible. Below 1245px the arrow buttons still show but do nothing.
+
+### Accessibility
+- Headings: the section title is an h2 and each pillar title an h3 by default. The editor can change both with the tag pickers; an invalid value falls back to the default.
+- Icons are decorative and hidden from screen readers.
+- The arrow buttons are labelled "Previous item" and "Next item". Each dot is labelled "Go to slide N" and the dot group "Choose a pillar".
+- A polite live region announces "Item N of M" (M is the number of pillars) when the slide changes.
+- Keyboard: Left and Right arrow keys on the controls row move to the previous or next slide; on a focused dot they move from dot to dot. Pillars themselves are skipped by the Tab key because they hold no links or buttons.
+- Visible focus styles are defined for the arrows and dots.
+- The section's ARIA label is the "Section ARIA label" field (set at deploy; "Areas of expertise" by default).
+- Reduced motion: slides change instantly instead of sliding.
+
+### Open questions
+- Which page will use the Why RBC Capital Markets variant? It is not in the build config.
+- The opening paragraph and the "Responsive breakpoints" table in this README say 1 per view under 768px and 2 per view from 768 to 1244px. The script does 1 / 2 / 3 / 4 per view at under 640 / 640 / 992 / 1245px. Which one matches the approved design?
+- What should the section look like with fewer than four pillars at 1245px and up? The files only say it "skews the divider math".
+
+## TeamSite locations
+
+| What | Where |
+|---|---|
+| CSS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components/rbccm-expertise.css` |
+| JS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/js/components/rbccm-expertise.js` |
+| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |
+
+On the site these load from `/assets/rbccm/css/components/rbccm-expertise.css` and `/assets/rbccm/js/components/rbccm-expertise.js`.
+
 ## Files
 
 - `rbccm-expertise.css` -- shared partial + all variant modifiers. Deploys to `/assets/rbccm/css/components/rbccm-expertise.css`.

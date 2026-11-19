@@ -77,13 +77,24 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- A story's title: typed, otherwise the picked story's. -->
+  <!-- A story's title. The picked story's (its short tile title when
+       it has one, else its headline) and the typed one; which wins is
+       the StoryPriority field, and the other fills in when it is blank. -->
   <xsl:template name="itemTitle">
     <xsl:param name="n"/>
     <xsl:variable name="typed" select="normalize-space(//Datum[@ID=concat('Item', $n, 'Title')])"/>
+    <xsl:variable name="record" select="//Datum[@ID=concat('Item', $n, 'Story')]/DCR"/>
+    <xsl:variable name="storyFirst" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
+    <xsl:variable name="picked">
+      <xsl:choose>
+        <xsl:when test="normalize-space($record/*/summarytitle) != ''"><xsl:value-of select="normalize-space($record/*/summarytitle)"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space($record/*/title)"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
+      <xsl:when test="$storyFirst and string($picked) != ''"><xsl:value-of select="$picked"/></xsl:when>
       <xsl:when test="$typed != ''"><xsl:value-of select="$typed"/></xsl:when>
-      <xsl:otherwise><xsl:value-of select="normalize-space(//Datum[@ID=concat('Item', $n, 'Story')]/DCR/*/title)"/></xsl:otherwise>
+      <xsl:otherwise><xsl:value-of select="$picked"/></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -137,6 +148,7 @@
     <xsl:variable name="THEME_RAW"   select="translate(normalize-space(//Datum[@ID='Theme']/text()[last()]), $UPPER, $LOWER)"/>
     <xsl:variable name="SHARE_RAW"   select="translate(normalize-space(//Datum[@ID='ShowShare']/text()[last()]), $UPPER, $LOWER)"/>
     <xsl:variable name="FILTERS_RAW" select="translate(normalize-space(//Datum[@ID='ShowFilters']/text()[last()]), $UPPER, $LOWER)"/>
+    <xsl:variable name="MOBILE_RAW"  select="translate(normalize-space(//Datum[@ID='MobileLayout']/text()[last()]), $UPPER, $LOWER)"/>
 
     <xsl:variable name="LAYOUT">
       <xsl:choose>
@@ -153,6 +165,14 @@
     </xsl:variable>
     <xsl:variable name="SHOW_SHARE"   select="$SHARE_RAW != 'no'"/>
     <xsl:variable name="SHOW_FILTERS" select="$FILTERS_RAW = 'yes'"/>
+    <!-- Phones: stack the stories (default), or one row to swipe. -->
+    <xsl:variable name="MOBILE">
+      <xsl:choose>
+        <xsl:when test="$MOBILE_RAW = 'carousel-peek'">carousel-peek</xsl:when>
+        <xsl:when test="$MOBILE_RAW = 'carousel'">carousel</xsl:when>
+        <xsl:otherwise>stack</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
     <xsl:variable name="EYEBROW"   select="normalize-space(//Datum[@ID='Eyebrow'])"/>
     <xsl:variable name="HEADING"   select="normalize-space(//Datum[@ID='SectionHeading'])"/>
@@ -206,6 +226,8 @@
     <xsl:variable name="G4"><xsl:if test="$H4"><xsl:value-of select="normalize-space(//Datum[@ID='Item4Filter'])"/></xsl:if></xsl:variable>
     <xsl:variable name="G5"><xsl:if test="$H5"><xsl:value-of select="normalize-space(//Datum[@ID='Item5Filter'])"/></xsl:if></xsl:variable>
     <xsl:variable name="HAS_FILTERS" select="$SHOW_FILTERS and $LAYOUT = 'cards' and $COUNT &gt; 1 and concat($G1, $G2, $G3, $G4, $G5) != ''"/>
+    <!-- Swipe row on phones: Cards layout with two or more stories. -->
+    <xsl:variable name="HAS_CAROUSEL" select="$MOBILE != 'stack' and $LAYOUT = 'cards' and $COUNT &gt; 1"/>
 
     <xsl:variable name="ID_BASE">
       <xsl:choose>
@@ -232,6 +254,8 @@
             <xsl:otherwise> rbccm-insight-cards--side-cards</xsl:otherwise>
           </xsl:choose>
         </xsl:if>
+        <xsl:if test="$HAS_CAROUSEL"> rbccm-insight-cards--mobile-carousel</xsl:if>
+        <xsl:if test="$HAS_CAROUSEL and $MOBILE = 'carousel-peek'"> rbccm-insight-cards--mobile-peek</xsl:if>
       </xsl:attribute>
       <xsl:attribute name="id"><xsl:value-of select="$ID_BASE"/></xsl:attribute>
       <xsl:choose>
@@ -246,7 +270,7 @@
       <div class="rbccm-insight-cards__inner rbccm-insight-cards__inner--outlook-2027">
 
         <xsl:if test="$EYEBROW != '' or $HEADING != '' or $HAS_INTRO or ($HEADER_BTN_LABEL != '' and $HEADER_BTN_LINK != '')">
-          <div class="rbccm-insight-cards__header rbccm-insight-cards__header--outlook-2027">
+          <header class="rbccm-insight-cards__header rbccm-insight-cards__header--outlook-2027">
             <div class="rbccm-insight-cards__header-text rbccm-insight-cards__header-text--outlook-2027">
               <xsl:if test="$EYEBROW != ''">
                 <p class="rbccm-insight-cards__eyebrow rbccm-insight-cards__eyebrow--outlook-2027" data-animate="fadeInUp"><xsl:value-of select="$EYEBROW"/></p>
@@ -268,7 +292,7 @@
                 <xsl:call-template name="iconArrow"><xsl:with-param name="class" select="'rbccm-insight-cards__header-button-icon rbccm-insight-cards__header-button-icon--outlook-2027'"/></xsl:call-template>
               </a>
             </xsl:if>
-          </div>
+          </header>
         </xsl:if>
 
         <!-- Filter pills. Printed hidden; the script shows them, so a
@@ -321,15 +345,47 @@
           <!-- Cards: one wide card, or two to four columns. -->
           <xsl:otherwise>
             <ul class="rbccm-insight-cards__list rbccm-insight-cards__list--outlook-2027">
+              <xsl:if test="$HAS_CAROUSEL"><xsl:attribute name="data-insight-carousel"></xsl:attribute></xsl:if>
               <xsl:call-template name="CARD"><xsl:with-param name="n" select="1"/><xsl:with-param name="showShare" select="$SHOW_SHARE"/><xsl:with-param name="noImageLabel" select="$NO_IMAGE_LABEL"/></xsl:call-template>
               <xsl:call-template name="CARD"><xsl:with-param name="n" select="2"/><xsl:with-param name="showShare" select="$SHOW_SHARE"/><xsl:with-param name="noImageLabel" select="$NO_IMAGE_LABEL"/></xsl:call-template>
               <xsl:call-template name="CARD"><xsl:with-param name="n" select="3"/><xsl:with-param name="showShare" select="$SHOW_SHARE"/><xsl:with-param name="noImageLabel" select="$NO_IMAGE_LABEL"/></xsl:call-template>
               <xsl:call-template name="CARD"><xsl:with-param name="n" select="4"/><xsl:with-param name="showShare" select="$SHOW_SHARE"/><xsl:with-param name="noImageLabel" select="$NO_IMAGE_LABEL"/></xsl:call-template>
               <xsl:call-template name="CARD"><xsl:with-param name="n" select="5"/><xsl:with-param name="showShare" select="$SHOW_SHARE"/><xsl:with-param name="noImageLabel" select="$NO_IMAGE_LABEL"/></xsl:call-template>
             </ul>
+            <!-- Phones, swipe row only: arrows and dots. Printed hidden;
+                 the script adds one dot per story and shows them, so a
+                 page without the script has no dead buttons. -->
+            <xsl:if test="$HAS_CAROUSEL">
+              <div class="rbccm-insight-cards__nav rbccm-insight-cards__nav--outlook-2027" role="group" hidden="hidden" data-insight-carousel-nav="">
+                <xsl:attribute name="aria-label">
+                  <xsl:choose>
+                    <xsl:when test="$HEADING != ''"><xsl:value-of select="concat('Stories: ', $HEADING)"/></xsl:when>
+                    <xsl:otherwise>Stories</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <button type="button" class="rbccm-insight-cards__nav-arrow rbccm-insight-cards__nav-arrow--outlook-2027 rbccm-insight-cards__nav-arrow--prev" aria-label="Previous story" data-insight-carousel-step="-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-cards__nav-arrow-icon rbccm-insight-cards__nav-arrow-icon--outlook-2027" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 4 7 12 15 20"/></svg>
+                </button>
+                <ol class="rbccm-insight-cards__nav-dots rbccm-insight-cards__nav-dots--outlook-2027" data-insight-carousel-dots=""></ol>
+                <button type="button" class="rbccm-insight-cards__nav-arrow rbccm-insight-cards__nav-arrow--outlook-2027 rbccm-insight-cards__nav-arrow--next" aria-label="Next story" data-insight-carousel-step="1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="rbccm-insight-cards__nav-arrow-icon rbccm-insight-cards__nav-arrow-icon--outlook-2027" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 4 17 12 9 20"/></svg>
+                </button>
+              </div>
+            </xsl:if>
           </xsl:otherwise>
 
         </xsl:choose>
+
+        <!-- The header button again, under the stories. On phones this
+             one shows and the one in the header is hidden, so the
+             button is read and reached in the order it appears. -->
+        <xsl:if test="$HEADER_BTN_LABEL != '' and $HEADER_BTN_LINK != ''">
+          <a class="rbccm-insight-cards__header-button rbccm-insight-cards__header-button--outlook-2027 rbccm-insight-cards__header-button--below">
+            <xsl:attribute name="href"><xsl:value-of select="$HEADER_BTN_LINK"/></xsl:attribute>
+            <span class="rbccm-insight-cards__header-button-label rbccm-insight-cards__header-button-label--outlook-2027"><xsl:value-of select="$HEADER_BTN_LABEL"/></span>
+            <xsl:call-template name="iconArrow"><xsl:with-param name="class" select="'rbccm-insight-cards__header-button-icon rbccm-insight-cards__header-button-icon--outlook-2027'"/></xsl:call-template>
+          </a>
+        </xsl:if>
 
         <!-- Notification strip under the stories. -->
         <xsl:if test="$NOTIFY_EYEBROW != '' or $NOTIFY_TEXT != ''">
@@ -426,9 +482,34 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- One story. Typed fields win; otherwise the picked story's
-       title / description / thumbnail / link (or url) are used. The DCR
-       wrapper element varies by story type, so it is wildcarded
+  <!-- One story. Each piece below can come from the picked story (the
+       article record) or from a typed field. Both are read on the
+       server, so the card is complete in the page source.
+
+       StoryPriority decides which wins:
+         story (default)  the picked story's value is used; the typed
+                          field shows when no story is picked, or when
+                          the story has nothing for that piece
+         typed            a typed field wins; leave it blank to use the
+                          story
+
+         title          summarytitle, else title
+         summary        summarydescription, else description (featured
+                        story only; small cards show a typed summary)
+         image          thumbnail
+         link           the story's public address,
+                        /en/insights/YYYY/MM/slug, built from where the
+                        story is saved; or its External URL when it has
+                        one. The share popup shares the same address.
+         type           story_type: text = article, audio = podcast,
+                        video = video
+         meta line      the first author's name
+         date           publish_date (YYYY-MM-DD; 0000-00-00 is ignored)
+         action label   Read / Listen / Watch, plus the story's
+                        time_to_read or time_to_watch ("Read . 5 min")
+
+       The pill, category, filter label and speaker are always typed.
+       The DCR wrapper element varies by story type, so it is wildcarded
        (DCR/*/field), same as rbccm-insight-list.
 
        role: card (default), feature, side-card or side-row. The markup
@@ -443,11 +524,67 @@
     <xsl:variable name="LOWER" select="'abcdefghijklmnopqrstuvwxyz'"/>
 
     <xsl:variable name="DCR"         select="//Datum[@ID=concat('Item', $n, 'Story')]/DCR"/>
+    <xsl:variable name="STORY_FIRST" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
+    <xsl:variable name="HAS_STORY"   select="boolean($DCR/*)"/>
+    <!-- The first author with a name (a story can carry several). -->
+    <xsl:variable name="S_AUTHOR"    select="normalize-space(($DCR//author_name_new[normalize-space(.) != ''] | $DCR/*/author_name[normalize-space(.) != ''])[1])"/>
+    <xsl:variable name="S_THUMB"     select="normalize-space($DCR/*/thumbnail)"/>
+    <xsl:variable name="S_TYPE"      select="translate(normalize-space($DCR/*/story_type), $UPPER, $LOWER)"/>
+    <xsl:variable name="S_DATE">
+      <xsl:if test="not(starts-with(normalize-space($DCR/*/publish_date), '0000'))"><xsl:value-of select="normalize-space($DCR/*/publish_date)"/></xsl:if>
+    </xsl:variable>
+    <xsl:variable name="S_LINK">
+      <!-- The story's address. Story pages publish to
+           /en/insights/YYYY/MM/slug, which mirrors where the story is
+           saved (templatedata/article/story/data/YYYY/MM/slug). The
+           record itself only carries the internal viewer address in
+           can_url (.../story.page?dcr=templatedata/...), so the clean
+           address is built from that path. A story set to an External
+           URL links there. -->
+      <xsl:variable name="CAN" select="normalize-space($DCR/*/can_url)"/>
+      <xsl:variable name="SAVED_AT" select="substring-after($CAN, 'templatedata/article/story/data/')"/>
+      <xsl:choose>
+        <xsl:when test="normalize-space($DCR/*/content/link) != ''"><xsl:value-of select="normalize-space($DCR/*/content/link)"/></xsl:when>
+        <xsl:when test="normalize-space($DCR/*/link) != ''"><xsl:value-of select="normalize-space($DCR/*/link)"/></xsl:when>
+        <xsl:when test="$SAVED_AT != '' and contains($SAVED_AT, '.xml')"><xsl:value-of select="concat('/en/insights/', substring-before($SAVED_AT, '.xml'))"/></xsl:when>
+        <xsl:when test="$SAVED_AT != '' and contains($SAVED_AT, '&amp;')"><xsl:value-of select="concat('/en/insights/', substring-before($SAVED_AT, '&amp;'))"/></xsl:when>
+        <xsl:when test="$SAVED_AT != ''"><xsl:value-of select="concat('/en/insights/', $SAVED_AT)"/></xsl:when>
+        <xsl:when test="$CAN != '' and not(contains($CAN, 'dcr='))"><xsl:value-of select="$CAN"/></xsl:when>
+        <xsl:when test="normalize-space($DCR/*/url) != ''"><xsl:value-of select="normalize-space($DCR/*/url)"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$CAN"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="BADGE"       select="normalize-space(//Datum[@ID=concat('Item', $n, 'Badge')])"/>
     <xsl:variable name="TYPE_RAW"    select="translate(normalize-space(//Datum[@ID=concat('Item', $n, 'Type')]/text()[last()]), $UPPER, $LOWER)"/>
     <xsl:variable name="CATEGORY"    select="normalize-space(//Datum[@ID=concat('Item', $n, 'Category')])"/>
     <xsl:variable name="SUMMARY_RAW" select="//Datum[@ID=concat('Item', $n, 'Summary')]"/>
-    <xsl:variable name="META"        select="normalize-space(//Datum[@ID=concat('Item', $n, 'Meta')])"/>
+    <xsl:variable name="META_TYPED"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'Meta')])"/>
+    <!-- Date: typed as YYYY-MM-DD. Shown after the meta line as
+         "Oct 9, 2026" inside a time element, so the page says when the
+         story was published in a form search engines read. Anything
+         that is not YYYY-MM-DD is ignored. -->
+    <xsl:variable name="DATE_TYPED"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'Date')])"/>
+    <xsl:variable name="DATE_RAW">
+      <xsl:choose>
+        <xsl:when test="$STORY_FIRST and string($S_DATE) != ''"><xsl:value-of select="$S_DATE"/></xsl:when>
+        <xsl:when test="$DATE_TYPED != ''"><xsl:value-of select="$DATE_TYPED"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$S_DATE"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="META">
+      <xsl:choose>
+        <xsl:when test="$STORY_FIRST and $S_AUTHOR != ''"><xsl:value-of select="$S_AUTHOR"/></xsl:when>
+        <xsl:when test="$META_TYPED != ''"><xsl:value-of select="$META_TYPED"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$S_AUTHOR"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="DATE" select="string($DATE_RAW)"/>
+    <xsl:variable name="DATE_OK"     select="string-length($DATE) = 10 and translate($DATE, '0123456789', '') = '--' and substring($DATE, 5, 1) = '-' and substring($DATE, 8, 1) = '-' and number(substring($DATE, 6, 2)) &gt;= 1 and number(substring($DATE, 6, 2)) &lt;= 12 and number(substring($DATE, 9, 2)) &gt;= 1 and number(substring($DATE, 9, 2)) &lt;= 31"/>
+    <xsl:variable name="DATE_TEXT">
+      <xsl:if test="$DATE_OK">
+        <xsl:value-of select="concat(substring('JanFebMarAprMayJunJulAugSepOctNovDec', (number(substring($DATE, 6, 2)) - 1) * 3 + 1, 3), ' ', number(substring($DATE, 9, 2)), ', ', substring($DATE, 1, 4))"/>
+      </xsl:if>
+    </xsl:variable>
     <xsl:variable name="IMG_RAW"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'Image')]/Image/Path)"/>
     <xsl:variable name="IMG_ALT"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'Image')]/Image/Description)"/>
     <xsl:variable name="LINK_RAW"    select="normalize-space(//Datum[@ID=concat('Item', $n, 'Link')])"/>
@@ -460,11 +597,17 @@
 
     <!-- Type: video, podcast or article sets the icon on the image and
          the default action label. Anything else: no icon. -->
+    <xsl:variable name="TYPE_SRC">
+      <xsl:choose>
+        <xsl:when test="($STORY_FIRST and $S_TYPE != '') or $TYPE_RAW = '' or $TYPE_RAW = 'auto'"><xsl:value-of select="$S_TYPE"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$TYPE_RAW"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="TYPE">
       <xsl:choose>
-        <xsl:when test="contains($TYPE_RAW, 'video') or contains($TYPE_RAW, 'watch')">video</xsl:when>
-        <xsl:when test="contains($TYPE_RAW, 'podcast') or contains($TYPE_RAW, 'listen') or contains($TYPE_RAW, 'audio')">podcast</xsl:when>
-        <xsl:when test="contains($TYPE_RAW, 'article') or contains($TYPE_RAW, 'read')">article</xsl:when>
+        <xsl:when test="contains($TYPE_SRC, 'video') or contains($TYPE_SRC, 'watch')">video</xsl:when>
+        <xsl:when test="contains($TYPE_SRC, 'podcast') or contains($TYPE_SRC, 'listen') or contains($TYPE_SRC, 'audio')">podcast</xsl:when>
+        <xsl:when test="contains($TYPE_SRC, 'article') or contains($TYPE_SRC, 'read') or $TYPE_SRC = 'text'">article</xsl:when>
         <xsl:otherwise>none</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -475,7 +618,10 @@
          the smaller cards show a summary when one is typed. -->
     <xsl:variable name="SUMMARY">
       <xsl:choose>
+        <xsl:when test="$STORY_FIRST and $role = 'feature' and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
+        <xsl:when test="$STORY_FIRST and $role = 'feature' and normalize-space($DCR/*/description) != ''"><xsl:value-of select="$DCR/*/description"/></xsl:when>
         <xsl:when test="$HAS_SUMMARY_RAW"><xsl:value-of select="$SUMMARY_RAW"/></xsl:when>
+        <xsl:when test="$role = 'feature' and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
         <xsl:when test="$role = 'feature'"><xsl:value-of select="$DCR/*/description"/></xsl:when>
       </xsl:choose>
     </xsl:variable>
@@ -484,23 +630,42 @@
 
     <xsl:variable name="IMG">
       <xsl:choose>
+        <xsl:when test="$STORY_FIRST and $S_THUMB != ''"><xsl:value-of select="$S_THUMB"/></xsl:when>
         <xsl:when test="$IMG_RAW != ''"><xsl:value-of select="$IMG_RAW"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="normalize-space($DCR/*/thumbnail)"/></xsl:otherwise>
+        <xsl:otherwise><xsl:value-of select="$S_THUMB"/></xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>
+    <!-- The typed image's description is its alt text; it does not
+         describe the story's own thumbnail. -->
+    <xsl:variable name="IMG_ALT_USED">
+      <xsl:if test="string($IMG) = $IMG_RAW"><xsl:value-of select="$IMG_ALT"/></xsl:if>
     </xsl:variable>
     <xsl:variable name="LINK">
       <xsl:choose>
+        <xsl:when test="$STORY_FIRST and string($S_LINK) != ''"><xsl:value-of select="$S_LINK"/></xsl:when>
         <xsl:when test="$LINK_RAW != ''"><xsl:value-of select="$LINK_RAW"/></xsl:when>
-        <xsl:when test="normalize-space($DCR/*/link) != ''"><xsl:value-of select="normalize-space($DCR/*/link)"/></xsl:when>
-        <xsl:otherwise><xsl:value-of select="normalize-space($DCR/*/url)"/></xsl:otherwise>
+        <xsl:otherwise><xsl:value-of select="$S_LINK"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- The story's own length: watch / listen time for video and
+         podcast, read time otherwise (typed on the article as "5 min"). -->
+    <xsl:variable name="DURATION">
+      <xsl:choose>
+        <xsl:when test="($TYPE = 'video' or $TYPE = 'podcast') and normalize-space($DCR/*/time_to_watch) != ''"><xsl:value-of select="normalize-space($DCR/*/time_to_watch)"/></xsl:when>
+        <xsl:when test="$TYPE != 'video' and $TYPE != 'podcast'"><xsl:value-of select="normalize-space($DCR/*/time_to_read)"/></xsl:when>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="ACTION">
       <xsl:choose>
-        <xsl:when test="$ACTION_RAW != ''"><xsl:value-of select="$ACTION_RAW"/></xsl:when>
-        <xsl:when test="$TYPE = 'video'">Watch</xsl:when>
-        <xsl:when test="$TYPE = 'podcast'">Listen</xsl:when>
-        <xsl:otherwise>Read</xsl:otherwise>
+        <xsl:when test="$ACTION_RAW != '' and not($STORY_FIRST and $HAS_STORY)"><xsl:value-of select="$ACTION_RAW"/></xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$TYPE = 'video'">Watch</xsl:when>
+            <xsl:when test="$TYPE = 'podcast'">Listen</xsl:when>
+            <xsl:otherwise>Read</xsl:otherwise>
+          </xsl:choose>
+          <xsl:if test="string($DURATION) != ''"><xsl:text> &#183; </xsl:text><xsl:value-of select="$DURATION"/></xsl:if>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
@@ -542,7 +707,7 @@
                      description makes the image decorative (alt=""). -->
                 <img class="rbccm-insight-cards__card-img rbccm-insight-cards__card-img--outlook-2027" width="369" height="194" loading="lazy" decoding="async">
                   <xsl:attribute name="src"><xsl:value-of select="$IMG"/></xsl:attribute>
-                  <xsl:attribute name="alt"><xsl:value-of select="$IMG_ALT"/></xsl:attribute>
+                  <xsl:attribute name="alt"><xsl:value-of select="$IMG_ALT_USED"/></xsl:attribute>
                 </img>
               </xsl:when>
               <xsl:when test="$noImageLabel != ''">
@@ -572,12 +737,32 @@
               <xsl:if test="$CATEGORY != ''">
                 <p class="rbccm-insight-cards__card-category rbccm-insight-cards__card-category--outlook-2027"><xsl:value-of select="$CATEGORY"/></p>
               </xsl:if>
-              <h3 class="rbccm-insight-cards__card-title rbccm-insight-cards__card-title--outlook-2027"><xsl:value-of select="$TITLE"/></h3>
+              <!-- The title links to the story, so the link's words say
+                   what the story is. The action link below goes to the
+                   same place and is the one keyboard users tab to, so
+                   the title is left out of the tab order. -->
+              <h3 class="rbccm-insight-cards__card-title rbccm-insight-cards__card-title--outlook-2027">
+                <xsl:choose>
+                  <xsl:when test="normalize-space($LINK) != ''">
+                    <a class="rbccm-insight-cards__card-title-link rbccm-insight-cards__card-title-link--outlook-2027" tabindex="-1">
+                      <xsl:attribute name="href"><xsl:value-of select="$LINK"/></xsl:attribute>
+                      <xsl:value-of select="$TITLE"/>
+                    </a>
+                  </xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$TITLE"/></xsl:otherwise>
+                </xsl:choose>
+              </h3>
               <xsl:if test="$HAS_SUMMARY">
                 <div class="rbccm-insight-cards__card-summary rbccm-insight-cards__card-summary--outlook-2027"><xsl:call-template name="rbccmRich"><xsl:with-param name="s" select="$SUMMARY"/></xsl:call-template></div>
               </xsl:if>
-              <xsl:if test="$META != ''">
-                <p class="rbccm-insight-cards__card-meta rbccm-insight-cards__card-meta--outlook-2027"><xsl:value-of select="$META"/></p>
+              <xsl:if test="string($META) != '' or $DATE_OK">
+                <p class="rbccm-insight-cards__card-meta rbccm-insight-cards__card-meta--outlook-2027">
+                  <xsl:value-of select="$META"/>
+                  <xsl:if test="$DATE_OK">
+                    <xsl:if test="string($META) != ''"><xsl:text> &#183; </xsl:text></xsl:if>
+                    <time class="rbccm-insight-cards__card-date rbccm-insight-cards__card-date--outlook-2027"><xsl:attribute name="datetime"><xsl:value-of select="$DATE"/></xsl:attribute><xsl:value-of select="$DATE_TEXT"/></time>
+                  </xsl:if>
+                </p>
               </xsl:if>
             </div>
 

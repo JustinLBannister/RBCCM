@@ -1,0 +1,42 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Layout and Naming" />
+
+# Layout and Naming
+
+## Layout
+
+| Rule | Value |
+|---|---|
+| Content width | 1140px maximum, centred |
+| Side gutter | 23px on every section, at every screen width |
+| Main breakpoint | 992px: most components switch between their small and large layouts here |
+| Other breakpoints | 768px and 600px, used by some components |
+
+A few older components still use their own content width (1180px or 1100px). Those are noted as open questions on their Requirements pages.
+
+## Naming
+
+Each component is one block named after its folder, for example `rbccm-hero`, and its parts follow the block, element, modifier pattern:
+
+| Part | Example |
+|---|---|
+| Block | `rbccm-insight-cards` |
+| Element | `rbccm-insight-cards__card-title` |
+| Variant modifier | `rbccm-hero--outlook-2027` |
+
+The variant modifier is repeated on every level it affects: the item, the card and each child element (for example `__card-title--deal`), so a variant can be styled without relying on nesting.
+
+## Variants
+
+A variant is a TeamSite skin, picked when the component is added to a page. It is not a field. The skins for one component share one properties file, so the editor sees the same fields whichever variant is used; each field's label says which variants use it.
+
+## Files in a component folder
+
+| File | What it is |
+|---|---|
+| `*.xsl` | Skin: turns the editor's fields into the page markup |
+| `*-properties.xml` | The editor's fields |
+| `*.css`, `*.js` | Styles and behaviour, uploaded to TeamSite |
+| `*.html` or `local-test.html` | Local preview page; the stories here are taken from it |
+| `README.md` | Requirements for editors and BAs, plus developer notes |
