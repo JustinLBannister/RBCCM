@@ -1,8 +1,9 @@
 <!--
   RBCCM Insight Cards - Properties + Data
   ==============================================================
-  A section of story cards: eyebrow, heading and intro, then up to
-  five stories. Each story: image with an optional pill and type
+  A section of story cards: eyebrow, heading and intro, then a list
+  of stories (the first five with a title show). Each story: image
+  with an optional pill and type
   icon, category label, title, summary, meta line, an action link
   and a share button.
 
@@ -20,11 +21,15 @@
                stories they stack as cards beside it; with three or
                four more they become the "Also selected" rows.
 
-  Picking a story: each Item{N}Story is TeamSite's article picker.
-  When a story is picked, its title, image and link fill in from the
-  story (and its summary, on the featured story). Anything typed in
-  that item's own fields overrides the picked story. Pill, type,
-  category, meta and action label are always typed.
+  Stories are a list (the Story group in Data): add one, pick the
+  story with TeamSite's article picker and / or type its fields, then
+  add the next. A picked story fills its title, image, link, type,
+  author, date and read or watch time (and its summary, on the
+  featured story). Pill, category and filter label are always typed.
+
+  Copies of the component saved before the list existed stored five
+  fixed stories (Item1... to Item5...). The skin still reads those
+  when the list has no story with a title, so they keep showing.
 
   Every text field is optional; blank ones don't render. A story
   hides when it has no title (typed or picked). A blank Link hides
@@ -93,194 +98,68 @@
   <Datum ID="NoImageLabel" Type="String" Name="Label shown on a story with no image (e.g. RBC Capital Markets Research; blank shows a plain block)">RBC Capital Markets Research</Datum>
 
   <!-- ============================================================
-       Story 1
-       ============================================================ -->
-  <Datum ID="Item1Story" Type="DCR" Name="Story 1 (the featured story in the Featured layout) : pick the story (fills the title, image, link, type, author, date and read or watch time; the fields below show when no story is picked)">
-    <DCR Category="article" Type="story"/>
-    <DCR-Category Name="article">
-      <DCR-Type Name=".*"/>
-    </DCR-Category>
-    <DCR-Category Name="rbccm">
-      <DCR-Type Name="episode"/>
-    </DCR-Category>
-  </Datum>
-  <Datum ID="Item1Badge" Type="String" Name="Story 1 : pill on the image (e.g. RBC Economics; blank hides it)">RBC Economics</Datum>
-  <Datum ID="Item1Type" Type="SelectSingle" Name="Story 1 : type (sets the icon on the image and the default action label)">
-    <Option><Display>From the picked story</Display><Value>auto</Value></Option>
-    <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
-    <Option Selected="true"><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
-    <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
-    <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
-    article
-  </Datum>
-  <Datum ID="Item1Category" Type="String" Name="Story 1 : category label (e.g. Macro &amp; rates)">Macro &amp; rates</Datum>
-  <Datum ID="Item1Title" Type="String" Name="Story 1 : title (blank uses the picked story; no title hides the story)">Global economic outlook</Datum>
-  <Datum ID="Item1Summary" Type="Textarea" Name="Story 1 : summary (optional; the featured story uses the picked story's summary when blank)"></Datum>
-  <Datum ID="Item1Meta" Type="String" Name="Story 1 : meta line (e.g. the author, Frances Donald; the date has its own field below)">Frances Donald</Datum>
-  <Datum ID="Item1Date" Type="String" Name="Story 1 : date published, as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as Oct 9, 2026 and tells search engines the date. Blank uses the picked story; no date shows nothing">2026-10-09</Datum>
-  <Datum ID="Item1Image" Type="Image" Name="Story 1 : image - pick from DAM (blank uses the picked story's thumbnail)">
-    <Image>
-      <Path></Path>
-      <Description></Description>
-    </Image>
-  </Datum>
-  <Datum ID="Item1Link" Type="String" Name="Story 1 : link (blank uses the picked story; no link hides the action link)">#</Datum>
-  <Datum ID="Item1ActionLabel" Type="String" Name="Story 1 : action label (e.g. Read &#183; 5 min read; blank shows Read, Listen or Watch by type, plus the picked story's read or watch time)">Read &#183; 5 min read</Datum>
-  <Datum ID="Item1Filter" Type="String" Name="Story 1 : filter label (e.g. Research; used by the filter pills)"></Datum>
-  <Datum ID="Item1SpeakerName" Type="String" Name="Story 1 : name shown on the image (e.g. Lindsay Patrick; optional - in the Featured layout a picked story fills it with its first author)"></Datum>
-  <Datum ID="Item1SpeakerRole" Type="String" Name="Story 1 : role shown under the name (e.g. Chief Economist, RBC; optional - in the Featured layout a picked story fills it with that author's title and company)"></Datum>
+       Stories : a list. One "Story" group per story; add another with
+       the list's own add button and they show in the order listed.
+       A story with no title (typed or from the picked story) is
+       skipped, and the first five with a title show. In the Featured
+       layout the first one is the large featured story.
 
-  <!-- ============================================================
-       Story 2
-       ============================================================ -->
-  <Datum ID="Item2Story" Type="DCR" Name="Story 2 : pick the story (fills the title, image, link, type, author, date and read or watch time; the fields below show when no story is picked)">
-    <DCR Category="article" Type="story"/>
-    <DCR-Category Name="article">
-      <DCR-Type Name=".*"/>
-    </DCR-Category>
-    <DCR-Category Name="rbccm">
-      <DCR-Type Name="episode"/>
-    </DCR-Category>
-  </Datum>
-  <Datum ID="Item2Badge" Type="String" Name="Story 2 : pill on the image (e.g. RBC Economics; blank hides it)"></Datum>
-  <Datum ID="Item2Type" Type="SelectSingle" Name="Story 2 : type (sets the icon on the image and the default action label)">
-    <Option Selected="true"><Display>From the picked story</Display><Value>auto</Value></Option>
-    <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
-    <Option><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
-    <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
-    <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
-    auto
-  </Datum>
-  <Datum ID="Item2Category" Type="String" Name="Story 2 : category label (e.g. Macro &amp; rates)"></Datum>
-  <Datum ID="Item2Title" Type="String" Name="Story 2 : title (blank uses the picked story; no title hides the story)"></Datum>
-  <Datum ID="Item2Summary" Type="Textarea" Name="Story 2 : summary (optional; the featured story uses the picked story's summary when blank)"></Datum>
-  <Datum ID="Item2Meta" Type="String" Name="Story 2 : meta line (e.g. the author, Frances Donald; the date has its own field below)"></Datum>
-  <Datum ID="Item2Date" Type="String" Name="Story 2 : date published, as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as Oct 9, 2026 and tells search engines the date. Blank uses the picked story; no date shows nothing"></Datum>
-  <Datum ID="Item2Image" Type="Image" Name="Story 2 : image - pick from DAM (blank uses the picked story's thumbnail)">
-    <Image>
-      <Path></Path>
-      <Description></Description>
-    </Image>
-  </Datum>
-  <Datum ID="Item2Link" Type="String" Name="Story 2 : link (blank uses the picked story; no link hides the action link)"></Datum>
-  <Datum ID="Item2ActionLabel" Type="String" Name="Story 2 : action label (e.g. Read &#183; 5 min read; blank shows Read, Listen or Watch by type, plus the picked story's read or watch time)"></Datum>
-  <Datum ID="Item2Filter" Type="String" Name="Story 2 : filter label (e.g. Research; used by the filter pills)"></Datum>
-  <Datum ID="Item2SpeakerName" Type="String" Name="Story 2 : name shown on the image (e.g. Lindsay Patrick; optional)"></Datum>
-  <Datum ID="Item2SpeakerRole" Type="String" Name="Story 2 : role shown under the name (e.g. Chief Economist, RBC; optional)"></Datum>
+       Each story: pick it, type it, or both. Which wins when both are
+       filled is the "When a story is picked" setting above.
 
-  <!-- ============================================================
-       Story 3
-       ============================================================ -->
-  <Datum ID="Item3Story" Type="DCR" Name="Story 3 : pick the story (fills the title, image, link, type, author, date and read or watch time; the fields below show when no story is picked)">
-    <DCR Category="article" Type="story"/>
-    <DCR-Category Name="article">
-      <DCR-Type Name=".*"/>
-    </DCR-Category>
-    <DCR-Category Name="rbccm">
-      <DCR-Type Name="episode"/>
-    </DCR-Category>
-  </Datum>
-  <Datum ID="Item3Badge" Type="String" Name="Story 3 : pill on the image (e.g. RBC Economics; blank hides it)"></Datum>
-  <Datum ID="Item3Type" Type="SelectSingle" Name="Story 3 : type (sets the icon on the image and the default action label)">
-    <Option Selected="true"><Display>From the picked story</Display><Value>auto</Value></Option>
-    <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
-    <Option><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
-    <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
-    <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
-    auto
-  </Datum>
-  <Datum ID="Item3Category" Type="String" Name="Story 3 : category label (e.g. Macro &amp; rates)"></Datum>
-  <Datum ID="Item3Title" Type="String" Name="Story 3 : title (blank uses the picked story; no title hides the story)"></Datum>
-  <Datum ID="Item3Summary" Type="Textarea" Name="Story 3 : summary (optional; the featured story uses the picked story's summary when blank)"></Datum>
-  <Datum ID="Item3Meta" Type="String" Name="Story 3 : meta line (e.g. the author, Frances Donald; the date has its own field below)"></Datum>
-  <Datum ID="Item3Date" Type="String" Name="Story 3 : date published, as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as Oct 9, 2026 and tells search engines the date. Blank uses the picked story; no date shows nothing"></Datum>
-  <Datum ID="Item3Image" Type="Image" Name="Story 3 : image - pick from DAM (blank uses the picked story's thumbnail)">
-    <Image>
-      <Path></Path>
-      <Description></Description>
-    </Image>
-  </Datum>
-  <Datum ID="Item3Link" Type="String" Name="Story 3 : link (blank uses the picked story; no link hides the action link)"></Datum>
-  <Datum ID="Item3ActionLabel" Type="String" Name="Story 3 : action label (e.g. Read &#183; 5 min read; blank shows Read, Listen or Watch by type, plus the picked story's read or watch time)"></Datum>
-  <Datum ID="Item3Filter" Type="String" Name="Story 3 : filter label (e.g. Research; used by the filter pills)"></Datum>
-  <Datum ID="Item3SpeakerName" Type="String" Name="Story 3 : name shown on the image (e.g. Lindsay Patrick; optional)"></Datum>
-  <Datum ID="Item3SpeakerRole" Type="String" Name="Story 3 : role shown under the name (e.g. Chief Economist, RBC; optional)"></Datum>
+       IMPORTANT: inside a list TeamSite can drop a field's ID, so the
+       skin also finds each field by the FIRST WORDS of its label:
+         Pick the story / Title / Category / Summary / Meta / Date /
+         Image / Link / Action label / Type / Pill / Filter /
+         Name on the image / Role
+       Keep every label starting with exactly those words, and keep
+       apostrophes out of the labels. Everything after the first words
+       is free to reword.
 
-  <!-- ============================================================
-       Story 4
+       Schema: a Group takes only ID, Name, Replicatable and
+       CloneGroupID. The picker's DCR element stays empty (a default
+       path there becomes a dependency TeamSite tries to resolve at
+       publish), and the Image skeleton stays empty too.
        ============================================================ -->
-  <Datum ID="Item4Story" Type="DCR" Name="Story 4 : pick the story (fills the title, image, link, type, author, date and read or watch time; the fields below show when no story is picked)">
-    <DCR Category="article" Type="story"/>
-    <DCR-Category Name="article">
-      <DCR-Type Name=".*"/>
-    </DCR-Category>
-    <DCR-Category Name="rbccm">
-      <DCR-Type Name="episode"/>
-    </DCR-Category>
-  </Datum>
-  <Datum ID="Item4Badge" Type="String" Name="Story 4 : pill on the image (e.g. RBC Economics; blank hides it)"></Datum>
-  <Datum ID="Item4Type" Type="SelectSingle" Name="Story 4 : type (sets the icon on the image and the default action label)">
-    <Option Selected="true"><Display>From the picked story</Display><Value>auto</Value></Option>
-    <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
-    <Option><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
-    <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
-    <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
-    auto
-  </Datum>
-  <Datum ID="Item4Category" Type="String" Name="Story 4 : category label (e.g. Macro &amp; rates)"></Datum>
-  <Datum ID="Item4Title" Type="String" Name="Story 4 : title (blank uses the picked story; no title hides the story)"></Datum>
-  <Datum ID="Item4Summary" Type="Textarea" Name="Story 4 : summary (optional; the featured story uses the picked story's summary when blank)"></Datum>
-  <Datum ID="Item4Meta" Type="String" Name="Story 4 : meta line (e.g. the author, Frances Donald; the date has its own field below)"></Datum>
-  <Datum ID="Item4Date" Type="String" Name="Story 4 : date published, as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as Oct 9, 2026 and tells search engines the date. Blank uses the picked story; no date shows nothing"></Datum>
-  <Datum ID="Item4Image" Type="Image" Name="Story 4 : image - pick from DAM (blank uses the picked story's thumbnail)">
-    <Image>
-      <Path></Path>
-      <Description></Description>
-    </Image>
-  </Datum>
-  <Datum ID="Item4Link" Type="String" Name="Story 4 : link (blank uses the picked story; no link hides the action link)"></Datum>
-  <Datum ID="Item4ActionLabel" Type="String" Name="Story 4 : action label (e.g. Read &#183; 5 min read; blank shows Read, Listen or Watch by type, plus the picked story's read or watch time)"></Datum>
-  <Datum ID="Item4Filter" Type="String" Name="Story 4 : filter label (e.g. Research; used by the filter pills)"></Datum>
-  <Datum ID="Item4SpeakerName" Type="String" Name="Story 4 : name shown on the image (e.g. Lindsay Patrick; optional)"></Datum>
-  <Datum ID="Item4SpeakerRole" Type="String" Name="Story 4 : role shown under the name (e.g. Chief Economist, RBC; optional)"></Datum>
-
-  <!-- ============================================================
-       Story 5
-       ============================================================ -->
-  <Datum ID="Item5Story" Type="DCR" Name="Story 5 : pick the story (fills the title, image, link, type, author, date and read or watch time; the fields below show when no story is picked)">
-    <DCR Category="article" Type="story"/>
-    <DCR-Category Name="article">
-      <DCR-Type Name=".*"/>
-    </DCR-Category>
-    <DCR-Category Name="rbccm">
-      <DCR-Type Name="episode"/>
-    </DCR-Category>
-  </Datum>
-  <Datum ID="Item5Badge" Type="String" Name="Story 5 : pill on the image (e.g. RBC Economics; blank hides it)"></Datum>
-  <Datum ID="Item5Type" Type="SelectSingle" Name="Story 5 : type (sets the icon on the image and the default action label)">
-    <Option Selected="true"><Display>From the picked story</Display><Value>auto</Value></Option>
-    <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
-    <Option><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
-    <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
-    <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
-    auto
-  </Datum>
-  <Datum ID="Item5Category" Type="String" Name="Story 5 : category label (e.g. Macro &amp; rates)"></Datum>
-  <Datum ID="Item5Title" Type="String" Name="Story 5 : title (blank uses the picked story; no title hides the story)"></Datum>
-  <Datum ID="Item5Summary" Type="Textarea" Name="Story 5 : summary (optional; the featured story uses the picked story's summary when blank)"></Datum>
-  <Datum ID="Item5Meta" Type="String" Name="Story 5 : meta line (e.g. the author, Frances Donald; the date has its own field below)"></Datum>
-  <Datum ID="Item5Date" Type="String" Name="Story 5 : date published, as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as Oct 9, 2026 and tells search engines the date. Blank uses the picked story; no date shows nothing"></Datum>
-  <Datum ID="Item5Image" Type="Image" Name="Story 5 : image - pick from DAM (blank uses the picked story's thumbnail)">
-    <Image>
-      <Path></Path>
-      <Description></Description>
-    </Image>
-  </Datum>
-  <Datum ID="Item5Link" Type="String" Name="Story 5 : link (blank uses the picked story; no link hides the action link)"></Datum>
-  <Datum ID="Item5ActionLabel" Type="String" Name="Story 5 : action label (e.g. Read &#183; 5 min read; blank shows Read, Listen or Watch by type, plus the picked story's read or watch time)"></Datum>
-  <Datum ID="Item5Filter" Type="String" Name="Story 5 : filter label (e.g. Research; used by the filter pills)"></Datum>
-  <Datum ID="Item5SpeakerName" Type="String" Name="Story 5 : name shown on the image (e.g. Lindsay Patrick; optional)"></Datum>
-  <Datum ID="Item5SpeakerRole" Type="String" Name="Story 5 : role shown under the name (e.g. Chief Economist, RBC; optional)"></Datum>
+  <Group ID="Story"
+         Name="Story"
+         Replicatable="true"
+         CloneGroupID="rbccm-insight-cards-story">
+    <Datum ID="Story" Type="DCR" Name="Pick the story (fills the title, image, link, type, author, date and read or watch time)">
+      <DCR Category="article" Type="story"/>
+      <DCR-Category Name="article">
+        <DCR-Type Name=".*"/>
+      </DCR-Category>
+      <DCR-Category Name="rbccm">
+        <DCR-Type Name="episode"/>
+      </DCR-Category>
+    </Datum>
+    <Datum ID="Title" Type="String" Name="Title (blank uses the picked story; a story with no title is skipped)"></Datum>
+    <Datum ID="Category" Type="String" Name="Category label (e.g. Macro &amp; rates)"></Datum>
+    <Datum ID="Summary" Type="Textarea" Name="Summary (optional; the featured story uses the picked story summary when blank)"></Datum>
+    <Datum ID="Meta" Type="String" Name="Meta line (e.g. the author, Frances Donald; blank uses the picked story author)"></Datum>
+    <Datum ID="Date" Type="String" Name="Date published, as YYYY-MM-DD (e.g. 2026-10-09; blank uses the picked story)"></Datum>
+    <Datum ID="Image" Type="Image" Name="Image - pick from DAM (blank uses the picked story thumbnail)">
+      <Image>
+        <Path></Path>
+        <Description></Description>
+      </Image>
+    </Datum>
+    <Datum ID="Link" Type="String" Name="Link (blank uses the picked story; no link hides the action link)"></Datum>
+    <Datum ID="ActionLabel" Type="String" Name="Action label (e.g. Read - 5 min read; blank shows Read, Listen or Watch plus the read or watch time)"></Datum>
+    <Datum ID="Type" Type="SelectSingle" Name="Type (sets the icon on the image and the default action label)">
+      <Option Selected="true"><Display>From the picked story</Display><Value>auto</Value></Option>
+      <Option><Display>None (no icon on the image)</Display><Value>none</Value></Option>
+      <Option><Display>Article (book icon, Read)</Display><Value>article</Value></Option>
+      <Option><Display>Podcast (headphones icon, Listen)</Display><Value>podcast</Value></Option>
+      <Option><Display>Video (play icon, Watch)</Display><Value>video</Value></Option>
+      auto
+    </Datum>
+    <Datum ID="Badge" Type="String" Name="Pill on the image (e.g. RBC Economics; blank hides it)"></Datum>
+    <Datum ID="Filter" Type="String" Name="Filter label (e.g. Research; used by the filter pills)"></Datum>
+    <Datum ID="SpeakerName" Type="String" Name="Name on the image (e.g. Lindsay Patrick; on the featured story a picked story fills it with its first author)"></Datum>
+    <Datum ID="SpeakerRole" Type="String" Name="Role under the name (e.g. Chief Economist, RBC; on the featured story a picked story fills it with that author title and company)"></Datum>
+  </Group>
 
   <!-- ============================================================
        Notification strip under the stories (blank text hides it)

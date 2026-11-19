@@ -1,6 +1,6 @@
 # Insight Cards
 
-A section of story cards: an eyebrow, heading and intro, then up to five stories. Each story shows an image with an optional pill and type icon, a category label, the title, a summary, a meta line, an action link and a share button. Built for the 2027 Outlook page, where it is used four times: Featured insight, Macro views, Capital Markets perspectives and Latest insights.
+A section of story cards: an eyebrow, heading and intro, then a list of stories (the first five with a title show). Each story shows an image with an optional pill and type icon, a category label, the title, a summary, a meta line, an action link and a share button. Built for the 2027 Outlook page, where it is used four times: Featured insight, Macro views, Capital Markets perspectives and Latest insights.
 
 Each story can be picked from TeamSite's article picker, so the title, image, link, type, author, date and read or watch time come from the story itself, printed into the page on the server with nothing typed. The typed fields show when no story is picked.
 
@@ -14,14 +14,14 @@ A section of hand-picked story cards under a heading, with a share button on eac
 
 - Variant `outlook-2027`: the only skin. Each instance sets its own layout and background.
 - Layout "Cards": the stories sit in columns; the number of stories sets the number of columns.
-- Layout "Featured": Story 1 is large and the other stories sit beside it.
+- Layout "Featured": the first story in the list is large and the other stories sit beside it.
 - Background: White, Light blue or Dark navy.
 
 ### What the editor can change
 
 - The layout (Cards or Featured), the background, whether share and filter pills show, and how the Cards layout behaves on phones (stacked, or a row to swipe through).
 - The eyebrow, heading, intro and the header button.
-- Up to five stories: pick the story, or type the title, summary, image and link by hand; set the pill, type, category, meta line, date, action label and filter label.
+- The stories are a list. Add a story, pick it or type its fields (or both), then add the next; they show in the order listed. For each one: pick the story, or type the title, summary, image and link by hand; set the pill, type, category, meta line, date, action label and filter label.
 - The "Also selected" heading, the "no image" label and the notification strip.
 - Each image's alt text (the image Description), and a name and role shown over a story's image.
 - The label of the first filter pill (blank shows "All") and the screen reader name of the section ("Section aria label").
@@ -30,7 +30,7 @@ A section of hand-picked story cards under a heading, with a share button on eac
 ### What it does not do
 
 - It does not pull the latest stories by itself. Stories are picked or typed; the order on the page is the order of the fields.
-- It shows five stories at most and has no carousel or paging.
+- It shows five stories at most (the first five in the list that have a title) and has no carousel or paging.
 - The pill, category and filter label are never filled from the picked story. They are always typed. The name and role on the image are typed too, except on the featured story (Story 1 in the Featured layout), where a picked story fills them with its first author and that author's title and company.
 - A picked story supplies: the title (the story's short tile title if it has one, else its headline), the image (its thumbnail), the link (the story's own address), the type (text, audio or video), the meta line (the first author's name, when the story has several), the date (its publish date; a story still dated 0000-00-00 shows no date) and the action label ("Read", "Listen" or "Watch" plus the story's read or watch time, for example "Read &#183; 5 min").
 - Which wins is one setting for the section ("When a story is picked"). By default the picked story wins: the typed fields show when no story is picked, and fill in any piece the story does not have. Clear sample text from the typed fields once real stories are picked, so a sample author or date cannot appear on a story that has none. The other choice lets a typed field replace the story's.
@@ -71,7 +71,8 @@ All stories are printed into the page by the skin, so they are present in the pa
 - A role typed without a name does not show.
 - Notification strip: hidden when both of its text fields are blank.
 - "Also selected" heading: only shows with three or four other stories, and is hidden when blank.
-- Featured layout with no title on Story 1: there is no large story, and the other stories list one under another.
+- A story in the list with no title (typed or from the picked story) is skipped, so the next one moves up. In the Featured layout the first story with a title is the large one.
+- A copy of the component saved before stories became a list still has its five fixed stories. They keep showing until a story with a title is added to the list; from then on the list is used and the old five are ignored.
 - No stories at all: the header and the notification strip show with nothing between them, and there is no share popup.
 - Filter pills switched on without two stories and a filter label: no pills show.
 - Copy link blocked by the browser: the popup shows "Copy failed".
@@ -231,19 +232,20 @@ An optional blue strip under the stories with a small heading, a line of text an
 | `FilterAllLabel` | Label of the first filter pill. Blank shows "All". |
 | `SideHeading` | Featured layout: heading above the rows. Default "Also selected". Blank hides it. |
 | `NoImageLabel` | Label on a story with no image. Blank shows a plain navy block. |
-| `Item1Story` to `Item5Story` | Article picker. Fills the title, image and link from the picked story. Story 1 is the featured story in the Featured layout. |
-| `Item{N}Badge` | Pill on the image, e.g. RBC Economics. Blank hides it. |
-| `Item{N}Type` | From the picked story, None, Article, Podcast or Video. "From the picked story" reads the story's own type (text, audio or video). |
-| `Item{N}Category` | Category label, e.g. Macro &amp; rates. |
-| `Item{N}Title` | Blank uses the picked story's title. A story with no title (typed or picked) is hidden. |
-| `Item{N}Summary` | Optional. |
-| `Item{N}Meta` | Meta line, e.g. the author: Frances Donald. |
-| `Item{N}Date` | Date published, typed as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as "Oct 9, 2026" and is marked up as a date so search engines can read it. Blank uses the picked story's publish date. No date, or anything not in that form, shows no date. |
-| `Item{N}Image` | DAM image. Blank uses the picked story's thumbnail. The image Description is the alt text; blank makes it decorative. |
-| `Item{N}Link` | Blank uses the picked story's link. No link hides the action link. The share popup shares the same address. |
-| `Item{N}ActionLabel` | e.g. Read &#183; 5 min read. Blank shows Read, Listen or Watch by type, plus the picked story's read or watch time. |
-| `Item{N}Filter` | Filter label used by the filter pills, e.g. Research. |
-| `Item{N}SpeakerName`, `Item{N}SpeakerRole` | Optional name and role shown over the image. On the featured story a picked story fills them from its first author (`author_name_new`, `author_title_new`, `author_company_new`). |
+| `Story` group | The list of stories. Repeatable: add one group per story. Each group holds the fields below. Inside a list TeamSite can drop a field ID, so the skin also matches each field by the first words of its label; keep the labels starting with those words. |
+| `Story` (in the group) | Article picker. Fills the title, image, link, type, author, date and read or watch time from the picked story. |
+| `Badge` | Pill on the image, e.g. RBC Economics. Blank hides it. |
+| `Type` | From the picked story, None, Article, Podcast or Video. "From the picked story" reads the story's own type (text, audio or video). |
+| `Category` | Category label, e.g. Macro &amp; rates. |
+| `Title` | Blank uses the picked story's title. A story with no title (typed or picked) is hidden. |
+| `Summary` | Optional. |
+| `Meta` | Meta line, e.g. the author: Frances Donald. |
+| `Date` | Date published, typed as YYYY-MM-DD (e.g. 2026-10-09). Shows after the meta line as "Oct 9, 2026" and is marked up as a date so search engines can read it. Blank uses the picked story's publish date. No date, or anything not in that form, shows no date. |
+| `Image` | DAM image. Blank uses the picked story's thumbnail. The image Description is the alt text; blank makes it decorative. |
+| `Link` | Blank uses the picked story's link. No link hides the action link. The share popup shares the same address. |
+| `ActionLabel` | e.g. Read &#183; 5 min read. Blank shows Read, Listen or Watch by type, plus the picked story's read or watch time. |
+| `Filter` | Filter label used by the filter pills, e.g. Research. |
+| `SpeakerName`, `SpeakerRole` | Optional name and role shown over the image. On the featured story a picked story fills them from its first author (`author_name_new`, `author_title_new`, `author_company_new`). |
 | `NotifyEyebrow`, `NotifyText` | Notification strip text. Both blank hides the strip. |
 | `NotifyButtonLabel`, `NotifyLink` | Notification strip button. Needs both. |
 

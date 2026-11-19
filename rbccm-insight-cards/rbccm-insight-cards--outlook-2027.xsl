@@ -98,13 +98,42 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- ===== Where the stories come from =====
+       Stories are a list in the component's data: one "Story" group
+       per story, added with the list's own add button, each with a
+       story picker and the typed fields. Only stories that end up with
+       a title count (typed, or from the picked story), in the order
+       they are listed; the first five show.
+
+       Copies of the component saved before the list existed keep their
+       five fixed slots (Item1... to Item5...). Those are read when the
+       list has no story with a title, so nothing saved goes blank.
+
+       Inside a list TeamSite can drop a field's ID, so each field is
+       matched on its ID or on the first words of its label. The labels
+       in the properties file must keep starting with those words. -->
+  <xsl:variable name="STORY_LIST" select="//Group[@ID='Story' or @Name='Story'][
+        normalize-space(Datum[@ID='Title' or starts-with(@Name, 'Title')]) != ''
+        or normalize-space(Datum[@ID='Story' or starts-with(@Name, 'Pick the story')]/DCR/*/summarytitle) != ''
+        or normalize-space(Datum[@ID='Story' or starts-with(@Name, 'Pick the story')]/DCR/*/title) != '']"/>
+
+  <!-- One typed field of story n, as text (used for the filter pills). -->
+  <xsl:template name="itemText">
+    <xsl:param name="n"/>
+    <xsl:param name="field"/>
+    <xsl:param name="label"/>
+    <xsl:variable name="SRC" select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
+    <xsl:value-of select="normalize-space($SRC[@ID=concat('Item', $n, $field) or @ID=$field or starts-with(@Name, $label)])"/>
+  </xsl:template>
+
   <!-- A story's title. The picked story's (its short tile title when
        it has one, else its headline) and the typed one; which wins is
        the StoryPriority field, and the other fills in when it is blank. -->
   <xsl:template name="itemTitle">
     <xsl:param name="n"/>
-    <xsl:variable name="typed" select="normalize-space(//Datum[@ID=concat('Item', $n, 'Title')])"/>
-    <xsl:variable name="record" select="//Datum[@ID=concat('Item', $n, 'Story')]/DCR"/>
+    <xsl:variable name="SRC" select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
+    <xsl:variable name="typed" select="normalize-space($SRC[@ID=concat('Item', $n, 'Title') or @ID='Title' or starts-with(@Name, 'Title')])"/>
+    <xsl:variable name="record" select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='Story' or starts-with(@Name, 'Pick the story')]/DCR"/>
     <xsl:variable name="storyFirst" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
     <xsl:variable name="picked">
       <xsl:choose>
@@ -241,11 +270,11 @@
 
     <!-- Filter pills: each story's filter label, blank for hidden
          stories. A pill prints once per distinct label. -->
-    <xsl:variable name="G1"><xsl:if test="$H1"><xsl:value-of select="normalize-space(//Datum[@ID='Item1Filter'])"/></xsl:if></xsl:variable>
-    <xsl:variable name="G2"><xsl:if test="$H2"><xsl:value-of select="normalize-space(//Datum[@ID='Item2Filter'])"/></xsl:if></xsl:variable>
-    <xsl:variable name="G3"><xsl:if test="$H3"><xsl:value-of select="normalize-space(//Datum[@ID='Item3Filter'])"/></xsl:if></xsl:variable>
-    <xsl:variable name="G4"><xsl:if test="$H4"><xsl:value-of select="normalize-space(//Datum[@ID='Item4Filter'])"/></xsl:if></xsl:variable>
-    <xsl:variable name="G5"><xsl:if test="$H5"><xsl:value-of select="normalize-space(//Datum[@ID='Item5Filter'])"/></xsl:if></xsl:variable>
+    <xsl:variable name="G1"><xsl:if test="$H1"><xsl:call-template name="itemText"><xsl:with-param name="n" select="1"/><xsl:with-param name="field" select="'Filter'"/><xsl:with-param name="label" select="'Filter'"/></xsl:call-template></xsl:if></xsl:variable>
+    <xsl:variable name="G2"><xsl:if test="$H2"><xsl:call-template name="itemText"><xsl:with-param name="n" select="2"/><xsl:with-param name="field" select="'Filter'"/><xsl:with-param name="label" select="'Filter'"/></xsl:call-template></xsl:if></xsl:variable>
+    <xsl:variable name="G3"><xsl:if test="$H3"><xsl:call-template name="itemText"><xsl:with-param name="n" select="3"/><xsl:with-param name="field" select="'Filter'"/><xsl:with-param name="label" select="'Filter'"/></xsl:call-template></xsl:if></xsl:variable>
+    <xsl:variable name="G4"><xsl:if test="$H4"><xsl:call-template name="itemText"><xsl:with-param name="n" select="4"/><xsl:with-param name="field" select="'Filter'"/><xsl:with-param name="label" select="'Filter'"/></xsl:call-template></xsl:if></xsl:variable>
+    <xsl:variable name="G5"><xsl:if test="$H5"><xsl:call-template name="itemText"><xsl:with-param name="n" select="5"/><xsl:with-param name="field" select="'Filter'"/><xsl:with-param name="label" select="'Filter'"/></xsl:call-template></xsl:if></xsl:variable>
     <xsl:variable name="HAS_FILTERS" select="$SHOW_FILTERS and $LAYOUT = 'cards' and $COUNT &gt; 1 and concat($G1, $G2, $G3, $G4, $G5) != ''"/>
     <!-- Swipe row on phones: Cards layout with two or more stories. -->
     <xsl:variable name="HAS_CAROUSEL" select="$MOBILE != 'stack' and $LAYOUT = 'cards' and $COUNT &gt; 1"/>
@@ -544,7 +573,10 @@
     <xsl:variable name="UPPER" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="LOWER" select="'abcdefghijklmnopqrstuvwxyz'"/>
 
-    <xsl:variable name="DCR"         select="//Datum[@ID=concat('Item', $n, 'Story')]/DCR"/>
+    <!-- This story's fields: its group in the list, or its fixed slot
+         on a copy saved before the list existed. -->
+    <xsl:variable name="SRC"         select="$STORY_LIST[position() = number($n)]/Datum | //Datum[not($STORY_LIST)][starts-with(@ID, concat('Item', $n))]"/>
+    <xsl:variable name="DCR"         select="$SRC[@ID=concat('Item', $n, 'Story') or @ID='Story' or starts-with(@Name, 'Pick the story')]/DCR"/>
     <xsl:variable name="STORY_FIRST" select="normalize-space(//Datum[@ID='StoryPriority']/text()[last()]) != 'typed'"/>
     <xsl:variable name="HAS_STORY"   select="boolean($DCR/*)"/>
     <!-- The first author with a name (a story can carry several). -->
@@ -588,16 +620,25 @@
         <xsl:otherwise><xsl:value-of select="$CAN"/></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="BADGE"       select="normalize-space(//Datum[@ID=concat('Item', $n, 'Badge')])"/>
-    <xsl:variable name="TYPE_RAW"    select="translate(normalize-space(//Datum[@ID=concat('Item', $n, 'Type')]/text()[last()]), $UPPER, $LOWER)"/>
-    <xsl:variable name="CATEGORY"    select="normalize-space(//Datum[@ID=concat('Item', $n, 'Category')])"/>
-    <xsl:variable name="SUMMARY_RAW" select="//Datum[@ID=concat('Item', $n, 'Summary')]"/>
-    <xsl:variable name="META_TYPED"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'Meta')])"/>
+    <xsl:variable name="BADGE"       select="normalize-space($SRC[@ID=concat('Item', $n, 'Badge') or @ID='Badge' or starts-with(@Name, 'Pill')])"/>
+    <!-- A dropdown's choice is the text after its options, or (as some
+         lists save it) the option marked selected. -->
+    <xsl:variable name="TYPE_AT"     select="$SRC[@ID=concat('Item', $n, 'Type') or @ID='Type' or starts-with(@Name, 'Type')]"/>
+    <xsl:variable name="TYPE_PICKED">
+      <xsl:choose>
+        <xsl:when test="normalize-space($TYPE_AT/text()[last()]) != ''"><xsl:value-of select="normalize-space($TYPE_AT/text()[last()])"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="normalize-space($TYPE_AT/Option[@Selected='true']/Value)"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="TYPE_RAW"    select="translate(string($TYPE_PICKED), $UPPER, $LOWER)"/>
+    <xsl:variable name="CATEGORY"    select="normalize-space($SRC[@ID=concat('Item', $n, 'Category') or @ID='Category' or starts-with(@Name, 'Category')])"/>
+    <xsl:variable name="SUMMARY_RAW" select="$SRC[@ID=concat('Item', $n, 'Summary') or @ID='Summary' or starts-with(@Name, 'Summary')]"/>
+    <xsl:variable name="META_TYPED"  select="normalize-space($SRC[@ID=concat('Item', $n, 'Meta') or @ID='Meta' or starts-with(@Name, 'Meta')])"/>
     <!-- Date: typed as YYYY-MM-DD. Shown after the meta line as
          "Oct 9, 2026" inside a time element, so the page says when the
          story was published in a form search engines read. Anything
          that is not YYYY-MM-DD is ignored. -->
-    <xsl:variable name="DATE_TYPED"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'Date')])"/>
+    <xsl:variable name="DATE_TYPED"  select="normalize-space($SRC[@ID=concat('Item', $n, 'Date') or @ID='Date' or starts-with(@Name, 'Date')])"/>
     <xsl:variable name="DATE_RAW">
       <xsl:choose>
         <xsl:when test="$STORY_FIRST and string($S_DATE) != ''"><xsl:value-of select="$S_DATE"/></xsl:when>
@@ -619,18 +660,18 @@
         <xsl:value-of select="concat(substring('JanFebMarAprMayJunJulAugSepOctNovDec', (number(substring($DATE, 6, 2)) - 1) * 3 + 1, 3), ' ', number(substring($DATE, 9, 2)), ', ', substring($DATE, 1, 4))"/>
       </xsl:if>
     </xsl:variable>
-    <xsl:variable name="IMG_RAW"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'Image')]/Image/Path)"/>
-    <xsl:variable name="IMG_ALT"     select="normalize-space(//Datum[@ID=concat('Item', $n, 'Image')]/Image/Description)"/>
-    <xsl:variable name="LINK_RAW"    select="normalize-space(//Datum[@ID=concat('Item', $n, 'Link')])"/>
-    <xsl:variable name="ACTION_RAW"  select="normalize-space(//Datum[@ID=concat('Item', $n, 'ActionLabel')])"/>
-    <xsl:variable name="FILTER"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'Filter')])"/>
+    <xsl:variable name="IMG_RAW"     select="normalize-space($SRC[@ID=concat('Item', $n, 'Image') or @ID='Image' or starts-with(@Name, 'Image')]/Image/Path)"/>
+    <xsl:variable name="IMG_ALT"     select="normalize-space($SRC[@ID=concat('Item', $n, 'Image') or @ID='Image' or starts-with(@Name, 'Image')]/Image/Description)"/>
+    <xsl:variable name="LINK_RAW"    select="normalize-space($SRC[@ID=concat('Item', $n, 'Link') or @ID='Link' or starts-with(@Name, 'Link')])"/>
+    <xsl:variable name="ACTION_RAW"  select="normalize-space($SRC[@ID=concat('Item', $n, 'ActionLabel') or @ID='ActionLabel' or starts-with(@Name, 'Action label')])"/>
+    <xsl:variable name="FILTER"      select="normalize-space($SRC[@ID=concat('Item', $n, 'Filter') or @ID='Filter' or starts-with(@Name, 'Filter')])"/>
     <!-- Name and role on the image. Typed, or on the featured story
          taken from the picked story's first author (which wins follows
          the same story-first / typed-first setting as the other
          fields). When the name comes from the story so does the role,
          so the two always belong to the same person. -->
-    <xsl:variable name="SPEAKER_TYPED"      select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerName')])"/>
-    <xsl:variable name="SPEAKER_ROLE_TYPED" select="normalize-space(//Datum[@ID=concat('Item', $n, 'SpeakerRole')])"/>
+    <xsl:variable name="SPEAKER_TYPED"      select="normalize-space($SRC[@ID=concat('Item', $n, 'SpeakerName') or @ID='SpeakerName' or starts-with(@Name, 'Name on the image')])"/>
+    <xsl:variable name="SPEAKER_ROLE_TYPED" select="normalize-space($SRC[@ID=concat('Item', $n, 'SpeakerRole') or @ID='SpeakerRole' or starts-with(@Name, 'Role')])"/>
     <xsl:variable name="SPEAKER_FROM_STORY" select="$role = 'feature' and $S_AUTHOR != '' and ($STORY_FIRST or $SPEAKER_TYPED = '')"/>
     <xsl:variable name="SPEAKER">
       <xsl:choose>

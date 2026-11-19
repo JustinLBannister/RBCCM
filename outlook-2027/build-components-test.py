@@ -86,9 +86,37 @@ def set_datum(tree, key, value):
     else:
         d.text = value
 
+def set_stories(tree, stories):
+    """The component's story list: one Story group per story, built from
+    the blank group the properties file ships with."""
+    blank = tree.xpath("//Group[@ID='Story']")
+    if not blank:
+        return
+    blank = blank[0]
+    parent = blank.getparent()
+    at = parent.index(blank)
+    parent.remove(blank)
+    for i, story in enumerate(stories):
+        group = copy.deepcopy(blank)
+        for field, value in story.items():
+            d = group.xpath('Datum[@ID=$k]', k=field)[0]
+            path = d.find('Image/Path')
+            options = d.findall('Option')
+            if path is not None:
+                path.text = value
+            elif options:
+                options[-1].tail = value
+            else:
+                d.text = value
+        parent.insert(at + i, group)
+
 def render(skin, props_file, overrides):
     """Component defaults from its properties file, then the Outlook copy."""
     tree = copy.deepcopy(load_props(os.path.join(ROOT, props_file)))
+    overrides = dict(overrides)
+    stories = overrides.pop('stories', None)
+    if stories is not None:
+        set_stories(tree, stories)
     for key, value in overrides.items():
         set_datum(tree, key, value)
     out = str(load_xsl(os.path.join(ROOT, skin))(tree))
@@ -121,10 +149,8 @@ def cards(stories, **section):
     d = {'Eyebrow': '', 'SectionIntro': '', 'HeaderButtonLabel': '', 'HeaderButtonLink': '',
          'NotifyEyebrow': '', 'NotifyText': '', 'NotifyButtonLabel': '', 'NotifyLink': '',
          'Layout': 'cards', 'Theme': 'white', 'ShowFilters': 'no', 'ShowShare': 'yes'}
-    for n in range(1, 6):
-        story = stories[n - 1] if n <= len(stories) else {}
-        for short, field in FIELDS.items():
-            d['Item%d%s' % (n, field)] = story.get(short, 'none' if short == 'type' else '')
+    d['stories'] = [dict((field, story.get(short, 'none' if short == 'type' else ''))
+                         for short, field in FIELDS.items()) for story in stories]
     d.update(section)
     return d
 
