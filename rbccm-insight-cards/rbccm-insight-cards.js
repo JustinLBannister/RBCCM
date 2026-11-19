@@ -131,6 +131,14 @@
     trigger.setAttribute('aria-expanded', 'true');
     open = { panel: panel, trigger: trigger, card: card, item: item };
 
+    /* Featured and single wide stories: the share button sits beside
+       the action button, and the row itself anchors the popup. Line
+       the popup up with the share button, not the start of the row. */
+    if (panel.offsetParent === trigger.parentNode) {
+      panel.style.right = 'auto';
+      panel.style.left = trigger.offsetLeft + 'px';
+    }
+
     /* Keep the popup on screen: drop below when there is no room
        above, and switch sides when it would leave the viewport. */
     var rect = panel.getBoundingClientRect();
