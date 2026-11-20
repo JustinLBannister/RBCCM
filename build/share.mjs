@@ -28,14 +28,6 @@ const SHARE = path.join(ROOT, '_share');
 const STAGE = path.join(SHARE, NAME);
 const ZIP = path.join(SHARE, NAME + '.zip');
 
-function git(args) {
-  try {
-    return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  } catch (e) {
-    return '';
-  }
-}
-
 let count = 0;
 let bytes = 0;
 
@@ -82,19 +74,7 @@ for (const item of INCLUDE.concat(components)) {
   else missing.push(item);
 }
 
-/* 4. Stamp it, so anyone can tell which package they have. */
-const commit = git(['rev-parse', '--short', 'HEAD']);
-const dirty = git(['status', '--porcelain', '--untracked-files=no']) !== '';
-const stamp = [
-  'RBCCM components package',
-  'Built: ' + new Date().toISOString(),
-  'Commit: ' + (commit || 'unknown') + (dirty ? ' + uncommitted changes' : ''),
-  'Files: ' + count,
-  ''
-].join('\n');
-fs.writeFileSync(path.join(STAGE, 'VERSION.txt'), stamp);
-
-/* 5. Zip. */
+/* 4. Zip. */
 fs.rmSync(ZIP, { force: true });
 execFileSync('zip', ['-r', '-q', '-X', NAME + '.zip', NAME], { cwd: SHARE, stdio: 'inherit' });
 
@@ -103,5 +83,4 @@ console.log('');
 console.log('Share package written: _share/' + NAME + '.zip');
 console.log('  ' + count + ' files, ' + (bytes / 1048576).toFixed(1) + ' MB unzipped, ' + zipMb + ' MB zipped');
 console.log('  ' + components.length + ' rbccm-* folders');
-console.log('  commit ' + (commit || 'unknown') + (dirty ? ' + uncommitted changes' : ''));
 if (missing.length) console.log('  not found, left out: ' + missing.join(', '));

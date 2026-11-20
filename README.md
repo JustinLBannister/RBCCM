@@ -214,8 +214,7 @@ The package includes Storybook, so after `npm install` a coworker can run
 This builds the pages, then writes the zip and an unzipped copy beside it
 (`_share/rbccm-components/`). Only the zip is kept in git. The unzipped copy
 is rebuilt from scratch each time, so never edit files in it; edit the repo
-and run the command again. `VERSION.txt` inside the package records when it
-was built and from which commit.
+and run the command again.
 
 What goes in and what is left out is listed in `build/share-rules.mjs`.
 
