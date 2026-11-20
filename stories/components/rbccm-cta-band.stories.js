@@ -192,25 +192,30 @@ export default {
 
 export const Maasplusmata = {
   name: "MAAS+MATA",
+  parameters: { rbccm: { file: "rbccm-cta-band/rbccm-cta-band.html", variant: "maasplusmata" } },
   render: () => renderPreview({ file: "rbccm-cta-band/rbccm-cta-band.html", variant: "maasplusmata" })
 };
 
 export const MaasplusmataTransparent = {
   name: "MAAS+MATA transparent",
+  parameters: { rbccm: { file: "rbccm-cta-band/rbccm-cta-band.html", variant: "maasplusmata-transparent" } },
   render: () => renderPreview({ file: "rbccm-cta-band/rbccm-cta-band.html", variant: "maasplusmata-transparent" })
 };
 
 export const StrategyAndEconomics = {
   name: "Strategy & Economics",
+  parameters: { rbccm: { file: "rbccm-cta-band/rbccm-cta-band.html", variant: "strategy-and-economics" } },
   render: () => renderPreview({ file: "rbccm-cta-band/rbccm-cta-band.html", variant: "strategy-and-economics" })
 };
 
 export const UsCredentials = {
   name: "US Credentials",
+  parameters: { rbccm: { file: "rbccm-cta-band/rbccm-cta-band.html", variant: "us-credentials" } },
   render: () => renderPreview({ file: "rbccm-cta-band/rbccm-cta-band.html", variant: "us-credentials" })
 };
 
 export const EtfInnovators = {
   name: "ETF Innovators",
+  parameters: { rbccm: { file: "rbccm-cta-band/rbccm-cta-band.html", variant: "etf-innovators" } },
   render: () => renderPreview({ file: "rbccm-cta-band/rbccm-cta-band.html", variant: "etf-innovators" })
 };

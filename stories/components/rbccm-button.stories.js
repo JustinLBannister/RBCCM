@@ -17,20 +17,24 @@ export default {
 
 export const Primary = {
   name: "Primary",
+  parameters: { rbccm: { file: "rbccm-button/local-test.html", variant: "primary" } },
   render: () => renderPreview({ file: "rbccm-button/local-test.html", variant: "primary" })
 };
 
 export const Yellow = {
   name: "Yellow",
+  parameters: { rbccm: { file: "rbccm-button/local-test.html", variant: "yellow" } },
   render: () => renderPreview({ file: "rbccm-button/local-test.html", variant: "yellow" })
 };
 
 export const Secondary = {
   name: "Secondary",
+  parameters: { rbccm: { file: "rbccm-button/local-test.html", variant: "secondary" } },
   render: () => renderPreview({ file: "rbccm-button/local-test.html", variant: "secondary" })
 };
 
 export const Ghost = {
   name: "Ghost",
+  parameters: { rbccm: { file: "rbccm-button/local-test.html", variant: "ghost" } },
   render: () => renderPreview({ file: "rbccm-button/local-test.html", variant: "ghost" })
 };

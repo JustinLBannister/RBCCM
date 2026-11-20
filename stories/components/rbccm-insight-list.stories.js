@@ -456,5 +456,6 @@ export default {
 
 export const EtfInnovators = {
   name: "ETF Innovators",
+  parameters: { rbccm: { file: "rbccm-insight-list/rbccm-insight-list.html", variant: "etf-innovators" } },
   render: () => renderPreview({ file: "rbccm-insight-list/rbccm-insight-list.html", variant: "etf-innovators" })
 };

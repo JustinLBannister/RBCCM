@@ -230,10 +230,12 @@ export default {
 
 export const Maasplusmata = {
   name: "MAAS+MATA",
+  parameters: { rbccm: { file: "rbccm-numbered-features/local-test.html", variant: "maasplusmata" } },
   render: () => renderPreview({ file: "rbccm-numbered-features/local-test.html", variant: "maasplusmata" })
 };
 
 export const NoSubheaderAutoNumbers = {
   name: "No subheader, auto numbers",
+  parameters: { rbccm: { file: "rbccm-numbered-features/local-test.html", variant: "no-subheader-auto-numbers" } },
   render: () => renderPreview({ file: "rbccm-numbered-features/local-test.html", variant: "no-subheader-auto-numbers" })
 };

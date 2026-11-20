@@ -584,15 +584,18 @@ export default {
 
 export const V4UpUsCreds = {
   name: "4-up (US Creds)",
+  parameters: { rbccm: { file: "rbccm-capability-cards/local-test.html", variant: "4-up-us-creds" } },
   render: () => renderPreview({ file: "rbccm-capability-cards/local-test.html", variant: "4-up-us-creds" })
 };
 
 export const V3UpMaasMata = {
   name: "3-up (MAAS/MATA)",
+  parameters: { rbccm: { file: "rbccm-capability-cards/local-test.html", variant: "3-up-maas-mata" } },
   render: () => renderPreview({ file: "rbccm-capability-cards/local-test.html", variant: "3-up-maas-mata" })
 };
 
 export const ThreeUpMaasMataSlider = {
   name: "Three-up (MAAS/MATA slider)",
+  parameters: { rbccm: { file: "rbccm-capability-cards/local-test.html", variant: "three-up-maas-mata-slider" } },
   render: () => renderPreview({ file: "rbccm-capability-cards/local-test.html", variant: "three-up-maas-mata-slider" })
 };

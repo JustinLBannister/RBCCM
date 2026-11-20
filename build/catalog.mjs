@@ -12,6 +12,7 @@
    ========================================================================= */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -128,6 +129,14 @@ function fieldsIn(dir) {
   if (!file) return [];
   const xml = read(`${dir}/${file}`).replace(/<!--[\s\S]*?-->/g, '');
   const out = [];
+  /* Repeatable lists (a Group): where each starts and ends, so the
+     fields inside one can be named with it. */
+  const lists = [];
+  for (const g of xml.matchAll(/<Group\b([^>]*)>/g)) {
+    const end = xml.indexOf('</Group>', g.index);
+    const name = (g[1].match(/\bName="([^"]*)"/) || [])[1] || (g[1].match(/\bID="([^"]*)"/) || [])[1] || 'List';
+    lists.push({ from: g.index, to: end === -1 ? xml.length : end, name: decode(name) });
+  }
   const re = /<Datum\b([^>]*?)(\/?)>/g;
   let m;
   while ((m = re.exec(xml))) {
@@ -135,7 +144,8 @@ function fieldsIn(dir) {
       const a = m[1].match(new RegExp('\\b' + k + '="([^"]*)"'));
       return a ? decode(a[1]) : '';
     };
-    const id = attr('ID');
+    const list = lists.find((l) => m.index > l.from && m.index < l.to);
+    const id = attr('ID') && list ? list.name + ' list: ' + attr('ID') : attr('ID');
     if (!id) continue;
     let value = '';
     let options = 0;
@@ -151,7 +161,7 @@ function fieldsIn(dir) {
       }
     }
     if (value.length > 90) value = value.slice(0, 90).replace(/\s+\S*$/, '') + '...';
-    out.push({ id, type: attr('Type') || 'String', label: attr('Name') || attr('Label'), value, options });
+    out.push({ id, type: attr('Type') || 'String', label: (list ? 'One per entry in the ' + list.name + ' list. ' : '') + (attr('Name') || attr('Label')), value, options });
   }
   return out;
 }
@@ -172,10 +182,25 @@ function kindOf(dir, name) {
   return 'Other';
 }
 
+/* Names in a folder that git ignores (files kept local, not in the repo). */
+function ignoredIn(dir, names) {
+  if (!names.length) return [];
+  try {
+    return execFileSync('git', ['check-ignore', '--stdin'], {
+      cwd: ROOT, encoding: 'utf8', input: names.map((n) => dir + '/' + n).join('\n'), stdio: ['pipe', 'pipe', 'ignore']
+    }).split('\n').filter(Boolean).map((line) => path.basename(line));
+  } catch (e) {
+    /* Exit code 1 means nothing is ignored; no git means nothing to check. */
+    return [];
+  }
+}
+
 function filesIn(dir) {
   const order = ['Skin', 'Fields', 'CSS', 'Script', 'Preview', 'Readme', 'Data', 'Media', 'Other', 'Folder'];
-  return fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })
-    .filter((e) => !e.name.startsWith('.') && !/\.tmp$/.test(e.name))
+  const all = fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true });
+  const ignored = ignoredIn(dir, all.map((e) => e.name));
+  return all
+    .filter((e) => !e.name.startsWith('.') && !/\.tmp$/.test(e.name) && !ignored.includes(e.name))
     .map((e) => (e.isDirectory() ? { name: e.name + '/', kind: 'Folder' } : { name: e.name, kind: kindOf(dir, e.name) }))
     .sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind) || a.name.localeCompare(b.name));
 }

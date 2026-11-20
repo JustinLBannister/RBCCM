@@ -556,20 +556,24 @@ export default {
 
 export const Features = {
   name: "Features",
+  parameters: { rbccm: { file: "rbccm-two-up-cards/local-test.html", variant: "features" } },
   render: () => renderPreview({ file: "rbccm-two-up-cards/local-test.html", variant: "features" })
 };
 
 export const VideoCallouts = {
   name: "Video callouts",
+  parameters: { rbccm: { file: "rbccm-two-up-cards/local-test.html", variant: "video-callouts" } },
   render: () => renderPreview({ file: "rbccm-two-up-cards/local-test.html", variant: "video-callouts" })
 };
 
 export const VideoSingle = {
   name: "Video single",
+  parameters: { rbccm: { file: "rbccm-two-up-cards/local-test.html", variant: "video-single" } },
   render: () => renderPreview({ file: "rbccm-two-up-cards/local-test.html", variant: "video-single" })
 };
 
 export const VideoSingleSectionColour = {
   name: "Video single, section colour",
+  parameters: { rbccm: { file: "rbccm-two-up-cards/local-test.html", variant: "video-single-section-colour" } },
   render: () => renderPreview({ file: "rbccm-two-up-cards/local-test.html", variant: "video-single-section-colour" })
 };

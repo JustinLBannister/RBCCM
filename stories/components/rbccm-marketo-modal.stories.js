@@ -226,5 +226,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-marketo-modal/local-test.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-marketo-modal/local-test.html", variant: "" })
 };

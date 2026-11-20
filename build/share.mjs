@@ -6,19 +6,20 @@
      npm run share -- --no-build   skip the page build (use dist/ as it is)
 
    Writes _share/rbccm-components.zip: everything a coworker needs to
-   preview the components and run the page builds. The zip is the only
+   preview the components, run the page builds and run Storybook. The zip is the only
    thing under _share/ that is tracked in git.
 
    The unzipped copy is left next to it in _share/rbccm-components/ so it
    can be opened or served locally. That folder is rebuilt from scratch
    on every run and is ignored by git; never edit files in it.
 
-   What goes in is set by the three lists below.
+   What goes in is set by the lists in build/share-rules.mjs.
    ========================================================================= */
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { INCLUDE, TRANSFORMS, skip } from './share-rules.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -26,66 +27,6 @@ const NAME = 'rbccm-components';
 const SHARE = path.join(ROOT, '_share');
 const STAGE = path.join(SHARE, NAME);
 const ZIP = path.join(SHARE, NAME + '.zip');
-
-/* Top-level files and folders that go in. Every rbccm-* folder is added
-   to this automatically. */
-const INCLUDE = [
-  'README.md',
-  'package.json',
-  'package-lock.json',
-  'build',
-  'dist',
-  'local-test-fixtures',
-  'filtered-content',
-  'maas-mata-page',
-  'outlook-2027'
-];
-
-/* Left out wherever they appear: a folder or file with one of these
-   names, and anything whose name starts with a dot (editor and system
-   files). */
-const SKIP_NAMES = ['node_modules', '_retired', 'snapshots'];
-
-/* Left out by path (relative to the repo root). A trailing slash means
-   the whole folder. */
-const SKIP_PATHS = [
-  'outlook-2027/design/',
-  'rbccm-global/dist/',
-  'filtered-content/filtered-content--deals-preview.html',
-  'filtered-content/future-state.png',
-  'filtered-content/rbccm-en-expertise-transactions.png',
-  'filtered-content/rbccm-en-expertise-transactions-preview-1012.png',
-  'rbccm-two-up-cards/two-cards-video-single.png'
-];
-
-/* Left out by file type: office documents, archives, editor leftovers. */
-const SKIP_EXT = ['.docx', '.pdf', '.pptx', '.key', '.zip', '.tmp'];
-
-function skip(rel) {
-  const parts = rel.split('/');
-  const base = parts[parts.length - 1];
-  if (parts.some((p) => SKIP_NAMES.includes(p) || p.startsWith('.'))) return true;
-  if (SKIP_EXT.includes(path.extname(base).toLowerCase())) return true;
-  return SKIP_PATHS.some((p) => (p.endsWith('/') ? (rel + '/').startsWith(p) : rel === p));
-}
-
-/* The package copy of the filtered-content README leaves out the deal
-   preview skin, which is not in the package. */
-function trimFilteredContentReadme(text) {
-  let out = text.replace(/\n---\n\n## Deals preview skin\n[\s\S]*?(?=\n## |$)/, '\n');
-  out = out
-    .split('\n')
-    .filter((line) => !(line.includes('filtered-content--deals-preview.html') &&
-      (line.startsWith('| ') || line.startsWith('- A second skin'))))
-    .join('\n');
-  out = out.replace(' (Transactions; the "Deals preview skin" section below records this skin as live there)', ' (Transactions)');
-  out = out.replace(', plus the separate skin for deal preview pages', '');
-  return out.replace(/\n+$/, '\n');
-}
-
-const TRANSFORMS = {
-  'filtered-content/README.md': trimFilteredContentReadme
-};
 
 function git(args) {
   try {

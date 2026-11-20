@@ -98,9 +98,9 @@ export default {
       }
     }
   },
-  "Year": {
-    "name": "Year",
-    "description": "Year",
+  "Award Card list: Year": {
+    "name": "Award Card list: Year",
+    "description": "One per entry in the Award Card list. Year",
     "control": false,
     "table": {
       "type": {
@@ -111,9 +111,9 @@ export default {
       }
     }
   },
-  "Title": {
-    "name": "Title",
-    "description": "Title",
+  "Award Card list: Title": {
+    "name": "Award Card list: Title",
+    "description": "One per entry in the Award Card list. Title",
     "control": false,
     "table": {
       "type": {
@@ -124,9 +124,9 @@ export default {
       }
     }
   },
-  "Issuer": {
-    "name": "Issuer",
-    "description": "Issuer",
+  "Award Card list: Issuer": {
+    "name": "Award Card list: Issuer",
+    "description": "One per entry in the Award Card list. Issuer",
     "control": false,
     "table": {
       "type": {
@@ -142,20 +142,24 @@ export default {
 
 export const V3Up = {
   name: "3-up",
+  parameters: { rbccm: { file: "rbccm-awards/local-test.html", variant: "3-up" } },
   render: () => renderPreview({ file: "rbccm-awards/local-test.html", variant: "3-up" })
 };
 
 export const V3UpNoEyebrow = {
   name: "3-up, no eyebrow",
+  parameters: { rbccm: { file: "rbccm-awards/local-test.html", variant: "3-up-no-eyebrow" } },
   render: () => renderPreview({ file: "rbccm-awards/local-test.html", variant: "3-up-no-eyebrow" })
 };
 
 export const V4Up = {
   name: "4-up",
+  parameters: { rbccm: { file: "rbccm-awards/local-test.html", variant: "4-up" } },
   render: () => renderPreview({ file: "rbccm-awards/local-test.html", variant: "4-up" })
 };
 
 export const V4UpCustomBackground = {
   name: "4-up, custom background",
+  parameters: { rbccm: { file: "rbccm-awards/local-test.html", variant: "4-up-custom-background" } },
   render: () => renderPreview({ file: "rbccm-awards/local-test.html", variant: "4-up-custom-background" })
 };

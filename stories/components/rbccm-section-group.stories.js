@@ -106,5 +106,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-section-group/local-test.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-section-group/local-test.html", variant: "" })
 };

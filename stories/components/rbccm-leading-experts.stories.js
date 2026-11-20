@@ -494,5 +494,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-leading-experts/rbccm-leading-experts.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-leading-experts/rbccm-leading-experts.html", variant: "" })
 };

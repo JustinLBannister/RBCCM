@@ -54,10 +54,12 @@ export default {
 
 export const DefaultWhite = {
   name: "Default (white)",
+  parameters: { rbccm: { file: "rbccm-disclaimer/local-test.html", variant: "default-white" } },
   render: () => renderPreview({ file: "rbccm-disclaimer/local-test.html", variant: "default-white" })
 };
 
 export const BackgroundColour = {
   name: "Background colour",
+  parameters: { rbccm: { file: "rbccm-disclaimer/local-test.html", variant: "background-colour" } },
   render: () => renderPreview({ file: "rbccm-disclaimer/local-test.html", variant: "background-colour" })
 };

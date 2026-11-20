@@ -17,25 +17,30 @@ export default {
 
 export const HeroOnLoad = {
   name: "Hero (on load)",
+  parameters: { rbccm: { file: "rbccm-animate/local-test.html", variant: "hero-on-load" } },
   render: () => renderPreview({ file: "rbccm-animate/local-test.html", variant: "hero-on-load" })
 };
 
 export const ScrollReveal = {
   name: "Scroll reveal",
+  parameters: { rbccm: { file: "rbccm-animate/local-test.html", variant: "scroll-reveal" } },
   render: () => renderPreview({ file: "rbccm-animate/local-test.html", variant: "scroll-reveal" })
 };
 
 export const Stagger = {
   name: "Stagger",
+  parameters: { rbccm: { file: "rbccm-animate/local-test.html", variant: "stagger" } },
   render: () => renderPreview({ file: "rbccm-animate/local-test.html", variant: "stagger" })
 };
 
 export const Effects = {
   name: "Effects",
+  parameters: { rbccm: { file: "rbccm-animate/local-test.html", variant: "effects" } },
   render: () => renderPreview({ file: "rbccm-animate/local-test.html", variant: "effects" })
 };
 
 export const CustomTiming = {
   name: "Custom timing",
+  parameters: { rbccm: { file: "rbccm-animate/local-test.html", variant: "custom-timing" } },
   render: () => renderPreview({ file: "rbccm-animate/local-test.html", variant: "custom-timing" })
 };

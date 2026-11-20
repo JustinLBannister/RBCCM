@@ -201,5 +201,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-in-the-media/rbccm-in-the-media.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-in-the-media/rbccm-in-the-media.html", variant: "" })
 };

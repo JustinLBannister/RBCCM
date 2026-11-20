@@ -221,6 +221,56 @@ export function renderPreview({ file, variant = '' }) {
   return host;
 }
 
+/* The markup of one variant, as text, for the Code tab: the variant's
+   own elements from the preview page, without the page's scripts,
+   styles, demo labels or picker, set out one element per line. */
+const VOID = { AREA: 1, BASE: 1, BR: 1, COL: 1, EMBED: 1, HR: 1, IMG: 1, INPUT: 1, LINK: 1, META: 1, SOURCE: 1, TRACK: 1, WBR: 1 };
+const INLINE = { A: 1, ABBR: 1, B: 1, BR: 1, CITE: 1, CODE: 1, EM: 1, I: 1, SMALL: 1, SPAN: 1, STRONG: 1, SUB: 1, SUP: 1, TIME: 1 };
+
+function openTag(el) {
+  let out = '<' + el.tagName.toLowerCase();
+  [].forEach.call(el.attributes, (a) => {
+    out += ' ' + a.name + (a.value === '' ? '' : '="' + a.value.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"');
+  });
+  return out + '>';
+}
+
+function pretty(node, depth, lines) {
+  const pad = '  '.repeat(depth);
+  if (node.nodeType === 3) {
+    const text = node.textContent.replace(/\s+/g, ' ').trim();
+    if (text) lines.push(pad + text);
+    return;
+  }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (VOID[node.tagName]) { lines.push(pad + openTag(node)); return; }
+  /* Icons are long and say nothing about the structure. */
+  if (tag === 'svg') { lines.push(pad + openTag(node) + '...</svg>'); return; }
+  const kids = [].filter.call(node.childNodes, (k) => k.nodeType === 1 || (k.nodeType === 3 && k.textContent.trim()));
+  const simple = kids.every((k) => k.nodeType === 3 || (INLINE[k.tagName] && !k.querySelector('*:not(a):not(b):not(em):not(strong):not(span):not(br)')));
+  const flat = node.innerHTML.replace(/\s+/g, ' ').trim();
+  if (!kids.length) { lines.push(pad + openTag(node) + '</' + tag + '>'); return; }
+  if (simple && flat.length < 160) { lines.push(pad + openTag(node) + flat + '</' + tag + '>'); return; }
+  lines.push(pad + openTag(node));
+  kids.forEach((k) => pretty(k, depth + 1, lines));
+  lines.push(pad + '</' + tag + '>');
+}
+
+export async function markupFor({ file, variant = '' }) {
+  const doc = new DOMParser().parseFromString(await fetchPage(file), 'text/html');
+  const groups = groupsIn(doc.body);
+  if (groups.length && variant !== 'all') {
+    const keep = groups.find((g) => g.slug === variant) || groups[0];
+    groups.forEach((g) => { if (g !== keep) g.nodes.forEach((n) => n.remove()); });
+  }
+  groups.forEach((g) => g.label.remove());
+  doc.body.querySelectorAll('script, style, link, noscript, .demo-fake-nav, [data-variant-end]').forEach((n) => n.remove());
+  const lines = [];
+  [].forEach.call(doc.body.childNodes, (n) => pretty(n, 0, lines));
+  return lines.join('\n');
+}
+
 /* A whole page (a build preview) shown in a frame. */
 export function renderFrame({ src, title }) {
   cleanup();

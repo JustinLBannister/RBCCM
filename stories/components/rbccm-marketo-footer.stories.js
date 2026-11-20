@@ -132,10 +132,12 @@ export default {
 
 export const LiveMarketoForm = {
   name: "Live Marketo form",
+  parameters: { rbccm: { file: "rbccm-marketo-footer/local-test.html", variant: "live-marketo-form" } },
   render: () => renderPreview({ file: "rbccm-marketo-footer/local-test.html", variant: "live-marketo-form" })
 };
 
 export const HeaderOnly = {
   name: "Header only",
+  parameters: { rbccm: { file: "rbccm-marketo-footer/local-test.html", variant: "header-only" } },
   render: () => renderPreview({ file: "rbccm-marketo-footer/local-test.html", variant: "header-only" })
 };

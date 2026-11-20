@@ -176,8 +176,9 @@ To change how it looks, edit `build/dashboard.template.html`, not
 
 The components are also set up in Storybook: a sidebar of every component
 and variant, a Requirements page per component, the editor's fields, and
-automated accessibility checks on each variant. It needs the one-time
-`npm install`.
+automated accessibility checks on each variant. The Catalog page lists
+every component as a card, grouped by purpose, and the Code tab under each
+variant shows its HTML. It needs the one-time `npm install`.
 
 ```bash
 npm run storybook
@@ -192,7 +193,10 @@ npm run stories
 ```
 
 `npm run build-storybook` writes a static copy to `storybook-static/` that
-can be hosted or zipped for people who do not have Node. The look is set in
+can be hosted for people who do not have Node. It has to be opened through
+a web server (a host, or `npx http-server storybook-static`), not by
+double-clicking `index.html`. It leaves out the same files the share
+package does. The look is set in
 `.storybook/theme.js`; the Welcome and Foundations pages are in `stories/`.
 
 ## Share package
@@ -204,13 +208,16 @@ whenever it should match the repo:
 npm run share
 ```
 
+The package includes Storybook, so after `npm install` a coworker can run
+`npm run storybook` from the unzipped folder.
+
 This builds the pages, then writes the zip and an unzipped copy beside it
 (`_share/rbccm-components/`). Only the zip is kept in git. The unzipped copy
 is rebuilt from scratch each time, so never edit files in it; edit the repo
 and run the command again. `VERSION.txt` inside the package records when it
 was built and from which commit.
 
-What goes in and what is left out is listed at the top of `build/share.mjs`.
+What goes in and what is left out is listed in `build/share-rules.mjs`.
 
 ## Component inventory
 

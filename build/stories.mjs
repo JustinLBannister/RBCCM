@@ -19,6 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { catalog, ROOT } from './catalog.mjs';
+import { TRANSFORMS } from './share-rules.mjs';
 
 const OUT = path.join(ROOT, 'stories');
 const COMPONENTS = path.join(OUT, 'components');
@@ -58,7 +59,8 @@ function docsFor(c) {
   const parts = [];
   if (c.desc) parts.push(c.desc);
   if (c.readme) {
-    const text = fs.readFileSync(path.join(ROOT, c.readme), 'utf8');
+    const raw = fs.readFileSync(path.join(ROOT, c.readme), 'utf8');
+    const text = TRANSFORMS[c.readme] ? TRANSFORMS[c.readme](raw) : raw;
     /* The deal preview skin is not shown here, so lines about it are left out. */
     const ba = section(text, 'For editors and BAs').split('\n')
       .filter((line) => !line.includes('deals-preview')).join('\n');
@@ -88,6 +90,9 @@ function argTypesFor(c) {
 }
 
 const shortTitle = (c) => c.title.replace(/^RBCCM\s+/, '');
+/* The id Storybook gives a component's docs page, from its title. */
+const docsId = (c) => ('Components/' + c.category + '/' + shortTitle(c)).toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') + '--docs';
 
 fs.mkdirSync(COMPONENTS, { recursive: true });
 if (!only.length) {
@@ -113,6 +118,7 @@ for (const c of catalog.components) {
   for (const v of variants) {
     const name = exportName(v.slug || 'default', taken);
     src += '\nexport const ' + name + ' = {\n  name: ' + js(v.name) + ',\n' +
+      '  parameters: { rbccm: { file: ' + js(c.preview) + ', variant: ' + js(v.slug) + ' } },\n' +
       '  render: () => renderPreview({ file: ' + js(c.preview) + ', variant: ' + js(v.slug) + ' })\n};\n';
     stories += 1;
   }
@@ -144,7 +150,16 @@ fs.writeFileSync(path.join(OUT, 'catalog.json'), js({
   pages: catalog.pages.length,
   categories: catalog.categories.map((name) => ({
     name,
-    components: catalog.components.filter((c) => c.category === name).map((c) => ({ id: c.id, title: shortTitle(c), desc: c.desc }))
+    components: catalog.components.filter((c) => c.category === name).map((c) => ({
+      id: c.id,
+      title: shortTitle(c),
+      desc: c.desc,
+      variants: c.variants.length || (c.preview ? 1 : 0),
+      fields: c.fields.length,
+      docs: c.preview ? docsId(c) : '',
+      live: catalog.pages.filter((p) => p.live && (p.components || []).includes(c.id)).map((p) => p.label),
+      building: catalog.pages.filter((p) => !p.live && (p.components || []).includes(c.id)).map((p) => p.label)
+    }))
   })).filter((g) => g.components.length)
 }) + '\n');
 

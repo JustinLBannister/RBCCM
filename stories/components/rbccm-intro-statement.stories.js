@@ -201,10 +201,12 @@ export default {
 
 export const MaasplusmataInDarkStrip = {
   name: "MAAS+MATA (in dark strip)",
+  parameters: { rbccm: { file: "rbccm-intro-statement/local-test.html", variant: "maasplusmata-in-dark-strip" } },
   render: () => renderPreview({ file: "rbccm-intro-statement/local-test.html", variant: "maasplusmata-in-dark-strip" })
 };
 
 export const MinimalPlusSolidBg = {
   name: "Minimal + solid bg",
+  parameters: { rbccm: { file: "rbccm-intro-statement/local-test.html", variant: "minimal-plus-solid-bg" } },
   render: () => renderPreview({ file: "rbccm-intro-statement/local-test.html", variant: "minimal-plus-solid-bg" })
 };

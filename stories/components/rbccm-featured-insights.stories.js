@@ -826,5 +826,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-featured-insights/rbccm-featured-insights.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-featured-insights/rbccm-featured-insights.html", variant: "" })
 };

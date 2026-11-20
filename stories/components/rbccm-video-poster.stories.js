@@ -240,15 +240,18 @@ export default {
 
 export const WithVideoMaasplusmata = {
   name: "With video (MAAS+MATA)",
+  parameters: { rbccm: { file: "rbccm-video-poster/local-test.html", variant: "with-video-maasplusmata" } },
   render: () => renderPreview({ file: "rbccm-video-poster/local-test.html", variant: "with-video-maasplusmata" })
 };
 
 export const ImageOnly = {
   name: "Image only",
+  parameters: { rbccm: { file: "rbccm-video-poster/local-test.html", variant: "image-only" } },
   render: () => renderPreview({ file: "rbccm-video-poster/local-test.html", variant: "image-only" })
 };
 
 export const EtfInnovators = {
   name: "ETF Innovators",
+  parameters: { rbccm: { file: "rbccm-video-poster/local-test.html", variant: "etf-innovators" } },
   render: () => renderPreview({ file: "rbccm-video-poster/local-test.html", variant: "etf-innovators" })
 };

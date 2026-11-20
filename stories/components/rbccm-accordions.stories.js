@@ -1240,5 +1240,6 @@ export default {
 
 export const Default = {
   name: "Default",
+  parameters: { rbccm: { file: "rbccm-accordions/rbccm-accordions.html", variant: "" } },
   render: () => renderPreview({ file: "rbccm-accordions/rbccm-accordions.html", variant: "" })
 };

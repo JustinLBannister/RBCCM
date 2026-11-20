@@ -1,0 +1,59 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import catalog from './catalog.json';
+
+<Meta title="Catalog" />
+
+<Unstyled>
+  <style>{`
+    .rbc-catalog { font-family: Roboto, Arial, sans-serif; color: #252525; }
+    .rbc-catalog h1.rbc-catalog__title { margin: 0 0 12px !important; border: 0 !important; padding: 0 !important; font-family: RBCDisplay, "RBC Display", Georgia, "Times New Roman", serif; font-size: 44px; line-height: 1.15; font-weight: 400; color: #003168; }
+    .rbc-catalog p.rbc-catalog__lead { margin: 0 0 8px; max-width: 720px; font-size: 17px; line-height: 27px; color: #494949; }
+    .rbc-catalog p.rbc-catalog__count { margin: 0; font-size: 14px; color: #6F6F6F; }
+    .rbc-catalog h2.rbc-catalog__h2 { border: 0 !important; padding: 0 !important; margin: 44px 0 16px !important; font-family: RBCDisplay, "RBC Display", Georgia, serif; font-size: 28px; line-height: 36px; font-weight: 400; color: #003168; }
+    .rbc-catalog__h2::before { content: ""; display: block; width: 44px; height: 2px; margin-bottom: 14px; background: #FFC72C; }
+    .rbc-catalog__grid { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .rbc-catalog__card { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; border: 1px solid #E0E0E0; border-radius: 12px; padding: 20px 22px; background: #FFFFFF; text-decoration: none; color: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+    a.rbc-catalog__card:hover, a.rbc-catalog__card:focus-visible { border-color: #0051A5; box-shadow: 0 4px 14px rgba(0, 49, 104, 0.10); }
+    a.rbc-catalog__card:focus-visible { outline: 2px solid #0051A5; outline-offset: 2px; }
+    .rbc-catalog__name { display: block; margin-bottom: 6px; font-size: 18px; line-height: 24px; font-weight: 500; color: #003168; }
+    .rbc-catalog__desc { display: block; flex: 1 1 auto; font-size: 14px; line-height: 21px; color: #494949; }
+    .rbc-catalog__meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .rbc-catalog__tag { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 12px; line-height: 16px; background: #F1F5FB; color: #003168; }
+    .rbc-catalog__tag--live { background: #E6F4EA; color: #1B5E20; }
+    .rbc-catalog__tag--building { background: #FFF4D6; color: #6B4E00; }
+    .rbc-catalog__tag--none { background: #F3F3F3; color: #6F6F6F; }
+  `}</style>
+  <div className="rbc-catalog">
+    <h1 className="rbc-catalog__title">Catalog</h1>
+    <p className="rbc-catalog__lead">Every component in the library, grouped by what it is for. Open one to see it running, read what an editor can and cannot change, and look at its markup.</p>
+    <p className="rbc-catalog__count">{catalog.components} components, {catalog.variants} variants, {catalog.pages} pages built from them.</p>
+    {catalog.categories.map((group) => (
+      <section key={group.name}>
+        <h2 className="rbc-catalog__h2">{group.name}</h2>
+        <ul className="rbc-catalog__grid">
+          {group.components.map((c) => {
+            const inside = (
+              <>
+                <span className="rbc-catalog__name">{c.title}</span>
+                <span className="rbc-catalog__desc">{c.desc}</span>
+                <span className="rbc-catalog__meta">
+                  {c.docs ? <span className="rbc-catalog__tag">{c.variants} {c.variants === 1 ? 'variant' : 'variants'}</span> : <span className="rbc-catalog__tag rbc-catalog__tag--none">No preview</span>}
+                  {c.fields ? <span className="rbc-catalog__tag">{c.fields} fields</span> : null}
+                  {c.live.length ? <span className="rbc-catalog__tag rbc-catalog__tag--live">Live: {c.live.join(', ')}</span> : null}
+                  {c.building.length ? <span className="rbc-catalog__tag rbc-catalog__tag--building">In progress: {c.building.join(', ')}</span> : null}
+                </span>
+              </>
+            );
+            return (
+              <li key={c.id}>
+                {c.docs
+                  ? <a className="rbc-catalog__card" href={'./?path=/docs/' + c.docs} target="_top">{inside}</a>
+                  : <div className="rbc-catalog__card">{inside}</div>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Unstyled>

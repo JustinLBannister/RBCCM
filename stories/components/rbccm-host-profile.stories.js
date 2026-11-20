@@ -669,5 +669,6 @@ export default {
 
 export const EtfInnovators = {
   name: "ETF Innovators",
+  parameters: { rbccm: { file: "rbccm-host-profile/rbccm-host-profile.html", variant: "etf-innovators" } },
   render: () => renderPreview({ file: "rbccm-host-profile/rbccm-host-profile.html", variant: "etf-innovators" })
 };

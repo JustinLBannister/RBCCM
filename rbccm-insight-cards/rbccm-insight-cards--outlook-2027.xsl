@@ -377,7 +377,7 @@
           <header class="rbccm-insight-cards__header rbccm-insight-cards__header--outlook-2027">
             <div class="rbccm-insight-cards__header-text rbccm-insight-cards__header-text--outlook-2027">
               <xsl:if test="$EYEBROW != ''">
-                <p class="rbccm-insight-cards__eyebrow rbccm-insight-cards__eyebrow--outlook-2027" data-animate="fadeInUp"><xsl:value-of select="$EYEBROW"/></p>
+                <p class="rbccm-insight-cards__eyebrow rbccm-insight-cards__eyebrow--outlook-2027" data-animate="fadeInUp"><xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="$EYEBROW"/></xsl:call-template></p>
               </xsl:if>
               <xsl:if test="$HEADING != ''">
                 <h2 class="rbccm-insight-cards__heading rbccm-insight-cards__heading--outlook-2027" data-animate="fadeInUp" data-animate-delay="80">
@@ -496,7 +496,7 @@
           <div class="rbccm-insight-cards__notify rbccm-insight-cards__notify--outlook-2027" data-animate="fadeInUp">
             <div class="rbccm-insight-cards__notify-text rbccm-insight-cards__notify-text--outlook-2027">
               <xsl:if test="$NOTIFY_EYEBROW != ''">
-                <p class="rbccm-insight-cards__notify-eyebrow rbccm-insight-cards__notify-eyebrow--outlook-2027"><xsl:value-of select="$NOTIFY_EYEBROW"/></p>
+                <p class="rbccm-insight-cards__notify-eyebrow rbccm-insight-cards__notify-eyebrow--outlook-2027"><xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="$NOTIFY_EYEBROW"/></xsl:call-template></p>
               </xsl:if>
               <xsl:if test="$NOTIFY_TEXT != ''">
                 <p class="rbccm-insight-cards__notify-title rbccm-insight-cards__notify-title--outlook-2027"><xsl:value-of select="$NOTIFY_TEXT"/></p>
@@ -861,7 +861,7 @@
               </xsl:when>
             </xsl:choose>
             <xsl:if test="$BADGE != ''">
-              <span class="rbccm-insight-cards__card-badge rbccm-insight-cards__card-badge--outlook-2027"><xsl:value-of select="$BADGE"/></span>
+              <span class="rbccm-insight-cards__card-badge rbccm-insight-cards__card-badge--outlook-2027"><xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="$BADGE"/></xsl:call-template></span>
             </xsl:if>
             <xsl:if test="$TYPE != 'none' and $TYPE_RAW != 'none'">
               <span class="rbccm-insight-cards__card-type rbccm-insight-cards__card-type--outlook-2027" aria-hidden="true">
@@ -881,7 +881,7 @@
           <div class="rbccm-insight-cards__card-content rbccm-insight-cards__card-content--outlook-2027">
             <div class="rbccm-insight-cards__card-body rbccm-insight-cards__card-body--outlook-2027">
               <xsl:if test="$CATEGORY != ''">
-                <p class="rbccm-insight-cards__card-category rbccm-insight-cards__card-category--outlook-2027"><xsl:value-of select="$CATEGORY"/></p>
+                <p class="rbccm-insight-cards__card-category rbccm-insight-cards__card-category--outlook-2027"><xsl:call-template name="rbccmDot"><xsl:with-param name="s" select="$CATEGORY"/></xsl:call-template></p>
               </xsl:if>
               <!-- The title links to the story, so the link's words say
                    what the story is. The action link below goes to the

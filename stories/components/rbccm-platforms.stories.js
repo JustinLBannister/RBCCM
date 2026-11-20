@@ -8,7 +8,7 @@ export default {
   parameters: {
   "docs": {
     "description": {
-      "component": "Section header + 2x2 grid of feature-tile cards. Each card is a navy tile with a right-aligned bg photo that fades under a left-to-right navy gradient; title + body + gold \"Explore\" CTA sit over the dark left half.\n\n### Purpose\nA section title and subtitle above up to six photo tiles, each one linking to a platform, podcast or other destination. It is used on US Credentials (live) and on Strategy & Economics and 2027 Outlook (in progress, not live yet). There is one skin and two presets.\n\n### What the editor can change\n- The section title and subtitle, their HTML tags, and the header alignment (Left or Center).\n- The section background colour. Blank uses the preset default: light blue (`#E7EEF1`) for Strategy and Economics, white for Outlook 2027.\n- Each card (Card 1 to Card 6): the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example \"Explore\" or \"Listen\") and CTA URL. Cards 5 and 6 are optional and only show when they have a title.\n- Per card fine-tuning: the title tag and body tag, the photo focal point (which part of the photo stays in view) and the body max-width at desktop (default 340px).\n- The Preset field: Strategy and Economics - Platforms, or Outlook 2027 - Platforms.\n- Technical fields exist (Section ID, Section ARIA label, CSS path, JS path, Last updated). They are set at deploy; Last updated is bumped on each save.\n\n### What it does not do\n- It does not pull content from anywhere. Every tile is typed and picked by hand.\n- It shows six tiles at most. There is no seventh slot, no carousel and no paging.\n- A tile has no separate button. The whole tile is the link; the CTA copy is only the visible label.\n- It does not darken the photo. The source images have to carry the navy tone behind the text themselves.\n- There is no per-tile colour choice.\n- It has no script.\n\n### Limits\n- Zero to six tiles. One column below 768px wide, two columns from 768px up.\n- In the two-column layout, three tiles leave the third alone on the second row.\n- Tile height: at least 253px below 992px wide and 200px from 992px; taller when the copy needs it. The Outlook 2027 preset uses a 185px minimum and tighter padding below 992px.\n- Photos: the mobile photo is used below 992px and the desktop photo from 992px up. The photo fills the tile and is cropped to fit. No image size or ratio is stated.\n- One skin, two presets.\n- No enforced character limit. The field labels mark the section title and each card's photos, title, body, CTA copy and CTA URL as required.\n\n### Empty and edge cases\n- A card with a blank title is hidden, whatever else is filled in.\n- Outlook 2027 preset: the section title is at most 740px wide, so a long title wraps onto two lines.\n- Outlook 2027 preset: to choose where the section title breaks on desktop, type a space and then `\u003cbr>` at that point in the title (for example `from across \u003cbr>RBC Capital Markets`). It breaks there from 992px wide and is ignored on narrower screens, where the title wraps by itself. Keep the space before it, so the two words stay apart when the break is ignored.\n- A blank subtitle is hidden. A blank section title is hidden too, although its label says not to blank it.\n- A blank card body is hidden. A blank CTA copy hides the label, but the tile is still a link.\n- A blank CTA URL makes the tile link to `#`, which goes nowhere.\n- A blank mobile photo: the desktop photo is used at every width. Both photos blank: the tile prints with no image, and the tile has no fill colour of its own.\n- If the Preset value is not recognised, nothing is printed.\n- Scripts off: no change to the content. The component has no script of its own.\n\n### Accessibility\n- The section title is an h2 and each card title an h3 by default. The editor can change them with the tag fields (h1 to h6, p, div or span).\n- The section is named for screen readers by its visible title. If the title is blank, the Section ARIA label is used.\n- Each tile is one link. Screen readers read the title, body and CTA copy as the link name; there is deliberately no separate screen-reader label.\n- Image alt text comes from the desktop photo's description in the DAM. If that is blank the card title is used. The mobile photo's description is not read.\n- The tile has a visible keyboard focus style, and the arrow icon is hidden from screen readers.\n- Reduced motion: the tile lift, photo zoom and arrow movement on hover or focus are turned off.\n\n### Open questions\n- Recommended photo dimensions for the desktop and mobile pickers are not stated.\n- The page list notes that two new platform cards are still to come for 2027 Outlook. Their content is not in this folder.\n- There is no stated guidance on title or body length.\n\n### TeamSite locations\n\n| What | Where |\n|---|---|\n| CSS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components/rbccm-platforms.css` |\n| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |\n\nOn the site this loads from `/assets/rbccm/css/components/rbccm-platforms.css`.\n\nFolder: `rbccm-platforms/` - preview page: `rbccm-platforms/rbccm-platforms.html`"
+      "component": "Section header + 2x2 grid of feature-tile cards. Each card is a navy tile with a right-aligned bg photo that fades under a left-to-right navy gradient; title + body + gold \"Explore\" CTA sit over the dark left half.\n\n### Purpose\nA section title and subtitle above up to six photo tiles, each one linking to a platform, podcast or other destination. It is used on US Credentials (live) and on Strategy & Economics and 2027 Outlook (in progress, not live yet). There is one skin and two presets.\n\n### What the editor can change\n- The section title and subtitle, their HTML tags, and the header alignment (Left or Center).\n- The section background colour. Blank uses the preset default: light blue (`#E7EEF1`) for Strategy and Economics, white for Outlook 2027.\n- **Platforms list.** A repeatable list: each entry is one dropdown that picks a platform, and the tile's title, description, link, button label and photo fill in by themselves. Add an entry for each tile; the tiles show in the order of the list, so reordering the list reorders the tiles. The title, link and photo of a platform are the same everywhere. Its description was written differently for three pages, so the dropdown lists each wording by page: for example \"Markets in Motion - Outlook 2027\", \"Markets in Motion - US Credentials\" and \"Markets in Motion - Strategy and Economics\". Strategic Alternatives reads the same everywhere and has one entry.\n- When the list has at least one platform chosen it is the whole section, and the Card 1 to Card 6 fields are ignored.\n- With the list left empty, Card 1 to Card 6 are used, each typed by hand as before: the desktop photo and mobile photo (picked from the DAM), title, body, CTA copy (for example \"Explore\" or \"Listen\") and CTA URL. Use this for a section whose tiles are not the six platforms. A card shows when it has a typed title. The list and the typed cards cannot be mixed in one section.\n- Per card fine-tuning: the title tag and body tag, the photo focal point (which part of the photo stays in view) and the body max-width at desktop (default 340px).\n- The Preset field: Strategy and Economics - Platforms, or Outlook 2027 - Platforms.\n- Technical fields exist (Section ID, Section ARIA label, CSS path, JS path, Last updated). They are set at deploy; Last updated is bumped on each save.\n\n### What it does not do\n- It does not pull content from a feed or a record. The six platforms are written into the skin (`platformText` in `rbccm-platforms.xsl`); changing one there changes it on every page that picks it, after the skin is uploaded.\n- It shows six tiles at most. There is no seventh slot, no carousel and no paging.\n- A tile has no separate button. The whole tile is the link; the CTA copy is only the visible label.\n- It does not darken the photo. The source images have to carry the navy tone behind the text themselves.\n- There is no per-tile colour choice.\n- It has no script.\n\n### Limits\n- Zero to six tiles. One column below 768px wide, two columns from 768px up.\n- In the two-column layout, three tiles leave the third alone on the second row.\n- Tile height: at least 253px below 992px wide and 200px from 992px; taller when the copy needs it. The Outlook 2027 preset uses a 185px minimum and tighter padding below 992px.\n- Photos: the mobile photo is used below 992px and the desktop photo from 992px up. The photo fills the tile and is cropped to fit. No image size or ratio is stated.\n- One skin, two presets.\n- No enforced character limit. The field labels mark the section title and each card's photos, title, body, CTA copy and CTA URL as required.\n\n### Empty and edge cases\n- A card with no platform picked and a blank title is hidden, whatever else is filled in.\n- A list entry left on \"Choose a platform\" is skipped. The list has no upper limit; the design shows up to six.\n- Copies saved while each card had its own platform dropdown keep working: the skin still reads those when the list is empty.\n- A tile title, tile body or the subtitle set to h1 prints with its default tag instead (h3, p and p). Those dropdowns list h1 first, and TeamSite saves the first option when nobody chooses, so an untouched tile would otherwise become a second h1 on the page.\n- Outlook 2027 preset: the section title is at most 740px wide, so a long title wraps onto two lines.\n- Outlook 2027 preset: to choose where the section title breaks on desktop, type a space and then `\u003cbr>` at that point in the title (for example `from across \u003cbr>RBC Capital Markets`). It breaks there from 992px wide and is ignored on narrower screens, where the title wraps by itself. Keep the space before it, so the two words stay apart when the break is ignored.\n- A blank subtitle is hidden. A blank section title is hidden too, although its label says not to blank it.\n- A blank card body is hidden. A blank CTA copy hides the label, but the tile is still a link.\n- A blank CTA URL makes the tile link to `#`, which goes nowhere.\n- A blank mobile photo: the desktop photo is used at every width. Both photos blank: the tile prints with no image, and the tile has no fill colour of its own.\n- If the Preset value is not recognised, nothing is printed.\n- Scripts off: no change to the content. The component has no script of its own.\n\n### Accessibility\n- The section title is an h2 and each card title an h3 by default. The editor can change them with the tag fields (h1 to h6, p, div or span).\n- The section is named for screen readers by its visible title. If the title is blank, the Section ARIA label is used.\n- Each tile is one link. Screen readers read the title, body and CTA copy as the link name; there is deliberately no separate screen-reader label.\n- Image alt text comes from the desktop photo's description in the DAM. If that is blank the card title is used. The mobile photo's description is not read.\n- The tile has a visible keyboard focus style, and the arrow icon is hidden from screen readers.\n- Reduced motion: the tile lift, photo zoom and arrow movement on hover or focus are turned off.\n\n### Open questions\n- Recommended photo dimensions for the desktop and mobile pickers are not stated.\n- The page list notes that two new platform cards are still to come for 2027 Outlook. Their content is not in this folder.\n- There is no stated guidance on title or body length.\n\n### TeamSite locations\n\n| What | Where |\n|---|---|\n| CSS | `/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components/rbccm-platforms.css` |\n| Component (skins and properties) | `/iwadmin/main/livesite/component/WORKAREA/shared/WWW/RBCCM.com/Components` |\n\nOn the site this loads from `/assets/rbccm/css/components/rbccm-platforms.css`.\n\nFolder: `rbccm-platforms/` - preview page: `rbccm-platforms/rbccm-platforms.html`"
     }
   }
 },
@@ -82,6 +82,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (2 options)"
+      },
+      "defaultValue": {
+        "summary": "Strategy and Economics - Platforms"
       }
     }
   },
@@ -105,6 +108,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h2"
       }
     }
   },
@@ -115,6 +121,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -145,6 +154,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -155,6 +167,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -185,6 +200,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -195,6 +213,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -205,9 +226,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "274px"
       }
     }
   },
@@ -228,6 +246,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -238,6 +259,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -248,9 +272,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "295px"
       }
     }
   },
@@ -271,6 +292,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -281,6 +305,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -291,9 +318,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "295px"
       }
     }
   },
@@ -314,6 +338,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -324,6 +351,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -354,6 +384,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "h3"
       }
     }
   },
@@ -364,6 +397,9 @@ export default {
     "table": {
       "type": {
         "summary": "SelectSingle (9 options)"
+      },
+      "defaultValue": {
+        "summary": "p"
       }
     }
   },
@@ -374,6 +410,19 @@ export default {
     "table": {
       "type": {
         "summary": "String"
+      }
+    }
+  },
+  "Platform list: PlatformPick": {
+    "name": "Platform list: PlatformPick",
+    "description": "One per entry in the Platform list. Platform (the name after the dash is which page wording it uses)",
+    "control": false,
+    "table": {
+      "type": {
+        "summary": "SelectSingle (14 options)"
+      },
+      "defaultValue": {
+        "summary": "Choose a platform"
       }
     }
   },
@@ -397,9 +446,6 @@ export default {
     "table": {
       "type": {
         "summary": "Textarea"
-      },
-      "defaultValue": {
-        "summary": "Insights from across RBC Capital Markets' global platform."
       }
     }
   },
@@ -430,22 +476,16 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Real-Time Geopolitics"
       }
     }
   },
   "Card1BodyText": {
     "name": "Card1BodyText",
-    "description": "Card 1 : body (required - do not blank; HTML allowed)",
+    "description": "Card 1 : body (used when the platform above is Typed; HTML allowed)",
     "control": false,
     "table": {
       "type": {
         "summary": "Textarea"
-      },
-      "defaultValue": {
-        "summary": "Decode the evolving power dynamics around energy, commodities and security."
       }
     }
   },
@@ -456,9 +496,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Explore"
       }
     }
   },
@@ -469,9 +506,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "/en/insights/real-time-geopolitics"
       }
     }
   },
@@ -502,22 +536,16 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "RBC Economics"
       }
     }
   },
   "Card2BodyText": {
     "name": "Card2BodyText",
-    "description": "Card 2 : body (required - do not blank; HTML allowed)",
+    "description": "Card 2 : body (used when the platform above is Typed; HTML allowed)",
     "control": false,
     "table": {
       "type": {
         "summary": "Textarea"
-      },
-      "defaultValue": {
-        "summary": "In-depth analysis and insights on the forces shaping businesses and markets."
       }
     }
   },
@@ -528,9 +556,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Explore"
       }
     }
   },
@@ -541,9 +566,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "https://www.rbc.com/en/economics"
       }
     }
   },
@@ -574,22 +596,16 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Markets in Motion"
       }
     }
   },
   "Card3BodyText": {
     "name": "Card3BodyText",
-    "description": "Card 3 : body (required - do not blank; HTML allowed)",
+    "description": "Card 3 : body (used when the platform above is Typed; HTML allowed)",
     "control": false,
     "table": {
       "type": {
         "summary": "Textarea"
-      },
-      "defaultValue": {
-        "summary": "Nuanced, data-driven perspectives on the trends moving U.S. equity markets."
       }
     }
   },
@@ -600,9 +616,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Listen"
       }
     }
   },
@@ -613,9 +626,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "/en/insights/podcasts/markets-in-motion"
       }
     }
   },
@@ -646,22 +656,16 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Macro Minutes"
       }
     }
   },
   "Card4BodyText": {
     "name": "Card4BodyText",
-    "description": "Card 4 : body (required - do not blank; HTML allowed)",
+    "description": "Card 4 : body (used when the platform above is Typed; HTML allowed)",
     "control": false,
     "table": {
       "type": {
         "summary": "Textarea"
-      },
-      "defaultValue": {
-        "summary": "High-conviction insights on the latest market and economic developments from RBC's desk..."
       }
     }
   },
@@ -672,9 +676,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "Listen"
       }
     }
   },
@@ -685,9 +686,6 @@ export default {
     "table": {
       "type": {
         "summary": "String"
-      },
-      "defaultValue": {
-        "summary": "/en/insights/podcasts/macro-minutes"
       }
     }
   },
@@ -816,15 +814,18 @@ export default {
 
 export const StrategyAndEconomics = {
   name: "Strategy & Economics",
+  parameters: { rbccm: { file: "rbccm-platforms/rbccm-platforms.html", variant: "strategy-and-economics" } },
   render: () => renderPreview({ file: "rbccm-platforms/rbccm-platforms.html", variant: "strategy-and-economics" })
 };
 
 export const UsCredentials = {
   name: "US Credentials",
+  parameters: { rbccm: { file: "rbccm-platforms/rbccm-platforms.html", variant: "us-credentials" } },
   render: () => renderPreview({ file: "rbccm-platforms/rbccm-platforms.html", variant: "us-credentials" })
 };
 
 export const Outlook2027 = {
   name: "Outlook 2027",
+  parameters: { rbccm: { file: "rbccm-platforms/rbccm-platforms.html", variant: "outlook-2027" } },
   render: () => renderPreview({ file: "rbccm-platforms/rbccm-platforms.html", variant: "outlook-2027" })
 };
