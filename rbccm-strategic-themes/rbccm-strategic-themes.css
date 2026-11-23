@@ -616,50 +616,52 @@
    theme's text, and the picture takes the right column for the full
    height, centred. The themes borrow the section's rows and columns
    (subgrid), so the text lines up under the tabs whatever their height.
-   A browser without subgrid keeps the layout above. */
+   A browser without subgrid keeps the layout above. The selectors carry
+   the section's other classes so these rules hold whatever order the
+   stylesheet is loaded in. */
 @supports (grid-template-rows: subgrid) {
   @media (min-width: 992px) {
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__main.rbccm-strategic-themes__main--outlook-2027 {
       column-gap: 48px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
       grid-template-rows: auto auto 1fr;
       row-gap: 28px;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__header.rbccm-strategic-themes__header--outlook-2027 {
       grid-area: 1 / 1;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__tabs.rbccm-strategic-themes__tabs--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__tabs.rbccm-strategic-themes__tabs--outlook-2027 {
       grid-area: 2 / 1;
       margin-bottom: 24px;       /* 52px from the tabs to the theme's text */
       position: relative;
       z-index: 1;                /* above the themes, which span the same rows */
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027,
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027,
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
       display: grid;
       grid-template-columns: subgrid;
       grid-template-rows: subgrid;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__list.rbccm-strategic-themes__list--outlook-2027 {
       column-gap: 48px;
       grid-area: 1 / 1 / 4 / 3;
       row-gap: 28px;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027 {
       column-gap: 48px;
       grid-area: 1 / 1 / 4 / 3;
       row-gap: 28px;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 {
       align-self: start;
       grid-area: 3 / 1;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027 {
       align-self: center;
       grid-area: 1 / 2 / 4 / 3;
     }
-    .rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
+    .rbccm-strategic-themes--outlook-2027.rbccm-strategic-themes--enhanced.rbccm-strategic-themes--tabs .rbccm-strategic-themes__slide.rbccm-strategic-themes__slide--outlook-2027 {
       margin: 0 0 0 auto;
     }
   }
