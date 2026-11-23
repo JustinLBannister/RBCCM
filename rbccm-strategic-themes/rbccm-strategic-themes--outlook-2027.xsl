@@ -12,16 +12,26 @@
     script (rbccm-strategic-themes.js) then turns the list into the
     interactive version:
 
-      Desktop     The section pins to the screen and scrolling steps
-                  through the themes one by one. A row of numbered tabs
-                  shows progress; pressing one jumps to that theme.
-      Elsewhere   (phones, tablets, short windows, or when the visitor
-                  has asked for reduced motion) the same tabs switch
-                  the theme on press, with no pinning.
+      Tabs        (the default) One theme shows at a time and a row of
+                  numbered tabs switches it. The page scrolls past the
+                  section as normal.
+      Pinned      Only when the PinnedScroll field is "yes": the section
+                  pins to the screen and scrolling steps through the
+                  themes one by one. Short windows and visitors who
+                  have asked for reduced motion still get the tabs.
 
     The graphics (radar, element tiles, cell grid, bar chart, maple
     leaf) are drawn by the script. They are decoration, hidden from
     screen readers. A theme can use an image instead.
+
+    Options (Properties fields), each off unless set:
+      LoopAnimation   "yes": the graphics keep repeating. Otherwise a
+                      graphic plays once each time its theme shows.
+      HideCount       "yes": hides the "01 / 05" line above the title.
+      PictureStyle    Graphic (the default), Clickable graphic (the
+                      picture links where the theme's button links),
+                      or Article (the picked story's image as a
+                      link, in place of the graphic).
 
     Each theme can be picked with its Story field (TeamSite's article
     picker): the title, description and link then come from the story.
@@ -103,6 +113,10 @@
          only. Blank: the script measures it. -->
     <xsl:variable name="OFFSET_RAW"    select="normalize-space(//Datum[@ID='StickyOffset'])"/>
     <xsl:variable name="OFFSET"        select="translate($OFFSET_RAW, translate($OFFSET_RAW, '0123456789', ''), '')"/>
+    <!-- Pinned scroll is off unless the field is "yes". -->
+    <xsl:variable name="PIN"           select="translate(normalize-space(//Datum[@ID='PinnedScroll']), 'YES', 'yes')"/>
+    <xsl:variable name="LOOP"          select="translate(normalize-space(//Datum[@ID='LoopAnimation']), 'YES', 'yes')"/>
+    <xsl:variable name="NO_COUNT"      select="translate(normalize-space(//Datum[@ID='HideCount']), 'YES', 'yes')"/>
 
     <xsl:variable name="EYEBROW" select="normalize-space(//Datum[@ID='Eyebrow'])"/>
     <xsl:variable name="HEADING" select="normalize-space(//Datum[@ID='SectionHeading'])"/>
@@ -144,9 +158,14 @@
     <section data-strategic-themes="">
       <xsl:attribute name="class">
         <xsl:text>rbccm-strategic-themes rbccm-strategic-themes--outlook-2027 rbccm-strategic-themes--count-</xsl:text><xsl:value-of select="$COUNT"/>
+        <xsl:if test="$LOOP = 'yes'"> rbccm-strategic-themes--loop</xsl:if>
+        <xsl:if test="$NO_COUNT = 'yes'"> rbccm-strategic-themes--no-count</xsl:if>
       </xsl:attribute>
       <xsl:attribute name="id"><xsl:value-of select="$ID_BASE"/></xsl:attribute>
       <xsl:attribute name="style">--rbccm-themes-count: <xsl:value-of select="$COUNT"/>;</xsl:attribute>
+      <xsl:if test="$PIN != 'yes'">
+        <xsl:attribute name="data-strategic-themes-pin">no</xsl:attribute>
+      </xsl:if>
       <xsl:if test="$OFFSET != ''">
         <xsl:attribute name="data-strategic-themes-offset"><xsl:value-of select="$OFFSET"/></xsl:attribute>
       </xsl:if>
@@ -259,6 +278,25 @@
     <xsl:variable name="CAPTION"   select="normalize-space(//Datum[@ID=concat('Theme', $n, 'GraphicCaption')])"/>
     <xsl:variable name="IMG"       select="normalize-space(//Datum[@ID=concat('Theme', $n, 'Image')]/Image/Path)"/>
     <xsl:variable name="IMG_ALT"   select="normalize-space(//Datum[@ID=concat('Theme', $n, 'Image')]/Image/Description)"/>
+    <!-- How the picture behaves: graphic, graphic-link or article. -->
+    <xsl:variable name="STYLE" select="translate(normalize-space((//Datum[@ID='PictureStyle']/Option[@Selected='true']/Value | //Datum[@ID='PictureStyle']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <!-- Article style: the picked story's image; its headline names the link. A typed
+         Image wins over the story's; with no image at all the theme
+         falls back to its graphic. -->
+    <xsl:variable name="S_THUMB" select="normalize-space($DCR/*/thumbnail)"/>
+    <xsl:variable name="S_TITLE" select="normalize-space($DCR/*/title)"/>
+    <xsl:variable name="ART_IMG">
+      <xsl:choose>
+        <xsl:when test="$IMG != ''"><xsl:value-of select="$IMG"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$S_THUMB"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="ART_TITLE">
+      <xsl:choose>
+        <xsl:when test="$S_TITLE != ''"><xsl:value-of select="$S_TITLE"/></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$title"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
     <!-- Graphic drawn by the script; anything else means none. -->
     <xsl:variable name="GRAPHIC">
@@ -360,35 +398,79 @@
         </xsl:if>
       </div>
 
-      <!-- The theme's picture: an image when one is picked, otherwise
-           the graphic the script draws into the empty box. -->
-      <xsl:if test="$IMG != '' or $GRAPHIC != 'none'">
-        <div class="rbccm-strategic-themes__visual rbccm-strategic-themes__visual--outlook-2027">
-          <xsl:if test="$IMG = '' or $IMG_ALT = ''">
-            <xsl:attribute name="aria-hidden">true</xsl:attribute>
-          </xsl:if>
-          <div class="rbccm-strategic-themes__slide rbccm-strategic-themes__slide--outlook-2027">
-            <xsl:choose>
-              <xsl:when test="$IMG != ''">
-                <img class="rbccm-strategic-themes__image rbccm-strategic-themes__image--outlook-2027" width="520" height="520" loading="lazy" decoding="async">
-                  <xsl:attribute name="src"><xsl:value-of select="$IMG"/></xsl:attribute>
-                  <xsl:attribute name="alt"><xsl:value-of select="$IMG_ALT"/></xsl:attribute>
-                </img>
-              </xsl:when>
-              <xsl:otherwise>
-                <div>
-                  <xsl:attribute name="class"><xsl:text>rbccm-strategic-themes__graphic rbccm-strategic-themes__graphic--outlook-2027 rbccm-strategic-themes__graphic--</xsl:text><xsl:value-of select="$GRAPHIC"/></xsl:attribute>
-                  <xsl:attribute name="data-strategic-themes-graphic"><xsl:value-of select="$GRAPHIC"/></xsl:attribute>
-                  <xsl:if test="$CAPTION != ''">
-                    <xsl:attribute name="data-strategic-themes-caption"><xsl:value-of select="$CAPTION"/></xsl:attribute>
-                  </xsl:if>
-                </div>
-              </xsl:otherwise>
-            </xsl:choose>
+      <!-- The theme's picture.
+           Article style (with a link and an image): the story's image
+           as a link to the story.
+           Otherwise an image when one is picked, or the graphic the
+           script draws into the empty box. Clickable graphic style
+           wraps that picture in a link to where the button goes; the
+           picture is decoration, so the link stays out of the tab
+           order and screen readers use the button. -->
+      <xsl:variable name="IS_ARTICLE" select="$STYLE = 'article' and string($ART_IMG) != '' and normalize-space($LINK) != ''"/>
+      <xsl:choose>
+        <xsl:when test="$IS_ARTICLE">
+          <div class="rbccm-strategic-themes__visual rbccm-strategic-themes__visual--outlook-2027 rbccm-strategic-themes__visual--article">
+            <div class="rbccm-strategic-themes__slide rbccm-strategic-themes__slide--outlook-2027 rbccm-strategic-themes__slide--article">
+              <a class="rbccm-strategic-themes__article rbccm-strategic-themes__article--outlook-2027">
+                <xsl:attribute name="href"><xsl:value-of select="$LINK"/></xsl:attribute>
+                <!-- The image is the whole link, so the story's headline is its name. -->
+                <xsl:attribute name="aria-label"><xsl:value-of select="$ART_TITLE"/></xsl:attribute>
+                <span class="rbccm-strategic-themes__article-media rbccm-strategic-themes__article-media--outlook-2027">
+                  <img class="rbccm-strategic-themes__article-img rbccm-strategic-themes__article-img--outlook-2027" width="520" height="292" loading="lazy" decoding="async" alt="">
+                    <xsl:attribute name="src"><xsl:value-of select="$ART_IMG"/></xsl:attribute>
+                  </img>
+                </span>
+              </a>
+            </div>
           </div>
-        </div>
-      </xsl:if>
+        </xsl:when>
+        <xsl:when test="$IMG != '' or $GRAPHIC != 'none'">
+          <div class="rbccm-strategic-themes__visual rbccm-strategic-themes__visual--outlook-2027">
+            <xsl:if test="$IMG = '' or $IMG_ALT = ''">
+              <xsl:attribute name="aria-hidden">true</xsl:attribute>
+            </xsl:if>
+            <div class="rbccm-strategic-themes__slide rbccm-strategic-themes__slide--outlook-2027">
+              <xsl:choose>
+                <xsl:when test="$STYLE = 'graphic-link' and normalize-space($LINK) != ''">
+                  <a class="rbccm-strategic-themes__visual-link rbccm-strategic-themes__visual-link--outlook-2027" tabindex="-1" aria-hidden="true">
+                    <xsl:attribute name="href"><xsl:value-of select="$LINK"/></xsl:attribute>
+                    <xsl:call-template name="PICTURE"><xsl:with-param name="img" select="$IMG"/><xsl:with-param name="alt" select="$IMG_ALT"/><xsl:with-param name="graphic" select="$GRAPHIC"/><xsl:with-param name="caption" select="$CAPTION"/></xsl:call-template>
+                  </a>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="PICTURE"><xsl:with-param name="img" select="$IMG"/><xsl:with-param name="alt" select="$IMG_ALT"/><xsl:with-param name="graphic" select="$GRAPHIC"/><xsl:with-param name="caption" select="$CAPTION"/></xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </div>
+          </div>
+        </xsl:when>
+      </xsl:choose>
     </li>
+  </xsl:template>
+
+  <!-- A theme's image, or the empty box its graphic is drawn into. -->
+  <xsl:template name="PICTURE">
+    <xsl:param name="img"/>
+    <xsl:param name="alt"/>
+    <xsl:param name="graphic"/>
+    <xsl:param name="caption"/>
+    <xsl:choose>
+      <xsl:when test="$img != ''">
+        <img class="rbccm-strategic-themes__image rbccm-strategic-themes__image--outlook-2027" width="520" height="520" loading="lazy" decoding="async">
+          <xsl:attribute name="src"><xsl:value-of select="$img"/></xsl:attribute>
+          <xsl:attribute name="alt"><xsl:value-of select="$alt"/></xsl:attribute>
+        </img>
+      </xsl:when>
+      <xsl:otherwise>
+        <div>
+          <xsl:attribute name="class"><xsl:text>rbccm-strategic-themes__graphic rbccm-strategic-themes__graphic--outlook-2027 rbccm-strategic-themes__graphic--</xsl:text><xsl:value-of select="$graphic"/></xsl:attribute>
+          <xsl:attribute name="data-strategic-themes-graphic"><xsl:value-of select="$graphic"/></xsl:attribute>
+          <xsl:if test="$caption != ''">
+            <xsl:attribute name="data-strategic-themes-caption"><xsl:value-of select="$caption"/></xsl:attribute>
+          </xsl:if>
+        </div>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

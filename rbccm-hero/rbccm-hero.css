@@ -1922,8 +1922,9 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    Navy hero with a full-bleed background video (Brightcove in-page
    player or MP4, as on S+E), the ETF Innovators copy column and yellow
    button, and a 6px warm-yellow rule along the bottom.
-     - Title: two lines. When line 1 is a year, its last digit is yellow
-       and rolls up from the year before once the hero has risen in.
+     - Title: two lines, white. With the year roll on (OlYearRoll "yes")
+       and a year on line 1, its last digit is yellow and rolls up from
+       the year before once the hero has risen in.
      - Pause / play button, bottom right, whenever there's a video.
        Pausing adds .rbccm-hero--video-paused (the icon flips to play).
    Desktop sizes are measured from the Outlook 2027 page PDF (1440 frame,
@@ -2112,7 +2113,8 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
    The last digit sits in a window one line tall that also opens 0.6em
    upward: the old digit (6) rises out of the top and fades while the new
    one (7, yellow) rises into place, 2s after the hero first shows (the
-   concept video's timing). Without the roll (OlYearRoll "no") the digit is simply yellow. */
+   concept video's timing). The roll is off unless OlYearRoll is "yes";
+   without it the digit is white like the rest of the year. */
 /* The year people see is drawn from data-text, so the heading's own
    text is just the plain year (the screen-reader span beside it). */
 .rbccm-hero--outlook-2027 .rbccm-hero__year [data-text]::before {
@@ -2125,7 +2127,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
   font-family: inherit;
   letter-spacing: inherit;
 }
-.rbccm-hero--outlook-2027 .rbccm-hero__year-digit--new {
+.rbccm-hero--outlook-2027 .rbccm-hero__year-strip .rbccm-hero__year-digit--new {
   color: var(--rbccm-hero-yellow);
 }
 .rbccm-hero--outlook-2027 .rbccm-hero__year-roll {
@@ -2293,14 +2295,15 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 
 /* ---- Entrance (from the concept video) ------------------------------------
    The breadcrumbs fade in. Everything below them fades in while rising
-   into place, in order, and the year rolls from 6 to 7 at 2s:
+   into place, in order, and (with the year roll on) the year rolls
+   from 6 to 7 at 2s:
        0ms  breadcrumbs fade in
       70ms  the year, one digit after the other (70 / 140 / 210 / 290ms)
      550ms  title line 2
      800ms  paragraph
     1000ms  button
     1450ms  pause / play button fades in
-    2000ms  year roll (650ms)
+    2000ms  year roll (650ms), only when it is on
    and the background video fades up from plain navy once it starts
    playing. The title pieces rise 24px, the paragraph and button 12px.
    The skin's rise marks (150 / 300 / 450) are restyled here. With an
@@ -2322,7 +2325,7 @@ h1.rbccm-hero__body,    p.rbccm-hero__body {
 }
 /* The year: the line itself stays put and its digits come in one by
    one. The last digit is the roll window (or, with the roll off, the
-   plain yellow digit). */
+   plain white digit). */
 .rbccm-hero--outlook-2027 .rbccm-hero__title-line--year {
   animation: none;
 }

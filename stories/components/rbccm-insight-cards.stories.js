@@ -68,7 +68,7 @@ export default {
         "summary": "String"
       },
       "defaultValue": {
-        "summary": "2026-11-13-1900"
+        "summary": "2026-11-23-1200"
       }
     }
   },

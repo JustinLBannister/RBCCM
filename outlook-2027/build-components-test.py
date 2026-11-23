@@ -122,6 +122,16 @@ def set_list(tree, group_id, entries):
                 d.text = value
         parent.insert(at + i, group)
 
+def set_picked(tree, picked):
+    """Stories chosen with a story picker field, the way TeamSite hands
+    them to the skin: the story's record sits inside the field's DCR
+    element. picked maps a field ID to the story's fields."""
+    for key, fields in picked.items():
+        dcr = tree.xpath('//Datum[@ID=$k]/DCR', k=key)[0]
+        story = ET.SubElement(dcr, 'story')
+        for name, value in fields.items():
+            ET.SubElement(story, name).text = value
+
 def render(skin, props_file, overrides):
     """Component defaults from its properties file, then the Outlook copy."""
     tree = copy.deepcopy(load_props(os.path.join(ROOT, props_file)))
@@ -132,6 +142,9 @@ def render(skin, props_file, overrides):
     platforms = overrides.pop('platforms', None)
     if platforms is not None:
         set_list(tree, 'PlatformTile', [{'PlatformPick': value} for value in platforms])
+    picked = overrides.pop('picked', None)
+    if picked is not None:
+        set_picked(tree, picked)
     for key, value in overrides.items():
         set_datum(tree, key, value)
     out = str(load_xsl(os.path.join(ROOT, skin))(tree))
@@ -184,12 +197,13 @@ S.append(('Hero (rbccm-hero, outlook-2027 skin)', render(
         'TitleLine1Text': '2027',
         'TitleLine2Text': 'Outlook',
         'SubtitleText': PAGE_DESCRIPTION,
-        'OlYearRoll': 'yes',
+        'OlYearRoll': 'no',
         'MmCta1Label': 'Download the report',
         'MmCta1Href': '#',
         'MmCta1Icon': 'arrow',
         'BgVideoMp4': '../rbccm-hero/hero-background-animation-4k-loop.mp4',
         'BgBrightcoveVideoId': '',
+        'BgVideoSpeed': '0.75',
     })))
 
 S.append(('Featured insight (rbccm-insight-cards, Featured layout)', render(CARDS_SKIN, CARDS_PROPS, cards([
@@ -215,11 +229,38 @@ S.append(('Macro views (rbccm-insight-cards, Cards, white, with the notification
    NotifyText='Stay up to date with the latest conversations and insights.',
    NotifyButtonLabel='Get notified', NotifyLink='#'))))
 
-S.append(('Strategic themes (rbccm-strategic-themes; pins and steps through the themes as the page scrolls)', render(
-    'rbccm-strategic-themes/rbccm-strategic-themes--outlook-2027.xsl',
-    'rbccm-strategic-themes/rbccm-strategic-themes-properties.xml', {
-        'SectionID': 'strategic-themes',
-    })))
+# Strategic themes, five versions one after another for the team to
+# compare. Versions 4 and 5 take each theme's link from a picked story
+# (placeholder stories here), as the live page will.
+THEMES_SKIN = 'rbccm-strategic-themes/rbccm-strategic-themes--outlook-2027.xsl'
+THEMES_PROPS = 'rbccm-strategic-themes/rbccm-strategic-themes-properties.xml'
+THEME_STORIES = [
+    ('defense-outlook', 'Defense outlook: budgets, supply chains and the industrial base', 'macro-1-fpo.jpg'),
+    ('critical-minerals', 'Critical minerals: securing the inputs behind the transition', 'macro-2-fpo.jpg'),
+    ('ai-value-chain', 'The AI value chain: where the value is accruing', 'macro-3-fpo.jpg'),
+    ('energy-infrastructure', 'Energy and infrastructure: financing the build-out', 'macro-4-fpo.jpg'),
+    ('canada-investment', 'Canada investment: policy, trade and capital flows', 'perspectives-1-fpo.jpg'),
+]
+PICKED = dict(('Theme%dStory' % (n + 1), {
+    'title': title,
+    'thumbnail': FPO + photo,
+    'can_url': '/story.page?dcr=templatedata/article/story/data/2026/12/%s.xml' % name,
+}) for n, (name, title, photo) in enumerate(THEME_STORIES))
+NO_TYPED_LINKS = dict(('Theme%dLink' % n, '') for n in range(1, 6))
+
+def themes(version, label, **fields):
+    fields['SectionID'] = 'strategic-themes-v%d' % version
+    note = ('<p class="demo-version"><strong>Strategic themes, version %d of 5.</strong> %s</p>\n' % (version, label))
+    S.append(('Strategic themes v%d (rbccm-strategic-themes): %s' % (version, label),
+              note + render(THEMES_SKIN, THEMES_PROPS, fields)))
+
+themes(1, 'Original: the graphics keep repeating, with the 01 / 05 count. No scroll lock.', LoopAnimation='yes')
+themes(2, 'Each graphic plays once and stops (press play to see it again), with the count.')
+themes(3, 'No 01 / 05 count. Graphics play once.', HideCount='yes')
+themes(4, 'Clickable graphic: the picture links to the story, the same place as the button.',
+       PictureStyle='graphic-link', picked=PICKED, **NO_TYPED_LINKS)
+themes(5, 'Article: the story\'s image in place of the graphic, linked to the story.',
+       PictureStyle='article', picked=PICKED, **NO_TYPED_LINKS)
 
 S.append(('Capital Markets perspectives (rbccm-insight-cards, Cards, dark)', render(CARDS_SKIN, CARDS_PROPS, cards([
     dict(type='video', cat='Deals & financing', title='M&A Outlook',
@@ -410,6 +451,7 @@ doc = '''<!DOCTYPE html>
   .demo-bar label { margin-left: 16px; font-weight: 400; }
   body.demo-outlines .iw_component { outline: 1px dashed rgba(255, 0, 128, .6); outline-offset: -1px; }
   .demo-no-component { background: #F1F5FB; color: #003168; font: 16px/1.5 Roboto, Arial, sans-serif; outline: 3px dashed #d33; outline-offset: -6px; padding: 72px 23px; text-align: center; }
+  .demo-version { background: #003168; color: #fff; font: 14px/1.4 Roboto, Arial, sans-serif; margin: 0; padding: 10px 23px; }
   .demo-no-component p { margin: 0 auto 8px; max-width: 640px; }
 </style>
 </head>

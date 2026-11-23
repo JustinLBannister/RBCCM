@@ -925,8 +925,13 @@
   .rbccm-insight-cards--feature-only .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature {
     align-items: center;
     display: grid;
-    gap: 48px;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 40px;
+    grid-template-columns: 596px minmax(0, 1fr);   /* image column fixed; the text takes the rest */
+  }
+  /* The image box is 596 x 330; the image covers it without stretching. */
+  .rbccm-insight-cards--feature-only .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-media.rbccm-insight-cards__card-media--outlook-2027 {
+    aspect-ratio: auto;
+    height: 330px;
   }
   .rbccm-insight-cards--feature-only .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-body.rbccm-insight-cards__card-body--outlook-2027 {
     padding-top: 0;
@@ -1420,4 +1425,27 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+
+/* =========================================================================
+   Hidden for now (review feedback, November 2026)
+   Nothing is removed from the skin; delete a rule here to bring the
+   part back.
+   ========================================================================= */
+/* Eyebrow above the heading of the Featured layout. */
+.rbccm-insight-cards--featured .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027 {
+  display: none;
+}
+/* Author name in the line under a story (some stories carry a dozen).
+   The name and its dot are bare text beside the date, so the line's
+   text is set to nothing and the date is given its size back. */
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 {
+  font-size: 0 !important;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 .rbccm-insight-cards__card-date.rbccm-insight-cards__card-date--outlook-2027 {
+  font-size: 13px;
+}
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 .rbccm-insight-cards__card-date.rbccm-insight-cards__card-date--outlook-2027 {
+  font-size: 14px;
 }

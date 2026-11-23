@@ -2,7 +2,7 @@
 
 An eyebrow and heading, then up to five themes. Each theme shows its number, a title, a description, a button and an animated graphic. Built for the "Strategic themes" section of the 2027 Outlook page.
 
-The section pins to the screen and scrolling steps through the themes one at a time, on desktops, tablets and phones. Where pinning cannot be used, the same numbered tabs switch the theme when pressed.
+One theme shows at a time and numbered tabs switch it, while the page scrolls past as normal. An optional pinned scroll can be turned on instead: the section then pins to the screen and scrolling steps through the themes one at a time.
 
 Each theme can be picked from TeamSite's article picker, so the title, description and link come from the story itself. Typed fields override the picked story.
 
@@ -15,8 +15,9 @@ Each theme can be picked from TeamSite's article picker, so the title, descripti
 Presents a short set of themes one at a time, each with its number, a title, a description, a button to the story and an animated graphic. It is used on the 2027 Outlook page (in progress, not live yet) as the "Strategic themes" section.
 
 - Variant `outlook-2027`: the only skin.
-- Pinned scroll mode: when the window is at least 600px tall, the section sticks to the screen and scrolling steps through the themes. From 992px wide the text and picture sit side by side. Below that the heading scrolls away first, then the tabs, text and picture stay in view, stacked.
-- Tabs mode: in short windows, on a narrow screen with no room left for the picture, for visitors with reduced motion turned on, and wherever pinning cannot work, numbered tabs switch the theme.
+- Tabs mode (the default): numbered tabs switch the theme and the page scrolls as normal.
+- Pinned scroll mode (only when the Pinned scroll field is `yes`): when the window is at least 600px tall, the section sticks to the screen and scrolling steps through the themes. From 992px wide the text and picture sit side by side. Below that the heading scrolls away first, then the tabs, text and picture stay in view, stacked.
+- With pinned scroll on, tabs mode is still used in short windows, on a narrow screen with no room left for the picture, for visitors with reduced motion turned on, and wherever pinning cannot work, numbered tabs switch the theme.
 
 ### What the editor can change
 
@@ -31,14 +32,14 @@ Presents a short set of themes one at a time, each with its number, a title, a d
 ### What it does not do
 
 - It does not advance on a timer. The visitor moves through the themes by scrolling, with the numbered tabs, or with the previous and next buttons beside each theme's button.
-- Pause only stops the movement that repeats in the drawn graphics (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
-- The ring round the pause button shows how far the showing graphic is through its loop (for example one turn of the radar sweep). It holds while paused and starts again with each theme. It is decoration and is not read out.
+- Each drawn graphic plays through once when its theme shows, then rests; it plays again each time the visitor comes back to that theme. Pause only stops that movement part-way (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
+- The ring round the pause button shows how far the showing graphic is through its one play. It holds while paused, stays full once the graphic has finished, and starts again with each theme. When the graphic has finished, the button turns to play and pressing it plays the graphic again. It is decoration and is not read out.
 - The pause button shows only on themes with a drawn graphic. It shows with reduced motion turned on too, because the graphics play by default there as well.
 - It shows five themes at most.
 - The graphics are fixed designs. Their shapes, colours and the element tiles can't be edited in TeamSite; only the words on them can.
 - A new kind of graphic needs a developer. An image can be used in the meantime.
 - The pinned scroll is not used in windows shorter than 600px.
-- The editor cannot choose between pinned scroll and tabs. The script chooses from the visitor's screen and settings.
+- The editor chooses whether pinned scroll is allowed (the Pinned scroll field, off by default). When it is allowed, the script still falls back to tabs from the visitor's screen and settings.
 - It does not show a graphic and an image together. When a theme has an image, the image is used and the graphic choice is ignored.
 - It does not use the picked story's image. A theme's image is always picked in the theme's own image field.
 - It does not open the story in a new tab.
@@ -49,7 +50,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 ### Limits
 
 - Themes: 1 to 5 will show. The fields ask for three to five. Only themes with a title count, and they are numbered in field order (01, 02 and so on).
-- Two or more themes: the numbered tabs show, and pinned scroll is used where the window allows. In pinned scroll the section is one screen tall for each theme, so five themes make it five screens tall.
+- Two or more themes: the numbered tabs show. With pinned scroll turned on, it is used where the window allows. In pinned scroll the section is one screen tall for each theme, so five themes make it five screens tall.
 - One theme: it shows on its own with no tabs and no pinned scroll.
 - Graphics: 5 fixed designs (Defense, Minerals, AI, Energy, Canada) or None, one per theme.
 - Words on a graphic (guidance from this README and the field label, not enforced): up to three words for Minerals, Energy and Canada; four labels work best for AI; Defense shows none. Energy can also take a chart title before a colon.
@@ -84,7 +85,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - The numbered tabs are buttons in a group named "Themes" (or the name typed in the tabs field). The showing one is marked as current.
 - Keyboard: Tab reaches each numbered tab; Enter or Space shows that theme; Left and Right arrows move to the next tab and show its theme. Focus stays on the tabs; it is not moved into the theme.
 - Previous, next and pause are real buttons named "Previous theme", "Next theme" and "Pause the animation", in a group named "Move between themes". Previous and next are marked as unavailable at the first and last theme. Pause is a toggle and says whether it is pressed. When the theme changes, focus stays on the same button.
-- The graphics repeat for as long as their theme shows. Pause is the visitor's way to stop that movement.
+- The graphics play once each time their theme shows, then stop. Pause is the visitor's way to stop that movement part-way.
 - Only the showing theme can be reached. The other themes' text and buttons are hidden from the keyboard and from screen readers until their tab is chosen.
 - Each button names its theme for screen readers: the button label, a colon, then the title ("Watch the episode: Defense Outlook").
 - The drawn graphics are decoration and hidden from screen readers. An image's alt text comes from the image Description; if that is blank the image is treated as decoration.
@@ -128,6 +129,8 @@ On the site these load from `/assets/rbccm/css/components/rbccm-strategic-themes
 ---
 
 ## How it behaves
+
+Pinned scroll is off by default, so every visitor gets the tabs version at every size. The pinned rows below apply only when the Pinned scroll field is `yes`.
 
 | Where | What the visitor gets |
 |---|---|
@@ -188,7 +191,11 @@ A theme can use an **image** instead (square works best). With no graphic and no
 | `SectionID` | Section id; the heading gets `<id>-heading`. |
 | `SectionAriaLabel` | Optional. Blank uses the section heading. |
 | `CssPath`, `JsPath`, `CacheVersion` | Stylesheet and script paths; bump `CacheVersion` after each upload. |
-| `StickyOffset` | Height in px of the site header that stays fixed at the top. Blank (recommended) measures it from the page. |
+| `StickyOffset` | Height in px of the site header that stays fixed at the top. Blank (recommended) measures it from the page. Only matters with pinned scroll on. |
+| `PinnedScroll` | `yes` turns on the pinned scroll. Blank or `no` (the default) is tabs only: the page scrolls past the section as normal. |
+| `LoopAnimation` | `yes` keeps the graphics repeating. Blank or `no` (the default): each graphic plays once when its theme shows, then rests. |
+| `HideCount` | `yes` hides the "01 / 05" count above each title. Blank or `no` (the default) shows it. |
+| `PictureStyle` | **Graphic** (the default): the picture is not a link. **Clickable graphic**: the picture links where the theme's button links. **Article**: the picked story's image, as a link, in place of the graphic (a typed Image wins over the story's; with no image the theme keeps its graphic). |
 | `Eyebrow` | Small label above the heading. Blank hides it. |
 | `SectionHeading` | Blank hides it. |
 | `SectionIntro` | One line under the heading. Blank hides it. |
@@ -211,6 +218,6 @@ A theme can use an **image** instead (square works best). With no graphic and no
 1. Upload `rbccm-strategic-themes.css` to `/assets/rbccm/css/components/` and `rbccm-strategic-themes.js` to `/assets/rbccm/js/components/`.
 2. Register `rbccm-strategic-themes--outlook-2027.xsl` in TeamSite with `rbccm-strategic-themes-properties.xml`.
 3. Pick the stories (or fill the fields by hand) and check each button goes to the right story.
-4. On the published page, at desktop size, check the section pins under the site header and steps through every theme. If it shows as tabs instead, the page template is clipping the section; see "How it behaves".
-5. Check a phone and a tablet: the heading scrolls away, the tabs stick under the site header, and scrolling steps through every theme. Check the last theme's button can still be reached.
+4. Only if pinned scroll is turned on: on the published page, at desktop size, check the section pins under the site header and steps through every theme. If it shows as tabs instead, the page template is clipping the section; see "How it behaves".
+5. Check a phone and a tablet: the tabs and the previous and next buttons switch the theme. With pinned scroll on, the heading scrolls away, the tabs stick under the site header, and scrolling steps through every theme. Check the last theme's button can still be reached.
 6. Bump `CacheVersion`.

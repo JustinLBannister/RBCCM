@@ -17,7 +17,9 @@
                 first and the stage sticks from the tabs down, with the
                 picture in the height that is left.
 
-     --tabs     Everything else: a window shorter than 600px, a narrow
+     --tabs     Everything else: pinning turned off by the skin
+                (data-strategic-themes-pin="no", the PinnedScroll
+                field), a window shorter than 600px, a narrow
                 window with no room left for the picture, a visitor who
                 asked for reduced motion, a single theme, or a page
                 where sticky positioning can't work (an ancestor that
@@ -27,20 +29,25 @@
 
    Each theme has round buttons beside its own button
    ([data-strategic-themes-control]): previous, next and pause.
-   Previous and next step one theme. Pause stops the movement that
-   repeats in the drawn graphics (class --still on the section) and
-   starts it again; the scroll and the layout do not change. Moving to
+   Previous and next step one theme. Each drawn graphic plays through
+   once when its theme shows, then rests. Pause stops that movement
+   part-way (class --still on the section) and starts it again; the scroll and the layout do not change. Moving to
    another theme, by any route, starts the movement again, so a theme
    never arrives paused. Pause shows on themes that have a drawn
    graphic. The graphics always start moving, whatever the device's
-   reduced-motion setting; pause is how a visitor turns them off. The ring round the pause button shows how far
-   through its loop the showing graphic is (its longest repeating
-   animation), and holds while paused.
+   reduced-motion setting; pause is how a visitor turns them off. The
+   ring round the pause button shows how far through its one play the
+   showing graphic is (up to the end of its last animation). It holds
+   while paused and stays full once the graphic has finished. The
+   button then shows play, and pressing it plays the graphic again.
+   With --loop on the section (the LoopAnimation field) the graphics
+   keep repeating instead, and the ring shows how far through one
+   round the graphic is.
 
    The state is re-chosen on resize. On each theme:
      --active   the theme that is showing (text visible, tab marked)
-     --shown    its graphic is on screen, so its animation runs; the
-                animation starts again each time the theme comes back
+     --shown    its graphic is on screen, so its animation plays once;
+                it plays again each time the theme comes back
 
    Site header height: the stage sticks below any header that stays
    fixed at the top. It is measured from the page, or taken from
@@ -112,8 +119,10 @@
 
   var GRAPHICS = {};
 
-  /* Radar: grid, rings and spokes draw in, a beam sweeps round, and
-     five blips ping as the beam passes them. */
+  /* Radar: grid, rings and spokes draw in, a beam sweeps round twice
+     (9s), and five blips ping as the beam passes them, each once. The
+     animations carry no idle time after their last movement, so the
+     pause button's ring ends when the picture stops moving. */
   GRAPHICS.defense = function (box) {
     var id = BLOCK + '-gfx-' + (++uid);
     var rings = [40, 30, 20, 10].map(function (r, i) {
@@ -348,13 +357,18 @@
     var lead = 0;
     var frame = 0;
     var still = false;         /* the visitor paused the graphics */
+    /* --loop (the LoopAnimation field): the graphics keep repeating,
+       so they never finish and the ring follows one round at a time. */
+    var looping = root.classList.contains(BLOCK + '--loop');
 
     function control(item, kind) {
       return item ? item.querySelector('[data-strategic-themes-control="' + kind + '"]') : null;
     }
 
     /* Previous and next go pale at each end. Pause shows on a theme
-       with a drawn graphic. */
+       with a drawn graphic. It reads as pressed (the play icon) while
+       paused and once the graphic has played through; pressing it
+       then plays the graphic again. */
     function syncControls() {
       items.forEach(function (item) {
         var prev = control(item, 'prev');
@@ -364,7 +378,7 @@
         if (next) next.setAttribute('aria-disabled', active >= count - 1 ? 'true' : 'false');
         if (pause) {
           pause.hidden = !item.querySelector('[data-strategic-themes-graphic]');
-          pause.setAttribute('aria-pressed', still ? 'true' : 'false');
+          pause.setAttribute('aria-pressed', still || (loopDone && item === items[active]) ? 'true' : 'false');
         }
       });
     }
@@ -377,12 +391,12 @@
       var held = document.activeElement;
       var kind = held && items[active] && items[active].contains(held) && held.getAttribute('data-strategic-themes-control');
       active = index;
-      /* A pause lasts for the theme it was pressed on. */
-      if (still) {
-        still = false;
-        root.classList.remove(BLOCK + '--still');
-        startRing();
-      }
+      /* A pause lasts for the theme it was pressed on, and the theme
+         coming in plays from the start. */
+      still = false;
+      root.classList.remove(BLOCK + '--still');
+      resetLoop();
+      startRing();
       items.forEach(function (item, i) { item.classList.toggle(BLOCK + '__item--active', i === index); });
       tabs.forEach(function (tab, i) {
         tab.classList.toggle(BLOCK + '__tab--active', i === index);
@@ -480,7 +494,8 @@
     function chooseMode() {
       offset = measureOffset(root);
       root.style.setProperty('--rbccm-themes-offset', offset + 'px');
-      var canPin = count > 1 && pinQuery.matches && !motionQuery.matches && stickyCanWork(root);
+      var pinAllowed = root.getAttribute('data-strategic-themes-pin') !== 'no';
+      var canPin = pinAllowed && count > 1 && pinQuery.matches && !motionQuery.matches && stickyCanWork(root);
       setMode(canPin ? 'pinned' : 'tabs');
       measureLead();
       if (mode === 'pinned' && !wideQuery.matches && !pictureFits()) {
@@ -491,8 +506,10 @@
       syncControls();
     }
 
-    /* Pause: stop or restart the movement that repeats in the graphics. */
+    /* Pause: stop or restart the movement in the showing graphic. Once
+       the graphic has played through, the same button plays it again. */
     function togglePause() {
+      if (loopDone) { replay(); return; }
       still = !still;
       root.classList.toggle(BLOCK + '--still', still);
       syncControls();
@@ -500,24 +517,56 @@
     }
 
     /* The ring round the pause button: how far the showing graphic is
-       through its loop. The loop that is followed is the graphic's
-       longest repeating animation (the radar sweep, the tile
-       highlights and so on). It is looked up again when the theme
-       changes, because the animations start afresh each time. */
+       through its one play. The animation that is followed is the one
+       that ends last (delay included), so the ring is full when the
+       whole graphic has come to rest. It is looked up again when the
+       theme changes, because the animations start afresh each time. */
     var ringFrame = 0;
     var loop = null;
     var loopItem = -1;
     var loopFound = 0;
+    var loopEnd = 0;       /* when the followed animation ends, in ms */
+    var loopDone = false;  /* the showing graphic has played through */
+
+    function resetLoop() {
+      loop = null;
+      loopEnd = 0;
+      loopDone = false;
+      loopFound = 0;
+    }
+
+    /* Play the showing graphic again from the start: its animations
+       run while the theme is --shown, so take that off and put it back. */
+    function replay() {
+      var item = items[active];
+      if (!item) return;
+      var shownClass = BLOCK + '__item--shown';
+      var was = item.classList.contains(shownClass);
+      item.classList.remove(shownClass);
+      void item.offsetWidth;
+      if (was) item.classList.add(shownClass);
+      still = false;
+      root.classList.remove(BLOCK + '--still');
+      resetLoop();
+      syncControls();
+      startRing();
+    }
 
     function findLoop(item) {
       var box = item && item.querySelector('[data-strategic-themes-graphic]');
       if (!box || !box.getAnimations) return null;
       var best = null;
-      var longest = 0;
+      var latest = 0;
       box.getAnimations({ subtree: true }).forEach(function (animation) {
         var timing = animation.effect && animation.effect.getComputedTiming ? animation.effect.getComputedTiming() : null;
-        if (!timing || timing.iterations !== Infinity) return;
-        if (timing.duration > longest) { longest = timing.duration; best = animation; }
+        if (looping) {
+          /* Repeating: follow the longest animation that repeats. */
+          if (!timing || timing.iterations !== Infinity) return;
+          if (timing.duration > latest) { latest = timing.duration; best = animation; }
+          return;
+        }
+        if (!timing || !isFinite(timing.endTime)) return;
+        if (timing.endTime > latest) { latest = timing.endTime; best = animation; }
       });
       return best;
     }
@@ -528,16 +577,39 @@
       var ring = item && item.querySelector('[data-strategic-themes-ring]');
       if (ring) {
         var now = Date.now();
-        if (loopItem !== active || !loop || loop.playState === 'idle' || now - loopFound > 1000) {
-          loop = findLoop(item);
-          loopItem = active;
+        if (looping) {
+          if (loopItem !== active || !loop || loop.playState === 'idle' || now - loopFound > 1000) {
+            loop = findLoop(item);
+            loopItem = active;
+            loopFound = now;
+          }
+          var round = loop ? loop.effect.getComputedTiming().progress : null;
+          ring.style.strokeDashoffset = String(100 - (round || 0) * 100);
+          if (!still) ringFrame = window.requestAnimationFrame(drawRing);
+          return;
+        }
+        if (loopItem !== active) resetLoop();
+        var wasDone = loopDone;
+        if (!loopDone && (loopItem !== active || !loop || loop.playState === 'idle' || now - loopFound > 1000)) {
+          var found = findLoop(item);
+          var end = found ? found.effect.getComputedTiming().endTime : 0;
+          /* The followed animation has ended and gone (or only shorter
+             ones are left): the graphic has played through. */
+          if (loop && end < loopEnd) loopDone = true;
+          else { loop = found; loopEnd = end; }
           loopFound = now;
         }
-        var progress = loop ? loop.effect.getComputedTiming().progress : null;
-        /* No loop to follow (or not started yet): an empty ring. */
-        ring.style.strokeDashoffset = String(100 - (progress || 0) * 100);
+        loopItem = active;
+        var progress = 0;
+        if (loopDone) progress = 1;
+        else if (loop && loopEnd > 0) progress = Math.min(1, Math.max(0, (Number(loop.currentTime) || 0) / loopEnd));
+        if (progress >= 1) loopDone = true;
+        /* Nothing to follow (or not started yet): an empty ring. */
+        ring.style.strokeDashoffset = String(100 - progress * 100);
+        /* Played through: the button turns to play. */
+        if (loopDone && !wasDone) syncControls();
       }
-      if (!still) ringFrame = window.requestAnimationFrame(drawRing);
+      if (!still && !loopDone) ringFrame = window.requestAnimationFrame(drawRing);
     }
 
     function startRing() {

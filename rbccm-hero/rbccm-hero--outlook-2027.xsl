@@ -10,10 +10,10 @@
   left-aligned copy, one yellow button) with the Strategy &amp;
   Economics background video (Brightcove in-page player, or an MP4),
   plus:
-    - a two-line title (title lines 1 and 2). When line 1 is a
-      four-digit year, its last digit is yellow and rolls up from
-      the year before (2026 to 2027) once the hero has loaded.
-      OlYearRoll "no" keeps the yellow digit without the roll.
+    - a two-line title (title lines 1 and 2), all white. Only when
+      OlYearRoll is "yes" and line 1 is a four-digit year, its last
+      digit is yellow and rolls up from the year before (2026 to
+      2027) once the hero has loaded.
     - a pause / play button for the background video (bottom right),
       so the motion can be stopped. The video always starts playing,
       whatever the device's reduced-motion setting; the button is how
@@ -225,12 +225,13 @@
       <xsl:call-template name="datum"><xsl:with-param name="id" select="'SubtitleTag'"/></xsl:call-template>
     </xsl:variable>
 
-    <!-- Year roll: line 1 is a four-digit year (e.g. 2027). Its last
-         digit is yellow; unless OlYearRoll is "no", it rolls up from the
-         digit before (6 to 7; 0 rolls up from 9). -->
+    <!-- Year roll: line 1 is a four-digit year (e.g. 2027). Only when
+         OlYearRoll is "yes", its last digit is yellow and rolls up from
+         the digit before (6 to 7; 0 rolls up from 9). Otherwise the
+         year is plain white. -->
     <xsl:variable name="OL_IS_YEAR" select="string-length($OL_LINE1) = 4 and translate($OL_LINE1, '0123456789', '') = ''"/>
-    <xsl:variable name="OL_ROLL_RAW" select="translate(normalize-space((//Datum[@ID='OlYearRoll']/Option[@Selected='true']/Value | //Datum[@ID='OlYearRoll']/text()[last()][not(../Option[@Selected='true'])])[1]), 'NO', 'no')"/>
-    <xsl:variable name="OL_ROLL" select="$OL_IS_YEAR and $OL_ROLL_RAW != 'no'"/>
+    <xsl:variable name="OL_ROLL_RAW" select="translate(normalize-space((//Datum[@ID='OlYearRoll']/Option[@Selected='true']/Value | //Datum[@ID='OlYearRoll']/text()[last()][not(../Option[@Selected='true'])])[1]), 'YES', 'yes')"/>
+    <xsl:variable name="OL_ROLL" select="$OL_IS_YEAR and $OL_ROLL_RAW = 'yes'"/>
     <xsl:variable name="OL_YEAR_LAST" select="substring($OL_LINE1, 4, 1)"/>
     <xsl:variable name="OL_YEAR_PREV" select="(number($OL_YEAR_LAST) + 9) mod 10"/>
 
@@ -266,6 +267,10 @@
       <xsl:call-template name="datum"><xsl:with-param name="id" select="'BgVideoMp4'"/></xsl:call-template>
     </xsl:variable>
     <xsl:variable name="OL_HAS_VIDEO" select="$OL_BG_MP4 != '' or $OL_BG_IDS != ''"/>
+    <!-- Playback speed of the background video: digits and a dot only
+         (0.75 = three-quarter speed). Blank = normal speed. -->
+    <xsl:variable name="OL_BG_SPEED_RAW" select="normalize-space(//Datum[@ID='BgVideoSpeed'])"/>
+    <xsl:variable name="OL_BG_SPEED" select="translate($OL_BG_SPEED_RAW, translate($OL_BG_SPEED_RAW, '0123456789.', ''), '')"/>
 
     <!-- Tag guards: no eyebrow on this variant, so the title is the h1. -->
     <xsl:variable name="OL_TITLE_TAG">
@@ -320,6 +325,7 @@
       <xsl:choose>
         <xsl:when test="$OL_BG_MP4 != ''">
           <div class="rbccm-hero__bg-video" aria-hidden="true">
+            <xsl:if test="$OL_BG_SPEED != ''"><xsl:attribute name="data-bg-video-speed"><xsl:value-of select="$OL_BG_SPEED"/></xsl:attribute></xsl:if>
             <video autoplay="autoplay" muted="muted" loop="loop" playsinline="playsinline" preload="auto">
               <source type="video/mp4">
                 <xsl:attribute name="src"><xsl:value-of select="$OL_BG_MP4"/></xsl:attribute>
@@ -330,6 +336,7 @@
         <xsl:when test="$OL_BG_IDS != ''">
           <div class="rbccm-hero__bg-video rbccm-brightcove-bg-layer" aria-hidden="true" inert="inert">
             <xsl:attribute name="data-bg-video-ids"><xsl:value-of select="$OL_BG_IDS"/></xsl:attribute>
+            <xsl:if test="$OL_BG_SPEED != ''"><xsl:attribute name="data-bg-video-speed"><xsl:value-of select="$OL_BG_SPEED"/></xsl:attribute></xsl:if>
             <xsl:attribute name="data-bg-player-js"><xsl:value-of select="$OL_BG_PLAYER_JS"/></xsl:attribute>
             <video-js class="rbccm-brightcove-bg-layer__player" data-embed="default" muted="muted" autoplay="autoplay" loop="loop" playsinline="playsinline" preload="auto" tabindex="-1">
               <xsl:attribute name="data-account"><xsl:value-of select="$OL_BG_ACCT"/></xsl:attribute>
@@ -451,12 +458,28 @@
   var ring = btn.querySelector('.rbccm-hero__video-toggle-ring-fill');
   var frame = 0;
 
+  /* Playback speed (the BgVideoSpeed field): 1 is normal, 0.75 is
+     three-quarter speed. Anything outside 0.25 to 2 plays at normal
+     speed. The player can put the speed back to normal when it loads
+     or swaps a video, so it is set again while the video plays. */
+  var speed = parseFloat(wrap.getAttribute('data-bg-video-speed'));
+  if (!(speed >= 0.25)) speed = 1;
+  if (speed > 2) speed = 1;
+  function setSpeed(media) {
+    if (!media) return;
+    if (speed === 1) return;
+    if (media.playbackRate === speed) return;
+    media.defaultPlaybackRate = speed;
+    media.playbackRate = speed;
+  }
+
   /* The ring round the button shows how far through the video is. It
      fills as the video plays and holds where it is while paused. If
      the length is not known yet, the ring is drawn whole. */
   function draw() {
     frame = 0;
     var media = native || wrap.querySelector('video');
+    setSpeed(media);
     if (ring) {
       var length = media ? media.duration : 0;
       var known = isFinite(length) ? length !== 0 : false;

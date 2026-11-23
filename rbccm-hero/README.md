@@ -12,7 +12,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
 - Strategy & Economics (S+E): title and body on the left, a "Latest insight" card on the right, optional background video, breadcrumbs.
 - US Credentials: eyebrow, two-line title (second line in yellow), subtitle, background images or a background video, breadcrumbs. No buttons.
 - ETF Innovators: left-aligned one-line title, paragraph, one yellow button, a background photo with a name tag, breadcrumbs.
-- 2027 Outlook: left-aligned two-line title with a yellow year digit that rolls in, paragraph, one yellow button, a background video with a pause / play button, breadcrumbs.
+- 2027 Outlook: left-aligned two-line white title (an optional yellow year digit that rolls in), paragraph, one yellow button, a background video with a pause / play button, breadcrumbs.
 
 ### What the editor can change
 - On every variant: Title line 1, Subtitle / body copy (bold, italics and line breaks are allowed there) and the "Last updated" stamp, which is bumped on each save.
@@ -28,7 +28,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
   - S+E, US Credentials and 2027 Outlook: a Background MP4 URL or a Brightcove video ID. On S+E and 2027 Outlook the Brightcove field also takes two or three IDs separated by commas, one cut per screen size (mobile, tablet, desktop).
   - US Credentials: four background image paths (Global Investment Banking desktop and mobile, Global Markets desktop and mobile) and the URL parameter that shows the Global Markets set (default `hero=global-markets`).
   - ETF Innovators: a desktop and a mobile background image, plus the name tag (name and job title) shown over the photo.
-- 2027 Outlook: the year roll can be turned off by typing `no` in the Outlook year roll field (`OlYearRoll`).
+- 2027 Outlook: the year roll is off by default, so the year is plain white. Typing `yes` in the Outlook year roll field (`OlYearRoll`) turns on the yellow last digit that rolls up from the year before.
 - S+E insight card: where the card comes from (DCR picker, Auto latest from the feed, or Manual), the pill label, title, body, date, link label, link URL and link screen-reader name, and the length limits for the title and body. For the Auto source there are also the feed URLs, tag keywords, a pinned article URL and a link override. The S+E body width at desktop can be set too.
 - Technical fields exist (Section ID, Section ARIA label, CSS and JS paths, Brightcove account and player IDs, Brightcove stylesheet path). They are set at deploy.
 
@@ -49,7 +49,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
 - Buttons: none to two on MAAS+MATA; none or one on ETF Innovators and 2027 Outlook; none on S+E and US Credentials.
 - Title: two lines on MAAS+MATA, US Credentials and 2027 Outlook; one line on S+E and ETF Innovators.
 - Text length: No enforced character limit on the hero copy. The S+E insight card is the exception: by default the title is cut at 70 characters and the body at 170 (the "..." counts toward the limit), cut at the last whole word. Each limit can be set to `default`, `full` (no limit) or `custom=N`.
-- 2027 Outlook: the yellow digit only appears when Title line 1 is exactly a four-digit year (for example 2027).
+- 2027 Outlook: the yellow rolling digit only appears when the year roll field is `yes` and Title line 1 is exactly a four-digit year (for example 2027).
 - Background images (US Credentials, ETF Innovators): the desktop image is used from 992px wide, the mobile image below that. No image size or ratio is enforced. The stylesheet notes say the US Credentials mobile layout is built around portrait art of 750 x 1068.
 - Brightcove background: one ID on US Credentials; one, two or three IDs on S+E and 2027 Outlook (two = mobile and desktop; three = mobile under 768px, tablet 768 to 991px, desktop 992px and up).
 
@@ -61,7 +61,7 @@ The variant is chosen by picking the skin in TeamSite, not by a field:
 - Background order: an MP4 wins over a Brightcove ID. On US Credentials any background image wins over both. With nothing set the hero is a plain colour (and on 2027 Outlook there is no pause button).
 - US Credentials images: a blank image uses the other size of the same set; a blank Global Markets set uses the Global Investment Banking set. The Global Markets set only shows when the page URL carries the parameter. With scripts off the Global Investment Banking set always shows.
 - ETF Innovators images: a blank image uses the other one; both blank shows navy only.
-- 2027 Outlook: if Title line 1 is not a four-digit year it prints as normal text with no yellow digit. `no` in the year roll field keeps the yellow digit but stops the roll.
+- 2027 Outlook: if Title line 1 is not a four-digit year it prints as normal text with no yellow digit, whatever the year roll field says. With the field blank or `no` a year prints in plain white with no roll.
 - S+E insight card:
   - DCR picker: the card is filled from the picked article. Any card field that is not blank (title, body, date) replaces the article's value. The link uses the card CTA URL field if set, otherwise the article's own link.
   - Auto: the typed card fields show first and are replaced once the feed loads. They stay if the feed fails, nothing matches, or scripts are off. A pinned article URL takes the place of the keyword search.
@@ -106,7 +106,7 @@ On the site these load from `/assets/rbccm/css/components/rbccm-hero.css` and `/
 | `rbccm-hero--strategy-and-economics.xsl` | Skin: S+E (split layout, title + body left, "Latest insight" card right, optional bg video) |
 | `rbccm-hero--us-credentials.xsl` | Skin: US Credentials (centred 2-line title + subtitle on navy, optional bg video, no buttons) |
 | `rbccm-hero--etf-innovators.xsl` | Skin: ETF Innovators (left-aligned title + paragraph + yellow button over a background photo, name tag on the photo) |
-| `rbccm-hero--outlook-2027.xsl` | Skin: Outlook 2027 (left-aligned 2-line title + paragraph + yellow button over a background video, pause / play button, rolling year digit) |
+| `rbccm-hero--outlook-2027.xsl` | Skin: Outlook 2027 (left-aligned 2-line title + paragraph + yellow button over a background video, pause / play button, optional rolling year digit) |
 | `rbccm-hero-properties.xml` | Fields for all the skins. Each field's label says which variants use it. |
 | `rbccm-hero-sample-dcr.xml` | Sample data for running a skin locally with any XSLT 1.0 tool. Not shipped. |
 | `rbccm-hero.css` | Base block + all variant modifiers. Ships to `/assets/rbccm/css/components/rbccm-hero.css`. |
@@ -124,7 +124,7 @@ The variant is picked by the skin, not a field. There is no Preset field.
 | Background video | BgVideoMp4, BgBrightcoveVideoId, BgBrightcoveAccount, BgBrightcovePlayer, BgBrightcoveLayerCssPath | S+E, US Credentials, Outlook |
 | MAAS+MATA buttons | MmCta1/2 Label, Href, AriaLabel, Title, Style, Icon (arrow / play / none) | MAAS+MATA. ETF uses button 1 (always yellow, Style is ignored); set its Href to `#latest-episode` and the episodes list points it at the newest episode (see filtered-content README). |
 | ETF | EtfBgImageDesktop / EtfBgImageMobile, EtfNameTagName / EtfNameTagTitle | ETF Innovators |
-| Outlook | OlYearRoll | Outlook 2027. Button 1 as on ETF (always yellow). |
+| Outlook | OlYearRoll, BgVideoSpeed | Outlook 2027. Button 1 as on ETF (always yellow). |
 | Strategy and Economics | SeBodyMaxWidth, SeInsight* card fields + sourcing (DCR picker / auto-latest / manual), SeInsightTitleLimit / SeInsightBodyLimit | S+E |
 
 In TeamSite, settings (paths, IDs, alignment, tag pickers, button style/icon, Brightcove IDs, feed URLs) sit on the Appearance tab (`<Properties>`); copy, links, media and the S+E insight card sit on the Content tab (`<Data>`).
@@ -135,10 +135,10 @@ Tag pickers default to **Auto**, which uses each variant's SEO default (MAAS+MAT
 
 ## Outlook 2027
 
-- **Title:** line 1 and line 2 on two lines (e.g. `2027` / `Outlook`). When line 1 is a four-digit year, its last digit is yellow and rolls up from the year before (the 6 rises out and fades as the 7 rises in) about two seconds after the page loads. `OlYearRoll` set to `no` keeps the yellow digit without the roll. Screen readers hear the plain year.
-- **Background video:** an MP4 (`BgVideoMp4`) or Brightcove (`BgBrightcoveVideoId`; one ID, or mobile, tablet, desktop cuts separated by commas, as on S+E). Brightcove loads the in-page player with every control hidden by `rbccm-brightcove-bg-layer.css`.
+- **Title:** line 1 and line 2 on two lines (e.g. `2027` / `Outlook`). By default the whole title is white. With `OlYearRoll` set to `yes` and a four-digit year on line 1, its last digit is yellow and rolls up from the year before (the 6 rises out and fades as the 7 rises in) about two seconds after the page loads. Screen readers hear the plain year either way.
+- **Background video:** an MP4 (`BgVideoMp4`) or Brightcove (`BgBrightcoveVideoId`; one ID, or mobile, tablet, desktop cuts separated by commas, as on S+E). Brightcove loads the in-page player with every control hidden by `rbccm-brightcove-bg-layer.css`. `BgVideoSpeed` sets how fast it plays: `1` or blank is normal, `0.75` is three-quarter speed (0.25 to 2).
 - **Pause / play:** whenever there is a background video, a round button sits bottom right. It pauses and resumes the video, and its screen reader label says what it will do ("Pause background video" / "Play background video"). Visitors who have asked their device to reduce motion get the video paused from the start, and the year doesn't roll.
-- **Entrance:** follows the design team's concept video. The breadcrumbs fade in. Then everything below fades in while rising into place: the year one digit after the other, the second title line, the paragraph and the button, in that order. The pause / play button fades in last. It all takes about 1.8 seconds. The year rolls at 2 seconds. The background video fades up from plain navy once it starts playing (or after 3 seconds if it never starts).
+- **Entrance:** follows the design team's concept video. The breadcrumbs fade in. Then everything below fades in while rising into place: the year one digit after the other, the second title line, the paragraph and the button, in that order. The pause / play button fades in last. It all takes about 1.8 seconds. With the year roll on, the year rolls at 2 seconds. The background video fades up from plain navy once it starts playing (or after 3 seconds if it never starts).
 - **Video framing:** the lines in the footage always begin a set distance to the right of the copy, run off the top of the hero and land their wave about 60% of the way down (about 72% on mobile and tablet). The values are at the top of the Outlook video rules in `rbccm-hero.css`.
 - **Sizes:** desktop is measured from the Outlook 2027 page PDF (1440 frame); mobile follows the ETF hero until there is a mobile spec.
 

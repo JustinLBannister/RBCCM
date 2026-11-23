@@ -233,6 +233,10 @@
   margin: 0 !important;
   white-space: nowrap;
 }
+/* The HideCount field. */
+.rbccm-strategic-themes--no-count .rbccm-strategic-themes__count.rbccm-strategic-themes__count--outlook-2027 {
+  display: none;
+}
 .rbccm-strategic-themes__count-num.rbccm-strategic-themes__count-num--outlook-2027 {
   color: #FFC72C;
   font-family: RBCDisplay, 'RBC Display', Georgia, Times, serif;
@@ -493,6 +497,53 @@
   max-width: 100% !important;
   object-fit: cover;
   width: 100% !important;
+}
+
+/* ---------- Picture style: clickable graphic ----------
+   The picture links where the theme's button links. */
+.rbccm-strategic-themes__visual-link.rbccm-strategic-themes__visual-link--outlook-2027 {
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+.rbccm-strategic-themes__visual-link.rbccm-strategic-themes__visual-link--outlook-2027:hover {
+  transform: scale(1.02);
+}
+
+/* ---------- Picture style: article ----------
+   The picked story's image, as a link to the story. */
+.rbccm-strategic-themes__article.rbccm-strategic-themes__article--outlook-2027 {
+  display: block;
+  text-decoration: none;
+}
+.rbccm-strategic-themes__article.rbccm-strategic-themes__article--outlook-2027:focus-visible {
+  border-radius: 20px;
+  outline: 2px solid #0051A5;
+  outline-offset: 4px;
+}
+.rbccm-strategic-themes__article-media.rbccm-strategic-themes__article-media--outlook-2027 {
+  aspect-ratio: 16 / 9;
+  background: #E0E0E0;
+  border-radius: 20px;
+  display: block;
+  overflow: hidden;
+}
+.rbccm-strategic-themes__article-img.rbccm-strategic-themes__article-img--outlook-2027 {
+  display: block;
+  height: 100% !important;     /* fill the block; beat site-wide img { height: auto } */
+  max-width: none !important;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  width: 100% !important;
+}
+.rbccm-strategic-themes__article.rbccm-strategic-themes__article--outlook-2027:hover .rbccm-strategic-themes__article-img.rbccm-strategic-themes__article-img--outlook-2027 {
+  transform: scale(1.04);
+}
+/* A theme that is not showing keeps its article link out of reach. */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) .rbccm-strategic-themes__visual.rbccm-strategic-themes__visual--outlook-2027.rbccm-strategic-themes__visual--article {
+  visibility: hidden;
 }
 
 
@@ -756,7 +807,7 @@
   position: absolute;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
-  animation: rbccm-themes-spin 4.5s linear infinite;
+  animation: rbccm-themes-spin 4.5s linear 2;
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-beam {
   background: linear-gradient(180deg, rgba(0, 81, 165, 0), #0051A5 40%);
@@ -788,7 +839,7 @@
   opacity: 0;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
-  animation: rbccm-themes-ring 4.5s var(--d, 0s) linear infinite;
+  animation: rbccm-themes-ring 2.5s var(--d, 0s) linear;
 }
 
 /* ---- Minerals: element tiles ---- */
@@ -815,7 +866,7 @@
   padding: 10px 12px;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
-  animation: rbccm-themes-highlight 6.3s var(--d, 0s) infinite;
+  animation: rbccm-themes-highlight 0.9s var(--d, 0s);
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile-num {
   font-family: Roboto, Arial, sans-serif;
@@ -859,7 +910,7 @@
   border-radius: 5px;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
-  animation: rbccm-themes-cell 2.8s var(--d, 0s) ease-in-out infinite;
+  animation: rbccm-themes-cell 2.8s var(--d, 0s) ease-in-out;
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain {
   background: rgba(0, 49, 104, 0.15);
@@ -889,7 +940,7 @@
   width: 10px;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
-  animation: rbccm-themes-travel 3.2s 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite both;
+  animation: rbccm-themes-travel 3.2s 1.6s cubic-bezier(0.5, 0, 0.5, 1) both;
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-nodes {
   display: flex;
@@ -980,7 +1031,7 @@
   box-shadow: 0 0 0 1.5px #FFC72C;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
-  animation: rbccm-themes-pulse 2.2s 3s infinite;
+  animation: rbccm-themes-pulse 2.2s 3s;
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--energy .rbccm-strategic-themes__gfx-caption {
   bottom: 8%;
@@ -993,7 +1044,7 @@
   transform-origin: center;
 }
 .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
-  animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot 4.8s var(--h, 0s) ease-in-out infinite;
+  animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot 0.96s var(--h, 0s) ease-in-out;
 }
 .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027.rbccm-strategic-themes__graphic--canada .rbccm-strategic-themes__gfx-caption {
   bottom: 3%;
@@ -1004,8 +1055,8 @@
    Keyframes
    ========================================================================= */
 /* ---------- Paused (--still, set by the pause button) ----------
-   The parts that repeat for as long as a theme shows stop where they
-   are: the radar sweep and pings, the tile highlights, the cell wave,
+   Each graphic plays through once when its theme shows, then rests.
+   Paused part-way, its moving parts stop where they are: the radar sweep and pings, the tile highlights, the cell wave,
    the dot on the chain, the pulse on the chart and the flicker in the
    leaf. The script clears the pause when the theme changes, so the
    next theme plays. */
@@ -1022,19 +1073,48 @@
   animation-play-state: running, paused;
 }
 
+/* ---------- Repeating (--loop, the LoopAnimation field) ----------
+   The moving parts keep repeating for as long as the theme shows. The
+   three -loop keyframes hold still for part of each round, so the
+   pings, highlights and flickers stay spaced out. */
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep {
+  animation: rbccm-themes-spin 4.5s linear infinite;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring {
+  animation: rbccm-themes-ring-loop 4.5s var(--d, 0s) linear infinite;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile {
+  animation: rbccm-themes-highlight-loop 6.3s var(--d, 0s) infinite;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell {
+  animation: rbccm-themes-cell 2.8s var(--d, 0s) ease-in-out infinite;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot {
+  animation: rbccm-themes-travel 3.2s 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite both;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  animation: rbccm-themes-pulse 2.2s 3s infinite;
+}
+.rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot-loop 4.8s var(--h, 0s) ease-in-out infinite;
+}
+@keyframes rbccm-themes-ring-loop      { 0% { opacity: 0.9; transform: scale(1); } 55% { opacity: 0; transform: scale(2.6); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-highlight-loop { 0%, 14%, 100% { background: #FFFFFF; color: #003168; } 3%, 11% { background: #003168; color: #FFC72C; } }
+@keyframes rbccm-themes-dot-loop       { 0%, 100% { fill: #0051A5; } 8% { fill: #FFC72C; } 20% { fill: #0051A5; } }
+
 @keyframes rbccm-themes-up        { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 @keyframes rbccm-themes-fade      { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rbccm-themes-draw      { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }
 @keyframes rbccm-themes-spin      { to { transform: rotate(360deg); } }
-@keyframes rbccm-themes-ring      { 0% { opacity: 0.9; transform: scale(1); } 55% { opacity: 0; transform: scale(2.6); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes rbccm-themes-ring      { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
 @keyframes rbccm-themes-pulse     { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
 @keyframes rbccm-themes-rise      { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes rbccm-themes-cell      { 0%, 100% { background: rgba(0, 49, 104, 0.08); } 45% { background: rgba(0, 81, 165, 0.9); } }
 @keyframes rbccm-themes-pop       { 0% { opacity: 0; transform: scale(0); } 70% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes rbccm-themes-rule      { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes rbccm-themes-travel    { 0% { left: 0%; } 100% { left: 100%; } }
-@keyframes rbccm-themes-highlight { 0%, 14%, 100% { background: #FFFFFF; color: #003168; } 3%, 11% { background: #003168; color: #FFC72C; } }
-@keyframes rbccm-themes-dot       { 0%, 100% { fill: #0051A5; } 8% { fill: #FFC72C; } 20% { fill: #0051A5; } }
+@keyframes rbccm-themes-highlight { 0%, 100% { background: #FFFFFF; color: #003168; } 21%, 79% { background: #003168; color: #FFC72C; } }
+@keyframes rbccm-themes-dot       { 0%, 100% { fill: #0051A5; } 40% { fill: #FFC72C; } }
 @keyframes rbccm-themes-shine {
   0%   { left: -60%; opacity: 0; }
   20%  { opacity: 1; }

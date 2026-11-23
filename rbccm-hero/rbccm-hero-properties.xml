@@ -62,7 +62,7 @@
 
   <!-- Bump on every content save. Doubles as the ?v= cache buster
        on the sidecar CSS / JS URLs. Format YYYY-MM-DD-HHMM. -->
-  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-09-12-1934</Datum>
+  <Datum ID="CacheVersion" Type="String" Name="Last updated (bump each time you save content - format: YYYY-MM-DD-HHMM, e.g. 2026-09-12-1934)">2026-11-23-1200</Datum>
 
   <Datum ID="SectionID" Type="String" Name="Section ID (technical - set once at deploy)">rbccm-hero-1</Datum>
 
@@ -211,6 +211,7 @@
   <Datum ID="SubtitleText" Type="Textarea" Name="Subtitle / body copy : all variants (optional - blank hides it; HTML allowed)"></Datum>
 
   <Datum ID="BgVideoMp4" Type="String" Name="Background MP4 URL (optional - overrides Brightcove if set)"></Datum>
+  <Datum ID="BgVideoSpeed" Type="String" Name="Background video speed : Outlook (optional - 1 = normal, 0.75 = three-quarter speed; blank = normal)"></Datum>
 
   <!-- One ID plays at every width. Strategy & Economics also takes
        IDs separated by commas, one cut per breakpoint, and loads only
@@ -257,11 +258,12 @@
 
   <Datum ID="EtfNameTagTitle" Type="String" Name="ETF : name tag - job title (optional, e.g. Director, Global ETF Strategy)"></Datum>
 
-  <!-- Outlook year roll: when title line 1 is a 4-digit year, its last
-       digit is yellow and rolls up from the year before (2026 to 2027)
-       once the hero loads. "no" keeps the yellow digit without the roll.
+  <!-- Outlook year roll: off unless this is "yes". When it is "yes" and
+       title line 1 is a 4-digit year, its last digit is yellow and rolls
+       up from the year before (2026 to 2027) once the hero loads.
+       Otherwise the year is plain white.
        The background video gets a pause / play button automatically. -->
-  <Datum ID="OlYearRoll" Type="String" Name="Outlook : year roll on the title's last digit (type no to turn it off; blank or yes = on)">yes</Datum>
+  <Datum ID="OlYearRoll" Type="String" Name="Outlook : year roll on the title's last digit (type yes to turn it on; blank or no = off, plain white year)">no</Datum>
 
   <Datum ID="MmCta1Label" Type="String" Name="MAAS+MATA, ETF, Outlook : button 1 label (optional - blank hides the button)">Request a demo</Datum>
 
