@@ -414,11 +414,32 @@
       items.forEach(function (item, i) { item.classList.toggle(BLOCK + '__item--shown', !!test(i)); });
     }
 
+    /* Tabs state: the graphics wait until the section has scrolled
+       into view, so the first one plays where it can be seen and not
+       while the page is loading further up. */
+    var seen = !('IntersectionObserver' in window);
+    if (!seen) {
+      var watcher = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (!entries[i].isIntersecting) continue;
+          watcher.disconnect();
+          seen = true;
+          if (mode === 'tabs') {
+            setShown(function (n) { return n === active; });
+            resetLoop();
+            startRing();
+          }
+          return;
+        }
+      }, { threshold: 0.3 });
+      watcher.observe(root);
+    }
+
     /* Tabs state: show one theme. */
     function show(index) {
       index = clamp(index, 0, count - 1);
       setActive(index);
-      setShown(function (i) { return i === index; });
+      setShown(function (i) { return seen && i === index; });
       fills.forEach(function (fill, i) { if (fill) fill.style.width = i <= index ? '100%' : '0'; });
     }
 

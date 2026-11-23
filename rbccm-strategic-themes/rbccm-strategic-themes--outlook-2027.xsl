@@ -340,6 +340,9 @@
     </xsl:variable>
     <xsl:variable name="LINK">
       <xsl:choose>
+        <!-- A typed "#" is the placeholder the field starts with, so
+             a picked story's address is used in its place. -->
+        <xsl:when test="$LINK_RAW = '#' and string($S_LINK) != ''"><xsl:value-of select="$S_LINK"/></xsl:when>
         <xsl:when test="$LINK_RAW != ''"><xsl:value-of select="$LINK_RAW"/></xsl:when>
         <xsl:otherwise><xsl:value-of select="$S_LINK"/></xsl:otherwise>
       </xsl:choose>

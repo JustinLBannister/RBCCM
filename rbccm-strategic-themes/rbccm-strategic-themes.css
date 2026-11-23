@@ -579,6 +579,12 @@
   opacity: 0;
   visibility: hidden;          /* also takes its button out of the tab order */
 }
+/* The themes sit on top of one another, so the ones that are not
+   showing must not take the clicks meant for the showing one (its
+   picture link in particular). */
+.rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027:not(.rbccm-strategic-themes__item--active) {
+  pointer-events: none;
+}
 /* The showing theme's text rises in, one line after another. */
 .rbccm-strategic-themes--enhanced .rbccm-strategic-themes__item.rbccm-strategic-themes__item--outlook-2027.rbccm-strategic-themes__item--active .rbccm-strategic-themes__text.rbccm-strategic-themes__text--outlook-2027 > * {
   animation: rbccm-themes-up 0.6s both;

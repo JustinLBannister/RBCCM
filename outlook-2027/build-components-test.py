@@ -246,7 +246,7 @@ PICKED = dict(('Theme%dStory' % (n + 1), {
     'thumbnail': FPO + photo,
     'can_url': '/story.page?dcr=templatedata/article/story/data/2026/12/%s.xml' % name,
 }) for n, (name, title, photo) in enumerate(THEME_STORIES))
-NO_TYPED_LINKS = dict(('Theme%dLink' % n, '') for n in range(1, 6))
+NO_TYPED_LINKS = dict(('Theme%dLink' % n, '#') for n in range(1, 6))
 
 def themes(version, label, **fields):
     fields['SectionID'] = 'strategic-themes-v%d' % version
