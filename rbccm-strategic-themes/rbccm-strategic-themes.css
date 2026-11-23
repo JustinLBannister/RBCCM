@@ -159,7 +159,7 @@
   outline-offset: 4px;
 }
 .rbccm-strategic-themes__tab-bar.rbccm-strategic-themes__tab-bar--outlook-2027 {
-  background: #FFC72C;         /* always yellow; the active tab is marked by its text colour */
+  background: #898989;         /* the inactive tab text colour; turns yellow up to the showing theme */
   border-radius: 2px;
   display: block;
   height: 3px;
@@ -167,7 +167,11 @@
   width: 100%;
 }
 .rbccm-strategic-themes__tab-fill.rbccm-strategic-themes__tab-fill--outlook-2027 {
-  display: none;               /* the progress fill is not used: the bar is solid */
+  background: #FFC72C;
+  display: block;
+  height: 100%;
+  transition: width 0.4s ease;
+  width: 0;
 }
 .rbccm-strategic-themes__tab-num.rbccm-strategic-themes__tab-num--outlook-2027 {
   color: inherit;
