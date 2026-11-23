@@ -82,6 +82,13 @@
     <Option><Display>No</Display><Value>no</Value></Option>
     yes
   </Datum>
+  <Datum ID="Descriptions" Type="SelectSingle" Name="Description under each story title (the picked story description, or the typed Summary; the featured story always shows its own)">
+    <Option Selected="true"><Display>Off (only a typed Summary shows)</Display><Value>off</Value></Option>
+    <Option><Display>On - up to 1 line</Display><Value>1</Value></Option>
+    <Option><Display>On - up to 2 lines</Display><Value>2</Value></Option>
+    <Option><Display>On - up to 3 lines</Display><Value>3</Value></Option>
+    off
+  </Datum>
   <Datum ID="ShowFilters" Type="SelectSingle" Name="Filter pills above the stories (Cards layout; uses each story's filter label)">
     <Option Selected="true"><Display>No</Display><Value>no</Value></Option>
     <Option><Display>Yes</Display><Value>yes</Value></Option>
@@ -155,7 +162,7 @@
     </Datum>
     <Datum ID="Title" Type="String" Name="Title (blank uses the picked story; a story with no title is skipped)"></Datum>
     <Datum ID="Category" Type="String" Name="Category label (e.g. Macro &amp; rates)"></Datum>
-    <Datum ID="Summary" Type="Textarea" Name="Summary (optional; the featured story uses the picked story summary when blank)"></Datum>
+    <Datum ID="Summary" Type="Textarea" Name="Summary (optional; blank uses the picked story description on the featured story, and on the other stories when Description is on)"></Datum>
     <Datum ID="Meta" Type="String" Name="Meta line (e.g. the author, Frances Donald; blank uses the picked story author)"></Datum>
     <Datum ID="Date" Type="String" Name="Date published, as YYYY-MM-DD (e.g. 2026-10-09; blank uses the picked story)"></Datum>
     <Datum ID="Image" Type="Image" Name="Image - pick from DAM (blank uses the picked story thumbnail)">

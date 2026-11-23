@@ -258,6 +258,9 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="SHOW_SHARE"   select="$SHARE_RAW != 'no'"/>
+    <!-- Descriptions on the smaller stories: 1, 2 or 3 (lines), else off. -->
+    <xsl:variable name="DESC_LINES"   select="translate(normalize-space((//Datum[@ID='Descriptions']/Option[@Selected='true']/Value | //Datum[@ID='Descriptions']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="SHOW_DESC"    select="$DESC_LINES = '1' or $DESC_LINES = '2' or $DESC_LINES = '3'"/>
     <xsl:variable name="SHOW_FILTERS" select="$FILTERS_RAW = 'yes'"/>
     <!-- Phones: stack the stories (default), or one row to swipe. -->
     <xsl:variable name="MOBILE">
@@ -358,6 +361,7 @@
             <xsl:otherwise> rbccm-insight-cards--side-cards</xsl:otherwise>
           </xsl:choose>
         </xsl:if>
+        <xsl:if test="$SHOW_DESC"><xsl:text> rbccm-insight-cards--desc-lines-</xsl:text><xsl:value-of select="$DESC_LINES"/></xsl:if>
         <xsl:if test="$HAS_CAROUSEL"> rbccm-insight-cards--mobile-carousel</xsl:if>
         <xsl:if test="$HAS_CAROUSEL and $MOBILE = 'carousel-peek'"> rbccm-insight-cards--mobile-peek</xsl:if>
       </xsl:attribute>
@@ -760,15 +764,18 @@
 
     <xsl:variable name="SUMMARY_RAW_TEXT"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$SUMMARY_RAW"/></xsl:call-template></xsl:variable>
     <xsl:variable name="HAS_SUMMARY_RAW" select="normalize-space(translate($SUMMARY_RAW_TEXT, '&#160;', '')) != '' and normalize-space($SUMMARY_RAW_TEXT) != '&amp;nbsp;'"/>
-    <!-- The picked story's summary shows on the featured story only;
-         the smaller cards show a summary when one is typed. -->
+    <!-- The picked story's summary always shows on the featured story.
+         The smaller cards show a typed summary, and the picked story's
+         own when the section's Descriptions setting is on. -->
+    <xsl:variable name="DESC_LINES" select="translate(normalize-space((//Datum[@ID='Descriptions']/Option[@Selected='true']/Value | //Datum[@ID='Descriptions']/text()[last()][not(../Option[@Selected='true'])])[1]), $UPPER, $LOWER)"/>
+    <xsl:variable name="STORY_DESC" select="$role = 'feature' or $DESC_LINES = '1' or $DESC_LINES = '2' or $DESC_LINES = '3'"/>
     <xsl:variable name="SUMMARY">
       <xsl:choose>
-        <xsl:when test="$STORY_FIRST and $role = 'feature' and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
-        <xsl:when test="$STORY_FIRST and $role = 'feature' and normalize-space($DCR/*/description) != ''"><xsl:value-of select="$DCR/*/description"/></xsl:when>
+        <xsl:when test="$STORY_FIRST and $STORY_DESC and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
+        <xsl:when test="$STORY_FIRST and $STORY_DESC and normalize-space($DCR/*/description) != ''"><xsl:value-of select="$DCR/*/description"/></xsl:when>
         <xsl:when test="$HAS_SUMMARY_RAW"><xsl:value-of select="$SUMMARY_RAW"/></xsl:when>
-        <xsl:when test="$role = 'feature' and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
-        <xsl:when test="$role = 'feature'"><xsl:value-of select="$DCR/*/description"/></xsl:when>
+        <xsl:when test="$STORY_DESC and normalize-space($DCR/*/summarydescription) != ''"><xsl:value-of select="$DCR/*/summarydescription"/></xsl:when>
+        <xsl:when test="$STORY_DESC"><xsl:value-of select="$DCR/*/description"/></xsl:when>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="SUMMARY_TEXT"><xsl:call-template name="stripTags"><xsl:with-param name="s" select="$SUMMARY"/></xsl:call-template></xsl:variable>

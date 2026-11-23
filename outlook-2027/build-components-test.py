@@ -220,18 +220,14 @@ S.append(('Macro views (rbccm-insight-cards, Cards, white, with the notification
          meta='Frances Donald', date='2026-10-09', img=FPO + 'macro-1-fpo.jpg', link='#', action='Read %s 5 min read' % DOT),
     dict(badge='Markets in Motion', type='podcast', cat='Macro & rates', title='Monetary policy and rates outlook',
          meta='Emma Laurent', date='2026-10-05', img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 22 min' % DOT),
-    dict(badge='Strategic Alternatives', type='article', cat='Equities', title='U.S. equity market outlook',
-         meta='Daniel Reyes', date='2026-10-01', img=FPO + 'macro-3-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
-    dict(badge='Strategic Alternatives', type='video', cat='Consumer', title='FX outlook',
-         meta='Daniel Reyes', date='2026-09-28', img=FPO + 'macro-4-fpo.jpg', link='#', action='Watch %s 6 min' % DOT),
 ], SectionID='macro-views', MobileLayout='carousel-peek', SectionHeading='Macro views',
    NotifyEyebrow='Never miss an Outlook episode',
    NotifyText='Stay up to date with the latest conversations and insights.',
    NotifyButtonLabel='Get notified', NotifyLink='#'))))
 
-# Strategic themes, five versions one after another for the team to
-# compare. Versions 4 and 5 take each theme's link from a picked story
-# (placeholder stories here), as the live page will.
+# Strategic themes: the version chosen in review. No 01 / 05 count, the
+# graphics keep repeating, and each graphic links to its theme's story (a
+# picked story; placeholder stories here, as the live page will have).
 THEMES_SKIN = 'rbccm-strategic-themes/rbccm-strategic-themes--outlook-2027.xsl'
 THEMES_PROPS = 'rbccm-strategic-themes/rbccm-strategic-themes-properties.xml'
 THEME_STORIES = [
@@ -248,42 +244,31 @@ PICKED = dict(('Theme%dStory' % (n + 1), {
 }) for n, (name, title, photo) in enumerate(THEME_STORIES))
 NO_TYPED_LINKS = dict(('Theme%dLink' % n, '#') for n in range(1, 6))
 
-def themes(version, label, **fields):
-    fields['SectionID'] = 'strategic-themes-v%d' % version
-    note = ('<p class="demo-version"><strong>Strategic themes, version %d of 5.</strong> %s</p>\n' % (version, label))
-    S.append(('Strategic themes v%d (rbccm-strategic-themes): %s' % (version, label),
-              note + render(THEMES_SKIN, THEMES_PROPS, fields)))
-
-themes(1, 'Original: the graphics keep repeating, with the 01 / 05 count. No scroll lock.', LoopAnimation='yes')
-themes(2, 'Each graphic plays once and stops (press play to see it again), with the count.')
-themes(3, 'No 01 / 05 count. Graphics play once.', HideCount='yes')
-themes(4, 'Clickable graphic: the picture links to the story, the same place as the button.',
-       PictureStyle='graphic-link', picked=PICKED, **NO_TYPED_LINKS)
-themes(5, 'Article: the story\'s image in place of the graphic, linked to the story.',
-       PictureStyle='article', picked=PICKED, **NO_TYPED_LINKS)
+S.append(('Strategic themes (rbccm-strategic-themes): loop, no count, clickable graphic', render(
+    THEMES_SKIN, THEMES_PROPS, dict(SectionID='strategic-themes', HideCount='yes', LoopAnimation='yes',
+                                    PictureStyle='graphic-link', picked=PICKED, **NO_TYPED_LINKS))))
 
 S.append(('Capital Markets perspectives (rbccm-insight-cards, Cards, dark)', render(CARDS_SKIN, CARDS_PROPS, cards([
     dict(type='video', cat='Deals & financing', title='M&A Outlook',
          date='2026-09-13', img=FPO + 'perspectives-1-fpo.jpg', link='#', action='Watch %s 5 min' % DOT),
-    dict(type='article', cat='Deals & financing', title='Capital Solutions',
-         date='2026-10-26', img=FPO + 'perspectives-2-fpo.jpg', link='#', action='Read %s 6 min' % DOT),
-    dict(type='podcast', cat='Deals & financing', title='Lending / Loan Outlook',
-         date='2026-11-02', img=FPO + 'macro-2-fpo.jpg', link='#', action='Listen %s 5 min' % DOT),
 ], SectionID='capital-markets-perspectives', Theme='dark', MobileLayout='carousel',
    Eyebrow='Capital Markets perspectives',
    SectionHeading=u'Perspectives on what’s ahead for dealmaking and capital markets.'))))
 
 S.append(('Latest insights (rbccm-insight-cards, Cards, light blue)', render(CARDS_SKIN, CARDS_PROPS, cards([
     dict(badge='Conference', cat='Conference', title='Macro & Markets Conference',
+         summary='Two days of conversations with our economists, strategists and clients on the forces shaping markets in 2027, from growth and rates to geopolitics.',
          meta='London, UK %s Dec 2-3, 2026' % DOT, img=FPO + 'latest-1-fpo.jpg', link='#',
          action='Learn more'),
     dict(badge='Breakfast', cat='Breakfast', title='Global Economic & Market Outlook Breakfast',
+         summary='Our annual breakfast briefing on the economic and market outlook, with time for questions from the floor.',
          meta='Toronto, CA %s January X, 2027' % DOT, img=FPO + 'macro-1-fpo.jpg', link='#',
          action='Listen %s 4 min' % DOT),
     dict(badge='Webinar', type='video', cat='Preview', title='New Years Previews',
+         summary='Our analysts preview the sectors, themes and stocks to watch as the new year begins, in a series of short on-demand sessions you can watch at your own pace.',
          meta='On-demand webinars', img=FPO + 'macro-3-fpo.jpg', link='#',
          action='Watch %s 12 min' % DOT),
-], SectionID='latest-insights', Theme='tint',
+], SectionID='latest-insights', Theme='tint', Descriptions='3',
    SectionHeading='Latest insights & highlights',
    SectionIntro='Stay up to date with our latest insights, perspectives and featured events.',
    HeaderButtonLabel='Explore all insights', HeaderButtonLink='#'))))

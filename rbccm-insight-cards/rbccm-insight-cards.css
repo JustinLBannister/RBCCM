@@ -1433,8 +1433,11 @@
    Nothing is removed from the skin; delete a rule here to bring the
    part back.
    ========================================================================= */
-/* Eyebrow above the heading of the Featured layout. */
-.rbccm-insight-cards--featured .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027 {
+/* Eyebrow above the heading of the Featured layout, and of the dark
+   Capital Markets perspectives section. */
+.rbccm-insight-cards--featured .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027,
+.rbccm-insight-cards--dark .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027,
+.rbccm-insight-cards--capital-markets-perspectives .rbccm-insight-cards__eyebrow.rbccm-insight-cards__eyebrow--outlook-2027 {
   display: none;
 }
 /* Author name in the line under a story (some stories carry a dozen).
@@ -1463,4 +1466,32 @@
   .rbccm-insight-cards--featured .rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027 {
     margin-bottom: -5px;
   }
+}
+
+/* ---------- Descriptions on the smaller stories ----------
+   The section's Description setting caps the text at one, two or three
+   lines; anything longer ends in an ellipsis. The featured story is
+   left alone. */
+.rbccm-insight-cards--desc-lines-1 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027,
+.rbccm-insight-cards--desc-lines-2 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027,
+.rbccm-insight-cards--desc-lines-3 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
+}
+.rbccm-insight-cards--desc-lines-1 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.rbccm-insight-cards--desc-lines-2 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.rbccm-insight-cards--desc-lines-3 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+/* The "Also selected" rows beside a featured story stay without one. */
+.rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--outlook-2027.rbccm-insight-cards__card--side-row:not(.rbccm-insight-cards__card--feature) .rbccm-insight-cards__card-summary.rbccm-insight-cards__card-summary--outlook-2027 {
+  display: none;
 }

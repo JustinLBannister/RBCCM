@@ -124,6 +124,19 @@ export default {
       }
     }
   },
+  "Descriptions": {
+    "name": "Descriptions",
+    "description": "Description under each story title (the picked story description, or the typed Summary; the featured story always shows its own)",
+    "control": false,
+    "table": {
+      "type": {
+        "summary": "SelectSingle (4 options)"
+      },
+      "defaultValue": {
+        "summary": "Off (only a typed Summary shows)"
+      }
+    }
+  },
   "ShowFilters": {
     "name": "ShowFilters",
     "description": "Filter pills above the stories (Cards layout; uses each story's filter label)",
@@ -284,7 +297,7 @@ export default {
   },
   "Story list: Summary": {
     "name": "Story list: Summary",
-    "description": "One per entry in the Story list. Summary (optional; the featured story uses the picked story summary when blank)",
+    "description": "One per entry in the Story list. Summary (optional; blank uses the picked story description on the featured story, and on the other stories when Description is on)",
     "control": false,
     "table": {
       "type": {
