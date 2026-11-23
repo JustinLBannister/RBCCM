@@ -1449,3 +1449,16 @@
 .rbccm-insight-cards--outlook-2027 .rbccm-insight-cards__card.rbccm-insight-cards__card--feature .rbccm-insight-cards__card-meta.rbccm-insight-cards__card-meta--outlook-2027 .rbccm-insight-cards__card-date.rbccm-insight-cards__card-date--outlook-2027 {
   font-size: 14px;
 }
+
+/* ---------- Tighter space under the header (desktop) ----------
+   The 40px gap reads too large when the heading has no intro paragraph
+   under it: 25px there, and 35px on the featured story. Done on the
+   header so the spacing between the stories and what follows is unchanged. */
+@media (min-width: 992px) {
+  .rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027:not(:has(.rbccm-insight-cards__intro)) {
+    margin-bottom: -15px;
+  }
+  .rbccm-insight-cards--featured .rbccm-insight-cards__header.rbccm-insight-cards__header--outlook-2027 {
+    margin-bottom: -5px;
+  }
+}
