@@ -1115,25 +1115,6 @@
 /* =========================================================================
    Keyframes
    ========================================================================= */
-/* ---------- Paused (--still, set by the pause button) ----------
-   Each graphic plays through once when its theme shows, then rests.
-   Paused part-way, its moving parts stop where they are: the radar sweep and pings, the tile highlights, the cell wave,
-   the dot on the chain, the pulse on the chart and the flicker in the
-   leaf. The script clears the pause when the theme changes, so the
-   next theme plays. */
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep,
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring,
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile,
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell,
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot,
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
-  animation-play-state: paused;
-}
-/* The leaf's dots carry two animations: pop in (still runs), then flicker. */
-.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
-  animation-play-state: running, paused;
-}
-
 /* ---------- Repeating (--loop, the LoopAnimation field) ----------
    The moving parts keep repeating for as long as the theme shows. The
    three -loop keyframes hold still for part of each round, so the
@@ -1159,6 +1140,26 @@
 .rbccm-strategic-themes--loop .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
   animation: rbccm-themes-pop 0.5s var(--d, 0s) both, rbccm-themes-dot-loop 4.8s var(--h, 0s) ease-in-out infinite;
 }
+/* ---------- Paused (--still, set by the pause button) ----------
+   Each graphic plays through once when its theme shows, then rests.
+   Paused part-way, its moving parts stop where they are: the radar sweep and pings, the tile highlights, the cell wave,
+   the dot on the chain, the pulse on the chart and the flicker in the
+   leaf. The script clears the pause when the theme changes, so the
+   next theme plays. These rules come after the repeating ones, which
+   would otherwise set the parts running again. */
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-radar-sweep,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-blip-ring,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-tile,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-cell,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-chain-dot,
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-peak-ring {
+  animation-play-state: paused;
+}
+/* The leaf's dots carry two animations: pop in (still runs), then flicker. */
+.rbccm-strategic-themes--still .rbccm-strategic-themes__item--shown .rbccm-strategic-themes__graphic.rbccm-strategic-themes__graphic--outlook-2027 .rbccm-strategic-themes__gfx-leaf-dot {
+  animation-play-state: running, paused;
+}
+
 @keyframes rbccm-themes-ring-loop      { 0% { opacity: 0.9; transform: scale(1); } 55% { opacity: 0; transform: scale(2.6); } 100% { opacity: 0; transform: scale(2.6); } }
 @keyframes rbccm-themes-highlight-loop { 0%, 14%, 100% { background: #FFFFFF; color: #003168; } 3%, 11% { background: #003168; color: #FFC72C; } }
 @keyframes rbccm-themes-dot-loop       { 0%, 100% { fill: #0051A5; } 8% { fill: #FFC72C; } 20% { fill: #0051A5; } }
