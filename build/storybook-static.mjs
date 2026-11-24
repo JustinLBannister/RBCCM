@@ -5,14 +5,14 @@
      npm run build-storybook
 
    Runs the Storybook build, then takes out of storybook-static/ the same
-   files the share package leaves out (build/share-rules.mjs), so the
+   files the package leaves out (build/package-rules.mjs), so the
    export is safe to host or zip.
    ========================================================================= */
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { TRANSFORMS, skip } from './share-rules.mjs';
+import { TRANSFORMS, skip } from './package-rules.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'storybook-static');
@@ -43,4 +43,4 @@ for (const entry of fs.readdirSync(OUT)) {
     if (fs.existsSync(source)) prune(entry);
   }
 }
-console.log('Left out of the export: ' + removed + ' files or folders (see build/share-rules.mjs)');
+console.log('Left out of the export: ' + removed + ' files or folders (see build/package-rules.mjs)');

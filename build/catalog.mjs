@@ -49,7 +49,7 @@ const EXTRA_COMPONENTS = ['filtered-content', 'maas-mata-page'];
 const NOT_COMPONENTS = ['rbccm-global'];
 /* Top-level folders left out of "Earlier work". */
 const NOT_EARLIER = ['build', 'dist', 'node_modules', 'stories', 'storybook-static', 'local-test-fixtures', 'outlook-2027',
-  '_share', 'invoices', 'transactions-preview', 'insights-json-builder'];
+  '_package', 'invoices', 'transactions-preview', 'insights-json-builder'];
 
 const TEAMSITE = {
   css: '/default/main/internet/rbccm/WORKAREA/shared/assets/rbccm/css/components',

@@ -195,28 +195,8 @@ npm run stories
 `npm run build-storybook` writes a static copy to `storybook-static/` that
 can be hosted for people who do not have Node. It has to be opened through
 a web server (a host, or `npx http-server storybook-static`), not by
-double-clicking `index.html`. It leaves out the same files the share
-package does. The look is set in
+double-clicking `index.html`. The look is set in
 `.storybook/theme.js`; the Welcome and Foundations pages are in `stories/`.
-
-## Share package
-
-`_share/rbccm-components.zip` is the package handed to coworkers. Rebuild it
-whenever it should match the repo:
-
-```bash
-npm run share
-```
-
-The package includes Storybook, so after `npm install` a coworker can run
-`npm run storybook` from the unzipped folder.
-
-This builds the pages, then writes the zip and an unzipped copy beside it
-(`_share/rbccm-components/`). Only the zip is kept in git. The unzipped copy
-is rebuilt from scratch each time, so never edit files in it; edit the repo
-and run the command again.
-
-What goes in and what is left out is listed in `build/share-rules.mjs`.
 
 ## Component inventory
 

@@ -19,7 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { catalog, ROOT } from './catalog.mjs';
-import { TRANSFORMS } from './share-rules.mjs';
+import { TRANSFORMS } from './package-rules.mjs';
 
 const OUT = path.join(ROOT, 'stories');
 const COMPONENTS = path.join(OUT, 'components');

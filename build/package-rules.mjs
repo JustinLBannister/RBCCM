@@ -1,7 +1,7 @@
 /* =========================================================================
-   What is shared and what is left out.
+   What goes in the package and what is left out.
 
-   Used by the share package (build/share.mjs), the static Storybook
+   Used by the package build (build/package.mjs), the static Storybook
    export (build/storybook-static.mjs) and the story generator
    (build/stories.mjs), so all three leave out the same things.
    ========================================================================= */
@@ -36,6 +36,7 @@ export const SKIP_NAMES = ['node_modules', '_retired', 'snapshots'];
 export const SKIP_PATHS = [
   'outlook-2027/design/',
   'rbccm-global/dist/',
+  'build/package.mjs',
   'filtered-content/filtered-content--deals-preview.html',
   'filtered-content/future-state.png',
   'filtered-content/rbccm-en-expertise-transactions.png',
@@ -68,6 +69,15 @@ export function trimFilteredContentReadme(text) {
   return out.replace(/\n+$/, '\n');
 }
 
+/* The package copy of package.json has no package command: making the
+   package is done from the repo, not from a copy of the package. */
+export function trimPackageJson(text) {
+  const pkg = JSON.parse(text);
+  if (pkg.scripts) delete pkg.scripts.package;
+  return JSON.stringify(pkg, null, 2) + '\n';
+}
+
 export const TRANSFORMS = {
-  'filtered-content/README.md': trimFilteredContentReadme
+  'filtered-content/README.md': trimFilteredContentReadme,
+  'package.json': trimPackageJson
 };

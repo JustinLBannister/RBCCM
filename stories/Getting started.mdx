@@ -1,7 +1,7 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
 import readme from '../README.md?raw';
 
-export const HIDDEN = ['Share package'];
+export const HIDDEN = [];
 
 export const guide = HIDDEN.reduce(
   (text, heading) => text.replace(new RegExp('^## ' + heading + '\\n[\\s\\S]*?(?=^## |$(?![\\s\\S]))', 'm'), ''),

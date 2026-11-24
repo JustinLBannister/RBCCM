@@ -1,32 +1,32 @@
 #!/usr/bin/env node
 /* =========================================================================
-   Share package
+   Package
 
-     npm run share            build the pages, then write the package
-     npm run share -- --no-build   skip the page build (use dist/ as it is)
+     npm run package            build the pages, then write the package
+     npm run package -- --no-build   skip the page build (use dist/ as it is)
 
-   Writes _share/rbccm-components.zip: everything a coworker needs to
+   Writes _package/rbccm-components.zip: everything needed to
    preview the components, run the page builds and run Storybook. The zip is the only
-   thing under _share/ that is tracked in git.
+   thing under _package/ that is tracked in git.
 
-   The unzipped copy is left next to it in _share/rbccm-components/ so it
+   The unzipped copy is left next to it in _package/rbccm-components/ so it
    can be opened or served locally. That folder is rebuilt from scratch
    on every run and is ignored by git; never edit files in it.
 
-   What goes in is set by the lists in build/share-rules.mjs.
+   What goes in is set by the lists in build/package-rules.mjs.
    ========================================================================= */
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { INCLUDE, TRANSFORMS, skip } from './share-rules.mjs';
+import { INCLUDE, TRANSFORMS, skip } from './package-rules.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const NAME = 'rbccm-components';
-const SHARE = path.join(ROOT, '_share');
-const STAGE = path.join(SHARE, NAME);
-const ZIP = path.join(SHARE, NAME + '.zip');
+const OUT_DIR = path.join(ROOT, '_package');
+const STAGE = path.join(OUT_DIR, NAME);
+const ZIP = path.join(OUT_DIR, NAME + '.zip');
 
 let count = 0;
 let bytes = 0;
@@ -58,7 +58,7 @@ if (!process.argv.includes('--no-build')) {
 }
 
 /* 2. Start the unzipped copy from scratch. */
-if (path.basename(STAGE) !== NAME || path.basename(path.dirname(STAGE)) !== '_share') {
+if (path.basename(STAGE) !== NAME || path.basename(path.dirname(STAGE)) !== '_package') {
   throw new Error('Refusing to clear ' + STAGE);
 }
 fs.rmSync(STAGE, { recursive: true, force: true });
@@ -76,11 +76,11 @@ for (const item of INCLUDE.concat(components)) {
 
 /* 4. Zip. */
 fs.rmSync(ZIP, { force: true });
-execFileSync('zip', ['-r', '-q', '-X', NAME + '.zip', NAME], { cwd: SHARE, stdio: 'inherit' });
+execFileSync('zip', ['-r', '-q', '-X', NAME + '.zip', NAME], { cwd: OUT_DIR, stdio: 'inherit' });
 
 const zipMb = (fs.statSync(ZIP).size / 1048576).toFixed(1);
 console.log('');
-console.log('Share package written: _share/' + NAME + '.zip');
+console.log('Package written: _package/' + NAME + '.zip');
 console.log('  ' + count + ' files, ' + (bytes / 1048576).toFixed(1) + ' MB unzipped, ' + zipMb + ' MB zipped');
 console.log('  ' + components.length + ' rbccm-* folders');
 if (missing.length) console.log('  not found, left out: ' + missing.join(', '));
