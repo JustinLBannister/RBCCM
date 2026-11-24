@@ -12,7 +12,7 @@ Each theme can be picked from TeamSite's article picker, so the title, descripti
 
 ### Purpose
 
-Presents a short set of themes one at a time, each with its number, a title, a description, a button to the story and an animated graphic. It is used on the 2027 Outlook page (in progress, not live yet) as the "Strategic themes" section.
+Presents a short set of themes one at a time, each with its number, a title, a description, a button to the story and an animated graphic. It is used on the 2027 Outlook page as the "Strategic themes" section. The "01 / 05" number above each title can be hidden with the Hide count setting, and the picture can link to the theme's story (Picture style).
 
 - Variant `outlook-2027`: the only skin.
 - Tabs mode (the default): numbered tabs switch the theme and the page scrolls as normal.
@@ -32,7 +32,7 @@ Presents a short set of themes one at a time, each with its number, a title, a d
 ### What it does not do
 
 - It does not advance on a timer. The visitor moves through the themes by scrolling, with the numbered tabs, or with the previous and next buttons beside each theme's button.
-- Each drawn graphic plays through once when its theme shows, then rests; it plays again each time the visitor comes back to that theme. Pause only stops that movement part-way (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
+- Each drawn graphic plays through once when its theme shows, then rests; it plays again each time the visitor comes back to that theme. With the Loop animation setting on, the graphics keep repeating instead. The first graphic waits until the section scrolls into view. Pause only stops that movement part-way (the radar sweep, the tile highlights and so on), and starts it again. It does not change the scroll or the layout, and the visitor cannot turn the pinned scroll off. A pause lasts for the theme it was pressed on: moving to another theme, by scrolling, a tab or the previous and next buttons, starts the movement again.
 - The ring round the pause button shows how far the showing graphic is through its one play. It holds while paused, stays full once the graphic has finished, and starts again with each theme. When the graphic has finished, the button turns to play and pressing it plays the graphic again. It is decoration and is not read out.
 - The pause button shows only on themes with a drawn graphic. It shows with reduced motion turned on too, because the graphics play by default there as well.
 - It shows five themes at most.
@@ -41,7 +41,7 @@ Presents a short set of themes one at a time, each with its number, a title, a d
 - The pinned scroll is not used in windows shorter than 600px.
 - The editor chooses whether pinned scroll is allowed (the Pinned scroll field, off by default). When it is allowed, the script still falls back to tabs from the visitor's screen and settings.
 - It does not show a graphic and an image together. When a theme has an image, the image is used and the graphic choice is ignored.
-- It does not use the picked story's image. A theme's image is always picked in the theme's own image field.
+- It does not use the picked story's image unless Picture style is set to Article. Otherwise a theme's image is always picked in the theme's own image field.
 - It does not open the story in a new tab.
 - It has no address for a single theme. A link to the page cannot open it on, say, theme 3.
 
@@ -85,7 +85,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - The numbered tabs are buttons in a group named "Themes" (or the name typed in the tabs field). The showing one is marked as current.
 - Keyboard: Tab reaches each numbered tab; Enter or Space shows that theme; Left and Right arrows move to the next tab and show its theme. Focus stays on the tabs; it is not moved into the theme.
 - Previous, next and pause are real buttons named "Previous theme", "Next theme" and "Pause the animation", in a group named "Move between themes". Previous and next are marked as unavailable at the first and last theme. Pause is a toggle and says whether it is pressed. When the theme changes, focus stays on the same button.
-- The graphics play once each time their theme shows, then stop. Pause is the visitor's way to stop that movement part-way.
+- The graphics play once each time their theme shows, then stop (or keep repeating when Loop animation is on). Pause is the visitor's way to stop that movement part-way.
 - Only the showing theme can be reached. The other themes' text and buttons are hidden from the keyboard and from screen readers until their tab is chosen.
 - Each button names its theme for screen readers: the button label, a colon, then the title ("Watch the episode: Defense Outlook").
 - The drawn graphics are decoration and hidden from screen readers. An image's alt text comes from the image Description; if that is blank the image is treated as decoration.
@@ -102,7 +102,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - No pixel size is stated for the optional theme image.
 - The prefilled links are "#". The real story links are still to be supplied.
 - Which story fields the article picker returns in TeamSite has not been confirmed here. The skin expects a title, description and link (or url).
-- The 2027 Outlook page has no address yet, so the live URL is not recorded.
+- The 2027 Outlook page is at `/en/insights/outlook-2027`; it launches December 2, 2026 and its content is placeholder until then.
 
 ---
 

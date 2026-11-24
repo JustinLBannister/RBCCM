@@ -10,7 +10,7 @@ Each story can be picked from TeamSite's article picker, so the title, image, li
 
 ### Purpose
 
-A section of hand-picked story cards under a heading, with a share button on each story and, optionally, filter pills and a notification strip. It is used on the 2027 Outlook page (in progress, not live yet), four times: Featured insight, Macro views, Capital Markets perspectives and Latest insights.
+A section of hand-picked story cards under a heading, with a share button on each story and, optionally, filter pills and a notification strip. It is used on the 2027 Outlook page four times: Featured insight, Macro views, Capital Markets perspectives and Latest insights.
 
 - Variant `outlook-2027`: the only skin. Each instance sets its own layout and background.
 - Layout "Cards": the stories sit in columns; the number of stories sets the number of columns.
@@ -102,7 +102,7 @@ All stories are printed into the page by the skin, so they are present in the pa
 - The prefilled story links and the notification strip link are "#", and the images are placeholders. The real links and images are still to be supplied.
 - Only the Macro views instance is prefilled in this folder. The layout, background and content of the other three instances are not recorded here.
 - Which story fields the article picker returns in TeamSite has not been confirmed here. The skin expects a title, description, thumbnail and link (or url).
-- The 2027 Outlook page has no address yet, so the live URL is not recorded.
+- The 2027 Outlook page is at `/en/insights/outlook-2027`; it launches December 2, 2026 and its content is placeholder until then.
 - Whether the page template gives visitors without scripts a way to see the section (see "All scripts off" above).
 
 ---
