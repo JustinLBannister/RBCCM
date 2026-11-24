@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { INCLUDE, TRANSFORMS, skip } from './package-rules.mjs';
+import { INCLUDE, TRANSFORMS, skip, strayCopies } from './package-rules.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -84,3 +84,7 @@ console.log('Package written: _package/' + NAME + '.zip');
 console.log('  ' + count + ' files, ' + (bytes / 1048576).toFixed(1) + ' MB unzipped, ' + zipMb + ' MB zipped');
 console.log('  ' + components.length + ' rbccm-* folders');
 if (missing.length) console.log('  not found, left out: ' + missing.join(', '));
+if (strayCopies.length) {
+  console.log('  WARNING: ' + strayCopies.length + ' stray copies left out (delete them):');
+  for (const rel of strayCopies) console.log('    ' + rel);
+}

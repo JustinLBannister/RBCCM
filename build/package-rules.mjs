@@ -47,9 +47,16 @@ export const SKIP_PATHS = [
 /* Left out by file type: office documents, archives, editor leftovers. */
 export const SKIP_EXT = ['.docx', '.pdf', '.pptx', '.key', '.zip', '.tmp'];
 
+/* A stray copy of a file: the same name with a space and a number
+   before the extension ("index 2.html"), as a file sync leaves behind
+   when two versions collide. Never part of the package. */
+export const isStrayCopy = (name) => / \d+(\.[^./]+)?$/.test(name);
+export const strayCopies = [];
+
 export function skip(rel) {
   const parts = rel.split('/');
   const base = parts[parts.length - 1];
+  if (isStrayCopy(base)) { strayCopies.push(rel); return true; }
   if (parts.some((p) => SKIP_NAMES.includes(p) || (p.startsWith('.') && !KEEP_DOT.includes(p)))) return true;
   if (SKIP_EXT.includes(path.extname(base).toLowerCase())) return true;
   return SKIP_PATHS.some((p) => (p.endsWith('/') ? (rel + '/').startsWith(p) : rel === p));
