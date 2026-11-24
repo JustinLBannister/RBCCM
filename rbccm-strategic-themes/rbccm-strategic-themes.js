@@ -172,8 +172,8 @@
   GRAPHICS.minerals = function (box, words) {
     var order = [0, 4, 2, 7, 5, 1, 8, 3, 6];
     var tiles = el('tiles');
-    [['3', 'Li', 'Lithium'], ['28', 'Ni', 'Nickel'], ['27', 'Co', 'Cobalt'], ['29', 'Cu', 'Copper'], ['6', 'C', 'Graphite'],
-      ['60', 'Nd', 'Rare earths'], ['25', 'Mn', 'Manganese'], ['92', 'U', 'Uranium'], ['13', 'Al', 'Aluminum']].forEach(function (m, i) {
+    [['3', 'Li', 'Lithium'], ['28', 'Ni', 'Nickel'], ['27', 'Co', 'Cobalt'], ['29', 'Cu', 'Copper'], ['1', 'KCl', 'Potash'],
+      ['30', 'Zn', 'Zinc'], ['79', 'Au', 'Gold'], ['92', 'U', 'Uranium'], ['13', 'Al', 'Aluminum']].forEach(function (m, i) {
       var wrap = el('tile-wrap pop', { '--t': '0.55s', '--d': (0.1 + i * 0.07).toFixed(2) + 's' });
       var tile = el('tile', { '--d': (1.2 + order[i] * 0.7).toFixed(2) + 's' });
       tile.appendChild(el('tile-num', null, m[0]));

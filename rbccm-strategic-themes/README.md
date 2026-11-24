@@ -53,7 +53,7 @@ All theme text and links are printed into the page by the skin, so they are pres
 - Two or more themes: the numbered tabs show. With pinned scroll turned on, it is used where the window allows. In pinned scroll the section is one screen tall for each theme, so five themes make it five screens tall.
 - One theme: it shows on its own with no tabs and no pinned scroll.
 - Graphics: 5 fixed designs (Defense, Minerals, AI, Energy, Canada) or None, one per theme.
-- Words on a graphic (guidance from this README and the field label, not enforced): up to three words for Minerals, Energy and Canada; four labels work best for AI; Defense shows none. Energy can also take a chart title before a colon.
+- Words on a graphic (guidance from this README and the field label, not enforced): up to three words for Minerals and Energy, up to four for Canada; four labels work best for AI; Defense shows none. Energy can also take a chart title before a colon.
 - Image in place of a graphic: shown as a square, cropped to fill. Square works best. No pixel size is stated.
 - Tabs: each tab shows its bar, number and short title at every width. On phones five tabs share the width, so a long word in a short title breaks across lines; keep short titles to one or two short words.
 - Tabs mode layout: text above the picture on phones, side by side from 768px. Pinned scroll below 992px: text above the picture, and the picture takes the height that is left (460px wide at most).
@@ -173,10 +173,10 @@ Each theme picks one of five graphics, drawn by the script. They are decoration 
 | Graphic | What it shows | Words on it |
 |---|---|---|
 | Defense | A radar: rings draw in, a beam sweeps round, blips ping as it passes. | None. |
-| Minerals | Nine element tiles (Li, Ni, Co, Cu, C, Nd, Mn, U, Al) that pop in and light up in turn. | Up to three words under the tiles. |
+| Minerals | Nine element tiles (Li, Ni, Co, Cu, KCl, Zn, Au, U, Al) that pop in and light up in turn. | Up to three words under the tiles. |
 | AI | A grid of cells with a wave of activity, above a value chain with a travelling dot. | The chain's labels (four works best). |
 | Energy | A rising bar chart with a trend line and a pulsing end point. | A chart title, then up to three words under the chart. |
-| Canada | A maple leaf outline filled with dots that flicker. | Up to three words under the leaf. |
+| Canada | A maple leaf outline filled with dots that flicker. | Up to four words under the leaf. |
 
 The words come from the theme's `GraphicCaption` field, separated by commas. For Energy the chart title comes first, before a colon: `Power demand: Generation, Grid, Storage`.
 
