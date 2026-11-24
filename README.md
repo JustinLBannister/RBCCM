@@ -248,10 +248,8 @@ live link the inventory shows.
   bundles are for review and for a future switch.
 - **jQuery, Slick and animate.css are not bundled.** The site loads them
   globally.
-- **Not in the picker yet:** Accordions, Expertise, Leading experts, In the
-  media, Featured insights, Marketo modal/footer, Brightcove background
-  layer, JSON Schema, Filtered content, Host profile, Insight list, Insight
-  cards, Strategic themes. Their
+- **Not in the picker:** Brightcove background layer, JSON Schema and
+  Filtered content, which have no preview page of their own. Their
   folders are here and they can still be built by name.
 - **XSL skins and properties** are pasted into TeamSite; the preview pages
   are local only.

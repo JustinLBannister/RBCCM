@@ -44,6 +44,17 @@ const PAGES = [
   { name: 'Disclaimer',       dir: 'rbccm-disclaimer',       file: 'local-test.html' },
   { name: 'Button',           dir: 'rbccm-button',           file: 'local-test.html' },
   { name: 'Animate',          dir: 'rbccm-animate',          file: 'local-test.html' },
+  { name: 'Insight cards',    dir: 'rbccm-insight-cards',    file: 'rbccm-insight-cards.html' },
+  { name: 'Strategic themes', dir: 'rbccm-strategic-themes', file: 'rbccm-strategic-themes.html' },
+  { name: 'Insight list',     dir: 'rbccm-insight-list',     file: 'rbccm-insight-list.html' },
+  { name: 'Featured insights', dir: 'rbccm-featured-insights', file: 'rbccm-featured-insights.html' },
+  { name: 'Expertise',        dir: 'rbccm-expertise',        file: 'rbccm-expertise.html' },
+  { name: 'Leading experts',  dir: 'rbccm-leading-experts',  file: 'rbccm-leading-experts.html' },
+  { name: 'Host profile',     dir: 'rbccm-host-profile',     file: 'rbccm-host-profile.html' },
+  { name: 'In the media',     dir: 'rbccm-in-the-media',     file: 'rbccm-in-the-media.html' },
+  { name: 'Accordions',       dir: 'rbccm-accordions',       file: 'rbccm-accordions.html' },
+  { name: 'Marketo footer',   dir: 'rbccm-marketo-footer',   file: 'local-test.html' },
+  { name: 'Marketo modal',    dir: 'rbccm-marketo-modal',    file: 'local-test.html' },
 ];
 
 // One copy of each shared library, whatever version a page asked for.

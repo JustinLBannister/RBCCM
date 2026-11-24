@@ -19,7 +19,7 @@ A review tool. It answers "what components exist and what do they look like" wit
 
 - It does not show live content. Components that read live rbccm.com feeds show their sample or fallback content here.
 - It is not a page on the website and is not a TeamSite component.
-- It does not include every component yet. The package README lists the ones not in the picker.
+- It leaves out the few components with no preview page of their own. The package README lists them.
 
 ### How to open it
 
